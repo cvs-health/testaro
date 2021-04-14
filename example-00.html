@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Example 00 | Autotest</title>
+    <meta
+      name="description"
+      content="Example of accessibility test automation"
+    >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main>
+      <h1>Autotest: Example 00</h1>
+      <section class="head">
+        <h2 class="headText">Instructions</h2>
+        <p>This example displays a form control with and without focus in 3 browsers.</p>
+      </section>
+      <div class="etc">
+        <section>
+          <h2>Example 00 (all answers are required)</h2>
+          <form method="POST" action="/autotest/example-00">
+            <p><label>
+              <span>URL of the page</span>
+              <input
+                name="url"
+                type="url"
+                size="80"
+                maxlength="150"
+                value="https://"
+                required
+              >
+            </label></p>
+            <p><label>
+              <span>Element type</span>
+              <select name="elementType" size="2" required>
+                <option value="a">a</option>
+                <option value="button">button</option>
+              </select>
+            </label></p>
+            <p><label>
+              <span>Element index (1 is first of its type, 2 second, etc.)</span>
+              <input
+                name="elementIndex"
+                type="number"
+                size="2"
+                maxlength="2"
+                step="1"
+                value="0"
+                required
+              >
+            </label></p>
+            <p><button>Submit</button></p>
+          </form>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
