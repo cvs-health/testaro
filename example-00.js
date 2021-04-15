@@ -20,7 +20,8 @@ exports.formHandler = globals => {
         clip: shotBox,
         path: `screenShots/example-00-off-${agent.name()}.png`
       });
-      await query.state === 'focus' ? element.focus() : element.hover();
+      // await query.state === 'focus' ? element.focus() : element.hover();
+      await element[query.state]();
       await page.screenshot({
         clip: shotBox,
         path: `screenShots/example-00-on-${agent.name()}.png`
