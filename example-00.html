@@ -16,7 +16,7 @@
       <h1>Autotest: Example 00</h1>
       <section class="head">
         <h2 class="headText">Instructions</h2>
-        <p>This example displays a form control with and without focus in 3 browsers.</p>
+        <p>This example displays a form control with and without focus or hover in 3 browsers.</p>
       </section>
       <div class="etc">
         <section>
@@ -36,7 +36,7 @@
             <p><label>
               <span>Element type</span>
               <select name="elementType" size="2" required>
-                <option value="a">a</option>
+                <option value="a" selected>a</option>
                 <option value="button">button</option>
               </select>
             </label></p>
@@ -48,9 +48,16 @@
                 size="2"
                 maxlength="2"
                 step="1"
-                value="0"
+                value="1"
                 required
               >
+            </label></p>
+            <p><label>
+              <span>State</span>
+              <select name="state" size="2" required>
+                <option value="focus" selected>focus</option>
+                <option value="hover">hover</option>
+              </select>
             </label></p>
             <p><button>Submit</button></p>
           </form>

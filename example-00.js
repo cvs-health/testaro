@@ -1,7 +1,8 @@
 // Handles a form submission.
 exports.formHandler = globals => {
   const {query} = globals;
-  if (globals.queryIncludes(['url', 'elementType', 'elementIndex'])) {
+  if (globals.queryIncludes(['url', 'elementType', 'elementIndex', 'state'])) {
+    query.State = query.state === 'focus' ? 'Focused' : 'Hovered';
     const {chromium, firefox, webkit} = require('playwright');
     const shoot = async agent => {
       const ui = await agent.launch();
@@ -17,12 +18,12 @@ exports.formHandler = globals => {
       };
       await page.screenshot({
         clip: shotBox,
-        path: `screenShots/example-00-blur-${agent.name()}.png`
+        path: `screenShots/example-00-off-${agent.name()}.png`
       });
-      await element.focus();
+      await query.state === 'focus' ? element.focus() : element.hover();
       await page.screenshot({
         clip: shotBox,
-        path: `screenShots/example-00-focus-${agent.name()}.png`
+        path: `screenShots/example-00-on-${agent.name()}.png`
       });
       await ui.close();
     };
