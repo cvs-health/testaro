@@ -17,6 +17,7 @@ globals.urlStart = `${process.env.PROTOCOL}://${process.env.HOST}`;
 const protocol = process.env.PROTOCOL || 'https';
 const mimeTypes = {
   '/example-00.html': 'text/html',
+  '/example-01.html': 'text/html',
   '/index.html': 'text/html',
   '/style.css': 'text/css'
 };
@@ -214,7 +215,7 @@ const requestHandler = (request, response) => {
       searchParams = new URLSearchParams(queryString);
       searchParams.forEach((value, name) => globals.query[name] = value);
       // If the request submitted the first step of an example:
-      if (/^\/example-\d0$/.test(pathName)) {
+      if (/^\/example-\d{2}$/.test(pathName)) {
         // Process the submission.
         require(`./example-${pathName.slice(-2)}`).formHandler(globals);
       }

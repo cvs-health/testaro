@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Example 01 | Autotest</title>
+    <meta
+      name="description"
+      content="Example of accessibility test automation"
+    >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main>
+      <h1>Autotest: Example 01</h1>
+      <section class="head">
+        <h2 class="headText">Instructions</h2>
+        <p>This example tabulates elements with <code>role</code> attributes.</p>
+      </section>
+      <div class="etc">
+        <section>
+          <h2>Example 01 (all answers are required)</h2>
+          <form method="POST" action="/autotest/example-01">
+            <p><label>
+              <span>URL of the page</span>
+              <input
+                name="url"
+                type="url"
+                size="80"
+                maxlength="150"
+                value="https://"
+                required
+              >
+            </label></p>
+            <p><button>Submit</button></p>
+          </form>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>

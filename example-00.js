@@ -1,6 +1,5 @@
 // Handles a form submission.
 exports.formHandler = globals => {
-  // Add the manager username and computed email to the query.
   const {query} = globals;
   if (globals.queryIncludes(['url', 'elementType', 'elementIndex'])) {
     const {chromium, firefox, webkit} = require('playwright');
