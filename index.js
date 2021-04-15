@@ -161,12 +161,20 @@ const requestHandler = (request, response) => {
       // Identify a query object, presupposing no query name occurs twice.
       searchParams = url.searchParams;
       searchParams.forEach((value, name) => globals.query[name] = value);
-      const type = mimeTypes[pathName];
+      let type = mimeTypes[pathName];
+      let encoding;
+      if (type) {
+        encoding = 'utf8';
+      }
+      else if (pathName.endsWith('.png')) {
+        type = 'image/png';
+        encoding = null;
+      }
       const target = redirects[pathName];
       // If a requestable static file is requested:
       if (type) {
         // Get the file content.
-        globals.fs.readFile(pathName.slice(1), 'utf8')
+        globals.fs.readFile(pathName.slice(1), encoding)
         .then(
           // When it has arrived, serve it.
           content => globals.servePage(content, pathName, type, response),

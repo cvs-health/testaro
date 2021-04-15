@@ -1,0 +1,107 @@
+*:focus {
+  outline: solid 0.2rem #00f;
+  outline-offset: 0.2rem;
+}
+body {
+  margin: 2rem 0;
+  font-size: large;
+}
+button {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.5rem;
+  border: solid 0.2rem #c00;
+  border-radius: 1rem;
+  font-size: inherit;
+  font-weight: 700;
+  color: #fff;
+  background-color: #c00;
+}
+button:hover {
+  color: #000;
+  border: solid 0.2rem #000;
+  background-color: #fff;
+}
+caption {
+  margin-bottom: 1rem;
+  font-weight: bold;
+  font-style: italic;
+}
+.dfn {
+  margin: auto 2rem;
+  padding: 0.5rem;
+  max-width: 30rem;
+  border: 1px white dashed;
+  font-style: italic;
+}
+.dl {
+  margin: 0 1rem;
+}
+.etc {
+  padding: 1rem 2rem;
+  color: #000;
+  background-color: #fff;
+}
+form {
+  margin-top: 1rem;
+}
+h1 {
+  padding-left: 2rem;
+}
+h1, h2 {
+  color: #006666;
+}
+section {
+  max-width: 36rem;
+}
+h2 {
+  margin: 0;
+}
+h2.headText {
+  color: #fff;
+}
+.head {
+  padding: 1rem 2rem;
+  color: #fff;
+  background-color: #066;
+}
+.head a {
+  color: #eef;
+}
+.head a:visited {
+  color: #fdf;
+}
+input, select {
+  margin: 0.5rem 0;
+  font-size: inherit;
+}
+label {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+label:hover > span {
+  background-color: #ddd;
+}
+label > span:first-child {
+  font-weight: 600;
+}
+p {
+  margin: 0.5rem 0 0.25rem 0;
+}
+pre {
+  margin-left: 2rem;
+}
+table {
+  border-collapse: collapse;
+}
+tbody td {
+  border: 1px gray solid;
+}
+tbody th {
+  padding-right: 1rem;
+  text-align: right;
+}
+thead th {
+  padding-bottom: 1rem;
+}
