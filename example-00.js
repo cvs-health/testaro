@@ -9,7 +9,7 @@ exports.formHandler = globals => {
       const page = await ui.newPage();
       await page.goto(query.url);
       const element = await page.$(`:nth-match(${query.elementType}, ${query.elementIndex})`);
-      const elementBox = await element.boundingBox();
+      let elementBox = await element.boundingBox();
       const shotBox = {
         x: elementBox.x - 10,
         y: elementBox.y - 10,
