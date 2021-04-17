@@ -14,17 +14,33 @@ exports.formHandler = globals => {
       const textContent = await element.textContent();
       return textContent.length > max ? `${textContent.slice(0, max)}&hellip;` : textContent;
     };
+    // Rounds the values of the properties of a bounding box.
+    const rounded = box => {
+      const outBox = {};
+      ['x', 'y', 'width', 'height'].forEach(prop => {
+        outBox[prop] = Math.round(box[prop]);
+      });
+      return outBox;
+    };
     // Returns the bounding box of an element.
-    const realBox = async (minWidth, minHeight, element) => {
+    const realBox = async (stateToggle, agentName, minWidth, minHeight, page, element) => {
       const ownBox = await element.boundingBox();
-      console.log(`ownBox is ${JSON.stringify(ownBox, null, 2)}`);
+      boxes[stateToggle][agentName] = {own: rounded(ownBox)};
+      /*
+      // TESTING START
+      const afterHeight = await page.$$eval(
+        'a', linkArray => window.getComputedStyle(linkArray[15], '::after').height
+      );
+      console.log(`Height of ::after pseudo-element is ${afterHeight}`);
+      // TESTING END
+      */
       if (ownBox.width >= minWidth && ownBox.height >= minHeight) {
         return ownBox;
       }
       else {
         const parentElement = await element.getProperty('parentElement');
         const parentBox = await parentElement.boundingBox();
-        console.log(`parentBox is ${JSON.stringify(parentBox, null, 2)}`);
+        boxes[stateToggle][agentName].parent = rounded(parentBox);
         return parentBox;
       }
     };
@@ -44,8 +60,10 @@ exports.formHandler = globals => {
       if (! globals.response.writableEnded) {
         // If specified, change the element state.
         await hasState ? element[query.state]() : Promise.resolve('');
+        await element.scrollIntoViewIfNeeded();
+        const stateToggle = hasState ? 'on' : 'off';
         // Identify the bounding box of the element.
-        let elementBox = await realBox(10, 10, element);
+        let elementBox = await realBox(stateToggle, agent.name(), 10, 10, page, element);
         const text = await textSample(element, 40);
         // If it has one:
         if (elementBox) {
@@ -79,14 +97,10 @@ exports.formHandler = globals => {
           }
           // Otherwise, i.e. if the bounding box is valid:
           else {
-            const toggle = hasState ? 'on' : 'off';
-            // Record it.
-            boxes[toggle][agent.name()] = elementBox;
             // Make and report a screen shot of it.
             await page.screenshot({
               clip: shotBox(10, elementBox),
-              fullPage: true,
-              path: `screenShots/example-00-${toggle}-${agent.name()}.png`
+              path: `screenShots/example-00-${stateToggle}-${agent.name()}.png`
             });
           }
         }
@@ -115,8 +129,6 @@ exports.formHandler = globals => {
       // If the specified element exists on the specified page:
       if (element) {
         // Make 2 screen shots of it.
-
-        console.log(agent.name());
         await shoot(page, element, false, agent);
         await shoot(page, element, true, agent);
         ui.close();
