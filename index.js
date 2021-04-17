@@ -104,27 +104,29 @@ globals.servePage = (content, newURL, mimeType, response) => {
 globals.queryIncludes = params => params.every(param => globals.query[param]);
 // Replaces the placeholders in a page and optionally serves the page.
 globals.render = (pageName, isServable) => {
-  // Get the page.
-  return globals.fs.readFile(`${pageName}.html`, 'utf8')
-  .then(
-    // When it arrives:
-    page => {
-      // Replace its placeholders with eponymous query parameters.
-      const renderedPage = page.replace(/__([a-zA-Z]+)__/g, (ph, qp) => globals.query[qp]);
-      // If the page is ready to serve:
-      if (isServable) {
-        // Serve it.
-        globals.servePage(renderedPage, `/${pageName}.html`, 'text/html', globals.response);
-        return '';
-      }
-      // Otherwise, i.e. if the page needs modification before it is served:
-      else {
-        // Return the rendered page.
-        return renderedPage;
-      }
-    },
-    error => globals.serveError(new Error(error), globals.response)
-  );
+  if (! globals.response.writableEnded) {
+    // Get the page.
+    return globals.fs.readFile(`${pageName}.html`, 'utf8')
+    .then(
+      // When it arrives:
+      page => {
+        // Replace its placeholders with eponymous query parameters.
+        const renderedPage = page.replace(/__([a-zA-Z]+)__/g, (ph, qp) => globals.query[qp]);
+        // If the page is ready to serve:
+        if (isServable) {
+          // Serve it.
+          globals.servePage(renderedPage, `/${pageName}.html`, 'text/html', globals.response);
+          return '';
+        }
+        // Otherwise, i.e. if the page needs modification before it is served:
+        else {
+          // Return the rendered page.
+          return renderedPage;
+        }
+      },
+      error => globals.serveError(new Error(error), globals.response)
+    );
+  }
 };
 // Serves a redirection.
 globals.redirect = (url, response) => {
