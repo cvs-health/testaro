@@ -18,6 +18,7 @@ const protocol = process.env.PROTOCOL || 'https';
 const mimeTypes = {
   '/example-00.html': 'text/html',
   '/example-01.html': 'text/html',
+  '/example-02.html': 'text/html',
   '/index.html': 'text/html',
   '/style.css': 'text/css'
 };
