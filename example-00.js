@@ -123,20 +123,18 @@ exports.formHandler = globals => {
       if (! globals.response.writableEnded) {
         // If specified, change the element state.
         await hasState ? element[query.state]() : Promise.resolve('');
-        // Ensure that the element is within the viewport.
-        // await element.scrollIntoViewIfNeeded();
         // Make and report a screen shot of the element.
         await page.screenshot({
-          clip: getShotBox(10, reportBox),
+          clip: getShotBox(15, reportBox),
           path: `screenShots/example-00-${hasState ? 'on' : 'off'}-${agent.name()}.png`,
           fullPage: true
         });
       }
     };
     // Creates and records 2 screen shots in a browser.
-    const shootBoth = async (agent, findsBox) => {
+    const shootBoth = async (agent, findsBox, headless, slowMo) => {
       // Launch a Browser of the specified type.
-      const ui = await agent.launch();
+      const ui = await agent.launch({headless, slowMo});
       // Identify a Page (tab).
       const page = await ui.newPage();
       // Navigate to the specified URL.
@@ -151,6 +149,7 @@ exports.formHandler = globals => {
         if (reportBox) {
           // Make 2 screen shots of the element.
           await shoot(page, element, false, agent);
+          await element.scrollIntoViewIfNeeded();
           await shoot(page, element, true, agent);
           // Quit the browser.
           ui.close();
@@ -174,9 +173,9 @@ exports.formHandler = globals => {
     // FUNCTION DEFINITIONS END
     (async () => {
       // Make the screen shots.
-      await shootBoth(chromium, true);
-      await shootBoth(firefox, false);
-      await shootBoth(webkit, false);
+      await shootBoth(chromium, true, true, 0);
+      await shootBoth(firefox, false, true, 0);
+      await shootBoth(webkit, false, true, 0);
       // Replace the placeholders and serve the step-2 view.
       globals.render('example-00-out', true);
     })();
