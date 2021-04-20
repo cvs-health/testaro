@@ -2,6 +2,8 @@
 exports.formHandler = globals => {
   const {query} = globals;
   if (globals.queryIncludes(['url', 'elementType', 'elementIndex', 'state'])) {
+    const minHeight = 10;
+    const minWidth = 10;
     query.State = query.state === 'focus' ? 'Focused' : 'Hovered';
     const {chromium, firefox, webkit} = require('playwright');
     const boxes = {
@@ -22,25 +24,41 @@ exports.formHandler = globals => {
       });
       return outBox;
     };
-    // Returns the bounding box of an element.
-    const realBox = async (stateToggle, agentName, minWidth, minHeight, page, element) => {
-      const ownBox = await element.boundingBox();
+    // Returns the JSON representation of the value of a property of an ElementHandle.
+    const jsonValue = async (element, propertyName) => {
+      const jsHandleValue = await element.getProperty(propertyName);
+      const jsValue = await jsHandleValue.jsonValue();
+      return jsValue;
+    };
+    // Returns the bounding box of an ElementHandle.
+    const boundingBox = async element => {
+      const box = {};
+      box.x = await jsonValue(element, 'offsetLeft');
+      box.y = await jsonValue(element, 'offsetTop');
+      box.width = await jsonValue(element, 'offsetWidth');
+      box.height = await jsonValue(element, 'offsetHeight');
+      return box;
+    };
+    // Returns the reportable bounding box of an element.
+    const reportBox = async (stateToggle, agentName, minWidth, minHeight, page, element) => {
+      // Identify the bounding box of the element itself.
+      const ownBox = await boundingBox(element);
+      // Report it.
       boxes[stateToggle][agentName] = {own: rounded(ownBox)};
-      /*
-      // TESTING START
-      const afterHeight = await page.$$eval(
-        'a', linkArray => window.getComputedStyle(linkArray[15], '::after').height
-      );
-      console.log(`Height of ::after pseudo-element is ${afterHeight}`);
-      // TESTING END
-      */
+      // If it is large enough:
       if (ownBox.width >= minWidth && ownBox.height >= minHeight) {
+        // Return the bounding box.
         return ownBox;
       }
+      // Otherwise, i.e. if it is too small:
       else {
-        const parentElement = await element.getProperty('parentElement');
-        const parentBox = await parentElement.boundingBox();
+        // Identify the parent element of the element.
+        const parent = await element.getProperty('parentElement');
+        // Identify the bounding box of the parent.
+        const parentBox = await boundingBox(parent);
+        // Report it.
         boxes[stateToggle][agentName].parent = rounded(parentBox);
+        // Return the bounding box.
         return parentBox;
       }
     };
@@ -60,12 +78,16 @@ exports.formHandler = globals => {
       if (! globals.response.writableEnded) {
         // If specified, change the element state.
         await hasState ? element[query.state]() : Promise.resolve('');
+        // Ensure that the element is within the viewport.
         await element.scrollIntoViewIfNeeded();
         const stateToggle = hasState ? 'on' : 'off';
-        // Identify the bounding box of the element.
-        let elementBox = await realBox(stateToggle, agent.name(), 10, 10, page, element);
+        // Identify the reportable bounding box of the element.
+        let elementBox = await reportBox(
+          stateToggle, agent.name(), minWidth, minHeight, page, element
+        );
+        // Identify a sample of the text content of the element.
         const text = await textSample(element, 40);
-        // If it has one:
+        // If the element has a reportable bounding box:
         if (elementBox) {
           // If the origin of the bounding box is above or to the left of the page:
           if (
@@ -84,7 +106,7 @@ exports.formHandler = globals => {
             );
           }
           // Otherwise, if the bounding box is 0 or 1 pixel in either dimension:
-          else if (elementBox.width < 2 || elementBox.height < 2) {
+          else if (elementBox.width < minWidth || elementBox.height < minHeight) {
             // Report the error.
             globals.serveMessage(
               `
@@ -100,7 +122,8 @@ exports.formHandler = globals => {
             // Make and report a screen shot of it.
             await page.screenshot({
               clip: shotBox(10, elementBox),
-              path: `screenShots/example-00-${stateToggle}-${agent.name()}.png`
+              path: `screenShots/example-00-${stateToggle}-${agent.name()}.png`,
+              fullPage: true
             });
           }
         }
@@ -118,15 +141,15 @@ exports.formHandler = globals => {
     };
     // Creates and records 2 screen shots in a browser.
     const shootBoth = async agent => {
-      // Launch the specified browser.
+      // Identify a Browser of the specified type.
       const ui = await agent.launch();
-      // Open an empty window.
+      // Identify a Page (tab).
       const page = await ui.newPage();
-      // Visit the specified page.
+      // Navigate to the specified URL.
       await page.goto(query.url);
-      // Identify the specified element.
+      // Identify the specified ElementHandle.
       const element = await page.$(`:nth-match(${query.elementType}, ${query.elementIndex})`);
-      // If the specified element exists on the specified page:
+      // If it exists:
       if (element) {
         // Make 2 screen shots of it.
         await shoot(page, element, false, agent);
