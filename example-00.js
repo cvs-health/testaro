@@ -6,6 +6,7 @@ exports.formHandler = globals => {
     const minWidth = 10;
     query.State = query.state === 'focus' ? 'Focused' : 'Hovered';
     const {chromium, firefox, webkit} = require('playwright');
+    const elementBoxJSON = '';
     const boxes = {
       off: {},
       on: {}
@@ -25,6 +26,7 @@ exports.formHandler = globals => {
       return outBox;
     };
     // Returns the JSON representation of the value of a property of an ElementHandle.
+    /*
     const jsonValue = async (element, propertyName) => {
       const jsHandleValue = await element.getProperty(propertyName);
       const jsValue = await jsHandleValue.jsonValue();
@@ -39,10 +41,25 @@ exports.formHandler = globals => {
       box.height = await jsonValue(element, 'offsetHeight');
       return box;
     };
+    */
+    // Returns the client rectangle of a JSHandle as JSON.
+    const boxJSON = async element => {
+      const elementBox = await element.evaluate(el => {
+        const domRect = el.getBoundingClientRect();
+        const objRect = {
+          x: domRect.x,
+          y: domRect.y,
+          width: domRect.width,
+          height: domRect.height
+        };
+        return JSON.stringify(objRect, null, 2);
+      });
+    };
     // Returns the reportable bounding box of an element.
-    const reportBox = async (stateToggle, agentName, minWidth, minHeight, page, element) => {
+    const reportBox = async (stateToggle, agentName, minWidth, minHeight, element) => {
       // Identify the bounding box of the element itself.
-      const ownBox = await boundingBox(element);
+      const ownBoxJSON = await boxJSON(element);
+      const ownBox = JSON.parse(ownBoxJSON);
       // Report it.
       boxes[stateToggle][agentName] = {own: rounded(ownBox)};
       // If it is large enough:
@@ -55,7 +72,8 @@ exports.formHandler = globals => {
         // Identify the parent element of the element.
         const parent = await element.getProperty('parentElement');
         // Identify the bounding box of the parent.
-        const parentBox = await boundingBox(parent);
+        const parentBoxJSON = await boxJSON(parent);
+        const parentBox = JSON.parse(parentBoxJSON);
         // Report it.
         boxes[stateToggle][agentName].parent = rounded(parentBox);
         // Return the bounding box.
@@ -74,16 +92,16 @@ exports.formHandler = globals => {
       };
     };
     // Creates and records a screen shot.
-    const shoot = async (page, element, hasState, agent) => {
+    const shoot = async (page, element, hasState, agent, boxJSON) => {
       if (! globals.response.writableEnded) {
         // If specified, change the element state.
         await hasState ? element[query.state]() : Promise.resolve('');
         // Ensure that the element is within the viewport.
-        await element.scrollIntoViewIfNeeded();
+        // await element.scrollIntoViewIfNeeded();
         const stateToggle = hasState ? 'on' : 'off';
         // Identify the reportable bounding box of the element.
         let elementBox = await reportBox(
-          stateToggle, agent.name(), minWidth, minHeight, page, element
+          stateToggle, agent.name(), minWidth, minHeight, element
         );
         // Identify a sample of the text content of the element.
         const text = await textSample(element, 40);
@@ -151,9 +169,11 @@ exports.formHandler = globals => {
       const element = await page.$(`:nth-match(${query.elementType}, ${query.elementIndex})`);
       // If it exists:
       if (element) {
+        // Identify its known or not-yet-known location.
+        const boxJSON = elementBoxJSON || await boxJSON(element);
         // Make 2 screen shots of it.
-        await shoot(page, element, false, agent);
-        await shoot(page, element, true, agent);
+        await shoot(page, element, false, agent, boxJSON);
+        await shoot(page, element, true, agent, boxJSON);
         ui.close();
       }
       // Otherwise, i.e. if the element does not exist:
