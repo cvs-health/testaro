@@ -8,7 +8,7 @@ exports.formHandler = globals => {
     const {chromium, firefox, webkit} = require('playwright');
     let reportBox;
     // FUNCTION DEFINITIONS START
-    // Return a semple of the text content of an element.
+    // Return a sample of the text content of an element.
     const getTextSample = async (element, maxLength) => {
       const textContent = await element.textContent();
       const isShort = textContent.length <= maxLength;
