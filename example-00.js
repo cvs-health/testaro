@@ -30,19 +30,12 @@ exports.formHandler = globals => {
     };
     // Validates the location and size of a bounding box.
     const validateBox = async (box, isFinal, element) => {
-      // If the box is above or before the document:
-      if (box.x < 0 || box.y < 0) {
-        // Report the error.
-        await reportBadBox(box, element, true);
-        // Return the result.
-        return [false, null];
-      }
-      // Otherwise, if the box is too small:
-      else if (box.width < minWidth || box.height < minHeight) {
+      // If the box does not exist or is too small:
+      if (! box || box.width < minWidth || box.height < minHeight) {
         // If it is the final box:
         if (isFinal) {
           // Report the error.
-          await reportBadBox(box, element, true);
+          await reportBadBox(box, element, false);
           // Return the result.
           return [true, false];
         }
@@ -51,6 +44,13 @@ exports.formHandler = globals => {
           // Return the result.
           return [true, false];
         }
+      }
+      // Otherwise, if the box is above or before the document:
+      else if (box.x < 0 || box.y < 0) {
+        // Report the error.
+        await reportBadBox(box, element, true);
+        // Return the result.
+        return [false, null];
       }
       // Otherwise, i.e. if the box is valid:
       else {
@@ -63,28 +63,28 @@ exports.formHandler = globals => {
       // Get and validate the element’s own bounding box.
       const ownBox = await element.boundingBox();
       const ownBoxResults = await validateBox(ownBox, false, element);
-      // If it is within the document:
+      // If it does not exist or is within the document:
       if (ownBoxResults[0]) {
-        // If it is large enough:
+        // If it exists and is large enough:
         if (ownBoxResults[1]) {
           // Return it.
           return ownBox;
         }
-        // Otherwise, i.e. if it is too small:
+        // Otherwise, i.e. if it does not exist or is too small:
         else {
           // Identify the parent element of the element.
           const parent = await element.getProperty('parentElement');
           // Get and validate the parent’s bounding box.
           const parentBox = await parent.boundingBox();
           const parentBoxResults = await validateBox(parentBox, false, parent);
-          // If it is within the document:
+          // If it does not exist or is within the document:
           if (parentBoxResults[0]) {
-            // If it is large enough:
+            // If it exists and is large enough:
             if (parentBoxResults[1]) {
               // Return it.
               return parentBox;
             }
-            // Otherwise, i.e. if it is too small:
+            // Otherwise, i.e. if it does not exist or is too small:
             else {
               // Identify the grandparent element of the element.
               const grandparent = await parent.getProperty('parentElement');
@@ -149,7 +149,7 @@ exports.formHandler = globals => {
         if (reportBox) {
           // Make 2 screen shots of the element.
           await shoot(page, element, false, agent);
-          await element.scrollIntoViewIfNeeded();
+          // await element.scrollIntoViewIfNeeded();
           await shoot(page, element, true, agent);
           // Quit the browser.
           ui.close();
@@ -174,8 +174,10 @@ exports.formHandler = globals => {
     (async () => {
       // Make the screen shots.
       await shootBoth(chromium, true, true, 0);
-      await shootBoth(firefox, false, true, 0);
-      await shootBoth(webkit, false, true, 0);
+      if (reportBox) {
+        await shootBoth(firefox, false, true, 0);
+        await shootBoth(webkit, false, true, 0);
+      }
       // Replace the placeholders and serve the step-2 view.
       globals.render('example-00-out', true);
     })();
