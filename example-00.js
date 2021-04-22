@@ -7,6 +7,7 @@ exports.formHandler = globals => {
     query.State = query.state === 'focus' ? 'Focused' : 'Hovered';
     const {chromium, firefox, webkit} = require('playwright');
     let reportBox;
+    let margin = 20;
     let reportElement;
     let reportLevel = 0;
     // FUNCTION DEFINITIONS START
@@ -63,6 +64,13 @@ exports.formHandler = globals => {
     // Returns the reportable bounding box of an element and records the box’s element.
     const getReportBox = async (element) => {
       // Get and validate the element’s own bounding box.
+      if (query.elementType === 'input' && query.state === 'hover') {
+        const labels = await element.getProperty('labels');
+        const labelCount = await labels.getProperty('length');
+        if (labelCount) {
+          margin = 50;
+        }
+      }
       const ownBox = await element.boundingBox();
       const ownBoxResults = await validateBox(ownBox, false, element);
       // If it does not exist or is within the document:
@@ -156,7 +164,7 @@ exports.formHandler = globals => {
         }
         // Make and report a screen shot of the element.
         await page.screenshot({
-          clip: getShotBox(15, reportBox),
+          clip: getShotBox(margin, reportBox),
           path: `screenShots/example-00-${hasState ? 'on' : 'off'}-${agent.name()}.png`,
           fullPage: true
         });
