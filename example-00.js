@@ -13,7 +13,8 @@ exports.formHandler = globals => {
     // FUNCTION DEFINITIONS START
     // Return a sample of the text content of an element.
     const getTextSample = async (element, maxLength) => {
-      const textContent = await element.textContent();
+      let textContent = await element.textContent();
+      textContent = textContent.replace(/[<>]/g, ' ');
       const isShort = textContent.length <= maxLength;
       return isShort ? textContent : `${textContent.slice(0, maxLength)}&hellip;`;
     };
@@ -32,7 +33,7 @@ exports.formHandler = globals => {
       );
     };
     // Validates the location and size of a bounding box.
-    const validateBox = async (box, isFinal, element) => {
+    const validateBox = async (box, isFinal, element, boxElement) => {
       // If the box does not exist or is too small:
       if (! box || box.width < minWidth || box.height < minHeight) {
         // If it is the final box:
@@ -72,7 +73,7 @@ exports.formHandler = globals => {
         }
       }
       const ownBox = await element.boundingBox();
-      const ownBoxResults = await validateBox(ownBox, false, element);
+      const ownBoxResults = await validateBox(ownBox, false, element, element);
       // If it does not exist or is within the document:
       if (ownBoxResults[0]) {
         // If it exists and is large enough:
@@ -87,7 +88,7 @@ exports.formHandler = globals => {
           const parent = await element.getProperty('parentElement');
           // Get and validate the parent’s bounding box.
           const parentBox = await parent.boundingBox();
-          const parentBoxResults = await validateBox(parentBox, false, parent);
+          const parentBoxResults = await validateBox(parentBox, false, element, parent);
           // If it does not exist or is within the document:
           if (parentBoxResults[0]) {
             // If it exists and is large enough:
@@ -103,7 +104,9 @@ exports.formHandler = globals => {
               const grandparent = await parent.getProperty('parentElement');
               // Get and validate the grandparent’s bounding box.
               const grandparentBox = await grandparent.boundingBox();
-              const grandparentBoxResults = await validateBox(grandparentBox, true, grandparent);
+              const grandparentBoxResults = await validateBox(
+                grandparentBox, true, element, grandparent
+              );
               // If it is valid:
               if (grandparentBoxResults[1]) {
                 // Return it.
