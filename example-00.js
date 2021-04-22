@@ -182,7 +182,8 @@ exports.formHandler = globals => {
       // Navigate to the specified URL.
       await page.goto(query.url);
       // Identify the specified ElementHandle.
-      const element = await page.$(`:nth-match(${query.elementType}, ${query.elementIndex})`);
+      const selector = `${query.elementType}:visible`;
+      const element = await page.$(`:nth-match(${selector}, ${query.elementIndex})`);
       // If it exists:
       if (element) {
         // Record the bounding box if specified.
