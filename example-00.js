@@ -7,6 +7,8 @@ exports.formHandler = globals => {
     query.State = query.state === 'focus' ? 'Focused' : 'Hovered';
     const {chromium, firefox, webkit} = require('playwright');
     let reportBox;
+    let reportElement;
+    let reportLevel = 0;
     // FUNCTION DEFINITIONS START
     // Return a sample of the text content of an element.
     const getTextSample = async (element, maxLength) => {
@@ -58,7 +60,7 @@ exports.formHandler = globals => {
         return [true, true];
       }
     };
-    // Returns the reportable bounding box of an element.
+    // Returns the reportable bounding box of an element and records the box’s element.
     const getReportBox = async (element) => {
       // Get and validate the element’s own bounding box.
       const ownBox = await element.boundingBox();
@@ -68,6 +70,7 @@ exports.formHandler = globals => {
         // If it exists and is large enough:
         if (ownBoxResults[1]) {
           // Return it.
+          reportElement = element;
           return ownBox;
         }
         // Otherwise, i.e. if it does not exist or is too small:
@@ -82,6 +85,8 @@ exports.formHandler = globals => {
             // If it exists and is large enough:
             if (parentBoxResults[1]) {
               // Return it.
+              reportElement = parent;
+              reportLevel = 1;
               return parentBox;
             }
             // Otherwise, i.e. if it does not exist or is too small:
@@ -94,6 +99,8 @@ exports.formHandler = globals => {
               // If it is valid:
               if (grandparentBoxResults[1]) {
                 // Return it.
+                reportElement = grandparent;
+                reportLevel = 2;
                 return grandparentBox;
               }
               else {
@@ -121,8 +128,32 @@ exports.formHandler = globals => {
     // Creates and records a screen shot.
     const shoot = async (page, element, hasState, agent) => {
       if (! globals.response.writableEnded) {
-        // If specified, change the element state.
-        await hasState ? element[query.state]() : Promise.resolve('');
+        // If a state change is required:
+        if (hasState) {
+          // If to a focus state:
+          if (query.state === 'focus') {
+            // Put the element into a focus state.
+            await element.focus();
+          }
+          // Otherwise, if to a hover state:
+          else if (query.state === 'hover') {
+            // Put the reportable element into a hover state.
+            if (reportElement) {
+              await reportElement.hover();
+            }
+            else if (reportLevel === 0) {
+              await element.hover();
+            }
+            else if (reportLevel === 1) {
+              await element.getProperty('parentElement').then(el => el.hover());
+            }
+            else if (reportLevel === 2) {
+              await element.getProperty('parentElement')
+              .then(pe => pe.getProperty('parentElement'))
+              .then(ge => ge.hover());
+            }
+          }
+        }
         // Make and report a screen shot of the element.
         await page.screenshot({
           clip: getShotBox(15, reportBox),
@@ -152,6 +183,7 @@ exports.formHandler = globals => {
           // await element.scrollIntoViewIfNeeded();
           await shoot(page, element, true, agent);
           // Quit the browser.
+          reportElement = null;
           ui.close();
         }
         else {
