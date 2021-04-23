@@ -48,9 +48,11 @@ exports.formHandler = globals => {
         });
         // If this element is the last one processed:
         if (++done === elements.length) {
-          // Output the result, sorted by element order in the DOM.
+          // Sort the tabulation by DOM order.
           tally.sort((a, b) => a.index - b.index);
+          // Convert the tabulation to JSON.
           query.tally = JSON.stringify(tally, null, 2);
+          // Render and serve a report.
           globals.render('example-03-out', true);
         }
       });

@@ -14,7 +14,7 @@ exports.formHandler = globals => {
       const elements = await page.$$('[role]');
       const list = [];
       // For each ElementHandle:
-      elements.forEach(async element => {
+      elements.forEach(async (element, index) => {
         // Identify a JSHandle for its type.
         const tagHandle = await element.getProperty('tagName');
         // Identify the upper-case name of the type.
@@ -23,14 +23,20 @@ exports.formHandler = globals => {
         const tag = ucTag.toLowerCase();
         // Identify the value of its role attribute.
         const role = await element.getAttribute('role');
-        // Add the type and role to the list.
-        list.push([tag, role]);
-        // When all matching elements have been processed:
+        // Add the index, type, and role to the list.
+        list.push([index, tag, role]);
+        // If all matching elements have been processed:
         if (list.length === elements.length) {
-          // Populate an array of HTML list elements.
+          // Sort the list by index.
+          list.sort((a, b) => a.index - b.index);
+          // Cenvert it to an array of HTML list elements.
           const htmlList = [];
           list.forEach(item => {
-            htmlList.push(`<li>Element ${item[0]} has role ${item[1]}.</li>`);
+            htmlList.push(
+              `<li>
+                ${item[0]}. Element <code>${item[1]}</code> has role <code>${item[2]}</code>.
+              </li>`
+            );
           });
           // Concatenate the array elements.
           query.report = htmlList.join('\n            ');

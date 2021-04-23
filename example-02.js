@@ -35,7 +35,7 @@ exports.formHandler = globals => {
         }
         // If the element is the last one processed:
         if (++done === elements.length) {
-          // Output the report.
+          // Render and serve a report.
           query.tally = JSON.stringify(tally, null, 2);
           globals.render('example-02-out', true);
         }

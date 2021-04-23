@@ -222,7 +222,7 @@ exports.formHandler = globals => {
         await shootBoth(firefox, false, true, 0);
         await shootBoth(webkit, false, true, 0);
       }
-      // Replace the placeholders and serve the step-2 view.
+      // Render and serve a report.
       globals.render('example-00-out', true);
     })();
   }
