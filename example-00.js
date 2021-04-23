@@ -192,7 +192,6 @@ exports.formHandler = globals => {
         if (reportBox) {
           // Make 2 screen shots of the element.
           await shoot(page, element, false, agent);
-          // await element.scrollIntoViewIfNeeded();
           await shoot(page, element, true, agent);
           // Quit the browser.
           reportElement = null;
