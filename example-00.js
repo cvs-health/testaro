@@ -39,7 +39,7 @@ exports.formHandler = globals => {
         // If it is the final box:
         if (isFinal) {
           // Report the error.
-          await reportBadBox(box, element, false);
+          await reportBadBox(box, boxElement, false);
           // Return the result.
           return [true, false];
         }
@@ -64,14 +64,16 @@ exports.formHandler = globals => {
     };
     // Returns the reportable bounding box of an element and records the box’s element.
     const getReportBox = async (element) => {
-      // Get and validate the element’s own bounding box.
+      // If the specified element is an input and the state is hover:
       if (query.elementType === 'input' && query.state === 'hover') {
+        // Increase the margin if the element is labeled.
         const labels = await element.getProperty('labels');
         const labelCount = await labels.getProperty('length');
         if (labelCount) {
           margin = 50;
         }
       }
+      // Get and validate the element’s own bounding box.
       const ownBox = await element.boundingBox();
       const ownBoxResults = await validateBox(ownBox, false, element, element);
       // If it does not exist or is within the document:
@@ -115,14 +117,14 @@ exports.formHandler = globals => {
                 return grandparentBox;
               }
               else {
-                return Promise.resolve(null);
+                return Promise.resolve({});
               }
             }
           }
         }
       }
       else {
-        return Promise.resolve(null);
+        return Promise.resolve({});
       }
     };
     // Returns a clipping object for a screenshot with a margin around a bounding box.
@@ -187,9 +189,11 @@ exports.formHandler = globals => {
       // If it exists:
       if (element) {
         // Record the bounding box if specified.
-        await findsBox ? (reportBox = await getReportBox(element)) : Promise.resolve('');
+        if (findsBox) {
+          reportBox = await getReportBox(element);
+        }
         // If a reportable bounding box exists:
-        if (reportBox) {
+        if (reportBox.width) {
           // Make 2 screen shots of the element.
           await shoot(page, element, false, agent);
           await shoot(page, element, true, agent);
