@@ -219,9 +219,9 @@ const requestHandler = (request, response) => {
       searchParams = new URLSearchParams(queryString);
       searchParams.forEach((value, name) => globals.query[name] = value);
       // If the request submitted the first step of a test:
-      if (/^\/tests\/-[-^w]+$/.test(pathName)) {
+      if (/^\/tests\/[-^w]+$/.test(pathName)) {
         // Process the submission.
-        require(`.${pathName.slice}/app`).formHandler(globals);
+        require(`.${pathName}/app`).formHandler(globals);
       }
       // Otherwise, i.e. if the request was invalid:
       else {
