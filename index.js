@@ -17,6 +17,7 @@ globals.urlStart = `${process.env.PROTOCOL}://${process.env.HOST}`;
 const protocol = process.env.PROTOCOL || 'https';
 const mimeTypes = {
   '/tests/autocom/in.html': 'text/html',
+  '/tests/imgdec/in.html': 'text/html',
   '/tests/role/in.html': 'text/html',
   '/tests/roles/in.html': 'text/html',
   '/tests/state/in.html': 'text/html',
