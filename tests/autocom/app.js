@@ -53,7 +53,7 @@ exports.formHandler = globals => {
           // Convert the tabulation to JSON.
           query.tally = JSON.stringify(tally, null, 2);
           // Render and serve a report.
-          globals.render('example-03-out', true);
+          globals.render('autocom', true);
         }
       });
     })();

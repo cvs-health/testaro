@@ -37,7 +37,7 @@ exports.formHandler = globals => {
         if (++done === elements.length) {
           // Render and serve a report.
           query.tally = JSON.stringify(tally, null, 2);
-          globals.render('example-02-out', true);
+          globals.render('roles', true);
         }
       });
     })();

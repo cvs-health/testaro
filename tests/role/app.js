@@ -41,7 +41,7 @@ exports.formHandler = globals => {
           // Concatenate the array elements.
           query.report = htmlList.join('\n            ');
           // Render and serve a report.
-          globals.render('example-01-out', true);
+          globals.render('role', true);
           ui.close();
         }
       });

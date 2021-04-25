@@ -16,10 +16,10 @@ const https = require('https');
 globals.urlStart = `${process.env.PROTOCOL}://${process.env.HOST}`;
 const protocol = process.env.PROTOCOL || 'https';
 const mimeTypes = {
-  '/example-00.html': 'text/html',
-  '/example-01.html': 'text/html',
-  '/example-02.html': 'text/html',
-  '/example-03.html': 'text/html',
+  '/tests/autocom/in.html': 'text/html',
+  '/tests/role/in.html': 'text/html',
+  '/tests/roles/in.html': 'text/html',
+  '/tests/state/in.html': 'text/html',
   '/index.html': 'text/html',
   '/style.css': 'text/css'
 };
@@ -104,11 +104,11 @@ globals.servePage = (content, newURL, mimeType, response) => {
 };
 // Returns whether each specified query parameter is truthy.
 globals.queryIncludes = params => params.every(param => globals.query[param]);
-// Replaces the placeholders in a page and optionally serves the page.
-globals.render = (pageName, isServable) => {
+// Replaces the placeholders in a result page and optionally serves the page.
+globals.render = (testName, isServable) => {
   if (! globals.response.writableEnded) {
     // Get the page.
-    return globals.fs.readFile(`${pageName}.html`, 'utf8')
+    return globals.fs.readFile(`./tests/${testName}/out.html`, 'utf8')
     .then(
       // When it arrives:
       page => {
@@ -117,7 +117,7 @@ globals.render = (pageName, isServable) => {
         // If the page is ready to serve:
         if (isServable) {
           // Serve it.
-          globals.servePage(renderedPage, `/${pageName}.html`, 'text/html', globals.response);
+          globals.servePage(renderedPage, `/${testName}-out.html`, 'text/html', globals.response);
           return '';
         }
         // Otherwise, i.e. if the page needs modification before it is served:
@@ -218,10 +218,10 @@ const requestHandler = (request, response) => {
       // Identify a query object.
       searchParams = new URLSearchParams(queryString);
       searchParams.forEach((value, name) => globals.query[name] = value);
-      // If the request submitted the first step of an example:
-      if (/^\/example-\d{2}$/.test(pathName)) {
+      // If the request submitted the first step of a test:
+      if (/^\/tests\/-[-^w]+$/.test(pathName)) {
         // Process the submission.
-        require(`./example-${pathName.slice(-2)}`).formHandler(globals);
+        require(`.${pathName.slice}/app`).formHandler(globals);
       }
       // Otherwise, i.e. if the request was invalid:
       else {

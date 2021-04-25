@@ -226,7 +226,7 @@ exports.formHandler = globals => {
         await shootBoth(webkit, false, true, 0);
       }
       // Render and serve a report.
-      globals.render('example-00-out', true);
+      globals.render('state', true);
     })();
   }
   else {
