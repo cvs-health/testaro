@@ -170,7 +170,7 @@ exports.formHandler = globals => {
         // Make and report a screen shot of the element.
         await page.screenshot({
           clip: getShotBox(margin, reportBox),
-          path: `screenShots/example-00-${hasState ? 'on' : 'off'}-${agent.name()}.png`,
+          path: `screenShots/state-${hasState ? 'on' : 'off'}-${agent.name()}.png`,
           fullPage: true
         });
       }
