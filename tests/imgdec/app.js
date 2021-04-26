@@ -8,21 +8,29 @@ exports.formHandler = globals => {
       const page = await ui.newPage();
       await page.goto(query.url);
       // Get an array of ElementHandles for decorative images.
-      const elements = await page.$$('img[alt=""]:visible');
+      const elements = await page.$$('img[alt=""][src]:not([src=""]):visible');
+      const urls = [];
       const listItems = [];
       let done = 0;
       // If any exist:
       if (elements.length) {
         // For each ElementHandle, in parallel in random order:
         elements.forEach(async (element, index) => {
-          // Get and record a screen shot of the element.
-          await element.screenshot({path: `screenShots/imgdec-${index + 1}.png`});
+          // Add the element’s URL, if any, and parent data to the array of URLs.
+          const url = await element.getAttribute('src');
+          const parentJSHandle = await element.getProperty('parentElement');
+          const parentTypeJSHandle = await parentJSHandle.getProperty('tagName');
+          const parentTextJSHandle = await parentJSHandle.getProperty('textContent');
+          const parentType = await parentTypeJSHandle.jsonValue();
+          const parentText = await parentTextJSHandle.jsonValue();
+          urls[index] = [url, parentType.toLowerCase(), parentText];
           // If this element is the last one processed:
           if (++done === elements.length) {
             // Compile the list items in DOM order.
             for (let i = 1; i <= done; i++) {
+              const data = urls[i - 1];
               listItems.push(
-                `<li><img alt="image ${i}" src="/autotest/screenShots/imgdec-${i}.png"></li>`
+                `<li><img alt="image ${i}" src="${data[0]}"><br>${data[1]}: ${data[2]}</li>`
               );
             }
             // Convert the list items to a string.

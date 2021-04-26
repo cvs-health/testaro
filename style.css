@@ -88,8 +88,10 @@ label > span:first-child {
 }
 li > img {
   max-width: 30rem;
+  max-height: 20rem;
   vertical-align: middle;
   border: 1px gray solid;
+  background-color: gray;
 }
 ol > li {
   margin: 1rem 0;
