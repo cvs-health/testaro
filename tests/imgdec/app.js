@@ -7,38 +7,28 @@ exports.formHandler = globals => {
       const ui = await chromium.launch();
       const page = await ui.newPage();
       await page.goto(query.url);
-      // Get an array of ElementHandles for decorative images.
-      const elements = await page.$$('img[alt=""][src]:not([src=""]):visible');
-      const urls = [];
-      const listItems = [];
-      let done = 0;
-      // If any exist:
-      if (elements.length) {
-        // For each ElementHandle, in parallel in random order:
-        elements.forEach(async (element, index) => {
-          // Add the element’s URL, if any, and parent data to the array of URLs.
-          const url = await element.getAttribute('src');
-          const parentJSHandle = await element.getProperty('parentElement');
-          const parentTypeJSHandle = await parentJSHandle.getProperty('tagName');
-          const parentTextJSHandle = await parentJSHandle.getProperty('textContent');
-          const parentType = await parentTypeJSHandle.jsonValue();
-          const parentText = await parentTextJSHandle.jsonValue();
-          urls[index] = [url, parentType.toLowerCase(), parentText];
-          // If this element is the last one processed:
-          if (++done === elements.length) {
-            // Compile the list items in DOM order.
-            for (let i = 1; i <= done; i++) {
-              const data = urls[i - 1];
-              listItems.push(
-                `<li><img alt="image ${i}" src="${data[0]}"><br>${data[1]}: ${data[2]}</li>`
-              );
-            }
-            // Convert the list items to a string.
-            query.listItems = listItems.join('\n            ');
-            // Render and serve a report.
-            globals.render('imgdec', true);
-          }
+      // Get an array of data on all decorative images.
+      const data = await page.$eval('body', body => {
+        const bgElements = Array.from(body.querySelectorAll('img[alt=""][src]:not([src=""])'));
+        const bgData = bgElements.map(el => {
+          const data = [el.src];
+          const parent = el.parentElement;
+          data.push(parent.tagName.toLowerCase(), parent.textContent);
+          return data;
         });
+        return bgData;
+      });
+      // If any background images exist:
+      if (data.length) {
+        // Compile the list items.
+        const listItems = data.map(
+          (item, index) =>
+            `<li><img alt="image ${index + 1}" src="${item[0]}"><br>${item[1]}: ${item[2]}</li>`
+        );
+        // Convert the list items to a string.
+        query.listItems = listItems.join('\n            ');
+        // Render and serve a report.
+        globals.render('imgdec', true);
       }
       // Otherwise, i.e. if no decorative images exist:
       else {
