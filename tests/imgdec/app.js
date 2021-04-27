@@ -9,16 +9,16 @@ exports.formHandler = globals => {
       await page.goto(query.url);
       // Get an array of data on all decorative images.
       const data = await page.$eval('body', body => {
-        const bgElements = Array.from(body.querySelectorAll('img[alt=""][src]:not([src=""])'));
-        const bgData = bgElements.map(el => {
-          const data = [el.src];
+        const elements = Array.from(body.querySelectorAll('img[alt=""][src]:not([src=""])'));
+        const elsData = elements.map(el => {
+          const elData = [el.src];
           const parent = el.parentElement;
-          data.push(parent.tagName.toLowerCase(), parent.textContent);
-          return data;
+          elData.push(parent.tagName.toLowerCase(), parent.textContent);
+          return elData;
         });
-        return bgData;
+        return elsData;
       });
-      // If any background images exist:
+      // If any decorative images exist:
       if (data.length) {
         // Compile the list items.
         const listItems = data.map(
