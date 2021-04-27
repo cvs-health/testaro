@@ -3,6 +3,7 @@ exports.formHandler = globals => {
   const {query} = globals;
   if (globals.queryIncludes(['url'])) {
     const {chromium} = require('playwright');
+    const {injectAxe, getViolations} = require('axe-playwright');
     (async () => {
       // Identify a Browser.
       const ui = await chromium.launch();
@@ -10,6 +11,33 @@ exports.formHandler = globals => {
       const page = await ui.newPage();
       // Navigate to the specified URL.
       await page.goto(query.url);
+      // Inject axe-core into the page.
+      await injectAxe(page);
+      // Get the violations of the axe-core aria-role rule.
+      const axeReport = await getViolations(page, null, {
+        axeOptions: {
+          runOnly: ['aria-roles']
+        }
+      });
+      // If there are any:
+      if (axeReport.length) {
+        // Compile an axe-core report.
+        const axeNodes = axeReport[0].nodes.map(node => {
+          const reportItem = {};
+          reportItem.id = node.none[0].id;
+          reportItem.target = node.target;
+          reportItem.impact = node.impact;
+          reportItem.message = node.none[0].message;
+          reportItem.html = node.html.trim();
+          return reportItem;
+        });
+        query.axeReport = JSON.stringify(axeNodes, null, 2).replace(/</g, '&lt;');
+      }
+      // Otherwise, i.e. if there are no axe-core violations:
+      else {
+        // Compile an axe-core report.
+        query.axeReport = 'NONE';
+      }
       // Identify an array of the ElementHandles of elements with role attributes.
       const elements = await page.$$('[role]');
       const list = [];
@@ -43,7 +71,7 @@ exports.formHandler = globals => {
             // Concatenate the array elements.
             query.report = htmlList.join('\n            ');
             // Render and serve a report.
-            globals.render('role', true);
+            globals.render('roleaxe', true);
             ui.close();
           }
         });
@@ -52,7 +80,7 @@ exports.formHandler = globals => {
       else {
         // Render and serve a report.
         query.report = '<li>NONE</li>';
-        globals.render('role', true);
+        globals.render('roleaxe', true);
       }
     })();
   }

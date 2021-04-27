@@ -23,10 +23,11 @@
   },
   "homepage": "https://github.com/jrpool/autotest#readme",
   "dependencies": {
-    "dotenv": "*"
+    "axe-playwright": "*",
+    "dotenv": "*",
+    "playwright": "*"
   },
   "devDependencies": {
-    "eslint": "^7.24.0",
-    "playwright": "*"
+    "eslint": "^7.24.0"
   }
 }

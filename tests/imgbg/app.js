@@ -23,7 +23,6 @@ exports.formHandler = globals => {
         return usableData;
       });
       // If any background images exist:
-      console.log(`data length is ${data.length}`);
       if (data.length) {
         // Compile the list items.
         const listItems = data.map(
