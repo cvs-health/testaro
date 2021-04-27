@@ -14,47 +14,74 @@ exports.formHandler = globals => {
       // Inject axe-core into the page.
       await injectAxe(page);
       // Get the violations of the axe-core aria-role rule.
-      const axeReport = await getViolations(page, 'body', {
+      const axeReport = await getViolations(page, null, {
         axeOptions: {
-          runOnly: ['aria-role']
+          runOnly: ['aria-roles']
         }
       });
-      query.axeReport = JSON.stringify(axeReport, null, 2);
+      // If there are any:
+      if (axeReport.length) {
+        // Compile an axe-core report.
+        const axeNodes = axeReport[0].nodes.map(node => {
+          const reportItem = {};
+          reportItem.id = node.none[0].id;
+          reportItem.target = node.target;
+          reportItem.impact = node.impact;
+          reportItem.message = node.none[0].message;
+          reportItem.html = node.html.trim();
+          return reportItem;
+        });
+        query.axeReport = JSON.stringify(axeNodes, null, 2).replace(/</g, '&lt;');
+      }
+      // Otherwise, i.e. if there are no axe-core violations:
+      else {
+        // Compile an axe-core report.
+        query.axeReport = 'NONE';
+      }
       // Identify an array of the ElementHandles of elements with role attributes.
       const elements = await page.$$('[role]');
       const list = [];
-      // For each ElementHandle:
-      elements.forEach(async (element, index) => {
-        // Identify a JSHandle for its type.
-        const tagHandle = await element.getProperty('tagName');
-        // Identify the upper-case name of the type.
-        const ucTag = await tagHandle.jsonValue();
-        // Identify its conversion to lower case.
-        const tag = ucTag.toLowerCase();
-        // Identify the value of its role attribute.
-        const role = await element.getAttribute('role');
-        // Add the index, type, and role to the list.
-        list.push([index, tag, role]);
-        // If all matching elements have been processed:
-        if (list.length === elements.length) {
-          // Sort the list by index.
-          list.sort((a, b) => a.index - b.index);
-          // Cenvert it to an array of HTML list elements.
-          const htmlList = [];
-          list.forEach(item => {
-            htmlList.push(
-              `<li>
-                ${item[0]}. Element <code>${item[1]}</code> has role <code>${item[2]}</code>.
-              </li>`
-            );
-          });
-          // Concatenate the array elements.
-          query.report = htmlList.join('\n            ');
-          // Render and serve a report.
-          globals.render('roleaxe', true);
-          ui.close();
-        }
-      });
+      // If any exist:
+      if (elements.length) {
+        // For each ElementHandle:
+        elements.forEach(async (element, index) => {
+          // Identify a JSHandle for its type.
+          const tagHandle = await element.getProperty('tagName');
+          // Identify the upper-case name of the type.
+          const ucTag = await tagHandle.jsonValue();
+          // Identify its conversion to lower case.
+          const tag = ucTag.toLowerCase();
+          // Identify the value of its role attribute.
+          const role = await element.getAttribute('role');
+          // Add the index, type, and role to the list.
+          list.push([index, tag, role]);
+          // If all matching elements have been processed:
+          if (list.length === elements.length) {
+            // Sort the list by index.
+            list.sort((a, b) => a.index - b.index);
+            // Cenvert it to an array of HTML list elements.
+            const htmlList = [];
+            list.forEach(item => {
+              htmlList.push(
+                `<li>
+                  ${item[0]}. Element <code>${item[1]}</code> has role <code>${item[2]}</code>.
+                </li>`
+              );
+            });
+            // Concatenate the array elements.
+            query.report = htmlList.join('\n            ');
+            // Render and serve a report.
+            globals.render('roleaxe', true);
+            ui.close();
+          }
+        });
+      }
+      // Otherwise, i.e. if no elements with role attributes exist:
+      else {
+        // Render and serve a report.
+        query.report = '<li>NONE</li>';
+        globals.render('roleaxe', true);
+      }
     })();
   }
   else {
