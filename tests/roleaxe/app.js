@@ -20,16 +20,32 @@ exports.formHandler = globals => {
         }
       });
       // If there are any:
-      if (axeReport.length) {
+      if (axeReport.length && axeReport[0].nodes) {
         // Compile an axe-core report.
         const axeNodes = axeReport[0].nodes.map(node => {
-          const reportItem = {};
-          reportItem.id = node.none[0].id;
-          reportItem.target = node.target;
-          reportItem.impact = node.impact;
-          reportItem.message = node.none[0].message;
-          reportItem.html = node.html.trim();
-          return reportItem;
+          if (
+            node.none
+            && node.none.length
+            && node.none[0].id
+            && node.none[0].message
+            && node.target
+            && node.target.length
+            && node.impact
+            && node.html
+          ) {
+            const reportItem = {};
+            reportItem.id = node.none[0].id;
+            reportItem.selector = node.target[0];
+            reportItem.impact = node.impact;
+            reportItem.message = node.none[0].message;
+            reportItem.html = node.html.trim();
+            return reportItem;
+          }
+          else {
+            return {
+              status: 'INCOMPLETE'
+            };
+          }
         });
         query.axeReport = JSON.stringify(axeNodes, null, 2).replace(/</g, '&lt;');
       }
