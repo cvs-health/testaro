@@ -75,7 +75,7 @@ exports.formHandler = globals => {
           if (list.length === elements.length) {
             // Sort the list by index.
             list.sort((a, b) => a.index - b.index);
-            // Cenvert it to an array of HTML list elements.
+            // Convert it to an array of HTML list elements.
             const htmlList = [];
             list.forEach(item => {
               htmlList.push(
