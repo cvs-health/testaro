@@ -13,38 +13,36 @@ exports.formHandler = globals => {
       await page.goto(query.url);
       // Inject axe-core into the page.
       await injectAxe(page);
-      // Get the violations of the axe-core aria-role rule.
+      // Get the data on the elements violating the axe-core label rule.
       const axeReport = await getViolations(page, null, {
         axeOptions: {
           runOnly: ['aria-roles']
         }
       });
       // If there are any:
-      if (axeReport.length && axeReport[0].nodes) {
-        // Compile an axe-core report.
-        const axeNodes = axeReport[0].nodes.map(node => {
-          if (
-            node.none
-            && node.none.length
-            && node.none[0].id
-            && node.none[0].message
-            && node.target
-            && node.target.length
-            && node.impact
-            && node.html
-          ) {
-            const reportItem = {};
-            reportItem.id = node.none[0].id;
-            reportItem.selector = node.target[0];
-            reportItem.impact = node.impact;
-            reportItem.message = node.none[0].message;
-            reportItem.html = node.html.trim();
-            return reportItem;
+      if (axeReport.length && axeReport[0].nodes && axeReport[0].nodes.length) {
+        const axeNodes = [];
+        // FUNCTION DEFINITION START
+        const compact = (node, data, logic) => {
+          if (node[logic] && node[logic].length) {
+            data[logic] = node[logic].map(rule => {
+              const item = {};
+              item.id = rule.id;
+              item.impact = rule.impact;
+              item.message = rule.message;
+              return item;
+            });
           }
-          else {
-            return {
-              status: 'INCOMPLETE'
-            };
+        };
+        // FUNCTION DEFINITION END
+        // For each such element:
+        axeReport[0].nodes.forEach(node => {
+          // Compact its axe-core report data.
+          const data = {};
+          compact(node, data, 'any');
+          compact(node, data, 'none');
+          if (data.any || data.none) {
+            axeNodes.push(data);
           }
         });
         query.axeReport = JSON.stringify(axeNodes, null, 2).replace(/</g, '&lt;');
@@ -75,7 +73,7 @@ exports.formHandler = globals => {
           if (list.length === elements.length) {
             // Sort the list by index.
             list.sort((a, b) => a.index - b.index);
-            // Cenvert it to an array of HTML list elements.
+            // Convert it to an array of HTML list elements.
             const htmlList = [];
             list.forEach(item => {
               htmlList.push(
