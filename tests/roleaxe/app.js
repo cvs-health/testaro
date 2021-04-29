@@ -13,14 +13,14 @@ exports.formHandler = globals => {
       await page.goto(query.url);
       // Inject axe-core into the page.
       await injectAxe(page);
-      // Get the violations of the axe-core aria-role rule.
+      // Get the data on the elements violating the axe-core aria-role rule.
       const axeReport = await getViolations(page, null, {
         axeOptions: {
           runOnly: ['aria-roles']
         }
       });
       // If there are any:
-      if (axeReport.length && axeReport[0].nodes) {
+      if (axeReport.length && axeReport[0].nodes && axeReport[0].nodes.length) {
         // Compile an axe-core report.
         const axeNodes = axeReport[0].nodes.map(node => {
           if (
@@ -33,13 +33,13 @@ exports.formHandler = globals => {
             && node.impact
             && node.html
           ) {
-            const reportItem = {};
-            reportItem.id = node.none[0].id;
-            reportItem.selector = node.target[0];
-            reportItem.impact = node.impact;
-            reportItem.message = node.none[0].message;
-            reportItem.html = node.html.trim();
-            return reportItem;
+            const item = {};
+            item.id = node.none[0].id;
+            item.selector = node.target[0];
+            item.impact = node.impact;
+            item.message = node.none[0].message;
+            item.html = node.html.trim();
+            return item;
           }
           else {
             return {
@@ -75,7 +75,7 @@ exports.formHandler = globals => {
           if (list.length === elements.length) {
             // Sort the list by index.
             list.sort((a, b) => a.index - b.index);
-            // Cenvert it to an array of HTML list elements.
+            // Convert it to an array of HTML list elements.
             const htmlList = [];
             list.forEach(item => {
               htmlList.push(
