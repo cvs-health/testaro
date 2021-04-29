@@ -7,7 +7,10 @@ exports.formHandler = globals => {
     const {injectAxe, getViolations} = require('axe-playwright');
     (async () => {
       // Identify a Browser.
-      const ui = await chromium.launch();
+      const ui = await chromium.launch({
+        headless: ! debug,
+        devtools: debug
+      });
       // Identify a Page (tab).
       const page = await ui.newPage();
       // If debugging is on, output page-script console-log messages.
@@ -68,26 +71,47 @@ exports.formHandler = globals => {
       const inputData = await page.$eval('body', body => {
         const inputs = body.querySelectorAll('input:not([type=hidden])');
         const data = [];
+        // FUNCTION DEFINITION START
+        const debloat = text => text.trim().replace(/\s+/g, ' ');
+        // FUNCTION DEFINITION END
+        // For each non-hidden input:
         for (let i = 0; i < inputs.length; i++) {
           const item = {};
           const input = inputs.item(i);
           item.type = input.type;
+          // Label in an aria-label attribute.
           const ariaLabel = input.getAttribute('aria-label');
           if (ariaLabel) {
-            const trimmedLabel = ariaLabel.trim();
+            const trimmedLabel = debloat(ariaLabel);
             if (trimmedLabel) {
               item.ariaLabel = trimmedLabel;
             }
           }
+          // Explicit and implicit label elements.
           const labelNodeList = input.labels;
           if (labelNodeList.length) {
             const labels = Array.from(labelNodeList);
             const labelTexts = labels
-            .map(el => el.textContent && el.textContent.trim().replace(/\s+/g, ' '))
+            .map(el => el.textContent && debloat(el.textContent))
             .filter(text => text);
             if (labelTexts.length) {
               item.labels = labelTexts;
             }
+          }
+          // Elements referenced by aria-labelledby attribute.
+          if (input.hasAttribute('aria-labelledby')) {
+            const labelerIDs = input.getAttribute('aria-labelledby').split(/\s+/);
+            labelerIDs.forEach(id => {
+              const labeler = document.getElementById(id);
+              if (labeler) {
+                if (item.labelers) {
+                  item.labelers.push(debloat(labeler.textContent));
+                }
+                else {
+                  item.labelers = [debloat(labeler.textContent)];
+                }
+              }
+            });
           }
           data.push(item);
         }
