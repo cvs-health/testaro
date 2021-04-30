@@ -73,7 +73,7 @@ exports.formHandler = globals => {
         const fieldSetMap = new Map();
         fieldSets.forEach(fieldSet => {
           const legend = fieldSet.firstElementChild;
-          if (legend && legend.tagName === 'legend') {
+          if (legend && legend.tagName === 'LEGEND') {
             const legendText = legend.textContent;
             if (legendText) {
               const inputs = Array.from(fieldSet.getElementsByTagName('input'));
