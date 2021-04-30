@@ -70,7 +70,7 @@ exports.formHandler = globals => {
       // Get data on the non-hidden inputs and their labels.
       const inputData = await page.$eval('body', body => {
         const fieldSets = Array.from(body.getElementsByTagName('fieldset'));
-        const fieldSetMap = Map();
+        const fieldSetMap = new Map();
         fieldSets.forEach(fieldSet => {
           const legend = fieldSet.firstElementChild;
           if (legend && legend.tagName === 'legend') {
