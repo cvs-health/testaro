@@ -76,7 +76,7 @@ exports.formHandler = globals => {
           if (legend && legend.tagName === 'LEGEND') {
             const legendText = legend.textContent;
             if (legendText) {
-              const inputs = Array.from(fieldSet.getElementsByTagName('input'));
+              const inputs = Array.from(fieldSet.querySelectorAll('input, select'));
               inputs.forEach(input => {
                 if (fieldSetMap.has(input)) {
                   fieldSetMap.set(input, `${fieldSetMap.get(input)}; ${legendText}`);
@@ -88,12 +88,12 @@ exports.formHandler = globals => {
             }
           }
         });
-        const inputs = body.querySelectorAll('input:not([type=hidden])');
+        const inputs = body.querySelectorAll('input:not([type=hidden]), select');
         const data = [];
         // FUNCTION DEFINITION START
         const debloat = text => text.trim().replace(/\s+/g, ' ');
         // FUNCTION DEFINITION END
-        // For each non-hidden input:
+        // For each non-hidden input or select:
         for (let i = 0; i < inputs.length; i++) {
           const item = {};
           const input = inputs.item(i);
@@ -122,7 +122,7 @@ exports.formHandler = globals => {
               item.labels = labelTexts;
             }
           }
-          // Elements referenced by aria-labelledby attribute, if any.
+          // Elements referenced by an aria-labelledby attribute, if any.
           if (input.hasAttribute('aria-labelledby')) {
             const labelerIDs = input.getAttribute('aria-labelledby').split(/\s+/);
             labelerIDs.forEach(id => {
