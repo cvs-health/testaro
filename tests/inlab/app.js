@@ -69,6 +69,25 @@ exports.formHandler = globals => {
       }
       // Get data on the non-hidden inputs and their labels.
       const inputData = await page.$eval('body', body => {
+        const fieldSets = Array.from(body.getElementsByTagName('fieldset'));
+        const fieldSetMap = Map();
+        fieldSets.forEach(fieldSet => {
+          const legend = fieldSet.firstElementChild;
+          if (legend && legend.tagName === 'legend') {
+            const legendText = legend.textContent;
+            if (legendText) {
+              const inputs = Array.from(fieldSet.getElementsByTagName('input'));
+              inputs.forEach(input => {
+                if (fieldSetMap.has(input)) {
+                  fieldSetMap.set(input, `${fieldSetMap.get(input)}; ${legendText}`);
+                }
+                else {
+                  fieldSetMap.set(input, legendText);
+                }
+              });
+            }
+          }
+        });
         const inputs = body.querySelectorAll('input:not([type=hidden])');
         const data = [];
         // FUNCTION DEFINITION START
@@ -78,8 +97,13 @@ exports.formHandler = globals => {
         for (let i = 0; i < inputs.length; i++) {
           const item = {};
           const input = inputs.item(i);
+          // Type.
           item.type = input.type;
-          // Label in an aria-label attribute.
+          // Fieldset legend, if any.
+          if (fieldSetMap.has(input)) {
+            item.legend = debloat(fieldSetMap.get(input));
+          }
+          // Label in an aria-label attribute, if any.
           const ariaLabel = input.getAttribute('aria-label');
           if (ariaLabel) {
             const trimmedLabel = debloat(ariaLabel);
@@ -87,7 +111,7 @@ exports.formHandler = globals => {
               item.ariaLabel = trimmedLabel;
             }
           }
-          // Explicit and implicit label elements.
+          // Explicit and implicit label elements, if any.
           const labelNodeList = input.labels;
           if (labelNodeList.length) {
             const labels = Array.from(labelNodeList);
@@ -98,7 +122,7 @@ exports.formHandler = globals => {
               item.labels = labelTexts;
             }
           }
-          // Elements referenced by aria-labelledby attribute.
+          // Elements referenced by aria-labelledby attribute, if any.
           if (input.hasAttribute('aria-labelledby')) {
             const labelerIDs = input.getAttribute('aria-labelledby').split(/\s+/);
             labelerIDs.forEach(id => {
