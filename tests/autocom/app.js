@@ -4,18 +4,24 @@ exports.formHandler = globals => {
   if (globals.queryIncludes(['url'])) {
     const {chromium} = require('playwright');
     (async () => {
-      const labelTextMax = 100;
       const ui = await chromium.launch();
       const page = await ui.newPage();
+      // Visit the specified URL.
       await page.goto(query.url);
+      // Perform any specified actions.
+      if (query.actFile) {
+        await page.$eval('body', globals.actions, query.actFile);
+      }
+      // Get an array of ElementHandles for autocomplete-eligible inputs.
       const inputTypes = ['date', 'email', 'password', 'tel', 'text', 'url'];
       const selectors = inputTypes.map(type => `input[type=${type}]`);
-      // Get an array of ElementHandles for autocomplete-eligible inputs.
       const elements = await page.$$(selectors.join(', '));
       const tally = [];
       let done = 0;
       // If there are any:
       if (elements.length) {
+        // Limit the length of displayed labels.
+        const labelTextMax = 100;
         // For each ElementHandle, in parallel in random order:
         elements.forEach(async (element, index) => {
           // Get a concatenation of the text contents of its associated label elements.
