@@ -2,15 +2,64 @@
 exports.formHandler = globals => {
   const {query} = globals;
   if (globals.queryIncludes(['url'])) {
+    const debug = true;
     const {chromium} = require('playwright');
     (async () => {
-      const ui = await chromium.launch();
+      const ui = await chromium.launch({headless: false, slowMo: 2000});
       const page = await ui.newPage();
+      // If debugging is on, output page-script console-log messages.
+      if (debug){
+        page.on('console', msg => {
+          if (msg.type() === 'log') {
+            console.log(msg.text());
+          }
+        });
+      }
       // Visit the specified URL.
       await page.goto(query.url);
       // Perform any specified actions.
       if (query.actFile) {
-        await page.$eval('body', globals.actions, query.actFile);
+        const actionsJSON = await globals.fs.readFile(`actions/${query.actFile}.json`, 'utf8');
+        await page.$eval('body', async (body, actionsJSON) => {
+          const actions = JSON.parse(actionsJSON);
+          console.log(actions[0].type);
+          const input = body.querySelector('input#zip');
+          console.log(`Input has tagName ${input.tagName}`);
+          input.value = '10069';
+          console.log('Entered ZIP');
+          input.dispatchEvent(new Event('input'));
+          console.log('Dispatched input event');
+          body.querySelector('button[type=submit]').click();
+          console.log('Clicked button');
+          return '';
+        }, actionsJSON);
+        /*
+        await page.$eval('body', async body => {
+          const actionsJSON = await globals.fs.readFile(globals.query.actFile, 'utf8');
+          const actions = JSON.parse(actionsJSON);
+          const input = body.querySelector('input#zip') || actions;
+          console.log(`Input has tagName ${input.tagName}`);
+          input.value = '10069';
+          console.log('Entered ZIP');
+          input.dispatchEvent(new Event('input'));
+          console.log('Dispatched input event');
+          body.querySelector('button[type=submit]').click();
+          console.log('Clicked button');
+          return '';
+        }, globals);
+        await page.$eval(
+          'body',
+          (body, globals) => {
+            body.querySelector('input[type=text]').value = globals.urlStart;
+            body.querySelector('button').click();
+            // return '';
+          },
+          globals
+        );
+        await page.$eval(
+          'body', (body, globals) => globals.actions(body, globals), globals
+        );
+        */
       }
       // Get an array of ElementHandles for autocomplete-eligible inputs.
       const inputTypes = ['date', 'email', 'password', 'tel', 'text', 'url'];

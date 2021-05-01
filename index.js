@@ -60,58 +60,54 @@ const actionSelectors = {
   button: 'button'
 };
 // ########## FUNCTIONS
-// Performs specified actions.
-globals.actions = (body, actFile) => {
+// Performs specified browser actions.
+globals.actions = async (body, globals) => {
+  console.log('Starting actions');
   // Get an array of acts from the specified file.
-  globals.fs.readFile(`actions/${actFile}`, 'utf8')
-  // When it arrives:
-  .then(
-    content => {
-      const acts = JSON.parse(content);
-      // FUNCTION DEFINITION START
-      const perform = acts => {
-        if (acts.length) {
-          const act = acts[0];
-          const actionSelector = actionSelectors[act.type];
-          const which = act.which;
-          const typeInstances = Array.from(body.querySelectorAll(actionSelector));
-          const whichInstance = typeInstances.find(instance =>
-            instance.textContent.includes(which)
-            || instance.getAttribute('aria-label').includes(which)
-            || Array
-            .from(instance.labels)
-            .map(label => label.textContent)
-            .join(' ')
-            .includes('which')
-            || instance
-            .getAttribute('aria-labelledby')
-            .split(/\s+/)
-            .map(id => document.getElementById(id).textContent)
-            .join(' ')
-            .includes(which)
-          );
-          if (whichInstance) {
-            if (act.type === 'text') {
-              whichInstance.value = act.value;
-            }
-            else if (act.type === 'select') {
-              whichInstance.selectedIndex = act.index;
-            }
-            else if (act.type === 'button') {
-              whichInstance.click();
-            }
-            else if (['radio', 'checkbox'].includes(act.type)) {
-              whichInstance.checked = true;
-            }
-          }
-          perform(acts.slice(1));
+  const content = await globals.fs.readFile(`actions/${globals.query.actFile}`, 'utf8');
+  const acts = JSON.parse(content);
+  // FUNCTION DEFINITION START
+  const perform = acts => {
+    if (acts.length) {
+      const act = acts[0];
+      const actionSelector = actionSelectors[act.type];
+      const which = act.which;
+      const typeInstances = Array.from(body.querySelectorAll(actionSelector));
+      const whichInstance = typeInstances.find(instance =>
+        instance.textContent.includes(which)
+        || instance.getAttribute('aria-label').includes(which)
+        || Array
+        .from(instance.labels)
+        .map(label => label.textContent)
+        .join(' ')
+        .includes('which')
+        || instance
+        .getAttribute('aria-labelledby')
+        .split(/\s+/)
+        .map(id => document.getElementById(id).textContent)
+        .join(' ')
+        .includes(which)
+      );
+      if (whichInstance) {
+        if (act.type === 'text') {
+          whichInstance.value = act.value;
         }
-      };
-      // FUNCTION DEFINITION END
-      perform(acts);
-    },
-    error => globals.serveError(error, globals.response)
-  );
+        else if (act.type === 'select') {
+          whichInstance.selectedIndex = act.index;
+        }
+        else if (act.type === 'button') {
+          whichInstance.click();
+        }
+        else if (['radio', 'checkbox'].includes(act.type)) {
+          whichInstance.checked = true;
+        }
+      }
+      perform(acts.slice(1));
+    }
+  };
+  // FUNCTION DEFINITION END
+  perform(acts);
+  return '';
 };
 // Serves a system error message.
 globals.serveError = (error, response) => {
