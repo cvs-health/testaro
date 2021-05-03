@@ -52,7 +52,7 @@ const errorPageEnd = [
 ];
 const customErrorPage = customErrorPageStart.concat(...errorPageEnd);
 const systemErrorPage = systemErrorPageStart.concat(...errorPageEnd);
-const actionSelectors = {
+globals.actSelectors = {
   text: 'input[type=text',
   radio: 'input[type=radio]',
   checkbox: 'input[type=checkbox]',
@@ -60,54 +60,89 @@ const actionSelectors = {
   button: 'button'
 };
 // ########## FUNCTIONS
-// Performs specified browser actions.
-globals.actions = async (body, globals) => {
-  console.log('Starting actions');
-  // Get an array of acts from the specified file.
-  const content = await globals.fs.readFile(`actions/${globals.query.actFile}`, 'utf8');
-  const acts = JSON.parse(content);
+// Recursively performs specified browser actions.
+globals.actions = async (body, args) => {
+  // Get an array of acts to be performed.
+  const acts = JSON.parse(args[0]);
   // FUNCTION DEFINITION START
   const perform = acts => {
     if (acts.length) {
       const act = acts[0];
-      const actionSelector = actionSelectors[act.type];
+      const actSelector = args[1][act.type];
       const which = act.which;
-      const typeInstances = Array.from(body.querySelectorAll(actionSelector));
+      const typeInstances = Array.from(body.querySelectorAll(actSelector));
       const whichInstance = typeInstances.find(instance =>
         instance.textContent.includes(which)
-        || instance.getAttribute('aria-label').includes(which)
-        || Array
-        .from(instance.labels)
-        .map(label => label.textContent)
-        .join(' ')
-        .includes('which')
-        || instance
-        .getAttribute('aria-labelledby')
-        .split(/\s+/)
-        .map(id => document.getElementById(id).textContent)
-        .join(' ')
-        .includes(which)
+        || (
+          instance.hasAttribute('aria-label')
+          && instance.getAttribute('aria-label').includes(which)
+        )
+        || (
+          instance.labels
+          && Array
+          .from(instance.labels)
+          .map(label => label.textContent)
+          .join(' ')
+          .includes(which)
+        )
+        || (
+          instance.hasAttribute('aria-labelledby')
+          && instance
+          .getAttribute('aria-labelledby')
+          .split(/\s+/)
+          .map(id => body.querySelector(`#${id}`).textContent)
+          .join(' ')
+          .includes(which)
+        )
       );
       if (whichInstance) {
+        whichInstance.focus();
         if (act.type === 'text') {
           whichInstance.value = act.value;
-        }
-        else if (act.type === 'select') {
-          whichInstance.selectedIndex = act.index;
-        }
-        else if (act.type === 'button') {
-          whichInstance.click();
+          whichInstance.dispatchEvent(new Event('input'));
         }
         else if (['radio', 'checkbox'].includes(act.type)) {
           whichInstance.checked = true;
+          whichInstance.dispatchEvent(new Event('change'));
+        }
+        else if (act.type === 'select') {
+          whichInstance.selectedIndex = act.index;
+          whichInstance.dispatchEvent(new Event('change'));
+        }
+        else if (act.type === 'button') {
+          whichInstance.click();
         }
       }
       perform(acts.slice(1));
     }
   };
   // FUNCTION DEFINITION END
+  // Perform the acts.
   perform(acts);
   return '';
+};
+// Launch Chrome and get the specified state of the specified page.
+globals.getPageState = async (debug) => {
+  const {chromium} = require('playwright');
+  const ui = await chromium.launch(debug ? {headless: false, slowMo: 3000} : {});
+  const page = await ui.newPage();
+  // If debugging is on, output page-script console-log messages.
+  if (debug){
+    page.on('console', msg => {
+      if (msg.type() === 'log') {
+        console.log(msg.text());
+      }
+    });
+  }
+  // Visit the specified URL.
+  const {query} = globals;
+  await page.goto(query.url);
+  // Perform any specified actions.
+  if (query.actFile) {
+    const actsJSON = await globals.fs.readFile(`actions/${query.actFile}.json`, 'utf8');
+    await page.$eval('body', globals.actions, [actsJSON, globals.actSelectors]);
+  }
+  return page;
 };
 // Serves a system error message.
 globals.serveError = (error, response) => {
