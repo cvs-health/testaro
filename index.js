@@ -61,80 +61,7 @@ globals.actSelectors = {
   link: 'a'
 };
 // ########## FUNCTIONS
-// Recursively performs specified browser actions.
-const actions = async (body, actsAndPage) => {
-  const [acts, page] = actsAndPage;
-  // If any unperformed actions remain:
-  if (acts.length) {
-    // Identify the first of them.
-    const act = acts[0];
-    const {type, which, index} = act;
-    // If it is a URL:
-    if (type === 'url') {
-      // Visit it.
-      await page.goto(which);
-    }
-    // Otherwise, i.e. if it is an in-page action:
-    else {
-      // Identify the specified element, if possible.
-      const actSelector = globals.actSelectors[type];
-      const typeInstances = Array.from(body.querySelectorAll(actSelector));
-      const whichInstance = typeInstances.find(instance =>
-        instance.textContent.includes(which)
-        || (
-          instance.hasAttribute('aria-label')
-          && instance.getAttribute('aria-label').includes(which)
-        )
-        || (
-          instance.labels
-          && Array
-          .from(instance.labels)
-          .map(label => label.textContent)
-          .join(' ')
-          .includes(which)
-        )
-        || (
-          instance.hasAttribute('aria-labelledby')
-          && instance
-          .getAttribute('aria-labelledby')
-          .split(/\s+/)
-          .map(id => body.querySelector(`#${id}`).textContent)
-          .join(' ')
-          .includes(which)
-        )
-      );
-      // If one was identified:
-      if (whichInstance) {
-        // Focus it.
-        whichInstance.focus();
-        // Perform the action.
-        if (type === 'text') {
-          whichInstance.value = act.value;
-          whichInstance.dispatchEvent(new Event('input'));
-        }
-        else if (['radio', 'checkbox'].includes(type)) {
-          whichInstance.checked = true;
-          whichInstance.dispatchEvent(new Event('change'));
-        }
-        else if (type === 'select') {
-          whichInstance.selectedIndex = index;
-          whichInstance.dispatchEvent(new Event('change'));
-        }
-        else if (['button', 'link'].includes(type)) {
-          whichInstance.click();
-        }
-      }
-    }
-    // Perform the remaining actions.
-    await actions(body, [acts.slice(1), page]);
-  }
-  // Otherwise, i.e. if all the actions have been performed:
-  else {
-    // Quit.
-    return '';
-  }
-};
-// Launch Chrome and get the specified state of the specified page.
+// Launches Chrome and gets the specified state of the specified page.
 globals.getPageState = async (debug) => {
   const {chromium} = require('playwright');
   const ui = await chromium.launch(debug ? {headless: false, slowMo: 3000} : {});
@@ -147,21 +74,106 @@ globals.getPageState = async (debug) => {
       }
     });
   }
-  const {query} = globals;
+  const {actFileOrURL} = globals.query;
+  let url;
   // If a URL was specified:
-  if (/^https?:\/\//.test(query.actFile)) {
+  if (/^https?:\/\//.test(actFileOrURL)) {
     // Visit it.
-    await page.goto(query.actFile);
+    url = actFileOrURL;
+    await page.goto(url);
   }
   // Otherwise, i.e. if an action file was specified:
   else {
-    // Perform the actions and wait for any ensuing navigation to finish.
-    const actsJSON = await globals.fs.readFile(`actions/${query.actFile}.json`, 'utf8');
+    // FUNCTION DEFINITION START
+    // Recursively perform the specified actions.
+    const actions = async acts => {
+      // If any actions remain unperformed:
+      if (acts.length) {
+        // Identify the first unperformed action.
+        const act = acts[0];
+        // If it is a URL:
+        if (act.type === 'url') {
+          // Visit it.
+          await page.goto(act.type);
+          url = act.type;
+          await page.waitForLoadState('networkidle', {timeout: 10000});
+        }
+        // Otherwise, i.e. if the action is an in-page action:
+        else {
+          // Perform it with a browser function.
+          await page.$eval(
+            'body',
+            (body, args) => {
+              const {type, which, index} = args[0];
+              const actSelectors = args[1];
+              // Identify the specified element, if possible.
+              const actSelector = actSelectors[type];
+              const typeInstances = Array.from(body.querySelectorAll(actSelector));
+              const whichInstance = typeInstances.find(instance =>
+                instance.textContent.includes(which)
+                || (
+                  instance.hasAttribute('aria-label')
+                  && instance.getAttribute('aria-label').includes(which)
+                )
+                || (
+                  instance.labels
+                  && Array
+                  .from(instance.labels)
+                  .map(label => label.textContent)
+                  .join(' ')
+                  .includes(which)
+                )
+                || (
+                  instance.hasAttribute('aria-labelledby')
+                  && instance
+                  .getAttribute('aria-labelledby')
+                  .split(/\s+/)
+                  .map(id => body.querySelector(`#${id}`).textContent)
+                  .join(' ')
+                  .includes(which)
+                )
+              );
+              // If one was identified:
+              if (whichInstance) {
+                // Focus it.
+                whichInstance.focus();
+                // Perform the action.
+                if (type === 'text') {
+                  whichInstance.value = act.value;
+                  whichInstance.dispatchEvent(new Event('input'));
+                }
+                else if (['radio', 'checkbox'].includes(type)) {
+                  whichInstance.checked = true;
+                  whichInstance.dispatchEvent(new Event('change'));
+                }
+                else if (type === 'select') {
+                  whichInstance.selectedIndex = index;
+                  whichInstance.dispatchEvent(new Event('change'));
+                }
+                else if (['button', 'link'].includes(type)) {
+                  whichInstance.click();
+                }
+              }
+            },
+            [act, globals.actSelectors]
+          );
+        }
+        // Perform the remaining actions.
+        await actions(acts.slice(1));
+      }
+      // Otherwise, i.e. if all the actions have been performed:
+      else {
+        // Return the last URL visited.
+        return url;
+      }
+    };
+    // FUNCTION DEFINITION END
+    // Perform the actions.
+    const actsJSON = await globals.fs.readFile(`actions/${actFileOrURL}.json`, 'utf8');
     const acts = JSON.parse(actsJSON);
-    await page.$eval('body', actions, [acts, page]);
-    await page.waitForLoadState('networkidle', {timeout: 10000});
+    url = actions(acts);
   }
-  return page;
+  return [page, url];
 };
 // Serves a system error message.
 globals.serveError = (error, response) => {

@@ -1,10 +1,11 @@
 // Handles a form submission.
 exports.formHandler = globals => {
   const {query} = globals;
-  if (globals.queryIncludes(['actFile'])) {
+  if (globals.queryIncludes(['actFileOrURL'])) {
     const debug = false;
     (async () => {
-      const page = await globals.getPageState(debug);
+      const [page, url] = await globals.getPageState(debug);
+      query.url = url;
       // Get an array of ElementHandles for autocomplete-eligible inputs.
       const inputTypes = ['date', 'email', 'password', 'tel', 'text', 'url'];
       const selectors = inputTypes.map(type => `input[type=${type}]`);
