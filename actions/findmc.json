@@ -1,5 +1,9 @@
 [
   {
+    "type": "url",
+    "which": "https://www.cvs.com/minuteclinic"
+  },
+  {
     "type": "text",
     "which": "locations",
     "value": "10069"

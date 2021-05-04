@@ -1,7 +1,7 @@
 // Handles a form submission.
 exports.formHandler = globals => {
   const {query} = globals;
-  if (globals.queryIncludes(['url'])) {
+  if (globals.queryIncludes(['actFile'])) {
     const debug = false;
     (async () => {
       const page = await globals.getPageState(debug);

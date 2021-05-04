@@ -23,24 +23,15 @@
           <h2>Specifications</h2>
           <form method="POST" action="/tests/autocom">
             <p><label>
-              <span>URL of the page (required)</span>
+              <span>Action file name (without <code>.json</code>) or page URL (required)</span>
               <input
-                name="url"
-                type="url"
+                name="actFile"
+                type="text"
                 size="60"
                 maxlength="300"
                 value="https://"
                 required
               >
-            </label></p>
-            <p><label>
-              <span>Action file</span>
-              <span><input
-                name="actFile"
-                type="text"
-                size="20"
-                maxlength="50"
-              >.json</span>
             </label></p>
             <p><button>Submit</button></p>
           </form>

@@ -1,5 +1,9 @@
 [
   {
+    "type": "url",
+    "which": "https://www.cvs.com/minuteclinic"
+  },
+  {
     "type": "link",
     "which": "eligible"
   }

@@ -62,15 +62,22 @@ globals.actSelectors = {
 };
 // ########## FUNCTIONS
 // Recursively performs specified browser actions.
-const actions = async (body, args) => {
-  // Get an array of acts to be performed.
-  const acts = JSON.parse(args[0]);
-  // FUNCTION DEFINITION START
-  const perform = async acts => {
-    if (acts.length) {
-      const act = acts[0];
-      const actSelector = args[1][act.type];
-      const which = act.which;
+const actions = async (body, actsAndPage) => {
+  const [acts, page] = actsAndPage;
+  // If any unperformed actions remain:
+  if (acts.length) {
+    // Identify the first of them.
+    const act = acts[0];
+    const {type, which, index} = act;
+    // If it is a URL:
+    if (type === 'url') {
+      // Visit it.
+      await page.goto(which);
+    }
+    // Otherwise, i.e. if it is an in-page action:
+    else {
+      // Identify the specified element, if possible.
+      const actSelector = globals.actSelectors[type];
       const typeInstances = Array.from(body.querySelectorAll(actSelector));
       const whichInstance = typeInstances.find(instance =>
         instance.textContent.includes(which)
@@ -96,31 +103,36 @@ const actions = async (body, args) => {
           .includes(which)
         )
       );
+      // If one was identified:
       if (whichInstance) {
+        // Focus it.
         whichInstance.focus();
-        if (act.type === 'text') {
+        // Perform the action.
+        if (type === 'text') {
           whichInstance.value = act.value;
           whichInstance.dispatchEvent(new Event('input'));
         }
-        else if (['radio', 'checkbox'].includes(act.type)) {
+        else if (['radio', 'checkbox'].includes(type)) {
           whichInstance.checked = true;
           whichInstance.dispatchEvent(new Event('change'));
         }
-        else if (act.type === 'select') {
-          whichInstance.selectedIndex = act.index;
+        else if (type === 'select') {
+          whichInstance.selectedIndex = index;
           whichInstance.dispatchEvent(new Event('change'));
         }
-        else if (['button', 'link'].includes(act.type)) {
+        else if (['button', 'link'].includes(type)) {
           whichInstance.click();
         }
       }
-      await perform(acts.slice(1));
     }
-  };
-  // FUNCTION DEFINITION END
-  // Perform the acts.
-  await perform(acts);
-  return '';
+    // Perform the remaining actions.
+    await actions(body, [acts.slice(1), page]);
+  }
+  // Otherwise, i.e. if all the actions have been performed:
+  else {
+    // Quit.
+    return '';
+  }
 };
 // Launch Chrome and get the specified state of the specified page.
 globals.getPageState = async (debug) => {
@@ -135,14 +147,18 @@ globals.getPageState = async (debug) => {
       }
     });
   }
-  // Visit the specified URL.
   const {query} = globals;
-  await page.goto(query.url);
-  // If any actions are specified:
-  if (query.actFile) {
-    // Perform them and wait for any ensuing navigation to finish.
+  // If a URL was specified:
+  if (/^https?:\/\//.test(query.actFile)) {
+    // Visit it.
+    await page.goto(query.actFile);
+  }
+  // Otherwise, i.e. if an action file was specified:
+  else {
+    // Perform the actions and wait for any ensuing navigation to finish.
     const actsJSON = await globals.fs.readFile(`actions/${query.actFile}.json`, 'utf8');
-    await page.$eval('body', actions, [actsJSON, globals.actSelectors]);
+    const acts = JSON.parse(actsJSON);
+    await page.$eval('body', actions, [acts, page]);
     await page.waitForLoadState('networkidle', {timeout: 10000});
   }
   return page;
