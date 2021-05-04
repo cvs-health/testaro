@@ -57,15 +57,16 @@ globals.actSelectors = {
   radio: 'input[type=radio]',
   checkbox: 'input[type=checkbox]',
   select: 'select',
-  button: 'button'
+  button: 'button',
+  link: 'a'
 };
 // ########## FUNCTIONS
 // Recursively performs specified browser actions.
-globals.actions = async (body, args) => {
+const actions = async (body, args) => {
   // Get an array of acts to be performed.
   const acts = JSON.parse(args[0]);
   // FUNCTION DEFINITION START
-  const perform = acts => {
+  const perform = async acts => {
     if (acts.length) {
       const act = acts[0];
       const actSelector = args[1][act.type];
@@ -109,16 +110,16 @@ globals.actions = async (body, args) => {
           whichInstance.selectedIndex = act.index;
           whichInstance.dispatchEvent(new Event('change'));
         }
-        else if (act.type === 'button') {
+        else if (['button', 'link'].includes(act.type)) {
           whichInstance.click();
         }
       }
-      perform(acts.slice(1));
+      await perform(acts.slice(1));
     }
   };
   // FUNCTION DEFINITION END
   // Perform the acts.
-  perform(acts);
+  await perform(acts);
   return '';
 };
 // Launch Chrome and get the specified state of the specified page.
@@ -137,10 +138,12 @@ globals.getPageState = async (debug) => {
   // Visit the specified URL.
   const {query} = globals;
   await page.goto(query.url);
-  // Perform any specified actions.
+  // If any actions are specified:
   if (query.actFile) {
+    // Perform them and wait for any ensuing navigation to finish.
     const actsJSON = await globals.fs.readFile(`actions/${query.actFile}.json`, 'utf8');
-    await page.$eval('body', globals.actions, [actsJSON, globals.actSelectors]);
+    await page.$eval('body', actions, [actsJSON, globals.actSelectors]);
+    await page.waitForLoadState('networkidle', {timeout: 10000});
   }
   return page;
 };
