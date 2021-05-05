@@ -12,6 +12,7 @@ require('dotenv').config();
 const http = require('http');
 // Module to create an HTTPS server and client.
 const https = require('https');
+const {injectAxe, getViolations} = require('axe-playwright');
 // ########## CONSTANTS
 globals.urlStart = `${process.env.PROTOCOL}://${process.env.HOST}`;
 const protocol = process.env.PROTOCOL || 'https';
@@ -170,6 +171,54 @@ globals.getPageState = async (debug) => {
     await page.waitForLoadState('networkidle', {timeout: 10000});
   }
   return page;
+};
+// Gets a report from axe-core.
+globals.axe = async (page, rules) => {
+  // Inject axe-core into the page.
+  await injectAxe(page);
+  // Get the data on the elements violating the specified axe-core rules.
+  const axeReport = await getViolations(page, null, {
+    axeOptions: {
+      runOnly: rules
+    }
+  });
+  // If there are any:
+  if (axeReport.length && axeReport[0].nodes && axeReport[0].nodes.length) {
+    const axeNodes = [];
+    // FUNCTION DEFINITION START
+    const compact = (node, data, logic) => {
+      if (node[logic] && node[logic].length) {
+        data[logic] = node[logic].map(rule => {
+          const item = {};
+          item.id = rule.id;
+          item.impact = rule.impact;
+          item.message = rule.message;
+          return item;
+        });
+      }
+    };
+    // FUNCTION DEFINITION END
+    // For each such element:
+    axeReport[0].nodes.forEach(node => {
+      // Compact its axe-core report data.
+      const data = {};
+      compact(node, data, 'any');
+      compact(node, data, 'none');
+      if (node.target && node.target.length) {
+        data.selector = node.target[0];
+      }
+      if (data.any || data.none) {
+        axeNodes.push(data);
+      }
+    });
+    // Compile an axe-core report.
+    globals.query.axeReport = JSON.stringify(axeNodes, null, 2).replace(/</g, '&lt;');
+  }
+  // Otherwise, i.e. if there are no axe-core violations:
+  else {
+    // Compile an axe-core report.
+    globals.query.axeReport = 'NONE';
+  }
 };
 // Serves a system error message.
 globals.serveError = (error, response) => {

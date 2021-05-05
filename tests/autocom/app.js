@@ -4,7 +4,10 @@ exports.formHandler = globals => {
   if (globals.queryIncludes(['actFileOrURL'])) {
     const debug = false;
     (async () => {
+      // Perform the specified preparations.
       const page = await globals.getPageState(debug);
+      // Compile an axe-core report.
+      await globals.axe(page, ['autocomplete-valid']);
       // Get an array of ElementHandles for autocomplete-eligible inputs.
       const inputTypes = ['date', 'email', 'password', 'tel', 'text', 'url'];
       const selectors = inputTypes.map(type => `input[type=${type}]`);
