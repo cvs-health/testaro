@@ -63,27 +63,23 @@ globals.actSelectors = {
 // ########## FUNCTIONS
 // Recursively performs the specified actions.
 const actions = async (acts, page) => {
-  console.log(`Count of actions remaining to perform: ${acts.length}`);
   // If any actions remain unperformed:
   if (acts.length) {
     // Identify the first unperformed action.
     const act = acts[0];
     // If it is a URL:
     if (act.type === 'url') {
-      console.log('Action type is url');
       // Visit it.
       await page.goto(act.which);
-      console.log(`URL after navigation is ${act.which}`);
       await page.waitForLoadState('networkidle', {timeout: 10000});
     }
     // Otherwise, i.e. if the action is an in-page action:
     else {
-      console.log('Action type is non-url');
       // Perform it with a browser function.
       await page.$eval(
         'body',
         (body, args) => {
-          const {type, which, index} = args[0];
+          const {type, which, index, value} = args[0];
           const actSelector = args[1][type];
           // Identify the specified element, if possible.
           const typeInstances = Array.from(body.querySelectorAll(actSelector));
@@ -117,7 +113,7 @@ const actions = async (acts, page) => {
             whichInstance.focus();
             // Perform the action.
             if (type === 'text') {
-              whichInstance.value = act.value;
+              whichInstance.value = value;
               whichInstance.dispatchEvent(new Event('input'));
             }
             else if (['radio', 'checkbox'].includes(type)) {
@@ -170,9 +166,8 @@ globals.getPageState = async (debug) => {
     globals.query.prep = actsJSON;
     // Perform the actions.
     const acts = JSON.parse(actsJSON);
-    console.log('About to run actions');
     await actions(acts, page);
-    console.log('actions performed');
+    await page.waitForLoadState('networkidle', {timeout: 10000});
   }
   return page;
 };
