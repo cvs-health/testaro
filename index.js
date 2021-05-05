@@ -157,7 +157,6 @@ globals.getPageState = async (debug) => {
     globals.query.prep = JSON.stringify({url: actFileOrURL}, null, 2);
     // Visit it.
     await page.goto(actFileOrURL);
-    await page.waitForLoadState('networkidle', {timeout: 20000});
   }
   // Otherwise, i.e. if an action file was specified:
   else {
@@ -168,8 +167,8 @@ globals.getPageState = async (debug) => {
     // Perform the actions.
     const acts = JSON.parse(actsJSON);
     await actions(acts, page);
-    await page.waitForLoadState('networkidle', {timeout: 20000});
   }
+  await page.waitForLoadState('networkidle', {timeout: 20000});
   return page;
 };
 // Gets a report from axe-core.
@@ -183,36 +182,52 @@ globals.axe = async (page, rules) => {
     }
   });
   // If there are any:
-  if (axeReport.length && axeReport[0].nodes && axeReport[0].nodes.length) {
-    const axeNodes = [];
-    // FUNCTION DEFINITION START
-    const compact = (node, data, logic) => {
-      if (node[logic] && node[logic].length) {
-        data[logic] = node[logic].map(rule => {
-          const item = {};
-          item.id = rule.id;
-          item.impact = rule.impact;
-          item.message = rule.message;
-          return item;
-        });
-      }
+  if (axeReport.length) {
+    const report = [];
+    // FUNCTION DEFINITIONS START
+    // Compacts a check violation.
+    const compactCheck = checkObj => {
+      return {
+        check: checkObj.id,
+        description: checkObj.message,
+        impact: checkObj.impact
+      };
     };
-    // FUNCTION DEFINITION END
-    // For each such element:
-    axeReport[0].nodes.forEach(node => {
-      // Compact its axe-core report data.
-      const data = {};
-      compact(node, data, 'any');
-      compact(node, data, 'none');
-      if (node.target && node.target.length) {
-        data.selector = node.target[0];
+    // Compacts a violating element.
+    const compactViolator = elObj => {
+      const out = {
+        selector: elObj.target[0],
+        impact: elObj.impact
+      };
+      if (elObj.any && elObj.any.length) {
+        out['must pass any of'] = elObj.any.map(checkObj => compactCheck(checkObj));
       }
-      if (data.any || data.none) {
-        axeNodes.push(data);
+      if (elObj.none && elObj.none.length) {
+        out['must pass all of'] = elObj.none.map(checkObj => compactCheck(checkObj));
       }
+      return out;
+    };
+    // Compacts a violated rule.
+    const compactRule = (ruleObj) => {
+      const out = {
+        rule: ruleObj.id,
+        description: ruleObj.description,
+        impact: ruleObj.impact,
+        elements: {}
+      };
+      if (ruleObj.nodes && ruleObj.nodes.length) {
+        out.elements = ruleObj.nodes.map(el => compactViolator(el));
+      }
+      return out;
+    };
+    // FUNCTION DEFINITIONS END
+    // For each rule violated:
+    axeReport.forEach(rule => {
+      // Add it to the report.
+      report.push(compactRule(rule));
     });
-    // Compile an axe-core report.
-    globals.query.axeReport = JSON.stringify(axeNodes, null, 2).replace(/</g, '&lt;');
+    // Format the report for output.
+    globals.query.axeReport = JSON.stringify(report, null, 2).replace(/</g, '&lt;');
   }
   // Otherwise, i.e. if there are no axe-core violations:
   else {

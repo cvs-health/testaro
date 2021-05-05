@@ -23,11 +23,11 @@
           <h2>Specifications</h2>
           <form method="POST" action="/tests/imginf">
             <p><label>
-              <span>URL of the page (required)</span>
+              <span>Action file name (without <code>.json</code>) or page URL (required)</span>
               <input
-                name="url"
-                type="url"
-                size="80"
+                name="actFileOrURL"
+                type="text"
+                size="60"
                 maxlength="300"
                 value="https://"
                 required

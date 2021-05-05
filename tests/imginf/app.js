@@ -1,12 +1,13 @@
 // Handles a form submission.
 exports.formHandler = globals => {
   const {query} = globals;
-  if (globals.queryIncludes(['url'])) {
-    const {chromium} = require('playwright');
+  if (globals.queryIncludes(['actFileOrURL'])) {
+    const debug = false;
     (async () => {
-      const ui = await chromium.launch();
-      const page = await ui.newPage();
-      await page.goto(query.url);
+      // Perform the specified preparations.
+      const page = await globals.getPageState(debug);
+      // Compile an axe-core report.
+      await globals.axe(page, ['image-alt', 'image-redundant-alt']);
       // Get an array of data on all informative images.
       const data = await page.$eval('body', body => {
         const elements = Array.from(
