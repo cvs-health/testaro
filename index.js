@@ -157,7 +157,7 @@ globals.getPageState = async (debug) => {
     globals.query.prep = JSON.stringify({url: actFileOrURL}, null, 2);
     // Visit it.
     await page.goto(actFileOrURL);
-    await page.waitForLoadState('networkidle', {timeout: 10000});
+    await page.waitForLoadState('networkidle', {timeout: 20000});
   }
   // Otherwise, i.e. if an action file was specified:
   else {
@@ -168,7 +168,7 @@ globals.getPageState = async (debug) => {
     // Perform the actions.
     const acts = JSON.parse(actsJSON);
     await actions(acts, page);
-    await page.waitForLoadState('networkidle', {timeout: 10000});
+    await page.waitForLoadState('networkidle', {timeout: 20000});
   }
   return page;
 };
