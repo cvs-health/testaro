@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>stylediff | Autotest</title>
+    <meta
+      name="description"
+      content="Example of accessibility test automation"
+    >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body>
+    <main>
+      <h1>Autotest: stylediff</h1>
+      <section class="head">
+        <h2 class="headText">Instructions</h2>
+        <p>This test tabulates inconsistencies in styles.</p>
+      </section>
+      <div class="etc">
+        <section>
+          <h2>Specifications (both answers required)</h2>
+          <form method="POST" action="/tests/stylediff">
+            <p><label>
+              <span>Action file name (without <code>.json</code>) or page URL</span>
+              <input
+                name="actFileOrURL"
+                type="text"
+                size="60"
+                maxlength="300"
+                value="https://"
+                required
+              >
+            </label></p>
+            <p><label>
+              <span>Element type</span>
+              <select name="elementType" size="8" required>
+                <option value="a" selected>a</option>
+                <option value="button">button</option>
+                <option value="h1">h1</option>
+                <option value="h2">h2</option>
+                <option value="h3">h3</option>
+                <option value="h4">h4</option>
+                <option value="h5">h5</option>
+                <option value="h6">h6</option>
+              </select>
+            </label></p>
+            <p><button>Submit</button></p>
+          </form>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>

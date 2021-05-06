@@ -7,14 +7,14 @@ exports.formHandler = globals => {
       // Perform the specified preparations.
       const page = await globals.getPageState(debug);
       // Get data.
-      const linkData = await page.$eval('body', body => {
+      const data = await page.$eval('body', (body, elementType) => {
         // Get data on the style declarations of links.
-        const linkStyleDecs = Array
-        .from(body.getElementsByTagName('a'))
-        .map(link => window.getComputedStyle(link));
+        const styleDecs = Array
+        .from(body.getElementsByTagName(elementType))
+        .map(element => window.getComputedStyle(element));
         // Tabulate the properties of the style declarations.
         const props = {};
-        linkStyleDecs.forEach(styleDec => {
+        styleDecs.forEach(styleDec => {
           for (let i = 0; i < styleDec.length; i++) {
             const styleName = styleDec[i];
             const styleValue = styleDec.getPropertyValue(styleName);
@@ -50,11 +50,12 @@ exports.formHandler = globals => {
             });
           }
         });
-        return props;
-      });
+        return [styleDecs.length, props];
+      }, query.elementType);
       // Render and serve a report.
-      query.report = Object.keys(linkData).length ? JSON.stringify(linkData, null, 2) : 'NONE';
-      globals.render('linkdiff', true);
+      query.elementCount = data[0];
+      query.report = Object.keys(data[1]).length ? JSON.stringify(data[1], null, 2) : 'NONE';
+      globals.render('stylediff', true);
     })();
   }
   else {
