@@ -22,6 +22,7 @@ const mimeTypes = {
   '/tests/imgdec/in.html': 'text/html',
   '/tests/imginf/in.html': 'text/html',
   '/tests/inlab/in.html': 'text/html',
+  '/tests/linkdiff/in.html': 'text/html',
   '/tests/role/in.html': 'text/html',
   '/tests/roleaxe/in.html': 'text/html',
   '/tests/roles/in.html': 'text/html',
@@ -153,7 +154,7 @@ globals.getPageState = async (debug) => {
   const {actFileOrURL} = globals.query;
   // If a URL was specified:
   if (/^(?:https?|file):\/\//.test(actFileOrURL)) {
-    // Make it the preparations content.
+    // Make it the preparation content.
     globals.query.prep = JSON.stringify({url: actFileOrURL}, null, 2);
     // Visit it.
     await page.goto(actFileOrURL);
@@ -162,10 +163,13 @@ globals.getPageState = async (debug) => {
   else {
     // Get the file content.
     const actsJSON = await globals.fs.readFile(`actions/${actFileOrURL}.json`, 'utf8');
-    // Make it the preparations content.
-    globals.query.prep = actsJSON;
-    // Perform the actions.
+    // Identify the actions.
     const acts = JSON.parse(actsJSON);
+    // Make the file name and the actions the preparation content.
+    globals.query.prep = JSON.stringify({
+      actFile: actFileOrURL,
+      actions: acts
+    }, null, 2);
     await actions(acts, page);
   }
   await page.waitForLoadState('networkidle', {timeout: 20000});

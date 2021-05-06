@@ -8,6 +8,7 @@ exports.formHandler = globals => {
       const page = await globals.getPageState(debug);
       // Compile an axe-core report.
       await globals.axe(page, ['label']);
+      // Get data.
       const inputData = await page.$eval('body', body => {
         // Get data on the fieldsets and their legends and inputs.
         const fieldSets = Array.from(body.getElementsByTagName('fieldset'));
