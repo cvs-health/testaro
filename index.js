@@ -152,7 +152,7 @@ globals.getPageState = async (debug) => {
   }
   const {actFileOrURL} = globals.query;
   // If a URL was specified:
-  if (/^https?:\/\//.test(actFileOrURL)) {
+  if (/^(?:https?|file):\/\//.test(actFileOrURL)) {
     // Make it the preparations content.
     globals.query.prep = JSON.stringify({url: actFileOrURL}, null, 2);
     // Visit it.

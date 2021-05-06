@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>form</title>
+    <meta
+      name="description"
+      content="form test"
+    >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main>
+      <h1>form</h1>
+      <form>
+        <input type="hidden" id="bad" name="bad" aria-label="Bad label" aria-labelledby="nameFoods">
+        <p><label id="nameFood" for="food">Name any food</label>
+          <input
+            role="input"
+            id="food"
+            name="food"
+            title="Name any food"
+            aria-label="Name any food"
+            aria-labelledby="nameFood meal nonsense"
+            aria-describedby="nameFood"
+            size="40"
+            maxlength="60"
+            required
+          >
+        </p>
+        <p>
+          <span>Name any drink</span><br>
+          <input
+            role="whatever"
+            id="drink"
+            name="drink"
+            size="40"
+            maxlength="60"
+          >
+        </p>
+        <fieldset><legend>Food choices</legend>
+          <p><label>
+            <span>Meal</span>
+            <select id="meal" name="meal" size="3">
+              <option value="breakfast">breakfast</option>
+              <option selected value="lunch">lunch</option>
+              <option value="supper">supper</option>
+            </select>
+          </label></p>
+          <fieldset>
+            <legend>Drink</legend>
+            <p><label><input name="water" type="radio" selected>water</label></p>
+            <p><label><input name="juice" type="radio">juice</label></p>
+            <p><label><input name="milk" type="radio">milk</label></p>
+            </label></p>
+          </fieldset>
+          <fieldset role="math">
+            <legend>Dessert</legend>
+            <p><label><input name="fruit" type="radio" selected>fruit</label></p>
+            <p><label><input name="cheese" type="radio">cheese</label></p>
+            <p><label><input name="pastry" type="radio">pastry</label></p>
+            </label></p>
+          </fieldset>
+        </fieldset>
+        <p role="button"><button type="button">Submit</button></p>
+      </form>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
