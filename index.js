@@ -22,6 +22,7 @@ const mimeTypes = {
   '/tests/imgdec/in.html': 'text/html',
   '/tests/imginf/in.html': 'text/html',
   '/tests/inlab/in.html': 'text/html',
+  '/tests/labclash/in.html': 'text/html',
   '/tests/role/in.html': 'text/html',
   '/tests/roleaxe/in.html': 'text/html',
   '/tests/roles/in.html': 'text/html',
