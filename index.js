@@ -16,24 +16,17 @@ const {injectAxe, getViolations} = require('axe-playwright');
 // ########## CONSTANTS
 globals.urlStart = `${process.env.PROTOCOL}://${process.env.HOST}`;
 const protocol = process.env.PROTOCOL || 'https';
+// Tests that require additional specifications.
+const multispec = new Set('state', 'stylediff');
+// Files servable without modification.
 const mimeTypes = {
-  '/tests/autocom/in.html': 'text/html',
-  '/tests/imgbg/in.html': 'text/html',
-  '/tests/imgdec/in.html': 'text/html',
-  '/tests/imginf/in.html': 'text/html',
-  '/tests/inlab/in.html': 'text/html',
-  '/tests/labclash/in.html': 'text/html',
-  '/tests/role/in.html': 'text/html',
-  '/tests/roleaxe/in.html': 'text/html',
-  '/tests/roles/in.html': 'text/html',
-  '/tests/state/in.html': 'text/html',
-  '/tests/stylediff/in.html': 'text/html',
   '/index.html': 'text/html',
   '/style.css': 'text/css'
 };
 const redirects = {
   '/': '/autotest/index.html'
 };
+// Pages to be served as error notifications.
 const customErrorPageStart = [
   '<html lang="en-US">',
   '  <head>',
@@ -55,6 +48,7 @@ const errorPageEnd = [
 ];
 const customErrorPage = customErrorPageStart.concat(...errorPageEnd);
 const systemErrorPage = systemErrorPageStart.concat(...errorPageEnd);
+// CSS selectors for preparation actions.
 globals.actSelectors = {
   text: 'input[type=text',
   radio: 'input[type=radio]',
@@ -297,10 +291,10 @@ globals.servePage = (content, newURL, mimeType, response) => {
 // Returns whether each specified query parameter is truthy.
 globals.queryIncludes = params => params.every(param => globals.query[param]);
 // Replaces the placeholders in a result page and optionally serves the page.
-globals.render = (testName, isServable) => {
+globals.render = (testName, isServable, which = 'out') => {
   if (! globals.response.writableEnded) {
     // Get the page.
-    return globals.fs.readFile(`./tests/${testName}/out.html`, 'utf8')
+    return globals.fs.readFile(`./tests/${testName}/${which}.html`, 'utf8')
     .then(
       // When it arrives:
       page => {
@@ -410,10 +404,19 @@ const requestHandler = (request, response) => {
       // Identify a query object.
       searchParams = new URLSearchParams(queryString);
       searchParams.forEach((value, name) => globals.query[name] = value);
-      // If the request submitted the first step of a test:
-      if (/^\/tests\/[-\w]+$/.test(pathName)) {
-        // Process the submission.
-        require(`.${pathName}/app`).formHandler(globals);
+      // If the request provided the initial specification of a test:
+      if (pathName === '/testspec') {
+        const test = globals.query.test;
+        // If additional specifications are required:
+        if (multispec.has(test)) {
+          // Render and serve the test’s specification form.
+          globals.render(test, true, 'in');
+        }
+        // Otherwise, i.e. if the specifications are complete:
+        else {
+          // Process the submission.
+          require(`.${test}/app}`).formHandler(globals);
+        }
       }
       // Otherwise, i.e. if the request was invalid:
       else {

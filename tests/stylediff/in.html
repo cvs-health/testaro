@@ -17,24 +17,15 @@
       <section class="head">
         <h2 class="headText">Instructions</h2>
         <p>This test tabulates inconsistencies in styles.</p>
+        <p>Action file or URL: <code>__actFileOrURL__</code></p>
       </section>
       <div class="etc">
         <section>
-          <h2>Specifications (both answers required)</h2>
+          <h2>Specification</h2>
           <form method="POST" action="/tests/stylediff">
+            <input type="hidden" name="actFileOrURL" value="__actFileOrURL__">
             <p><label>
-              <span>Action file name (without <code>.json</code>) or page URL</span>
-              <input
-                name="actFileOrURL"
-                type="text"
-                size="60"
-                maxlength="300"
-                value="https://"
-                required
-              >
-            </label></p>
-            <p><label>
-              <span>Element type</span>
+              <span>Element type (required)</span>
               <select name="elementType" size="8" required>
                 <option value="a" selected>a</option>
                 <option value="button">button</option>

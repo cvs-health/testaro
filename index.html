@@ -20,29 +20,58 @@
       </section>
       <div class="etc">
         <section>
-          <h2>Implemented tests</h2>
-          <ul>
-            <li>
-              <a href="tests/autocom/in.html">autocom</a>: <code>autocomplete</code> attributes of inputs
-            </li>
-            <li><a href="tests/imgbg/in.html">imgbg</a>: background images</li>
-            <li><a href="tests/imgdec/in.html">imgdec</a>: images marked up as decorative</li>
-            <li><a href="tests/imginf/in.html">imginf</a>: images marked up as informative</li>
-            <li><a href="tests/inlab/in.html">inlab</a>: inputs and their labels</li>
-            <li><a href="tests/labclash/in.html">labclash</a>: input labeling conflicts</li>
-            <li>
-              <a href="tests/role/in.html">role</a>: elements with <code>role</code> attributes, listed
-            </li>
-            <li>
-              <a href="tests/roles/in.html">roles</a>: elements with <code>role</code> attributes, tabulated
-            </li>
-            <li>
-              <a href="tests/state/in.html">state</a>: focus and hover states of form controls
-            </li>
-            <li>
-              <a href="tests/stylediff/in.html">stylediff</a>: style inconsistencies, tabulated
-            </li>
-          </ul>
+          <h2>Test request</h2>
+          <form action="/testspec">
+            <fieldset>
+              <legend>Choose a test to run</legend>
+              <ul class="radios">
+                <li><label>
+                  <input type="radio" name="test" value="autocom" checked>
+                  <code>autocom</code>: <code>autocomplete</code> attributes of inputs
+                </label></li>
+                <li><label>
+                  <input type="radio" name="test" value="imgbg">
+                  <code>imgbg</code>: background images
+                </label></li>
+                <li><label><input type="radio" name="test" value="imgdec">
+                  <code>imgdec</code>: images marked up as decorative</label></li>
+                <li><label><input type="radio" name="test" value="imginf">
+                  <code>imginf</code>: images marked up as informative</label></li>
+                <li><label><input type="radio" name="test" value="inlab">
+                  <code>inlab</code>: inputs and their labels</label></li>
+                <li><label><input type="radio" name="test" value="labclash">
+                  <code>labclash</code>: input labeling conflicts</label></li>
+                <li>
+                  <label><input type="radio" name="test" value="role">
+                    <code>role</code>: elements with <code>role</code> attributes, listed
+                </label></li>
+                <li>
+                  <label><input type="radio" name="test" value="roles">
+                    <code>roles</code>: elements with <code>role</code> attributes, tabulated
+                </label></li>
+                <li>
+                  <label><input type="radio" name="test" value="state">
+                    <code>state</code>: focus and hover states of form controls
+                </label></li>
+                <li>
+                  <label><input type="radio" name="test" value="stylediff">
+                    <code>stylediff</code>: style inconsistencies, tabulated
+                </label></li>
+              </ul>
+            </fieldset>
+            <p><label>
+              <span>Action file name (without <code>.json</code>) or page URL (required)</span>
+              <input
+                name="actFileOrURL"
+                type="text"
+                size="60"
+                maxlength="300"
+                value="https://"
+                required
+              >
+            </label></p>
+            <p><button>Submit</button></p>
+          </form>
         </section>
       </div>
     </main>

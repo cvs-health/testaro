@@ -1,7 +1,7 @@
 // Handles a form submission.
 exports.formHandler = globals => {
   const {query} = globals;
-  if (globals.queryIncludes(['url', 'elementType', 'elementIndex', 'state'])) {
+  if (globals.queryIncludes(['actFileOrURL', 'elementType', 'elementIndex', 'state'])) {
     const minHeight = 10;
     const minWidth = 10;
     query.State = query.state === 'focus' ? 'Focused' : 'Hovered';
@@ -182,7 +182,7 @@ exports.formHandler = globals => {
       // Identify a Page (tab).
       const page = await ui.newPage();
       // Navigate to the specified URL.
-      await page.goto(query.url);
+      await page.goto(query.actFileOrURL);
       // Identify the specified ElementHandle.
       const selector = `${query.elementType}:visible`;
       const element = await page.$(`:nth-match(${selector}, ${query.elementIndex})`);
@@ -212,7 +212,7 @@ exports.formHandler = globals => {
         globals.serveMessage(
           `
             ERROR: No <code>&lt;${query.elementType}&gt;</code> number ${query.elementIndex}
-            at ${query.url}.
+            at ${query.actFileOrURL}.
           `, globals.response
         );
       }

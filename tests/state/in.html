@@ -17,22 +17,13 @@
       <section class="head">
         <h2 class="headText">Instructions</h2>
         <p>This test displays a form control with and without focus or hover in 3 browsers.</p>
+        <p>Action file or URL: <code>__actFileOrURL__</code></p>
       </section>
       <div class="etc">
         <section>
           <h2>Specifications (all answers are required)</h2>
           <form method="POST" action="/tests/state">
-            <p><label>
-              <span>Page URL</span>
-              <input
-                name="url"
-                type="url"
-                size="60"
-                maxlength="300"
-                value="https://"
-                required
-              >
-            </label></p>
+            <input type="hidden" name="actFileOrURL" value="__actFileOrURL__">
             <p><label>
               <span>Element type</span>
               <select name="elementType" size="3" required>

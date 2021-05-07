@@ -75,7 +75,7 @@ input, select {
   margin: 0.5rem 0;
   font-size: inherit;
 }
-label {
+label.vertical {
   display: flex;
   flex-direction: column;
   align-items: start;
@@ -114,4 +114,7 @@ tbody th {
 }
 thead th {
   padding-bottom: 1rem;
+}
+ul.radios {
+  list-style-type: none;
 }
