@@ -415,7 +415,7 @@ const requestHandler = (request, response) => {
         // Otherwise, i.e. if the specifications are complete:
         else {
           // Process the submission.
-          require(`.${test}/app}`).formHandler(globals);
+          require(`./tests/${test}/app`).formHandler(globals);
         }
       }
       // Otherwise, i.e. if the request was invalid:
