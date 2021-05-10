@@ -23,8 +23,9 @@
         <section>
           <h2>Specifications (all answers are required)</h2>
           <form method="POST" action="/tests/state">
+            <input type="hidden" name="test" value="__test__">
             <input type="hidden" name="actFileOrURL" value="__actFileOrURL__">
-            <p><label>
+            <p><label class="vertical">
               <span>Element type</span>
               <select name="elementType" size="3" required>
                 <option value="a" selected>a</option>
@@ -32,7 +33,7 @@
                 <option value="input">input</option>
               </select>
             </label></p>
-            <p><label>
+            <p><label class="vertical">
               <span>Element index (1 is first of its type, 2 second, etc.)</span>
               <input
                 name="elementIndex"
@@ -45,7 +46,7 @@
                 required
               >
             </label></p>
-            <p><label>
+            <p><label class="vertical">
               <span>State</span>
               <select name="state" size="2" required>
                 <option value="focus" selected>focus</option>

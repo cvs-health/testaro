@@ -17,7 +17,7 @@ const {injectAxe, getViolations} = require('axe-playwright');
 globals.urlStart = `${process.env.PROTOCOL}://${process.env.HOST}`;
 const protocol = process.env.PROTOCOL || 'https';
 // Tests that require additional specifications.
-const multispec = new Set('state', 'stylediff');
+const multiSpec = new Set(['state', 'stylediff']);
 // Files servable without modification.
 const mimeTypes = {
   '/index.html': 'text/html',
@@ -404,11 +404,11 @@ const requestHandler = (request, response) => {
       // Identify a query object.
       searchParams = new URLSearchParams(queryString);
       searchParams.forEach((value, name) => globals.query[name] = value);
-      // If the request provided the initial specification of a test:
+      const test = globals.query.test;
+      // If the request provides an initial specification:
       if (pathName === '/testspec') {
-        const test = globals.query.test;
         // If additional specifications are required:
-        if (multispec.has(test)) {
+        if (multiSpec.has(test)) {
           // Render and serve the test’s specification form.
           globals.render(test, true, 'in');
         }
@@ -418,7 +418,12 @@ const requestHandler = (request, response) => {
           require(`./tests/${test}/app`).formHandler(globals);
         }
       }
-      // Otherwise, i.e. if the request was invalid:
+      // Otherwise, if the request provides a final specification:
+      else if (multiSpec.has(pathName.replace(/^\/tests\//, ''))) {
+        // Process the submission.
+        require(`./tests/${test}/app`).formHandler(globals);        
+      }
+      // Otherwise, i.e. if the request is invalid:
       else {
         // Serve an error message.
         globals.serveMessage('ERROR: Form submission invalid.', response);
