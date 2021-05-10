@@ -6,3 +6,6 @@ node_modules/
 
 # Screen shots
 screenShots/
+
+# Temporary files
+temp/
