@@ -23,8 +23,9 @@
         <section>
           <h2>Specification</h2>
           <form method="POST" action="/tests/stylediff">
+            <input type="hidden" name="test" value="__test__">
             <input type="hidden" name="actFileOrURL" value="__actFileOrURL__">
-            <p><label>
+            <p><label class="vertical">
               <span>Element type (required)</span>
               <select name="elementType" size="8" required>
                 <option value="a" selected>a</option>
