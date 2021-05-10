@@ -5,7 +5,7 @@ exports.formHandler = globals => {
     const debug = false;
     (async () => {
       // Perform the specified preparations.
-      const page = await globals.getPageState(debug);
+      const page = await globals.perform(debug);
       // Get data.
       const data = await page.$eval('body', (body, elementType) => {
         // Get data on the style declarations of links.

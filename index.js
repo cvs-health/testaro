@@ -17,7 +17,18 @@ const {injectAxe, getViolations} = require('axe-playwright');
 globals.urlStart = `${process.env.PROTOCOL}://${process.env.HOST}`;
 const protocol = process.env.PROTOCOL || 'https';
 // Tests that require additional specifications.
-const multiSpec = new Set(['state', 'stylediff']);
+const acts = {
+  autocom: 1,
+  imgbg: 1,
+  imgdec: 1,
+  imginf: 1,
+  inlab: 1,
+  labclash: 1,
+  role: 1,
+  roles: 1,
+  state: 2,
+  stylediff: 2
+};
 // Files servable without modification.
 const mimeTypes = {
   '/index.html': 'text/html',
@@ -133,8 +144,10 @@ const actions = async (acts, page) => {
     await actions(acts.slice(1), page);
   }
 };
+// Returns whether a string is a URL.
+const isURL = textString => /^(?:https?|file):\/\//.test(textString);
 // Launches Chrome and gets the specified state of the specified page.
-globals.getPageState = async (debug) => {
+globals.perform = async (debug) => {
   const {chromium} = require('playwright');
   const ui = await chromium.launch(debug ? {headless: false, slowMo: 3000} : {});
   const page = await ui.newPage();
@@ -148,7 +161,7 @@ globals.getPageState = async (debug) => {
   }
   const {actFileOrURL} = globals.query;
   // If a URL was specified:
-  if (/^(?:https?|file):\/\//.test(actFileOrURL)) {
+  if (isURL(actFileOrURL)) {
     // Make it the preparation content.
     globals.query.prep = JSON.stringify({url: actFileOrURL}, null, 2);
     // Visit it.
@@ -401,25 +414,32 @@ const requestHandler = (request, response) => {
     else if (method === 'POST') {
       // Get a query string from the request body.
       const queryString = Buffer.concat(bodyParts).toString();
-      // Identify a query object.
+      // Create a query object.
       searchParams = new URLSearchParams(queryString);
       searchParams.forEach((value, name) => globals.query[name] = value);
       const test = globals.query.test;
-      // If the request provides an initial specification:
+      // If the request provides initial specifications:
       if (pathName === '/testspec') {
-        // If additional specifications are required:
-        if (multiSpec.has(test)) {
-          // Render and serve the test’s specification form.
+        // If the test is valid and needs more specifications:
+        if (acts[test] === 2) {
+          // Render and serve the test’s additional specification form.
           globals.render(test, true, 'in');
         }
-        // Otherwise, i.e. if the specifications are complete:
-        else {
+        // Otherwise, if the request or an action file specifies the test(s):
+        else if (acts[test] === 1 || (test === 'spec' && ! isURL(globals.query.actFileOrURL))) {
           // Process the submission.
           require(`./tests/${test}/app`).formHandler(globals);
         }
+        // Otherwise, i.e. if the initial specification is complete but invalid:
+        else {
+          // Serve an error message.
+          globals.serveMessage(
+            'ERROR: Test <code>spec</code> requires action file name.', response
+          );
+        }
       }
       // Otherwise, if the request provides a final specification:
-      else if (multiSpec.has(pathName.replace(/^\/tests\//, ''))) {
+      else if (acts[pathName.replace(/^\/tests\//, '')] === 2) {
         // Process the submission.
         require(`./tests/${test}/app`).formHandler(globals);        
       }

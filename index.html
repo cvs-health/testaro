@@ -23,8 +23,12 @@
           <h2>Test request</h2>
           <form method="POST" action="/testspec">
             <fieldset>
-              <legend>Choose a test to run</legend>
+              <legend>Which test(s) should be run?</legend>
               <ul class="radios">
+                <li><label>
+                  <input type="radio" name="test" value="spec" checked>
+                  <code>spec</code>: all tests specified in the action file
+                </label></li>
                 <li><label>
                   <input type="radio" name="test" value="autocom" checked>
                   <code>autocom</code>: <code>autocomplete</code> attributes of inputs

@@ -5,7 +5,7 @@ exports.formHandler = globals => {
     const debug = false;
     (async () => {
       // Perform the specified preparations.
-      const page = await globals.getPageState(debug);
+      const page = await globals.perform(debug);
       // Define constants.
       const minHeight = 10;
       const minWidth = 10;

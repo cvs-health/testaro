@@ -5,7 +5,7 @@ exports.formHandler = globals => {
     const debug = false;
     (async () => {
       // Perform the specified preparations.
-      const page = await globals.getPageState(debug);
+      const page = await globals.perform(debug);
       // Compile an axe-core report.
       await globals.axe(page, ['aria-roles', 'aria-allowed-role']);
       // Identify an array of the ElementHandles of elements with role attributes.
