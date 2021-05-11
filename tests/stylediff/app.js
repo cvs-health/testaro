@@ -54,7 +54,7 @@ exports.formHandler = globals => {
       }, query.elementType);
       // Render and serve a report.
       query.elementCount = data[0];
-      query.report = Object.keys(data[1]).length ? JSON.stringify(data[1], null, 2) : 'NONE';
+      query.report = Object.keys(data[1]).length ? JSON.stringify(data[1], null, 2) : '<strong>None</strong>';
       globals.render('stylediff', true);
     })();
   }

@@ -87,7 +87,7 @@ exports.formHandler = globals => {
         return data;
       });
       // Render and serve a report.
-      query.report = inputData.length ? JSON.stringify(inputData, null, 2) : 'NONE';
+      query.report = inputData.length ? JSON.stringify(inputData, null, 2) : '<strong>None</strong>';
       globals.render('inlab', true);
     })();
   }

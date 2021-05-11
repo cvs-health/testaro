@@ -32,7 +32,7 @@ exports.formHandler = globals => {
       // Otherwise, i.e. if no decorative images exist:
       else {
         // Render and serve a report.
-        query.listItems = '<li>NONE</li>';
+        query.listItems = '<li><strong>None</strong></li>';
         globals.render('imgdec', true);
       }
     })();

@@ -244,7 +244,7 @@ globals.axe = async (page, rules) => {
   // Otherwise, i.e. if there are no axe-core violations:
   else {
     // Compile an axe-core report.
-    globals.query.axeReport = 'NONE';
+    globals.query.axeReport = '<strong>None</strong>';
   }
 };
 // Serves a system error message.

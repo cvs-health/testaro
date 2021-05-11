@@ -45,7 +45,7 @@ exports.formHandler = globals => {
       // Otherwise, i.e. if no elements with role attributes exist:
       else {
         // Render and serve a report.
-        query.tally = 'NONE';
+        query.tally = '<strong>None</strong>';
         globals.render('roles', true);
       }
     })();

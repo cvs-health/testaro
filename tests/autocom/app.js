@@ -42,7 +42,7 @@ exports.formHandler = globals => {
           const typeHandle = await element.getProperty('type');
           const type = await typeHandle.jsonValue() || 'text';
           const acHandle = await element.getAttribute('autocomplete') || '';
-          const autocomplete = acHandle || 'NONE';
+          const autocomplete = acHandle || '<strong>None</strong>';
           // Add the element to the result array.
           tally.push({
             index,
@@ -64,7 +64,7 @@ exports.formHandler = globals => {
       // Otherwise, i.e. if there are no autocomplete-eligible inputs:
       else {
         // Render and serve a report.
-        query.tally = 'NONE';
+        query.tally = '<strong>None</strong>';
         globals.render('autocom', true);
       }
     })();
