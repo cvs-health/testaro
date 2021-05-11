@@ -361,7 +361,16 @@ const formHandler = (args, axeRules, test) => {
       }
       // Compile the specified report.
       const report = await require(`./tests/${test}/app`).reporter(page);
-      globals.query.report = JSON.stringify(report, null, 2);
+      if (report.json) {
+        globals.query.report = report.data.length
+          ? JSON.stringify(report, null, 2)
+          : '<strong>None</strong>';
+      }
+      else {
+        globals.query.report = report.data.length
+          ? report.join('\n            ')
+          : '<li><strong>None</strong></li>';
+      }
       // Render and serve a report.
       render(test, true);
     })();
@@ -454,7 +463,7 @@ const requestHandler = (request, response) => {
       searchParams.forEach((value, name) => globals.query[name] = value);
       const test = globals.query.test;
       const act = globals.query.actFileOrURL;
-      // If the request specifies a valid combination of test and action file or URL:
+      // If the request specifies a valid combination of test and action:
       if (test && (testData[test]) && act && (isAct(act) || (test !== 'spec' && isURL(act)))) {
         // If the form is the initial specification form:
         if (pathName === '/spec0') {
@@ -477,13 +486,13 @@ const requestHandler = (request, response) => {
         // Otherwise, i.e. if the request is invalid:
         else {
           // Serve an error message.
-          globals.serveMessage('ERROR: Form submission invalid.', response);
+          globals.serveMessage('ERROR: Form action invalid.', response);
         }
       }
       // Otherwise, i.e. if the test does not exist:
       else {
         // Serve an error message.
-        globals.serveMessage('ERROR: Form submission invalid.', response);
+        globals.serveMessage('ERROR: Form data invalid.', response);
       }
     }
   });
