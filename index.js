@@ -16,19 +16,30 @@ const {injectAxe, getViolations} = require('axe-playwright');
 // ########## CONSTANTS
 globals.urlStart = `${process.env.PROTOCOL}://${process.env.HOST}`;
 const protocol = process.env.PROTOCOL || 'https';
-// Tests that require additional specifications.
-const acts = {
-  autocom: 1,
-  imgbg: 1,
-  imgdec: 1,
-  imginf: 1,
-  inlab: 1,
-  labclash: 1,
-  role: 1,
-  roles: 1,
-  state: 2,
-  stylediff: 2
+// Test data: (0) spec count, (1) axe rules, (2) query params of 2nd spec.
+const testData = {
+  autocom: [1, ['autocomplete-valid']],
+  imgbg: [1, []],
+  imgdec: [1, []],
+  imginf: [1, ['image-alt', 'image-redundant-alt']],
+  inlab: [1, ['label']],
+  labclash: [1, ['label']],
+  role: [1, ['aria-roles', 'aria-allowed-role']],
+  roles: [1, []],
+  spec: [1, []],
+  state: [2, [], ['elementType', 'elementIndex', 'state']],
+  stylediff: [2, [], ['elementType']]
 };
+// Action data.
+const actData = [
+  'badform',
+  'cotest',
+  'eddsrequest',
+  'elcovax',
+  'findmc',
+  'jointalent',
+  'newaccount',
+];
 // Files servable without modification.
 const mimeTypes = {
   '/index.html': 'text/html',
@@ -144,10 +155,12 @@ const actions = async (acts, page) => {
     await actions(acts.slice(1), page);
   }
 };
+// Returns whether a string is an action.
+const isAct = act => actData.includes(act);
 // Returns whether a string is a URL.
 const isURL = textString => /^(?:https?|file):\/\//.test(textString);
 // Launches Chrome and gets the specified state of the specified page.
-globals.perform = async (debug) => {
+const perform = async (debug) => {
   const {chromium} = require('playwright');
   const ui = await chromium.launch(debug ? {headless: false, slowMo: 3000} : {});
   const page = await ui.newPage();
@@ -184,7 +197,7 @@ globals.perform = async (debug) => {
   return page;
 };
 // Gets a report from axe-core.
-globals.axe = async (page, rules) => {
+const axe = async (page, rules) => {
   // Inject axe-core into the page.
   await injectAxe(page);
   // Get the data on the elements violating the specified axe-core rules.
@@ -302,9 +315,9 @@ globals.servePage = (content, newURL, mimeType, response) => {
   response.end(content);
 };
 // Returns whether each specified query parameter is truthy.
-globals.queryIncludes = params => params.every(param => globals.query[param]);
+const queryIncludes = params => params.every(param => globals.query[param]);
 // Replaces the placeholders in a result page and optionally serves the page.
-globals.render = (testName, isServable, which = 'out') => {
+const render = (testName, isServable, which = 'out') => {
   if (! globals.response.writableEnded) {
     // Get the page.
     return globals.fs.readFile(`./tests/${testName}/${which}.html`, 'utf8')
@@ -334,6 +347,28 @@ globals.redirect = (url, response) => {
   response.statusCode = 303;
   response.setHeader('Location', url);
   response.end();
+};
+// Handles a form submission.
+const formHandler = (args, axeRules, test) => {
+  if (queryIncludes(args)) {
+    const debug = false;
+    (async () => {
+      // Perform the specified actions.
+      const page = await perform(debug);
+      // Compile an axe-core report, if specified.
+      if (axeRules.length) {
+        await axe(page, axeRules);
+      }
+      // Compile the specified report.
+      const report = await require(`./tests/${test}/app`).reporter(page);
+      globals.query.report = JSON.stringify(report, null, 2);
+      // Render and serve a report.
+      render(test, true);
+    })();
+  }
+  else {
+    globals.serveMessage('ERROR: Some information missing or invalid.', globals.response);
+  }
 };
 // Handles a request.
 const requestHandler = (request, response) => {
@@ -418,32 +453,34 @@ const requestHandler = (request, response) => {
       searchParams = new URLSearchParams(queryString);
       searchParams.forEach((value, name) => globals.query[name] = value);
       const test = globals.query.test;
-      // If the request provides initial specifications:
-      if (pathName === '/testspec') {
-        // If the test is valid and needs more specifications:
-        if (acts[test] === 2) {
-          // Render and serve the test’s additional specification form.
-          globals.render(test, true, 'in');
+      const act = globals.query.actFileOrURL;
+      // If the request specifies a valid combination of test and action file or URL:
+      if (test && (testData[test]) && act && (isAct(act) || (test !== 'spec' && isURL(act)))) {
+        // If the form is the initial specification form:
+        if (pathName === '/spec0') {
+          // If a second specification form exists:
+          if (testData[test][0] === 2) {
+            // Render and serve it.
+            globals.render(test, true, 'in');
+          }
+          // Otherwise, i.e. if there is no second specification form:
+          else {
+            // Process the submission.
+            formHandler([], testData[test][1], test);
+          }
         }
-        // Otherwise, if the request or an action file specifies the test(s):
-        else if (acts[test] === 1 || (test === 'spec' && ! isURL(globals.query.actFileOrURL))) {
+        // Otherwise, if the form is a second specification form:
+        else if (pathName === '/spec1') {
           // Process the submission.
-          require(`./tests/${test}/app`).formHandler(globals);
+          formHandler(testData[test][2], testData[test][1], test);        
         }
-        // Otherwise, i.e. if the initial specification is complete but invalid:
+        // Otherwise, i.e. if the request is invalid:
         else {
           // Serve an error message.
-          globals.serveMessage(
-            'ERROR: Test <code>spec</code> requires action file name.', response
-          );
+          globals.serveMessage('ERROR: Form submission invalid.', response);
         }
       }
-      // Otherwise, if the request provides a final specification:
-      else if (acts[pathName.replace(/^\/tests\//, '')] === 2) {
-        // Process the submission.
-        require(`./tests/${test}/app`).formHandler(globals);        
-      }
-      // Otherwise, i.e. if the request is invalid:
+      // Otherwise, i.e. if the test does not exist:
       else {
         // Serve an error message.
         globals.serveMessage('ERROR: Form submission invalid.', response);

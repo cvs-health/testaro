@@ -33,24 +33,3 @@ exports.reporter = async page => await page.$eval('body', body => {
     };
   });
 });
-// Handles a form submission.
-exports.formHandler = globals => {
-  const {query} = globals;
-  if (globals.queryIncludes(['actFileOrURL'])) {
-    const debug = false;
-    (async () => {
-      // Perform the specified preparations.
-      const page = await globals.perform(debug);
-      // Compile an axe-core report.
-      await globals.axe(page, ['autocomplete-valid']);
-      // Compile an autocomplete report.
-      const report = await exports.reporter(page);
-      query.report = JSON.stringify(report, null, 2);
-      // Render and serve a report.
-      globals.render('autocom', true);
-    })();
-  }
-  else {
-    globals.serveMessage('ERROR: Some information missing or invalid.', globals.response);
-  }
-};
