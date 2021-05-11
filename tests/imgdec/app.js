@@ -14,9 +14,9 @@ exports.reporter = async page => {
   // Return a report object.
   return {
     json: false,
-    data: data.length ? data.map(
+    data: data.map(
       (item, index) =>
         `<li><img alt="image ${index}" src="${item[0]}"><br>${item[1]}: ${item[2]}</li>`
-    ) : ['<li><strong>None</strong></li>']
+    )
   };
 };
