@@ -4,7 +4,7 @@ exports.formHandler = globals => {
   if (globals.queryIncludes(['actFileOrURL'])) {
     const debug = false;
     (async () => {
-      // Perform the specified preparations.
+      // Perform the specified actions.
       const page = await globals.perform(debug);
       // Get an array of ElementHandles for elements with role attributes.
       const elements = await page.$$('[role]');
