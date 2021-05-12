@@ -361,16 +361,12 @@ const formHandler = (args, axeRules, test) => {
       }
       // Compile the specified report.
       const report = await require(`./tests/${test}/app`).reporter(page);
-      if (report.json) {
-        globals.query.report = report.data.length
-          ? JSON.stringify(report.data, null, 2)
-          : '<strong>None</strong>';
-      }
-      else {
-        globals.query.report = report.data.length
-          ? report.data.join('\n            ')
-          : '<li><strong>None</strong></li>';
-      }
+      const noText = '<strong>None</strong>';
+      const data = report.data;
+      const dataLength = Array.isArray(data) ? data.length : Object.keys(data).length;
+      globals.query.report = report.json
+        ? dataLength ? JSON.stringify(data, null, 2) : noText
+        : dataLength ? data.join('\n            ') : `<li>${noText}</li>`;
       // Render and serve a report.
       render(test, true);
     })();
