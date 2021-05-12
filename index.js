@@ -360,7 +360,7 @@ const formHandler = (args, axeRules, test) => {
         await axe(page, axeRules);
       }
       // Compile the specified report.
-      const report = await require(`./tests/${test}/app`).reporter(page);
+      const report = await require(`./tests/${test}/app`).reporter(page, globals.query);
       const noText = '<strong>None</strong>';
       const data = report.data;
       const dataLength = Array.isArray(data) ? data.length : Object.keys(data).length;

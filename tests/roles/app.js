@@ -1,6 +1,6 @@
 // Compiles a report.
 exports.reporter = async page => {
-  // Get an array of data on all elements with role attributes.
+  // Get data on all elements with role attributes.
   const data = await page.$eval('body', body => {
     const elements = Array.from(body.querySelectorAll('[role]:not([role=""])'));
     const tally = {};
