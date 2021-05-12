@@ -466,7 +466,7 @@ const requestHandler = (request, response) => {
           // If a second specification form exists:
           if (testData[test][0] === 2) {
             // Render and serve it.
-            globals.render(test, true, 'in');
+            render(test, true, 'in');
           }
           // Otherwise, i.e. if there is no second specification form:
           else {
