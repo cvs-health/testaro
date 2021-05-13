@@ -1,11 +1,10 @@
 // Compiles a report.
-exports.reporter = async (page, query) => {
+exports.reporter = async (page, query, perform) => {
   // CONSTANTS AND VARIABLES
   const debug = false;
   const minHeight = 10;
   const minWidth = 10;
   query.State = query.state === 'focus' ? 'Focused' : 'Hovered';
-  const {firefox, webkit} = require('playwright');
   let margin = 20;
   const data = {
     elementType: query.elementType,
@@ -122,11 +121,11 @@ exports.reporter = async (page, query) => {
     });
   };
   // Creates and records 2 screen shots in a browser.
-  const shootBoth = async agent => {
+  const shootBoth = async agentName => {
     // If the agent is not Chrome:
-    if (agent) {
-      const ui = await agent.launch(debug ? {headless: false, slowMo: 3000} : {});
-      page = await ui.newPage();
+    if (agentName !== 'chromium') {
+      // Create and launch a browser and perform the preparations.
+      page = await perform(debug, agentName);
     }
     // Identify the specified ElementHandle.
     const selector = `${query.elementType}:visible`;
@@ -137,10 +136,9 @@ exports.reporter = async (page, query) => {
       const reportBox = await getReportBox(element);
       // If it exists:
       if (reportBox.box.width) {
-        const agentName = agent ? agent.name() : 'chromium';
         // Make 2 screen shots of the element.
-        await shoot(page, reportBox, false, agentName);
-        await shoot(page, reportBox, true, agentName);
+        await shoot(page, reportBox, false, agentName || 'chromium');
+        await shoot(page, reportBox, true, agentName || 'chromium');
         return true;
       }
       else {
@@ -150,12 +148,12 @@ exports.reporter = async (page, query) => {
   };
   // FUNCTION DEFINITIONS END
   // Make the screen shots in Chrome.
-  const shot = await shootBoth(null);
+  const shot = await shootBoth('chromium');
   // If the shooting succeeded:
   if (shot) {
     // Make them in Firefox and Safari.
-    await shootBoth(firefox);
-    await shootBoth(webkit);
+    await shootBoth('firefox');
+    await shootBoth('webkit');
   }
   // Return report data.
   return {

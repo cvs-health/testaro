@@ -160,9 +160,9 @@ const isAct = act => actData.includes(act);
 // Returns whether a string is a URL.
 const isURL = textString => /^(?:https?|file):\/\//.test(textString);
 // Launches Chrome and gets the specified state of the specified page.
-const perform = async (debug) => {
-  const {chromium} = require('playwright');
-  const ui = await chromium.launch(debug ? {headless: false, slowMo: 3000} : {});
+const perform = async (debug, browserType = 'chromium') => {
+  const browser = require('playwright')[browserType];
+  const ui = await browser.launch(debug ? {headless: false, slowMo: 3000} : {});
   const page = await ui.newPage();
   // If debugging is on, output page-script console-log messages.
   if (debug){
@@ -353,14 +353,14 @@ const formHandler = (args, axeRules, test) => {
   if (queryIncludes(args)) {
     const debug = false;
     (async () => {
-      // Perform the specified actions.
+      // Perform the specified actions in Chrome.
       const page = await perform(debug);
       // Compile an axe-core report, if specified.
       if (axeRules.length) {
         await axe(page, axeRules);
       }
       // Compile the specified report.
-      const report = await require(`./tests/${test}/app`).reporter(page, globals.query);
+      const report = await require(`./tests/${test}/app`).reporter(page, globals.query, perform);
       const noText = '<strong>None</strong>';
       const data = report.data;
       const dataLength = Array.isArray(data) ? data.length : Object.keys(data).length;
