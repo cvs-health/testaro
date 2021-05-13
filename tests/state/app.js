@@ -1,228 +1,147 @@
-// Handles a form submission.
-exports.formHandler = globals => {
-  const {query} = globals;
-  if (globals.queryIncludes(['actFileOrURL', 'elementType', 'elementIndex', 'state'])) {
-    const debug = false;
-    (async () => {
-      // Perform the specified preparations.
-      const page = await globals.perform(debug);
-      // Define constants.
-      const minHeight = 10;
-      const minWidth = 10;
-      query.State = query.state === 'focus' ? 'Focused' : 'Hovered';
-      const {chromium, firefox, webkit} = require('playwright');
-      let reportBox;
-      let margin = 20;
-      let reportElement;
-      let reportLevel = 0;
-      // FUNCTION DEFINITIONS START
-      // Returns a sample of the text content of an element.
-      const getTextSample = async (element, maxLength) => {
-        let textContent = await element.textContent();
-        textContent = textContent.replace(/[<>]/g, ' ');
-        const isShort = textContent.length <= maxLength;
-        return isShort ? textContent : `${textContent.slice(0, maxLength)}&hellip;`;
-      };
-      // Reports an invalid bounding box.
-      const reportBadBox = async (box, element, isOffPage) => {
-        // Get a text sample of the element.
-        const textSample = await getTextSample(element, 40);
-        // Report the error.
-        globals.serveMessage(
-          `
-            ERROR: <code>&lt;${query.elementType}&gt;</code> number ${query.elementIndex}
-            (${textSample}) has invalid ${isOffPage ? 'location' : 'size'}:
-            <br><pre>${JSON.stringify(box, null, 2)}</pre>
-          `,
-          globals.response
-        );
-      };
-      // Validates the location and size of a bounding box.
-      const validateBox = async (box, isFinal, element, boxElement) => {
-        // If the box does not exist or is too small:
-        if (! box || box.width < minWidth || box.height < minHeight) {
-          // If it is the final box:
-          if (isFinal) {
-            // Report the error.
-            await reportBadBox(box, boxElement, false);
-            // Return the result.
-            return [true, false];
-          }
-          // Otherwise, i.e. if it is not the final box:
-          else {
-            // Return the result.
-            return [true, false];
-          }
-        }
-        // Otherwise, if the box is above or before the document:
-        else if (box.x < 0 || box.y < 0) {
-          // Report the error.
-          await reportBadBox(box, element, true);
-          // Return the result.
-          return [false, null];
-        }
-        // Otherwise, i.e. if the box is valid:
-        else {
-          // Return the result.
-          return [true, true];
-        }
-      };
-      // Returns the reportable bounding box of an element and records the box’s element.
-      const getReportBox = async (element) => {
-        // If the specified element is an input and the state is hover:
-        if (query.elementType === 'input' && query.state === 'hover') {
-          // Increase the margin if the element is labeled.
-          const labels = await element.getProperty('labels');
-          const labelCount = await labels.getProperty('length');
-          if (labelCount) {
-            margin = 50;
-          }
-        }
-        // Get and validate the element’s own bounding box.
-        const ownBox = await element.boundingBox();
-        const ownBoxResults = await validateBox(ownBox, false, element, element);
-        // If it does not exist or is within the document:
-        if (ownBoxResults[0]) {
-          // If it exists and is large enough:
-          if (ownBoxResults[1]) {
-            // Return it.
-            reportElement = element;
-            return ownBox;
-          }
-          // Otherwise, i.e. if it does not exist or is too small:
-          else {
-            // Identify the parent element of the element.
-            const parent = await element.getProperty('parentElement');
-            // Get and validate the parent’s bounding box.
-            const parentBox = await parent.boundingBox();
-            const parentBoxResults = await validateBox(parentBox, false, element, parent);
-            // If it does not exist or is within the document:
-            if (parentBoxResults[0]) {
-              // If it exists and is large enough:
-              if (parentBoxResults[1]) {
-                // Return it.
-                reportElement = parent;
-                reportLevel = 1;
-                return parentBox;
-              }
-              // Otherwise, i.e. if it does not exist or is too small:
-              else {
-                // Identify the grandparent element of the element.
-                const grandparent = await parent.getProperty('parentElement');
-                // Get and validate the grandparent’s bounding box.
-                const grandparentBox = await grandparent.boundingBox();
-                const grandparentBoxResults = await validateBox(
-                  grandparentBox, true, element, grandparent
-                );
-                // If it is valid:
-                if (grandparentBoxResults[1]) {
-                  // Return it.
-                  reportElement = grandparent;
-                  reportLevel = 2;
-                  return grandparentBox;
-                }
-                else {
-                  return Promise.resolve({});
-                }
-              }
-            }
-          }
-        }
-        else {
-          return Promise.resolve({});
-        }
-      };
-      // Returns a clipping object for a screenshot with a margin around a bounding box.
-      const getShotBox = (margin, reportBox) => {
-        const marginLeft = Math.min(margin, reportBox.x);
-        const marginTop = Math.min(margin, reportBox.y);
-        return {
-          x: reportBox.x - marginLeft,
-          y: reportBox.y - marginTop,
-          width: reportBox.width + marginLeft + margin,
-          height: reportBox.height + marginTop + margin
-        };
-      };
-      // Creates and records a screen shot.
-      const shoot = async (page, element, hasState, agent) => {
-        if (! globals.response.writableEnded) {
-          // If a state change is required:
-          if (hasState) {
-            // If to a focus state:
-            if (query.state === 'focus') {
-              // Put the element into a focus state.
-              await element.focus();
-            }
-            // Otherwise, if to a hover state:
-            else if (query.state === 'hover') {
-              // Put the reportable element into a hover state.
-              if (reportElement) {
-                await reportElement.hover();
-              }
-              else if (reportLevel === 0) {
-                await element.hover();
-              }
-              else if (reportLevel === 1) {
-                await element.getProperty('parentElement').then(el => el.hover());
-              }
-              else if (reportLevel === 2) {
-                await element.getProperty('parentElement')
-                .then(pe => pe.getProperty('parentElement'))
-                .then(ge => ge.hover());
-              }
-            }
-          }
-          // Make and report a screen shot of the element.
-          await page.screenshot({
-            clip: getShotBox(margin, reportBox),
-            path: `screenShots/state-${hasState ? 'on' : 'off'}-${agent.name()}.png`,
-            fullPage: true
-          });
-        }
-      };
-      // Creates and records 2 screen shots in the browser.
-      const shootBoth = async (agent, findsBox) => {
-        // Identify the specified ElementHandle.
-        const selector = `${query.elementType}:visible`;
-        const element = await page.$(`:nth-match(${selector}, ${query.elementIndex})`);
-        // If it exists:
-        if (element) {
-          // Record the bounding box if specified.
-          if (findsBox) {
-            reportBox = await getReportBox(element);
-          }
-          // If a reportable bounding box exists:
-          if (reportBox.width) {
-            // Make 2 screen shots of the element.
-            await shoot(page, element, false, agent);
-            await shoot(page, element, true, agent);
-            // Quit the browser.
-            reportElement = null;
-          }
-        }
-        // Otherwise, i.e. if the element does not exist:
-        else {
-          // Serve an error message.
-          globals.serveMessage(
-            `
-              ERROR: No <code>&lt;${query.elementType}&gt;</code> number ${query.elementIndex}
-              at ${query.actFileOrURL}.
-            `, globals.response
-          );
-        }
-      };
-      // FUNCTION DEFINITIONS END
-      // Make the screen shots.
-      await shootBoth(chromium, true);
-      if (reportBox) {
-        await shootBoth(firefox, false);
-        await shootBoth(webkit, false);
+// Compiles a report.
+exports.reporter = async (page, query) => {
+  // CONSTANTS AND VARIABLES
+  const debug = false;
+  const minHeight = 10;
+  const minWidth = 10;
+  query.State = query.state === 'focus' ? 'Focused' : 'Hovered';
+  const {firefox, webkit} = require('playwright');
+  let margin = 20;
+  const data = {
+    elementType: query.elementType,
+    elementIndex: query.elementIndex,
+    result: 'Success'
+  };
+  // FUNCTION DEFINITIONS START
+  // Validates the location and size of a bounding box.
+  const boxValidity = box => ({
+    existence: !! box,
+    location: box && box.x >= 0 && box.y >= 0,
+    size: box && box.width >= minWidth && box.height >= minHeight
+  });
+  // Returns the reportable bounding box of an element and that box’s element.
+  const getReportBox = async element => {
+    // If the specified element is an input and the state is hover:
+    if (query.elementType === 'input' && query.state === 'hover') {
+      // Increase the margin if the element is labeled.
+      const labels = await element.getProperty('labels');
+      const labelCount = await labels.getProperty('length');
+      if (labelCount) {
+        margin = 50;
       }
-      // Render and serve a report.
-      globals.render('state', true);
-    })();
+    }
+    // Get and validate the element’s own bounding box.
+    const ownBox = await element.boundingBox();
+    const ownBoxValidity = boxValidity(ownBox);
+    // If it is satisfactory:
+    if (ownBoxValidity.location && ownBoxValidity.size) {
+      // Return it and its element.
+      return {
+        element,
+        box: ownBox
+      };
+    }
+    // Otherwise, i.e. if it is not satisfactory:
+    else {
+      // Identify the parent element of the element.
+      const parent = await element.getProperty('parentElement');
+      // Get and validate the parent’s bounding box.
+      const parentBox = await parent.boundingBox();
+      const parentBoxValidity = boxValidity(parentBox);
+      // If it is satisfactory:
+      if (parentBoxValidity.location && parentBoxValidity.size) {
+        // Return it and its element.
+        return {
+          element: parent,
+          box: parentBox
+        };
+      }
+      // Otherwise, i.e. if it is not satisfactory:
+      else {
+        // Identify the grandparent element of the element.
+        const grandparent = await parent.getProperty('parentElement');
+        // Get and validate the grandparent’s bounding box.
+        const grandparentBox = await grandparent.boundingBox();
+        const grandparentBoxValidity = boxValidity(grandparentBox);
+        // If it is satisfactory:
+        if (grandparentBoxValidity.location && grandparentBoxValidity.size) {
+          // Return it and its element.
+          return {
+            element: grandparent,
+            box: parentBox
+          };
+        }
+        // Otherwise, i.e. if it is not satisfactory:
+        else {
+          // Record the error.
+          data.result = 'Failure to determine valid bounding box for element';
+          // Return an error result.
+          return {};
+        }
+      }
+    }
+  };
+  // Returns a clipping object for a screenshot with a margin around a bounding box.
+  const getShotBox = (margin, reportBox) => {
+    const marginLeft = Math.min(margin, reportBox.x);
+    const marginTop = Math.min(margin, reportBox.y);
+    return {
+      x: reportBox.x - marginLeft,
+      y: reportBox.y - marginTop,
+      width: reportBox.width + marginLeft + margin,
+      height: reportBox.height + marginTop + margin
+    };
+  };
+  // Creates and records a screen shot.
+  const shoot = async (page, element, reportBox, hasState, agent) => {
+    // If a state change is required:
+    if (hasState) {
+      // Make the change.
+      await query.state === 'focus' ? element.focus() : reportBox.element.hover();
+    }
+    // Make and report a screen shot.
+    await page.screenshot({
+      clip: getShotBox(margin, reportBox),
+      path: `screenShots/state-${hasState ? 'on' : 'off'}-${agent.name()}.png`,
+      fullPage: true
+    });
+  };
+  // Creates and records 2 screen shots in a browser.
+  const shootBoth = async (agent, reportBox) => {
+    // If the agent is not Chrome:
+    if (agent) {
+      const ui = await agent.launch(debug ? {headless: false, slowMo: 3000} : {});
+      page = await ui.newPage();    
+    }
+    // Identify the specified ElementHandle.
+    const selector = `${query.elementType}:visible`;
+    const element = await page.$(`:nth-match(${selector}, ${query.elementIndex})`);
+    // If it exists:
+    if (element) {
+      // If its reportable bounding box is not yet known:
+      if (! reportBox) {
+        // Determine it.
+        reportBox = await getReportBox(element);
+      }
+      // If a reportable bounding box exists:
+      if (reportBox.element) {
+        // Make 2 screen shots of the element.
+        await shoot(page, element, reportBox, false, agent);
+        await shoot(page, element, reportBox, true, agent);
+      }
+    }
+    return reportBox;
+  };
+  // FUNCTION DEFINITIONS END
+  // Make the screen shots.
+  const reportBox = await shootBoth(null, null);
+  if (reportBox.element) {
+    await shootBoth(firefox, reportBox);
+    await shootBoth(webkit, reportBox);
   }
-  else {
-    globals.serveMessage('ERROR: Some information missing or invalid.', globals.response);
-  }
+  // Return report data.
+  return {
+    json: true,
+    data
+  };
 };
