@@ -82,18 +82,18 @@ exports.reporter = async (page, query) => {
     }
   };
   // Returns a clipping object for a screenshot with a margin around a bounding box.
-  const getShotBox = (margin, reportBox) => {
-    const marginLeft = Math.min(margin, reportBox.x);
-    const marginTop = Math.min(margin, reportBox.y);
+  const getShotBox = (margin, box) => {
+    const marginLeft = Math.min(margin, box.x);
+    const marginTop = Math.min(margin, box.y);
     return {
-      x: reportBox.x - marginLeft,
-      y: reportBox.y - marginTop,
-      width: reportBox.width + marginLeft + margin,
-      height: reportBox.height + marginTop + margin
+      x: box.x - marginLeft,
+      y: box.y - marginTop,
+      width: box.width + marginLeft + margin,
+      height: box.height + marginTop + margin
     };
   };
   // Creates and records a screen shot.
-  const shoot = async (page, element, reportBox, hasState, agent) => {
+  const shoot = async (page, element, reportBox, hasState, agentName) => {
     // If a state change is required:
     if (hasState) {
       // Make the change.
@@ -101,8 +101,8 @@ exports.reporter = async (page, query) => {
     }
     // Make and report a screen shot.
     await page.screenshot({
-      clip: getShotBox(margin, reportBox),
-      path: `screenShots/state-${hasState ? 'on' : 'off'}-${agent.name()}.png`,
+      clip: getShotBox(margin, reportBox.box),
+      path: `screenShots/state-${hasState ? 'on' : 'off'}-${agentName}.png`,
       fullPage: true
     });
   };
@@ -111,7 +111,7 @@ exports.reporter = async (page, query) => {
     // If the agent is not Chrome:
     if (agent) {
       const ui = await agent.launch(debug ? {headless: false, slowMo: 3000} : {});
-      page = await ui.newPage();    
+      page = await ui.newPage();
     }
     // Identify the specified ElementHandle.
     const selector = `${query.elementType}:visible`;
@@ -125,9 +125,11 @@ exports.reporter = async (page, query) => {
       }
       // If a reportable bounding box exists:
       if (reportBox.element) {
+        const agentName = agent ? agent.name : 'Chrome';
         // Make 2 screen shots of the element.
-        await shoot(page, element, reportBox, false, agent);
-        await shoot(page, element, reportBox, true, agent);
+        console.log(`reportBox is ${JSON.stringify(reportBox, null, 2)}`);
+        await shoot(page, element, reportBox, false, agentName);
+        await shoot(page, element, reportBox, true, agentName);
       }
     }
     return reportBox;
