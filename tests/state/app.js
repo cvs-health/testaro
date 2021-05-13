@@ -127,7 +127,6 @@ exports.reporter = async (page, query) => {
       if (reportBox.element) {
         const agentName = agent ? agent.name : 'Chrome';
         // Make 2 screen shots of the element.
-        console.log(`reportBox is ${JSON.stringify(reportBox, null, 2)}`);
         await shoot(page, element, reportBox, false, agentName);
         await shoot(page, element, reportBox, true, agentName);
       }
