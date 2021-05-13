@@ -19,7 +19,7 @@ exports.reporter = async (page, query) => {
     location: box && box.x >= 0 && box.y >= 0,
     size: box && box.width >= minWidth && box.height >= minHeight
   });
-  // Returns the reportable bounding box of an element and that box’s element.
+  // Returns the reportable bounding box of an element and that box’s element(s).
   const getReportBox = async element => {
     // If the specified element is an input and the state is hover:
     if (query.elementType === 'input' && query.state === 'hover') {
@@ -37,7 +37,7 @@ exports.reporter = async (page, query) => {
     if (ownBoxValidity.location && ownBoxValidity.size) {
       // Return it and its element.
       return {
-        element,
+        elements: [element],
         box: ownBox
       };
     }
@@ -52,7 +52,7 @@ exports.reporter = async (page, query) => {
       if (parentBoxValidity.location && parentBoxValidity.size) {
         // Return it and its element.
         return {
-          element: parent,
+          elements: [element, parent],
           box: parentBox
         };
       }
@@ -67,8 +67,8 @@ exports.reporter = async (page, query) => {
         if (grandparentBoxValidity.location && grandparentBoxValidity.size) {
           // Return it and its element.
           return {
-            element: grandparent,
-            box: parentBox
+            element: [element, parent, grandparent],
+            box: grandparentBox
           };
         }
         // Otherwise, i.e. if it is not satisfactory:
@@ -76,7 +76,10 @@ exports.reporter = async (page, query) => {
           // Record the error.
           data.result = 'Failure to determine valid bounding box for element';
           // Return an error result.
-          return {};
+          return {
+            element: null,
+            box: {}
+          };
         }
       }
     }
@@ -93,13 +96,25 @@ exports.reporter = async (page, query) => {
     };
   };
   // Creates and records a screen shot.
-  const shoot = async (page, element, reportBox, hasState, agentName) => {
+  const shoot = async (page, reportBox, hasState, agentName) => {
     // If a state change is required:
     if (hasState) {
       // Make the change.
-      await query.state === 'focus' ? element.focus() : reportBox.element.hover();
+      if (query.state === 'focus') {
+        await reportBox.elements[0].focus();
+      }
+      else {
+        const elementCount = reportBox.elements.length;
+        await reportBox.elements[0].hover();
+        if (elementCount > 1) {
+          await reportBox.elements[1].hover();
+          if (elementCount === 3) {
+            await reportBox.elements[2].hover();
+          }
+        }
+      }
     }
-    // Make and report a screen shot.
+    // Make a screen shot.
     await page.screenshot({
       clip: getShotBox(margin, reportBox.box),
       path: `screenShots/state-${hasState ? 'on' : 'off'}-${agentName}.png`,
@@ -107,7 +122,7 @@ exports.reporter = async (page, query) => {
     });
   };
   // Creates and records 2 screen shots in a browser.
-  const shootBoth = async (agent, reportBox) => {
+  const shootBoth = async agent => {
     // If the agent is not Chrome:
     if (agent) {
       const ui = await agent.launch(debug ? {headless: false, slowMo: 3000} : {});
@@ -118,27 +133,29 @@ exports.reporter = async (page, query) => {
     const element = await page.$(`:nth-match(${selector}, ${query.elementIndex})`);
     // If it exists:
     if (element) {
-      // If its reportable bounding box is not yet known:
-      if (! reportBox) {
-        // Determine it.
-        reportBox = await getReportBox(element);
-      }
-      // If a reportable bounding box exists:
-      if (reportBox.element) {
-        const agentName = agent ? agent.name : 'Chrome';
+      // Determine its reportable bounding box:
+      const reportBox = await getReportBox(element);
+      // If it exists:
+      if (reportBox.box.width) {
+        const agentName = agent ? agent.name() : 'chromium';
         // Make 2 screen shots of the element.
-        await shoot(page, element, reportBox, false, agentName);
-        await shoot(page, element, reportBox, true, agentName);
+        await shoot(page, reportBox, false, agentName);
+        await shoot(page, reportBox, true, agentName);
+        return true;
+      }
+      else {
+        return false;
       }
     }
-    return reportBox;
   };
   // FUNCTION DEFINITIONS END
-  // Make the screen shots.
-  const reportBox = await shootBoth(null, null);
-  if (reportBox.element) {
-    await shootBoth(firefox, reportBox);
-    await shootBoth(webkit, reportBox);
+  // Make the screen shots in Chrome.
+  const shot = await shootBoth(null);
+  // If the shooting succeeded:
+  if (shot) {
+    // Make them in Firefox and Safari.
+    await shootBoth(firefox);
+    await shootBoth(webkit);
   }
   // Return report data.
   return {
