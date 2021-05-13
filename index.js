@@ -26,7 +26,6 @@ const testData = {
   labclash: [1, ['label']],
   role: [1, ['aria-roles', 'aria-allowed-role']],
   roles: [1, []],
-  spec: [1, []],
   state: [2, [], ['elementType', 'elementIndex', 'state']],
   stylediff: [2, [], ['elementType']]
 };
@@ -460,7 +459,7 @@ const requestHandler = (request, response) => {
       const test = globals.query.test;
       const act = globals.query.actFileOrURL;
       // If the request specifies a valid combination of test and action:
-      if (test && (testData[test]) && act && (isAct(act) || (test !== 'spec' && isURL(act)))) {
+      if (test && (testData[test]) && act && (isAct(act) || isURL(act))) {
         // If the form is the initial specification form:
         if (pathName === '/spec0') {
           // If a second specification form exists:
