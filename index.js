@@ -381,10 +381,15 @@ const formHandler = (args, axeRules, test) => {
   }
 };
 // Handles a script.
-const scriptHandler = () => {
-  globals.query.scriptName = 'Name of the script';
-  globals.query.script = 'Content of the script';
-  globals.query.report = 'Result of the script';
+const scriptHandler = async scriptName => {
+  const scriptJSON = await globals.fs.readFile(`scripts/${scriptName}.json`, 'utf8');
+  const script = JSON.parse(scriptJSON);
+  const report = {
+    scriptName,
+    script,
+    result: 'Result of the script'
+  };
+  globals.query.report = JSON.stringify(report, null, 2);
   render('script', true);
 };
 // Handles a request.
@@ -472,10 +477,11 @@ const requestHandler = (request, response) => {
       const {query} = globals;
       // If the form is a script-specification form:
       if (pathName === '/script') {
+        const {scriptName} = query;
         // If the request specifies a script:
-        if (scriptData.includes(query.scriptFile)) {
+        if (scriptData.includes(scriptName)) {
           // Process the submission.
-          scriptHandler();        
+          scriptHandler(scriptName);        
         }
         // Otherwise:
         else {
@@ -485,10 +491,11 @@ const requestHandler = (request, response) => {
       }
       // Otherwise, if the form is a test-specification form:
       else if (['/one/0', '/one/1'].includes(pathName)) {
-        const test = query.test;
-        const act = query.actFileOrURL;
+        const {test, actFileOrURL} = query;
         // If the request specifies a valid combination of test and action:
-        if (test && (testData[test]) && act && (isAct(act) || isURL(act))) {
+        if (
+          test && (testData[test]) && actFileOrURL && (isAct(actFileOrURL) || isURL(actFileOrURL))
+        ) {
         // If the form is the initial specification form:
           if (pathName === '/one/0') {
             // If a second specification form exists:
