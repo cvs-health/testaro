@@ -42,6 +42,8 @@ const actData = [
 // Files servable without modification.
 const mimeTypes = {
   '/index.html': 'text/html',
+  '/one.html': 'text/html',
+  '/scriptIn.html': 'text/html',
   '/style.css': 'text/css'
 };
 const redirects = {
@@ -374,6 +376,13 @@ const formHandler = (args, axeRules, test) => {
     globals.serveMessage('ERROR: Some information missing or invalid.', globals.response);
   }
 };
+// Handles a script.
+const scriptHandler = () => {
+  globals.query.scriptName = 'Name of the script';
+  globals.query.script = 'Content of the script';
+  globals.query.report = 'Result of the script';
+  render('script', true);
+};
 // Handles a request.
 const requestHandler = (request, response) => {
   const {method} = request;
@@ -432,12 +441,12 @@ const requestHandler = (request, response) => {
       // Otherwise, if the site icon was requested:
       else if (pathName === '/favicon.ico') {
         // Get the file content.
-        globals.fs.readFile('favicon.ico')
+        globals.fs.readFile('favicon.png')
         .then(
           // When it has arrived:
           content => {
             // Serve it.
-            response.setHeader('Content-Type', 'image/x-icon');
+            response.setHeader('Content-Type', 'image/png');
             response.write(content, 'binary');
             response.end();
           },
@@ -456,27 +465,40 @@ const requestHandler = (request, response) => {
       // Create a query object.
       searchParams = new URLSearchParams(queryString);
       searchParams.forEach((value, name) => globals.query[name] = value);
-      const test = globals.query.test;
-      const act = globals.query.actFileOrURL;
-      // If the request specifies a valid combination of test and action:
-      if (test && (testData[test]) && act && (isAct(act) || isURL(act))) {
+      const {query} = globals;
+      // If the form is a script-specification form:
+      if (pathName === '/script') {
+        // Process the submission.
+        scriptHandler();        
+      }
+      // Otherwise, if the form is a test-specification form:
+      else if (['/one/0', '/one/1'].includes(pathName)) {
+        const test = query.test;
+        const act = query.actFileOrURL;
+        // If the request specifies a valid combination of test and action:
+        if (test && (testData[test]) && act && (isAct(act) || isURL(act))) {
         // If the form is the initial specification form:
-        if (pathName === '/spec0') {
-          // If a second specification form exists:
-          if (testData[test][0] === 2) {
-            // Render and serve it.
-            render(test, true, 'in');
+          if (pathName === '/one/0') {
+            // If a second specification form exists:
+            if (testData[test][0] === 2) {
+              // Render and serve it.
+              render(test, true, 'in');
+            }
+            // Otherwise, i.e. if there is no second specification form:
+            else {
+              // Process the submission.
+              formHandler([], testData[test][1], test);
+            }
           }
-          // Otherwise, i.e. if there is no second specification form:
-          else {
+          // Otherwise, if the form is a second specification form:
+          else if (pathName === '/one/1') {
             // Process the submission.
-            formHandler([], testData[test][1], test);
+            formHandler(testData[test][2], testData[test][1], test);        
           }
-        }
-        // Otherwise, if the form is a second specification form:
-        else if (pathName === '/spec1') {
-          // Process the submission.
-          formHandler(testData[test][2], testData[test][1], test);        
+          // Otherwise, i.e. if the request is invalid:
+          else {
+            globals.serveMessage('ERROR: No such test form.', response);
+          }
         }
         // Otherwise, i.e. if the request is invalid:
         else {
@@ -484,7 +506,7 @@ const requestHandler = (request, response) => {
           globals.serveMessage('ERROR: Form action invalid.', response);
         }
       }
-      // Otherwise, i.e. if the test does not exist:
+      // Otherwise, i.e. if the form is unknown:
       else {
         // Serve an error message.
         globals.serveMessage('ERROR: Form data invalid.', response);

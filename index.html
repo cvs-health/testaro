@@ -20,58 +20,12 @@
       </section>
       <div class="etc">
         <section>
-          <h2>Test request</h2>
-          <form method="POST" action="/autotest/spec0">
-            <fieldset>
-              <legend>Which test should be run?</legend>
-              <ul class="radios">
-                <li><label>
-                  <input type="radio" name="test" value="autocom">
-                  <code>autocom</code>: <code>autocomplete</code> attributes of inputs
-                </label></li>
-                <li><label>
-                  <input type="radio" name="test" value="imgbg">
-                  <code>imgbg</code>: background images
-                </label></li>
-                <li><label><input type="radio" name="test" value="imgdec">
-                  <code>imgdec</code>: images marked up as decorative</label></li>
-                <li><label><input type="radio" name="test" value="imginf">
-                  <code>imginf</code>: images marked up as informative</label></li>
-                <li><label><input type="radio" name="test" value="inlab">
-                  <code>inlab</code>: inputs and their labels</label></li>
-                <li><label><input type="radio" name="test" value="labclash">
-                  <code>labclash</code>: input labeling conflicts</label></li>
-                <li>
-                  <label><input type="radio" name="test" value="role">
-                    <code>role</code>: elements with <code>role</code> attributes, listed
-                </label></li>
-                <li>
-                  <label><input type="radio" name="test" value="roles">
-                    <code>roles</code>: elements with <code>role</code> attributes, tabulated
-                </label></li>
-                <li>
-                  <label><input type="radio" name="test" value="state">
-                    <code>state</code>: focus and hover states of form controls
-                </label></li>
-                <li>
-                  <label><input type="radio" name="test" value="stylediff">
-                    <code>stylediff</code>: style inconsistencies, tabulated
-                </label></li>
-              </ul>
-            </fieldset>
-            <p><label>
-              <span>Action file name (without <code>.json</code>) or page URL (required)</span>
-              <input
-                name="actFileOrURL"
-                type="text"
-                size="60"
-                maxlength="300"
-                value="https://"
-                required
-              >
-            </label></p>
-            <p><button>Submit</button></p>
-          </form>
+          <h2>Testing type</h2>
+          <p>Choose a testing type.</p>
+          <ul class="radios">
+            <li><a href="/autotest/one.html">Single test</a></li>
+            <li><a href="/autotest/scriptIn.html">Script</a></li>
+          </ul>
         </section>
       </div>
     </main>

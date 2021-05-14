@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Script | Autotest</title>
+    <meta
+      name="description"
+      content="Accessibility test automation"
+    >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main>
+      <h1>Autotest: Script</h1>
+      <section class="head">
+        <h2 class="headText">Instructions</h2>
+        <p>You may choose a script that specifies a testing process.</p>
+      </section>
+      <div class="etc">
+        <section>
+          <h2></h2>
+          <form method="POST" action="/autotest/script">
+            <p><label>
+              <span>Name a script file (without <code>.json</code>; required).</span>
+              <input
+                name="scriptFile"
+                type="text"
+                size="30"
+                maxlength="40"
+                required
+              >
+            </label></p>
+            <p><button>Submit</button></p>
+          </form>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
