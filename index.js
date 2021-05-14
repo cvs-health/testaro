@@ -39,6 +39,10 @@ const actData = [
   'jointalent',
   'newaccount',
 ];
+// Script data.
+const scriptData = [
+  'newaccount'
+];
 // Files servable without modification.
 const mimeTypes = {
   '/index.html': 'text/html',
@@ -468,8 +472,16 @@ const requestHandler = (request, response) => {
       const {query} = globals;
       // If the form is a script-specification form:
       if (pathName === '/script') {
-        // Process the submission.
-        scriptHandler();        
+        // If the request specifies a script:
+        if (scriptData.includes(query.scriptFile)) {
+          // Process the submission.
+          scriptHandler();        
+        }
+        // Otherwise:
+        else {
+          // Serve an error message.
+          globals.serveMessage('ERROR: No such script.', response);
+        }
       }
       // Otherwise, if the form is a test-specification form:
       else if (['/one/0', '/one/1'].includes(pathName)) {
