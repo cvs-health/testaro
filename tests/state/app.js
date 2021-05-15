@@ -1,5 +1,5 @@
 // Compiles a report.
-exports.reporter = async (page, query, perform) => {
+exports.reporter = async (page, query, getTestPage) => {
   // CONSTANTS AND VARIABLES
   const debug = false;
   const minHeight = 10;
@@ -125,7 +125,7 @@ exports.reporter = async (page, query, perform) => {
     // If the agent is not Chrome:
     if (agentName !== 'chromium') {
       // Create and launch a browser and perform the preparations.
-      page = await perform(debug, agentName);
+      page = await getTestPage(debug, agentName);
     }
     // Identify the specified ElementHandle.
     const selector = `${query.elementType}:visible`;

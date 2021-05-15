@@ -86,7 +86,7 @@ globals.actSelectors = {
 };
 // ########## FUNCTIONS
 // Recursively performs the specified actions.
-const actions = async (acts, page) => {
+const doTestPreps = async (acts, page, type) => {
   // If any actions remain unperformed:
   if (acts.length) {
     // Identify the first unperformed action.
@@ -157,15 +157,15 @@ const actions = async (acts, page) => {
       );
     }
     // Perform the remaining actions.
-    await actions(acts.slice(1), page);
+    await doTestPreps(acts.slice(1), page);
   }
 };
 // Returns whether a string is an action.
 const isAct = act => actData.includes(act);
 // Returns whether a string is a URL.
 const isURL = textString => /^(?:https?|file):\/\//.test(textString);
-// Launches Chrome and gets the specified state of the specified page.
-const perform = async (debug, browserType = 'chromium') => {
+// Launches a browser and returns a new page.
+const launch = async (debug, browserType = 'chromium') => {
   const browser = require('playwright')[browserType];
   const ui = await browser.launch(debug ? {headless: false, slowMo: 3000} : {});
   const page = await ui.newPage();
@@ -177,6 +177,11 @@ const perform = async (debug, browserType = 'chromium') => {
       }
     });
   }
+  return page;
+};
+// Launches Chrome and gets the specified state of the specified page.
+const getTestPage = async (debug, browserType = 'chromium') => {
+  const page = await launch(debug, browserType);
   const {actFileOrURL} = globals.query;
   // If a URL was specified:
   if (isURL(actFileOrURL)) {
@@ -188,7 +193,7 @@ const perform = async (debug, browserType = 'chromium') => {
   // Otherwise, i.e. if an action file was specified:
   else {
     // Get the file content.
-    const actsJSON = await globals.fs.readFile(`actions/${actFileOrURL}.json`, 'utf8');
+    const actsJSON = await globals.fs.readFile(`scripts/pretest/${actFileOrURL}.json`, 'utf8');
     // Identify the actions.
     const acts = JSON.parse(actsJSON);
     // Make the file name and the actions the preparation content.
@@ -196,7 +201,8 @@ const perform = async (debug, browserType = 'chromium') => {
       actFile: actFileOrURL,
       actions: acts
     }, null, 2);
-    await actions(acts, page);
+    // Perform the actions.
+    await doTestPreps(acts, page);
   }
   await page.waitForLoadState('networkidle', {timeout: 20000});
   return page;
@@ -353,19 +359,19 @@ globals.redirect = (url, response) => {
   response.setHeader('Location', url);
   response.end();
 };
-// Handles a form submission.
-const formHandler = (args, axeRules, test) => {
+// Handles a test request.
+const testHandler = (args, axeRules, test) => {
   if (queryIncludes(args)) {
     const debug = false;
     (async () => {
       // Perform the specified actions in Chrome.
-      const page = await perform(debug);
+      const page = await getTestPage(debug);
       // Compile an axe-core report, if specified.
       if (axeRules.length) {
         await axe(page, axeRules);
       }
       // Compile the specified report.
-      const report = await require(`./tests/${test}/app`).reporter(page, globals.query, perform);
+      const report = await require(`./tests/${test}/app`).reporter(page, globals.query, getTestPage);
       const noText = '<strong>None</strong>';
       const data = report.data;
       const dataLength = Array.isArray(data) ? data.length : Object.keys(data).length;
@@ -380,7 +386,7 @@ const formHandler = (args, axeRules, test) => {
     globals.serveMessage('ERROR: Some information missing or invalid.', globals.response);
   }
 };
-// Handles a script.
+// Handles a script request.
 const scriptHandler = async scriptName => {
   const scriptJSON = await globals.fs.readFile(`scripts/${scriptName}.json`, 'utf8');
   const script = JSON.parse(scriptJSON);
@@ -475,7 +481,7 @@ const requestHandler = (request, response) => {
       searchParams = new URLSearchParams(queryString);
       searchParams.forEach((value, name) => globals.query[name] = value);
       const {query} = globals;
-      // If the form is a script-specification form:
+      // If the form specifies a script:
       if (pathName === '/script') {
         const {scriptName} = query;
         // If the request specifies a script:
@@ -489,30 +495,30 @@ const requestHandler = (request, response) => {
           globals.serveMessage('ERROR: No such script.', response);
         }
       }
-      // Otherwise, if the form is a test-specification form:
+      // Otherwise, if the form specifies a test:
       else if (['/one/0', '/one/1'].includes(pathName)) {
         const {test, actFileOrURL} = query;
-        // If the request specifies a valid combination of test and action:
+        // If the form data are valid:
         if (
           test && (testData[test]) && actFileOrURL && (isAct(actFileOrURL) || isURL(actFileOrURL))
         ) {
-        // If the form is the initial specification form:
+        // If the form is the first form:
           if (pathName === '/one/0') {
-            // If a second specification form exists:
+            // If a second form exists:
             if (testData[test][0] === 2) {
               // Render and serve it.
               render(test, true, 'in');
             }
-            // Otherwise, i.e. if there is no second specification form:
+            // Otherwise, i.e. if no second form exists:
             else {
               // Process the submission.
-              formHandler([], testData[test][1], test);
+              testHandler([], testData[test][1], test);
             }
           }
-          // Otherwise, if the form is a second specification form:
+          // Otherwise, if the form is a second form:
           else if (pathName === '/one/1') {
             // Process the submission.
-            formHandler(testData[test][2], testData[test][1], test);        
+            testHandler(testData[test][2], testData[test][1], test);        
           }
           // Otherwise, i.e. if the request is invalid:
           else {
