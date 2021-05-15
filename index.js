@@ -193,7 +193,7 @@ const getTestPage = async (debug, browserType = 'chromium') => {
   // Otherwise, i.e. if an action file was specified:
   else {
     // Get the file content.
-    const actsJSON = await globals.fs.readFile(`scripts/pretest/${actFileOrURL}.json`, 'utf8');
+    const actsJSON = await globals.fs.readFile(`scripts/one/${actFileOrURL}.json`, 'utf8');
     // Identify the actions.
     const acts = JSON.parse(actsJSON);
     // Make the file name and the actions the preparation content.
@@ -371,7 +371,8 @@ const testHandler = (args, axeRules, testName) => {
         await axe(page, axeRules);
       }
       // Compile the specified report.
-      const report = await require(`./tests/${test}/app`).reporter(page, globals.query, getTestPage);
+      const report = await require(`./tests/one/${testName}/app`)
+      .reporter(page, globals.query, getTestPage);
       const noText = '<strong>None</strong>';
       const data = report.data;
       const dataLength = Array.isArray(data) ? data.length : Object.keys(data).length;
@@ -388,7 +389,7 @@ const testHandler = (args, axeRules, testName) => {
 };
 // Handles a script request.
 const scriptHandler = async scriptName => {
-  const scriptJSON = await globals.fs.readFile(`scripts/${scriptName}.json`, 'utf8');
+  const scriptJSON = await globals.fs.readFile(`scripts/multi/${scriptName}.json`, 'utf8');
   const script = JSON.parse(scriptJSON);
   const report = {
     scriptName,
@@ -508,7 +509,7 @@ const requestHandler = (request, response) => {
         // If the form is the first form:
           if (pathName === '/one/0') {
             // If a second form exists:
-            if (testData[test][0] === 2) {
+            if (testData[testName][0] === 2) {
               // Render and serve it.
               render(`tests/one/${testName}`, true, 'in');
             }
