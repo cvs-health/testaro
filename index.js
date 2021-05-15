@@ -29,25 +29,9 @@ const testData = {
   state: [2, [], ['elementType', 'elementIndex', 'state']],
   stylediff: [2, [], ['elementType']]
 };
-// Action data.
-const actData = [
-  'badform',
-  'cotest',
-  'eddsrequest',
-  'elcovax',
-  'findmc',
-  'jointalent',
-  'newaccount',
-];
-// Script data.
-const scriptData = [
-  'newaccount'
-];
 // Files servable without modification.
 const mimeTypes = {
   '/index.html': 'text/html',
-  '/one.html': 'text/html',
-  '/scriptIn.html': 'text/html',
   '/style.css': 'text/css'
 };
 const redirects = {
@@ -75,7 +59,7 @@ const errorPageEnd = [
 ];
 const customErrorPage = customErrorPageStart.concat(...errorPageEnd);
 const systemErrorPage = systemErrorPageStart.concat(...errorPageEnd);
-// CSS selectors for preparation actions.
+// CSS selectors for actions.
 globals.actSelectors = {
   text: 'input[type=text',
   radio: 'input[type=radio]',
@@ -86,7 +70,7 @@ globals.actSelectors = {
 };
 // ########## FUNCTIONS
 // Recursively performs the specified actions.
-const doTestPreps = async (acts, page, type) => {
+const doTestPreps = async (acts, page) => {
   // If any actions remain unperformed:
   if (acts.length) {
     // Identify the first unperformed action.

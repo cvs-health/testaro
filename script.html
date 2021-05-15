@@ -2,7 +2,7 @@
 <html lang="en-US">
   <head>
     <meta charset="utf-8">
-    <title>Script | Autotest</title>
+    <title>Choose a script | Autotest</title>
     <meta
       name="description"
       content="Accessibility test automation"
@@ -13,25 +13,18 @@
   </head>
   <body>
     <main>
-      <h1>Autotest: Script</h1>
+      <h1>Autotest: Choose a script</h1>
       <section class="head">
         <h2 class="headText">Instructions</h2>
-        <p>You may choose a script that specifies a testing process.</p>
+        <p>Autotest will perform the actions specified in the script that you choose.</p>
       </section>
       <div class="etc">
         <section>
-          <h2></h2>
-          <form method="POST" action="/autotest/script">
-            <p><label>
-              <span>Name a script file (without <code>.json</code>; required).</span>
-              <input
-                name="scriptName"
-                type="text"
-                size="30"
-                maxlength="40"
-                required
-              >
-            </label></p>
+          <h2>Script</h2>
+          <form method="POST" action="/autotest/scriptName">
+            <select id="scriptName" name="scriptName" size="__scriptCount__">
+              __scriptNames__
+            </select>
             <p><button>Submit</button></p>
           </form>
         </section>

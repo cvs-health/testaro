@@ -17,15 +17,28 @@
       <section class="head">
         <h2 class="headText">Introduction</h2>
         <p>Autotest is a prototype application investigating methods of web-application test automation, with an emphasis on tests for accessibility.</p>
+        <p>Your instructions to Autotest are in a <strong>script</strong>.</p>
+        <p>A script follows <a href="doc.html">Autotest script rules</a>. Each script is stored in its own file.</p>
+        <p>The standard place to put your script files is a directory named <code>autotest-scripts</code> next to the <code>autotest</code> directory.</p>
+        <p>You will tell Autotest where your scripts are located. Then Autotest will show you a list of your scripts. You will choose a script to run from. Then Autotest will perform the actions specified in the script and create a report.</p>
       </section>
       <div class="etc">
         <section>
-          <h2>Testing type</h2>
-          <p>Choose a testing type.</p>
-          <ul class="radios">
-            <li><a href="/autotest/one.html">Single test</a></li>
-            <li><a href="/autotest/scriptIn.html">Script</a></li>
-          </ul>
+          <h2>Script location</h2>
+          <form method="POST" action="/autotest/scriptPath">
+            <p><label>
+              <span>Where are your scripts?</span>
+              <input
+                name="scriptPath"
+                type="text"
+                size="30"
+                maxlength="50"
+                value="../autotest-scripts"
+                required
+              >
+            </label></p>
+          </form>
+          <p><button>Submit</button></p>
         </section>
       </div>
     </main>
