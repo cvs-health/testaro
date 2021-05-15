@@ -328,10 +328,10 @@ globals.servePage = (content, newURL, mimeType, response) => {
 // Returns whether each specified query parameter is truthy.
 const queryIncludes = params => params.every(param => globals.query[param]);
 // Replaces the placeholders in a result page and optionally serves the page.
-const render = (testName, isServable, which = 'out') => {
+const render = (path, isServable, which = 'out') => {
   if (! globals.response.writableEnded) {
     // Get the page.
-    return globals.fs.readFile(`./tests/${testName}/${which}.html`, 'utf8')
+    return globals.fs.readFile(`./${path}/${which}.html`, 'utf8')
     .then(
       // When it arrives:
       page => {
@@ -340,7 +340,7 @@ const render = (testName, isServable, which = 'out') => {
         // If the page is ready to serve:
         if (isServable) {
           // Serve it.
-          globals.servePage(renderedPage, `/${testName}-out.html`, 'text/html', globals.response);
+          globals.servePage(renderedPage, `/${path}-out.html`, 'text/html', globals.response);
           return '';
         }
         // Otherwise, i.e. if the page needs modification before it is served:
@@ -360,7 +360,7 @@ globals.redirect = (url, response) => {
   response.end();
 };
 // Handles a test request.
-const testHandler = (args, axeRules, test) => {
+const testHandler = (args, axeRules, testName) => {
   if (queryIncludes(args)) {
     const debug = false;
     (async () => {
@@ -379,7 +379,7 @@ const testHandler = (args, axeRules, test) => {
         ? dataLength ? JSON.stringify(data, null, 2) : noText
         : dataLength ? data.join('\n            ') : `<li>${noText}</li>`;
       // Render and serve a report.
-      render(test, true);
+      render(`tests/one/${testName}`, true);
     })();
   }
   else {
@@ -396,7 +396,7 @@ const scriptHandler = async scriptName => {
     result: 'Result of the script'
   };
   globals.query.report = JSON.stringify(report, null, 2);
-  render('script', true);
+  render('tests/multi', true);
 };
 // Handles a request.
 const requestHandler = (request, response) => {
@@ -497,28 +497,31 @@ const requestHandler = (request, response) => {
       }
       // Otherwise, if the form specifies a test:
       else if (['/one/0', '/one/1'].includes(pathName)) {
-        const {test, actFileOrURL} = query;
+        const {testName, actFileOrURL} = query;
         // If the form data are valid:
         if (
-          test && (testData[test]) && actFileOrURL && (isAct(actFileOrURL) || isURL(actFileOrURL))
+          testName
+          && testData[testName]
+          && actFileOrURL
+          && (isAct(actFileOrURL) || isURL(actFileOrURL))
         ) {
         // If the form is the first form:
           if (pathName === '/one/0') {
             // If a second form exists:
             if (testData[test][0] === 2) {
               // Render and serve it.
-              render(test, true, 'in');
+              render(`tests/one/${testName}`, true, 'in');
             }
             // Otherwise, i.e. if no second form exists:
             else {
               // Process the submission.
-              testHandler([], testData[test][1], test);
+              testHandler([], testData[testName][1], testName);
             }
           }
           // Otherwise, if the form is a second form:
           else if (pathName === '/one/1') {
             // Process the submission.
-            testHandler(testData[test][2], testData[test][1], test);        
+            testHandler(testData[testName][2], testData[testName][1], testName);        
           }
           // Otherwise, i.e. if the request is invalid:
           else {
