@@ -16,21 +16,8 @@ const {injectAxe, getViolations} = require('axe-playwright');
 // ########## CONSTANTS
 globals.urlStart = `${process.env.PROTOCOL}://${process.env.HOST}`;
 const protocol = process.env.PROTOCOL || 'https';
-// Test data: (0) spec count, (1) axe rules, (2) query params of 2nd spec.
-const testData = {
-  autocom: [1, ['autocomplete-valid']],
-  imgbg: [1, []],
-  imgdec: [1, []],
-  imginf: [1, ['image-alt', 'image-redundant-alt']],
-  inlab: [1, ['label']],
-  labclash: [1, ['label']],
-  role: [1, ['aria-roles', 'aria-allowed-role']],
-  roles: [1, []],
-  state: [2, [], ['elementType', 'elementIndex', 'state']],
-  stylediff: [2, [], ['elementType']]
-};
 // Files servable without modification.
-const mimeTypes = {
+const statics = {
   '/index.html': 'text/html',
   '/style.css': 'text/css'
 };
@@ -60,7 +47,7 @@ const errorPageEnd = [
 const customErrorPage = customErrorPageStart.concat(...errorPageEnd);
 const systemErrorPage = systemErrorPageStart.concat(...errorPageEnd);
 // CSS selectors for actions.
-globals.actSelectors = {
+globals.elementActs = {
   text: 'input[type=text',
   radio: 'input[type=radio]',
   checkbox: 'input[type=checkbox]',
@@ -68,130 +55,23 @@ globals.actSelectors = {
   button: 'button',
   link: 'a'
 };
+const testNames = [
+  'autocom',
+  'imgbg',
+  'imgdec',
+  'imginf',
+  'inlab',
+  'labclash',
+  'role',
+  'roles',
+  'state',
+  'stylediff'
+];
 // ########## FUNCTIONS
-// Recursively performs the specified actions.
-const doTestPreps = async (acts, page) => {
-  // If any actions remain unperformed:
-  if (acts.length) {
-    // Identify the first unperformed action.
-    const act = acts[0];
-    // If it is a URL:
-    if (act.type === 'url') {
-      // Visit it.
-      await page.goto(act.which);
-      await page.waitForLoadState('networkidle', {timeout: 10000});
-    }
-    // Otherwise, i.e. if the action is an in-page action:
-    else {
-      // Perform it with a browser function.
-      await page.$eval(
-        'body',
-        (body, args) => {
-          const {type, which, index, value} = args[0];
-          const actSelector = args[1][type];
-          // Identify the specified element, if possible.
-          const typeInstances = Array.from(body.querySelectorAll(actSelector));
-          const whichInstance = typeInstances.find(instance =>
-            instance.textContent.includes(which)
-            || (
-              instance.hasAttribute('aria-label')
-              && instance.getAttribute('aria-label').includes(which)
-            )
-            || (
-              instance.labels
-              && Array
-              .from(instance.labels)
-              .map(label => label.textContent)
-              .join(' ')
-              .includes(which)
-            )
-            || (
-              instance.hasAttribute('aria-labelledby')
-              && instance
-              .getAttribute('aria-labelledby')
-              .split(/\s+/)
-              .map(id => body.querySelector(`#${id}`).textContent)
-              .join(' ')
-              .includes(which)
-            )
-          );
-          // If one was identified:
-          if (whichInstance) {
-            // Focus it.
-            whichInstance.focus();
-            // Perform the action.
-            if (type === 'text') {
-              whichInstance.value = value;
-              whichInstance.dispatchEvent(new Event('input'));
-            }
-            else if (['radio', 'checkbox'].includes(type)) {
-              whichInstance.checked = true;
-              whichInstance.dispatchEvent(new Event('change'));
-            }
-            else if (type === 'select') {
-              whichInstance.selectedIndex = index;
-              whichInstance.dispatchEvent(new Event('change'));
-            }
-            else if (['button', 'link'].includes(type)) {
-              whichInstance.click();
-            }
-          }
-        },
-        [act, globals.actSelectors]
-      );
-    }
-    // Perform the remaining actions.
-    await doTestPreps(acts.slice(1), page);
-  }
-};
-// Returns whether a string is an action.
-const isAct = act => actData.includes(act);
 // Returns whether a string is a URL.
 const isURL = textString => /^(?:https?|file):\/\//.test(textString);
-// Launches a browser and returns a new page.
-const launch = async (debug, browserType = 'chromium') => {
-  const browser = require('playwright')[browserType];
-  const ui = await browser.launch(debug ? {headless: false, slowMo: 3000} : {});
-  const page = await ui.newPage();
-  // If debugging is on, output page-script console-log messages.
-  if (debug){
-    page.on('console', msg => {
-      if (msg.type() === 'log') {
-        console.log(msg.text());
-      }
-    });
-  }
-  return page;
-};
-// Launches Chrome and gets the specified state of the specified page.
-const getTestPage = async (debug, browserType = 'chromium') => {
-  const page = await launch(debug, browserType);
-  const {actFileOrURL} = globals.query;
-  // If a URL was specified:
-  if (isURL(actFileOrURL)) {
-    // Make it the preparation content.
-    globals.query.prep = JSON.stringify({url: actFileOrURL}, null, 2);
-    // Visit it.
-    await page.goto(actFileOrURL);
-  }
-  // Otherwise, i.e. if an action file was specified:
-  else {
-    // Get the file content.
-    const actsJSON = await globals.fs.readFile(`scripts/one/${actFileOrURL}.json`, 'utf8');
-    // Identify the actions.
-    const acts = JSON.parse(actsJSON);
-    // Make the file name and the actions the preparation content.
-    globals.query.prep = JSON.stringify({
-      actFile: actFileOrURL,
-      actions: acts
-    }, null, 2);
-    // Perform the actions.
-    await doTestPreps(acts, page);
-  }
-  await page.waitForLoadState('networkidle', {timeout: 20000});
-  return page;
-};
-// Gets a report from axe-core.
+// Recursively performs the specified acts.
+// Conducts an axe test.
 const axe = async (page, rules) => {
   // Inject axe-core into the page.
   await injectAxe(page);
@@ -246,15 +126,152 @@ const axe = async (page, rules) => {
       // Add it to the report.
       report.push(compactRule(rule));
     });
-    // Format the report for output.
-    globals.query.axeReport = JSON.stringify(report, null, 2).replace(/</g, '&lt;');
+    // Return the report.
+    return report;
   }
   // Otherwise, i.e. if there are no axe-core violations:
   else {
-    // Compile an axe-core report.
-    globals.query.axeReport = '<strong>None</strong>';
+    // Compile and return a report.
+    return '<strong>None</strong>';
   }
 };
+// Recursively performs the acts of a script.
+const doActs = async (acts, page) => {
+  // If any acts remain unperformed:
+  if (acts.length) {
+    // Identify the first unperformed act.
+    const act = acts[0];
+    // If it is a valid custom test:
+    if (act.type === 'test' && testNames.includes(act.which)) {
+      // Conduct the test and add the result to the act.
+      act.result = await require(`./tests/${act.which}`).reporter(page);
+    }
+    // Otherwise, if it is an axe test:
+    else if (act.type === 'axe') {
+      // Conduct it and add its result to the act.
+      act.result = await axe(page, act.which);
+    }
+    // Otherwise, if it is a valid URL:
+    else if (act.type === 'url' && isURL(act.which)) {
+      // Visit it and add the final URL to the act.
+      await page.goto(act.which);
+      await page.waitForLoadState('networkidle', {timeout: 10000});
+      act.result = page.url();
+    }
+    // Otherwise, if it is a valid element act:
+    else if (globals.elementActs[act.type]) {
+      // Perform it with a browser function.
+      await page.$eval(
+        'body',
+        (body, args) => {
+          const {type, which, index, value} = args[0];
+          const selector = args[1][type];
+          // Identify the specified element, if possible.
+          const matches = Array.from(body.querySelectorAll(selector));
+          const whichElement = matches.find(match =>
+            match.textContent.includes(which)
+            || (
+              match.hasAttribute('aria-label')
+              && match.getAttribute('aria-label').includes(which)
+            )
+            || (
+              match.labels
+              && Array
+              .from(match.labels)
+              .map(label => label.textContent)
+              .join(' ')
+              .includes(which)
+            )
+            || (
+              match.hasAttribute('aria-labelledby')
+              && match
+              .getAttribute('aria-labelledby')
+              .split(/\s+/)
+              .map(id => body.querySelector(`#${id}`).textContent)
+              .join(' ')
+              .includes(which)
+            )
+          );
+          // If one was identified:
+          if (whichElement) {
+            // Focus it.
+            whichElement.focus();
+            // Perform the act.
+            if (type === 'text') {
+              whichElement.value = value;
+              whichElement.dispatchEvent(new Event('input'));
+            }
+            else if (['radio', 'checkbox'].includes(type)) {
+              whichElement.checked = true;
+              whichElement.dispatchEvent(new Event('change'));
+            }
+            else if (type === 'select') {
+              whichElement.selectedIndex = index;
+              whichElement.dispatchEvent(new Event('change'));
+            }
+            else if (['button', 'link'].includes(type)) {
+              whichElement.click();
+            }
+          }
+        },
+        [act, globals.elementActs]
+      );
+    }
+    // Otherwise, i.e. if the act is unknown:
+    else {
+      act.result = 'INVALID';
+    }
+    // Add the act to the report.
+    report.acts.push(act);
+    // Perform the remaining actions.
+    await doActs(acts.slice(1), page);
+  }
+};
+// Launches a browser and returns a new page.
+const launch = async (debug, browserType = 'chromium') => {
+  const browser = require('playwright')[browserType];
+  const ui = await browser.launch(debug ? {headless: false, slowMo: 3000} : {});
+  const page = await ui.newPage();
+  // If debugging is on, output page-script console-log messages.
+  if (debug){
+    page.on('console', msg => {
+      if (msg.type() === 'log') {
+        console.log(msg.text());
+      }
+    });
+  }
+  return page;
+};
+// Launches Chrome and gets the specified state of the specified page.
+/*
+const getTestPage = async (debug, browserType = 'chromium') => {
+  const page = await launch(debug, browserType);
+  const {actFileOrURL} = globals.query;
+  // If a URL was specified:
+  if (isURL(actFileOrURL)) {
+    // Make it the preparation content.
+    globals.query.prep = JSON.stringify({url: actFileOrURL}, null, 2);
+    // Visit it.
+    await page.goto(actFileOrURL);
+  }
+  // Otherwise, i.e. if an action file was specified:
+  else {
+    // Get the file content.
+    const actsJSON = await globals.fs.readFile(`scripts/one/${actFileOrURL}.json`, 'utf8');
+    // Identify the actions.
+    const acts = JSON.parse(actsJSON);
+    // Make the file name and the actions the preparation content.
+    globals.query.prep = JSON.stringify({
+      actFile: actFileOrURL,
+      actions: acts
+    }, null, 2);
+    // Perform the actions.
+    await doTestPreps(acts, page);
+  }
+  await page.waitForLoadState('networkidle', {timeout: 20000});
+  return page;
+};
+*/
 // Serves a system error message.
 globals.serveError = (error, response) => {
   if (response.writableEnded) {
@@ -309,8 +326,10 @@ globals.servePage = (content, newURL, mimeType, response) => {
   }
   response.end(content);
 };
+/*
 // Returns whether each specified query parameter is truthy.
 const queryIncludes = params => params.every(param => globals.query[param]);
+*/
 // Replaces the placeholders in a result page and optionally serves the page.
 const render = (path, isServable, which = 'out') => {
   if (! globals.response.writableEnded) {
@@ -343,6 +362,7 @@ globals.redirect = (url, response) => {
   response.setHeader('Location', url);
   response.end();
 };
+/*
 // Handles a test request.
 const testHandler = (args, axeRules, testName) => {
   if (queryIncludes(args)) {
@@ -371,16 +391,17 @@ const testHandler = (args, axeRules, testName) => {
     globals.serveMessage('ERROR: Some information missing or invalid.', globals.response);
   }
 };
+*/
 // Handles a script request.
 const scriptHandler = async scriptName => {
   const scriptJSON = await globals.fs.readFile(`scripts/multi/${scriptName}.json`, 'utf8');
-  const script = JSON.parse(scriptJSON);
+  const acts = JSON.parse(scriptJSON);
   const report = {
     scriptName,
-    script,
-    result: 'Result of the script'
+    acts: []
   };
-  globals.query.report = JSON.stringify(report, null, 2);
+  report.acts = await doActs(acts, page, report);
+  globals.query.report = JSON.stringify(report.replace(/</g, '&lt;'), null, 2);
   render('tests/multi', true);
 };
 // Handles a request.
