@@ -14,6 +14,8 @@ const http = require('http');
 const https = require('https');
 const {injectAxe, getViolations} = require('axe-playwright');
 // ########## CONSTANTS
+// Set debug to true to add debugging features.
+const debug = false;
 globals.urlStart = `${process.env.PROTOCOL}://${process.env.HOST}`;
 const protocol = process.env.PROTOCOL || 'https';
 // Files servable without modification.
@@ -136,7 +138,7 @@ const axe = async (page, rules) => {
   }
 };
 // Recursively performs the acts of a script.
-const doActs = async (acts, page) => {
+const doActs = async (acts, page, report) => {
   // If any acts remain unperformed:
   if (acts.length) {
     // Identify the first unperformed act.
@@ -303,7 +305,7 @@ globals.serveMessage = (msg, response) => {
   return '';
 };
 // Replaces a select-list placeholder.
-globals.fillSelect = (string, placeholder, sourceObject, selected) => {
+const fillSelect = (string, placeholder, sourceObject, selected) => {
   return string.replace(
     new RegExp(`( *)${placeholder}`),
     Object
@@ -392,17 +394,29 @@ const testHandler = (args, axeRules, testName) => {
   }
 };
 */
+// Retursively gets an object of file-name bases and property values from JSON object files.
+const getProps = async (obj, path, baseNames, propName) => {
+  if (baseNames.length) {
+    const firstName = baseNames[0];
+    const content = await globals.fs.readFile(`${path}/${firstName}.json`, 'utf8');
+    obj[firstName][propName] = JSON.parse(content)[propName];
+    await getProps(obj, path, baseNames.slice(1), propName);
+  }
+  else {
+    return Promise.resolve('');
+  }
+};
 // Handles a script request.
-const scriptHandler = async scriptName => {
-  const scriptJSON = await globals.fs.readFile(`scripts/multi/${scriptName}.json`, 'utf8');
-  const acts = JSON.parse(scriptJSON);
+const scriptHandler = async (scriptName, what, acts, debug) => {
   const report = {
     scriptName,
-    acts: []
+    what,
+    acts
   };
-  report.acts = await doActs(acts, page, report);
+  const page = await launch(debug, 'chromium');
+  report.result = await doActs(acts, page, report);
   globals.query.report = JSON.stringify(report.replace(/</g, '&lt;'), null, 2);
-  render('tests/multi', true);
+  render('', true);
 };
 // Handles a request.
 const requestHandler = (request, response) => {
@@ -434,7 +448,7 @@ const requestHandler = (request, response) => {
       // Identify a query object, presupposing no query name occurs twice.
       searchParams = url.searchParams;
       searchParams.forEach((value, name) => globals.query[name] = value);
-      let type = mimeTypes[pathName];
+      let type = statics[pathName];
       let encoding;
       if (type) {
         encoding = 'utf8';
@@ -487,63 +501,86 @@ const requestHandler = (request, response) => {
       searchParams = new URLSearchParams(queryString);
       searchParams.forEach((value, name) => globals.query[name] = value);
       const {query} = globals;
-      // If the form specifies a script:
-      if (pathName === '/script') {
-        const {scriptName} = query;
-        // If the request specifies a script:
-        if (scriptData.includes(scriptName)) {
-          // Process the submission.
-          scriptHandler(scriptName);        
-        }
-        // Otherwise:
-        else {
-          // Serve an error message.
-          globals.serveMessage('ERROR: No such script.', response);
-        }
-      }
-      // Otherwise, if the form specifies a test:
-      else if (['/one/0', '/one/1'].includes(pathName)) {
-        const {testName, actFileOrURL} = query;
-        // If the form data are valid:
-        if (
-          testName
-          && testData[testName]
-          && actFileOrURL
-          && (isAct(actFileOrURL) || isURL(actFileOrURL))
-        ) {
-        // If the form is the first form:
-          if (pathName === '/one/0') {
-            // If a second form exists:
-            if (testData[testName][0] === 2) {
-              // Render and serve it.
-              render(`tests/one/${testName}`, true, 'in');
+      const {scriptPath, scriptName} = query;
+      // If the path and the request specify a script path:
+      if (pathName === '/scriptPath' && scriptPath) {
+        // Request an array of the names of the files at the path.
+        globals.fs.readdir(scriptPath)
+        .then(
+          // When the array arrives:
+          fileNames => {
+            // Get an array of script names from it.
+            const scriptNames = fileNames
+            .filter(name => name.endsWith('.json')
+            .map(name => name.slice(-5)));
+            // If any exist:
+            if (scriptNames.length) {
+              // Create an object of script-name data.
+              const scriptNamesObj = {};
+              getProps(scriptNamesObj, scriptPath, scriptNames, 'what')
+              .then(
+                () => {
+                  // Request the script-selection page.
+                  render('', false, 'script')
+                  .then(
+                    // When it arrives:
+                    scriptPage => {
+                      // Replace its select-list placeholder.
+                      const newPage = fillSelect(
+                        scriptPage, '__scriptNames__', scriptNamesObj, scriptNames[0]
+                      );
+                      globals.servePage(
+                        newPage, '/autotest/script.html', 'text/html', response
+                      );
+                    },
+                    error => globals.serveError(new Error(error), response)
+                  );
+                },
+                error => globals.serveError(new Error(error), response)
+              );
             }
-            // Otherwise, i.e. if no second form exists:
+            // Otherwise, i.e. if no scripts exist at the specified path:
             else {
-              // Process the submission.
-              testHandler([], testData[testName][1], testName);
+              // Serve an error message.
+              globals.serveMessage(`ERROR: No scripts at ${scriptPath}.`, response);
             }
-          }
-          // Otherwise, if the form is a second form:
-          else if (pathName === '/one/1') {
-            // Process the submission.
-            testHandler(testData[testName][2], testData[testName][1], testName);        
-          }
-          // Otherwise, i.e. if the request is invalid:
-          else {
-            globals.serveMessage('ERROR: No such test form.', response);
-          }
-        }
-        // Otherwise, i.e. if the request is invalid:
-        else {
-          // Serve an error message.
-          globals.serveMessage('ERROR: Form action invalid.', response);
-        }
+          },
+          error => globals.serveError(new Error(error), response)
+        );
       }
-      // Otherwise, i.e. if the form is unknown:
+      // Otherwise, if the path and the request specify a script:
+      else if (pathName === '/scriptName' && scriptPath && scriptName) {
+        // Get the content of the script.
+        globals.fs.readFile(`${scriptPath}/${scriptName}.json`, 'utf8')
+        .then(
+          // When the content arrives:
+          scriptJSON => {
+            // If there is any:
+            if (scriptJSON) {
+              // Get the script data.
+              const script = JSON.parse(scriptJSON);
+              const {what, acts} = script;
+              // If the script is valid:
+              if (what && acts && typeof what === 'string' && Array.isArray(acts)) {
+                // Process it.
+                scriptHandler(scriptName, what, acts, debug);
+              }
+            }
+            // Otherwise, i.e. if there is no content:
+            else {
+              // Serve an error message.
+              globals.serveMessage(
+                `ERROR: No script found in ${scriptPath}/${scriptName}.json.`, response
+              );
+            }
+          },
+          error => globals.serveError(new Error(error), response)
+        );
+      }
+      // Otherwise, i.e. if the path or the request is invalid:
       else {
         // Serve an error message.
-        globals.serveMessage('ERROR: Form data invalid.', response);
+        globals.serveMessage('ERROR: Form submission invalid.', response);
       }
     }
   });
