@@ -67,6 +67,7 @@ const testNames = [
   'labclash',
   'role',
   'roles',
+  'simple',
   'state',
   'stylediff'
 ];
@@ -213,6 +214,7 @@ globals.serveMessage = (msg, response) => {
   }
   return '';
 };
+/*
 // Replaces a select-list placeholder.
 const fillSelect = (string, placeholder, sourceObject, selected) => {
   return string.replace(
@@ -229,6 +231,7 @@ const fillSelect = (string, placeholder, sourceObject, selected) => {
     .join('\n')
   );
 };
+*/
 // Serves a page.
 globals.servePage = (content, newURL, mimeType, response) => {
   response.setHeader('Content-Type', mimeType);
@@ -304,27 +307,29 @@ const testHandler = (args, axeRules, testName) => {
 };
 */
 // Recursively gets an object of file-name bases and property values from JSON object files.
-const getProps = async (obj, path, baseNames, propName) => {
+const getWhats = async (path, baseNames, result) => {
   if (baseNames.length) {
     const firstName = baseNames[0];
     const content = await globals.fs.readFile(`${path}/${firstName}.json`, 'utf8');
-    obj[firstName] = {[propName]: JSON.parse(content)[propName]};
-    await getProps(obj, path, baseNames.slice(1), propName);
+    const addition = [firstName, JSON.parse(content).what];
+    result.push(addition);
+    return await getWhats(path, baseNames.slice(1), result);
   }
   else {
-    return Promise.resolve('');
+    return Promise.resolve(result);
   }
 };
 // Recursively performs the acts of a script.
-const doActs = async (acts, page, report) => {
+const doActs = async (page, report, actIndex) => {
+  const {acts} = report;
   // If any acts remain unperformed:
-  if (acts.length) {
+  if (actIndex < acts.length) {
     // Identify the first unperformed act.
-    const act = acts[0];
+    const act = acts[actIndex];
     // If it is a valid custom test:
     if (act.type === 'test' && testNames.includes(act.which)) {
       // Conduct the test and add the result to the act.
-      act.result = await require(`./tests/${act.which}`).reporter(page);
+      act.result = await require(`./tests/${act.which}/app`).reporter(page);
     }
     // Otherwise, if it is an axe test:
     else if (act.type === 'axe') {
@@ -401,10 +406,8 @@ const doActs = async (acts, page, report) => {
     else {
       act.result = 'INVALID';
     }
-    // Add the act to the report.
-    report.acts.push(act);
     // Perform the remaining actions.
-    await doActs(acts.slice(1), page);
+    await doActs(page, report, actIndex + 1);
   }
 };
 // Handles a script request.
@@ -415,8 +418,8 @@ const scriptHandler = async (scriptName, what, acts, debug) => {
     acts
   };
   const page = await launch(debug, 'chromium');
-  report.result = await doActs(acts, page, report);
-  globals.query.report = JSON.stringify(report.replace(/</g, '&lt;'), null, 2);
+  await doActs(page, report, 0);
+  globals.query.report = JSON.stringify(report, null, 2).replace(/</g, '&lt;');
   render('', true);
 };
 // Handles a request.
@@ -516,28 +519,20 @@ const requestHandler = (request, response) => {
             .map(name => name.slice(0, -5));
             // If any exist:
             if (scriptNames.length) {
+              // Add their count to the query.
               query.scriptSize = scriptNames.length;
-              // Create an object of script-name data.
-              const scriptNamesObj = {};
-              getProps(scriptNamesObj, scriptPath, scriptNames, 'what')
+              // Get their descriptions.              
+              getWhats(scriptPath, scriptNames, [])
               .then(
-                () => {
-                  // Request the script-selection page.
-                  render('', false, 'script')
-                  .then(
-                    // When it arrives:
-                    scriptPage => {
-                      // Replace its select-list placeholder.
-                      console.log(scriptPage);
-                      const newPage = fillSelect(
-                        scriptPage, '__scriptNames__', scriptNamesObj, scriptNames[0]
-                      );
-                      globals.servePage(
-                        newPage, '/autotest/script.html', 'text/html', response
-                      );
-                    },
-                    error => globals.serveError(new Error(error), response)
-                  );
+                // When the descriptions arrive:
+                nameWhats => {
+                  // Add a list of scripts as options to the query.
+                  query.scriptNames = nameWhats.map(
+                    nameWhat =>
+                      `<option value="${nameWhat[0]}">${nameWhat[0]}: ${nameWhat[1]}</option>`
+                  ).join('');
+                  // Render the script-selection page.
+                  render('', true, 'script');
                 },
                 error => globals.serveError(new Error(error), response)
               );
