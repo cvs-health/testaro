@@ -20,6 +20,7 @@ globals.urlStart = `${process.env.PROTOCOL}://${process.env.HOST}`;
 const protocol = process.env.PROTOCOL || 'https';
 // Files servable without modification.
 const statics = {
+  '/doc.html': 'text/html',
   '/index.html': 'text/html',
   '/style.css': 'text/css'
 };

@@ -57,13 +57,12 @@ section {
 h2 {
   margin: 0;
 }
-h2.headText {
-  color: #fff;
-}
 .head {
   padding: 1rem 2rem;
-  color: #fff;
   background-color: #066;
+}
+.head, .head > h2 {
+  color: #fff;
 }
 .head a {
   color: #eef;
