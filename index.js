@@ -137,98 +137,6 @@ const axe = async (page, rules) => {
     return '<strong>None</strong>';
   }
 };
-// Recursively performs the acts of a script.
-const doActs = async (acts, page, report) => {
-  // If any acts remain unperformed:
-  if (acts.length) {
-    // Identify the first unperformed act.
-    const act = acts[0];
-    // If it is a valid custom test:
-    if (act.type === 'test' && testNames.includes(act.which)) {
-      // Conduct the test and add the result to the act.
-      act.result = await require(`./tests/${act.which}`).reporter(page);
-    }
-    // Otherwise, if it is an axe test:
-    else if (act.type === 'axe') {
-      // Conduct it and add its result to the act.
-      act.result = await axe(page, act.which);
-    }
-    // Otherwise, if it is a valid URL:
-    else if (act.type === 'url' && isURL(act.which)) {
-      // Visit it and add the final URL to the act.
-      await page.goto(act.which);
-      await page.waitForLoadState('networkidle', {timeout: 10000});
-      act.result = page.url();
-    }
-    // Otherwise, if it is a valid element act:
-    else if (globals.elementActs[act.type]) {
-      // Perform it with a browser function.
-      await page.$eval(
-        'body',
-        (body, args) => {
-          const {type, which, index, value} = args[0];
-          const selector = args[1][type];
-          // Identify the specified element, if possible.
-          const matches = Array.from(body.querySelectorAll(selector));
-          const whichElement = matches.find(match =>
-            match.textContent.includes(which)
-            || (
-              match.hasAttribute('aria-label')
-              && match.getAttribute('aria-label').includes(which)
-            )
-            || (
-              match.labels
-              && Array
-              .from(match.labels)
-              .map(label => label.textContent)
-              .join(' ')
-              .includes(which)
-            )
-            || (
-              match.hasAttribute('aria-labelledby')
-              && match
-              .getAttribute('aria-labelledby')
-              .split(/\s+/)
-              .map(id => body.querySelector(`#${id}`).textContent)
-              .join(' ')
-              .includes(which)
-            )
-          );
-          // If one was identified:
-          if (whichElement) {
-            // Focus it.
-            whichElement.focus();
-            // Perform the act.
-            if (type === 'text') {
-              whichElement.value = value;
-              whichElement.dispatchEvent(new Event('input'));
-            }
-            else if (['radio', 'checkbox'].includes(type)) {
-              whichElement.checked = true;
-              whichElement.dispatchEvent(new Event('change'));
-            }
-            else if (type === 'select') {
-              whichElement.selectedIndex = index;
-              whichElement.dispatchEvent(new Event('change'));
-            }
-            else if (['button', 'link'].includes(type)) {
-              whichElement.click();
-            }
-          }
-        },
-        [act, globals.elementActs]
-      );
-    }
-    // Otherwise, i.e. if the act is unknown:
-    else {
-      act.result = 'INVALID';
-    }
-    // Add the act to the report.
-    report.acts.push(act);
-    // Perform the remaining actions.
-    await doActs(acts.slice(1), page);
-  }
-};
 // Launches a browser and returns a new page.
 const launch = async (debug, browserType = 'chromium') => {
   const browser = require('playwright')[browserType];
@@ -404,6 +312,98 @@ const getProps = async (obj, path, baseNames, propName) => {
   }
   else {
     return Promise.resolve('');
+  }
+};
+// Recursively performs the acts of a script.
+const doActs = async (acts, page, report) => {
+  // If any acts remain unperformed:
+  if (acts.length) {
+    // Identify the first unperformed act.
+    const act = acts[0];
+    // If it is a valid custom test:
+    if (act.type === 'test' && testNames.includes(act.which)) {
+      // Conduct the test and add the result to the act.
+      act.result = await require(`./tests/${act.which}`).reporter(page);
+    }
+    // Otherwise, if it is an axe test:
+    else if (act.type === 'axe') {
+      // Conduct it and add its result to the act.
+      act.result = await axe(page, act.which);
+    }
+    // Otherwise, if it is a valid URL:
+    else if (act.type === 'url' && isURL(act.which)) {
+      // Visit it and add the final URL to the act.
+      await page.goto(act.which);
+      await page.waitForLoadState('networkidle', {timeout: 10000});
+      act.result = page.url();
+    }
+    // Otherwise, if it is a valid element act:
+    else if (globals.elementActs[act.type]) {
+      // Perform it with a browser function.
+      await page.$eval(
+        'body',
+        (body, args) => {
+          const {type, which, index, value} = args[0];
+          const selector = args[1][type];
+          // Identify the specified element, if possible.
+          const matches = Array.from(body.querySelectorAll(selector));
+          const whichElement = matches.find(match =>
+            match.textContent.includes(which)
+            || (
+              match.hasAttribute('aria-label')
+              && match.getAttribute('aria-label').includes(which)
+            )
+            || (
+              match.labels
+              && Array
+              .from(match.labels)
+              .map(label => label.textContent)
+              .join(' ')
+              .includes(which)
+            )
+            || (
+              match.hasAttribute('aria-labelledby')
+              && match
+              .getAttribute('aria-labelledby')
+              .split(/\s+/)
+              .map(id => body.querySelector(`#${id}`).textContent)
+              .join(' ')
+              .includes(which)
+            )
+          );
+          // If one was identified:
+          if (whichElement) {
+            // Focus it.
+            whichElement.focus();
+            // Perform the act.
+            if (type === 'text') {
+              whichElement.value = value;
+              whichElement.dispatchEvent(new Event('input'));
+            }
+            else if (['radio', 'checkbox'].includes(type)) {
+              whichElement.checked = true;
+              whichElement.dispatchEvent(new Event('change'));
+            }
+            else if (type === 'select') {
+              whichElement.selectedIndex = index;
+              whichElement.dispatchEvent(new Event('change'));
+            }
+            else if (['button', 'link'].includes(type)) {
+              whichElement.click();
+            }
+          }
+        },
+        [act, globals.elementActs]
+      );
+    }
+    // Otherwise, i.e. if the act is unknown:
+    else {
+      act.result = 'INVALID';
+    }
+    // Add the act to the report.
+    report.acts.push(act);
+    // Perform the remaining actions.
+    await doActs(acts.slice(1), page);
   }
 };
 // Handles a script request.

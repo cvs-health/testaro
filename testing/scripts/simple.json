@@ -1,0 +1,13 @@
+{
+  "what": "Simple script for testing",
+  "acts": [
+    {
+      "type": "url",
+      "which": "https://airtable.com/shrjpOPGmKjmkbMi8"
+    },
+    {
+      "type": "test",
+      "which": "simple"
+    }
+  ]
+}
