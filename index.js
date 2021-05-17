@@ -303,12 +303,12 @@ const testHandler = (args, axeRules, testName) => {
   }
 };
 */
-// Retursively gets an object of file-name bases and property values from JSON object files.
+// Recursively gets an object of file-name bases and property values from JSON object files.
 const getProps = async (obj, path, baseNames, propName) => {
   if (baseNames.length) {
     const firstName = baseNames[0];
     const content = await globals.fs.readFile(`${path}/${firstName}.json`, 'utf8');
-    obj[firstName][propName] = JSON.parse(content)[propName];
+    obj[firstName] = {[propName]: JSON.parse(content)[propName]};
     await getProps(obj, path, baseNames.slice(1), propName);
   }
   else {
@@ -512,10 +512,11 @@ const requestHandler = (request, response) => {
           fileNames => {
             // Get an array of script names from it.
             const scriptNames = fileNames
-            .filter(name => name.endsWith('.json')
-            .map(name => name.slice(-5)));
+            .filter(name => name.endsWith('.json'))
+            .map(name => name.slice(0, -5));
             // If any exist:
             if (scriptNames.length) {
+              query.scriptSize = scriptNames.length;
               // Create an object of script-name data.
               const scriptNamesObj = {};
               getProps(scriptNamesObj, scriptPath, scriptNames, 'what')
@@ -527,6 +528,7 @@ const requestHandler = (request, response) => {
                     // When it arrives:
                     scriptPage => {
                       // Replace its select-list placeholder.
+                      console.log(scriptPage);
                       const newPage = fillSelect(
                         scriptPage, '__scriptNames__', scriptNamesObj, scriptNames[0]
                       );
