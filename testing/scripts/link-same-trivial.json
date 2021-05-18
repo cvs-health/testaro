@@ -1,5 +1,5 @@
 {
-  "what": "Link to form in same tab",
+  "what": "Trivial test on link-opened page in same tab",
   "acts": [
     {
       "type": "url",
@@ -11,7 +11,7 @@
     },
     {
       "type": "test",
-      "which": "autocom"
+      "which": "simple"
     }
   ]
 }

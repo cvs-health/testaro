@@ -1,0 +1,17 @@
+{
+  "what": "Autocom test on link-opened new tab",
+  "acts": [
+    {
+      "type": "url",
+      "which": "https://design.aetna.com"
+    },
+    {
+      "type": "link",
+      "which": "feedback"
+    },
+    {
+      "type": "test",
+      "which": "autocom"
+    }
+  ]
+}

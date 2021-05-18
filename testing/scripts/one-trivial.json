@@ -1,5 +1,5 @@
 {
-  "what": "Realistic script for testing",
+  "what": "Trivial test on airtable page",
   "acts": [
     {
       "type": "url",
@@ -7,7 +7,7 @@
     },
     {
       "type": "test",
-      "which": "autocom"
+      "which": "simple"
     }
   ]
 }

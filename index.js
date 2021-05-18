@@ -145,29 +145,27 @@ const axe = async (page, rules) => {
     return 'NONE';
   }
 };
-// Launches a browser and returns a new page.
-const launch = async (debug, browserType = 'chromium') => {
-  const browser = require('playwright')[browserType];
-  const ui = await browser.launch(debug ? {headless: false, slowMo: 3000} : {});
-  let page = await ui.newPage();
-  // Include page console messages in Playwright console.
-  page.on('console', msg => console.log(msg.text()));
-  // If a new tab opens, switch the page to it.
-  page.context().on('page', async newPage => {
-    await newPage.waitForLoadState();
-    page = newPage;
-    // Temp debug
-    console.log(`New URL is ${page.url()}`);
+// Launches a browser.
+const launch = async (debug, browserTypeName = 'chromium') => {
+  const browserType = require('playwright')[browserTypeName];
+  const browser = await browserType.launch(debug ? {headless: false, slowMo: 3000} : {});
+  globals.browserContext = await browser.newContext();
+  // When a page is added to the browser context:
+  globals.browserContext.on('page', page => {
+    console.log('A new browser page has opened');
+    // Make its console messages appear in the Playwright console.
+    page.on('console', msg => console.log(msg.text()));
+    /*
+    // If a page already is open:
+    const pages = globals.browserContext.pages();
+    if (pages.length === 2) {
+      // Close it.
+      pages[0].close();
+    }
+    */
   });
-  // If debugging is on, output page-script console-log messages.
-  if (debug){
-    page.on('console', msg => {
-      if (msg.type() === 'log') {
-        console.log(msg.text());
-      }
-    });
-  }
-  return page;
+  // Open the first page.
+  await globals.browserContext.newPage();
 };
 // Serves a system error message.
 globals.serveError = (error, response) => {
@@ -207,7 +205,7 @@ globals.servePage = (content, newURL, mimeType, response) => {
   }
   response.end(content);
 };
-// Replaces the placeholders in a result page and optionally serves the page.
+// Replaces the placeholders in a result page and serves or returns the page.
 const render = (path, isServable, which = 'out') => {
   if (! globals.response.writableEnded) {
     // Get the page.
@@ -247,109 +245,133 @@ const getWhats = async (path, baseNames, result) => {
   }
 };
 // Recursively performs the acts of a script.
-const doActs = async (page, report, actIndex) => {
+const doActs = async (report, actIndex) => {
   const {acts} = report;
   // If any acts remain unperformed:
   if (actIndex < acts.length) {
     // Identify the act to be performed.
     const act = acts[actIndex];
-    // If it is a valid custom test:
-    if (act.type === 'test' && testNames.includes(act.which)) {
-      // Conduct the test and add the result to the act.
-      act.result = await require(`./tests/${act.which}/app`).reporter(page);
+    console.log(`Starting to perform act ${actIndex} (${act.type})`);
+    // Describe the open pages.
+    const pages = globals.browserContext.pages();
+    pages.forEach((page, index) => {
+      console.log(`Page ${index} has URL ${page.url()}`);
+    });
+    // If no pages are open:
+    if (! pages.length) {
+      // Add the result to the act.
+      act.result = 'NO PAGE FOUND';
     }
-    // Otherwise, if it is an axe test:
-    else if (act.type === 'axe') {
-      // Conduct it and add its result to the act.
-      await page.waitForLoadState('networkidle', {timeout: 10000});
-      act.result = await axe(page, act.which);
-    }
-    // Otherwise, if it is a valid URL:
-    else if (act.type === 'url' && isURL(act.which)) {
-      // Visit it and add the final URL to the act.
-      await page.goto(act.which);
-      await page.waitForLoadState('networkidle', {timeout: 10000});
-      act.result = page.url();
-    }
-    // Otherwise, if it is a valid element act:
-    else if (globals.elementActs[act.type]) {
-      const selector = globals.elementActs[act.type];
-      // Perform it with a browser function.
-      act.result = await page.$eval(
-        'body',
-        (body, args) => {
-          const [act, selector] = args;
-          const {type, which, index, value} = act;
-          // Identify the specified element, if possible.
-          const matches = Array.from(body.querySelectorAll(selector));
-          const whichElement = matches.find(match =>
-            match.textContent.includes(which)
-            || (
-              match.hasAttribute('aria-label')
-              && match.getAttribute('aria-label').includes(which)
-            )
-            || (
-              match.labels
-              && Array
-              .from(match.labels)
-              .map(label => label.textContent)
-              .join(' ')
-              .includes(which)
-            )
-            || (
-              match.hasAttribute('aria-labelledby')
-              && match
-              .getAttribute('aria-labelledby')
-              .split(/\s+/)
-              .map(id => body.querySelector(`#${id}`).textContent)
-              .join(' ')
-              .includes(which)
-            )
-            || (
-              match.hasAttribute('placeholder')
-              && match.getAttribute('placeholder').includes(which)
-            )
-          );
-          // If one was identified:
-          if (whichElement) {
-            // Focus it.
-            whichElement.focus();
-            // Perform the act on the element.
-            if (type === 'text') {
-              whichElement.value = value;
-              whichElement.dispatchEvent(new Event('input'));
-              return 'Entered';
-            }
-            else if (['radio', 'checkbox'].includes(type)) {
-              whichElement.checked = true;
-              whichElement.dispatchEvent(new Event('change'));
-              return 'Checked';
-            }
-            else if (type === 'select') {
-              whichElement.selectedIndex = index;
-              whichElement.dispatchEvent(new Event('change'));
-              return `<code>${whichElement.item(index).textContent}</code> selected`;
-
-            }
-            else if (['button', 'link'].includes(type)) {
-              whichElement.click();
-              return 'Clicked';
-            }
-          }
-          // Otherwise, i.e. if the specified element was not identified:
-          else {
-            return 'NOT FOUND';
-          }
-        },
-        [act, selector]
-      );
-    }
-    // Otherwise, i.e. if the act is unknown:
+    // Otherwise, i.e. if any pages are open:
     else {
-      act.result = 'INVALID';
+      // Identify the last-opened page as current.
+      const page = pages[pages.length - 1];
+      console.log(`Current page has URL ${page.url()}`);
+      // If the act is a valid custom test:
+      if (act.type === 'test' && testNames.includes(act.which)) {
+        // Conduct the test and add the result to the act.
+        /*
+        await globals.browserContext.waitForEvent('page', page => {
+          console.log('Before test a page event has fired');
+          console.log(`URL of the new page is ${page.url()}`);
+        });
+        */
+        await page.waitForLoadState('networkidle', {timeout: 10000});
+        act.result = await require(`./tests/${act.which}/app`).reporter(page);
+      }
+      // Otherwise, if it is an axe test:
+      else if (act.type === 'axe') {
+        // Conduct it and add its result to the act.
+        await page.waitForLoadState('networkidle', {timeout: 10000});
+        act.result = await axe(page, act.which);
+      }
+      // Otherwise, if it is a valid URL:
+      else if (act.type === 'url' && isURL(act.which)) {
+        // Visit it and add the final URL to the act.
+        await page.goto(act.which);
+        await page.waitForLoadState('networkidle', {timeout: 10000});
+        act.result = page.url();
+      }
+      // Otherwise, if it is a valid element act:
+      else if (globals.elementActs[act.type]) {
+        const selector = globals.elementActs[act.type];
+        // Perform it with a browser function.
+        act.result = await page.$eval(
+          'body',
+          (body, args) => {
+            const [act, selector] = args;
+            const {type, which, index, value} = act;
+            // Identify the specified element, if possible.
+            const matches = Array.from(body.querySelectorAll(selector));
+            const whichElement = matches.find(match =>
+              match.textContent.includes(which)
+              || (
+                match.hasAttribute('aria-label')
+                && match.getAttribute('aria-label').includes(which)
+              )
+              || (
+                match.labels
+                && Array
+                .from(match.labels)
+                .map(label => label.textContent)
+                .join(' ')
+                .includes(which)
+              )
+              || (
+                match.hasAttribute('aria-labelledby')
+                && match
+                .getAttribute('aria-labelledby')
+                .split(/\s+/)
+                .map(id => body.querySelector(`#${id}`).textContent)
+                .join(' ')
+                .includes(which)
+              )
+              || (
+                match.hasAttribute('placeholder')
+                && match.getAttribute('placeholder').includes(which)
+              )
+            );
+            // If one was identified:
+            if (whichElement) {
+              // Focus it.
+              whichElement.focus();
+              // Perform the act on the element.
+              if (type === 'text') {
+                whichElement.value = value;
+                whichElement.dispatchEvent(new Event('input'));
+                return 'Entered';
+              }
+              else if (['radio', 'checkbox'].includes(type)) {
+                whichElement.checked = true;
+                whichElement.dispatchEvent(new Event('change'));
+                return 'Checked';
+              }
+              else if (type === 'select') {
+                whichElement.selectedIndex = index;
+                whichElement.dispatchEvent(new Event('change'));
+                return `<code>${whichElement.item(index).textContent}</code> selected`;
+
+              }
+              else if (['button', 'link'].includes(type)) {
+                whichElement.click();
+                return 'Clicked';
+              }
+            }
+            // Otherwise, i.e. if the specified element was not identified:
+            else {
+              return 'NOT FOUND';
+            }
+          },
+          [act, selector]
+        );
+      }
+      // Otherwise, i.e. if the act is unknown:
+      else {
+        act.result = 'INVALID';
+      }
+      // Perform the remaining actions.
+      await doActs(report, actIndex + 1);
     }
-    // Perform the remaining actions.
-    await doActs(page, report, actIndex + 1);
   }
 };
 // Handles a script request.
@@ -360,9 +382,9 @@ const scriptHandler = async (scriptName, what, acts, debug) => {
     acts
   };
   // Launch Chrome.
-  const page = await launch(debug, 'chromium');
+  await launch(debug);
   // Add results to the acts of the report.
-  await doActs(page, report, 0);
+  await doActs(report, 0);
   // Convert the report to JSON.
   globals.query.report = JSON.stringify(report, null, 2).replace(/</g, '&lt;');
   // Render and serve the output.

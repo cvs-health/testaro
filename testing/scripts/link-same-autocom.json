@@ -1,13 +1,13 @@
 {
-  "what": "Design form in new tab",
+  "what": "Autocom test on link-opened page in same tab",
   "acts": [
     {
       "type": "url",
-      "which": "https://design.aetna.com"
+      "which": "https://thebaffler.com/"
     },
     {
       "type": "link",
-      "which": "feedback"
+      "which": "Subscribe"
     },
     {
       "type": "test",
