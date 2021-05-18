@@ -1,0 +1,17 @@
+{
+  "what": "Realistic script for testing",
+  "acts": [
+    {
+      "type": "url",
+      "which": "https://jobs.cvshealth.com"
+    },
+    {
+      "type": "link",
+      "which": "Join"
+    },
+    {
+      "type": "test",
+      "which": "autocom"
+    }
+  ]
+}

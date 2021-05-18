@@ -154,36 +154,6 @@ const launch = async (debug, browserType = 'chromium') => {
   }
   return page;
 };
-// Launches Chrome and gets the specified state of the specified page.
-/*
-const getTestPage = async (debug, browserType = 'chromium') => {
-  const page = await launch(debug, browserType);
-  const {actFileOrURL} = globals.query;
-  // If a URL was specified:
-  if (isURL(actFileOrURL)) {
-    // Make it the preparation content.
-    globals.query.prep = JSON.stringify({url: actFileOrURL}, null, 2);
-    // Visit it.
-    await page.goto(actFileOrURL);
-  }
-  // Otherwise, i.e. if an action file was specified:
-  else {
-    // Get the file content.
-    const actsJSON = await globals.fs.readFile(`scripts/one/${actFileOrURL}.json`, 'utf8');
-    // Identify the actions.
-    const acts = JSON.parse(actsJSON);
-    // Make the file name and the actions the preparation content.
-    globals.query.prep = JSON.stringify({
-      actFile: actFileOrURL,
-      actions: acts
-    }, null, 2);
-    // Perform the actions.
-    await doTestPreps(acts, page);
-  }
-  await page.waitForLoadState('networkidle', {timeout: 20000});
-  return page;
-};
-*/
 // Serves a system error message.
 globals.serveError = (error, response) => {
   if (response.writableEnded) {
@@ -214,24 +184,6 @@ globals.serveMessage = (msg, response) => {
   }
   return '';
 };
-/*
-// Replaces a select-list placeholder.
-const fillSelect = (string, placeholder, sourceObject, selected) => {
-  return string.replace(
-    new RegExp(`( *)${placeholder}`),
-    Object
-    .keys(sourceObject)
-    .map(
-      key => {
-        const selAttr = key === selected ? 'selected ' : '';
-        const replacement = sourceObject[key].name || sourceObject[key];
-        return `$1<option ${selAttr}value="${key}">${replacement}</option>`;
-      }
-    )
-    .join('\n')
-  );
-};
-*/
 // Serves a page.
 globals.servePage = (content, newURL, mimeType, response) => {
   response.setHeader('Content-Type', mimeType);
@@ -240,10 +192,6 @@ globals.servePage = (content, newURL, mimeType, response) => {
   }
   response.end(content);
 };
-/*
-// Returns whether each specified query parameter is truthy.
-const queryIncludes = params => params.every(param => globals.query[param]);
-*/
 // Replaces the placeholders in a result page and optionally serves the page.
 const render = (path, isServable, which = 'out') => {
   if (! globals.response.writableEnded) {
@@ -276,36 +224,6 @@ globals.redirect = (url, response) => {
   response.setHeader('Location', url);
   response.end();
 };
-/*
-// Handles a test request.
-const testHandler = (args, axeRules, testName) => {
-  if (queryIncludes(args)) {
-    const debug = false;
-    (async () => {
-      // Perform the specified actions in Chrome.
-      const page = await getTestPage(debug);
-      // Compile an axe-core report, if specified.
-      if (axeRules.length) {
-        await axe(page, axeRules);
-      }
-      // Compile the specified report.
-      const report = await require(`./tests/one/${testName}/app`)
-      .reporter(page, globals.query, getTestPage);
-      const noText = '<strong>None</strong>';
-      const data = report.data;
-      const dataLength = Array.isArray(data) ? data.length : Object.keys(data).length;
-      globals.query.report = report.json
-        ? dataLength ? JSON.stringify(data, null, 2) : noText
-        : dataLength ? data.join('\n            ') : `<li>${noText}</li>`;
-      // Render and serve a report.
-      render(`tests/one/${testName}`, true);
-    })();
-  }
-  else {
-    globals.serveMessage('ERROR: Some information missing or invalid.', globals.response);
-  }
-};
-*/
 // Recursively gets an object of file-name bases and property values from JSON object files.
 const getWhats = async (path, baseNames, result) => {
   if (baseNames.length) {
@@ -324,16 +242,20 @@ const doActs = async (page, report, actIndex) => {
   const {acts} = report;
   // If any acts remain unperformed:
   if (actIndex < acts.length) {
-    // Identify the first unperformed act.
+    // Identify the act to be performed.
     const act = acts[actIndex];
     // If it is a valid custom test:
     if (act.type === 'test' && testNames.includes(act.which)) {
       // Conduct the test and add the result to the act.
+      console.log('About to wait for 6 seconds');
+      await page.waitForTimeout(6000);
+      console.log('About to record test result');
       act.result = await require(`./tests/${act.which}/app`).reporter(page);
     }
     // Otherwise, if it is an axe test:
     else if (act.type === 'axe') {
       // Conduct it and add its result to the act.
+      await page.waitForLoadState('networkidle', {timeout: 10000});
       act.result = await axe(page, act.which);
     }
     // Otherwise, if it is a valid URL:
@@ -345,12 +267,13 @@ const doActs = async (page, report, actIndex) => {
     }
     // Otherwise, if it is a valid element act:
     else if (globals.elementActs[act.type]) {
+      const selector = globals.elementActs[act.type];
       // Perform it with a browser function.
-      await page.$eval(
+      act.result = await page.$eval(
         'body',
         (body, args) => {
-          const {type, which, index, value} = args[0];
-          const selector = args[1][type];
+          const [act, selector] = args;
+          const {type, which, index, value} = act;
           // Identify the specified element, if possible.
           const matches = Array.from(body.querySelectorAll(selector));
           const whichElement = matches.find(match =>
@@ -376,6 +299,10 @@ const doActs = async (page, report, actIndex) => {
               .join(' ')
               .includes(which)
             )
+            || (
+              match.hasAttribute('placeholder')
+              && match.getAttribute('placeholder').includes(which)
+            )
           );
           // If one was identified:
           if (whichElement) {
@@ -385,21 +312,30 @@ const doActs = async (page, report, actIndex) => {
             if (type === 'text') {
               whichElement.value = value;
               whichElement.dispatchEvent(new Event('input'));
+              return 'Entered';
             }
             else if (['radio', 'checkbox'].includes(type)) {
               whichElement.checked = true;
               whichElement.dispatchEvent(new Event('change'));
+              return 'Checked';
             }
             else if (type === 'select') {
               whichElement.selectedIndex = index;
               whichElement.dispatchEvent(new Event('change'));
+              return `<code>${whichElement.item(index).textContent}</code> selected`;
+
             }
             else if (['button', 'link'].includes(type)) {
               whichElement.click();
+              return 'Clicked';
             }
           }
+          // Otherwise, i.e. if the specified element was not identified:
+          else {
+            return 'NOT FOUND';
+          }
         },
-        [act, globals.elementActs]
+        [act, selector]
       );
     }
     // Otherwise, i.e. if the act is unknown:
@@ -407,7 +343,11 @@ const doActs = async (page, report, actIndex) => {
       act.result = 'INVALID';
     }
     // Perform the remaining actions.
+    console.log(`Added result ${JSON.stringify(act.result, null, 2)}`);
     await doActs(page, report, actIndex + 1);
+  }
+  else {
+    console.log('Finished acts');
   }
 };
 // Handles a script request.
@@ -417,9 +357,13 @@ const scriptHandler = async (scriptName, what, acts, debug) => {
     what,
     acts
   };
+  // Launch Chrome.
   const page = await launch(debug, 'chromium');
+  // Add results to the acts of the report.
   await doActs(page, report, 0);
+  // Convert the report to JSON.
   globals.query.report = JSON.stringify(report, null, 2).replace(/</g, '&lt;');
+  // Render and serve the output.
   render('', true);
 };
 // Handles a request.
@@ -527,10 +471,10 @@ const requestHandler = (request, response) => {
                 // When the descriptions arrive:
                 nameWhats => {
                   // Add a list of scripts as options to the query.
-                  query.scriptNames = nameWhats.map(
-                    nameWhat =>
-                      `<option value="${nameWhat[0]}">${nameWhat[0]}: ${nameWhat[1]}</option>`
-                  ).join('');
+                  query.scriptNames = nameWhats.map((pair, index) => {
+                    const state = index === 0 ? 'selected ' : '';
+                    return `<option ${state}value="${pair[0]}">${pair[0]}: ${pair[1]}</option>`;
+                  }).join('\n              ');
                   // Render the script-selection page.
                   render('', true, 'script');
                 },
