@@ -152,17 +152,8 @@ const launch = async (debug, browserTypeName = 'chromium') => {
   globals.browserContext = await browser.newContext();
   // When a page is added to the browser context:
   globals.browserContext.on('page', page => {
-    console.log('A new browser page has opened');
     // Make its console messages appear in the Playwright console.
     page.on('console', msg => console.log(msg.text()));
-    /*
-    // If a page already is open:
-    const pages = globals.browserContext.pages();
-    if (pages.length === 2) {
-      // Close it.
-      pages[0].close();
-    }
-    */
   });
   // Open the first page.
   const page = await globals.browserContext.newPage();
@@ -253,54 +244,41 @@ const doActs = async (report, actIndex) => {
   if (actIndex < acts.length) {
     // Identify the act to be performed.
     const act = acts[actIndex];
-    console.log(`Starting to perform act ${actIndex} (${act.type})`);
-    // Describe the open pages.
     const pages = globals.browserContext.pages();
-    pages.forEach((page, index) => {
-      console.log(`Page ${index} has URL ${page.url()}`);
-    });
     // If no pages are open:
     if (! pages.length) {
-      // Add the result to the act.
+      // Add the error result to the act.
       act.result = 'NO PAGE FOUND';
     }
     // Otherwise, i.e. if any pages are open:
     else {
       // Identify the last-opened page as current.
       const page = pages[pages.length - 1];
-      console.log(`Current page has URL ${page.url()}`);
       // If the act is a valid custom test:
       if (act.type === 'test' && testNames.includes(act.which)) {
         // Conduct the test and add the result to the act.
-        /*
-        await globals.browserContext.waitForEvent('page', page => {
-          console.log('Before test a page event has fired');
-          console.log(`URL of the new page is ${page.url()}`);
-        });
-        */
-        // await page.waitForLoadState('networkidle', {timeout: 10000});
         act.result = await require(`./tests/${act.which}/app`).reporter(page);
       }
       // Otherwise, if it is an axe test:
       else if (act.type === 'axe') {
         // Conduct it and add its result to the act.
-        // await page.waitForLoadState('networkidle', {timeout: 10000});
         act.result = await axe(page, act.which);
       }
       // Otherwise, if it is a valid URL:
       else if (act.type === 'url' && isURL(act.which)) {
-        // Visit it and add the final URL to the act.
+        // Visit it.
         await page.goto(act.which);
+        // Wait until it is stable.
         await page.waitForLoadState('networkidle', {timeout: 10000});
+        // Add the result to the act.
         act.result = page.url();
       }
       // Otherwise, if it is a page switch:
       else if (act.type === 'page') {
         // Wait for a page to be created and identify it.
         const page = await globals.browserContext.waitForEvent('page');
-        // Wait until it is stable.
+        // Wait until it is stable, so it becomes the page of the next act.
         await page.waitForLoadState('networkidle');
-        console.log(`New page ready, at URL ${page.url()}`);
       }
       // Otherwise, if it is a valid element act:
       else if (globals.elementActs[act.type]) {
@@ -377,6 +355,7 @@ const doActs = async (report, actIndex) => {
       }
       // Otherwise, i.e. if the act is unknown:
       else {
+        // Add the error result to the act.
         act.result = 'INVALID';
       }
       // Perform the remaining actions.
