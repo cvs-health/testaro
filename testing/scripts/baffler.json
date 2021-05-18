@@ -1,13 +1,13 @@
 {
-  "what": "Realistic script for testing",
+  "what": "Link to form in same tab",
   "acts": [
     {
       "type": "url",
-      "which": "https://jobs.cvshealth.com"
+      "which": "https://thebaffler.com/"
     },
     {
       "type": "link",
-      "which": "Join"
+      "which": "Subscribe"
     },
     {
       "type": "test",

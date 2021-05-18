@@ -72,6 +72,12 @@ const testNames = [
   'stylediff'
 ];
 // ########## FUNCTIONS
+// Serves a redirection.
+globals.redirect = (url, response) => {
+  response.statusCode = 303;
+  response.setHeader('Location', url);
+  response.end();
+};
 // Returns whether a string is a URL.
 const isURL = textString => /^(?:https?|file):\/\//.test(textString);
 // Recursively performs the specified acts.
@@ -136,14 +142,23 @@ const axe = async (page, rules) => {
   // Otherwise, i.e. if there are no axe-core violations:
   else {
     // Compile and return a report.
-    return '<strong>None</strong>';
+    return 'NONE';
   }
 };
 // Launches a browser and returns a new page.
 const launch = async (debug, browserType = 'chromium') => {
   const browser = require('playwright')[browserType];
   const ui = await browser.launch(debug ? {headless: false, slowMo: 3000} : {});
-  const page = await ui.newPage();
+  let page = await ui.newPage();
+  // Include page console messages in Playwright console.
+  page.on('console', msg => console.log(msg.text()));
+  // If a new tab opens, switch the page to it.
+  page.context().on('page', async newPage => {
+    await newPage.waitForLoadState();
+    page = newPage;
+    // Temp debug
+    console.log(`New URL is ${page.url()}`);
+  });
   // If debugging is on, output page-script console-log messages.
   if (debug){
     page.on('console', msg => {
@@ -218,12 +233,6 @@ const render = (path, isServable, which = 'out') => {
     );
   }
 };
-// Serves a redirection.
-globals.redirect = (url, response) => {
-  response.statusCode = 303;
-  response.setHeader('Location', url);
-  response.end();
-};
 // Recursively gets an object of file-name bases and property values from JSON object files.
 const getWhats = async (path, baseNames, result) => {
   if (baseNames.length) {
@@ -247,9 +256,6 @@ const doActs = async (page, report, actIndex) => {
     // If it is a valid custom test:
     if (act.type === 'test' && testNames.includes(act.which)) {
       // Conduct the test and add the result to the act.
-      console.log('About to wait for 6 seconds');
-      await page.waitForTimeout(6000);
-      console.log('About to record test result');
       act.result = await require(`./tests/${act.which}/app`).reporter(page);
     }
     // Otherwise, if it is an axe test:
@@ -308,7 +314,7 @@ const doActs = async (page, report, actIndex) => {
           if (whichElement) {
             // Focus it.
             whichElement.focus();
-            // Perform the act.
+            // Perform the act on the element.
             if (type === 'text') {
               whichElement.value = value;
               whichElement.dispatchEvent(new Event('input'));
@@ -343,11 +349,7 @@ const doActs = async (page, report, actIndex) => {
       act.result = 'INVALID';
     }
     // Perform the remaining actions.
-    console.log(`Added result ${JSON.stringify(act.result, null, 2)}`);
     await doActs(page, report, actIndex + 1);
-  }
-  else {
-    console.log('Finished acts');
   }
 };
 // Handles a script request.
