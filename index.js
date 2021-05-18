@@ -165,7 +165,9 @@ const launch = async (debug, browserTypeName = 'chromium') => {
     */
   });
   // Open the first page.
-  await globals.browserContext.newPage();
+  const page = await globals.browserContext.newPage();
+  // Wait until it is stable.
+  await page.waitForLoadState('networkidle');
 };
 // Serves a system error message.
 globals.serveError = (error, response) => {
@@ -276,13 +278,13 @@ const doActs = async (report, actIndex) => {
           console.log(`URL of the new page is ${page.url()}`);
         });
         */
-        await page.waitForLoadState('networkidle', {timeout: 10000});
+        // await page.waitForLoadState('networkidle', {timeout: 10000});
         act.result = await require(`./tests/${act.which}/app`).reporter(page);
       }
       // Otherwise, if it is an axe test:
       else if (act.type === 'axe') {
         // Conduct it and add its result to the act.
-        await page.waitForLoadState('networkidle', {timeout: 10000});
+        // await page.waitForLoadState('networkidle', {timeout: 10000});
         act.result = await axe(page, act.which);
       }
       // Otherwise, if it is a valid URL:
@@ -291,6 +293,14 @@ const doActs = async (report, actIndex) => {
         await page.goto(act.which);
         await page.waitForLoadState('networkidle', {timeout: 10000});
         act.result = page.url();
+      }
+      // Otherwise, if it is a page switch:
+      else if (act.type === 'page') {
+        // Wait for a page to be created and identify it.
+        const page = await globals.browserContext.waitForEvent('page');
+        // Wait until it is stable.
+        await page.waitForLoadState('networkidle');
+        console.log(`New page ready, at URL ${page.url()}`);
       }
       // Otherwise, if it is a valid element act:
       else if (globals.elementActs[act.type]) {

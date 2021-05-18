@@ -10,6 +10,9 @@
       "which": "feedback"
     },
     {
+      "type": "page"
+    },
+    {
       "type": "test",
       "which": "autocom"
     }
