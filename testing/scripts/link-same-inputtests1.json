@@ -1,0 +1,21 @@
+{
+  "what": "Input tests on link-opened page in same tab at RangeMe",
+  "acts": [
+    {
+      "type": "url",
+      "which": "https://www.rangeme.com/cvs"
+    },
+    {
+      "type": "link",
+      "which": "Started"
+    },
+    {
+      "type": "test",
+      "which": "autocom"
+    },
+    {
+      "type": "test",
+      "which": "inlab"
+    }
+  ]
+}

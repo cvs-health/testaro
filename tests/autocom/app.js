@@ -1,6 +1,5 @@
 // Compiles a report.
 exports.reporter = async page => {
-  await page.waitForSelector('body');
   return await page.$eval('body', body => {
     // Get an array of autocomplete-eligible inputs.
     const inputTypes = ['date', 'email', 'password', 'tel', 'text', 'url'];

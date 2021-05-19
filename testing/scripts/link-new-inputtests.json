@@ -1,5 +1,5 @@
 {
-  "what": "Autocom test on link-opened new tab",
+  "what": "Input tests on link-opened new tab",
   "acts": [
     {
       "type": "url",
@@ -15,6 +15,10 @@
     {
       "type": "test",
       "which": "autocom"
+    },
+    {
+      "type": "test",
+      "which": "inlab"
     }
   ]
 }

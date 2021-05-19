@@ -254,6 +254,18 @@ const doActs = async (report, actIndex) => {
     else {
       // Identify the last-opened page as current.
       const page = pages[pages.length - 1];
+      // If the previous act exists and was a link or button act:
+      if (actIndex && ['button', 'link'].includes(acts[actIndex - 1].type)) {
+        // Wait until the page is stable, if not yet.
+        await page.waitForLoadState('networkidle', {timeout: 10000});
+      }
+      // Otherwise:
+      else {
+        // Wait until the body element is visible, if not yet.
+        await page.waitForSelector('body');
+      }
+      // Add the page URL to the act.
+      act.url = page.url();
       // If the act is a valid custom test:
       if (act.type === 'test' && testNames.includes(act.which)) {
         // Conduct the test and add the result to the act.
@@ -278,7 +290,9 @@ const doActs = async (report, actIndex) => {
         // Wait for a page to be created and identify it.
         const page = await globals.browserContext.waitForEvent('page');
         // Wait until it is stable, so it becomes the page of the next act.
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('networkidle', {timeout: 10000});
+        // Add the result to the act.
+        act.result = page.url();
       }
       // Otherwise, if it is a valid element act:
       else if (globals.elementActs[act.type]) {

@@ -1,5 +1,5 @@
 {
-  "what": "Autocom test on link-opened page in same tab",
+  "what": "Input tests on link-opened page in same tab at Baffler",
   "acts": [
     {
       "type": "url",
@@ -12,6 +12,10 @@
     {
       "type": "test",
       "which": "autocom"
+    },
+    {
+      "type": "test",
+      "which": "inlab"
     }
   ]
 }

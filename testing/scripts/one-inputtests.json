@@ -1,5 +1,5 @@
 {
-  "what": "Autocom test on airtable page",
+  "what": "Input tests on airtable page",
   "acts": [
     {
       "type": "url",
@@ -8,6 +8,10 @@
     {
       "type": "test",
       "which": "autocom"
+    },
+    {
+      "type": "test",
+      "which": "inlab"
     }
   ]
 }
