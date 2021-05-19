@@ -253,13 +253,10 @@ const doActs = async (report, actIndex) => {
     // Otherwise, i.e. if any pages are open:
     else {
       // Temp debug
-      console.log(`Next act is ${act.type}`);
-      console.log(JSON.stringify(pages.map(page => page.url()), null, 2));
       // Identify the last-opened page as current.
       const page = pages[pages.length - 1];
       // If the previous act exists and was a link or button act:
       if (actIndex && ['button', 'link'].includes(acts[actIndex - 1].type)) {
-        console.log('Waiting for idle');
         // Wait until the page is stable, if not yet.
         await page.waitForLoadState('networkidle', {timeout: 10000});
       }
@@ -273,7 +270,6 @@ const doActs = async (report, actIndex) => {
       // If the act is a valid custom test:
       if (act.type === 'test' && testNames.includes(act.which)) {
         // Conduct the test and add the result to the act.
-        console.log('About to run test');
         act.result = await require(`./tests/${act.which}/app`).reporter(page);
       }
       // Otherwise, if it is an axe test:
@@ -300,12 +296,13 @@ const doActs = async (report, actIndex) => {
         // Wait for the specified text to appear.
         await page.waitForFunction(which => {
           const {type, text} = which;
-          const content = {
-            url: document.URL,
-            title: document.title,
-            body: document.body.textContent
+          const {URL, title, body} = document;
+          const success = {
+            url: URL && URL.includes(text),
+            title: title && title.includes(text),
+            body: body && body.textContent && body.textContent.includes(text)
           };
-          return content[type].includes(text);
+          return success[type];
         }, act.which);
         // Add the result to the act.
         act.result = page.url();
