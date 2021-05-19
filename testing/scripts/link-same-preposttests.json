@@ -6,6 +6,10 @@
       "which": "https://thebaffler.com/"
     },
     {
+      "type": "test",
+      "which": "role"
+    },
+    {
       "type": "link",
       "which": "Subscribe"
     },

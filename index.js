@@ -252,7 +252,6 @@ const doActs = async (report, actIndex) => {
     }
     // Otherwise, i.e. if any pages are open:
     else {
-      // Temp debug
       // Identify the last-opened page as current.
       const page = pages[pages.length - 1];
       // If the previous act exists and was a link or button act:
@@ -303,7 +302,7 @@ const doActs = async (report, actIndex) => {
             body: body && body.textContent && body.textContent.includes(text)
           };
           return success[type];
-        }, act.which);
+        }, act.which, {timeout: 10000});
         // Add the result to the act.
         act.result = page.url();
       }
