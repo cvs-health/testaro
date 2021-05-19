@@ -1,5 +1,5 @@
 {
-  "what": "Input tests on link-opened page in same tab at Baffler",
+  "what": "Tests pre and post link-opened page in same tab at Baffler",
   "acts": [
     {
       "type": "url",

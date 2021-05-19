@@ -1,7 +1,6 @@
 // Compiles a report.
 exports.reporter = async page => {
-  // Get data on all elements with role attributes.
-  const data = await page.$eval('body', body => {
+  return await page.$eval('body', body => {
     const elements = Array.from(body.querySelectorAll('[role]:not([role=""])'));
     const tally = {};
     elements.forEach(element => {
@@ -19,10 +18,6 @@ exports.reporter = async page => {
         tally[type] = {[role]: 1};
       }
     });
-    return tally;
+    return Object.keys(tally).length ? tally : 'NONE';
   });
-  return {
-    json: true,
-    data
-  };
 };

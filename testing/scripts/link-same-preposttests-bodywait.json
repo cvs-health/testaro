@@ -1,9 +1,13 @@
 {
-  "what": "Input tests on link-opened page in same tab at RangeMe",
+  "what": "Tests pre and post link-opened page in same tab at RangeMe",
   "acts": [
     {
       "type": "url",
       "which": "https://www.rangeme.com/cvs"
+    },
+    {
+      "type": "test",
+      "which": "roles"
     },
     {
       "type": "link",
