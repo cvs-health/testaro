@@ -1,10 +1,9 @@
 // Compiles a report.
 exports.reporter = async page => {
-  // Get an array of data on all inputs and select lists and their labels.
-  const data = await page.$eval('body', body => {
+  return await page.$eval('body', body => {
     // Get data on the non-hidden inputs and the select lists.
     const inputs = Array.from(body.querySelectorAll('input:not([type=hidden]), select'));
-    const itemsData = [];
+    const itemData = [];
     // FUNCTION DEFINITION START
     const debloat = text => text.trim().replace(/\s+/g, ' ');
     // FUNCTION DEFINITION END
@@ -41,21 +40,16 @@ exports.reporter = async page => {
       // If it has labeling conflicts:
       if (labelTypes.length > 1) {
         // Compile its data.
-        const itemData = {
+        const item = {
           index,
           type: input.type,
           labelTypes,
           text: texts.join('; ')
         };
         // Add its data to the report data.
-        itemsData.push(itemData);
+        itemData.push(item);
       }
     });
-    return itemsData;
+    return itemData.length ? itemData : 'NONE';
   });
-  // Return a report object.
-  return {
-    json: true,
-    data
-  };
 };

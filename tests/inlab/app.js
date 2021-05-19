@@ -1,6 +1,5 @@
 // Compiles a report.
 exports.reporter = async page => {
-  // Get an array of data on all inputs and select lists and their labels.
   return await page.$eval('body', body => {
     // Get data on the fieldsets and their legends and inputs.
     const fieldSets = Array.from(body.getElementsByTagName('fieldset'));

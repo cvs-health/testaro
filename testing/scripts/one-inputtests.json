@@ -12,6 +12,10 @@
     {
       "type": "test",
       "which": "inlab"
+    },
+    {
+      "type": "test",
+      "which": "labclash"
     }
   ]
 }

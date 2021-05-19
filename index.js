@@ -384,6 +384,7 @@ const doActs = async (report, actIndex) => {
                 whichElement.click();
                 return {
                   href: whichElement.href || 'NONE',
+                  target: whichElement.target,
                   act: 'Clicked'
                 };
               }
