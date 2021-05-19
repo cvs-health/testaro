@@ -10,6 +10,13 @@
       "which": "Subscribe"
     },
     {
+      "type": "wait",
+      "which": {
+        "type": "url",
+        "text": "subscribe"
+      }
+    },
+    {
       "type": "test",
       "which": "simple"
     }

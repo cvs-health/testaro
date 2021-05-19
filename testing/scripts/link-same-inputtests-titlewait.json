@@ -10,6 +10,13 @@
       "which": "Subscribe"
     },
     {
+      "type": "wait",
+      "which": {
+        "type": "title",
+        "text": "Magazine"
+      }
+    },
+    {
       "type": "test",
       "which": "autocom"
     },

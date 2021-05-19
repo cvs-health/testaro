@@ -252,10 +252,14 @@ const doActs = async (report, actIndex) => {
     }
     // Otherwise, i.e. if any pages are open:
     else {
+      // Temp debug
+      console.log(`Next act is ${act.type}`);
+      console.log(JSON.stringify(pages.map(page => page.url()), null, 2));
       // Identify the last-opened page as current.
       const page = pages[pages.length - 1];
       // If the previous act exists and was a link or button act:
       if (actIndex && ['button', 'link'].includes(acts[actIndex - 1].type)) {
+        console.log('Waiting for idle');
         // Wait until the page is stable, if not yet.
         await page.waitForLoadState('networkidle', {timeout: 10000});
       }
@@ -269,6 +273,7 @@ const doActs = async (report, actIndex) => {
       // If the act is a valid custom test:
       if (act.type === 'test' && testNames.includes(act.which)) {
         // Conduct the test and add the result to the act.
+        console.log('About to run test');
         act.result = await require(`./tests/${act.which}/app`).reporter(page);
       }
       // Otherwise, if it is an axe test:
@@ -282,6 +287,26 @@ const doActs = async (report, actIndex) => {
         await page.goto(act.which);
         // Wait until it is stable.
         await page.waitForLoadState('networkidle', {timeout: 10000});
+        // Add the result to the act.
+        act.result = page.url();
+      }
+      // Otherwise, if it is a valid wait:
+      else if (
+        act.type === 'wait'
+        && act.which
+        && ['url', 'title', 'body'].includes(act.which.type)
+        && act.which.text
+      ) {
+        // Wait for the specified text to appear.
+        await page.waitForFunction(which => {
+          const {type, text} = which;
+          const content = {
+            url: document.URL,
+            title: document.title,
+            body: document.body.textContent
+          };
+          return content[type].includes(text);
+        }, act.which);
         // Add the result to the act.
         act.result = page.url();
       }
@@ -354,9 +379,16 @@ const doActs = async (report, actIndex) => {
                 return `<code>${whichElement.item(index).textContent}</code> selected`;
 
               }
-              else if (['button', 'link'].includes(type)) {
+              else if (type === 'button') {
                 whichElement.click();
                 return 'Clicked';
+              }
+              else if (type === 'link') {
+                whichElement.click();
+                return {
+                  href: whichElement.href || 'NONE',
+                  act: 'Clicked'
+                };
               }
             }
             // Otherwise, i.e. if the specified element was not identified:

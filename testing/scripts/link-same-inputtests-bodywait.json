@@ -10,6 +10,13 @@
       "which": "Started"
     },
     {
+      "type": "wait",
+      "which": {
+        "type": "body",
+        "text": "Showcase"
+      }
+    },
+    {
       "type": "test",
       "which": "autocom"
     },
