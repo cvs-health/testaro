@@ -6,9 +6,11 @@ exports.reporter = async page => await page.$eval('body', body => {
   .filter(pair => pair[1] && pair[1] !== 'none')
   .map(pair => [pair[1].slice(4, -1), pair[0].tagName.toLowerCase(), pair[0].textContent])
   .map(triple => `            <li><img src=${triple[0]}><br>${triple[1]}: ${triple[2]}</li>`);
-  const exhibits = `          <ol>\n${listItems}\n          </ol>`;
+  const exhibits = `          <ol>\n${listItems.join('\n')}\n          </ol>`;
   return {
-    bgImageCount: listItems.length,
+    result: {
+      bgImageCount: listItems.length
+    },
     exhibits
   };
 });

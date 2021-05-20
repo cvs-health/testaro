@@ -1,0 +1,13 @@
+{
+  "what": "Informative image test",
+  "acts": [
+    {
+      "type": "url",
+      "which": "https://www.cvs.com/shop/vitamins?icid=CVS-HOME-VITAMINS"
+    },
+    {
+      "type": "test",
+      "which": "imginf"
+    }
+  ]
+}
