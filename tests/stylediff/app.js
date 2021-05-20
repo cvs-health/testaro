@@ -45,8 +45,10 @@ exports.reporter = async page => await page.$eval('body', body => [
     }
   });
   return {
-    tagName,
-    elementCount: styleDecs.length,
-    inconsistencies: props
+    result: {
+      tagName,
+      elementCount: styleDecs.length,
+      inconsistencies: props
+    }
   };
 }));

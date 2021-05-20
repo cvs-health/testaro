@@ -5,7 +5,7 @@ exports.reporter = async page => await page.$eval('body', body => {
   const selectors = inputTypes.map(type => `input[type=${type}]`);
   const elements = Array.from(body.querySelectorAll(selectors.join(', ')));
   // Return a result array, in which, for each input:
-  const results = elements.map((el, index) => {
+  const result = elements.map((el, index) => {
     // Limit the length of displayed labels.
     const labelTextMax = 100;
     // Get an array of the text contents of its label elements, if any.
@@ -42,5 +42,7 @@ exports.reporter = async page => await page.$eval('body', body => {
       labelText
     };
   });
-  return results.length ? results : 'NONE';
+  return {
+    result
+  };
 });

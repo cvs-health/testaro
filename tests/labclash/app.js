@@ -2,7 +2,7 @@
 exports.reporter = async page => await page.$eval('body', body => {
   // Get data on the non-hidden inputs and the select lists.
   const inputs = Array.from(body.querySelectorAll('input:not([type=hidden]), select'));
-  const itemData = [];
+  const result = [];
   // FUNCTION DEFINITION START
   const debloat = text => text.trim().replace(/\s+/g, ' ');
   // FUNCTION DEFINITION END
@@ -46,8 +46,10 @@ exports.reporter = async page => await page.$eval('body', body => {
         text: texts.join('; ')
       };
       // Add its data to the report data.
-      itemData.push(item);
+      result.push(item);
     }
   });
-  return itemData.length ? itemData : 'NONE';
+  return {
+    result
+  };
 });

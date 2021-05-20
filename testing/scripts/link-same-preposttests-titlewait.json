@@ -10,6 +10,10 @@
       "which": "role"
     },
     {
+      "type": "axe",
+      "which": ["aria-roles", "aria-allowed-role"]
+    },
+    {
       "type": "link",
       "which": "Subscribe"
     },
@@ -31,6 +35,10 @@
     {
       "type": "test",
       "which": "labclash"
+    },
+    {
+      "type": "axe",
+      "which": ["label"]
     }
   ]
 }

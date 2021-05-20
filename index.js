@@ -268,8 +268,23 @@ const doActs = async (report, actIndex) => {
       act.url = page.url();
       // If the act is a valid custom test:
       if (act.type === 'test' && testNames.includes(act.which)) {
-        // Conduct the test and add the result to the act.
-        act.result = await require(`./tests/${act.which}/app`).reporter(page);
+        // Conduct the test.
+        const testReport = await require(`./tests/${act.which}/app`).reporter(page);
+        // If the test produced exhibits:
+        if (testReport.exhibits) {
+          // Add that fact to the act.
+          act.exhibits = 'appended';
+          // Add the exhibits to the report.
+          if (report.exhibits) {
+            report.exhibits += `\n${testReport.exhibits}`;
+          }
+          else {
+            report.exhibits = testReport.exhibits;
+          }
+        }
+        // Add the result to the act.
+        const resultCount = Object.keys(testReport.result).length;
+        act.result = resultCount ? testReport.result : 'NONE';
       }
       // Otherwise, if it is an axe test:
       else if (act.type === 'axe') {
@@ -362,12 +377,12 @@ const doActs = async (report, actIndex) => {
               if (type === 'text') {
                 whichElement.value = value;
                 whichElement.dispatchEvent(new Event('input'));
-                return 'Entered';
+                return 'entered';
               }
               else if (['radio', 'checkbox'].includes(type)) {
                 whichElement.checked = true;
                 whichElement.dispatchEvent(new Event('change'));
-                return 'Checked';
+                return 'checked';
               }
               else if (type === 'select') {
                 whichElement.selectedIndex = index;
@@ -377,14 +392,14 @@ const doActs = async (report, actIndex) => {
               }
               else if (type === 'button') {
                 whichElement.click();
-                return 'Clicked';
+                return 'clicked';
               }
               else if (type === 'link') {
                 whichElement.click();
                 return {
                   href: whichElement.href || 'NONE',
                   target: whichElement.target,
-                  act: 'Clicked'
+                  move: 'clicked'
                 };
               }
             }
@@ -415,14 +430,20 @@ const scriptHandler = async (scriptName, what, acts, debug) => {
   };
   // Launch Chrome.
   await launch(debug);
-  // Add results to the acts of the report.
+  // Add the results to the acts of the report.
   await doActs(report, 0);
-  // Convert the report to JSON.
-  globals.query.report = JSON.stringify(report, null, 2).replace(/</g, '&lt;');
-  // Add an empty exhibit to the output if no exhibit exists yet.
-  if (! globals.query.exhibits) {
+  // If any exhibits have been added to the report, move them to the query.
+  if (report.exhibits) {
+    globals.query.exhibits = report.exhibits;
+    delete report.exhibits;
+  }
+  // Otherwise, i.e. if no exhibits have been added to the report:
+  else {
+    // Add an empty exhibit to the query.
     globals.query.exhibits = '<p><strong>None</strong></p>';
   }
+  // Convert the report to JSON.
+  globals.query.report = JSON.stringify(report, null, 2).replace(/</g, '&lt;');
   // Render and serve the output.
   render('', true);
 };

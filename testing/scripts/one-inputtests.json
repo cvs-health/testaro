@@ -16,6 +16,10 @@
     {
       "type": "test",
       "which": "labclash"
+    },
+    {
+      "type": "axe",
+      "which": ["label"]
     }
   ]
 }
