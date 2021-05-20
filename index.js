@@ -419,6 +419,10 @@ const scriptHandler = async (scriptName, what, acts, debug) => {
   await doActs(report, 0);
   // Convert the report to JSON.
   globals.query.report = JSON.stringify(report, null, 2).replace(/</g, '&lt;');
+  // Add an empty exhibit to the output if no exhibit exists yet.
+  if (! globals.query.exhibits) {
+    globals.query.exhibits = '<p><strong>None</strong></p>';
+  }
   // Render and serve the output.
   render('', true);
 };
