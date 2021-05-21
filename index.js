@@ -229,31 +229,60 @@ const render = (path, isServable, which, query, response) => {
     );
   }
 };
+// Returns an element matching a type and text.
+const matchElement = (body, selector, text) => {
+  const matches = Array.from(body.querySelectorAll(selector));
+  return matches.find(match =>
+    match.textContent.includes(text)
+    || (
+      match.hasAttribute('aria-label')
+      && match.getAttribute('aria-label').includes(text)
+    )
+    || (
+      match.labels
+      && Array
+      .from(match.labels)
+      .map(label => label.textContent)
+      .join(' ')
+      .includes(text)
+    )
+    || (
+      match.hasAttribute('aria-labelledby')
+      && match
+      .getAttribute('aria-labelledby')
+      .split(/\s+/)
+      .map(id => body.querySelector(`#${id}`).textContent)
+      .join(' ')
+      .includes(text)
+    )
+    || (
+      match.hasAttribute('placeholder')
+      && match.getAttribute('placeholder').includes(text)
+    )
+  );
+};
 // Recursively performs the acts of a script.
-const doActs = async (report, actIndex) => {
+const doActs = async (report, actIndex, page) => {
   const {acts} = report;
   // If any acts remain unperformed:
   if (actIndex < acts.length) {
     // Identify the act (an element of report.acts) to be performed.
     const act = acts[actIndex];
-    // If the act is a valid launch:
-    if (act.type === 'launch' && ['chromium', 'firefox', 'webkit'].includes(act.which)) {
-      // Launch the specified browser, creating a browser context and a page in it.
-      await launch(act.which);
-    }
-    // Otherwise, i.e. if the act is a post-launch act:
-    else {
-      // Identify the open pages of the browser context.
-      const pages = browserContext ? browserContext.pages() : [];
-      // If it has no open pages:
-      if (! pages.length) {
-        // Add the error result to the act.
-        act.result = 'NO PAGE FOUND';
+    // If the act has the required property:
+    if (act.type) {
+      // If the act is a valid launch:
+      if (
+        act.type === 'launch'
+        && act.which
+        && ['chromium', 'firefox', 'webkit'].includes(act.which)
+      ) {
+        // Launch the specified browser, creating a browser context and a page in it.
+        await launch(act.which);
+        // Identify its only page as current.
+        page = browserContext.pages()[0];
       }
-      // Otherwise, i.e. if the browser context has any open pages:
-      else {
-        // Make the last-opened page the current page.
-        let page = pages[pages.length - 1];
+      // Otherwise, if the act is a post-launch act:
+      else if (page) {
         // If the act is a valid URL:
         if (act.type === 'url' && isURL(act.which)) {
           // Visit it.
@@ -286,14 +315,14 @@ const doActs = async (report, actIndex) => {
         }
         // Otherwise, if the act is a page switch:
         else if (act.type === 'page') {
-          // Wait for a page to be created and reidentify it.
+          // Wait for a page to be created and identify it as current.
           page = await browserContext.waitForEvent('page');
-          // Wait until it is stable, so it becomes the page of the next act.
+          // Wait until it is stable and thus ready for the next act.
           await page.waitForLoadState('networkidle', {timeout: 10000});
           // Add the resulting URL to the act.
           act.result = page.url();
         }
-        // Otherwise, i.e. if the act is a test or move:
+        // Otherwise, i.e. if the act is a test, focus, or move:
         else {
           // Identify the URL of the page.
           const url = page.url();
@@ -322,7 +351,7 @@ const doActs = async (report, actIndex) => {
                   report.exhibits = testReport.exhibits;
                 }
               }
-              // Add the result array or other object to the act.
+              // Add the result object (possibly an array) to the act.
               const resultCount = Object.keys(testReport.result).length;
               act.result = resultCount ? testReport.result : 'NONE';
             }
@@ -330,6 +359,24 @@ const doActs = async (report, actIndex) => {
             else if (act.type === 'axe') {
               // Conduct it and add its result to the act.
               act.result = await axe(page, act.which);
+            }
+            // Otherwise, if the act is a valid focus:
+            else if (act.type === 'focus' && act.which.type && moves[act.which.type]) {
+              // Focus the specified element and add the result to the act.
+              act.result = await page.$eval(
+                'body',
+                (body, which) => {
+                  const whichElement = matchElement(body, which.type, which.text);
+                  if (whichElement) {
+                    whichElement.focus();
+                    return 'focused';
+                  }
+                  else {
+                    return 'ELEMENT NOT FOUND';
+                  }
+                },
+                act.which
+              );
             }
             // Otherwise, if the act is a valid move:
             else if (moves[act.type]) {
@@ -341,35 +388,7 @@ const doActs = async (report, actIndex) => {
                   const [act, selector] = args;
                   const {type, which, index, value} = act;
                   // Identify the specified element, if possible.
-                  const matches = Array.from(body.querySelectorAll(selector));
-                  const whichElement = matches.find(match =>
-                    match.textContent.includes(which)
-                    || (
-                      match.hasAttribute('aria-label')
-                      && match.getAttribute('aria-label').includes(which)
-                    )
-                    || (
-                      match.labels
-                      && Array
-                      .from(match.labels)
-                      .map(label => label.textContent)
-                      .join(' ')
-                      .includes(which)
-                    )
-                    || (
-                      match.hasAttribute('aria-labelledby')
-                      && match
-                      .getAttribute('aria-labelledby')
-                      .split(/\s+/)
-                      .map(id => body.querySelector(`#${id}`).textContent)
-                      .join(' ')
-                      .includes(which)
-                    )
-                    || (
-                      match.hasAttribute('placeholder')
-                      && match.getAttribute('placeholder').includes(which)
-                    )
-                  );
+                  const whichElement = matchElement(body, selector, which);
                   // If one was identified:
                   if (whichElement) {
                     // Focus it.
@@ -416,14 +435,19 @@ const doActs = async (report, actIndex) => {
             // Otherwise, i.e. if the act type is unknown:
             else {
               // Add the error result to the act.
-              act.result = 'INVALID';
+              act.result = 'INVALID ACT';
             }
           }
         }
       }
+      // Otherwise, i.e. if the act is invalid:
+      else {
+        // Add an error result to the act.
+        act.result = 'NO PAGE IDENTIFIED';
+      }
+      // Perform the remaining acts.
+      await doActs(report, actIndex + 1, page);
     }
-    // Perform the remaining acts.
-    await doActs(report, actIndex + 1);
   }
 };
 // Handles a script request.
@@ -434,7 +458,7 @@ const scriptHandler = async (scriptName, what, acts, query, response) => {
     acts
   };
   // Perform the specified acts and add the results and exhibits to the report.
-  await doActs(report, 0);
+  await doActs(report, 0, null);
   // If any exhibits have been added to the report, move them to the query.
   if (report.exhibits) {
     query.exhibits = report.exhibits;
