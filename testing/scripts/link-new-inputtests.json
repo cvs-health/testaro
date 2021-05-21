@@ -2,6 +2,10 @@
   "what": "Input tests on link-opened new tab",
   "acts": [
     {
+      "type": "launch",
+      "which": "chromium"
+    },
+    {
       "type": "url",
       "which": "https://design.aetna.com"
     },

@@ -2,10 +2,9 @@
   index.js
   autotest main script.
 */
-const globals = {};
 // ########## IMPORTS
 // Module to access files.
-globals.fs = require('fs').promises;
+const fs = require('fs').promises;
 // Module to keep secrets local.
 require('dotenv').config();
 // Module to create an HTTP server and client.
@@ -16,7 +15,6 @@ const {injectAxe, getViolations} = require('axe-playwright');
 // ########## CONSTANTS
 // Set debug to true to add debugging features.
 const debug = false;
-globals.urlStart = `${process.env.PROTOCOL}://${process.env.HOST}`;
 const protocol = process.env.PROTOCOL || 'https';
 // Files servable without modification.
 const statics = {
@@ -50,7 +48,7 @@ const errorPageEnd = [
 const customErrorPage = customErrorPageStart.concat(...errorPageEnd);
 const systemErrorPage = systemErrorPageStart.concat(...errorPageEnd);
 // CSS selectors for actions.
-globals.elementActs = {
+const moves = {
   text: 'input[type=text',
   radio: 'input[type=radio]',
   checkbox: 'input[type=checkbox]',
@@ -71,9 +69,11 @@ const testNames = [
   'state',
   'stylediff'
 ];
+// ########## VARIABLES
+let browserContext;
 // ########## FUNCTIONS
 // Serves a redirection.
-globals.redirect = (url, response) => {
+const redirect = (url, response) => {
   response.statusCode = 303;
   response.setHeader('Location', url);
   response.end();
@@ -146,22 +146,27 @@ const axe = async (page, rules) => {
   }
 };
 // Launches a browser.
-const launch = async (debug, browserTypeName = 'chromium') => {
+const launch = async browserTypeName => {
   const browserType = require('playwright')[browserTypeName];
-  const browser = await browserType.launch(debug ? {headless: false, slowMo: 3000} : {});
-  globals.browserContext = await browser.newContext();
-  // When a page is added to the browser context:
-  globals.browserContext.on('page', page => {
-    // Make its console messages appear in the Playwright console.
-    page.on('console', msg => console.log(msg.text()));
-  });
-  // Open the first page.
-  const page = await globals.browserContext.newPage();
-  // Wait until it is stable.
-  await page.waitForLoadState('networkidle');
+  // If the specified browser type exists:
+  if (browserType) {
+    // Launch it.
+    const browser = await browserType.launch(debug ? {headless: false, slowMo: 3000} : {});
+    // Create a new context (window) in it.
+    browserContext = await browser.newContext();
+    // When a page is added to the browser context:
+    browserContext.on('page', page => {
+      // Make its console messages appear in the Playwright console.
+      page.on('console', msg => console.log(msg.text()));
+    });
+    // Open the first page of the context.
+    const page = await browserContext.newPage();
+    // Wait until it is stable.
+    await page.waitForLoadState('networkidle');
+  }
 };
 // Serves a system error message.
-globals.serveError = (error, response) => {
+const serveError = (error, response) => {
   if (response.writableEnded) {
     console.log(error.message);
     console.log(error.stack);
@@ -179,7 +184,7 @@ globals.serveError = (error, response) => {
   return '';
 };
 // Serves a custom error message.
-globals.serveMessage = (msg, response) => {
+const serveMessage = (msg, response) => {
   if (response.writableEnded) {
     console.log(msg);
   }
@@ -191,7 +196,7 @@ globals.serveMessage = (msg, response) => {
   return '';
 };
 // Serves a page.
-globals.servePage = (content, newURL, mimeType, response) => {
+const servePage = (content, newURL, mimeType, response) => {
   response.setHeader('Content-Type', mimeType);
   if (newURL) {
     response.setHeader('Content-Location', newURL);
@@ -199,19 +204,19 @@ globals.servePage = (content, newURL, mimeType, response) => {
   response.end(content);
 };
 // Replaces the placeholders in a result page and serves or returns the page.
-const render = (path, isServable, which = 'out') => {
-  if (! globals.response.writableEnded) {
+const render = (path, isServable, which, query, response) => {
+  if (! response.writableEnded) {
     // Get the page.
-    return globals.fs.readFile(`./${path}/${which}.html`, 'utf8')
+    return fs.readFile(`./${path}/${which}.html`, 'utf8')
     .then(
       // When it arrives:
       page => {
         // Replace its placeholders with eponymous query parameters.
-        const renderedPage = page.replace(/__([a-zA-Z]+)__/g, (ph, qp) => globals.query[qp]);
+        const renderedPage = page.replace(/__([a-zA-Z]+)__/g, (ph, qp) => query[qp]);
         // If the page is ready to serve:
         if (isServable) {
           // Serve it.
-          globals.servePage(renderedPage, `/${path}-out.html`, 'text/html', globals.response);
+          servePage(renderedPage, `/${path}-out.html`, 'text/html', response);
           return '';
         }
         // Otherwise, i.e. if the page needs modification before it is served:
@@ -220,21 +225,8 @@ const render = (path, isServable, which = 'out') => {
           return renderedPage;
         }
       },
-      error => globals.serveError(new Error(error), globals.response)
+      error => serveError(new Error(error), response)
     );
-  }
-};
-// Recursively gets an object of file-name bases and property values from JSON object files.
-const getWhats = async (path, baseNames, result) => {
-  if (baseNames.length) {
-    const firstName = baseNames[0];
-    const content = await globals.fs.readFile(`${path}/${firstName}.json`, 'utf8');
-    const addition = [firstName, JSON.parse(content).what];
-    result.push(addition);
-    return await getWhats(path, baseNames.slice(1), result);
-  }
-  else {
-    return Promise.resolve(result);
   }
 };
 // Recursively performs the acts of a script.
@@ -242,210 +234,243 @@ const doActs = async (report, actIndex) => {
   const {acts} = report;
   // If any acts remain unperformed:
   if (actIndex < acts.length) {
-    // Identify the act to be performed.
+    // Identify the act (an element of report.acts) to be performed.
     const act = acts[actIndex];
-    const pages = globals.browserContext.pages();
-    // If no pages are open:
-    if (! pages.length) {
-      // Add the error result to the act.
-      act.result = 'NO PAGE FOUND';
+    // If the act is a valid launch:
+    if (act.type === 'launch' && ['chromium', 'firefox', 'webkit'].includes(act.which)) {
+      // Launch the specified browser, creating a browser context.
+      launch(act.which);
     }
-    // Otherwise, i.e. if any pages are open:
+    // Otherwise, i.e. if the act is a post-launch act:
     else {
-      // Identify the last-opened page as current.
-      const page = pages[pages.length - 1];
-      // If the previous act exists and was a link or button act:
-      if (actIndex && ['button', 'link'].includes(acts[actIndex - 1].type)) {
-        // Wait until the page is stable, if not yet.
-        await page.waitForLoadState('networkidle', {timeout: 10000});
+      // Identify the open pages of the browser context.
+      const pages = browserContext ? browserContext.pages() : [];
+      // If it has no open pages:
+      if (! pages.length) {
+        // Add the error result to the act.
+        act.result = 'NO PAGE FOUND';
       }
-      // Otherwise:
+      // Otherwise, i.e. if the browser context has any open pages:
       else {
-        // Wait until the body element is visible, if not yet.
-        await page.waitForSelector('body');
-      }
-      // Add the page URL to the act.
-      act.url = page.url();
-      // If the act is a valid Chrome-only test:
-      if (act.type === 'test' && testNames.includes(act.which)) {
-        // Conduct the test.
-        const testReport = await require(`./tests/${act.which}/app`).reporter(page);
-        // If the test produced exhibits:
-        if (testReport.exhibits) {
-          // Add that fact to the act.
-          act.exhibits = 'appended';
-          // Add the exhibits to the report.
-          if (report.exhibits) {
-            report.exhibits += `\n${testReport.exhibits}`;
+        // Make the last-opened page the current page.
+        const page = pages[pages.length - 1];
+        // If the previous act exists and was a link or button act:
+        if (actIndex && ['button', 'link'].includes(acts[actIndex - 1].type)) {
+          // Wait until the page is stable, if not yet.
+          await page.waitForLoadState('networkidle', {timeout: 10000});
+        }
+        // Otherwise:
+        else {
+          // Wait until the body element is visible, if not yet.
+          await page.waitForSelector('body');
+        }
+        // If the act is a valid URL:
+        if (act.type === 'url' && isURL(act.which)) {
+          // Visit it.
+          await page.goto(act.which);
+          // Wait until it is stable.
+          await page.waitForLoadState('networkidle', {timeout: 10000});
+          // Add the resulting URL to the act.
+          act.result = page.url();
+        }
+        // Otherwise, i.e. if the act is a post-URL act:
+        else {
+          const url = page.url();
+          // If the page has no URL:
+          if (! isURL(url)) {
+            // Add an error result to the act.
+            act.result = 'PAGE HAS NO URL';
           }
+          // Otherwise, i.e. if the page has a URL:
           else {
-            report.exhibits = testReport.exhibits;
+            // Add it to the act.
+            act.url = url;
+            // If the act is a valid custom test:
+            if (act.type === 'test' && testNames.includes(act.which)) {
+              // Conduct it.
+              const testReport = await require(`./tests/${act.which}/app`).reporter(page);
+              // If the test produced exhibits:
+              if (testReport.exhibits) {
+                // Add that fact to the act.
+                act.exhibits = 'appended';
+                // Append them to the exhibits in the report.
+                if (report.exhibits) {
+                  report.exhibits += `\n${testReport.exhibits}`;
+                }
+                else {
+                  report.exhibits = testReport.exhibits;
+                }
+              }
+              // Add the result array or other object to the act.
+              const resultCount = Object.keys(testReport.result).length;
+              act.result = resultCount ? testReport.result : 'NONE';
+            }
+            // Otherwise, if the act is an axe test:
+            else if (act.type === 'axe') {
+              // Conduct it and add its result to the act.
+              act.result = await axe(page, act.which);
+            }
+            // Otherwise, if the act is a valid wait:
+            else if (
+              act.type === 'wait'
+              && act.which
+              && ['url', 'title', 'body'].includes(act.which.type)
+              && act.which.text
+            ) {
+              // Wait for the specified text to appear in the specified place.
+              await page.waitForFunction(which => {
+                const {type, text} = which;
+                const {URL, title, body} = document;
+                const success = {
+                  url: URL && URL.includes(text),
+                  title: title && title.includes(text),
+                  body: body && body.textContent && body.textContent.includes(text)
+                };
+                return success[type];
+              }, act.which, {timeout: 10000});
+              // Add the resulting URL to the act.
+              act.result = page.url();
+            }
+            // Otherwise, if the act is a page switch:
+            else if (act.type === 'page') {
+              // Wait for a page to be created and identify it.
+              const page = await browserContext.waitForEvent('page');
+              // Wait until it is stable, so it becomes the page of the next act.
+              await page.waitForLoadState('networkidle', {timeout: 10000});
+              // Add the resulting URL to the act.
+              act.result = page.url();
+            }
+            // Otherwise, if the act is a valid move:
+            else if (moves[act.type]) {
+              const selector = moves[act.type];
+              // Perform it with a browser function and add the result to the act.
+              act.result = await page.$eval(
+                'body',
+                (body, args) => {
+                  const [act, selector] = args;
+                  const {type, which, index, value} = act;
+                  // Identify the specified element, if possible.
+                  const matches = Array.from(body.querySelectorAll(selector));
+                  const whichElement = matches.find(match =>
+                    match.textContent.includes(which)
+                    || (
+                      match.hasAttribute('aria-label')
+                      && match.getAttribute('aria-label').includes(which)
+                    )
+                    || (
+                      match.labels
+                      && Array
+                      .from(match.labels)
+                      .map(label => label.textContent)
+                      .join(' ')
+                      .includes(which)
+                    )
+                    || (
+                      match.hasAttribute('aria-labelledby')
+                      && match
+                      .getAttribute('aria-labelledby')
+                      .split(/\s+/)
+                      .map(id => body.querySelector(`#${id}`).textContent)
+                      .join(' ')
+                      .includes(which)
+                    )
+                    || (
+                      match.hasAttribute('placeholder')
+                      && match.getAttribute('placeholder').includes(which)
+                    )
+                  );
+                  // If one was identified:
+                  if (whichElement) {
+                    // Focus it.
+                    whichElement.focus();
+                    // Perform the act on the element and return a move description.
+                    if (type === 'text') {
+                      whichElement.value = value;
+                      whichElement.dispatchEvent(new Event('input'));
+                      return 'entered';
+                    }
+                    else if (['radio', 'checkbox'].includes(type)) {
+                      whichElement.checked = true;
+                      whichElement.dispatchEvent(new Event('change'));
+                      return 'checked';
+                    }
+                    else if (type === 'select') {
+                      whichElement.selectedIndex = index;
+                      whichElement.dispatchEvent(new Event('change'));
+                      return `<code>${whichElement.item(index).textContent}</code> selected`;
+      
+                    }
+                    else if (type === 'button') {
+                      whichElement.click();
+                      return 'clicked';
+                    }
+                    else if (type === 'link') {
+                      whichElement.click();
+                      return {
+                        href: whichElement.href || 'NONE',
+                        target: whichElement.target,
+                        move: 'clicked'
+                      };
+                    }
+                  }
+                  // Otherwise, i.e. if the specified element was not identified:
+                  else {
+                    // Return an error result.
+                    return 'NOT FOUND';
+                  }
+                },
+                [act, selector]
+              );
+            }
+            // Otherwise, i.e. if the act is unknown:
+            else {
+              // Add the error result to the act.
+              act.result = 'INVALID';
+            }
           }
         }
-        // Add the result to the act.
-        const resultCount = Object.keys(testReport.result).length;
-        act.result = resultCount ? testReport.result : 'NONE';
       }
-      // Otherwise, if it is an axe test:
-      else if (act.type === 'axe') {
-        // Conduct it and add its result to the act.
-        act.result = await axe(page, act.which);
-      }
-      // Otherwise, if it is a valid URL:
-      else if (act.type === 'url' && isURL(act.which)) {
-        // Visit it.
-        await page.goto(act.which);
-        // Wait until it is stable.
-        await page.waitForLoadState('networkidle', {timeout: 10000});
-        // Add the result to the act.
-        act.result = page.url();
-      }
-      // Otherwise, if it is a valid wait:
-      else if (
-        act.type === 'wait'
-        && act.which
-        && ['url', 'title', 'body'].includes(act.which.type)
-        && act.which.text
-      ) {
-        // Wait for the specified text to appear.
-        await page.waitForFunction(which => {
-          const {type, text} = which;
-          const {URL, title, body} = document;
-          const success = {
-            url: URL && URL.includes(text),
-            title: title && title.includes(text),
-            body: body && body.textContent && body.textContent.includes(text)
-          };
-          return success[type];
-        }, act.which, {timeout: 10000});
-        // Add the result to the act.
-        act.result = page.url();
-      }
-      // Otherwise, if it is a page switch:
-      else if (act.type === 'page') {
-        // Wait for a page to be created and identify it.
-        const page = await globals.browserContext.waitForEvent('page');
-        // Wait until it is stable, so it becomes the page of the next act.
-        await page.waitForLoadState('networkidle', {timeout: 10000});
-        // Add the result to the act.
-        act.result = page.url();
-      }
-      // Otherwise, if it is a valid element act:
-      else if (globals.elementActs[act.type]) {
-        const selector = globals.elementActs[act.type];
-        // Perform it with a browser function.
-        act.result = await page.$eval(
-          'body',
-          (body, args) => {
-            const [act, selector] = args;
-            const {type, which, index, value} = act;
-            // Identify the specified element, if possible.
-            const matches = Array.from(body.querySelectorAll(selector));
-            const whichElement = matches.find(match =>
-              match.textContent.includes(which)
-              || (
-                match.hasAttribute('aria-label')
-                && match.getAttribute('aria-label').includes(which)
-              )
-              || (
-                match.labels
-                && Array
-                .from(match.labels)
-                .map(label => label.textContent)
-                .join(' ')
-                .includes(which)
-              )
-              || (
-                match.hasAttribute('aria-labelledby')
-                && match
-                .getAttribute('aria-labelledby')
-                .split(/\s+/)
-                .map(id => body.querySelector(`#${id}`).textContent)
-                .join(' ')
-                .includes(which)
-              )
-              || (
-                match.hasAttribute('placeholder')
-                && match.getAttribute('placeholder').includes(which)
-              )
-            );
-            // If one was identified:
-            if (whichElement) {
-              // Focus it.
-              whichElement.focus();
-              // Perform the act on the element.
-              if (type === 'text') {
-                whichElement.value = value;
-                whichElement.dispatchEvent(new Event('input'));
-                return 'entered';
-              }
-              else if (['radio', 'checkbox'].includes(type)) {
-                whichElement.checked = true;
-                whichElement.dispatchEvent(new Event('change'));
-                return 'checked';
-              }
-              else if (type === 'select') {
-                whichElement.selectedIndex = index;
-                whichElement.dispatchEvent(new Event('change'));
-                return `<code>${whichElement.item(index).textContent}</code> selected`;
-
-              }
-              else if (type === 'button') {
-                whichElement.click();
-                return 'clicked';
-              }
-              else if (type === 'link') {
-                whichElement.click();
-                return {
-                  href: whichElement.href || 'NONE',
-                  target: whichElement.target,
-                  move: 'clicked'
-                };
-              }
-            }
-            // Otherwise, i.e. if the specified element was not identified:
-            else {
-              return 'NOT FOUND';
-            }
-          },
-          [act, selector]
-        );
-      }
-      // Otherwise, i.e. if the act is unknown:
-      else {
-        // Add the error result to the act.
-        act.result = 'INVALID';
-      }
-      // Perform the remaining actions.
-      await doActs(report, actIndex + 1);
     }
+    // Perform the remaining acts.
+    await doActs(report, actIndex + 1);
   }
 };
 // Handles a script request.
-const scriptHandler = async (scriptName, what, acts, debug) => {
+const scriptHandler = async (scriptName, what, acts, query, response) => {
   const report = {
     scriptName,
     what,
     acts
   };
-  // Launch Chrome.
-  await launch(debug);
-  // Perform the specified acts and add the results to the acts of the report.
+  // Perform the specified acts and add the results and exhibits to the report.
   await doActs(report, 0);
   // If any exhibits have been added to the report, move them to the query.
   if (report.exhibits) {
-    globals.query.exhibits = report.exhibits;
+    query.exhibits = report.exhibits;
     delete report.exhibits;
   }
   // Otherwise, i.e. if no exhibits have been added to the report:
   else {
     // Add an empty exhibit to the query.
-    globals.query.exhibits = '<p><strong>None</strong></p>';
+    query.exhibits = '<p><strong>None</strong></p>';
   }
   // Convert the report to JSON.
-  globals.query.report = JSON.stringify(report, null, 2).replace(/</g, '&lt;');
+  query.report = JSON.stringify(report, null, 2).replace(/</g, '&lt;');
   // Render and serve the output.
-  render('', true);
+  render('', true, 'out', query, response);
+};
+// Recursively gets an object of file-name bases and property values from JSON object files.
+const getWhats = async (path, baseNames, result) => {
+  if (baseNames.length) {
+    const firstName = baseNames[0];
+    const content = await fs.readFile(`${path}/${firstName}.json`, 'utf8');
+    const addition = [firstName, JSON.parse(content).what];
+    result.push(addition);
+    return await getWhats(path, baseNames.slice(1), result);
+  }
+  else {
+    return Promise.resolve(result);
+  }
 };
 // Handles a request.
 const requestHandler = (request, response) => {
@@ -458,7 +483,7 @@ const requestHandler = (request, response) => {
     bodyParts.push(chunk);
   })
   // When the request has arrived:
-  .on('end', () => {
+  .on('end', async () => {
     // Identify its WHATWG URL instance.
     let url = new URL(request.url, `${protocol}://${request.headers.host}`);
     // Identify the pathname, with any initial 'autotest/' segment deleted.
@@ -469,14 +494,14 @@ const requestHandler = (request, response) => {
     else if (pathName === '/autotest') {
       pathName = '/';
     }
-    let searchParams = {};
-    globals.query = {};
-    globals.response = response;
+    const query = {};
     // If the request method is GET:
     if (method === 'GET') {
       // Identify a query object, presupposing no query name occurs twice.
-      searchParams = url.searchParams;
-      searchParams.forEach((value, name) => globals.query[name] = value);
+      const searchParams = url.searchParams;
+      searchParams.forEach((value, name) => {
+        query[name] = value;
+      });
       let type = statics[pathName];
       let encoding;
       if (type) {
@@ -490,36 +515,27 @@ const requestHandler = (request, response) => {
       // If a requestable static file is requested:
       if (type) {
         // Get the file content.
-        globals.fs.readFile(pathName.slice(1), encoding)
-        .then(
-          // When it has arrived, serve it.
-          content => globals.servePage(content, pathName, type, response),
-          error => globals.serveError(new Error(error), response)
-        );
+        const content = await fs.readFile(pathName.slice(1), encoding);
+        // When it has arrived, serve it.
+        servePage(content, pathName, type, response);
       }
       // Otherwise, if the request must be redirected:
       else if (target) {
         // Redirect it.
-        globals.redirect(target, response);
+        redirect(target, response);
       }
       // Otherwise, if the site icon was requested:
       else if (pathName === '/favicon.ico') {
         // Get the file content.
-        globals.fs.readFile('favicon.png')
-        .then(
-          // When it has arrived:
-          content => {
-            // Serve it.
-            response.setHeader('Content-Type', 'image/png');
-            response.write(content, 'binary');
-            response.end();
-          },
-          error => globals.serveError(new Error(error), response)
-        );
+        const content = await fs.readFile('favicon.png');
+        // When it has arrived, serve it.
+        response.setHeader('Content-Type', 'image/png');
+        response.write(content, 'binary');
+        response.end();
       }
       // Otherwise, i.e. if the URL is invalid:
       else {
-        globals.serveMessage('ERROR: Invalid URL.', response);
+        serveMessage('ERROR: Invalid URL.', response);
       }
     }
     // Otherwise, if the request method is POST:
@@ -527,83 +543,79 @@ const requestHandler = (request, response) => {
       // Get a query string from the request body.
       const queryString = Buffer.concat(bodyParts).toString();
       // Create a query object.
-      searchParams = new URLSearchParams(queryString);
-      searchParams.forEach((value, name) => globals.query[name] = value);
-      const {query} = globals;
+      const searchParams = new URLSearchParams(queryString);
+      searchParams.forEach((value, name) => {
+        query[name] = value;
+      });
       const {scriptPath, scriptName} = query;
       // If the path and the request specify a script path:
       if (pathName === '/scriptPath' && scriptPath) {
         // Request an array of the names of the files at the path.
-        globals.fs.readdir(scriptPath)
-        .then(
-          // When the array arrives:
-          fileNames => {
-            // Get an array of script names from it.
-            const scriptNames = fileNames
-            .filter(name => name.endsWith('.json'))
-            .map(name => name.slice(0, -5));
-            // If any exist:
-            if (scriptNames.length) {
-              // Add their count to the query.
-              query.scriptSize = scriptNames.length;
-              // Get their descriptions.              
-              getWhats(scriptPath, scriptNames, [])
-              .then(
-                // When the descriptions arrive:
-                nameWhats => {
-                  // Add a list of scripts as options to the query.
-                  query.scriptNames = nameWhats.map((pair, index) => {
-                    const state = index === 0 ? 'selected ' : '';
-                    return `<option ${state}value="${pair[0]}">${pair[0]}: ${pair[1]}</option>`;
-                  }).join('\n              ');
-                  // Render the script-selection page.
-                  render('', true, 'script');
-                },
-                error => globals.serveError(new Error(error), response)
-              );
-            }
-            // Otherwise, i.e. if no scripts exist at the specified path:
-            else {
-              // Serve an error message.
-              globals.serveMessage(`ERROR: No scripts at ${scriptPath}.`, response);
-            }
-          },
-          error => globals.serveError(new Error(error), response)
-        );
+        const fileNames = await fs.readdir(scriptPath);
+        // When the array arrives, get an array of script names from it.
+        const scriptNames = fileNames
+        .filter(name => name.endsWith('.json'))
+        .map(name => name.slice(0, -5));
+        // If any exist:
+        if (scriptNames.length) {
+          // Add their count to the query.
+          query.scriptSize = scriptNames.length;
+          // Get their descriptions.              
+          const nameWhats = await getWhats(scriptPath, scriptNames, []);
+          // When the descriptions arrive, add them as options to the query.
+          query.scriptNames = nameWhats.map((pair, index) => {
+            const state = index === 0 ? 'selected ' : '';
+            return `<option ${state}value="${pair[0]}">${pair[0]}: ${pair[1]}</option>`;
+          }).join('\n              ');
+          // Render the script-selection page.
+          render('', true, 'script', query, response);
+        }
+        // Otherwise, i.e. if no scripts exist at the specified path:
+        else {
+          // Serve an error message.
+          serveMessage(`ERROR: No scripts at ${scriptPath}.`, response);
+        }
       }
       // Otherwise, if the path and the request specify a script:
       else if (pathName === '/scriptName' && scriptPath && scriptName) {
         // Get the content of the script.
-        globals.fs.readFile(`${scriptPath}/${scriptName}.json`, 'utf8')
-        .then(
-          // When the content arrives:
-          scriptJSON => {
-            // If there is any:
-            if (scriptJSON) {
-              // Get the script data.
-              const script = JSON.parse(scriptJSON);
-              const {what, acts} = script;
-              // If the script is valid:
-              if (what && acts && typeof what === 'string' && Array.isArray(acts)) {
-                // Process it.
-                scriptHandler(scriptName, what, acts, debug);
-              }
-            }
-            // Otherwise, i.e. if there is no content:
-            else {
-              // Serve an error message.
-              globals.serveMessage(
-                `ERROR: No script found in ${scriptPath}/${scriptName}.json.`, response
-              );
-            }
-          },
-          error => globals.serveError(new Error(error), response)
-        );
+        const scriptJSON = await fs.readFile(`${scriptPath}/${scriptName}.json`, 'utf8');
+        // When the content arrives, if there is any:
+        if (scriptJSON) {
+          // Get the script data.
+          const script = JSON.parse(scriptJSON);
+          const {what, acts} = script;
+          // If the script is valid:
+          if (
+            what
+            && acts
+            && typeof what === 'string'
+            && Array.isArray(acts)
+            && acts.length > 1
+            && acts[0].type === 'launch'
+            && acts[1].type === 'url'
+          ) {
+            // Process it.
+            scriptHandler(scriptName, what, acts, query, response);
+          }
+          // Otherwise, i.e. if the script is invalid:
+          else {
+            // Serve an error message.
+            serveMessage(`ERROR: Script ${scriptName} invalid.`, response);
+          }
+        }
+        // Otherwise, i.e. if there is no content:
+        else {
+          // Serve an error message.
+          serveMessage(
+            `ERROR: No script found in ${scriptPath}/${scriptName}.json.`, response
+          );
+        }
       }
       // Otherwise, i.e. if the path or the request is invalid:
       else {
         // Serve an error message.
-        globals.serveMessage('ERROR: Form submission invalid.', response);
+        serveMessage('ERROR: Form submission invalid.', response);
       }
     }
   });
@@ -620,10 +632,10 @@ if (protocol === 'http') {
   serve(http, {});
 }
 else if (protocol === 'https') {
-  globals.fs.readFile(process.env.KEY)
+  fs.readFile(process.env.KEY)
   .then(
     key => {
-      globals.fs.readFile(process.env.CERT)
+      fs.readFile(process.env.CERT)
       .then(
         cert => {
           serve(https, {key, cert});

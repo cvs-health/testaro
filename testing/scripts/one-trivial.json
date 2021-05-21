@@ -2,6 +2,10 @@
   "what": "Trivial test on airtable page",
   "acts": [
     {
+      "type": "launch",
+      "which": "chromium"
+    },
+    {
       "type": "url",
       "which": "https://airtable.com/shrjpOPGmKjmkbMi8"
     },
