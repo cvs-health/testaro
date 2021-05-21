@@ -3,7 +3,7 @@
   "acts": [
     {
       "type": "launch",
-      "which": "chromium"
+      "which": "webkit"
     },
     {
       "type": "url",

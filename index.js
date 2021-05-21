@@ -238,7 +238,7 @@ const doActs = async (report, actIndex) => {
     const act = acts[actIndex];
     // If the act is a valid launch:
     if (act.type === 'launch' && ['chromium', 'firefox', 'webkit'].includes(act.which)) {
-      // Launch the specified browser, creating a browser context.
+      // Launch the specified browser, creating a browser context and a page in it.
       await launch(act.which);
     }
     // Otherwise, i.e. if the act is a post-launch act:
@@ -253,17 +253,7 @@ const doActs = async (report, actIndex) => {
       // Otherwise, i.e. if the browser context has any open pages:
       else {
         // Make the last-opened page the current page.
-        const page = pages[pages.length - 1];
-        // If the previous act exists and was a link or button act:
-        if (actIndex && ['button', 'link'].includes(acts[actIndex - 1].type)) {
-          // Wait until the page is stable, if not yet.
-          await page.waitForLoadState('networkidle', {timeout: 10000});
-        }
-        // Otherwise:
-        else {
-          // Wait until the body element is visible, if not yet.
-          await page.waitForSelector('body');
-        }
+        let page = pages[pages.length - 1];
         // If the act is a valid URL:
         if (act.type === 'url' && isURL(act.which)) {
           // Visit it.
@@ -273,10 +263,41 @@ const doActs = async (report, actIndex) => {
           // Add the resulting URL to the act.
           act.result = page.url();
         }
-        // Otherwise, i.e. if the act is a post-URL act:
+        // Otherwise, if the act is a valid wait:
+        else if (
+          act.type === 'wait'
+          && act.which
+          && ['url', 'title', 'body'].includes(act.which.type)
+          && act.which.text
+        ) {
+          // Wait for the specified text to appear in the specified place.
+          await page.waitForFunction(which => {
+            const {type, text} = which;
+            const {URL, title, body} = document;
+            const success = {
+              url: URL && URL.includes(text),
+              title: title && title.includes(text),
+              body: body && body.textContent && body.textContent.includes(text)
+            };
+            return success[type];
+          }, act.which, {timeout: 10000});
+          // Add the resulting URL to the act.
+          act.result = page.url();
+        }
+        // Otherwise, if the act is a page switch:
+        else if (act.type === 'page') {
+          // Wait for a page to be created and reidentify it.
+          page = await browserContext.waitForEvent('page');
+          // Wait until it is stable, so it becomes the page of the next act.
+          await page.waitForLoadState('networkidle', {timeout: 10000});
+          // Add the resulting URL to the act.
+          act.result = page.url();
+        }
+        // Otherwise, i.e. if the act is a test or move:
         else {
+          // Identify the URL of the page.
           const url = page.url();
-          // If the page has no URL:
+          // If the page has none:
           if (! isURL(url)) {
             // Add an error result to the act.
             act.result = 'PAGE HAS NO URL';
@@ -309,36 +330,6 @@ const doActs = async (report, actIndex) => {
             else if (act.type === 'axe') {
               // Conduct it and add its result to the act.
               act.result = await axe(page, act.which);
-            }
-            // Otherwise, if the act is a valid wait:
-            else if (
-              act.type === 'wait'
-              && act.which
-              && ['url', 'title', 'body'].includes(act.which.type)
-              && act.which.text
-            ) {
-              // Wait for the specified text to appear in the specified place.
-              await page.waitForFunction(which => {
-                const {type, text} = which;
-                const {URL, title, body} = document;
-                const success = {
-                  url: URL && URL.includes(text),
-                  title: title && title.includes(text),
-                  body: body && body.textContent && body.textContent.includes(text)
-                };
-                return success[type];
-              }, act.which, {timeout: 10000});
-              // Add the resulting URL to the act.
-              act.result = page.url();
-            }
-            // Otherwise, if the act is a page switch:
-            else if (act.type === 'page') {
-              // Wait for a page to be created and identify it.
-              const page = await browserContext.waitForEvent('page');
-              // Wait until it is stable, so it becomes the page of the next act.
-              await page.waitForLoadState('networkidle', {timeout: 10000});
-              // Add the resulting URL to the act.
-              act.result = page.url();
             }
             // Otherwise, if the act is a valid move:
             else if (moves[act.type]) {
@@ -422,7 +413,7 @@ const doActs = async (report, actIndex) => {
                 [act, selector]
               );
             }
-            // Otherwise, i.e. if the act is unknown:
+            // Otherwise, i.e. if the act type is unknown:
             else {
               // Add the error result to the act.
               act.result = 'INVALID';
