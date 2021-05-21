@@ -266,7 +266,7 @@ const doActs = async (report, actIndex) => {
       }
       // Add the page URL to the act.
       act.url = page.url();
-      // If the act is a valid custom test:
+      // If the act is a valid Chrome-only test:
       if (act.type === 'test' && testNames.includes(act.which)) {
         // Conduct the test.
         const testReport = await require(`./tests/${act.which}/app`).reporter(page);
@@ -430,7 +430,7 @@ const scriptHandler = async (scriptName, what, acts, debug) => {
   };
   // Launch Chrome.
   await launch(debug);
-  // Add the results to the acts of the report.
+  // Perform the specified acts and add the results to the acts of the report.
   await doActs(report, 0);
   // If any exhibits have been added to the report, move them to the query.
   if (report.exhibits) {
