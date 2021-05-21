@@ -239,7 +239,7 @@ const doActs = async (report, actIndex) => {
     // If the act is a valid launch:
     if (act.type === 'launch' && ['chromium', 'firefox', 'webkit'].includes(act.which)) {
       // Launch the specified browser, creating a browser context.
-      launch(act.which);
+      await launch(act.which);
     }
     // Otherwise, i.e. if the act is a post-launch act:
     else {
