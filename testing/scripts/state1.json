@@ -1,0 +1,24 @@
+{
+  "what": "State comparison test",
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium"
+    },
+    {
+      "type": "url",
+      "which": "https://www.healthcare.gov/quick-guide/one-page-guide-to-the-marketplace/"
+    },
+    {
+      "type": "focus",
+      "which": {
+        "type": "link",
+        "text": "Get Coverage"
+      }
+    },
+    {
+      "type": "test",
+      "which": "state"
+    }
+  ]
+}

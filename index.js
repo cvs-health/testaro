@@ -238,11 +238,14 @@ const render = (path, isServable, which, query, response) => {
   }
 };
 // Returns an element matching a selector and text.
-const matchElement = async (page, selector, text) => await page.evaluateHandle(args => {
-  const [selector, text] = args;
-  const matches = Array.from(document.body.querySelectorAll(selector));
+const matchIndex = async (page, selector, text) => {
+  // Identify the elements of the specified type.
+  const matches = await page.$$(selector);
+  let index;
+  // If there are any:
   if (matches.length) {
-    return Promise.resolve(matches.find(match =>
+    // Identify the first one that contains the specified text, or -1 if none.
+    index = matches.findIndex(match =>
       match.textContent.includes(text)
       || (
         match.hasAttribute('aria-label')
@@ -269,12 +272,15 @@ const matchElement = async (page, selector, text) => await page.evaluateHandle(a
         match.hasAttribute('placeholder')
         && match.getAttribute('placeholder').includes(text)
       )
-    ));
+    );
   }
+  // Otherwise, i.e. if there are no elements of the specified type:
   else {
-    return Promise.resolve(null);
+    // Identify this.
+    index = -1;
   }
-}, [selector, text]);
+  return index;
+};
 // Recursively performs the acts of a script.
 const doActs = async (report, actIndex, page) => {
   const {acts} = report;
@@ -385,14 +391,16 @@ const doActs = async (report, actIndex, page) => {
             }
             // Otherwise, if the act is a valid focus:
             else if (type === 'focus' && which && which.type && moves[which.type]) {
-              // Identify the specified element as an ElementHandle.
+              // Identify the index of the specified element among same-type elements.
               const {type, text} = which;
-              const whichJS = await matchElement(page, type, text);
-              const whichElement = whichJS.asElement();
+              const whichIndex = await matchIndex(page, type, text);
               // If it exists:
-              if (whichElement) {
-                // Focus it and add a success result to the act.
-                await whichElement.focus();
+              if (whichIndex > -1) {
+                // Focus it.
+                await page.$eval(`:nth-match(${type}, ${whichIndex + 1})`, async element => {
+                  await element.focus();
+                });
+                // Add a success result to the act.
                 act.result = 'focused';
               }
               // Otherwise, i.e. if the element does not exist:
@@ -404,11 +412,12 @@ const doActs = async (report, actIndex, page) => {
             // Otherwise, if the act is a valid move:
             else if (moves[type] && typeof which === 'string' && which) {
               const selector = moves[type];
-              // Identify the specified element as an ElementHandle.
-              const whichJSHandle = await matchElement(page, selector, which);
-              const whichElement = whichJSHandle.asElement();
+              // Identify the index of the specified element among same-type elements.
+              const whichIndex= await matchIndex(page, selector, which);
               // If it exists:
-              if (whichElement) {
+              if (whichIndex > -1) {
+                // Get its ElementHandle.
+                const whichElement = await page.$(`:nth-match(${selector}, ${whichIndex + 1})`);
                 // Focus it.
                 await whichElement.focus();
                 // Perform the act on the element and add a move description to the act.
@@ -425,7 +434,9 @@ const doActs = async (report, actIndex, page) => {
                   const optionText = await whichElement.$eval(
                     'option:selected', el => el.textContent
                   );
-                  act.result = optionText ? `&ldquo;${optionText}}&rdquo; selected` : 'OPTION NOT FOUND';
+                  act.result = optionText
+                    ? `&ldquo;${optionText}}&rdquo; selected`
+                    : 'OPTION NOT FOUND';
                 }
                 else if (type === 'button') {
                   await whichElement.click();
