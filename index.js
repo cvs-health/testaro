@@ -229,38 +229,44 @@ const render = (path, isServable, which, query, response) => {
     );
   }
 };
-// Returns an element matching a type and text.
-const matchElement = (body, selector, text) => {
-  const matches = Array.from(body.querySelectorAll(selector));
-  return matches.find(match =>
-    match.textContent.includes(text)
-    || (
-      match.hasAttribute('aria-label')
-      && match.getAttribute('aria-label').includes(text)
-    )
-    || (
-      match.labels
-      && Array
-      .from(match.labels)
-      .map(label => label.textContent)
-      .join(' ')
-      .includes(text)
-    )
-    || (
-      match.hasAttribute('aria-labelledby')
-      && match
-      .getAttribute('aria-labelledby')
-      .split(/\s+/)
-      .map(id => body.querySelector(`#${id}`).textContent)
-      .join(' ')
-      .includes(text)
-    )
-    || (
-      match.hasAttribute('placeholder')
-      && match.getAttribute('placeholder').includes(text)
-    )
-  );
-};
+// Returns an element matching a selector and text.
+const matchElement = async (page, selector, text) => await page.evaluateHandle(args => {
+  const [selector, text] = args;
+  const matches = Array.from(document.body.querySelectorAll(selector));
+  if (matches.length) {
+    return Promise.resolve(matches.find(match =>
+      match.textContent.includes(text)
+      || (
+        match.hasAttribute('aria-label')
+        && match.getAttribute('aria-label').includes(text)
+      )
+      || (
+        match.labels
+        && Array
+        .from(match.labels)
+        .map(label => label.textContent)
+        .join(' ')
+        .includes(text)
+      )
+      || (
+        match.hasAttribute('aria-labelledby')
+        && match
+        .getAttribute('aria-labelledby')
+        .split(/\s+/)
+        .map(id => document.getElementById(id).textContent)
+        .join(' ')
+        .includes(text)
+      )
+      || (
+        match.hasAttribute('placeholder')
+        && match.getAttribute('placeholder').includes(text)
+      )
+    ));
+  }
+  else {
+    return Promise.resolve(null);
+  }
+}, [selector, text]);
 // Recursively performs the acts of a script.
 const doActs = async (report, actIndex, page) => {
   const {acts} = report;
@@ -268,25 +274,26 @@ const doActs = async (report, actIndex, page) => {
   if (actIndex < acts.length) {
     // Identify the act (an element of report.acts) to be performed.
     const act = acts[actIndex];
+    const {type, which, value, index} = act;
     // If the act has the required property:
-    if (act.type) {
+    if (type) {
       // If the act is a valid launch:
       if (
-        act.type === 'launch'
-        && act.which
-        && ['chromium', 'firefox', 'webkit'].includes(act.which)
+        type === 'launch'
+        && which
+        && ['chromium', 'firefox', 'webkit'].includes(which)
       ) {
         // Launch the specified browser, creating a browser context and a page in it.
-        await launch(act.which);
+        await launch(which);
         // Identify its only page as current.
         page = browserContext.pages()[0];
       }
       // Otherwise, if the act is a post-launch act:
       else if (page) {
         // If the act is a valid URL:
-        if (act.type === 'url' && isURL(act.which)) {
+        if (type === 'url' && isURL(which)) {
           // Visit it.
-          await page.goto(act.which);
+          await page.goto(which);
           // Wait until it is stable.
           await page.waitForLoadState('networkidle', {timeout: 10000});
           // Add the resulting URL to the act.
@@ -294,10 +301,11 @@ const doActs = async (report, actIndex, page) => {
         }
         // Otherwise, if the act is a valid wait:
         else if (
-          act.type === 'wait'
-          && act.which
-          && ['url', 'title', 'body'].includes(act.which.type)
-          && act.which.text
+          type === 'wait'
+          && which
+          && which.type
+          && ['url', 'title', 'body'].includes(which.type)
+          && which.text
         ) {
           // Wait for the specified text to appear in the specified place.
           await page.waitForFunction(which => {
@@ -309,12 +317,12 @@ const doActs = async (report, actIndex, page) => {
               body: body && body.textContent && body.textContent.includes(text)
             };
             return success[type];
-          }, act.which, {timeout: 10000});
+          }, which, {timeout: 10000});
           // Add the resulting URL to the act.
           act.result = page.url();
         }
         // Otherwise, if the act is a page switch:
-        else if (act.type === 'page') {
+        else if (type === 'page') {
           // Wait for a page to be created and identify it as current.
           page = await browserContext.waitForEvent('page');
           // Wait until it is stable and thus ready for the next act.
@@ -336,9 +344,11 @@ const doActs = async (report, actIndex, page) => {
             // Add it to the act.
             act.url = url;
             // If the act is a valid custom test:
-            if (act.type === 'test' && testNames.includes(act.which)) {
+            if (
+              type === 'test' && typeof which === 'string' && which && testNames.includes(which)
+            ) {
               // Conduct it.
-              const testReport = await require(`./tests/${act.which}/app`).reporter(page);
+              const testReport = await require(`./tests/${which}/app`).reporter(page);
               // If the test produced exhibits:
               if (testReport.exhibits) {
                 // Add that fact to the act.
@@ -356,81 +366,70 @@ const doActs = async (report, actIndex, page) => {
               act.result = resultCount ? testReport.result : 'NONE';
             }
             // Otherwise, if the act is an axe test:
-            else if (act.type === 'axe') {
+            else if (type === 'axe') {
               // Conduct it and add its result to the act.
-              act.result = await axe(page, act.which);
+              act.result = await axe(page, which);
             }
             // Otherwise, if the act is a valid focus:
-            else if (act.type === 'focus' && act.which.type && moves[act.which.type]) {
-              // Focus the specified element and add the result to the act.
-              act.result = await page.$eval(
-                'body',
-                (body, which) => {
-                  const whichElement = matchElement(body, which.type, which.text);
-                  if (whichElement) {
-                    whichElement.focus();
-                    return 'focused';
-                  }
-                  else {
-                    return 'ELEMENT NOT FOUND';
-                  }
-                },
-                act.which
-              );
+            else if (type === 'focus' && which && which.type && moves[which.type]) {
+              // Identify the specified element as an ElementHandle.
+              const {type, text} = which;
+              const whichElement = await matchElement(page, type, text).asElement();
+              // If it exists:
+              if (whichElement) {
+                // Focus it and add a success result to the act.
+                await whichElement.focus();
+                act.result = 'focused';
+              }
+              // Otherwise, i.e. if the element does not exist:
+              else {
+                // Add a failure result to the act.
+                act.result = 'ELEMENT NOT FOUND';
+              }
             }
             // Otherwise, if the act is a valid move:
-            else if (moves[act.type]) {
-              const selector = moves[act.type];
-              // Perform it with a browser function and add the result to the act.
-              act.result = await page.$eval(
-                'body',
-                (body, args) => {
-                  const [act, selector] = args;
-                  const {type, which, index, value} = act;
-                  // Identify the specified element, if possible.
-                  const whichElement = matchElement(body, selector, which);
-                  // If one was identified:
-                  if (whichElement) {
-                    // Focus it.
-                    whichElement.focus();
-                    // Perform the act on the element and return a move description.
-                    if (type === 'text') {
-                      whichElement.value = value;
-                      whichElement.dispatchEvent(new Event('input'));
-                      return 'entered';
-                    }
-                    else if (['radio', 'checkbox'].includes(type)) {
-                      whichElement.checked = true;
-                      whichElement.dispatchEvent(new Event('change'));
-                      return 'checked';
-                    }
-                    else if (type === 'select') {
-                      whichElement.selectedIndex = index;
-                      whichElement.dispatchEvent(new Event('change'));
-                      return `<code>${whichElement.item(index).textContent}</code> selected`;
-      
-                    }
-                    else if (type === 'button') {
-                      whichElement.click();
-                      return 'clicked';
-                    }
-                    else if (type === 'link') {
-                      whichElement.click();
-                      return {
-                        href: whichElement.href || 'NONE',
-                        target: whichElement.target,
-                        move: 'clicked'
-                      };
-                    }
-                  }
-                  // Otherwise, i.e. if the specified element was not identified:
-                  else {
-                    // Return an error result.
-                    return 'NOT FOUND';
-                  }
-                },
-                [act, selector]
-              );
+            else if (moves[type] && typeof which === 'string' && which) {
+              const selector = moves[type];
+              // Identify the specified element as an ElementHandle.
+              const whichElement = await matchElement(page, selector, which).asElement();
+              // If it exists:
+              if (whichElement) {
+                // Focus it.
+                await whichElement.focus();
+                // Perform the act on the element and add a move description to the act.
+                if (type === 'text' && typeof value === 'string' && value) {
+                  await whichElement.type(value);
+                  return 'entered';
+                }
+                else if (['radio', 'checkbox'].includes(type)) {
+                  await whichElement.check();
+                  return 'checked';
+                }
+                else if (type === 'select') {
+                  await whichElement.selectOption({index});
+                  const optionText = await whichElement.$eval(
+                    'option:selected', el => el.textContent
+                  );
+                  return optionText ? `&ldquo;${optionText}}&rdquo; selected` : 'OPTION NOT FOUND';
+                }
+                else if (type === 'button') {
+                  await whichElement.click();
+                  return 'clicked';
+                }
+                else if (type === 'link') {
+                  await whichElement.click();
+                  return {
+                    href: whichElement.href || 'NONE',
+                    target: whichElement.target,
+                    move: 'clicked'
+                  };
+                }
+                // Otherwise, i.e. if the specified element was not identified:
+                else {
+                  // Return an error result.
+                  return 'NOT FOUND';
+                }
+              }
             }
             // Otherwise, i.e. if the act type is unknown:
             else {
