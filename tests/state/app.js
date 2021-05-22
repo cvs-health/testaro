@@ -1,11 +1,11 @@
 // Compiles a report.
 exports.reporter = async page => {
   // CONSTANTS AND VARIABLES
-  const debug = false;
   const minHeight = 10;
   const minWidth = 10;
   let margin = 20;
   const result = {};
+  const unique = Math.floor(process.uptime());
   // FUNCTION DEFINITIONS START
   // Validates the location and size of a bounding box.
   const boxValidity = box => ({
@@ -81,57 +81,95 @@ exports.reporter = async page => {
     };
   };
   // Creates and records a screen shot.
-  const shoot = async (page, reportBox, hasState, agentName) => {
-    // If an element exists and its state change is required:
-    if (reportBox.elements.length && hasState) {
-      // Make the change.
-      await reportBox.elements[0].focus();
+  const shoot = async (page, reportBox, state) => {
+    // If an element exists:
+    if (reportBox.elements.length) {
+      // Put it into the specified states.
+      if (['focus', 'both'].includes(state)) {
+        await reportBox.elements[0].focus();
+      }
+      else {
+        await reportBox.elements[0].dispatchEvent('blur');
+      }
+      if (['hover', 'both'].includes(state)) {
+        await reportBox.elements[0].hover();
+      }
+      else {
+        await reportBox.elements[0].dispatchEvent('mouseout');
+      }
     }
     // Make a screen shot.
     await page.screenshot({
       clip: getShotBox(margin, reportBox.box),
-      path: `screenShots/state-${hasState ? 'on' : 'off'}-${agentName}.png`,
+      path: `screenShots/${unique}-${state}.png`,
       fullPage: true
     });
   };
   // Creates and records 2 screen shots in a browser.
-  const shootBoth = async agentName => {
-    // If the agent is not Chrome:
-    if (agentName !== 'chromium') {
-      // Create and launch a browser and perform the preparations.
-      page = await (debug, agentName);
-    }
-    // Identify the specified ElementHandle.
-    const selector = `${query.elementType}:visible`;
-    const element = await page.$(`:nth-match(${selector}, ${query.elementIndex})`);
+  const shootAll = async () => {
+    // Identify a JSHandle of the specified element.
+    const elementJS = await page.evaluateHandle(() => document.activeElement());
     // If it exists:
-    if (element) {
-      // Determine its reportable bounding box:
-      const reportBox = await getReportBox(element);
-      // If it exists:
-      if (reportBox.box.width) {
-        // Make 2 screen shots of the element.
-        await shoot(page, reportBox, false, agentName || 'chromium');
-        await shoot(page, reportBox, true, agentName || 'chromium');
-        return true;
+    if (elementJS) {
+      // Make it an ElementHandle.
+      const element = elementJS.asElement();
+      // If that succeeded:
+      if (element) {
+        // Determine its reportable bounding box:
+        const reportBox = await getReportBox(element);
+        // If it exists:
+        if (reportBox.box.width) {
+          // Make 4 screen shots of the element.
+          await shoot(page, reportBox, 'normal');
+          await shoot(page, reportBox, 'focus');
+          await shoot(page, reportBox, 'hover');
+          await shoot(page, reportBox, 'both');
+          // Return success.
+          return true;
+        }
+        // Otherwise, i.e. if the reportable bounding box does not exist:
+        else {
+          // Return failure.
+          return false;
+        }
       }
+      // Otherwise, i.e. if the element could not be made an ElementHandle
       else {
+        // Return failure.
         return false;
       }
+    }
+    // Otherwise, i.e. if a JSHandle of the element could not be identified:
+    else {
+      // Return failure.
+      return false;
     }
   };
   // FUNCTION DEFINITIONS END
   // Make the screen shots in Chrome.
-  const shot = await shootBoth('chromium');
+  const shot = await shootAll();
   // If the shooting succeeded:
   if (shot) {
-    // Make them in Firefox and Safari.
-    await shootBoth('firefox');
-    await shootBoth('webkit');
+    const states = {
+      normal: 'Normal',
+      focus: 'Focus',
+      hover: 'Hover',
+      both: 'Focus and hover'
+    };
+    const figureOf = state => `<figure><figcaption>${states[state]}</figcaption><img src="screenshots/${unique}-${state}.png" alt="${states[state]} state of image"`;
+    const figures = Object.keys(states).map(state => figureOf(state)).join('\n');
+    const exhibits = `<h3>__browserTypeName__</h3>\n${figures}\n</h3>`;
+    // Return success and the exhibits.
+    return {
+      result: 'screenshots made',
+      exhibits
+    };
   }
-  // Return report data.
-  return {
-    json: true,
-    data
-  };
+  // Otherwise, i.e. if the shooting failed:
+  else {
+    // Return failure.
+    return {
+      result: 'screenshots failed'
+    };
+  }
 };

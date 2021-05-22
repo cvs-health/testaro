@@ -69,8 +69,14 @@ const testNames = [
   'state',
   'stylediff'
 ];
+const browserTypeNames = {
+  'chromium': 'Chrome',
+  'firefox': 'Firefox',
+  'webkit': 'Safari'
+};
 // ########## VARIABLES
 let browserContext;
+let browserTypeName;
 // ########## FUNCTIONS
 // Serves a redirection.
 const redirect = (url, response) => {
@@ -146,8 +152,8 @@ const axe = async (page, rules) => {
   }
 };
 // Launches a browser.
-const launch = async browserTypeName => {
-  const browserType = require('playwright')[browserTypeName];
+const launch = async typeName => {
+  const browserType = require('playwright')[typeName];
   // If the specified browser type exists:
   if (browserType) {
     // Launch it.
@@ -163,6 +169,8 @@ const launch = async browserTypeName => {
     const page = await browserContext.newPage();
     // Wait until it is stable.
     await page.waitForLoadState('networkidle');
+    // Update the name of the current browser type.
+    browserTypeName = typeName;
   }
 };
 // Serves a system error message.
@@ -312,8 +320,8 @@ const doActs = async (report, actIndex, page) => {
             const {type, text} = which;
             const {URL, title, body} = document;
             const success = {
-              url: URL && URL.includes(text),
-              title: title && title.includes(text),
+              url: body && URL && URL.includes(text),
+              title: body && title && title.includes(text),
               body: body && body.textContent && body.textContent.includes(text)
             };
             return success[type];
@@ -348,17 +356,22 @@ const doActs = async (report, actIndex, page) => {
               type === 'test' && typeof which === 'string' && which && testNames.includes(which)
             ) {
               // Conduct it.
-              const testReport = await require(`./tests/${which}/app`).reporter(page);
+              const testReport = await require(`./tests/${which}/app`)
+              .reporter(page);
               // If the test produced exhibits:
               if (testReport.exhibits) {
                 // Add that fact to the act.
                 act.exhibits = 'appended';
-                // Append them to the exhibits in the report.
+                // Replace any browser-type placeholder in the exhibits.
+                const newExhibits = testReport.exhibits.replace(
+                  /__browserTypeName__/g, browserTypeNames[browserTypeName]
+                );
+                // Append the exhibits to the exhibits in the report.
                 if (report.exhibits) {
-                  report.exhibits += `\n${testReport.exhibits}`;
+                  report.exhibits += `\n${newExhibits}`;
                 }
                 else {
-                  report.exhibits = testReport.exhibits;
+                  report.exhibits = newExhibits;
                 }
               }
               // Add the result object (possibly an array) to the act.
@@ -391,7 +404,8 @@ const doActs = async (report, actIndex, page) => {
             else if (moves[type] && typeof which === 'string' && which) {
               const selector = moves[type];
               // Identify the specified element as an ElementHandle.
-              const whichElement = await matchElement(page, selector, which).asElement();
+              const whichJSHandle = await matchElement(page, selector, which);
+              const whichElement = whichJSHandle.asElement();
               // If it exists:
               if (whichElement) {
                 // Focus it.
@@ -399,28 +413,30 @@ const doActs = async (report, actIndex, page) => {
                 // Perform the act on the element and add a move description to the act.
                 if (type === 'text' && typeof value === 'string' && value) {
                   await whichElement.type(value);
-                  return 'entered';
+                  act.result = 'entered';
                 }
                 else if (['radio', 'checkbox'].includes(type)) {
                   await whichElement.check();
-                  return 'checked';
+                  act.result = 'checked';
                 }
                 else if (type === 'select') {
                   await whichElement.selectOption({index});
                   const optionText = await whichElement.$eval(
                     'option:selected', el => el.textContent
                   );
-                  return optionText ? `&ldquo;${optionText}}&rdquo; selected` : 'OPTION NOT FOUND';
+                  act.result = optionText ? `&ldquo;${optionText}}&rdquo; selected` : 'OPTION NOT FOUND';
                 }
                 else if (type === 'button') {
                   await whichElement.click();
-                  return 'clicked';
+                  act.result = 'clicked';
                 }
                 else if (type === 'link') {
+                  const href = await whichElement.getAttribute('href');
+                  const target = await whichElement.getAttribute('target');
                   await whichElement.click();
-                  return {
-                    href: whichElement.href || 'NONE',
-                    target: whichElement.target,
+                  act.result = {
+                    href: href || 'NONE',
+                    target: target || 'NONE',
                     move: 'clicked'
                   };
                 }
