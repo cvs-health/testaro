@@ -108,7 +108,7 @@ exports.reporter = async page => {
   // Creates and records 2 screen shots in a browser.
   const shootAll = async () => {
     // Identify a JSHandle of the specified element.
-    const elementJS = await page.evaluateHandle(() => document.activeElement());
+    const elementJS = await page.evaluateHandle(() => document.activeElement);
     // If it exists:
     if (elementJS) {
       // Make it an ElementHandle.

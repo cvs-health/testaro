@@ -387,7 +387,8 @@ const doActs = async (report, actIndex, page) => {
             else if (type === 'focus' && which && which.type && moves[which.type]) {
               // Identify the specified element as an ElementHandle.
               const {type, text} = which;
-              const whichElement = await matchElement(page, type, text).asElement();
+              const whichJS = await matchElement(page, type, text);
+              const whichElement = whichJS.asElement();
               // If it exists:
               if (whichElement) {
                 // Focus it and add a success result to the act.
