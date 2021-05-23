@@ -237,50 +237,53 @@ const render = (path, isServable, which, query, response) => {
     );
   }
 };
-// Returns an element matching a selector and text.
-const matchIndex = async (page, selector, text) => {
-  // Identify the elements of the specified type.
-  const matches = await page.$$(selector);
-  let index;
-  // If there are any:
-  if (matches.length) {
-    // Identify the first one that contains the specified text, or -1 if none.
-    index = matches.findIndex(match =>
-      match.textContent.includes(text)
-      || (
-        match.hasAttribute('aria-label')
-        && match.getAttribute('aria-label').includes(text)
-      )
-      || (
-        match.labels
-        && Array
-        .from(match.labels)
-        .map(label => label.textContent)
-        .join(' ')
-        .includes(text)
-      )
-      || (
-        match.hasAttribute('aria-labelledby')
-        && match
-        .getAttribute('aria-labelledby')
-        .split(/\s+/)
-        .map(id => document.getElementById(id).textContent)
-        .join(' ')
-        .includes(text)
-      )
-      || (
-        match.hasAttribute('placeholder')
-        && match.getAttribute('placeholder').includes(text)
-      )
-    );
-  }
-  // Otherwise, i.e. if there are no elements of the specified type:
-  else {
-    // Identify this.
-    index = -1;
-  }
-  return index;
-};
+// Returns the index of an element matching a text, among elements of a type.
+const matchIndex = async (page, selector, text) => await page.$eval(
+  'body',
+  (body, args) => {
+    const [selector, text] = args;
+    // Identify the elements of the specified type.
+    const matches = Array.from(body.querySelectorAll(selector));
+    // If there are any:
+    if (matches.length) {
+      // Return the index of the first one satisfying the text condition, or -1 if none.
+      return matches.findIndex(match =>
+        match.textContent.includes(text)
+        || (
+          match.hasAttribute('aria-label')
+          && match.getAttribute('aria-label').includes(text)
+        )
+        || (
+          match.labels
+          && Array
+          .from(match.labels)
+          .map(label => label.textContent)
+          .join(' ')
+          .includes(text)
+        )
+        || (
+          match.hasAttribute('aria-labelledby')
+          && match
+          .getAttribute('aria-labelledby')
+          .split(/\s+/)
+          .map(id => document.getElementById(id).textContent)
+          .join(' ')
+          .includes(text)
+        )
+        || (
+          match.hasAttribute('placeholder')
+          && match.getAttribute('placeholder').includes(text)
+        )
+      );
+    }
+    // Otherwise, i.e. if there are no elements of the specified type:
+    else {
+      // Return this.
+      return -1;
+    }
+  },
+  [selector, text]
+);
 // Recursively performs the acts of a script.
 const doActs = async (report, actIndex, page) => {
   const {acts} = report;
