@@ -92,11 +92,11 @@ const axe = async (page, rules) => {
   // Inject axe-core into the page.
   await injectAxe(page);
   // Get the data on the elements violating the specified axe-core rules.
-  const axeReport = await getViolations(page, null, {
-    axeOptions: {
-      runOnly: rules
-    }
-  });
+  const axeOptions = {};
+  if (rules.length) {
+    axeOptions.runOnly = rules;
+  }
+  const axeReport = await getViolations(page, null, {axeOptions});
   // If there are any:
   if (axeReport.length) {
     const report = [];
@@ -610,7 +610,7 @@ const requestHandler = (request, response) => {
         if (scriptNames.length) {
           // Add their count to the query.
           query.scriptSize = scriptNames.length;
-          // Get their descriptions.              
+          // Get their descriptions.
           const nameWhats = await getWhats(scriptPath, scriptNames, []);
           // When the descriptions arrive, add them as options to the query.
           query.scriptNames = nameWhats.map((pair, index) => {
