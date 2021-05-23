@@ -442,6 +442,28 @@ const doActs = async (report, actIndex, page) => {
               // Conduct it and add its result to the act.
               act.result = await axes(page);
             }
+            // Otherwise, if the act is a WAVE summary:
+            else if (type === 'waves') {
+              const url = page.url();
+              const waveKey = process.env.WAVE_KEY;
+              // Get the data on WAVE errors and warnings.
+              return https.get(
+                `wave.webaim.org/api/request?key=${waveKey}&url=${url}`,
+                response => {
+                  let result = '';
+                  response.on('data', chunk => {
+                    result += chunk;
+                  });
+                  // When the data arrive:
+                  response.on('end', () => {
+                    // Add the result to the act.
+                    act.result = JSON.parse(result);
+                  });
+                }
+              ).on('error', error => {
+                act.result = `ERROR: ${error.message}`;
+              });
+            }
             // Otherwise, if the act is a valid focus:
             else if (type === 'focus' && which && which.type && moves[which.type]) {
               // Identify the index of the specified element among same-type elements.
