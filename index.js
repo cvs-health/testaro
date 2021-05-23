@@ -145,11 +145,51 @@ const axe = async (page, rules) => {
     // Return the report.
     return report;
   }
-  // Otherwise, i.e. if there are no axe-core violations:
+  // Otherwise, i.e. if there are no violations:
   else {
-    // Compile and return a report.
+    // Return a success report.
     return 'NONE';
   }
+};
+// Conducts all axe tests and return a summary.
+const axes = async page => {
+  // Count the elements in the page.
+  const elementCount = await page.$$eval('*', elements => elements.length);
+  // Inject axe-core into the page.
+  await injectAxe(page);
+  // Get the data on the elements violating axe-core rules.
+  const axeReport = await getViolations(page);
+  // Define score weights.
+  const weights = {
+    minor: 1,
+    moderate: 2,
+    serious: 3,
+    critical: 4
+  };
+  // Initialize a summary.
+  const report = {
+    elementCount,
+    warnings: 0,
+    violations: {
+      minor: 0,
+      moderate: 0,
+      serious: 0,
+      critical: 0
+    },
+    score: 0
+  };
+  // For each rule violated:
+  axeReport.forEach(rule => {
+    // For each element violating the rule:
+    rule.nodes.forEach(element => {
+      // Increment the element count of the impact of its violation.
+      report.violations[element.impact]++;
+      report.score -= weights[element.impact];
+    });
+  });
+  report.score += Math.floor(report.score * 400 / elementCount);
+  // Return the report.
+  return report;
 };
 // Launches a browser.
 const launch = async typeName => {
@@ -396,6 +436,11 @@ const doActs = async (report, actIndex, page) => {
             else if (type === 'axe') {
               // Conduct it and add its result to the act.
               act.result = await axe(page, which);
+            }
+            // Otherwise, if the act is an axe summary:
+            else if (type === 'axes') {
+              // Conduct it and add its result to the act.
+              act.result = await axes(page);
             }
             // Otherwise, if the act is a valid focus:
             else if (type === 'focus' && which && which.type && moves[which.type]) {
