@@ -156,8 +156,13 @@ const launch = async typeName => {
   const browserType = require('playwright')[typeName];
   // If the specified browser type exists:
   if (browserType) {
+    // Close any existing browser.
+    let browser = browserContext && browserContext.browser();
+    if (browser) {
+      await browser.close();
+    }
     // Launch it.
-    const browser = await browserType.launch(debug ? {headless: false, slowMo: 3000} : {});
+    browser = await browserType.launch(debug ? {headless: false, slowMo: 3000} : {});
     // Create a new context (window) in it.
     browserContext = await browser.newContext();
     // When a page is added to the browser context:

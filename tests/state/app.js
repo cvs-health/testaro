@@ -103,7 +103,7 @@ exports.reporter = async page => {
     await page.screenshot({
       clip: getShotBox(margin, reportBox.box),
       path: `screenShots/${unique}-${state}.png`,
-      fullPage: false
+      fullPage: true
     });
   };
   // Creates and records 2 screen shots in a browser.
@@ -157,8 +157,8 @@ exports.reporter = async page => {
       hover: 'Hover',
       both: 'Focus and hover'
     };
-    const figureOf = state => `<figure><figcaption>${states[state]}</figcaption><img src="screenshots/${unique}-${state}.png" alt="${states[state]} state of image"`;
-    const figures = Object.keys(states).map(state => figureOf(state)).join('\n');
+    const figureOf = state => `<figure><figcaption>${states[state]}</figcaption><img src="screenshots/${unique}-${state}.png" alt="${states[state]} state of image"></figure>`;
+    const figures = Object.keys(states).map(state => figureOf(state)).join('\n          ');
     const exhibits = `<h3>__browserTypeName__</h3>\n${figures}\n</h3>`;
     // Return success and the exhibits.
     return {

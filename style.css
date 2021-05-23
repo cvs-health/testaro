@@ -42,6 +42,12 @@ caption {
   color: #000;
   background-color: #fff;
 }
+figcaption {
+  font-weight: 700;
+}
+figure > img {
+  border: 1px solid black;
+}
 form {
   margin-top: 1rem;
 }

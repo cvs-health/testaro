@@ -1,5 +1,5 @@
 {
-  "what": "State comparison test on CDC link",
+  "what": "State comparison test",
   "acts": [
     {
       "type": "launch",
@@ -7,13 +7,13 @@
     },
     {
       "type": "url",
-      "which": "https://www.cdc.gov/about/default.htm"
+      "which": "https://jpdev.pro/jpdev/blog/entries/0000/index.html"
     },
     {
       "type": "focus",
       "which": {
         "type": "link",
-        "text": "Organization"
+        "text": "experimented"
       }
     },
     {
