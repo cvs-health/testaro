@@ -1,0 +1,24 @@
+{
+  "what": "State comparison test",
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium"
+    },
+    {
+      "type": "url",
+      "which": "https://jpdev.pro/jpdev/blog/entries/0000/index.html"
+    },
+    {
+      "type": "focus",
+      "which": {
+        "type": "link",
+        "text": "experimented"
+      }
+    },
+    {
+      "type": "test",
+      "which": "state"
+    }
+  ]
+}

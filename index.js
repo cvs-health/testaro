@@ -396,11 +396,11 @@ const doActs = async (report, actIndex, page) => {
             else if (type === 'focus' && which && which.type && moves[which.type]) {
               // Identify the index of the specified element among same-type elements.
               const {type, text} = which;
-              const whichIndex = await matchIndex(page, type, text);
+              const whichIndex = await matchIndex(page, moves[type], text);
               // If it exists:
               if (whichIndex > -1) {
                 // Focus it.
-                await page.$eval(`:nth-match(${type}, ${whichIndex + 1})`, async element => {
+                await page.$eval(`:nth-match(${moves[type]}, ${whichIndex + 1})`, async element => {
                   await element.focus();
                 });
                 // Add a success result to the act.

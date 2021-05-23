@@ -89,7 +89,8 @@ exports.reporter = async page => {
         await reportBox.elements[0].focus();
       }
       else {
-        await reportBox.elements[0].dispatchEvent('blur');
+        await page.keyboard.press('Tab');
+        await page.keyboard.press('Tab');
       }
       if (['hover', 'both'].includes(state)) {
         await reportBox.elements[0].hover();
@@ -102,7 +103,7 @@ exports.reporter = async page => {
     await page.screenshot({
       clip: getShotBox(margin, reportBox.box),
       path: `screenShots/${unique}-${state}.png`,
-      fullPage: true
+      fullPage: false
     });
   };
   // Creates and records 2 screen shots in a browser.
