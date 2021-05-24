@@ -339,8 +339,8 @@ const doActs = async (report, actIndex, page) => {
     const {type, which, value, index} = act;
     // If the act has the required property:
     if (type) {
-      // If the act is a WAVE summary:
-      if (type === 'waves') {
+      // If the act is a valid WAVE summary:
+      if (type === 'waves' && which) {
         const url = page.url();
         // const waveKey = process.env.WAVE_KEY;
         // Get the data on WAVE errors and warnings.
@@ -354,6 +354,8 @@ const doActs = async (report, actIndex, page) => {
             });
             // When the data arrive:
             response.on('end', async () => {
+              // Add the page name to the act.
+              act.name = which;
               // Add the result to the act.
               // act.result = JSON.parse(result);
               console.log('About to record waves');
@@ -379,10 +381,10 @@ const doActs = async (report, actIndex, page) => {
           // Identify its only page as current.
           page = browserContext.pages()[0];
         }
-        // Otherwise, if the act is a post-launch act:
+        // Otherwise, if a current page exists:
         else if (page) {
           // If the act is a valid URL:
-          if (type === 'url' && isURL(which)) {
+          if (type === 'url' && which && isURL(which)) {
             // Visit it.
             await page.goto(which);
             // Wait until it is stable.
@@ -557,7 +559,15 @@ const doActs = async (report, actIndex, page) => {
         // Perform the remaining acts.
         await doActs(report, actIndex + 1, page);
       }
-   }
+    }
+    // Otherwise, i.e. if the act type is missing:
+    else {
+      // Add an error result to the act.
+      act.result = 'ACT TYPE MISSING';
+      // Perform the remaining acts.
+      await doActs(report, actIndex + 1, page);
+    }
+  }
 };
 // Handles a script request.
 const scriptHandler = async (scriptName, what, acts, query, response) => {
