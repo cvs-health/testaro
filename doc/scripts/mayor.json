@@ -6,116 +6,102 @@
       "which": "chromium"
     },
     {
-      "type": "url",
-      "which": "https://www.ericadams2021.com"
+      "type": "waves",
+      "which": {
+        "url": "https://www.ericadams2021.com",
+        "name": "Eric Adams"
+      }
     },
     {
       "type": "waves",
-      "which": "Eric Adams"
-    },
-    {
-      "type": "url",
-      "which": "https://shaunfornyc.com"
-    },
-    {
-      "type": "waves",
-      "which": "Shaun Donovan"
-    },
-    {
-      "type": "url",
-      "which": "https://www.kgfornyc.com"
+      "which": {
+        "url": "https://shaunfornyc.com",
+        "name": "Shaun Donovan"
+      }
     },
     {
       "type": "waves",
-      "which": "Kathryn Garcia"
-    },
-    {
-      "type": "url",
-      "which": "https://www.rayformayor.com"
-    },
-    {
-      "type": "waves",
-      "which": "Raymond McGuire"
-    },
-    {
-      "type": "url",
-      "which": "https://www.dianne.nyc"
+      "which": {
+        "url": "https://www.kgfornyc.com",
+        "name": "Kathryn Garcia"
+      }
     },
     {
       "type": "waves",
-      "which": "Dianne Morales"
-    },
-    {
-      "type": "url",
-      "which": "https://stringerformayor.com"
-    },
-    {
-      "type": "waves",
-      "which": "Scott Stringer"
-    },
-    {
-      "type": "url",
-      "which": "https://www.mayawileyformayor.com"
+      "which": {
+        "url": "https://www.rayformayor.com",
+        "name": "Raymond McGuire"
+      }
     },
     {
       "type": "waves",
-      "which": "Maya Wiley"
-    },
-    {
-      "type": "url",
-      "which": "https://www.yangforny.com"
-    },
-    {
-      "type": "waves",
-      "which": "Andrew Yang"
-    },
-    {
-      "type": "url",
-      "which": "https://aaronfornyc.com/meet-aaron/"
+      "which": {
+        "url": "https://www.dianne.nyc",
+        "name": "Dianne Morales"
+      }
     },
     {
       "type": "waves",
-      "which": "Aaron Foldenauer"
-    },
-    {
-      "type": "url",
-      "which": "https://taylorfor2021.com"
-    },
-    {
-      "type": "waves",
-      "which": "Jocelyn Taylor"
-    },
-    {
-      "type": "url",
-      "which": "https://www.mateothemayor.com"
+      "which": {
+        "url": "https://stringerformayor.com",
+        "name": "Scott Stringer"
+      }
     },
     {
       "type": "waves",
-      "which": "Fernando Mateo"
-    },
-    {
-      "type": "url",
-      "which": "https://sliwaforny.com"
-    },
-    {
-      "type": "waves",
-      "which": "Curtis Sliwa"
-    },
-    {
-      "type": "url",
-      "which": "https://www.vitalyformayor.com"
+      "which": {
+        "url": "https://www.mayawileyformayor.com",
+        "name": "Maya Wiley"
+      }
     },
     {
       "type": "waves",
-      "which": "Vitaly Filipchenko"
-    },
-    {
-      "type": "url",
-      "which": "https://csk4mayor.nyc"
+      "which": {
+        "url": "https://www.yangforny.com",
+        "name": "Andrew Yang"
+      }
     },
     {
       "type": "waves",
-      "which": "Christopher Krietchman"
+      "which": {
+        "url": "https://aaronfornyc.com/meet-aaron/",
+        "name": "Aaron Foldenauer"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://taylorfor2021.com",
+        "name": "Jocelyn Taylor"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.mateothemayor.com",
+        "name": "Fernando Mateo"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://sliwaforny.com",
+        "name": "Curtis Sliwa"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.vitalyformayor.com",
+        "name": "Vitaly Filipchenko"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://csk4mayor.nyc",
+        "name": "Christopher Krietchman"
+      }
     }
   ]
 }
