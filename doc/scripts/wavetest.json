@@ -6,12 +6,11 @@
       "which": "chromium"
     },
     {
-      "type": "url",
-      "which": "https://shaunfornyc.com"
-    },
-    {
       "type": "waves",
-      "which": "Shaun Donovan"
+      "which": {
+        "url": "https://shaunfornyc.com",
+        "name": "Shaun Donovan"
+      }
     }
   ]
 }

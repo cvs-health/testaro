@@ -192,8 +192,8 @@ const axes = async page => {
   return report;
 };
 // Conducts a WAVE test and returns a Promise of a result.
-const waves = page => {
-  const url = page.url();
+const waves = url => {
+  console.log(`URL is ${url}`);
   const waveKey = process.env.WAVE_KEY;
   // Get the data on WAVE errors and warnings.
   return new Promise(resolve => {
@@ -415,139 +415,136 @@ const doActs = async (report, actIndex, page) => {
           // Add the resulting URL to the act.
           act.result = page.url();
         }
-        // Otherwise, i.e. if the act is a test, focus, or move:
-        else {
-          // Identify the URL of the page.
+        // Otherwise, if the act is a valid WAVE summary:
+        else if (type === 'waves' && which && which.name && (page.url() || which.url)) {
+          // Conduct a WAVE test and add the result to the act.
+          act.result = await waves(which.url || page.url());
+        }
+        // Otherwise, if the required page URL exists:
+        else if (page.url() && page.url() !== 'about:blank') {
           const url = page.url();
-          // If the page has none:
-          if (! isURL(url)) {
-            // Add an error result to the act.
-            act.result = 'PAGE HAS NO URL';
-          }
-          // Otherwise, i.e. if the page has a URL:
-          else {
-            // Add it to the act.
-            act.url = url;
-            // If the act is a valid custom test:
-            if (
-              type === 'test' && typeof which === 'string' && which && testNames.includes(which)
-            ) {
-              // Conduct it.
-              const testReport = await require(`./tests/${which}/app`)
-              .reporter(page);
-              // If the test produced exhibits:
-              if (testReport.exhibits) {
-                // Add that fact to the act.
-                act.exhibits = 'appended';
-                // Replace any browser-type placeholder in the exhibits.
-                const newExhibits = testReport.exhibits.replace(
-                  /__browserTypeName__/g, browserTypeNames[browserTypeName]
-                );
-                // Append the exhibits to the exhibits in the report.
-                if (report.exhibits) {
-                  report.exhibits += `\n${newExhibits}`;
-                }
-                else {
-                  report.exhibits = newExhibits;
-                }
+          // Add it to the act.
+          act.url = url;
+          // If the act is a valid custom test:
+          if (
+            type === 'test' && typeof which === 'string' && which && testNames.includes(which)
+          ) {
+            // Conduct it.
+            const testReport = await require(`./tests/${which}/app`)
+            .reporter(page);
+            // If the test produced exhibits:
+            if (testReport.exhibits) {
+              // Add that fact to the act.
+              act.exhibits = 'appended';
+              // Replace any browser-type placeholder in the exhibits.
+              const newExhibits = testReport.exhibits.replace(
+                /__browserTypeName__/g, browserTypeNames[browserTypeName]
+              );
+              // Append the exhibits to the exhibits in the report.
+              if (report.exhibits) {
+                report.exhibits += `\n${newExhibits}`;
               }
-              // Add the result object (possibly an array) to the act.
-              const resultCount = Object.keys(testReport.result).length;
-              act.result = resultCount ? testReport.result : 'NONE';
-            }
-            // Otherwise, if the act is an axe test:
-            else if (type === 'axe') {
-              // Conduct it and add its result to the act.
-              act.result = await axe(page, which);
-            }
-            // Otherwise, if the act is an axe summary:
-            else if (type === 'axes') {
-              // Conduct it and add its result to the act.
-              act.result = await axes(page);
-            }
-            // Otherwise, if the act is a valid WAVE summary:
-            else if (type === 'waves' && which) {
-              act.result = await waves(page);
-            }
-            // Otherwise, if the act is a valid focus:
-            else if (type === 'focus' && which && which.type && moves[which.type]) {
-              // Identify the index of the specified element among same-type elements.
-              const {type, text} = which;
-              const whichIndex = await matchIndex(page, moves[type], text);
-              // If it exists:
-              if (whichIndex > -1) {
-                // Focus it.
-                await page.$eval(`:nth-match(${moves[type]}, ${whichIndex + 1})`, async element => {
-                  await element.focus();
-                });
-                // Add a success result to the act.
-                act.result = 'focused';
-              }
-              // Otherwise, i.e. if the element does not exist:
               else {
-                // Add a failure result to the act.
-                act.result = 'ELEMENT NOT FOUND';
+                report.exhibits = newExhibits;
               }
             }
-            // Otherwise, if the act is a valid move:
-            else if (moves[type] && typeof which === 'string' && which) {
-              const selector = moves[type];
-              // Identify the index of the specified element among same-type elements.
-              const whichIndex= await matchIndex(page, selector, which);
-              // If it exists:
-              if (whichIndex > -1) {
-                // Get its ElementHandle.
-                const whichElement = await page.$(`:nth-match(${selector}, ${whichIndex + 1})`);
-                // Focus it.
-                await whichElement.focus();
-                // Perform the act on the element and add a move description to the act.
-                if (type === 'text' && typeof value === 'string' && value) {
-                  await whichElement.type(value);
-                  act.result = 'entered';
-                }
-                else if (['radio', 'checkbox'].includes(type)) {
-                  await whichElement.check();
-                  act.result = 'checked';
-                }
-                else if (type === 'select') {
-                  await whichElement.selectOption({index});
-                  const optionText = await whichElement.$eval(
-                    'option:selected', el => el.textContent
-                  );
-                  act.result = optionText
-                    ? `&ldquo;${optionText}}&rdquo; selected`
-                    : 'OPTION NOT FOUND';
-                }
-                else if (type === 'button') {
-                  await whichElement.click();
-                  act.result = 'clicked';
-                }
-                else if (type === 'link') {
-                  const href = await whichElement.getAttribute('href');
-                  const target = await whichElement.getAttribute('target');
-                  await whichElement.click();
-                  act.result = {
-                    href: href || 'NONE',
-                    target: target || 'NONE',
-                    move: 'clicked'
-                  };
-                }
-                // Otherwise, i.e. if the specified element was not identified:
-                else {
-                  // Return an error result.
-                  return 'NOT FOUND';
-                }
-              }
+            // Add the result object (possibly an array) to the act.
+            const resultCount = Object.keys(testReport.result).length;
+            act.result = resultCount ? testReport.result : 'NONE';
+          }
+          // Otherwise, if the act is an axe test:
+          else if (type === 'axe') {
+            // Conduct it and add its result to the act.
+            act.result = await axe(page, which);
+          }
+          // Otherwise, if the act is an axe summary:
+          else if (type === 'axes') {
+            // Conduct it and add its result to the act.
+            act.result = await axes(page);
+          }
+          // Otherwise, if the act is a valid focus:
+          else if (type === 'focus' && which && which.type && moves[which.type]) {
+            // Identify the index of the specified element among same-type elements.
+            const {type, text} = which;
+            const whichIndex = await matchIndex(page, moves[type], text);
+            // If it exists:
+            if (whichIndex > -1) {
+              // Focus it.
+              await page.$eval(`:nth-match(${moves[type]}, ${whichIndex + 1})`, async element => {
+                await element.focus();
+              });
+              // Add a success result to the act.
+              act.result = 'focused';
             }
-            // Otherwise, i.e. if the act type is unknown:
+            // Otherwise, i.e. if the element does not exist:
             else {
-              // Add the error result to the act.
-              act.result = 'INVALID ACT';
+              // Add a failure result to the act.
+              act.result = 'ELEMENT NOT FOUND';
             }
+          }
+          // Otherwise, if the act is a valid move:
+          else if (moves[type] && typeof which === 'string' && which) {
+            const selector = moves[type];
+            // Identify the index of the specified element among same-type elements.
+            const whichIndex= await matchIndex(page, selector, which);
+            // If it exists:
+            if (whichIndex > -1) {
+              // Get its ElementHandle.
+              const whichElement = await page.$(`:nth-match(${selector}, ${whichIndex + 1})`);
+              // Focus it.
+              await whichElement.focus();
+              // Perform the act on the element and add a move description to the act.
+              if (type === 'text' && typeof value === 'string' && value) {
+                await whichElement.type(value);
+                act.result = 'entered';
+              }
+              else if (['radio', 'checkbox'].includes(type)) {
+                await whichElement.check();
+                act.result = 'checked';
+              }
+              else if (type === 'select') {
+                await whichElement.selectOption({index});
+                const optionText = await whichElement.$eval(
+                  'option:selected', el => el.textContent
+                );
+                act.result = optionText
+                  ? `&ldquo;${optionText}}&rdquo; selected`
+                  : 'OPTION NOT FOUND';
+              }
+              else if (type === 'button') {
+                await whichElement.click();
+                act.result = 'clicked';
+              }
+              else if (type === 'link') {
+                const href = await whichElement.getAttribute('href');
+                const target = await whichElement.getAttribute('target');
+                await whichElement.click();
+                act.result = {
+                  href: href || 'NONE',
+                  target: target || 'NONE',
+                  move: 'clicked'
+                };
+              }
+              // Otherwise, i.e. if the specified element was not identified:
+              else {
+                // Return an error result.
+                return 'NOT FOUND';
+              }
+            }
+          }
+          // Otherwise, i.e. if the act type is unknown:
+          else {
+            // Add the error result to the act.
+            act.result = 'INVALID ACT';
           }
         }
+        // Otherwise, i.e. if the required page URL does not exist:
+        else {
+          // Add an error result to the act.
+          act.result = 'PAGE HAS NO URL';
+        }
       }
-      // Otherwise, i.e. if the act is invalid:
+      // Otherwise, i.e. if no page exists:
       else {
         // Add an error result to the act.
         act.result = 'NO PAGE IDENTIFIED';
@@ -557,8 +554,9 @@ const doActs = async (report, actIndex, page) => {
     else {
       // Add an error result to the act.
       act.result = 'ACT TYPE MISSING';
-      // Perform the remaining acts.
     }
+    // Update the report file.
+    fs.writeFile('report.json', JSON.stringify(report, null, 2));
     // Perform the remaining acts.
     await doActs(report, actIndex + 1, page);
   }
@@ -726,7 +724,7 @@ const requestHandler = (request, response) => {
             && Array.isArray(acts)
             && acts.length > 1
             && acts[0].type === 'launch'
-            && acts[1].type === 'url'
+            && ['url', 'waves'].includes(acts[1].type)
           ) {
             // Process it.
             scriptHandler(scriptName, what, acts, query, response);
