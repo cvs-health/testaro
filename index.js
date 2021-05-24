@@ -193,9 +193,8 @@ const axes = async page => {
 };
 // Conducts a WAVE test and returns a Promise of a result.
 const waves = url => {
-  console.log(`URL is ${url}`);
   const waveKey = process.env.WAVE_KEY;
-  // Get the data on WAVE errors and warnings.
+  // Get the data from a WAVE test.
   return new Promise(resolve => {
     https.get(
       {
