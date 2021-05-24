@@ -192,20 +192,28 @@ const axes = async page => {
   return report;
 };
 // Conducts a WAVE test and returns a Promise of a result.
-const waves = async page => {
-  const url = page.url();
-  // const waveKey = process.env.WAVE_KEY;
+const waves = page => {
+  const url = 'https://jpdev.pro/site/index.html';
+  // const url = page.url();
+  const waveKey = process.env.WAVE_KEY;
+  // const waveKey = 'nonsense';
   // Get the data on WAVE errors and warnings.
   return new Promise(resolve => {
     https.get(
-      // `wave.webaim.org/api/request?key=${waveKey}&url=${url}`,
-      url,
+      // 'wave.webaim.org',
+      {
+      //   path: `/api/request?key=${waveKey}&url=${url}`,
+        host: 'webaim.org',
+        path: `/api/request?key=${waveKey}&url=${url}`,
+        protocol: 'https:'
+      },
       response => {
         let result = '';
         response.on('data', chunk => {
           result += chunk;
         });
         // When the data arrive:
+        // response.on('end', () => resolve(JSON.parse(result)));
         response.on('end', () => resolve(result));
       }
     );
@@ -351,7 +359,6 @@ const matchIndex = async (page, selector, text) => await page.$eval(
 );
 // Recursively performs the acts of a script.
 const doActs = async (report, actIndex, page) => {
-  console.log(`About to process act ${actIndex}`);
   const {acts} = report;
   // If any acts remain unperformed:
   if (actIndex < acts.length) {
@@ -575,7 +582,6 @@ const scriptHandler = async (scriptName, what, acts, query, response) => {
   };
   // Perform the specified acts and add the results and exhibits to the report.
   await doActs(report, 0, null);
-  console.log('doActs done');
   // If any exhibits have been added to the report, move them to the query.
   if (report.exhibits) {
     query.exhibits = report.exhibits;
