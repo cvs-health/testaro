@@ -193,28 +193,23 @@ const axes = async page => {
 };
 // Conducts a WAVE test and returns a Promise of a result.
 const waves = page => {
-  const url = 'https://jpdev.pro/site/index.html';
-  // const url = page.url();
+  const url = page.url();
   const waveKey = process.env.WAVE_KEY;
-  // const waveKey = 'nonsense';
   // Get the data on WAVE errors and warnings.
   return new Promise(resolve => {
     https.get(
-      // 'wave.webaim.org',
       {
-      //   path: `/api/request?key=${waveKey}&url=${url}`,
-        host: 'webaim.org',
+        host: 'wave.webaim.org',
         path: `/api/request?key=${waveKey}&url=${url}`,
         protocol: 'https:'
       },
       response => {
-        let result = '';
+        let report = '';
         response.on('data', chunk => {
-          result += chunk;
+          report += chunk;
         });
-        // When the data arrive:
-        // response.on('end', () => resolve(JSON.parse(result)));
-        response.on('end', () => resolve(result));
+        // When the data arrive, return them as an object.
+        response.on('end', () => resolve(JSON.parse(report)));
       }
     );
   });
