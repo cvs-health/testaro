@@ -151,7 +151,7 @@ const axe = async (page, rules) => {
     return 'NONE';
   }
 };
-// Conducts all axe tests and return a summary.
+// Conducts all axe tests and returns a summary.
 const axes = async page => {
   // Count the elements in the page.
   const elementCount = await page.$$eval('*', elements => elements.length);
@@ -190,6 +190,26 @@ const axes = async page => {
   report.score += Math.floor(report.score * 400 / elementCount);
   // Return the report.
   return report;
+};
+// Conducts a WAVE test and returns a Promise of a result.
+const waves = async page => {
+  const url = page.url();
+  // const waveKey = process.env.WAVE_KEY;
+  // Get the data on WAVE errors and warnings.
+  return new Promise(resolve => {
+    https.get(
+      // `wave.webaim.org/api/request?key=${waveKey}&url=${url}`,
+      url,
+      response => {
+        let result = '';
+        response.on('data', chunk => {
+          result += chunk;
+        });
+        // When the data arrive:
+        response.on('end', () => resolve(result));
+      }
+    );
+  });
 };
 // Launches a browser.
 const launch = async typeName => {
@@ -331,6 +351,7 @@ const matchIndex = async (page, selector, text) => await page.$eval(
 );
 // Recursively performs the acts of a script.
 const doActs = async (report, actIndex, page) => {
+  console.log(`About to process act ${actIndex}`);
   const {acts} = report;
   // If any acts remain unperformed:
   if (actIndex < acts.length) {
@@ -339,225 +360,195 @@ const doActs = async (report, actIndex, page) => {
     const {type, which, value, index} = act;
     // If the act has the required property:
     if (type) {
-      // If the act is a valid WAVE summary:
-      if (type === 'waves' && which) {
-        const url = page.url();
-        // const waveKey = process.env.WAVE_KEY;
-        // Get the data on WAVE errors and warnings.
-        https.get(
-          // `wave.webaim.org/api/request?key=${waveKey}&url=${url}`,
-          url,
-          response => {
-            let result = '';
-            response.on('data', chunk => {
-              result += chunk;
-            });
-            // When the data arrive:
-            response.on('end', async () => {
-              // Add the page name to the act.
-              act.name = which;
-              // Add the result to the act.
-              // act.result = JSON.parse(result);
-              console.log('About to record waves');
-              act.result = result;
-              await doActs(report, actIndex + 1, page);
-            });
-          }
-        ).on('error', async error => {
-          act.result = `ERROR: ${error.message}`;
-          await doActs(report, actIndex + 1, page);
-        });
+      // If the act is a valid launch:
+      if (
+        type === 'launch'
+        && which
+        && ['chromium', 'firefox', 'webkit'].includes(which)
+      ) {
+        // Launch the specified browser, creating a browser context and a page in it.
+        await launch(which);
+        // Identify its only page as current.
+        page = browserContext.pages()[0];
       }
-      // Otherwise, i.e. if the act is not a WAVE summary:
-      else {
-        // If the act is a valid launch:
-        if (
-          type === 'launch'
+      // Otherwise, if a current page exists:
+      else if (page) {
+        // If the act is a valid URL:
+        if (type === 'url' && which && isURL(which)) {
+          // Visit it.
+          await page.goto(which);
+          // Wait until it is stable.
+          await page.waitForLoadState('networkidle', {timeout: 10000});
+          // Add the resulting URL to the act.
+          act.result = page.url();
+        }
+        // Otherwise, if the act is a valid wait:
+        else if (
+          type === 'wait'
           && which
-          && ['chromium', 'firefox', 'webkit'].includes(which)
+          && which.type
+          && ['url', 'title', 'body'].includes(which.type)
+          && which.text
         ) {
-          // Launch the specified browser, creating a browser context and a page in it.
-          await launch(which);
-          // Identify its only page as current.
-          page = browserContext.pages()[0];
+          // Wait for the specified text to appear in the specified place.
+          await page.waitForFunction(which => {
+            const {type, text} = which;
+            const {URL, title, body} = document;
+            const success = {
+              url: body && URL && URL.includes(text),
+              title: body && title && title.includes(text),
+              body: body && body.textContent && body.textContent.includes(text)
+            };
+            return success[type];
+          }, which, {timeout: 10000});
+          // Add the resulting URL to the act.
+          act.result = page.url();
         }
-        // Otherwise, if a current page exists:
-        else if (page) {
-          // If the act is a valid URL:
-          if (type === 'url' && which && isURL(which)) {
-            // Visit it.
-            await page.goto(which);
-            // Wait until it is stable.
-            await page.waitForLoadState('networkidle', {timeout: 10000});
-            // Add the resulting URL to the act.
-            act.result = page.url();
-          }
-          // Otherwise, if the act is a valid wait:
-          else if (
-            type === 'wait'
-            && which
-            && which.type
-            && ['url', 'title', 'body'].includes(which.type)
-            && which.text
-          ) {
-            // Wait for the specified text to appear in the specified place.
-            await page.waitForFunction(which => {
-              const {type, text} = which;
-              const {URL, title, body} = document;
-              const success = {
-                url: body && URL && URL.includes(text),
-                title: body && title && title.includes(text),
-                body: body && body.textContent && body.textContent.includes(text)
-              };
-              return success[type];
-            }, which, {timeout: 10000});
-            // Add the resulting URL to the act.
-            act.result = page.url();
-          }
-          // Otherwise, if the act is a page switch:
-          else if (type === 'page') {
-            // Wait for a page to be created and identify it as current.
-            page = await browserContext.waitForEvent('page');
-            // Wait until it is stable and thus ready for the next act.
-            await page.waitForLoadState('networkidle', {timeout: 10000});
-            // Add the resulting URL to the act.
-            act.result = page.url();
-          }
-          // Otherwise, i.e. if the act is a test, focus, or move:
-          else {
-            // Identify the URL of the page.
-            const url = page.url();
-            // If the page has none:
-            if (! isURL(url)) {
-              // Add an error result to the act.
-              act.result = 'PAGE HAS NO URL';
-            }
-            // Otherwise, i.e. if the page has a URL:
-            else {
-              // Add it to the act.
-              act.url = url;
-              // If the act is a valid custom test:
-              if (
-                type === 'test' && typeof which === 'string' && which && testNames.includes(which)
-              ) {
-                // Conduct it.
-                const testReport = await require(`./tests/${which}/app`)
-                .reporter(page);
-                // If the test produced exhibits:
-                if (testReport.exhibits) {
-                  // Add that fact to the act.
-                  act.exhibits = 'appended';
-                  // Replace any browser-type placeholder in the exhibits.
-                  const newExhibits = testReport.exhibits.replace(
-                    /__browserTypeName__/g, browserTypeNames[browserTypeName]
-                  );
-                  // Append the exhibits to the exhibits in the report.
-                  if (report.exhibits) {
-                    report.exhibits += `\n${newExhibits}`;
-                  }
-                  else {
-                    report.exhibits = newExhibits;
-                  }
-                }
-                // Add the result object (possibly an array) to the act.
-                const resultCount = Object.keys(testReport.result).length;
-                act.result = resultCount ? testReport.result : 'NONE';
-              }
-              // Otherwise, if the act is an axe test:
-              else if (type === 'axe') {
-                // Conduct it and add its result to the act.
-                act.result = await axe(page, which);
-              }
-              // Otherwise, if the act is an axe summary:
-              else if (type === 'axes') {
-                // Conduct it and add its result to the act.
-                act.result = await axes(page);
-              }
-              // Otherwise, if the act is a valid focus:
-              else if (type === 'focus' && which && which.type && moves[which.type]) {
-                // Identify the index of the specified element among same-type elements.
-                const {type, text} = which;
-                const whichIndex = await matchIndex(page, moves[type], text);
-                // If it exists:
-                if (whichIndex > -1) {
-                  // Focus it.
-                  await page.$eval(`:nth-match(${moves[type]}, ${whichIndex + 1})`, async element => {
-                    await element.focus();
-                  });
-                  // Add a success result to the act.
-                  act.result = 'focused';
-                }
-                // Otherwise, i.e. if the element does not exist:
-                else {
-                  // Add a failure result to the act.
-                  act.result = 'ELEMENT NOT FOUND';
-                }
-              }
-              // Otherwise, if the act is a valid move:
-              else if (moves[type] && typeof which === 'string' && which) {
-                const selector = moves[type];
-                // Identify the index of the specified element among same-type elements.
-                const whichIndex= await matchIndex(page, selector, which);
-                // If it exists:
-                if (whichIndex > -1) {
-                  // Get its ElementHandle.
-                  const whichElement = await page.$(`:nth-match(${selector}, ${whichIndex + 1})`);
-                  // Focus it.
-                  await whichElement.focus();
-                  // Perform the act on the element and add a move description to the act.
-                  if (type === 'text' && typeof value === 'string' && value) {
-                    await whichElement.type(value);
-                    act.result = 'entered';
-                  }
-                  else if (['radio', 'checkbox'].includes(type)) {
-                    await whichElement.check();
-                    act.result = 'checked';
-                  }
-                  else if (type === 'select') {
-                    await whichElement.selectOption({index});
-                    const optionText = await whichElement.$eval(
-                      'option:selected', el => el.textContent
-                    );
-                    act.result = optionText
-                      ? `&ldquo;${optionText}}&rdquo; selected`
-                      : 'OPTION NOT FOUND';
-                  }
-                  else if (type === 'button') {
-                    await whichElement.click();
-                    act.result = 'clicked';
-                  }
-                  else if (type === 'link') {
-                    const href = await whichElement.getAttribute('href');
-                    const target = await whichElement.getAttribute('target');
-                    await whichElement.click();
-                    act.result = {
-                      href: href || 'NONE',
-                      target: target || 'NONE',
-                      move: 'clicked'
-                    };
-                  }
-                  // Otherwise, i.e. if the specified element was not identified:
-                  else {
-                    // Return an error result.
-                    return 'NOT FOUND';
-                  }
-                }
-              }
-              // Otherwise, i.e. if the act type is unknown:
-              else {
-                // Add the error result to the act.
-                act.result = 'INVALID ACT';
-              }
-            }
-          }
+        // Otherwise, if the act is a page switch:
+        else if (type === 'page') {
+          // Wait for a page to be created and identify it as current.
+          page = await browserContext.waitForEvent('page');
+          // Wait until it is stable and thus ready for the next act.
+          await page.waitForLoadState('networkidle', {timeout: 10000});
+          // Add the resulting URL to the act.
+          act.result = page.url();
         }
-        // Otherwise, i.e. if the act is invalid:
+        // Otherwise, i.e. if the act is a test, focus, or move:
         else {
-          // Add an error result to the act.
-          act.result = 'NO PAGE IDENTIFIED';
+          // Identify the URL of the page.
+          const url = page.url();
+          // If the page has none:
+          if (! isURL(url)) {
+            // Add an error result to the act.
+            act.result = 'PAGE HAS NO URL';
+          }
+          // Otherwise, i.e. if the page has a URL:
+          else {
+            // Add it to the act.
+            act.url = url;
+            // If the act is a valid custom test:
+            if (
+              type === 'test' && typeof which === 'string' && which && testNames.includes(which)
+            ) {
+              // Conduct it.
+              const testReport = await require(`./tests/${which}/app`)
+              .reporter(page);
+              // If the test produced exhibits:
+              if (testReport.exhibits) {
+                // Add that fact to the act.
+                act.exhibits = 'appended';
+                // Replace any browser-type placeholder in the exhibits.
+                const newExhibits = testReport.exhibits.replace(
+                  /__browserTypeName__/g, browserTypeNames[browserTypeName]
+                );
+                // Append the exhibits to the exhibits in the report.
+                if (report.exhibits) {
+                  report.exhibits += `\n${newExhibits}`;
+                }
+                else {
+                  report.exhibits = newExhibits;
+                }
+              }
+              // Add the result object (possibly an array) to the act.
+              const resultCount = Object.keys(testReport.result).length;
+              act.result = resultCount ? testReport.result : 'NONE';
+            }
+            // Otherwise, if the act is an axe test:
+            else if (type === 'axe') {
+              // Conduct it and add its result to the act.
+              act.result = await axe(page, which);
+            }
+            // Otherwise, if the act is an axe summary:
+            else if (type === 'axes') {
+              // Conduct it and add its result to the act.
+              act.result = await axes(page);
+            }
+            // Otherwise, if the act is a valid WAVE summary:
+            else if (type === 'waves' && which) {
+              act.result = await waves(page);
+            }
+            // Otherwise, if the act is a valid focus:
+            else if (type === 'focus' && which && which.type && moves[which.type]) {
+              // Identify the index of the specified element among same-type elements.
+              const {type, text} = which;
+              const whichIndex = await matchIndex(page, moves[type], text);
+              // If it exists:
+              if (whichIndex > -1) {
+                // Focus it.
+                await page.$eval(`:nth-match(${moves[type]}, ${whichIndex + 1})`, async element => {
+                  await element.focus();
+                });
+                // Add a success result to the act.
+                act.result = 'focused';
+              }
+              // Otherwise, i.e. if the element does not exist:
+              else {
+                // Add a failure result to the act.
+                act.result = 'ELEMENT NOT FOUND';
+              }
+            }
+            // Otherwise, if the act is a valid move:
+            else if (moves[type] && typeof which === 'string' && which) {
+              const selector = moves[type];
+              // Identify the index of the specified element among same-type elements.
+              const whichIndex= await matchIndex(page, selector, which);
+              // If it exists:
+              if (whichIndex > -1) {
+                // Get its ElementHandle.
+                const whichElement = await page.$(`:nth-match(${selector}, ${whichIndex + 1})`);
+                // Focus it.
+                await whichElement.focus();
+                // Perform the act on the element and add a move description to the act.
+                if (type === 'text' && typeof value === 'string' && value) {
+                  await whichElement.type(value);
+                  act.result = 'entered';
+                }
+                else if (['radio', 'checkbox'].includes(type)) {
+                  await whichElement.check();
+                  act.result = 'checked';
+                }
+                else if (type === 'select') {
+                  await whichElement.selectOption({index});
+                  const optionText = await whichElement.$eval(
+                    'option:selected', el => el.textContent
+                  );
+                  act.result = optionText
+                    ? `&ldquo;${optionText}}&rdquo; selected`
+                    : 'OPTION NOT FOUND';
+                }
+                else if (type === 'button') {
+                  await whichElement.click();
+                  act.result = 'clicked';
+                }
+                else if (type === 'link') {
+                  const href = await whichElement.getAttribute('href');
+                  const target = await whichElement.getAttribute('target');
+                  await whichElement.click();
+                  act.result = {
+                    href: href || 'NONE',
+                    target: target || 'NONE',
+                    move: 'clicked'
+                  };
+                }
+                // Otherwise, i.e. if the specified element was not identified:
+                else {
+                  // Return an error result.
+                  return 'NOT FOUND';
+                }
+              }
+            }
+            // Otherwise, i.e. if the act type is unknown:
+            else {
+              // Add the error result to the act.
+              act.result = 'INVALID ACT';
+            }
+          }
         }
-        // Perform the remaining acts.
-        await doActs(report, actIndex + 1, page);
+      }
+      // Otherwise, i.e. if the act is invalid:
+      else {
+        // Add an error result to the act.
+        act.result = 'NO PAGE IDENTIFIED';
       }
     }
     // Otherwise, i.e. if the act type is missing:
@@ -565,8 +556,14 @@ const doActs = async (report, actIndex, page) => {
       // Add an error result to the act.
       act.result = 'ACT TYPE MISSING';
       // Perform the remaining acts.
-      await doActs(report, actIndex + 1, page);
     }
+    // Perform the remaining acts.
+    await doActs(report, actIndex + 1, page);
+  }
+  // Otherwise, i.e. if all acts have been performed:
+  else {
+    // Return a Promise.
+    return Promise.resolve('');
   }
 };
 // Handles a script request.
@@ -578,6 +575,7 @@ const scriptHandler = async (scriptName, what, acts, query, response) => {
   };
   // Perform the specified acts and add the results and exhibits to the report.
   await doActs(report, 0, null);
+  console.log('doActs done');
   // If any exhibits have been added to the report, move them to the query.
   if (report.exhibits) {
     query.exhibits = report.exhibits;
