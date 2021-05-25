@@ -1,0 +1,58 @@
+{
+  "what": "Comparison of COVID-19 information websites of U.S. states",
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium"
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://vaccinesignup.mass.gov/#/",
+        "name": "Massachusetts"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://myvaccinegeorgia.com/en/site/ALL",
+        "name": "Georgia"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.vaccinatecnmi.com/covid-19/registration/",
+        "name": "Northern Mariana Islands"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://covidvaccination.dph.illinois.gov/questionnaire",
+        "name": "Illinois"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://vini.nh.gov/providers/s/",
+        "name": "New Hampshire"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://cvvaccine.nmhealth.org",
+        "name": "New Mexico"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://myvaccine.fl.gov/#/RegistrationForm",
+        "name": "Florida"
+      }
+    }
+  ]
+}

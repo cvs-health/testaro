@@ -1,0 +1,1101 @@
+{
+  "scriptName": "statecovid",
+  "what": "Comparison of COVID-19 information websites of U.S. states",
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium"
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://vax4nv.nv.gov/patient/s/",
+        "name": "Nevada"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "Queue-it",
+          "pageurl": "https://vax4nv.nv.gov/patient/s/",
+          "time": 3.63,
+          "creditsremaining": 61,
+          "allitemcount": 19,
+          "totalelements": 87,
+          "waveurl": "http://wave.webaim.org/report?url=https://vax4nv.nv.gov/patient/s/",
+          "domid": "3ff19ef01a5dd08462b60e0d8928262e"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 3
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 1
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 3
+          },
+          "feature": {
+            "description": "Features",
+            "count": 1
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 10
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 1
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://massvax.maryland.gov/",
+        "name": "Maryland"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "Maryland - State of Maryland GoVax Branding",
+          "pageurl": "https://massvax.maryland.gov/",
+          "time": 4.03,
+          "creditsremaining": 60,
+          "allitemcount": 14,
+          "totalelements": 84,
+          "waveurl": "http://wave.webaim.org/report?url=https://massvax.maryland.gov/",
+          "domid": "24b9149a96f3ef1e60120f524f63c2a3"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 0
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 1
+          },
+          "feature": {
+            "description": "Features",
+            "count": 3
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 9
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 1
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://covidvaccine.umc.edu/Screening",
+        "name": "Mississippi"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "Screening - UMMC COVID Scheduling",
+          "pageurl": "https://covidvaccine.umc.edu/Screening",
+          "time": 2.22,
+          "creditsremaining": 59,
+          "allitemcount": 17,
+          "totalelements": 134,
+          "waveurl": "http://wave.webaim.org/report?url=https://covidvaccine.umc.edu/Screening",
+          "domid": "2f8a27cd355560c04ac57c0b0a09c8fb"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 0
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 3
+          },
+          "feature": {
+            "description": "Features",
+            "count": 2
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 6
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 6
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://vaccine.coronavirus.in.gov/en-US/",
+        "name": "Indiana"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "Vaccine Waiting Room",
+          "pageurl": "https://vaccine.coronavirus.in.gov/en-US/",
+          "time": 2.82,
+          "creditsremaining": 58,
+          "allitemcount": 21,
+          "totalelements": 87,
+          "waveurl": "http://wave.webaim.org/report?url=https://vaccine.coronavirus.in.gov/en-US/",
+          "domid": "e9cc85e56922325beb775e5cca105bb1"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 0
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 3
+          },
+          "feature": {
+            "description": "Features",
+            "count": 4
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 0
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 14
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://govstatus.egov.com/vaccine-eligibility-form",
+        "name": "Alabama"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "Alabama Vaccination Eligibility Check and Scheduling",
+          "pageurl": "https://govstatus.egov.com/vaccine-eligibility-form",
+          "time": 2.32,
+          "creditsremaining": 57,
+          "allitemcount": 36,
+          "totalelements": 296,
+          "waveurl": "http://wave.webaim.org/report?url=https://govstatus.egov.com/vaccine-eligibility-form",
+          "domid": "92157cd8b41f3f038d4b7a9ddd2bd3aa"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 0
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 5
+          },
+          "feature": {
+            "description": "Features",
+            "count": 12
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 18
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 1
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://myturn.ca.gov/index.html",
+        "name": "California"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "My Turn - California COVID-19 Vaccine Scheduling & Notifications",
+          "pageurl": "https://myturn.ca.gov/index.html",
+          "time": 2.92,
+          "creditsremaining": 56,
+          "allitemcount": 29,
+          "totalelements": 183,
+          "waveurl": "http://wave.webaim.org/report?url=https://myturn.ca.gov/index.html",
+          "domid": "e063d3c37688eec6043695860667fa54"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 0
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 3
+          },
+          "feature": {
+            "description": "Features",
+            "count": 7
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 10
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 9
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://vaccineconnector.mn.gov/en-US/covid-19%20vaccine/",
+        "name": "Minnesota"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "COVID-19 Vaccine ",
+          "pageurl": "https://vaccineconnector.mn.gov/en-US/covid-19 vaccine/",
+          "time": 5.43,
+          "creditsremaining": 55,
+          "allitemcount": 330,
+          "totalelements": 2257,
+          "waveurl": "http://wave.webaim.org/report?url=https://vaccineconnector.mn.gov/en-US/covid-19 vaccine/",
+          "domid": "b0222ab0ec4bc0955b4946f433649f67"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 0
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 32
+          },
+          "feature": {
+            "description": "Features",
+            "count": 95
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 10
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 193
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://covidvaccine.nj.gov/en-US/",
+        "name": "New Jersey"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "Home  ",
+          "pageurl": "https://covidvaccine.nj.gov/en-US/",
+          "time": 1.92,
+          "creditsremaining": 54,
+          "allitemcount": 34,
+          "totalelements": 143,
+          "waveurl": "http://wave.webaim.org/report?url=https://covidvaccine.nj.gov/en-US/",
+          "domid": "ead4fe76f761ca15e901f32c86cc9e07"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 1
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 6
+          },
+          "feature": {
+            "description": "Features",
+            "count": 4
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 11
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 12
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://v51r5a21s.dc.gov/cvq_dc/",
+        "name": "District of Columbia"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "Vaccination Questionnaire ",
+          "pageurl": "https://v51r5a21s.dc.gov/cvq_dc/",
+          "time": 4.63,
+          "creditsremaining": 53,
+          "allitemcount": 73,
+          "totalelements": 417,
+          "waveurl": "http://wave.webaim.org/report?url=https://v51r5a21s.dc.gov/cvq_dc/",
+          "domid": "a23bdcb3c0e00f99e39389106c380292"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 1
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 19
+          },
+          "feature": {
+            "description": "Features",
+            "count": 20
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 8
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 25
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "hhttps://gettheshot.coronavirus.ohio.gov/",
+        "name": "Ohio"
+      },
+      "result": {
+        "status": {
+          "success": false,
+          "error": "Error: net::ERR_NAME_NOT_RESOLVED at http://hhttps://gettheshot.coronavirus.ohio.gov/"
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://podvaccine.azdhs.gov/signup",
+        "name": "Arizona"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "ADHS Sign Up",
+          "pageurl": "https://podvaccine.azdhs.gov/signup",
+          "time": 2.12,
+          "creditsremaining": 52,
+          "allitemcount": 50,
+          "totalelements": 144,
+          "waveurl": "http://wave.webaim.org/report?url=https://podvaccine.azdhs.gov/signup",
+          "domid": "b8a1aa5a9aaed159f59987c6e97765cd"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 2
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 0
+          },
+          "feature": {
+            "description": "Features",
+            "count": 9
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 5
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 34
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://vaccinate.tn.gov",
+        "name": "Tennessee"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "COVID-19 Vaccination Registration  ",
+          "pageurl": "https://vaccinate.tn.gov",
+          "time": 2.81,
+          "creditsremaining": 51,
+          "allitemcount": 50,
+          "totalelements": 150,
+          "waveurl": "http://wave.webaim.org/report?url=https://vaccinate.tn.gov",
+          "domid": "75e19cc52e34f1def5e460227c5a7de8"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 1
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 9
+          },
+          "feature": {
+            "description": "Features",
+            "count": 8
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 7
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 25
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://vaccinate.oklahoma.gov/en-US/",
+        "name": "Oklahoma"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "Home  ",
+          "pageurl": "https://vaccinate.oklahoma.gov/en-US/",
+          "time": 3.42,
+          "creditsremaining": 50,
+          "allitemcount": 57,
+          "totalelements": 195,
+          "waveurl": "http://wave.webaim.org/report?url=https://vaccinate.oklahoma.gov/en-US/",
+          "domid": "452373829716a416d1842630f65c29eb"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 1
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 8
+          },
+          "feature": {
+            "description": "Features",
+            "count": 6
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 13
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 29
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://vaccinerequest.delaware.gov/s/de-vms-screening?language=en_US",
+        "name": "Delaware"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "de-vms-screening",
+          "pageurl": "https://vaccinerequest.delaware.gov/s/de-vms-screening?language=en_US",
+          "time": 5.13,
+          "creditsremaining": 49,
+          "allitemcount": 15,
+          "totalelements": 128,
+          "waveurl": "http://wave.webaim.org/report?url=https://vaccinerequest.delaware.gov/s/de-vms-screening?language=en_US",
+          "domid": "b9e48c120db28f56ffa2c3b4b9bf8ba4"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 2
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 3
+          },
+          "feature": {
+            "description": "Features",
+            "count": 2
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 2
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 6
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://vermont.force.com/events/s/selfregistration",
+        "name": "Vermont"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "selfRegistration",
+          "pageurl": "https://vermont.force.com/events/s/selfregistration",
+          "time": 2.93,
+          "creditsremaining": 48,
+          "allitemcount": 6,
+          "totalelements": 82,
+          "waveurl": "http://wave.webaim.org/report?url=https://vermont.force.com/events/s/selfregistration",
+          "domid": "14b0ede1a17277f32240c8761cc36dd5"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 2
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 1
+          },
+          "feature": {
+            "description": "Features",
+            "count": 1
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 1
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 1
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://member.everbridge.net/747122446041089/new",
+        "name": "West Virginia"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "West Virginia Vaccine Appointment Scheduling - Sign Up",
+          "pageurl": "https://member.everbridge.net/747122446041089/new",
+          "time": 3.02,
+          "creditsremaining": 47,
+          "allitemcount": 89,
+          "totalelements": 1155,
+          "waveurl": "http://wave.webaim.org/report?url=https://member.everbridge.net/747122446041089/new",
+          "domid": "8b0707cd80f44bacdba4b5a813709a0b"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 4
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 7
+          },
+          "feature": {
+            "description": "Features",
+            "count": 24
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 9
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 45
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://vaccinate.wi.gov/en-US/",
+        "name": "Wisconsin"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "COVID-19 Vaccination Registration ",
+          "pageurl": "https://vaccinate.wi.gov/en-US/",
+          "time": 2.22,
+          "creditsremaining": 46,
+          "allitemcount": 36,
+          "totalelements": 113,
+          "waveurl": "http://wave.webaim.org/report?url=https://vaccinate.wi.gov/en-US/",
+          "domid": "d1d40cbfbf4e6f74428d1ec4c64ed0de"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 3
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 7
+          },
+          "feature": {
+            "description": "Features",
+            "count": 8
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 7
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 11
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://getthevaccine.dshs.texas.gov/txces/s/txsignup?language=en_US&eventId=undefined",
+        "name": "Texas"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "signup",
+          "pageurl": "https://getthevaccine.dshs.texas.gov/txces/s/txsignup?language=en_US",
+          "time": 5.95,
+          "creditsremaining": 45,
+          "allitemcount": 24,
+          "totalelements": 182,
+          "waveurl": "http://wave.webaim.org/report?url=https://getthevaccine.dshs.texas.gov/txces/s/txsignup?language=en_US",
+          "domid": "788ed2e00c0378ad4ad7d54f9c07ba0f"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 3
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 3
+          },
+          "feature": {
+            "description": "Features",
+            "count": 1
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 6
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 11
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://covidvaccine.idaho.gov/register",
+        "name": "Idaho"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 403
+        },
+        "statistics": {
+          "pagetitle": "Idaho's COVID-19 Vaccine Pre‑Registration System",
+          "pageurl": "https://covidvaccine.idaho.gov/register",
+          "time": 2.92,
+          "creditsremaining": 44,
+          "allitemcount": 58,
+          "totalelements": 200,
+          "waveurl": "http://wave.webaim.org/report?url=https://covidvaccine.idaho.gov/register",
+          "domid": "4638719083e7fb3405541b6ff4630c53"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 1
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 2
+          },
+          "feature": {
+            "description": "Features",
+            "count": 9
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 2
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 44
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://am-i-eligible.covid19vaccine.health.ny.gov/Public/prescreener",
+        "name": "New York"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 404
+        },
+        "statistics": {
+          "pagetitle": "New York | Covid-19 Vaccine",
+          "pageurl": "https://am-i-eligible.covid19vaccine.health.ny.gov/Public/prescreener",
+          "time": 2.62,
+          "creditsremaining": 43,
+          "allitemcount": 72,
+          "totalelements": 229,
+          "waveurl": "http://wave.webaim.org/report?url=https://am-i-eligible.covid19vaccine.health.ny.gov/Public/prescreener",
+          "domid": "aa31ba022cc555dbe9b8fdf3ce9dfd19"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 4
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 1
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 4
+          },
+          "feature": {
+            "description": "Features",
+            "count": 10
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 13
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 40
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://vaccinate.ne.gov/en-US/",
+        "name": "Nebraska"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "Nebraska Department of Health and Human Services (DHHS) COVID-19 vaccine registration portal ",
+          "pageurl": "https://vaccinate.ne.gov/en-US/",
+          "time": 2.72,
+          "creditsremaining": 42,
+          "allitemcount": 49,
+          "totalelements": 187,
+          "waveurl": "http://wave.webaim.org/report?url=https://vaccinate.ne.gov/en-US/",
+          "domid": "bdaee3e98a9777586bc2c63913b49788"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 1
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 5
+          },
+          "feature": {
+            "description": "Features",
+            "count": 6
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 9
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 28
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://modhss.iad1.qualtrics.com/jfe/form/SV_231d5TxZxkGedCt",
+        "name": "Missouri"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "Vaccine Registration & Scheduling",
+          "pageurl": "https://modhss.iad1.qualtrics.com/jfe/form/SV_231d5TxZxkGedCt",
+          "time": 2.92,
+          "creditsremaining": 41,
+          "allitemcount": 51,
+          "totalelements": 159,
+          "waveurl": "http://wave.webaim.org/report?url=https://modhss.iad1.qualtrics.com/jfe/form/SV_231d5TxZxkGedCt",
+          "domid": "92436b8db48b3139312db874489b4fb4"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 8
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 8
+          },
+          "feature": {
+            "description": "Features",
+            "count": 2
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 15
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 18
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://vaccinesignup.mass.gov/#/",
+        "name": "Massachusetts"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://myvaccinegeorgia.com/en/site/ALL",
+        "name": "Georgia"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.vaccinatecnmi.com/covid-19/registration/",
+        "name": "Northern Mariana Islands"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://covidvaccination.dph.illinois.gov/questionnaire",
+        "name": "Illinois"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://vini.nh.gov/providers/s/",
+        "name": "New Hampshire"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://cvvaccine.nmhealth.org",
+        "name": "New Mexico"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://myvaccine.fl.gov/#/RegistrationForm",
+        "name": "Florida"
+      }
+    }
+  ]
+}
