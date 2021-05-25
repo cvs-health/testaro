@@ -22,16 +22,57 @@
         <section>
           <h2>What Autotest is</h2>
           <p>Autotest is a prototype application investigating methods of web-application test automation, with an emphasis on tests for accessibility.</p>
+          <h2>System requirements</h2>
+          <p>Autotest needs to be installed on a computer where version 14 or later of <a href="https://nodejs.org/en/">Node.js</a> is installed.</p>
           <h2>What Autotest does</h2>
-          <p>Your instructions to Autotest are in a <strong>script</strong>.</p>
-          <p>A script follows rules documented below.</p>
+          <p>Autotest uses Node.js to run an HTTP(S) server and uses the <a href="https://playwright.dev/">Playwright</a> package to perform tests in browsers.</p>
+          <p>You give instructions to Autotest in a <dfn>script</dfn>. A script follows rules documented below. Each script is a sequence of <dfn>commands</dfn>, namely instructions for things that Autotest should do, called <dfn>acts</dfn>.</p>
           <p>Each script is stored in its own file, located in a scripts directory.</p>
           <p>The standard name for a scripts directory is <code>autotest-scripts</code>.</p>
           <p>The standard location for a scripts directory is next to the <code>autotest</code> directory.</p>
           <p>It is possible to have more than one scripts directory.</p>
-          <p>When you run Autotest, you first give it the location and name of the scripts directory that you want it to use. Then Autotest shows you a list of the scripts in that directory. You choose a script. Then Autotest performs the actions specified in that script and outputs a report.</p>
+          <p>When you run Autotest:</p>
+          <ol>
+            <li>Autotest asks you for the location and name of the scripts directory that you want it to use.</li>
+            <li>Autotest shows you a list of the scripts in that directory.</li>
+            <li>You choose one of those scripts.</li>
+            <li>Autotest performs the acts specified by the commands in that script.</li>
+            <li>Autotest outputs a report to your browser.</li>
+            <li>As it proceeds, Autotest also writes a copy of the report to a <code>report.json</code> file. In case Autotest throws an error while performing the acts, the browser report may fail to appear, but the file report, up to the point of the error, will be preserved.</li>
+            <li>You can perform analyses on the data in a report, using existing Autotest routines or writing your own.</li>
+          </ol>
           <h2>Rules</h2>
           <p>The rules for scripts will be here.</p>
+          <h3>Basic command format</h3>
+          <p>Most commands are formulated in this format:</p>
+          <pre>{
+  "type": "xxx",
+  "which": "yyy"
+}</pre>
+          <p>The <dfn>type</dfn> value (represented by <code>xxx</code>) is the name of an act, such as <code>button</code> (for the act of clicking a button). The <dfn>which</dfn> value (represented by <code>yyy</code>) is a specification that narrows the class of all acts of a type to a particular act. In the example of a <code>button</code> command, the <code>which</code> value is some text that belongs to one of the buttons on a page; Autotest will click that button.
+          <p>There are some exceptions to the basic command format:</p>
+          <ol>
+            <li>The <code>page</code> act has no <code>which</code> property.</li>
+            <li>The <code>wait</code> and <code>focus</code> acts have objects as the values of their <code>which</code> properties. Such an object has two properties: <code>type</code> and <code>text</code>.
+            <li>The <code>waves</code> act has an object as the value of its <code>which</code> property. The object has two properties: <code>url</code> and <code>name</code>.
+          <h2>Test-package integrations</h2>
+          <p>Autotest provides opportunities to integrate two accessibility test packages, <a href="https://github.com/dequelabs/axe-core">Axe</a> and <a href="https://wave.webaim.org/">WAVE</a>, into scripts. The rules governing their commands in scripts are described above. More details follow.</p>
+          <h3>Axe</h3>
+          <p>Axe integration depends on the <a href="https://www.npmjs.com/package/axe-playwright">axe-playwright</a> package. Violations reported with that package exclude <dfn>incomplete</dfn> (also called <q>needs-review</q>) violations and violations of <q>experimental</q> rules.</p>
+          <h3>WAVE</h3>
+          <h4>Testing with WAVE</h4>
+          <p>WAVE integration depends on the user having a WAVE API key. Use of the WAVE API depletes the user&rsquo;s WAVE API credits. The <dfn>waves</dfn> command performs a WAVE test with <code>reporttype=1</code> on a specified URL. Such a test costs 1 credit ($0.04, or less in quantity). When you register with WebAIM and obtain a WAVE API key, you must add a line to your <code>.env</code> file, in the format <code>WAVE_KEY=x0x0x0x0x0x0x</code> (where <code>x0x0x0x0x0x0x</code> represents your key).</p>
+          <h4>JHU-WAVE comparisons</h4>
+          <p>One of the Autotest analysis routines performs the <dfn>JHU-WAVE</dfn> comparison. That is a comparison of web pages that have been subjected to the <code>waves</code> test in a script. The comparison follows the rule applied by the Johns Hopkins University Disability Health Research Center in its <a href="https://disabilityhealth.jhu.edu/vaccinedashboard/webaccess/">Vaccine Website Accessibility</a> dashboard. That rule is described summarily on the cited page. Missing details were obtained from WebAIM, which conducted the testing.</p>
+          <p>Autotest&rsquo;s implementation of the JHU-WAVE rule is located in the <code>jhuwave.js</code> file. By executing the command <code>node jhuwave</code>, you can apply that rule to the pages whose <code>waves</code> test results are recorded in the <code>report.json</code> file.</p>
+          <p>The JHU-WAVE rule is defined as follows:</p>
+          <ol>
+            <li>Give each page a rank, on the basis of its error total, namely the total of its <q>Errors</q> and its <q>Contrast Errors</q>, with 0 being the best rank (i.e. the smallest total). If there is a tie for the next rank, use that rank for all of the tied pages, but then skip ranks so that the used rank plus the skipped ranks are equal in number to the number of tied pages.</li>
+            <li>Give each page a rank, on the basis of its error density, namely its error total divided by the total number of its elements. Use the same rule for ties.</li>
+            <li>Give each page a rank, on the basis of its alert total. Use the same rule for ties.</li>
+            <li>For each page, multiply its error-total rank by 6, multiply its error-density rank by 3, and multiply its alert rank by 1.</li>
+            <li>Total those three products. That total is the page&rsquo;s score. The smaller the score, the better the page, according to the JHU-WAVE rule.</li>
+          </ol>
         </section>
       </div>
     </main>

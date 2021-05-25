@@ -1,82 +1,20 @@
 /*
-  index.js
-  autotest main script.
+  jhuwave.js
+  Implementation of the JHU-WAVE rule.
 */
 // ########## IMPORTS
 // Module to access files.
 const fs = require('fs').promises;
-// Module to keep secrets local.
-require('dotenv').config();
-// Module to create an HTTP server and client.
-const http = require('http');
-// Module to create an HTTPS server and client.
-const https = require('https');
-const {injectAxe, getViolations} = require('axe-playwright');
 // ########## CONSTANTS
-// Set debug to true to add debugging features.
-const debug = false;
-const protocol = process.env.PROTOCOL || 'https';
-// Files servable without modification.
-const statics = {
-  '/doc.html': 'text/html',
-  '/index.html': 'text/html',
-  '/style.css': 'text/css'
+// Weights.
+const weights = {
+  errors: 6,
+  density: 3,
+  alerts: 1
 };
-const redirects = {
-  '/': '/autotest/index.html'
-};
-// Pages to be served as error notifications.
-const customErrorPageStart = [
-  '<html lang="en-US">',
-  '  <head>',
-  '    <meta charset="utf-8">',
-  '    <title>ERROR</title>',
-  '  </head>',
-  '  <body><main>',
-  '    <h1>ERROR</h1>',
-  '    <p>__msg__</p>'
-];
-const systemErrorPageStart = customErrorPageStart.concat(...[
-  '    <p>Location:</p>',
-  '    <pre>__stack__</pre>'
-]);
-const errorPageEnd = [
-  '  </main></body>',
-  '</html>',
-  ''
-];
-const customErrorPage = customErrorPageStart.concat(...errorPageEnd);
-const systemErrorPage = systemErrorPageStart.concat(...errorPageEnd);
-// CSS selectors for actions.
-const moves = {
-  text: 'input[type=text',
-  radio: 'input[type=radio]',
-  checkbox: 'input[type=checkbox]',
-  select: 'select',
-  button: 'button',
-  link: 'a'
-};
-const testNames = [
-  'autocom',
-  'imgbg',
-  'imgdec',
-  'imginf',
-  'inlab',
-  'labclash',
-  'role',
-  'roles',
-  'simple',
-  'state',
-  'stylediff'
-];
-const browserTypeNames = {
-  'chromium': 'Chrome',
-  'firefox': 'Firefox',
-  'webkit': 'Safari'
-};
+// Report file.
+const reportFileName = 'report.json';
 // ########## VARIABLES
-let browserContext;
-let browserTypeName;
 // ########## FUNCTIONS
 // Serves a redirection.
 const redirect = (url, response) => {
@@ -352,7 +290,7 @@ const matchIndex = async (page, selector, text) => await page.$eval(
   [selector, text]
 );
 // Recursively performs the acts of a script.
-const doActs = async (report, actIndex, page, timeStamp) => {
+const doActs = async (report, actIndex, page) => {
   const {acts} = report;
   // If any acts remain unperformed:
   if (actIndex < acts.length) {
@@ -555,9 +493,9 @@ const doActs = async (report, actIndex, page, timeStamp) => {
       act.result = 'ACT TYPE MISSING';
     }
     // Update the report file.
-    fs.writeFile(`report-${timeStamp}.json`, JSON.stringify(report, null, 2));
+    fs.writeFile('report.json', JSON.stringify(report, null, 2));
     // Perform the remaining acts.
-    await doActs(report, actIndex + 1, page, timeStamp);
+    await doActs(report, actIndex + 1, page);
   }
   // Otherwise, i.e. if all acts have been performed:
   else {
@@ -572,10 +510,8 @@ const scriptHandler = async (scriptName, what, acts, query, response) => {
     what,
     acts
   };
-  // Define a timestamp for the report file.
-  const timeStamp = Math.floor((Date.now() - Date.UTC(2021, 4)) / 10000).toString(36);
   // Perform the specified acts and add the results and exhibits to the report.
-  await doActs(report, 0, null, timeStamp);
+  await doActs(report, 0, null);
   // If any exhibits have been added to the report, move them to the query.
   if (report.exhibits) {
     query.exhibits = report.exhibits;
