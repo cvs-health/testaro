@@ -15,7 +15,7 @@
     {
       "type": "waves",
       "which": {
-        "url": "https://massvax.maryland.gov/screening",
+        "url": "https://massvax.maryland.gov/",
         "name": "Maryland"
       }
     },
@@ -29,7 +29,7 @@
     {
       "type": "waves",
       "which": {
-        "url": "https://vaccine.coronavirus.in.gov/",
+        "url": "https://vaccine.coronavirus.in.gov/en-US/",
         "name": "Indiana"
       }
     },
@@ -43,21 +43,21 @@
     {
       "type": "waves",
       "which": {
-        "url": "https://myturn.ca.gov/screening",
+        "url": "https://myturn.ca.gov/index.html",
         "name": "California"
       }
     },
     {
       "type": "waves",
       "which": {
-        "url": "https://vaccineconnector.mn.gov/covid-19%20vaccine/",
+        "url": "https://vaccineconnector.mn.gov/en-US/covid-19%20vaccine/",
         "name": "Minnesota"
       }
     },
     {
       "type": "waves",
       "which": {
-        "url": "https://covidvaccine.nj.gov/",
+        "url": "https://covidvaccine.nj.gov/en-US/",
         "name": "New Jersey"
       }
     },
@@ -71,7 +71,7 @@
     {
       "type": "waves",
       "which": {
-        "url": "https://gettheshot.coronavirus.ohio.gov/screening",
+        "url": "hhttps://gettheshot.coronavirus.ohio.gov/",
         "name": "Ohio"
       }
     },
@@ -190,7 +190,7 @@
     {
       "type": "waves",
       "which": {
-        "url": "https://sonh-community.force.com/providers/s/",
+        "url": "https://vini.nh.gov/providers/s/",
         "name": "New Hampshire"
       }
     },
