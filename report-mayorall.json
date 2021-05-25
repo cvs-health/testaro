@@ -691,6 +691,398 @@
           }
         }
       }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://wrightfornyc2021.com/",
+        "name": "Isaac Wright, Jr."
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "Isaac Wright Jr. For NYC Mayor 2021 - Official Website",
+          "pageurl": "https://wrightfornyc2021.com/",
+          "time": 7.45,
+          "creditsremaining": 69,
+          "allitemcount": 106,
+          "totalelements": 953,
+          "waveurl": "http://wave.webaim.org/report?url=https://wrightfornyc2021.com/",
+          "domid": "5bd4d3aed8d7cda447f5ff731aa4a6a7"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 10
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 8
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 23
+          },
+          "feature": {
+            "description": "Features",
+            "count": 9
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 28
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 28
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://paperboyprince.com/",
+        "name": "Paperboy Prince"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "Paperboy Love Prince",
+          "pageurl": "https://paperboyprince.com/",
+          "time": 5.93,
+          "creditsremaining": 68,
+          "allitemcount": 84,
+          "totalelements": 427,
+          "waveurl": "http://wave.webaim.org/report?url=https://paperboyprince.com/",
+          "domid": "b34f4c85b2d5c5a8f45ce2cccf61c4de"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 8
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 25
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 2
+          },
+          "feature": {
+            "description": "Features",
+            "count": 8
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 24
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 17
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://quandafrancis.com/",
+        "name": "Quanda Francis"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "Home | Quanda Francis For Mayor NYC",
+          "pageurl": "https://quandafrancis.com/",
+          "time": 3.73,
+          "creditsremaining": 67,
+          "allitemcount": 182,
+          "totalelements": 1116,
+          "waveurl": "http://wave.webaim.org/report?url=https://quandafrancis.com/",
+          "domid": "e26173fad53b51a94d347b2a275551c8"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 23
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 28
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 21
+          },
+          "feature": {
+            "description": "Features",
+            "count": 28
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 48
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 34
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.chang.nyc/",
+        "name": "Art Chang"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "Art Chang for NYC Mayor",
+          "pageurl": "https://www.chang.nyc/",
+          "time": 5.13,
+          "creditsremaining": 66,
+          "allitemcount": 288,
+          "totalelements": 851,
+          "waveurl": "http://wave.webaim.org/report?url=https://www.chang.nyc/",
+          "domid": "0f3090c22ce76be18821db34a72f6694"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 0
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 36
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 11
+          },
+          "feature": {
+            "description": "Features",
+            "count": 51
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 30
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 160
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.billpepitonefornycmayor.com/",
+        "name": "William Pepitone"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "Real New Yorker | Bill Pepitone For NYC Mayor",
+          "pageurl": "https://www.billpepitonefornycmayor.com/",
+          "time": 3.23,
+          "creditsremaining": 65,
+          "allitemcount": 164,
+          "totalelements": 725,
+          "waveurl": "http://wave.webaim.org/report?url=https://www.billpepitonefornycmayor.com/",
+          "domid": "738b6d9ae11000cf6b87961e8a90800b"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 4
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 33
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 24
+          },
+          "feature": {
+            "description": "Features",
+            "count": 14
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 26
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 63
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.prussmanformayor.com/",
+        "name": "Stacey Prussman"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "Stacey Prussman for NYC Mayor",
+          "pageurl": "https://www.prussmanformayor.com/",
+          "time": 2.83,
+          "creditsremaining": 64,
+          "allitemcount": 55,
+          "totalelements": 416,
+          "waveurl": "http://wave.webaim.org/report?url=https://www.prussmanformayor.com/",
+          "domid": "c67017d56ff68888a829cc8227938142"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 0
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 7
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 11
+          },
+          "feature": {
+            "description": "Features",
+            "count": 9
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 14
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 14
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.rajafloresny.com/raja",
+        "name": "Raja Flores"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "Who is Raja? — Raja Flores For Mayor",
+          "pageurl": "https://www.rajafloresny.com/raja",
+          "time": 2.62,
+          "creditsremaining": 63,
+          "allitemcount": 85,
+          "totalelements": 404,
+          "waveurl": "http://wave.webaim.org/report?url=https://www.rajafloresny.com/raja",
+          "domid": "df05727afaf2cef8de89e61ba4bb74f7"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 0
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 17
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 18
+          },
+          "feature": {
+            "description": "Features",
+            "count": 17
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 18
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 15
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.riseofthegoodpeople.org/",
+        "name": "Aaron Benjamin Miles"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "New York City Mayor 2021 | Rise Of The Good People | Bushwick",
+          "pageurl": "https://www.riseofthegoodpeople.org/",
+          "time": 12.25,
+          "creditsremaining": 62,
+          "allitemcount": 399,
+          "totalelements": 2317,
+          "waveurl": "http://wave.webaim.org/report?url=https://www.riseofthegoodpeople.org/",
+          "domid": "eee8ad4da4d7236822e048379ad834cc"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 2
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 32
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 68
+          },
+          "feature": {
+            "description": "Features",
+            "count": 14
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 94
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 189
+          }
+        }
+      }
     }
   ]
 }
