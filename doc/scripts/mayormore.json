@@ -1,0 +1,65 @@
+{
+  "what": "Comparison of websites of more NYC mayor candidates",
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium"
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://wrightfornyc2021.com/",
+        "name": "Isaac Wright, Jr."
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://paperboyprince.com/",
+        "name": "Paperboy Prince"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://quandafrancis.com/",
+        "name": "Quanda Francis"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.chang.nyc/",
+        "name": "Art Chang"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.billpepitonefornycmayor.com/",
+        "name": "William Pepitone"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.prussmanformayor.com/",
+        "name": "Stacey Prussman"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.rajafloresny.com/raja",
+        "name": "Raja Flores"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.riseofthegoodpeople.org/",
+        "name": "Aaron Benjamin Miles"
+      }
+    }
+  ]
+}

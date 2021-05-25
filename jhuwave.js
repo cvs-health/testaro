@@ -63,10 +63,54 @@ const rank = (relArray, rankName, sorter) => {
 const score = (relArray, rankNames) => relArray.forEach(act => {
   act.score = rankNames.reduce((total, rankName) => total + weights[rankName] * act[rankName], 0);
 });
+// Creates and rcords an HTML report.
+const webify = relArray => {
+  const data = relArray.map(
+    act => `<tr><td>${act.score}</td><td>${act.name}</td><td>${act.url}</td></tr>`
+  ).join('\n         ');
+  const page = `<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Web-page accessibility comparison</title>
+    <meta
+      name="description"
+      content="Comparison of accessibility of web pages per the JHU-WAVE rule"
+    >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="favicon.png">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main>
+      <h1>Web-page accessibility comparison</h1>
+      <section class="etc">
+        <p>The table below ranks and scores web pages on accessibility, as measured by the <dfn>JHU-WAVE rule</dfn>, the method used by the Johns Hopkins University Disability Health Research Center in producing its <a href="https://disabilityhealth.jhu.edu/vaccinedashboard/webaccess/">Vaccine Website Accessibility dashboard</a>.</p>
+        <p>This table was produced with <a href="https://github.com/jrpool/autotest">Autotest</a>.</p>
+        <table>
+          <caption>Results of JHU-WAVE test of web pages</caption>
+          <thead>
+            <tr><th>Deficit</th><th>Name</th><th>URL</th></tr>
+          </thead>
+          <tbody class="firstCellRight">
+          ${data}
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </body>
+</html>
+`;
+  fs.writeFile(`jhuwave-${timeStamp}.html`, page);
+};
 // ########## OPERATION
-const relArray = distill();
-rank(relArray, 'errorRank', a => a.errorCount);
-rank(relArray, 'densityRank', a => a.errorCount / a.elementCount);
-rank(relArray, 'alertRank', a => a.alertCount);
-score(relArray, ['errorRank', 'densityRank', 'alertRank']);
-fs.writeFile(`jhuwave-${timeStamp}.json`, relArray);
+(async () => {
+  const relArray = await distill();
+  rank(relArray, 'errorRank', a => a.errorCount);
+  rank(relArray, 'densityRank', a => a.errorCount / a.elementCount);
+  rank(relArray, 'alertRank', a => a.alertCount);
+  score(relArray, ['errorRank', 'densityRank', 'alertRank']);
+  relArray.sort((a, b) => a.score - b.score);
+  fs.writeFile(`jhuwave-${timeStamp}.json`, JSON.stringify(relArray, null, 2));
+  webify(relArray);
+})();

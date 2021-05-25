@@ -23,7 +23,7 @@ button:hover {
   background-color: #fff;
 }
 caption {
-  margin-bottom: 1rem;
+  margin: 1rem 0;
   font-weight: bold;
   font-style: italic;
 }
@@ -47,6 +47,9 @@ figcaption {
 }
 figure > img {
   border: 1px solid black;
+}
+.firstCellRight td:nth-child(1) {
+  text-align: right;
 }
 form {
   margin-top: 1rem;
@@ -116,6 +119,9 @@ tbody td {
 tbody th {
   padding-right: 1rem;
   text-align: right;
+}
+td, th {
+  padding: 0 0.5rem;
 }
 thead th {
   padding-bottom: 1rem;
