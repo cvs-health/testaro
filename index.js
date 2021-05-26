@@ -159,13 +159,6 @@ const axes = async page => {
   await injectAxe(page);
   // Get the data on the elements violating axe-core rules.
   const axeReport = await getViolations(page);
-  // Define score weights.
-  const weights = {
-    minor: 1,
-    moderate: 2,
-    serious: 3,
-    critical: 4
-  };
   // Initialize a summary.
   const report = {
     elementCount,
@@ -175,8 +168,7 @@ const axes = async page => {
       moderate: 0,
       serious: 0,
       critical: 0
-    },
-    score: 0
+    }
   };
   // For each rule violated:
   axeReport.forEach(rule => {
@@ -184,10 +176,8 @@ const axes = async page => {
     rule.nodes.forEach(element => {
       // Increment the element count of the impact of its violation.
       report.violations[element.impact]++;
-      report.score -= weights[element.impact];
     });
   });
-  report.score += Math.floor(report.score * 400 / elementCount);
   // Return the report.
   return report;
 };
@@ -389,7 +379,7 @@ const doActs = async (report, actIndex, page, timeStamp) => {
           // Visit it.
           await page.goto(which);
           // Wait until it is stable.
-          await page.waitForLoadState('networkidle', {timeout: 10000});
+          await page.waitForLoadState('networkidle', {timeout: 20000});
           // Add the resulting URL to the act.
           act.result = page.url();
         }
@@ -411,7 +401,7 @@ const doActs = async (report, actIndex, page, timeStamp) => {
               body: body && body.textContent && body.textContent.includes(text)
             };
             return success[type];
-          }, which, {timeout: 10000});
+          }, which, {timeout: 20000});
           // Add the resulting URL to the act.
           act.result = page.url();
         }
@@ -420,7 +410,7 @@ const doActs = async (report, actIndex, page, timeStamp) => {
           // Wait for a page to be created and identify it as current.
           page = await browserContext.waitForEvent('page');
           // Wait until it is stable and thus ready for the next act.
-          await page.waitForLoadState('networkidle', {timeout: 10000});
+          await page.waitForLoadState('networkidle', {timeout: 20000});
           // Add the resulting URL to the act.
           act.result = page.url();
         }
@@ -469,6 +459,7 @@ const doActs = async (report, actIndex, page, timeStamp) => {
           // Otherwise, if the act is an axe summary:
           else if (type === 'axes') {
             // Conduct it and add its result to the act.
+            act.name = which;
             act.result = await axes(page);
           }
           // Otherwise, if the act is a valid focus:
