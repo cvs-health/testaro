@@ -25,7 +25,22 @@ const distill = async () => {
   // Distill it into the relevant array.
   const relArray = report
   .acts
-  .filter(act => act.type === 'waves')
+  .filter(act =>
+    act.type === 'waves'
+    && act.which
+    && act.which.url
+    && act.which.name
+    && act.result
+    && act.result.statistics
+    && act.result.statistics.totalelements
+    && act.result.categories
+    && act.result.categories.error
+    && act.result.categories.error.count > -1
+    && act.result.categories.contrast
+    && act.result.categories.contrast.count > -1
+    && act.result.categories.alert
+    && act.result.categories.alert.count > -1
+  )
   .map((act, index) => ({
     index,
     url: act.which.url,
@@ -84,7 +99,7 @@ const webify = relArray => {
   <body>
     <main>
       <h1>Web-page accessibility comparison</h1>
-      <section class="etc">
+      <section class="etc wide">
         <p>The table below ranks and scores web pages on accessibility, as measured by the <dfn>JHU-WAVE rule</dfn>, the method used by the Johns Hopkins University Disability Health Research Center in producing its <a href="https://disabilityhealth.jhu.edu/vaccinedashboard/webaccess/">Vaccine Website Accessibility dashboard</a>.</p>
         <p>This table was produced with <a href="https://github.com/jrpool/autotest">Autotest</a>.</p>
         <table>

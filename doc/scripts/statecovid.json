@@ -71,7 +71,7 @@
     {
       "type": "waves",
       "which": {
-        "url": "hhttps://gettheshot.coronavirus.ohio.gov/",
+        "url": "https://gettheshot.coronavirus.ohio.gov/",
         "name": "Ohio"
       }
     },
@@ -162,7 +162,7 @@
     {
       "type": "waves",
       "which": {
-        "url": "https://vaccinesignup.mass.gov/#/",
+        "url": "https://vaccinesignup.mass.gov",
         "name": "Massachusetts"
       }
     },
@@ -204,7 +204,7 @@
     {
       "type": "waves",
       "which": {
-        "url": "https://myvaccine.fl.gov/#/RegistrationForm",
+        "url": "https://myvaccine.fl.gov",
         "name": "Florida"
       }
     }

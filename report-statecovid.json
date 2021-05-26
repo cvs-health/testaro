@@ -450,13 +450,49 @@
     {
       "type": "waves",
       "which": {
-        "url": "hhttps://gettheshot.coronavirus.ohio.gov/",
+        "url": "https://gettheshot.coronavirus.ohio.gov/",
         "name": "Ohio"
       },
       "result": {
         "status": {
-          "success": false,
-          "error": "Error: net::ERR_NAME_NOT_RESOLVED at http://hhttps://gettheshot.coronavirus.ohio.gov/"
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "ODH - Check Vaccine Eligibility",
+          "pageurl": "https://gettheshot.coronavirus.ohio.gov/",
+          "time": 3.53,
+          "creditsremaining": 33,
+          "allitemcount": 19,
+          "totalelements": 89,
+          "waveurl": "http://wave.webaim.org/report?url=https://gettheshot.coronavirus.ohio.gov/",
+          "domid": "13206efe994c82b00a8e5e90e051c5c7"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 1
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 3
+          },
+          "feature": {
+            "description": "Features",
+            "count": 3
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 10
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 2
+          }
         }
       }
     },
@@ -1051,15 +1087,50 @@
     {
       "type": "waves",
       "which": {
-        "url": "https://vaccinesignup.mass.gov/#/",
-        "name": "Massachusetts"
-      }
-    },
-    {
-      "type": "waves",
-      "which": {
         "url": "https://myvaccinegeorgia.com/en/site/ALL",
         "name": "Georgia"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "MyVaccine",
+          "pageurl": "https://myvaccinegeorgia.com/en/site/ALL",
+          "time": 2.92,
+          "creditsremaining": 40,
+          "allitemcount": 85,
+          "totalelements": 547,
+          "waveurl": "http://wave.webaim.org/report?url=https://myvaccinegeorgia.com/en/site/ALL",
+          "domid": "a95acf5bab46564bbea313ef5249e4dd"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 7
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 1
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 10
+          },
+          "feature": {
+            "description": "Features",
+            "count": 6
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 8
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 53
+          }
+        }
       }
     },
     {
@@ -1067,6 +1138,48 @@
       "which": {
         "url": "https://www.vaccinatecnmi.com/covid-19/registration/",
         "name": "Northern Mariana Islands"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "COVID-19 Vaccination Form - Vaccinate CNMI",
+          "pageurl": "https://www.vaccinatecnmi.com/covid-19/registration/",
+          "time": 9.96,
+          "creditsremaining": 39,
+          "allitemcount": 505,
+          "totalelements": 2552,
+          "waveurl": "http://wave.webaim.org/report?url=https://www.vaccinatecnmi.com/covid-19/registration/",
+          "domid": "bdc807851324d3016d40cb9280aa15cc"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 11
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 6
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 45
+          },
+          "feature": {
+            "description": "Features",
+            "count": 189
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 99
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 155
+          }
+        }
       }
     },
     {
@@ -1074,6 +1187,48 @@
       "which": {
         "url": "https://covidvaccination.dph.illinois.gov/questionnaire",
         "name": "Illinois"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "IDPH - Vaccination",
+          "pageurl": "https://covidvaccination.dph.illinois.gov/questionnaire",
+          "time": 2.02,
+          "creditsremaining": 38,
+          "allitemcount": 20,
+          "totalelements": 135,
+          "waveurl": "http://wave.webaim.org/report?url=https://covidvaccination.dph.illinois.gov/questionnaire",
+          "domid": "7a0ef3300a8d12d145791c158f33c86b"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 3
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 4
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 1
+          },
+          "feature": {
+            "description": "Features",
+            "count": 2
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 4
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 6
+          }
+        }
       }
     },
     {
@@ -1081,6 +1236,48 @@
       "which": {
         "url": "https://vini.nh.gov/providers/s/",
         "name": "New Hampshire"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "State of New Hampshire Vaccination Site",
+          "pageurl": "https://vini.nh.gov/providers/s/",
+          "time": 4.03,
+          "creditsremaining": 37,
+          "allitemcount": 20,
+          "totalelements": 95,
+          "waveurl": "http://wave.webaim.org/report?url=https://vini.nh.gov/providers/s/",
+          "domid": "330181f973df6e70891ced401861e9ae"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 5
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 3
+          },
+          "feature": {
+            "description": "Features",
+            "count": 1
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 10
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 1
+          }
+        }
       }
     },
     {
@@ -1088,13 +1285,146 @@
       "which": {
         "url": "https://cvvaccine.nmhealth.org",
         "name": "New Mexico"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "",
+          "pageurl": "https://cvvaccine.nmhealth.org",
+          "time": 5.23,
+          "creditsremaining": 36,
+          "allitemcount": 989,
+          "totalelements": 1680,
+          "waveurl": "http://wave.webaim.org/report?url=https://cvvaccine.nmhealth.org",
+          "domid": "2e23a5a8c28750e00ab2641a21bd67c5"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 48
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 18
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 95
+          },
+          "feature": {
+            "description": "Features",
+            "count": 35
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 12
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 781
+          }
+        }
       }
     },
     {
       "type": "waves",
       "which": {
-        "url": "https://myvaccine.fl.gov/#/RegistrationForm",
+        "url": "https://myvaccine.fl.gov",
         "name": "Florida"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "MyVaccineFlorida | Stop the Virus",
+          "pageurl": "https://myvaccine.fl.gov",
+          "time": 2.72,
+          "creditsremaining": 35,
+          "allitemcount": 34,
+          "totalelements": 197,
+          "waveurl": "http://wave.webaim.org/report?url=https://myvaccine.fl.gov",
+          "domid": "cc85fd9ba1000d33822972454b1efe91"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 9
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 7
+          },
+          "feature": {
+            "description": "Features",
+            "count": 9
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 6
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 3
+          }
+        }
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://vaccinesignup.mass.gov",
+        "name": "Massachusetts"
+      },
+      "result": {
+        "status": {
+          "success": true,
+          "httpstatuscode": 200
+        },
+        "statistics": {
+          "pagetitle": "Vaccine Signup MA",
+          "pageurl": "https://vaccinesignup.mass.gov",
+          "time": 2.63,
+          "creditsremaining": 34,
+          "allitemcount": 23,
+          "totalelements": 120,
+          "waveurl": "http://wave.webaim.org/report?url=https://vaccinesignup.mass.gov",
+          "domid": "a4907877a64b910c2486cffcdf5454f3"
+        },
+        "categories": {
+          "error": {
+            "description": "Errors",
+            "count": 5
+          },
+          "contrast": {
+            "description": "Contrast Errors",
+            "count": 0
+          },
+          "alert": {
+            "description": "Alerts",
+            "count": 4
+          },
+          "feature": {
+            "description": "Features",
+            "count": 2
+          },
+          "structure": {
+            "description": "Structural Elements",
+            "count": 9
+          },
+          "aria": {
+            "description": "ARIA",
+            "count": 3
+          }
+        }
       }
     }
   ]

@@ -208,7 +208,17 @@ const waves = url => {
           report += chunk;
         });
         // When the data arrive, return them as an object.
-        response.on('end', () => resolve(JSON.parse(report)));
+        response.on('end', () => {
+          try {
+            return resolve(JSON.parse(report));
+          }
+          catch (error) {
+            return resolve({
+              error: 'WAVE did not return JSON.',
+              report
+            });
+          }
+        });
       }
     );
   });

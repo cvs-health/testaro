@@ -60,7 +60,7 @@ h1 {
 h1, h2 {
   color: #006666;
 }
-section {
+section:not(.wide) {
   max-width: 36rem;
 }
 h2 {

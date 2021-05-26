@@ -8,8 +8,15 @@
     {
       "type": "waves",
       "which": {
-        "url": "https://gettheshot.coronavirus.ohio.gov/",
-        "name": "Ohio"
+        "url": "https://myvaccine.fl.gov",
+        "name": "Florida"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://vaccinesignup.mass.gov",
+        "name": "Massachusetts"
       }
     }
   ]
