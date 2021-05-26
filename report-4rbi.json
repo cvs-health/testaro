@@ -1,0 +1,472 @@
+{
+  "scriptName": "mayoraxes",
+  "what": "Axe comparison of websites of NYC mayor candidates",
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium"
+    },
+    {
+      "type": "url",
+      "which": "https://www.ericadams2021.com",
+      "result": "https://ericadams2021.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Eric Adams",
+      "url": "https://ericadams2021.com/",
+      "name": "Eric Adams",
+      "result": {
+        "elementCount": 1015,
+        "warnings": 0,
+        "violations": {
+          "minor": 12,
+          "moderate": 26,
+          "serious": 14,
+          "critical": 1
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://shaunfornyc.com",
+      "result": "https://shaunfornyc.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Shaun Donovan",
+      "url": "https://shaunfornyc.com/",
+      "name": "Shaun Donovan",
+      "result": {
+        "elementCount": 744,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 18,
+          "serious": 16,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://www.kgfornyc.com",
+      "result": "https://www.kgfornyc.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Kathryn Garcia",
+      "url": "https://www.kgfornyc.com/",
+      "name": "Kathryn Garcia",
+      "result": {
+        "elementCount": 1293,
+        "warnings": 0,
+        "violations": {
+          "minor": 13,
+          "moderate": 2,
+          "serious": 26,
+          "critical": 9
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://www.rayformayor.com",
+      "result": "https://www.rayformayor.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Raymond McGuire",
+      "url": "https://www.rayformayor.com/",
+      "name": "Raymond McGuire",
+      "result": {
+        "elementCount": 459,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 1,
+          "serious": 2,
+          "critical": 4
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://www.dianne.nyc",
+      "result": "https://www.dianne.nyc/"
+    },
+    {
+      "type": "axes",
+      "which": "Dianne Morales",
+      "url": "https://www.dianne.nyc/",
+      "name": "Dianne Morales",
+      "result": {
+        "elementCount": 718,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 4,
+          "serious": 8,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://stringerformayor.com",
+      "result": "https://stringerformayor.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Scott Stringer",
+      "url": "https://stringerformayor.com/",
+      "name": "Scott Stringer",
+      "result": {
+        "elementCount": 580,
+        "warnings": 0,
+        "violations": {
+          "minor": 13,
+          "moderate": 23,
+          "serious": 12,
+          "critical": 6
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://www.mayawileyformayor.com",
+      "result": "https://www.mayawileyformayor.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Maya Wiley",
+      "url": "https://www.mayawileyformayor.com/",
+      "name": "Maya Wiley",
+      "result": {
+        "elementCount": 1024,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 110,
+          "serious": 11,
+          "critical": 59
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://www.yangforny.com",
+      "result": "https://www.yangforny.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Andrew Yang",
+      "url": "https://www.yangforny.com/",
+      "name": "Andrew Yang",
+      "result": {
+        "elementCount": 664,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 7,
+          "serious": 22,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://aaronfornyc.com/meet-aaron/",
+      "result": "https://aaronfornyc.com/meet-aaron/"
+    },
+    {
+      "type": "axes",
+      "which": "Aaron Foldenauer",
+      "url": "https://aaronfornyc.com/meet-aaron/",
+      "name": "Aaron Foldenauer",
+      "result": {
+        "elementCount": 405,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 3,
+          "serious": 18,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://taylorfor2021.com",
+      "result": "https://taylorfor2021.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Jocelyn Taylor",
+      "url": "https://taylorfor2021.com/",
+      "name": "Jocelyn Taylor",
+      "result": {
+        "elementCount": 500,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 2,
+          "serious": 5,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://www.mateothemayor.com",
+      "result": "https://www.mateothemayor.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Fernando Mateo",
+      "url": "https://www.mateothemayor.com/",
+      "name": "Fernando Mateo",
+      "result": {
+        "elementCount": 568,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 4,
+          "serious": 11,
+          "critical": 2
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://sliwaforny.com",
+      "result": "https://sliwaforny.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Curtis Sliwa",
+      "url": "https://sliwaforny.com/",
+      "name": "Curtis Sliwa",
+      "result": {
+        "elementCount": 875,
+        "warnings": 0,
+        "violations": {
+          "minor": 4,
+          "moderate": 9,
+          "serious": 22,
+          "critical": 10
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://www.vitalyformayor.com",
+      "result": "https://www.vitalyformayor.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Vitaly Filipchenko",
+      "url": "https://www.vitalyformayor.com/",
+      "name": "Vitaly Filipchenko",
+      "result": {
+        "elementCount": 256,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 1,
+          "serious": 9,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://csk4mayor.nyc",
+      "result": "https://csk4mayor.nyc/"
+    },
+    {
+      "type": "axes",
+      "which": "Christopher Krietchman",
+      "url": "https://csk4mayor.nyc/",
+      "name": "Christopher Krietchman",
+      "result": {
+        "elementCount": 1983,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 34,
+          "serious": 6,
+          "critical": 2
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://wrightfornyc2021.com/",
+      "result": "https://wrightfornyc2021.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Isaac Wright, Jr.",
+      "url": "https://wrightfornyc2021.com/",
+      "name": "Isaac Wright, Jr.",
+      "result": {
+        "elementCount": 952,
+        "warnings": 0,
+        "violations": {
+          "minor": 1,
+          "moderate": 19,
+          "serious": 13,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://paperboyprince.com/",
+      "result": "https://paperboyprince.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Paperboy Prince",
+      "url": "https://paperboyprince.com/",
+      "name": "Paperboy Prince",
+      "result": {
+        "elementCount": 426,
+        "warnings": 0,
+        "violations": {
+          "minor": 2,
+          "moderate": 8,
+          "serious": 20,
+          "critical": 1
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://quandafrancis.com/",
+      "result": "https://quandafrancis.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Quanda Francis",
+      "url": "https://quandafrancis.com/",
+      "name": "Quanda Francis",
+      "result": {
+        "elementCount": 1115,
+        "warnings": 0,
+        "violations": {
+          "minor": 2,
+          "moderate": 30,
+          "serious": 19,
+          "critical": 4
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://www.chang.nyc/",
+      "result": "https://www.chang.nyc/"
+    },
+    {
+      "type": "axes",
+      "which": "Art Chang",
+      "url": "https://www.chang.nyc/",
+      "name": "Art Chang",
+      "result": {
+        "elementCount": 850,
+        "warnings": 0,
+        "violations": {
+          "minor": 1,
+          "moderate": 4,
+          "serious": 20,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://www.billpepitonefornycmayor.com/",
+      "result": "https://www.billpepitonefornycmayor.com/"
+    },
+    {
+      "type": "axes",
+      "which": "William Pepitone",
+      "url": "https://www.billpepitonefornycmayor.com/",
+      "name": "William Pepitone",
+      "result": {
+        "elementCount": 740,
+        "warnings": 0,
+        "violations": {
+          "minor": 4,
+          "moderate": 1,
+          "serious": 26,
+          "critical": 2
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://www.prussmanformayor.com/",
+      "result": "https://www.prussmanformayor.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Stacey Prussman",
+      "url": "https://www.prussmanformayor.com/",
+      "name": "Stacey Prussman",
+      "result": {
+        "elementCount": 419,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 1,
+          "serious": 5,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://www.rajafloresny.com/raja",
+      "result": "https://www.rajafloresny.com/raja"
+    },
+    {
+      "type": "axes",
+      "which": "Raja Flores",
+      "url": "https://www.rajafloresny.com/raja",
+      "name": "Raja Flores",
+      "result": {
+        "elementCount": 407,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 3,
+          "serious": 15,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://www.riseofthegoodpeople.org/",
+      "result": "https://www.riseofthegoodpeople.org/"
+    },
+    {
+      "type": "axes",
+      "which": "Aaron Benjamin Miles",
+      "url": "https://www.riseofthegoodpeople.org/",
+      "name": "Aaron Benjamin Miles",
+      "result": {
+        "elementCount": 2316,
+        "warnings": 0,
+        "violations": {
+          "minor": 10,
+          "moderate": 4,
+          "serious": 27,
+          "critical": 5
+        }
+      }
+    }
+  ]
+}
