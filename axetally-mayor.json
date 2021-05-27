@@ -1,0 +1,48 @@
+{
+  "critical": {
+    "image-alt": 60,
+    "aria-required-attr": 6,
+    "aria-required-children": 10,
+    "aria-valid-attr-value": 9,
+    "duplicate-id-aria": 3,
+    "aria-allowed-attr": 11,
+    "select-name": 1,
+    "meta-viewport": 1,
+    "button-name": 4
+  },
+  "serious": {
+    "avoid-inline-spacing": 1,
+    "color-contrast": 169,
+    "frame-title": 3,
+    "link-name": 99,
+    "duplicate-id-active": 3,
+    "listitem": 9,
+    "autocomplete-valid": 4,
+    "tabindex": 11,
+    "html-has-lang": 2,
+    "aria-hidden-focus": 2,
+    "svg-img-alt": 7,
+    "aria-input-field-name": 4,
+    "nested-interactive": 5,
+    "label-title-only": 1,
+    "frame-title-unique": 2,
+    "object-alt": 5
+  },
+  "moderate": {
+    "heading-order": 30,
+    "landmark-one-main": 7,
+    "landmark-unique": 13,
+    "region": 255,
+    "page-has-heading-one": 5,
+    "landmark-complementary-is-top-level": 1,
+    "skip-link": 1,
+    "landmark-main-is-top-level": 1,
+    "landmark-no-duplicate-main": 1
+  },
+  "minor": {
+    "duplicate-id": 52,
+    "presentation-role-conflict": 6,
+    "empty-heading": 1,
+    "aria-allowed-role": 4
+  }
+}

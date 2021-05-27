@@ -10,9 +10,12 @@ const prefix = process.argv[2];
 // ########## FUNCTIONS
 // Creates and records an HTML report.
 const webify = relArray => {
-  const data = relArray.map(
-    act => `<tr><td>${act.score}</td><td>${act.name}</td><td>${act.url}</td></tr>`
-  ).join('\n         ');
+  const data = relArray
+  .map(act => {
+    const {score, name, url} = act;
+    return `<tr><td>${score}</td><td>${name}</td><td><a href="${url}">${url}</a></td></tr>`;
+  })
+  .join('\n            ');
   const page = `<!DOCTYPE html>
 <html lang="en-US">
   <head>
@@ -43,7 +46,7 @@ const webify = relArray => {
             <tr><th>Deficit</th><th>Name</th><th>URL</th></tr>
           </thead>
           <tbody class="firstCellRight">
-          ${data}
+            ${data}
           </tbody>
         </table>
       </section>
