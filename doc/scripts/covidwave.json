@@ -1,0 +1,93 @@
+{
+  "what": "WAVE comparison of COVID-19 websites of health companies",
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium"
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.cvs.com/immunizations/covid-19-vaccine?icid=cvs-home-hero1-link1-coronavirus-vaccine",
+        "name": "CVS Pharmacy"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.aetna.com/individuals-families/member-rights-resources/covid19.html",
+        "name": "Aetna"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.walgreens.com/findcare/vaccination/covid-19?ban=covid_scheduler_brandstory_main_March2021",
+        "name": "Walgreens"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.riteaid.com/covid-19",
+        "name": "Rite Aid"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.uhc.com/health-and-wellness/health-topics/covid-19/vaccine",
+        "name": "United HealthCare"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.walmart.com/cp/flu-shots-immunizations/1228302",
+        "name": "Walmart"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.albertsons.com/pharmacy/covid-19.html",
+        "name": "Albertsons"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.anthem.com/coronavirus/blog/well-being-and-community/3-things-about-the-coronavirus-vaccine/",
+        "name": "Anthem"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.humana.com/coronavirus",
+        "name": "Humana"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://healthy.kaiserpermanente.org/health-wellness/coronavirus-information",
+        "name": "Kaiser Permanente"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://www.mayoclinic.org/coronavirus-covid-19",
+        "name": "Mayo Clinic"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://healthcare.ascension.org/covid-19/covid-vaccine",
+        "name": "Ascension"
+      }
+    }
+  ]
+}

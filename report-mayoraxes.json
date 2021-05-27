@@ -15,7 +15,6 @@
       "type": "axes",
       "which": "Eric Adams",
       "url": "https://ericadams2021.com/",
-      "name": "Eric Adams",
       "result": {
         "elementCount": 1015,
         "warnings": 0,
@@ -36,7 +35,6 @@
       "type": "axes",
       "which": "Shaun Donovan",
       "url": "https://shaunfornyc.com/",
-      "name": "Shaun Donovan",
       "result": {
         "elementCount": 744,
         "warnings": 0,
@@ -57,7 +55,6 @@
       "type": "axes",
       "which": "Kathryn Garcia",
       "url": "https://www.kgfornyc.com/",
-      "name": "Kathryn Garcia",
       "result": {
         "elementCount": 1293,
         "warnings": 0,
@@ -78,7 +75,6 @@
       "type": "axes",
       "which": "Raymond McGuire",
       "url": "https://www.rayformayor.com/",
-      "name": "Raymond McGuire",
       "result": {
         "elementCount": 459,
         "warnings": 0,
@@ -99,7 +95,6 @@
       "type": "axes",
       "which": "Dianne Morales",
       "url": "https://www.dianne.nyc/",
-      "name": "Dianne Morales",
       "result": {
         "elementCount": 718,
         "warnings": 0,
@@ -120,7 +115,6 @@
       "type": "axes",
       "which": "Scott Stringer",
       "url": "https://stringerformayor.com/",
-      "name": "Scott Stringer",
       "result": {
         "elementCount": 580,
         "warnings": 0,
@@ -141,7 +135,6 @@
       "type": "axes",
       "which": "Maya Wiley",
       "url": "https://www.mayawileyformayor.com/",
-      "name": "Maya Wiley",
       "result": {
         "elementCount": 1024,
         "warnings": 0,
@@ -162,7 +155,6 @@
       "type": "axes",
       "which": "Andrew Yang",
       "url": "https://www.yangforny.com/",
-      "name": "Andrew Yang",
       "result": {
         "elementCount": 664,
         "warnings": 0,
@@ -183,7 +175,6 @@
       "type": "axes",
       "which": "Aaron Foldenauer",
       "url": "https://aaronfornyc.com/meet-aaron/",
-      "name": "Aaron Foldenauer",
       "result": {
         "elementCount": 405,
         "warnings": 0,
@@ -204,7 +195,6 @@
       "type": "axes",
       "which": "Jocelyn Taylor",
       "url": "https://taylorfor2021.com/",
-      "name": "Jocelyn Taylor",
       "result": {
         "elementCount": 500,
         "warnings": 0,
@@ -225,7 +215,6 @@
       "type": "axes",
       "which": "Fernando Mateo",
       "url": "https://www.mateothemayor.com/",
-      "name": "Fernando Mateo",
       "result": {
         "elementCount": 568,
         "warnings": 0,
@@ -246,7 +235,6 @@
       "type": "axes",
       "which": "Curtis Sliwa",
       "url": "https://sliwaforny.com/",
-      "name": "Curtis Sliwa",
       "result": {
         "elementCount": 875,
         "warnings": 0,
@@ -267,7 +255,6 @@
       "type": "axes",
       "which": "Vitaly Filipchenko",
       "url": "https://www.vitalyformayor.com/",
-      "name": "Vitaly Filipchenko",
       "result": {
         "elementCount": 256,
         "warnings": 0,
@@ -288,7 +275,6 @@
       "type": "axes",
       "which": "Christopher Krietchman",
       "url": "https://csk4mayor.nyc/",
-      "name": "Christopher Krietchman",
       "result": {
         "elementCount": 1983,
         "warnings": 0,
@@ -309,7 +295,6 @@
       "type": "axes",
       "which": "Isaac Wright, Jr.",
       "url": "https://wrightfornyc2021.com/",
-      "name": "Isaac Wright, Jr.",
       "result": {
         "elementCount": 952,
         "warnings": 0,
@@ -330,7 +315,6 @@
       "type": "axes",
       "which": "Paperboy Prince",
       "url": "https://paperboyprince.com/",
-      "name": "Paperboy Prince",
       "result": {
         "elementCount": 426,
         "warnings": 0,
@@ -351,7 +335,6 @@
       "type": "axes",
       "which": "Quanda Francis",
       "url": "https://quandafrancis.com/",
-      "name": "Quanda Francis",
       "result": {
         "elementCount": 1115,
         "warnings": 0,
@@ -372,7 +355,6 @@
       "type": "axes",
       "which": "Art Chang",
       "url": "https://www.chang.nyc/",
-      "name": "Art Chang",
       "result": {
         "elementCount": 850,
         "warnings": 0,
@@ -393,7 +375,6 @@
       "type": "axes",
       "which": "William Pepitone",
       "url": "https://www.billpepitonefornycmayor.com/",
-      "name": "William Pepitone",
       "result": {
         "elementCount": 740,
         "warnings": 0,
@@ -414,7 +395,6 @@
       "type": "axes",
       "which": "Stacey Prussman",
       "url": "https://www.prussmanformayor.com/",
-      "name": "Stacey Prussman",
       "result": {
         "elementCount": 419,
         "warnings": 0,
@@ -435,7 +415,6 @@
       "type": "axes",
       "which": "Raja Flores",
       "url": "https://www.rajafloresny.com/raja",
-      "name": "Raja Flores",
       "result": {
         "elementCount": 407,
         "warnings": 0,
@@ -456,7 +435,6 @@
       "type": "axes",
       "which": "Aaron Benjamin Miles",
       "url": "https://www.riseofthegoodpeople.org/",
-      "name": "Aaron Benjamin Miles",
       "result": {
         "elementCount": 2316,
         "warnings": 0,

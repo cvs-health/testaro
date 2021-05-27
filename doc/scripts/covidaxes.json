@@ -1,0 +1,105 @@
+{
+  "what": "WAVE comparison of COVID-19 websites of health companies",
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium"
+    },
+    {
+      "type": "url",
+      "which": "https://www.cvs.com/immunizations/covid-19-vaccine?icid=cvs-home-hero1-link1-coronavirus-vaccine"
+    },
+    {
+      "type": "axes",
+      "which": "CVS Pharmacy"
+    },
+    {
+      "type": "url",
+      "which": "https://www.aetna.com/individuals-families/member-rights-resources/covid19.html"
+    },
+    {
+      "type": "axes",
+      "which": "Aetna"
+    },
+    {
+      "type": "url",
+      "which": "https://www.walgreens.com/findcare/vaccination/covid-19?ban=covid_scheduler_brandstory_main_March2021"
+    },
+    {
+      "type": "axes",
+      "which": "Walgreens"
+    },
+    {
+      "type": "url",
+      "which": "https://www.riteaid.com/covid-19"
+    },
+    {
+      "type": "axes",
+      "which": "Rite Aid"
+    },
+    {
+      "type": "url",
+      "which": "https://www.uhc.com/health-and-wellness/health-topics/covid-19/vaccine"
+    },
+    {
+      "type": "axes",
+      "which": "United HealthCare"
+    },
+    {
+      "type": "url",
+      "which": "https://www.walmart.com/cp/flu-shots-immunizations/1228302"
+    },
+    {
+      "type": "axes",
+      "which": "Walmart"
+    },
+    {
+      "type": "url",
+      "which": "https://www.albertsons.com/pharmacy/covid-19.html"
+    },
+    {
+      "type": "axes",
+      "which": "Albertsons"
+    },
+    {
+      "type": "url",
+      "which": "https://www.anthem.com/coronavirus/blog/well-being-and-community/3-things-about-the-coronavirus-vaccine/"
+    },
+    {
+      "type": "axes",
+      "which": "Anthem"
+    },
+    {
+      "type": "url",
+      "which": "https://www.humana.com/coronavirus"
+    },
+    {
+      "type": "axes",
+      "which": "Humana"
+    },
+    {
+      "type": "url",
+      "which": "https://healthy.kaiserpermanente.org/health-wellness/coronavirus-information"
+    },
+    {
+      "type": "axes",
+      "which": "Kaiser Permanente"
+    },
+    {
+      "type": "url",
+      "which": "https://www.mayoclinic.org/coronavirus-covid-19"
+    },
+    {
+      "type": "axes",
+      "which": "Mayo Clinic"
+    },
+    {
+      "type": "url",
+      "which": "https://healthcare.ascension.org/covid-19/covid-vaccine"
+    },
+    {
+      "type": "axes",
+      "which": "Ascension"
+    }
+  ]
+}

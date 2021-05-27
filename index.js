@@ -459,7 +459,6 @@ const doActs = async (report, actIndex, page, timeStamp) => {
           // Otherwise, if the act is an axe summary:
           else if (type === 'axes') {
             // Conduct it and add its result to the act.
-            act.name = which;
             act.result = await axes(page);
           }
           // Otherwise, if the act is a valid focus:

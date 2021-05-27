@@ -78,7 +78,7 @@ const rank = (relArray, rankName, sorter) => {
 const score = (relArray, rankNames) => relArray.forEach(act => {
   act.score = rankNames.reduce((total, rankName) => total + weights[rankName] * act[rankName], 0);
 });
-// Creates and rcords an HTML report.
+// Creates and records an HTML report.
 const webify = relArray => {
   const data = relArray.map(
     act => `<tr><td>${act.score}</td><td>${act.name}</td><td>${act.url}</td></tr>`

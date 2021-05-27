@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Web-page accessibility comparison</title>
+    <meta
+      name="description"
+      content="Comparison of accessibility of web pages per the JHU-Combo rule"
+    >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="favicon.png">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main>
+      <h1>Web-page accessibility comparison</h1>
+      <section class="etc wide">
+        <p>The table below ranks and scores web pages on accessibility, as measured by the <dfn>JHU-Combo rule</dfn>.</p>
+        <ol>
+          <li>The first step in this rule is to apply the method used by the Johns Hopkins University (<abbr>JHU</abbr>) Disability Health Research Center in producing its <a href="https://disabilityhealth.jhu.edu/vaccinedashboard/webaccess/">Vaccine Website Accessibility dashboard</a>, which uses the <a href="https://wave.webaim.org/api/">WAVE API</a> to rate web pages on accessibility.</li>
+          <li>The second step is to apply the same method, except substituting the <a href="https://github.com/dequelabs/axe-core">axe-core</a> ruleset for the WAVE ruleset.</li>
+          <li>The third step is to give each page a deficit score equal to the sum of the scores it received in the first two steps.</li>
+        </ol>
+        <p>This table was produced with <a href="https://github.com/jrpool/autotest">Autotest</a>.</p>
+        <table>
+          <caption>Results of JHU-Combo test of web pages</caption>
+          <thead>
+            <tr><th>Deficit</th><th>Name</th><th>URL</th></tr>
+          </thead>
+          <tbody class="firstCellRight">
+          <tr><td>17</td><td>Stacey Prussman</td><td>https://www.prussmanformayor.com/</td></tr>
+         <tr><td>18</td><td>Jocelyn Taylor</td><td>https://taylorfor2021.com</td></tr>
+         <tr><td>55</td><td>Vitaly Filipchenko</td><td>https://www.vitalyformayor.com</td></tr>
+         <tr><td>105</td><td>Dianne Morales</td><td>https://www.dianne.nyc</td></tr>
+         <tr><td>119</td><td>Isaac Wright, Jr.</td><td>https://wrightfornyc2021.com/</td></tr>
+         <tr><td>122</td><td>Raja Flores</td><td>https://www.rajafloresny.com/raja</td></tr>
+         <tr><td>126</td><td>Aaron Foldenauer</td><td>https://aaronfornyc.com/meet-aaron/</td></tr>
+         <tr><td>162</td><td>Shaun Donovan</td><td>https://shaunfornyc.com</td></tr>
+         <tr><td>185</td><td>Raymond McGuire</td><td>https://www.rayformayor.com</td></tr>
+         <tr><td>197</td><td>Fernando Mateo</td><td>https://www.mateothemayor.com</td></tr>
+         <tr><td>217</td><td>Art Chang</td><td>https://www.chang.nyc/</td></tr>
+         <tr><td>221</td><td>Andrew Yang</td><td>https://www.yangforny.com</td></tr>
+         <tr><td>235</td><td>Eric Adams</td><td>https://www.ericadams2021.com</td></tr>
+         <tr><td>256</td><td>Scott Stringer</td><td>https://stringerformayor.com</td></tr>
+         <tr><td>259</td><td>Christopher Krietchman</td><td>https://csk4mayor.nyc</td></tr>
+         <tr><td>262</td><td>Paperboy Prince</td><td>https://paperboyprince.com/</td></tr>
+         <tr><td>289</td><td>Aaron Benjamin Miles</td><td>https://www.riseofthegoodpeople.org/</td></tr>
+         <tr><td>303</td><td>William Pepitone</td><td>https://www.billpepitonefornycmayor.com/</td></tr>
+         <tr><td>313</td><td>Kathryn Garcia</td><td>https://www.kgfornyc.com</td></tr>
+         <tr><td>333</td><td>Quanda Francis</td><td>https://quandafrancis.com/</td></tr>
+         <tr><td>378</td><td>Maya Wiley</td><td>https://www.mayawileyformayor.com</td></tr>
+         <tr><td>401</td><td>Curtis Sliwa</td><td>https://sliwaforny.com</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </body>
+</html>
