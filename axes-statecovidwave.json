@@ -1,0 +1,292 @@
+[
+  {
+    "index": 1,
+    "url": "https://massvax.maryland.gov/",
+    "name": "Maryland",
+    "elementCount": 84,
+    "errorCount": 0,
+    "errorDensity": 0,
+    "alertCount": 1,
+    "score": 0
+  },
+  {
+    "index": 2,
+    "url": "https://covidvaccine.umc.edu/Screening",
+    "name": "Mississippi",
+    "elementCount": 134,
+    "errorCount": 0,
+    "errorDensity": 0,
+    "alertCount": 3,
+    "score": 2
+  },
+  {
+    "index": 3,
+    "url": "https://vaccine.coronavirus.in.gov/en-US/",
+    "name": "Indiana",
+    "elementCount": 87,
+    "errorCount": 0,
+    "errorDensity": 0,
+    "alertCount": 3,
+    "score": 2
+  },
+  {
+    "index": 5,
+    "url": "https://myturn.ca.gov/index.html",
+    "name": "California",
+    "elementCount": 183,
+    "errorCount": 0,
+    "errorDensity": 0,
+    "alertCount": 3,
+    "score": 2
+  },
+  {
+    "index": 4,
+    "url": "https://govstatus.egov.com/vaccine-eligibility-form",
+    "name": "Alabama",
+    "elementCount": 296,
+    "errorCount": 0,
+    "errorDensity": 0,
+    "alertCount": 5,
+    "score": 3
+  },
+  {
+    "index": 18,
+    "url": "https://covidvaccine.idaho.gov/register",
+    "name": "Idaho",
+    "elementCount": 200,
+    "errorCount": 1,
+    "errorDensity": 0.005,
+    "alertCount": 2,
+    "score": 5
+  },
+  {
+    "index": 9,
+    "url": "https://gettheshot.coronavirus.ohio.gov/",
+    "name": "Ohio",
+    "elementCount": 89,
+    "errorCount": 1,
+    "errorDensity": 0.011235955056179775,
+    "alertCount": 3,
+    "score": 6
+  },
+  {
+    "index": 7,
+    "url": "https://covidvaccine.nj.gov/en-US/",
+    "name": "New Jersey",
+    "elementCount": 143,
+    "errorCount": 1,
+    "errorDensity": 0.006993006993006993,
+    "alertCount": 6,
+    "score": 8
+  },
+  {
+    "index": 10,
+    "url": "https://podvaccine.azdhs.gov/signup",
+    "name": "Arizona",
+    "elementCount": 144,
+    "errorCount": 2,
+    "errorDensity": 0.013888888888888888,
+    "alertCount": 0,
+    "score": 8
+  },
+  {
+    "index": 20,
+    "url": "https://vaccinate.ne.gov/en-US/",
+    "name": "Nebraska",
+    "elementCount": 187,
+    "errorCount": 1,
+    "errorDensity": 0.0053475935828877,
+    "alertCount": 5,
+    "score": 8
+  },
+  {
+    "index": 14,
+    "url": "https://vermont.force.com/events/s/selfregistration",
+    "name": "Vermont",
+    "elementCount": 82,
+    "errorCount": 2,
+    "errorDensity": 0.024390243902439025,
+    "alertCount": 1,
+    "score": 9
+  },
+  {
+    "index": 11,
+    "url": "https://vaccinate.tn.gov",
+    "name": "Tennessee",
+    "elementCount": 150,
+    "errorCount": 1,
+    "errorDensity": 0.006666666666666667,
+    "alertCount": 9,
+    "score": 10
+  },
+  {
+    "index": 12,
+    "url": "https://vaccinate.oklahoma.gov/en-US/",
+    "name": "Oklahoma",
+    "elementCount": 195,
+    "errorCount": 1,
+    "errorDensity": 0.005128205128205128,
+    "alertCount": 8,
+    "score": 10
+  },
+  {
+    "index": 13,
+    "url": "https://vaccinerequest.delaware.gov/s/de-vms-screening?language=en_US",
+    "name": "Delaware",
+    "elementCount": 128,
+    "errorCount": 2,
+    "errorDensity": 0.015625,
+    "alertCount": 3,
+    "score": 10
+  },
+  {
+    "index": 17,
+    "url": "https://getthevaccine.dshs.texas.gov/txces/s/txsignup?language=en_US&eventId=undefined",
+    "name": "Texas",
+    "elementCount": 182,
+    "errorCount": 3,
+    "errorDensity": 0.016483516483516484,
+    "alertCount": 3,
+    "score": 15
+  },
+  {
+    "index": 8,
+    "url": "https://v51r5a21s.dc.gov/cvq_dc/",
+    "name": "District of Columbia",
+    "elementCount": 417,
+    "errorCount": 1,
+    "errorDensity": 0.002398081534772182,
+    "alertCount": 19,
+    "score": 18
+  },
+  {
+    "index": 16,
+    "url": "https://vaccinate.wi.gov/en-US/",
+    "name": "Wisconsin",
+    "elementCount": 113,
+    "errorCount": 3,
+    "errorDensity": 0.02654867256637168,
+    "alertCount": 7,
+    "score": 18
+  },
+  {
+    "index": 0,
+    "url": "https://vax4nv.nv.gov/patient/s/",
+    "name": "Nevada",
+    "elementCount": 87,
+    "errorCount": 4,
+    "errorDensity": 0.04597701149425287,
+    "alertCount": 3,
+    "score": 19
+  },
+  {
+    "index": 15,
+    "url": "https://member.everbridge.net/747122446041089/new",
+    "name": "West Virginia",
+    "elementCount": 1155,
+    "errorCount": 4,
+    "errorDensity": 0.003463203463203463,
+    "alertCount": 7,
+    "score": 22
+  },
+  {
+    "index": 6,
+    "url": "https://vaccineconnector.mn.gov/en-US/covid-19%20vaccine/",
+    "name": "Minnesota",
+    "elementCount": 2257,
+    "errorCount": 0,
+    "errorDensity": 0,
+    "alertCount": 32,
+    "score": 23
+  },
+  {
+    "index": 19,
+    "url": "https://am-i-eligible.covid19vaccine.health.ny.gov/Public/prescreener",
+    "name": "New York",
+    "elementCount": 229,
+    "errorCount": 5,
+    "errorDensity": 0.021834061135371178,
+    "alertCount": 4,
+    "score": 24
+  },
+  {
+    "index": 25,
+    "url": "https://vini.nh.gov/providers/s/",
+    "name": "New Hampshire",
+    "elementCount": 95,
+    "errorCount": 5,
+    "errorDensity": 0.05263157894736842,
+    "alertCount": 3,
+    "score": 24
+  },
+  {
+    "index": 28,
+    "url": "https://vaccinesignup.mass.gov",
+    "name": "Massachusetts",
+    "elementCount": 120,
+    "errorCount": 5,
+    "errorDensity": 0.041666666666666664,
+    "alertCount": 4,
+    "score": 24
+  },
+  {
+    "index": 24,
+    "url": "https://covidvaccination.dph.illinois.gov/questionnaire",
+    "name": "Illinois",
+    "elementCount": 135,
+    "errorCount": 7,
+    "errorDensity": 0.05185185185185185,
+    "alertCount": 1,
+    "score": 31
+  },
+  {
+    "index": 21,
+    "url": "https://modhss.iad1.qualtrics.com/jfe/form/SV_231d5TxZxkGedCt",
+    "name": "Missouri",
+    "elementCount": 159,
+    "errorCount": 8,
+    "errorDensity": 0.050314465408805034,
+    "alertCount": 8,
+    "score": 40
+  },
+  {
+    "index": 22,
+    "url": "https://myvaccinegeorgia.com/en/site/ALL",
+    "name": "Georgia",
+    "elementCount": 547,
+    "errorCount": 8,
+    "errorDensity": 0.014625228519195612,
+    "alertCount": 10,
+    "score": 42
+  },
+  {
+    "index": 27,
+    "url": "https://myvaccine.fl.gov",
+    "name": "Florida",
+    "elementCount": 197,
+    "errorCount": 9,
+    "errorDensity": 0.04568527918781726,
+    "alertCount": 7,
+    "score": 44
+  },
+  {
+    "index": 23,
+    "url": "https://www.vaccinatecnmi.com/covid-19/registration/",
+    "name": "Northern Mariana Islands",
+    "elementCount": 2552,
+    "errorCount": 17,
+    "errorDensity": 0.0066614420062695925,
+    "alertCount": 45,
+    "score": 106
+  },
+  {
+    "index": 26,
+    "url": "https://cvvaccine.nmhealth.org",
+    "name": "New Mexico",
+    "elementCount": 1680,
+    "errorCount": 66,
+    "errorDensity": 0.039285714285714285,
+    "alertCount": 95,
+    "score": 357
+  }
+]

@@ -97,6 +97,7 @@ const axe = async (page, rules) => {
     axeOptions.runOnly = rules;
   }
   const axeReport = await getViolations(page, null, {axeOptions});
+  console.log(JSON.stringify(axeReport, null, 2));
   // If there are any:
   if (axeReport.length) {
     const report = [];

@@ -1,0 +1,30 @@
+{
+  "what": "Test of WAVE",
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium"
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://jpdev.pro/blog/0004/index1.html",
+        "name": "Test page 1"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://jpdev.pro/blog/0004/index2.html",
+        "name": "Test page 2"
+      }
+    },
+    {
+      "type": "waves",
+      "which": {
+        "url": "https://jpdev.pro/blog/0004/index3.html",
+        "name": "Test page 2"
+      }
+    }
+  ]
+}

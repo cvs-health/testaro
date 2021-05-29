@@ -1,0 +1,226 @@
+{
+  "scriptName": "one-inputtests",
+  "what": "Input tests on airtable page",
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium"
+    },
+    {
+      "type": "url",
+      "which": "https://airtable.com/shrjpOPGmKjmkbMi8",
+      "result": "https://airtable.com/shrjpOPGmKjmkbMi8"
+    },
+    {
+      "type": "test",
+      "which": "autocom",
+      "url": "https://airtable.com/shrjpOPGmKjmkbMi8",
+      "result": [
+        {
+          "index": 0,
+          "type": "text",
+          "autocomplete": "NONE",
+          "labelText": "Name *"
+        },
+        {
+          "index": 1,
+          "type": "email",
+          "autocomplete": "NONE",
+          "labelText": "Email *"
+        }
+      ]
+    },
+    {
+      "type": "test",
+      "which": "inlab",
+      "url": "https://airtable.com/shrjpOPGmKjmkbMi8",
+      "result": [
+        {
+          "index": 0,
+          "type": "text",
+          "labels": [
+            "Name *"
+          ]
+        },
+        {
+          "index": 1,
+          "type": "email",
+          "labels": [
+            "Email *"
+          ]
+        },
+        {
+          "index": 2,
+          "type": "text"
+        },
+        {
+          "index": 3,
+          "type": "text"
+        },
+        {
+          "index": 4,
+          "type": "button"
+        }
+      ]
+    },
+    {
+      "type": "test",
+      "which": "labclash",
+      "url": "https://airtable.com/shrjpOPGmKjmkbMi8",
+      "result": "NONE"
+    },
+    {
+      "type": "axe",
+      "which": [],
+      "url": "https://airtable.com/shrjpOPGmKjmkbMi8",
+      "result": [
+        {
+          "rule": "aria-command-name",
+          "description": "Ensures every ARIA button, link and menuitem has an accessible name",
+          "impact": "serious",
+          "elements": [
+            {
+              "selector": ".required.sharedFormField:nth-child(3) > .cellContainer > .cell.formCell[data-columntype=\"select\"] > .baymax.flex-auto.flex > .lg-col-6.md-col-6.sm-col-12 > .relative.baymax.flex-auto > .border-thick.border-darken2.border-darken3-hover",
+              "impact": "serious",
+              "must pass any of": [
+                {
+                  "check": "has-visible-text",
+                  "description": "Element does not have text that is visible to screen readers",
+                  "impact": "minor"
+                },
+                {
+                  "check": "aria-label",
+                  "description": "aria-label attribute does not exist or is empty",
+                  "impact": "serious"
+                },
+                {
+                  "check": "aria-labelledby",
+                  "description": "aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty",
+                  "impact": "serious"
+                },
+                {
+                  "check": "non-empty-title",
+                  "description": "Element has no title attribute",
+                  "impact": "serious"
+                }
+              ]
+            },
+            {
+              "selector": ".required.sharedFormField:nth-child(4) > .cellContainer > .cell.formCell[data-columntype=\"select\"] > .baymax.flex-auto.flex > .lg-col-6.md-col-6.sm-col-12 > .relative.baymax.flex-auto > .border-thick.border-darken2.border-darken3-hover",
+              "impact": "serious",
+              "must pass any of": [
+                {
+                  "check": "has-visible-text",
+                  "description": "Element does not have text that is visible to screen readers",
+                  "impact": "minor"
+                },
+                {
+                  "check": "aria-label",
+                  "description": "aria-label attribute does not exist or is empty",
+                  "impact": "serious"
+                },
+                {
+                  "check": "aria-labelledby",
+                  "description": "aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty",
+                  "impact": "serious"
+                },
+                {
+                  "check": "non-empty-title",
+                  "description": "Element has no title attribute",
+                  "impact": "serious"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rule": "color-contrast",
+          "description": "Ensures the contrast between foreground and background colors meets WCAG 2 AA contrast ratio thresholds",
+          "impact": "serious",
+          "elements": [
+            {
+              "selector": ".py2 > .ml1.strong",
+              "impact": "serious",
+              "must pass any of": [
+                {
+                  "check": "color-contrast",
+                  "description": "Element has insufficient color contrast of 1.74 (foreground color: #c0c0c0, background color: #fafafa, font size: 10.8pt (14.4px), font weight: normal). Expected contrast ratio of 4.5:1",
+                  "impact": "serious"
+                }
+              ]
+            },
+            {
+              "selector": ".submitButton",
+              "impact": "serious",
+              "must pass any of": [
+                {
+                  "check": "color-contrast",
+                  "description": "Element has insufficient color contrast of 3.8 (foreground color: #ffffff, background color: #2d7ff9, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1",
+                  "impact": "serious"
+                }
+              ]
+            },
+            {
+              "selector": ".mt2",
+              "impact": "serious",
+              "must pass any of": [
+                {
+                  "check": "color-contrast",
+                  "description": "Element has insufficient color contrast of 2.4 (foreground color: #a4a4a4, background color: #fafafa, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1",
+                  "impact": "serious"
+                }
+              ]
+            },
+            {
+              "selector": ".understroke",
+              "impact": "serious",
+              "must pass any of": [
+                {
+                  "check": "color-contrast",
+                  "description": "Element has insufficient color contrast of 2.4 (foreground color: #a4a4a4, background color: #fafafa, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1",
+                  "impact": "serious"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rule": "html-has-lang",
+          "description": "Ensures every HTML document has a lang attribute",
+          "impact": "serious",
+          "elements": [
+            {
+              "selector": "html",
+              "impact": "serious",
+              "must pass any of": [
+                {
+                  "check": "has-lang",
+                  "description": "The <html> element does not have a lang attribute",
+                  "impact": "serious"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rule": "meta-viewport",
+          "description": "Ensures <meta name=\"viewport\"> does not disable text scaling and zooming",
+          "impact": "critical",
+          "elements": [
+            {
+              "selector": "meta[name=\"viewport\"]",
+              "impact": "critical",
+              "must pass any of": [
+                {
+                  "check": "meta-viewport",
+                  "description": "user-scalable=no on <meta> tag disables zooming on mobile devices",
+                  "impact": "critical"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
