@@ -1,0 +1,90 @@
+{
+  "scriptName": "advoaxes",
+  "what": "WAVE comparison of websites of NYC Public Advocate candidates",
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium"
+    },
+    {
+      "type": "url",
+      "which": "https://jumaanewilliams.com/",
+      "result": "https://jumaanewilliams.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Jumaane Williams",
+      "url": "https://jumaanewilliams.com/",
+      "result": {
+        "elementCount": 709,
+        "warnings": 0,
+        "violations": {
+          "minor": 2,
+          "moderate": 6,
+          "serious": 9,
+          "critical": 6
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://pubadvocate.nyc/",
+      "result": "https://pubadvocate.nyc/"
+    },
+    {
+      "type": "axes",
+      "which": "Theo Chino",
+      "url": "https://pubadvocate.nyc/",
+      "result": {
+        "elementCount": 362,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 6,
+          "serious": 8,
+          "critical": 1
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://www.tonyherbert.com/",
+      "result": "https://www.tonyherbert.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Tony Herbert",
+      "url": "https://www.tonyherbert.com/",
+      "result": {
+        "elementCount": 897,
+        "warnings": 0,
+        "violations": {
+          "minor": 9,
+          "moderate": 98,
+          "serious": 23,
+          "critical": 2
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://www.drdevifornyc.com/",
+      "result": "https://www.drdevifornyc.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Devi E. Nampiaparampil",
+      "url": "https://www.drdevifornyc.com/",
+      "result": {
+        "elementCount": 500,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 2,
+          "serious": 21,
+          "critical": 0
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "critical": {
+    "duplicate-id-aria": 1,
+    "image-alt": 7,
+    "meta-viewport": 1
+  },
+  "serious": {
+    "aria-dialog-name": 1,
+    "duplicate-id-active": 1,
+    "frame-title": 2,
+    "link-name": 20,
+    "color-contrast": 36,
+    "tabindex": 1
+  },
+  "moderate": {
+    "landmark-unique": 2,
+    "region": 102,
+    "heading-order": 5,
+    "landmark-one-main": 2,
+    "page-has-heading-one": 1
+  },
+  "minor": {
+    "duplicate-id": 11
+  }
+}

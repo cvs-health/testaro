@@ -1,0 +1,50 @@
+[
+  {
+    "index": 0,
+    "url": "https://jumaanewilliams.com/",
+    "name": "Jumaane Williams",
+    "elementCount": 710,
+    "errorCount": 29,
+    "alertCount": 49,
+    "errorRank": 0,
+    "densityRank": 0,
+    "alertRank": 2,
+    "score": 2
+  },
+  {
+    "index": 1,
+    "url": "https://pubadvocate.nyc/",
+    "name": "Theo Chino",
+    "elementCount": 510,
+    "errorCount": 30,
+    "alertCount": 19,
+    "errorRank": 1,
+    "densityRank": 1,
+    "alertRank": 0,
+    "score": 9
+  },
+  {
+    "index": 3,
+    "url": "https://www.drdevifornyc.com/",
+    "name": "Devi E. Nampiaparampil",
+    "elementCount": 501,
+    "errorCount": 31,
+    "alertCount": 20,
+    "errorRank": 2,
+    "densityRank": 3,
+    "alertRank": 1,
+    "score": 22
+  },
+  {
+    "index": 2,
+    "url": "https://www.tonyherbert.com/",
+    "name": "Tony Herbert",
+    "elementCount": 898,
+    "errorCount": 55,
+    "alertCount": 90,
+    "errorRank": 3,
+    "densityRank": 2,
+    "alertRank": 3,
+    "score": 27
+  }
+]
