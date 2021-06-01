@@ -21,7 +21,7 @@ const getURL = orgName => {
     https.get(
       {
         host: 'api.kickfire.com',
-        path: `/v1/name2website?key=${kickFireKey}&name=${orgName}${countryParam}`,
+        path: `/v1/name2website?key=${kickFireKey}&name=${encodeURIComponent(orgName)}${countryParam}`,
         protocol: 'https:'
       },
       response => {
@@ -35,12 +35,24 @@ const getURL = orgName => {
             const report = JSON.parse(reportText);
             if (report.status === 'success' && report.results > 0) {
               return resolve(
-                report.data.filter((result, index) => index === 0 || result.matchRate === 100)
+                report
+                .data
+                .filter((result, index) => index === 0 || result.matchRate === 100)
+                .map((result, index) => {
+                  const newResult = {
+                    index,
+                    orgName
+                  };
+                  ['companyName', 'tradeName', 'website','matchRate']
+                  .forEach(prop => newResult[prop] = result[prop]);
+                  return newResult;
+                })
               );
             }
             else {
+              console.log(`Failed on ${orgName}.`);
               return resolve([{
-                error: 'KickFire found no matches.',
+                error: `KickFire found no matches for ${orgName}.`,
                 reportText: 'NONE'
               }]);
             }

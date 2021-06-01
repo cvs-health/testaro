@@ -352,6 +352,19 @@ const matchIndex = async (page, selector, text) => await page.$eval(
   [selector, text]
 );
 // Recursively performs the acts of a script.
+/*
+Tests for important a11y defects not detected by Axe or WAVE
+# links with href="#" (ACI)
+# links and buttons that are not reachable with keyboard navigation (ACI)
+# links and buttons styled non-distinguishably (ACI)
+# first focused element not first focusable element in DOM (Kimball)
+# skip link that is never visible (ACI); gets credit from Axe and WAVE
+# button inside link (ACI)
+# button with no text content
+# invisible focus indicators
+Weights:
+# defects that intrinsically can occur only once per page versus once per element
+*/
 const doActs = async (report, actIndex, page, timeStamp) => {
   const {acts} = report;
   // If any acts remain unperformed:
@@ -377,11 +390,17 @@ const doActs = async (report, actIndex, page, timeStamp) => {
         // If the act is a valid URL:
         if (type === 'url' && which && isURL(which)) {
           // Visit it.
-          await page.goto(which);
-          // Wait until it is stable.
-          await page.waitForLoadState('networkidle', {timeout: 20000});
-          // Add the resulting URL to the act.
-          act.result = page.url();
+          try {
+            await page.goto(which);
+            // Wait until it is stable.
+            await page.waitForLoadState('networkidle', {timeout: 20000});
+            // Add the resulting URL to the act.
+            act.result = page.url();
+          }
+          catch {
+            await page.goto('about:blank');
+            act.result = 'ERROR';
+          }
         }
         // Otherwise, if the act is a valid wait:
         else if (
@@ -457,7 +476,7 @@ const doActs = async (report, actIndex, page, timeStamp) => {
             act.result = await axe(page, which);
           }
           // Otherwise, if the act is an axe summary:
-          else if (type === 'axes') {
+          else if (type === 'axes' && page.url() !== 'about:blank') {
             // Conduct it and add its result to the act.
             act.result = await axes(page);
           }

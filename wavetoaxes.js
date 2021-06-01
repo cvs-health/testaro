@@ -1,6 +1,6 @@
 /*
-  jhuwavetoaxes.js
-  Converts a JHU-WAVE script to a JHU-Axes script.
+  wavetoaxes.js
+  Converts a waves script to an Axes script.
 */
 // ########## IMPORTS
 // Module to access files.

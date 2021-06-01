@@ -1,0 +1,1450 @@
+{
+  "scriptName": "orgaxes",
+  "what": "WAVE tests of organization webpages",
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium"
+    },
+    {
+      "type": "url",
+      "which": "https://azek.com",
+      "result": "https://azekco.com/"
+    },
+    {
+      "type": "axes",
+      "which": "AZEK Co Inc",
+      "url": "https://azekco.com/",
+      "result": {
+        "elementCount": 308,
+        "warnings": 0,
+        "violations": {
+          "minor": 2,
+          "moderate": 5,
+          "serious": 10,
+          "critical": 4
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://mineralstech.com",
+      "result": "https://www.mineralstech.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Minerals Technologies Inc",
+      "url": "https://www.mineralstech.com/",
+      "result": {
+        "elementCount": 630,
+        "warnings": 0,
+        "violations": {
+          "minor": 1,
+          "moderate": 2,
+          "serious": 16,
+          "critical": 3
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://nationalvision.com",
+      "result": "https://nationalvision.com/"
+    },
+    {
+      "type": "axes",
+      "which": "National Vision Holdings Inc",
+      "url": "https://nationalvision.com/",
+      "result": {
+        "elementCount": 710,
+        "warnings": 0,
+        "violations": {
+          "minor": 27,
+          "moderate": 1,
+          "serious": 2,
+          "critical": 17
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://aciworldwide.com",
+      "result": "https://www.aciworldwide.com/"
+    },
+    {
+      "type": "axes",
+      "which": "ACI Worldwide Inc",
+      "url": "https://www.aciworldwide.com/",
+      "result": {
+        "elementCount": 742,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 1,
+          "serious": 0,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://pfgstore.com",
+      "result": "https://pfgstore.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Performance Food Group Co",
+      "url": "https://pfgstore.com/",
+      "result": {
+        "elementCount": 438,
+        "warnings": 0,
+        "violations": {
+          "minor": 1,
+          "moderate": 14,
+          "serious": 6,
+          "critical": 1
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://muellerwaterproducts.com",
+      "result": "https://muellerwaterproducts.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Mueller Water Products Inc",
+      "url": "https://muellerwaterproducts.com/",
+      "result": {
+        "elementCount": 504,
+        "warnings": 0,
+        "violations": {
+          "minor": 1,
+          "moderate": 3,
+          "serious": 7,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://landing.terminix.com",
+      "result": "https://landing.terminix.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Terminix Global Holdings Inc",
+      "url": "https://landing.terminix.com/",
+      "result": {
+        "elementCount": 272,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 19,
+          "serious": 1,
+          "critical": 16
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://pnfp.com",
+      "result": "https://www.pnfp.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Pinnacle Financial Partners Inc",
+      "url": "https://www.pnfp.com/",
+      "result": {
+        "elementCount": 340,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 1,
+          "serious": 2,
+          "critical": 2
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://cbna.com",
+      "result": "https://cbna.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Community Bank System Inc",
+      "url": "https://cbna.com/",
+      "result": {
+        "elementCount": 920,
+        "warnings": 0,
+        "violations": {
+          "minor": 13,
+          "moderate": 0,
+          "serious": 0,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://chemed.com",
+      "result": "https://www.chemed.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Chemed Corp",
+      "url": "https://www.chemed.com/",
+      "result": {
+        "elementCount": 78,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 3,
+          "serious": 2,
+          "critical": 2
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://southstatebank.com",
+      "result": "https://southstatebank.com/personal"
+    },
+    {
+      "type": "axes",
+      "which": "South State Corp",
+      "url": "https://southstatebank.com/personal",
+      "result": {
+        "elementCount": 1121,
+        "warnings": 0,
+        "violations": {
+          "minor": 1,
+          "moderate": 7,
+          "serious": 3,
+          "critical": 3
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://haemonetics.com",
+      "result": "https://www.haemonetics.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Haemonetics Corp",
+      "url": "https://www.haemonetics.com/",
+      "result": {
+        "elementCount": 430,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 4,
+          "serious": 0,
+          "critical": 1
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://lhcgroup.com",
+      "result": "https://lhcgroup.com/"
+    },
+    {
+      "type": "axes",
+      "which": "LHC Group Inc",
+      "url": "https://lhcgroup.com/",
+      "result": {
+        "elementCount": 423,
+        "warnings": 0,
+        "violations": {
+          "minor": 2,
+          "moderate": 5,
+          "serious": 7,
+          "critical": 2
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://cbiz.com",
+      "result": "https://www.cbiz.com/"
+    },
+    {
+      "type": "axes",
+      "which": "CBIZ Inc",
+      "url": "https://www.cbiz.com/",
+      "result": {
+        "elementCount": 1771,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 21,
+          "serious": 20,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://dormanproducts.com",
+      "result": "https://www.dormanproducts.com/securitycheck.aspx?reason=captcha"
+    },
+    {
+      "type": "axes",
+      "which": "Dorman Products Inc",
+      "url": "https://www.dormanproducts.com/securitycheck.aspx?reason=captcha",
+      "result": {
+        "elementCount": 625,
+        "warnings": 0,
+        "violations": {
+          "minor": 2,
+          "moderate": 5,
+          "serious": 16,
+          "critical": 8
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://cswindustrials.com",
+      "result": "https://cswindustrials.com/"
+    },
+    {
+      "type": "axes",
+      "which": "CSW Industrials Inc",
+      "url": "https://cswindustrials.com/",
+      "result": {
+        "elementCount": 279,
+        "warnings": 0,
+        "violations": {
+          "minor": 1,
+          "moderate": 8,
+          "serious": 4,
+          "critical": 8
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://icumed.com",
+      "result": "https://www.icumed.com/"
+    },
+    {
+      "type": "axes",
+      "which": "ICU Medical Inc",
+      "url": "https://www.icumed.com/",
+      "result": {
+        "elementCount": 962,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 6,
+          "serious": 1,
+          "critical": 8
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://commerce.gov",
+      "result": "https://www.commerce.gov/"
+    },
+    {
+      "type": "axes",
+      "which": "Commerce Bancshares Inc/MO",
+      "url": "https://www.commerce.gov/",
+      "result": {
+        "elementCount": 1017,
+        "warnings": 0,
+        "violations": {
+          "minor": 1,
+          "moderate": 2,
+          "serious": 2,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://cubesmart.com",
+      "result": "https://cubesmart.com/"
+    },
+    {
+      "type": "axes",
+      "which": "CubeSmart",
+      "url": "https://cubesmart.com/",
+      "result": {
+        "elementCount": 10,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 2,
+          "serious": 3,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://storecapital.com",
+      "result": "https://www.storecapital.com/"
+    },
+    {
+      "type": "axes",
+      "which": "STORE Capital Corp",
+      "url": "https://www.storecapital.com/",
+      "result": {
+        "elementCount": 1400,
+        "warnings": 0,
+        "violations": {
+          "minor": 1,
+          "moderate": 14,
+          "serious": 17,
+          "critical": 2
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://essentialproperties.com",
+      "result": "https://essentialproperties.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Essential Properties Realty Trust Inc",
+      "url": "https://essentialproperties.com/",
+      "result": {
+        "elementCount": 311,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 6,
+          "serious": 3,
+          "critical": 5
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://onegas.com",
+      "result": "ERROR"
+    },
+    {
+      "type": "axes",
+      "which": "ONE Gas Inc",
+      "result": "PAGE HAS NO URL"
+    },
+    {
+      "type": "url",
+      "which": "https://supplychaingeeks.com",
+      "result": "ERROR"
+    },
+    {
+      "type": "axes",
+      "which": "Envista Holdings Corp",
+      "result": "PAGE HAS NO URL"
+    },
+    {
+      "type": "url",
+      "which": "https://landstaronline.com",
+      "result": "ERROR"
+    },
+    {
+      "type": "axes",
+      "which": "Landstar System Inc",
+      "result": "PAGE HAS NO URL"
+    },
+    {
+      "type": "url",
+      "which": "https://amerisafe.com",
+      "result": "https://www.amerisafe.com/"
+    },
+    {
+      "type": "axes",
+      "which": "AMERISAFE Inc",
+      "url": "https://www.amerisafe.com/",
+      "result": {
+        "elementCount": 350,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 5,
+          "serious": 11,
+          "critical": 8
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://envestnet.com",
+      "result": "https://www.envestnet.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Envestnet Inc",
+      "url": "https://www.envestnet.com/",
+      "result": {
+        "elementCount": 1257,
+        "warnings": 0,
+        "violations": {
+          "minor": 1,
+          "moderate": 3,
+          "serious": 0,
+          "critical": 4
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://capri-suds.com",
+      "result": "ERROR"
+    },
+    {
+      "type": "axes",
+      "which": "Capri Holdings Ltd",
+      "result": "PAGE HAS NO URL"
+    },
+    {
+      "type": "url",
+      "which": "https://mrcy.com",
+      "result": "https://www.mrcy.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Mercury Systems Inc",
+      "url": "https://www.mrcy.com/",
+      "result": {
+        "elementCount": 1383,
+        "warnings": 0,
+        "violations": {
+          "minor": 3,
+          "moderate": 30,
+          "serious": 1,
+          "critical": 15
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://tempursealyhospitality.com",
+      "result": "https://www.tempursealyhospitality.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Tempur Sealy International Inc",
+      "url": "https://www.tempursealyhospitality.com/",
+      "result": {
+        "elementCount": 372,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 11,
+          "serious": 36,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://cdkglobal.ca",
+      "result": "ERROR"
+    },
+    {
+      "type": "axes",
+      "which": "CDK Global Inc",
+      "result": "PAGE HAS NO URL"
+    },
+    {
+      "type": "url",
+      "which": "https://danabeauty.com",
+      "result": "https://danaclassics.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Dana Inc",
+      "url": "https://danaclassics.com/",
+      "result": {
+        "elementCount": 849,
+        "warnings": 0,
+        "violations": {
+          "minor": 1,
+          "moderate": 2,
+          "serious": 26,
+          "critical": 1
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://nomadwhere.com",
+      "result": "https://www.nomadwhere.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Nomad Foods Ltd",
+      "url": "https://www.nomadwhere.com/",
+      "result": {
+        "elementCount": 407,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 1,
+          "serious": 6,
+          "critical": 1
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://healthcareempowered.com",
+      "result": "https://healthcareempowered.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Inovalon Holdings Inc",
+      "url": "https://healthcareempowered.com/",
+      "result": {
+        "elementCount": 498,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 4,
+          "serious": 2,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://silabs.com",
+      "result": "https://www.silabs.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Silicon Laboratories Inc",
+      "url": "https://www.silabs.com/",
+      "result": {
+        "elementCount": 2603,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 22,
+          "serious": 60,
+          "critical": 41
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://selective.com",
+      "result": "ERROR"
+    },
+    {
+      "type": "axes",
+      "which": "Selective Insurance Group Inc",
+      "result": "PAGE HAS NO URL"
+    },
+    {
+      "type": "url",
+      "which": "https://ebsi.com",
+      "result": "https://www.emergentbiosolutions.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Emergent BioSolutions Inc",
+      "url": "https://www.emergentbiosolutions.com/",
+      "result": {
+        "elementCount": 500,
+        "warnings": 0,
+        "violations": {
+          "minor": 2,
+          "moderate": 3,
+          "serious": 14,
+          "critical": 1
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://suburban-extended-stay-hotels.travel",
+      "result": "ERROR"
+    },
+    {
+      "type": "axes",
+      "which": "Choice Hotels International Inc",
+      "result": "PAGE HAS NO URL"
+    },
+    {
+      "type": "url",
+      "which": "https://sine.ni.com",
+      "result": "https://www.ni.com/en-us.html"
+    },
+    {
+      "type": "axes",
+      "which": "National Instruments Corp",
+      "url": "https://www.ni.com/en-us.html",
+      "result": {
+        "elementCount": 2196,
+        "warnings": 0,
+        "violations": {
+          "minor": 8,
+          "moderate": 43,
+          "serious": 24,
+          "critical": 11
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://middlesexwater.net",
+      "result": "ERROR"
+    },
+    {
+      "type": "axes",
+      "which": "Middlesex Water Co",
+      "result": "PAGE HAS NO URL"
+    },
+    {
+      "type": "url",
+      "which": "https://cargurus.com",
+      "result": "https://www.cargurus.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Cargurus Inc",
+      "url": "https://www.cargurus.com/",
+      "result": {
+        "elementCount": 5032,
+        "warnings": 0,
+        "violations": {
+          "minor": 41,
+          "moderate": 10,
+          "serious": 4,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://i-bankonline.com",
+      "result": "https://www.i-bankonline.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Independent Bank Corp",
+      "url": "https://www.i-bankonline.com/",
+      "result": {
+        "elementCount": 806,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 19,
+          "serious": 11,
+          "critical": 13
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://bloomfieldworldwide.com",
+      "result": "https://www.bloomfieldworldwide.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Middleby Corp",
+      "url": "https://www.bloomfieldworldwide.com/",
+      "result": {
+        "elementCount": 269,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 6,
+          "serious": 28,
+          "critical": 5
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://psychologistinbeavertonor.com",
+      "result": "ERROR"
+    },
+    {
+      "type": "axes",
+      "which": "Allison Transmission Holdings Inc",
+      "result": "PAGE HAS NO URL"
+    },
+    {
+      "type": "url",
+      "which": "https://careers-alliancehealthcareservices.icims.com",
+      "result": "https://careers-alliancehealthcareservices.icims.com/jobs/intro?hashed=-435742435&mobile=false&width=907&height=500&bga=true&needsRedirect=false&jan1offset=-300&jun1offset=-240"
+    },
+    {
+      "type": "axes",
+      "which": "AMN Healthcare Services Inc",
+      "url": "https://careers-alliancehealthcareservices.icims.com/jobs/intro?hashed=-435742435&mobile=false&width=907&height=500&bga=true&needsRedirect=false&jan1offset=-300&jun1offset=-240",
+      "result": {
+        "elementCount": 1030,
+        "warnings": 0,
+        "violations": {
+          "minor": 1,
+          "moderate": 8,
+          "serious": 37,
+          "critical": 1
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://integralife.com",
+      "result": "ERROR"
+    },
+    {
+      "type": "axes",
+      "which": "Integra LifeSciences Holdings Corp",
+      "result": "PAGE HAS NO URL"
+    },
+    {
+      "type": "url",
+      "which": "https://hermanmiller.com",
+      "result": "https://www.hermanmiller.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Herman Miller Inc",
+      "url": "https://www.hermanmiller.com/",
+      "result": {
+        "elementCount": 2796,
+        "warnings": 0,
+        "violations": {
+          "minor": 59,
+          "moderate": 85,
+          "serious": 8,
+          "critical": 1
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://sensient.com",
+      "result": "https://www.sensient.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Sensient Technologies Corp",
+      "url": "https://www.sensient.com/",
+      "result": {
+        "elementCount": 328,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 7,
+          "serious": 30,
+          "critical": 7
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://eastgroup.net",
+      "result": "https://eastgroup.net/"
+    },
+    {
+      "type": "axes",
+      "which": "EastGroup Properties Inc",
+      "url": "https://eastgroup.net/",
+      "result": {
+        "elementCount": 451,
+        "warnings": 0,
+        "violations": {
+          "minor": 14,
+          "moderate": 13,
+          "serious": 57,
+          "critical": 9
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://woodward.com",
+      "result": "https://www.woodward.com/home"
+    },
+    {
+      "type": "axes",
+      "which": "Woodward Inc",
+      "url": "https://www.woodward.com/home",
+      "result": {
+        "elementCount": 1262,
+        "warnings": 0,
+        "violations": {
+          "minor": 4,
+          "moderate": 4,
+          "serious": 23,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://glacierindustrial.com",
+      "result": "https://glacierindustrial.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Glacier Bancorp Inc",
+      "url": "https://glacierindustrial.com/",
+      "result": {
+        "elementCount": 356,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 8,
+          "serious": 10,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://brunswickprobatelawyers.com",
+      "result": "ERROR"
+    },
+    {
+      "type": "axes",
+      "which": "Brunswick Corp/DE",
+      "result": "PAGE HAS NO URL"
+    },
+    {
+      "type": "url",
+      "which": "https://rexfordindustrial.com",
+      "result": "ERROR"
+    },
+    {
+      "type": "axes",
+      "which": "Rexford Industrial Realty Inc",
+      "result": "PAGE HAS NO URL"
+    },
+    {
+      "type": "url",
+      "which": "https://ambarella.com",
+      "result": "https://www.ambarella.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Ambarella Inc",
+      "url": "https://www.ambarella.com/",
+      "result": {
+        "elementCount": 4135,
+        "warnings": 0,
+        "violations": {
+          "minor": 1,
+          "moderate": 1,
+          "serious": 5,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://visteon.com",
+      "result": "https://www.visteon.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Visteon Corp",
+      "url": "https://www.visteon.com/",
+      "result": {
+        "elementCount": 789,
+        "warnings": 0,
+        "violations": {
+          "minor": 1,
+          "moderate": 7,
+          "serious": 39,
+          "critical": 4
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://hexcel.com",
+      "result": "https://hexcel.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Hexcel Corp",
+      "url": "https://hexcel.com/",
+      "result": {
+        "elementCount": 640,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 15,
+          "serious": 5,
+          "critical": 1
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://lithiamotorsinc.com",
+      "result": "ERROR"
+    },
+    {
+      "type": "axes",
+      "which": "Lithia Motors Inc",
+      "result": "PAGE HAS NO URL"
+    },
+    {
+      "type": "url",
+      "which": "https://addus.com",
+      "result": "https://addus.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Addus HomeCare Corp",
+      "url": "https://addus.com/",
+      "result": {
+        "elementCount": 357,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 13,
+          "serious": 1,
+          "critical": 2
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://radiologyleaders.org",
+      "result": "ERROR"
+    },
+    {
+      "type": "axes",
+      "which": "RLI Corp",
+      "result": "PAGE HAS NO URL"
+    },
+    {
+      "type": "url",
+      "which": "https://applied.com",
+      "result": "https://www.applied.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Applied Industrial Technologies Inc",
+      "url": "https://www.applied.com/",
+      "result": {
+        "elementCount": 2308,
+        "warnings": 0,
+        "violations": {
+          "minor": 22,
+          "moderate": 30,
+          "serious": 18,
+          "critical": 3
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://calvertusa.bizland.com",
+      "result": "https://calvertusa.bizland.com/"
+    },
+    {
+      "type": "axes",
+      "which": "CALVERT CASH RESERVES FUND",
+      "url": "https://calvertusa.bizland.com/",
+      "result": {
+        "elementCount": 127,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 5,
+          "serious": 3,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://tandemdiabetes.com",
+      "result": "https://tandemdiabetes.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Tandem Diabetes Care Inc",
+      "url": "https://tandemdiabetes.com/",
+      "result": {
+        "elementCount": 1094,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 26,
+          "serious": 5,
+          "critical": 1
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://greateroregonherc.info",
+      "result": "ERROR"
+    },
+    {
+      "type": "axes",
+      "which": "Herc Holdings Inc",
+      "result": "PAGE HAS NO URL"
+    },
+    {
+      "type": "url",
+      "which": "https://viad.com",
+      "result": "http://www.viad.com/home/default.aspx"
+    },
+    {
+      "type": "axes",
+      "which": "Viad Corp",
+      "url": "http://www.viad.com/home/default.aspx",
+      "result": {
+        "elementCount": 391,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 2,
+          "serious": 12,
+          "critical": 7
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://altairsmartworks.com",
+      "result": "https://www.altair.com/smartworks/"
+    },
+    {
+      "type": "axes",
+      "which": "Altair Engineering Inc",
+      "url": "https://www.altair.com/smartworks/",
+      "result": {
+        "elementCount": 1026,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 66,
+          "serious": 3,
+          "critical": 2
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://casella.com",
+      "result": "https://casella.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Casella Waste Systems Inc",
+      "url": "https://casella.com/",
+      "result": {
+        "elementCount": 675,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 5,
+          "serious": 15,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://stevenfierberg.com",
+      "result": "https://stevenfierberg.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Steven Madden Ltd",
+      "url": "https://stevenfierberg.com/",
+      "result": {
+        "elementCount": 768,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 11,
+          "serious": 1,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://citizensbank.com",
+      "result": "https://citizensbank.com/"
+    },
+    {
+      "type": "axes",
+      "which": "First Citizens BancShares Inc/NC",
+      "url": "https://citizensbank.com/",
+      "result": {
+        "elementCount": 6,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 3,
+          "serious": 1,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://biaoutlet.com",
+      "result": "ERROR"
+    },
+    {
+      "type": "axes",
+      "which": "Chefs' Warehouse Inc",
+      "result": "PAGE HAS NO URL"
+    },
+    {
+      "type": "url",
+      "which": "https://apria.com",
+      "result": "https://www.apria.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Apria Inc",
+      "url": "https://www.apria.com/",
+      "result": {
+        "elementCount": 818,
+        "warnings": 0,
+        "violations": {
+          "minor": 3,
+          "moderate": 27,
+          "serious": 61,
+          "critical": 26
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://ncino.com",
+      "result": "https://www.ncino.com/"
+    },
+    {
+      "type": "axes",
+      "which": "nCino Inc",
+      "url": "https://www.ncino.com/",
+      "result": {
+        "elementCount": 416,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 16,
+          "serious": 2,
+          "critical": 1
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://sunnova.com",
+      "result": "https://www.sunnova.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Sunnova Energy International Inc",
+      "url": "https://www.sunnova.com/",
+      "result": {
+        "elementCount": 865,
+        "warnings": 0,
+        "violations": {
+          "minor": 1,
+          "moderate": 4,
+          "serious": 32,
+          "critical": 1
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://accretivehealth.com",
+      "result": "ERROR"
+    },
+    {
+      "type": "axes",
+      "which": "R1 RCM Inc",
+      "result": "PAGE HAS NO URL"
+    },
+    {
+      "type": "url",
+      "which": "https://lydall.com",
+      "result": "https://lydall.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Lydall Inc",
+      "url": "https://lydall.com/",
+      "result": {
+        "elementCount": 488,
+        "warnings": 0,
+        "violations": {
+          "minor": 2,
+          "moderate": 33,
+          "serious": 11,
+          "critical": 2
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://stridewrite.com",
+      "result": "https://www.strideinc.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Stride Inc",
+      "url": "https://www.strideinc.com/",
+      "result": {
+        "elementCount": 468,
+        "warnings": 0,
+        "violations": {
+          "minor": 7,
+          "moderate": 0,
+          "serious": 6,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://kimballinternational.com",
+      "result": "https://www.kimballinternational.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Kimball International Inc",
+      "url": "https://www.kimballinternational.com/",
+      "result": {
+        "elementCount": 788,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 3,
+          "serious": 0,
+          "critical": 0
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://olo.com",
+      "result": "ERROR"
+    },
+    {
+      "type": "axes",
+      "which": "Olo Inc",
+      "result": "PAGE HAS NO URL"
+    },
+    {
+      "type": "url",
+      "which": "https://corelab.com",
+      "result": "https://corelab.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Core Laboratories NV",
+      "url": "https://corelab.com/",
+      "result": {
+        "elementCount": 1017,
+        "warnings": 0,
+        "violations": {
+          "minor": 1,
+          "moderate": 18,
+          "serious": 42,
+          "critical": 1
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://syb.com",
+      "result": "https://syb.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Stock Yards Bancorp Inc",
+      "url": "https://syb.com/",
+      "result": {
+        "elementCount": 502,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 8,
+          "serious": 2,
+          "critical": 5
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://asburyauto.com",
+      "result": "https://www.asburyauto.com/"
+    },
+    {
+      "type": "axes",
+      "which": "Asbury Automotive Group Inc",
+      "url": "https://www.asburyauto.com/",
+      "result": {
+        "elementCount": 667,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 18,
+          "serious": 1,
+          "critical": 13
+        }
+      }
+    },
+    {
+      "type": "url",
+      "which": "https://cnsbrussels.com",
+      "result": "ERROR"
+    },
+    {
+      "type": "axes",
+      "which": "Cohen & Steers Inc",
+      "result": "PAGE HAS NO URL"
+    },
+    {
+      "type": "url",
+      "which": "https://wingatehotels.com",
+      "result": "ERROR"
+    },
+    {
+      "type": "axes",
+      "which": "Wyndham Hotels & Resorts Inc",
+      "result": "PAGE HAS NO URL"
+    },
+    {
+      "type": "url",
+      "which": "https://churros.com",
+      "result": "https://churros.com/"
+    },
+    {
+      "type": "axes",
+      "which": "J & J Snack Foods Corp",
+      "url": "https://churros.com/",
+      "result": {
+        "elementCount": 598,
+        "warnings": 0,
+        "violations": {
+          "minor": 0,
+          "moderate": 5,
+          "serious": 8,
+          "critical": 1
+        }
+      }
+    }
+  ]
+}
