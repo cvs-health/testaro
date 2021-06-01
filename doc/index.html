@@ -20,36 +20,38 @@
       </section>
       <div class="etc">
         <section>
-          <h2>What Autotest is</h2>
+          <h2>What is Autotest?</h2>
           <p>Autotest is a prototype application investigating methods of web-application test automation, with an emphasis on tests for accessibility.</p>
           <h2>System requirements</h2>
           <p>Autotest needs to be installed on a computer where version 14 or later of <a href="https://nodejs.org/en/">Node.js</a> is installed.</p>
-          <h2>What Autotest does</h2>
-          <p>Autotest uses Node.js to run an HTTP(S) server and uses the <a href="https://playwright.dev/">Playwright</a> package to perform tests in browsers.</p>
+          <h2>What does Autotest do?</h2>
+          <p>Autotest performs automated tests on web documents.</p>
+          <h2>What technologies does Autotest use?</h2>
+          <p>Autotest uses Node.js to run an HTTP(S) server to interact with you, the user, and an HTTP(S) client to interact with websites.</p>
+          <p>Autotest uses the <a href="https://playwright.dev/">Playwright</a> package to launch browsers, perform user actions in them, and perform tests.</p>
+          <h2>How do you use Autotest?</h2>
           <p>You give instructions to Autotest in a <dfn>script</dfn>. A script follows rules documented below. Each script is a sequence of <dfn>commands</dfn>, namely instructions for things that Autotest should do, called <dfn>acts</dfn>.</p>
           <p>Each script is stored in its own file, located in a scripts directory.</p>
-          <p>The standard name for a scripts directory is <code>autotest-scripts</code>.</p>
-          <p>The standard location for a scripts directory is next to the <code>autotest</code> directory.</p>
           <p>It is possible to have more than one scripts directory.</p>
-          <p>When you run Autotest:</p>
+          <p>After you install Autotest and its dependencies, you open a command shell (a terminal), navigate to the Autotest directory, and enter the command <code>node index</code>. That causes Autotest&rsquo;s server to start. The server listens for requests on port 3000 of your computer, <code>localhost</code>.</p>
+          <p>To make requests, you visit <code>localhost:3000/autotest</code> with a web browser and follow the instructions displayed by Autotest.</p>
+          <p>The sequence is:</p>
           <ol>
-            <li>Autotest asks you for the location and name of the scripts directory that you want it to use.</li>
-            <li>Autotest shows you a list of the scripts in that directory.</li>
+            <li>Autotest asks you for the location and name of the scripts directory that you want it to use. If you have put a line such as <code>SCRIPTDIR=../autotest-scripts</code> into a <code>.env</code> file, Autotest will propose the path from that line as the scripts directory, and you can accept it or change it to another path.</li>
+            <li>Autotest shows you a list of the scripts in the directory you specified.</li>
             <li>You choose one of those scripts.</li>
             <li>Autotest performs the acts specified by the commands in that script.</li>
             <li>Autotest outputs a report to your browser.</li>
-            <li>As it proceeds, Autotest also writes a copy of the report to a <code>report-xxx.json</code> file (where <code>xxx</code> represents a timestamp). In case Autotest throws an error while performing the acts, the browser report may fail to appear, but the file report, up to the point of the error, will be preserved.</li>
+            <li>As it proceeds, Autotest also writes a copy of the report to a <code>report-xxx.json</code> file (where <code>xxx</code> represents a timestamp). In case Autotest throws an error or while performing the acts or takes longer than your browser is willing to wait, the browser report may fail to appear, but the file report, up to the point of the error or disconnection, will be preserved.</li>
+            <li>When you have finished using Autotest, you stop it by entering <kbd>CTRL-c</kbd>.</li>
             <li>You can perform analyses on the data in a report, using existing Autotest routines or writing your own.</li>
           </ol>
           <h2>Rules</h2>
-          <p>The rules for scripts will be here.</p>
-          <h3>Basic command format</h3>
-          <p>Most commands are formulated in this format:</p>
-          <pre>{
-  "type": "xxx",
-  "which": "yyy"
-}</pre>
-          <p>The <dfn>type</dfn> value (represented by <code>xxx</code>) is the name of an act, such as <code>button</code> (for the act of clicking a button). The <dfn>which</dfn> value (represented by <code>yyy</code>) is a specification that narrows the class of all acts of a type to a particular act. In the example of a <code>button</code> command, the <code>which</code> value is some text that belongs to one of the buttons on a page; Autotest will click that button.
+          <p>A script is a JSON file representing an array of commands.</p>
+          <p>Each command is an object.</p>
+          <p>Each command has a <code>type</code> property. There is a closed set of types, and the value of <code>type</code> must be one of those types.</p>
+          <p>Commands of some types also require either or both of two other properties, <code>which</code> and <code>what</code>. They provide additional information to Autotest that it needs in order to perform the commanded act, or sometimes <code>what</code> provides documentation explaining the purpose of the act.</p>
+          <p>The command types, and the properties they require, are documented in the file <code>doc/commands.json</code>. This file not only tells you what the requirements are, but also specifies them to Autotest when it validates a script. The value of command type is a two-element array. The first element is a description of what that command does. The second element is an object that has the properties required by commands of that type. Each required property has an array value. The first element is an object type, such as <code>string</code>. The second element is a validity rule (such as <code>isURL</code>), or <code>doc</code>, if the property has the purpose of documenting the act. The third element is a boolean value: <code>true</code> if the property is required, <code>false</code> if optional; if it is missing, it is <code>true</code> by default.</p>
           <p>There are some exceptions to the basic command format:</p>
           <ol>
             <li>The <code>page</code> act has no <code>which</code> property.</li>
@@ -73,6 +75,18 @@
             <li>For each page, multiply its error-total rank by 6, multiply its error-density rank by 3, and multiply its alert rank by 1.</li>
             <li>Total those three products. That total is the page&rsquo;s score. The smaller the score, the better the page, according to the JHU-WAVE rule.</li>
           </ol>
+          Tests for important a11y defects not detected by Axe or WAVE
+# links with href="#" (ACI)
+# links and buttons that are not reachable with keyboard navigation (ACI)
+# links and buttons styled non-distinguishably (ACI)
+# first focused element not first focusable element in DOM (Kimball)
+# skip link that is never visible (ACI); gets credit from Axe and WAVE
+# button inside link (ACI)
+# button with no text content
+# invisible focus indicators
+Weights:
+# defects that intrinsically can occur only once per page versus once per element
+
         </section>
       </div>
     </main>

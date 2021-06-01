@@ -1,0 +1,42 @@
+{
+  "launch": [
+    "Launch a Playwright browser (chromium, firefox, or webkit)",
+    {
+      "which": ["string", "isBrowserType"]
+    }
+  ],
+  "page": [
+    "Switch to the last-opened browser tab",
+    {
+      "what": ["string", "doc"]
+    }
+  ],
+  "test": [
+    "Perform a custom test",
+    {
+      "which": ["string", "isCustomTest"],
+      "what": ["string", "doc"]
+    }
+  ],
+  "url": [
+    "Navigate with the current page to a new URL",
+    {
+      "which": ["string", "isURL"],
+      "what": ["string", "doc"]
+    }
+  ],
+  "wait": [
+    "Wait until something appears that contains a specified string",
+    {
+      "what": ["string", "isWaitable"],
+      "which": ["string"]
+    }
+  ],
+  "waves": [
+    "Perform a type-1 WAVE test on the specified, or else the current, URL",
+    {
+      "which": ["string", "isURL", false],
+      "what": ["string", "doc"]
+    }
+  ]
+}

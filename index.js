@@ -352,19 +352,6 @@ const matchIndex = async (page, selector, text) => await page.$eval(
   [selector, text]
 );
 // Recursively performs the acts of a script.
-/*
-Tests for important a11y defects not detected by Axe or WAVE
-# links with href="#" (ACI)
-# links and buttons that are not reachable with keyboard navigation (ACI)
-# links and buttons styled non-distinguishably (ACI)
-# first focused element not first focusable element in DOM (Kimball)
-# skip link that is never visible (ACI); gets credit from Axe and WAVE
-# button inside link (ACI)
-# button with no text content
-# invisible focus indicators
-Weights:
-# defects that intrinsically can occur only once per page versus once per element
-*/
 const doActs = async (report, actIndex, page, timeStamp) => {
   const {acts} = report;
   // If any acts remain unperformed:
