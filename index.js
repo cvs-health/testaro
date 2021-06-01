@@ -430,8 +430,14 @@ const doActs = async (report, actIndex, page, timeStamp) => {
           page = await browserContext.waitForEvent('page');
           // Wait until it is stable and thus ready for the next act.
           await page.waitForLoadState('networkidle', {timeout: 20000});
-          // Add the resulting URL to the act.
-          act.result = page.url();
+          // Add the resulting URL and any description of it to the act.
+          const result = {
+            url: page.url()
+          };
+          if (which) {
+            result.description = which;
+          }
+          act.result = result;
         }
         // Otherwise, if the act is a valid WAVE summary:
         else if (type === 'waves' && which && which.name && (page.url() || which.url)) {
