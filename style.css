@@ -57,14 +57,12 @@ form {
 h1 {
   padding-left: 2rem;
 }
-h1, h2 {
+h2 {
+  margin: 1rem 0 0.5rem 0;
   color: #006666;
 }
 section:not(.wide) {
   max-width: 36rem;
-}
-h2 {
-  margin: 0;
 }
 .head {
   padding: 1rem 2rem;

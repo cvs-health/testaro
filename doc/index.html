@@ -9,7 +9,7 @@
     >
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="favicon.png">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../style.css">
   </head>
   <body>
     <main>
@@ -51,19 +51,24 @@
           <p>Each command is an object.</p>
           <p>Each command has a <code>type</code> property. There is a closed set of types, and the value of <code>type</code> must be one of those types.</p>
           <p>Commands of some types also require either or both of two other properties, <code>which</code> and <code>what</code>. They provide additional information to Autotest that it needs in order to perform the commanded act, or sometimes <code>what</code> provides documentation explaining the purpose of the act.</p>
-          <p>The command types, and the properties they require, are documented in the file <code>doc/commands.json</code>. This file not only tells you what the requirements are, but also specifies them to Autotest when it validates a script. The value of command type is a two-element array. The first element is a description of what that command does. The second element is an object that has the properties required by commands of that type. Each required property has an array value. The first element is an object type, such as <code>string</code>. The second element is a validity rule (such as <code>isURL</code>), or <code>doc</code>, if the property has the purpose of documenting the act. The third element is a boolean value: <code>true</code> if the property is required, <code>false</code> if optional; if it is missing, it is <code>true</code> by default.</p>
-          <p>There are some exceptions to the basic command format:</p>
-          <ol>
-            <li>The <code>page</code> act has no <code>which</code> property.</li>
-            <li>The <code>wait</code> and <code>focus</code> acts have objects as the values of their <code>which</code> properties. Such an object has two properties: <code>type</code> and <code>text</code>.
-            <li>The <code>waves</code> act has an object as the value of its <code>which</code> property. The object has two properties: <code>url</code> and <code>name</code>.
+          <p>The command types, and the properties they require, are documented in the file <code>doc/commands.json</code>. This file not only tells you what the requirements are, but also specifies them to Autotest when it validates a script.</p>
+          <p>The <code>commands.json</code> file represents an array of command rules, one per command type. Each rule is, in turn, an array with two elements. The first element is a description of what a command of that type does. The second element is an object that has the properties that commands of that type may or must have. Each property has an array value. The first element is a boolean value, specifying whether the property is required (<code>true</code>) or optional (<code>false</code>). The second element is a string identifying the type of value the property must have (<code>string</code> or <code>object</code>). If there is a third element, it identifies a validity rule.</p>
+          <p>Here is an example of a command rule from <code>commands.json</code>:</p>
+          <pre>"test": [
+  "Perform a custom test (what: description)",
+  {
+    "which": [true, "string", "isCustomTest"],
+    "what": [false, "string", "hasLength"]
+  }
+]</pre>
+          <p>In this example, the command type is <code>test</code>, and the purpose of the command is to perform a custom test. A command of this type must have a <code>which</code> property and may optionally have a <code>what</code> property. Both properties have string values. The <code>which</code> property must satisfy the <code>isCustomTest</code> requirement, which means that its value must be the name of a custom test. The <code>what</code> property, if it exists, must satisfy the <code>hasLength</code> requirement, which means it must not be a blank string.</p>
           <h2>Test-package integrations</h2>
-          <p>Autotest provides opportunities to integrate two accessibility test packages, <a href="https://github.com/dequelabs/axe-core">Axe</a> and <a href="https://wave.webaim.org/">WAVE</a>, into scripts. The rules governing their commands in scripts are described above. More details follow.</p>
+          <p>Autotest provides opportunities to integrate two accessibility test packages, <a href="https://github.com/dequelabs/axe-core">Axe</a> and <a href="https://wave.webaim.org/">WAVE</a>, into scripts. The rules governing their commands in scripts are described above.</p>
           <h3>Axe</h3>
           <p>Axe integration depends on the <a href="https://www.npmjs.com/package/axe-playwright">axe-playwright</a> package. Violations reported with that package exclude <dfn>incomplete</dfn> (also called <q>needs-review</q>) violations and violations of <q>experimental</q> rules.</p>
           <h3>WAVE</h3>
           <h4>Testing with WAVE</h4>
-          <p>WAVE integration depends on the user having a WAVE API key. Use of the WAVE API depletes the user&rsquo;s WAVE API credits. The <dfn>waves</dfn> command performs a WAVE test with <code>reporttype=1</code> on a specified URL. Such a test costs 1 credit ($0.04, or less in quantity). When you register with WebAIM and obtain a WAVE API key, you must add a line to your <code>.env</code> file, in the format <code>WAVE_KEY=x0x0x0x0x0x0x</code> (where <code>x0x0x0x0x0x0x</code> represents your key).</p>
+          <p>WAVE integration depends on the user having a WAVE API key. Use of the WAVE API depletes the user&rsquo;s WAVE API credits. The <code>waves</code> command performs a WAVE test with <code>reporttype=1</code> on a specified URL. Such a test costs 1 credit ($0.04, or less in quantity). When you register with WebAIM and obtain a WAVE API key, you must add a line to your <code>.env</code> file, in the format <code>WAVE_KEY=x0x0x0x0x0x0x</code> (where <code>x0x0x0x0x0x0x</code> represents your key).</p>
           <h4>JHU-WAVE comparisons</h4>
           <p>One of the Autotest analysis routines performs the <dfn>JHU-WAVE</dfn> comparison. That is a comparison of web pages that have been subjected to the <code>waves</code> test in a script. The comparison follows the rule applied by the Johns Hopkins University Disability Health Research Center in its <a href="https://disabilityhealth.jhu.edu/vaccinedashboard/webaccess/">Vaccine Website Accessibility</a> dashboard. That rule is described summarily on the cited page. Missing details were obtained from WebAIM, which conducted the testing.</p>
           <p>Autotest&rsquo;s implementation of the JHU-WAVE rule is located in the <code>jhuwave.js</code> file. By executing the command <code>node jhuwave xxx</code> (where <code>xxx</code> represents the timestamp of a report file), you can apply that rule to the pages whose <code>waves</code> test results are recorded in a report file.</p>

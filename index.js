@@ -49,7 +49,7 @@ const customErrorPage = customErrorPageStart.concat(...errorPageEnd);
 const systemErrorPage = systemErrorPageStart.concat(...errorPageEnd);
 // CSS selectors for actions.
 const moves = {
-  text: 'input[type=text',
+  text: 'input[type=text]',
   radio: 'input[type=radio]',
   checkbox: 'input[type=checkbox]',
   select: 'select',
@@ -497,7 +497,7 @@ const doActs = async (report, actIndex, page, timeStamp) => {
           else if (moves[type] && typeof which === 'string' && which) {
             const selector = moves[type];
             // Identify the index of the specified element among same-type elements.
-            const whichIndex= await matchIndex(page, selector, which);
+            const whichIndex = await matchIndex(page, selector, which);
             // If it exists:
             if (whichIndex > -1) {
               // Get its ElementHandle.
