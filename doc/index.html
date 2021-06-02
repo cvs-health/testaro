@@ -67,8 +67,12 @@
           <h3>Axe</h3>
           <p>Axe integration depends on the <a href="https://www.npmjs.com/package/axe-playwright">axe-playwright</a> package. Violations reported with that package exclude <dfn>incomplete</dfn> (also called <q>needs-review</q>) violations and violations of <q>experimental</q> rules.</p>
           <h3>WAVE</h3>
-          <h4>Testing with WAVE</h4>
           <p>WAVE integration depends on the user having a WAVE API key. Use of the WAVE API depletes the user&rsquo;s WAVE API credits. The <code>waves</code> command performs a WAVE test with <code>reporttype=1</code> on a specified URL. Such a test costs 1 credit ($0.04, or less in quantity). When you register with WebAIM and obtain a WAVE API key, you must add a line to your <code>.env</code> file, in the format <code>WAVE_KEY=x0x0x0x0x0x0x</code> (where <code>x0x0x0x0x0x0x</code> represents your key).</p>
+          <h2>Reports</h2>
+          <p>Every script produces a report in JSON format and deposits it into the <code>reports</code> directory. The report name contains an automatically generated timestamp. You can rename a report as you wish and move it to wherever you want to store it.</p>
+          <h2>Repository exclusions</h2>
+          <p>The files in the <code>temp</code> and <code>reports</code> directories are presumed ephemeral and are not tracked by <code>git</code>.</p>
+
           <h4>JHU-WAVE comparisons</h4>
           <p>One of the Autotest analysis routines performs the <dfn>JHU-WAVE</dfn> comparison. That is a comparison of web pages that have been subjected to the <code>waves</code> test in a script. The comparison follows the rule applied by the Johns Hopkins University Disability Health Research Center in its <a href="https://disabilityhealth.jhu.edu/vaccinedashboard/webaccess/">Vaccine Website Accessibility</a> dashboard. That rule is described summarily on the cited page. Missing details were obtained from WebAIM, which conducted the testing.</p>
           <p>Autotest&rsquo;s implementation of the JHU-WAVE rule is located in the <code>jhuwave.js</code> file. By executing the command <code>node jhuwave xxx</code> (where <code>xxx</code> represents the timestamp of a report file), you can apply that rule to the pages whose <code>waves</code> test results are recorded in a report file.</p>

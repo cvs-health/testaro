@@ -9,7 +9,7 @@ screenShots/
 
 # Temporary files
 temp/
-report.json
+reports/
 
 # System files
 .DS_Store
