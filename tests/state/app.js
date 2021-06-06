@@ -1,4 +1,7 @@
-// Compiles a report.
+/*
+  Shows the currently focused element in normal, focused, hovered, and focused-hovered states in
+  3 browsers.
+*/
 exports.reporter = async page => {
   // CONSTANTS AND VARIABLES
   const minHeight = 10;

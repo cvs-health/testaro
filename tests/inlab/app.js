@@ -1,4 +1,4 @@
-// Compiles a report.
+// Lists input elements, their labels, and their fieldset legend text contents.
 exports.reporter = async page => await page.$eval('body', body => {
   // Get data on the fieldsets and their legends and inputs.
   const fieldSets = Array.from(body.getElementsByTagName('fieldset'));

@@ -1,4 +1,4 @@
-// Compiles a report.
+// Lists labeling conflicts of input and select elements.
 exports.reporter = async page => await page.$eval('body', body => {
   // Get data on the non-hidden inputs and the select lists.
   const inputs = Array.from(body.querySelectorAll('input:not([type=hidden]), select'));

@@ -1,4 +1,4 @@
-// Compiles a report.
+// hows decorative images and the tag names and text contents of their elements.
 exports.reporter = async page => await page.$eval('body', body => {
   // Compile an array of list items documenting decorative images.
   const listItems = Array.from(body.querySelectorAll('img[alt=""][src]:not([src=""]'))

@@ -1,4 +1,7 @@
-// Compiles a report.
+/*
+  Lists autocomplete-eligible input elements with their autocomplete attributes and
+  accessible names.
+*/
 exports.reporter = async page => await page.$eval('body', body => {
   // Get an array of autocomplete-eligible inputs.
   const inputTypes = ['date', 'email', 'password', 'tel', 'text', 'url'];

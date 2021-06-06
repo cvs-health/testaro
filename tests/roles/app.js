@@ -1,4 +1,4 @@
-// Compiles a report.
+// Lists counts of combinations of element tag names and role attributes.
 exports.reporter = async page => {
   return await page.$eval('body', body => {
     // Get the elements that have role attributes.

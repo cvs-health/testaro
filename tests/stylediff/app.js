@@ -1,4 +1,4 @@
-// Compiles a report.
+// Lists any differences in style properties, with counts, per link, button, and heading tag name.
 exports.reporter = async page => await page.$eval('body', body => [
   'a', 'button', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
 ].map(tagName => {
