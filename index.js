@@ -688,7 +688,7 @@ const requestHandler = (request, response) => {
           reportDir: process.env.REPORTDIR || ''
         };
         // Render it.
-        render('', true, query, 'index', response);
+        render('', true, 'index', query, response);
       }
       // Otherwise, i.e. if the URL is invalid:
       else {
