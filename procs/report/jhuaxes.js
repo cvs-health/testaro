@@ -1,6 +1,6 @@
 /*
   jhuaxes.js
-  Implementation of the JHU-Axes rule.
+  Converts an axes report to JSON and HTML JHU-Axes reports.
 */
 // ########## IMPORTS
 // Module to access files.

@@ -1,6 +1,6 @@
 /*
   orgurls.js
-  Adds URLs to organization names via the KickFire API.
+  Converts a file of organization names to a file of organization names and URLs.
 */
 // ########## IMPORTS
 // Module to access files.

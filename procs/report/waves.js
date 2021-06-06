@@ -1,6 +1,6 @@
 /*
-  jhuwave.js
-  Implementation of the JHU-WAVE rule.
+  waves.js
+  Converts a waves report to a Rankless JHU-WAVE report.
 */
 // ########## IMPORTS
 // Module to access files.
@@ -8,9 +8,9 @@ const fs = require('fs').promises;
 // ########## CONSTANTS
 // Weights.
 const weights = {
-  errorRank: 6,
-  densityRank: 3,
-  alertRank: 1
+  errorCount: 6,
+  errorDensity: 3,
+  alertCount: 1
 };
 // Timestamp.
 const timeStamp = process.argv[2];
@@ -32,8 +32,8 @@ const distill = async () => {
     && act.which.name
     && act.result
     && act.result.statistics
-    && act.result.statistics.totalelements
     && act.result.categories
+    && act.result.statistics.totalelements > -1
     && act.result.categories.error
     && act.result.categories.error.count > -1
     && act.result.categories.contrast
@@ -47,36 +47,19 @@ const distill = async () => {
     name: act.which.name,
     elementCount: act.result.statistics.totalelements,
     errorCount: act.result.categories.error.count + act.result.categories.contrast.count,
+    errorDensity:
+      (act.result.categories.error.count + act.result.categories.contrast.count)
+      / act.result.statistics.totalelements,
     alertCount: act.result.categories.alert.count
   }));
   // Return the relevant array.
   return relArray;
 };
-// Assigns ranks to pages on a criterion.
-const rank = (relArray, rankName, sorter) => {
-  // Sort the relevant array by the specified criterion.
-  relArray.sort((a, b) => sorter(a) - sorter(b));
-  // Assign the first sorted page the rank 0 and initialize 0 as the last rank.
-  let lastRank = relArray[0][rankName] = 0;
-  // For each subsequent page:
-  for (let i = 1; i < relArray.length; i++) {
-    // If it is tied with the previous page:
-    if (sorter(relArray[i]) === sorter(relArray[i - 1])) {
-      // Assign it the same rank as the previous page.
-      relArray[i][rankName] = relArray[i - 1][rankName];
-      // Skip a rank.
-      lastRank++;
-    }
-    // Otherwise, i.e. if it is not tied with the previous page:
-    else {
-      // Increment the last rank and assign it to the page.
-      relArray[i][rankName] = ++lastRank;
-    }
-  }
-};
-// Scores ranked pages.
-const score = (relArray, rankNames) => relArray.forEach(act => {
-  act.score = rankNames.reduce((total, rankName) => total + weights[rankName] * act[rankName], 0);
+// Scores pages.
+const score = (relArray, termNames) => relArray.forEach(act => {
+  act.score = Math.floor(
+    8 / 11 * termNames.reduce((total, termName) => total + weights[termName] * act[termName], 0)
+  );
 });
 // Creates and records an HTML report.
 const webify = relArray => {
@@ -90,7 +73,7 @@ const webify = relArray => {
     <title>Web-page accessibility comparison</title>
     <meta
       name="description"
-      content="Comparison of accessibility of web pages per the JHU-WAVE rule"
+      content="Comparison of accessibility of web pages per WAVE"
     >
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="favicon.png">
@@ -100,10 +83,10 @@ const webify = relArray => {
     <main>
       <h1>Web-page accessibility comparison</h1>
       <section class="etc wide">
-        <p>The table below ranks and scores web pages on accessibility, as measured by the <dfn>JHU-WAVE rule</dfn>, the method used by the Johns Hopkins University Disability Health Research Center in producing its <a href="https://disabilityhealth.jhu.edu/vaccinedashboard/webaccess/">Vaccine Website Accessibility dashboard</a>.</p>
+        <p>The table below ranks and scores web pages on accessibility, as measured by the <dfn>Rankless JHU-WAVE rule</dfn>, derived from the JHU-WAVE rule, used by the Johns Hopkins University Disability Health Research Center in producing its <a href="https://disabilityhealth.jhu.edu/vaccinedashboard/webaccess/">Vaccine Website Accessibility dashboard</a>. This derivation reports sums of the weighted violations and densities, not weighted ranks. In generating a deficit score, this rule weighs the sum of errors and contrast errors 6, their density 3, and the count of alerts 1.</p>
         <p>This table was produced with <a href="https://github.com/jrpool/autotest">Autotest</a>.</p>
         <table>
-          <caption>Results of JHU-WAVE test of web pages</caption>
+          <caption>Results of Rankless JHU-WAVE test of web pages</caption>
           <thead>
             <tr><th>Deficit</th><th>Name</th><th>URL</th></tr>
           </thead>
@@ -116,16 +99,22 @@ const webify = relArray => {
   </body>
 </html>
 `;
-  fs.writeFile(`jhuwave-${timeStamp}.html`, page);
+  fs.writeFile(`waves-${timeStamp}.html`, page);
 };
 // ########## OPERATION
 (async () => {
   const relArray = await distill();
-  rank(relArray, 'errorRank', a => a.errorCount);
-  rank(relArray, 'densityRank', a => a.errorCount / a.elementCount);
-  rank(relArray, 'alertRank', a => a.alertCount);
-  score(relArray, ['errorRank', 'densityRank', 'alertRank']);
-  relArray.sort((a, b) => a.score - b.score);
-  fs.writeFile(`jhuwave-${timeStamp}.json`, JSON.stringify(relArray, null, 2));
-  webify(relArray);
+  if (relArray.length) {
+    score(relArray, [
+      'errorCount',
+      'errorDensity',
+      'alertCount'
+    ]);
+    relArray.sort((a, b) => a.score - b.score);
+    fs.writeFile(`axes-${timeStamp}.json`, JSON.stringify(relArray, null, 2));
+    webify(relArray);
+  }
+  else {
+    console.log('ERROR: Related array of act reports is empty');
+  }
 })();

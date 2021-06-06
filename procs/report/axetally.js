@@ -1,6 +1,6 @@
 /*
   axetally.js
-  Analyzes an axe report.
+  Converts an axe report to a tally of rule violations by severity.
 */
 // ########## IMPORTS
 // Module to access files.

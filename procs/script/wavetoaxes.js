@@ -1,6 +1,6 @@
 /*
   wavetoaxes.js
-  Converts a waves script to an Axes script.
+  Converts a waves script to an axes script.
 */
 // ########## IMPORTS
 // Module to access files.

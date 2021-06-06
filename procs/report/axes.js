@@ -1,6 +1,6 @@
 /*
   axes.js
-  Comparative scores on axes.
+  Converts an axes report to a Rankless JHU-Axes report.
 */
 // ########## IMPORTS
 // Module to access files.

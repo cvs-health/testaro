@@ -1,6 +1,6 @@
 /*
   jhucombo.js
-  Produces a web page combining JHU-WAVE and JHU-Axes results.
+  Converts JSON JHU-WAVE and JHU-Axes reports to an HTML JHU-Combo report.
 */
 // ########## IMPORTS
 // Module to access files.

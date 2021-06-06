@@ -1,6 +1,6 @@
 /*
   orgwave.js
-  Converts on orgurls.json file to a waves script.
+  Converts a file of organization names and URLs to a waves script.
 */
 // ########## IMPORTS
 // Module to access files.
