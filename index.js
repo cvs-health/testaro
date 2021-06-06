@@ -351,7 +351,7 @@ const isBrowserType = type => ['chromium', 'firefox', 'webkit'].includes(type);
 // Validates a URL.
 const isURL = string => /^(?:https?|file):\/\/[^ ]+$/.test(string);
 // Recursively performs the acts of a script.
-const doActs = async (report, actIndex, page, timeStamp) => {
+const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
   const {acts} = report;
   // If any acts remain unperformed:
   if (actIndex < acts.length) {
@@ -571,9 +571,9 @@ const doActs = async (report, actIndex, page, timeStamp) => {
       act.result = 'ACT TYPE MISSING';
     }
     // Update the report file.
-    fs.writeFile(`report-${timeStamp}.json`, JSON.stringify(report, null, 2));
+    fs.writeFile(`${reportDir}/report-${timeStamp}.json`, JSON.stringify(report, null, 2));
     // Perform the remaining acts.
-    await doActs(report, actIndex + 1, page, timeStamp);
+    await doActs(report, actIndex + 1, page, timeStamp, reportDir);
   }
   // Otherwise, i.e. if all acts have been performed:
   else {
@@ -591,7 +591,7 @@ const scriptHandler = async (scriptName, what, acts, query, response) => {
   // Define a timeStamp for the report file.
   const timeStamp = Math.floor((Date.now() - Date.UTC(2021, 4)) / 10000).toString(36);
   // Perform the specified acts and add the results and exhibits to the report.
-  await doActs(report, 0, null, timeStamp);
+  await doActs(report, 0, null, timeStamp, query.reportDir);
   // If any exhibits have been added to the report, move them to the query.
   if (report.exhibits) {
     query.exhibits = report.exhibits;

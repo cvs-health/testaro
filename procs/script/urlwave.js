@@ -35,7 +35,7 @@ fs.readFile(`${dataDir}/${inName}.txt`, 'utf8')
   })
   .filter(command => typeof command === 'object');
   const wave1Script = {
-    what: 'WAVE tests of organization webpages',
+    what: 'WAVE tests of _______________',
     acts: [{
       type: 'launch',
       which: 'chromium'
