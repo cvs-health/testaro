@@ -18,8 +18,6 @@ const debug = false;
 const protocol = process.env.PROTOCOL || 'https';
 // Files servable without modification.
 const statics = {
-  '/doc.html': 'text/html',
-  '/index.html': 'text/html',
   '/style.css': 'text/css'
 };
 const redirects = {
@@ -682,6 +680,15 @@ const requestHandler = (request, response) => {
         response.setHeader('Content-Type', 'image/png');
         response.write(content, 'binary');
         response.end();
+      }
+      // Otherwise, if the initial form was requested:
+      else if (pathName === '/' || pathName === '/index.html') {
+        const query = {
+          scriptDir: process.env.SCRIPTDIR || '',
+          reportDir: process.env.REPORTDIR || ''
+        };
+        // Render it.
+        render('', true, query, 'index', response);
       }
       // Otherwise, i.e. if the URL is invalid:
       else {
