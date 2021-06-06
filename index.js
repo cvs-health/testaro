@@ -86,7 +86,6 @@ const redirect = (url, response) => {
 };
 // Returns whether a string is a URL.
 const isURL = textString => /^(?:https?|file):\/\//.test(textString);
-// Recursively performs the specified acts.
 // Conducts an axe test.
 const axe = async (page, rules) => {
   // Inject axe-core into the page.

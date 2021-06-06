@@ -4,12 +4,8 @@ node_modules/
 # dotenv environment variables file
 .env
 
-# Screen shots
-screenShots/
-
 # Temporary files
 temp/
-reports/
 
 # System files
 .DS_Store
