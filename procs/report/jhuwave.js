@@ -33,9 +33,6 @@ const distill = async () => {
   .acts
   .filter(act =>
     act.type === 'wave1'
-    && act.which
-    && act.which.url
-    && act.which.name
     && act.result
     && act.result.statistics
     && act.result.statistics.totalelements
@@ -49,8 +46,8 @@ const distill = async () => {
   )
   .map((act, index) => ({
     index,
-    url: act.which.url,
-    name: act.which.name,
+    url: act.which || act.result.statistics.pageurl,
+    name: act.what || act.result.statistics.pagetitle,
     elementCount: act.result.statistics.totalelements,
     errorCount: act.result.categories.error.count + act.result.categories.contrast.count,
     alertCount: act.result.categories.alert.count
@@ -123,7 +120,6 @@ const webify = relArray => {
 </html>
 `;
   fs.writeFile(`${reportDir}/report-${jhuWaveSuffix}.html`, page);
-  fs.copyFile('style.css', `${reportDir}/style.css`, fs.constants.COPYFILE_EXCL);
 };
 // ########## OPERATION
 (async () => {

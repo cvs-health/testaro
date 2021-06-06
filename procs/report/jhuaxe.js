@@ -38,7 +38,7 @@ const distill = async () => {
   .acts
   .filter(act =>
     act.type === 'axes'
-    && act.which
+    && act.what
     && act.url
     && act.result
     && act.result.elementCount
@@ -51,7 +51,7 @@ const distill = async () => {
   .map((act, index) => ({
     index,
     url: act.url,
-    name: act.which,
+    name: act.what,
     elementCount: act.result.elementcount,
     minorCount: act.result.violations.minor,
     moderateCount: act.result.violations.moderate,
@@ -154,7 +154,6 @@ const webify = relArray => {
     relArray.sort((a, b) => a.score - b.score);
     fs.writeFile(`${reportDir}/report-${jhuAxeSuffix}.json`, JSON.stringify(relArray, null, 2));
     webify(relArray);
-    fs.copyFile('style.css', `${reportDir}/style.css`, fs.constants.COPYFILE_EXCL);
   }
   else {
     console.log('ERROR: Related array of act reports is empty');
