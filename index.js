@@ -748,11 +748,11 @@ const requestHandler = (request, response) => {
             && acts
             && typeof what === 'string'
             && Array.isArray(acts)
-            && acts.length > 2
             && acts[0].type === 'launch'
+            && acts.length > 1
             && (
-              acts[1].type === 'url'
-              || (acts[1].type === 'waves1' && isURL(acts[1].which))
+              acts[1].type === 'url' && acts.length > 2
+              || (acts[1].type === 'wave1' && isURL(acts[1].which))
             )
           ) {
             // Process it.
