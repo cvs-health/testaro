@@ -1,15 +1,21 @@
 /*
   jhucombo.js
-  Converts JSON JHU-WAVE and JHU-Axes reports to an HTML JHU-Combo report.
+  Converts JSON JHU-WAVE and JHU-Axe reports to an HTML JHU-Combo report.
+  This proc requires 3 arguments:
+    0. the suffix of the base of the name of the JHU-WAVE report.
+    1. the suffix of the base of the name of the JHU-Axe report.
+    2. the suffix of the base of the name of the JHU-Combo report.
 */
 // ########## IMPORTS
 // Module to access files.
 const fs = require('fs').promises;
 // ########## CONSTANTS
-// Timestamp.
-const timeStamp = process.argv[2];
+// Filenames.
+const waveSuffix = process.argv[2] || 'MISSING';
+const axesSuffix = process.argv[3] || 'MISSING';
+const comboSuffix = process.argv[4] || 'MISSING';
 // Report directory.
-const reportDir = process.env.REPORTDIR || process.argv[3] || 'MISSING';
+const reportDir = process.env.REPORTDIR || 'MISSING';
 // ########## FUNCTIONS
 // Creates and records an HTML report.
 const webify = relArray => {
@@ -57,13 +63,13 @@ const webify = relArray => {
   </body>
 </html>
 `;
-  fs.writeFile(`${reportDir}/report-jhuc-${timeStamp}.html`, page);
+  fs.writeFile(`${reportDir}/report-${comboSuffix}.html`, page);
   fs.copyFile('style.css', `${reportDir}/style.css`, fs.constants.COPYFILE_EXCL);
 };
 // ########## OPERATION
 (async () => {
-  const waveJSON = await fs.readFile(`${reportDir}/report-jhuw-${timeStamp}.json`);
-  const axesJSON = await fs.readFile(`${reportDir}/report-jhua-${timeStamp}.json`);
+  const waveJSON = await fs.readFile(`${reportDir}/report-${waveSuffix}.json`);
+  const axesJSON = await fs.readFile(`${reportDir}/report-${axesSuffix}.json`);
   const waveArray = JSON.parse(waveJSON).sort((a, b) => a.index - b.index);
   const axesArray = JSON.parse(axesJSON).sort((a, b) => a.index - b.index);
   const relArray = waveArray
