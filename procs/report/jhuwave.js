@@ -8,6 +8,8 @@
 // ########## IMPORTS
 // Module to access files.
 const fs = require('fs').promises;
+// Module to keep secrets local.
+require('dotenv').config();
 // ########## CONSTANTS
 // Filenames.
 const wave1Suffix = process.argv[2] || 'MISSING';
