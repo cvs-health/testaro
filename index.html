@@ -21,16 +21,27 @@
       </section>
       <div class="etc">
         <section>
-          <h2>Script location</h2>
-          <form method="POST" action="/autotest/scriptPath">
+          <h2>Directories (both answers are required)</h2>
+          <form method="POST" action="/autotest/dirs">
             <p><label>
               <span>Where are your scripts?</span>
               <input
-                name="scriptPath"
+                name="scriptDir"
                 type="text"
-                size="30"
-                maxlength="50"
-                value="../autotest-scripts"
+                size="40"
+                maxlength="60"
+                value="__scriptDir__"
+                required
+              >
+            </label></p>
+            <p><label>
+              <span>Where are your reports?</span>
+              <input
+                name="reportDir"
+                type="text"
+                size="40"
+                maxlength="60"
+                value="__reportDir__"
                 required
               >
             </label></p>

@@ -84,8 +84,6 @@ const redirect = (url, response) => {
   response.setHeader('Location', url);
   response.end();
 };
-// Returns whether a string is a URL.
-const isURL = textString => /^(?:https?|file):\/\//.test(textString);
 // Conducts an axe test.
 const axe = async (page, rules) => {
   // Inject axe-core into the page.
@@ -181,7 +179,7 @@ const axes = async page => {
   return report;
 };
 // Conducts a WAVE test and returns a Promise of a result.
-const waves = url => {
+const wave1 = url => {
   const waveKey = process.env.WAVE_KEY;
   // Get the data from a WAVE test.
   return new Promise(resolve => {
@@ -350,6 +348,10 @@ const matchIndex = async (page, selector, text) => await page.$eval(
   },
   [selector, text]
 );
+// Validates a browser type.
+const isBrowserType = type => ['chromium', 'firefox', 'webkit'].includes(type);
+// Validates a URL.
+const isURL = string => /^(?:https?|file):\/\/[^ ]+$/.test(string);
 // Recursively performs the acts of a script.
 const doActs = async (report, actIndex, page, timeStamp) => {
   const {acts} = report;
@@ -357,14 +359,13 @@ const doActs = async (report, actIndex, page, timeStamp) => {
   if (actIndex < acts.length) {
     // Identify the act (an element of report.acts) to be performed.
     const act = acts[actIndex];
-    const {type, which, value, index} = act;
-    // If the act has the required property:
+    const {type, which, what} = act;
+    // If the act has the universally required property:
     if (type) {
       // If the act is a valid launch:
       if (
         type === 'launch'
-        && which
-        && ['chromium', 'firefox', 'webkit'].includes(which)
+        && isBrowserType(which)
       ) {
         // Launch the specified browser, creating a browser context and a page in it.
         await launch(which);
@@ -373,8 +374,8 @@ const doActs = async (report, actIndex, page, timeStamp) => {
       }
       // Otherwise, if a current page exists:
       else if (page) {
-        // If the act is a valid URL:
-        if (type === 'url' && which && isURL(which)) {
+        // If the act is a valid url:
+        if (type === 'url' && isURL(which)) {
           // Visit it.
           try {
             await page.goto(which);
@@ -425,10 +426,16 @@ const doActs = async (report, actIndex, page, timeStamp) => {
           }
           act.result = result;
         }
-        // Otherwise, if the act is a valid WAVE summary:
-        else if (type === 'wave1' && which && which.name && (page.url() || which.url)) {
+        // Otherwise, if the act is a valid WAVE type-1 test:
+        else if (type === 'wave1' && (page.url() || isURL(which))) {
           // Conduct a WAVE test and add the result to the act.
-          act.result = await waves(which.url || page.url());
+          if (what) {
+            act.what = what;
+          }
+          if (which) {
+            act.which = which;
+          }
+          act.result = await wave1(which || page.url());
         }
         // Otherwise, if the required page URL exists:
         else if (page.url() && page.url() !== 'about:blank') {
@@ -504,8 +511,8 @@ const doActs = async (report, actIndex, page, timeStamp) => {
               // Focus it.
               await whichElement.focus();
               // Perform the act on the element and add a move description to the act.
-              if (type === 'text' && typeof value === 'string' && value) {
-                await whichElement.type(value);
+              if (type === 'text' && typeof value === 'string' && what) {
+                await whichElement.type(what);
                 act.result = 'entered';
               }
               else if (['radio', 'checkbox'].includes(type)) {
@@ -513,7 +520,7 @@ const doActs = async (report, actIndex, page, timeStamp) => {
                 act.result = 'checked';
               }
               else if (type === 'select') {
-                await whichElement.selectOption({index});
+                await whichElement.selectOption({what});
                 const optionText = await whichElement.$eval(
                   'option:selected', el => el.textContent
                 );
@@ -690,11 +697,11 @@ const requestHandler = (request, response) => {
       searchParams.forEach((value, name) => {
         query[name] = value;
       });
-      const {scriptPath, scriptName} = query;
-      // If the path and the request specify a script path:
-      if (pathName === '/scriptPath' && scriptPath) {
-        // Request an array of the names of the files at the path.
-        const fileNames = await fs.readdir(scriptPath);
+      const {scriptDir, reportDir, scriptName} = query;
+      // If the path and the request specify directories:
+      if (pathName === '/dirs' && scriptDir && reportDir) {
+        // Request an array of the names of the files in the script directory.
+        const fileNames = await fs.readdir(scriptDir);
         // When the array arrives, get an array of script names from it.
         const scriptNames = fileNames
         .filter(name => name.endsWith('.json'))
@@ -704,7 +711,7 @@ const requestHandler = (request, response) => {
           // Add their count to the query.
           query.scriptSize = scriptNames.length;
           // Get their descriptions.
-          const nameWhats = await getWhats(scriptPath, scriptNames, []);
+          const nameWhats = await getWhats(scriptDir, scriptNames, []);
           // When the descriptions arrive, add them as options to the query.
           query.scriptNames = nameWhats.map((pair, index) => {
             const state = index === 0 ? 'selected ' : '';
@@ -713,16 +720,16 @@ const requestHandler = (request, response) => {
           // Render the script-selection page.
           render('', true, 'script', query, response);
         }
-        // Otherwise, i.e. if no scripts exist at the specified path:
+        // Otherwise, i.e. if no scripts exist in the specified directory:
         else {
           // Serve an error message.
-          serveMessage(`ERROR: No scripts at ${scriptPath}.`, response);
+          serveMessage(`ERROR: No scripts in ${scriptDir}.`, response);
         }
       }
       // Otherwise, if the path and the request specify a script:
-      else if (pathName === '/scriptName' && scriptPath && scriptName) {
+      else if (pathName === '/scriptName' && scriptDir && reportDir && scriptName) {
         // Get the content of the script.
-        const scriptJSON = await fs.readFile(`${scriptPath}/${scriptName}.json`, 'utf8');
+        const scriptJSON = await fs.readFile(`${scriptDir}/${scriptName}.json`, 'utf8');
         // When the content arrives, if there is any:
         if (scriptJSON) {
           // Get the script data.
@@ -734,9 +741,12 @@ const requestHandler = (request, response) => {
             && acts
             && typeof what === 'string'
             && Array.isArray(acts)
-            && acts.length > 1
+            && acts.length > 2
             && acts[0].type === 'launch'
-            && ['url', 'wave1'].includes(acts[1].type)
+            && (
+              acts[1].type === 'url'
+              || (acts[1].type === 'waves1' && isURL(acts[1].which))
+            )
           ) {
             // Process it.
             scriptHandler(scriptName, what, acts, query, response);
@@ -751,7 +761,7 @@ const requestHandler = (request, response) => {
         else {
           // Serve an error message.
           serveMessage(
-            `ERROR: No script found in ${scriptPath}/${scriptName}.json.`, response
+            `ERROR: No script found in ${scriptDir}/${scriptName}.json.`, response
           );
         }
       }

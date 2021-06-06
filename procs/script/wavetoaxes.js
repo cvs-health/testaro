@@ -8,6 +8,8 @@
 // ########## IMPORTS
 // Module to access files.
 const fs = require('fs').promises;
+// Module to keep secrets local.
+require('dotenv').config();
 // ########## CONSTANTS
 // Base of the names of the files.
 const inName = process.argv[2] || 'MISSING';
