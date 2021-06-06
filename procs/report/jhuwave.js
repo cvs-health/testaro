@@ -1,6 +1,6 @@
 /*
   jhuwave.js
-  Converts a waves report to JSON and HTML JHU-WAVE reports.
+  Converts a wave1 report to JSON and HTML JHU-WAVE reports listing per-URL scores.
 */
 // ########## IMPORTS
 // Module to access files.
@@ -14,19 +14,19 @@ const weights = {
 };
 // Timestamp.
 const timeStamp = process.argv[2];
-// Report file.
-const reportFileName = `report-${timeStamp}.json`;
+// Report directory.
+const reportDir = process.env.REPORTDIR || process.argv[3] || 'MISSING';
 // ########## FUNCTIONS
 // Distills the report into the relevant array.
 const distill = async () => {
   // Get the report.
-  const reportJSON = await fs.readFile(reportFileName, 'utf8');
+  const reportJSON = await fs.readFile(`${reportDir}/report-${timeStamp}.json`, 'utf8');
   const report = JSON.parse(reportJSON);
   // Distill it into the relevant array.
   const relArray = report
   .acts
   .filter(act =>
-    act.type === 'waves'
+    act.type === 'wave1'
     && act.which
     && act.which.url
     && act.which.name
@@ -74,7 +74,7 @@ const rank = (relArray, rankName, sorter) => {
     }
   }
 };
-// Scores ranked pages.
+// Adds scores to the elements of an array of rank data on pages.
 const score = (relArray, rankNames) => relArray.forEach(act => {
   act.score = rankNames.reduce((total, rankName) => total + weights[rankName] * act[rankName], 0);
 });
@@ -116,7 +116,8 @@ const webify = relArray => {
   </body>
 </html>
 `;
-  fs.writeFile(`jhuwave-${timeStamp}.html`, page);
+  fs.writeFile(`${reportDir}/report-jhuw-${timeStamp}.html`, page);
+  fs.copyFile('style.css', `${reportDir}/style.css`, fs.constants.COPYFILE_EXCL);
 };
 // ########## OPERATION
 (async () => {
@@ -126,6 +127,6 @@ const webify = relArray => {
   rank(relArray, 'alertRank', a => a.alertCount);
   score(relArray, ['errorRank', 'densityRank', 'alertRank']);
   relArray.sort((a, b) => a.score - b.score);
-  fs.writeFile(`jhuwave-${timeStamp}.json`, JSON.stringify(relArray, null, 2));
+  fs.writeFile(`${reportDir}/report-jhuw-${timeStamp}.json`, JSON.stringify(relArray, null, 2));
   webify(relArray);
 })();

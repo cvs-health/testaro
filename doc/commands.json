@@ -94,7 +94,7 @@
       "which": [true, "string", "hasLength"]
     }
   ],
-  "waves": [
+  "wave1": [
     "Perform a type-1 WAVE test (which: URL if not the current; what: description)",
     {
       "which": [false, "string", "isURL"],

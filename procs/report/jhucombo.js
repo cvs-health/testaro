@@ -6,7 +6,10 @@
 // Module to access files.
 const fs = require('fs').promises;
 // ########## CONSTANTS
-const prefix = process.argv[2];
+// Timestamp.
+const timeStamp = process.argv[2];
+// Report directory.
+const reportDir = process.env.REPORTDIR || process.argv[3] || 'MISSING';
 // ########## FUNCTIONS
 // Creates and records an HTML report.
 const webify = relArray => {
@@ -54,12 +57,13 @@ const webify = relArray => {
   </body>
 </html>
 `;
-  fs.writeFile(`jhucombo-${prefix}.html`, page);
+  fs.writeFile(`${reportDir}/report-jhuc-${timeStamp}.html`, page);
+  fs.copyFile('style.css', `${reportDir}/style.css`, fs.constants.COPYFILE_EXCL);
 };
 // ########## OPERATION
 (async () => {
-  const waveJSON = await fs.readFile(`jhuwave-${prefix}wave.json`);
-  const axesJSON = await fs.readFile(`jhuaxes-${prefix}axes.json`);
+  const waveJSON = await fs.readFile(`${reportDir}/report-jhuw-${timeStamp}.json`);
+  const axesJSON = await fs.readFile(`${reportDir}/report-jhua-${timeStamp}.json`);
   const waveArray = JSON.parse(waveJSON).sort((a, b) => a.index - b.index);
   const axesArray = JSON.parse(axesJSON).sort((a, b) => a.index - b.index);
   const relArray = waveArray

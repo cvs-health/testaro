@@ -42,7 +42,7 @@
             <li>You choose one of those scripts.</li>
             <li>Autotest performs the acts specified by the commands in that script.</li>
             <li>Autotest outputs a report to your browser.</li>
-            <li>As it proceeds, Autotest also writes a copy of the report to a <code>report-xxx.json</code> file (where <code>xxx</code> represents a timestamp). In case Autotest throws an error or while performing the acts or takes longer than your browser is willing to wait, the browser report may fail to appear, but the file report, up to the point of the error or disconnection, will be preserved.</li>
+            <li>As it proceeds, Autotest also writes a copy of the report to a <code>report-xxx.json</code> file (where <code>xxx</code> represents a timeStamp). In case Autotest throws an error or while performing the acts or takes longer than your browser is willing to wait, the browser report may fail to appear, but the file report, up to the point of the error or disconnection, will be preserved.</li>
             <li>When you have finished using Autotest, you stop it by entering <kbd>CTRL-c</kbd>.</li>
             <li>You can perform analyses on the data in a report, using existing Autotest routines or writing your own.</li>
           </ol>
@@ -69,13 +69,13 @@
           <h3>WAVE</h3>
           <p>WAVE integration depends on the user having a WAVE API key. Use of the WAVE API depletes the user&rsquo;s WAVE API credits. The <code>waves</code> command performs a WAVE test with <code>reporttype=1</code> on a specified URL. Such a test costs 1 credit ($0.04, or less in quantity). When you register with WebAIM and obtain a WAVE API key, you must add a line to your <code>.env</code> file, in the format <code>WAVE_KEY=x0x0x0x0x0x0x</code> (where <code>x0x0x0x0x0x0x</code> represents your key).</p>
           <h2>Reports</h2>
-          <p>Every script produces a report in JSON format and deposits it into the <code>reports</code> directory. The report name contains an automatically generated timestamp. You can rename a report as you wish and move it to wherever you want to store it.</p>
+          <p>Every script produces a report in JSON format and deposits it into the <code>reports</code> directory. The report name contains an automatically generated timeStamp. You can rename a report as you wish and move it to wherever you want to store it.</p>
           <h2>Repository exclusions</h2>
           <p>The files in the <code>temp</code> and <code>reports</code> directories are presumed ephemeral and are not tracked by <code>git</code>.</p>
 
           <h4>JHU-WAVE comparisons</h4>
           <p>One of the Autotest analysis routines performs the <dfn>JHU-WAVE</dfn> comparison. That is a comparison of web pages that have been subjected to the <code>waves</code> test in a script. The comparison follows the rule applied by the Johns Hopkins University Disability Health Research Center in its <a href="https://disabilityhealth.jhu.edu/vaccinedashboard/webaccess/">Vaccine Website Accessibility</a> dashboard. That rule is described summarily on the cited page. Missing details were obtained from WebAIM, which conducted the testing.</p>
-          <p>Autotest&rsquo;s implementation of the JHU-WAVE rule is located in the <code>jhuwave.js</code> file. By executing the command <code>node jhuwave xxx</code> (where <code>xxx</code> represents the timestamp of a report file), you can apply that rule to the pages whose <code>waves</code> test results are recorded in a report file.</p>
+          <p>Autotest&rsquo;s implementation of the JHU-WAVE rule is located in the <code>jhuwave.js</code> file. By executing the command <code>node jhuwave xxx</code> (where <code>xxx</code> represents the timeStamp of a report file), you can apply that rule to the pages whose <code>waves</code> test results are recorded in a report file.</p>
           <p>The JHU-WAVE rule is defined as follows:</p>
           <ol>
             <li>Give each page a rank, on the basis of its error total, namely the total of its <q>Errors</q> and its <q>Contrast Errors</q>, with 0 being the best rank (i.e. the smallest total). If there is a tie for the next rank, use that rank for all of the tied pages, but then skip ranks so that the used rank plus the skipped ranks are equal in number to the number of tied pages.</li>

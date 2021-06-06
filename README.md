@@ -104,7 +104,7 @@ Autotest contains these custom tests. Each test adds
 - state: Shows the currently focused element in normal, focused, hovered, and focused-hovered states in 3 browsers.
 - stylediff: Lists any differences in style properties, with counts, per link, button, and heading tag name.
 
-Other tests on which further development is contemplated or is taking place include:
+Other custom tests on which further development is contemplated or is taking place include:
 - links with href="#"
 - links and buttons that are not reachable with keyboard navigation
 - links and buttons styled non-distinguishably
@@ -138,7 +138,7 @@ WAVE integration depends on the user having a WAVE API key. Use of the WAVE API 
 
 One of the Autotest procs implements the <dfn>JHU-WAVE</dfn> rule. That is an algorithm comparing web pages that have been subjected to the `waves` test in a script. The rule is used by the Johns Hopkins University (_JHU_) Disability Health Research Center in its [Vaccine Website Accessibility](https://disabilityhealth.jhu.edu/vaccinedashboard/webaccess/) dashboard. The rule is described summarily on the cited page. Missing details were obtained from WebAIM, which conducted the testing for JHU.
 
-The proc is `procs/report/jhuwave.js`. By executing the command `node procs/report/jhuwave xxx` (where `xxx` represents the timestamp of a report file or another string that you have changed the timestamp to), you can apply the rule to the pages whose `waves` test results are recorded in the report file.
+The proc is `procs/report/jhuwave.js`. By executing the command `node procs/report/jhuwave xxx` (where `xxx` represents the timeStamp of a report file or another string that you have changed the timestamp to), you can apply the rule to the pages whose `waves` test results are recorded in the report file.
 
 The JHU-WAVE rule is defined as follows:
 

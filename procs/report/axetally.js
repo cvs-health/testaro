@@ -1,13 +1,16 @@
 /*
   axetally.js
-  Converts an axe report to a tally of rule violations by severity.
+  Converts an axe report to an all-acts tally of rule violations by severity.
 */
 // ########## IMPORTS
 // Module to access files.
 const fs = require('fs').promises;
 // ########## OPERATION
-const prefix = process.argv[2];
-fs.readFile(`report-${prefix}axe.json`, 'utf8')
+// Timestamp.
+const timeStamp = process.argv[2];
+// Report directory.
+const reportDir = process.env.REPORTDIR || process.argv[3] || 'MISSING';
+fs.readFile(`${reportDir}/report-axecounts-${timeStamp}.json`, 'utf8')
 .then(axeJSON => {
   const axeActs = JSON.parse(axeJSON).acts.filter(act => act.type === 'axe');
   const rules = {
@@ -29,5 +32,7 @@ fs.readFile(`report-${prefix}axe.json`, 'utf8')
       });
     });
   });
-  fs.writeFile(`axetally-${prefix}.json`, `${JSON.stringify(rules, null, 2)}\n`);
+  fs.writeFile(
+    `${reportDir}/report-axecounts-${timeStamp}.json`, `${JSON.stringify(rules, null, 2)}\n`
+  );
 });

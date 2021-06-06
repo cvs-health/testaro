@@ -1,6 +1,9 @@
 /*
   orgurls.js
   Converts a file of organization names to a file of organization names and URLs.
+  This proc requires:
+    0. a KickFire API key, provided by a KICKFIRE_KEY entry in the .env file.
+    1. a directory of data, provided either by a DATADIR entry in the .env file or by an argument.
 */
 // ########## IMPORTS
 // Module to access files.
@@ -10,6 +13,8 @@ require('dotenv').config();
 // Module to create an HTTPS server and client.
 const https = require('https');
 // ########## CONSTANTS
+// Directory of data.
+const dataDir = process.env.DATADIR || process.argv[2] || 'MISSING';
 const isInUS = true;
 // ########## FUNCTIONS
 // Gets the URL of the website of an organization.
@@ -81,14 +86,14 @@ const addURLs = async (orgData, orgNames, index) => {
 };
 // Adds URLs to orgnames.txt.
 const createData = async () => {
-  const orgNameList = await fs.readFile('orgnames.txt', 'utf8');
+  const orgNameList = await fs.readFile(`${dataDir}/orgnames.txt`, 'utf8');
   if (orgNameList.length) {
     const orgNames = orgNameList.split('\n').filter(name => name.trim().length);
     if (orgNames.length) {
       const orgData = [];
       await addURLs(orgData, orgNames, 0);
-      fs.writeFile('orgurls.json', JSON.stringify(orgData, null, 2));
-      console.log('File orgurls.json created.');
+      fs.writeFile(`${dataDir}/orgurls.json`, JSON.stringify(orgData, null, 2));
+      console.log(`File ${dataDir}/orgurls.json created.`);
     }
     else {
       console.log('ERROR: No organization names found.');

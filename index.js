@@ -426,7 +426,7 @@ const doActs = async (report, actIndex, page, timeStamp) => {
           act.result = result;
         }
         // Otherwise, if the act is a valid WAVE summary:
-        else if (type === 'waves' && which && which.name && (page.url() || which.url)) {
+        else if (type === 'wave1' && which && which.name && (page.url() || which.url)) {
           // Conduct a WAVE test and add the result to the act.
           act.result = await waves(which.url || page.url());
         }
@@ -583,7 +583,7 @@ const scriptHandler = async (scriptName, what, acts, query, response) => {
     what,
     acts
   };
-  // Define a timestamp for the report file.
+  // Define a timeStamp for the report file.
   const timeStamp = Math.floor((Date.now() - Date.UTC(2021, 4)) / 10000).toString(36);
   // Perform the specified acts and add the results and exhibits to the report.
   await doActs(report, 0, null, timeStamp);
@@ -736,7 +736,7 @@ const requestHandler = (request, response) => {
             && Array.isArray(acts)
             && acts.length > 1
             && acts[0].type === 'launch'
-            && ['url', 'waves'].includes(acts[1].type)
+            && ['url', 'wave1'].includes(acts[1].type)
           ) {
             // Process it.
             scriptHandler(scriptName, what, acts, query, response);

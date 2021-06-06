@@ -1,6 +1,6 @@
 /*
   jhuaxes.js
-  Converts an axes report to JSON and HTML JHU-Axes reports.
+  Converts an axes report to JSON and HTML JHU-Axe reports listing per-URL scores.
 */
 // ########## IMPORTS
 // Module to access files.
@@ -19,13 +19,13 @@ const weights = {
 };
 // Timestamp.
 const timeStamp = process.argv[2];
-// Report file.
-const reportFileName = `report-${timeStamp}.json`;
+// Report directory.
+const reportDir = process.env.REPORTDIR || process.argv[3] || 'MISSING';
 // ########## FUNCTIONS
 // Distills the report into the relevant array.
 const distill = async () => {
   // Get the report.
-  const reportJSON = await fs.readFile(reportFileName, 'utf8');
+  const reportJSON = await fs.readFile(`${reportDir}/report-${timeStamp}.json`, 'utf8');
   const report = JSON.parse(reportJSON);
   // Distill it into the relevant array.
   const relArray = report
@@ -77,7 +77,7 @@ const rank = (relArray, rankName, sorter) => {
     }
   }
 };
-// Scores ranked pages.
+// Adds scores to the elements of an array of rank data on pages.
 const score = (relArray, rankNames) => relArray.forEach(act => {
   act.score = Math.floor(
     8 / 11 * rankNames.reduce((total, rankName) => total + weights[rankName] * act[rankName], 0)
@@ -121,7 +121,7 @@ const webify = relArray => {
   </body>
 </html>
 `;
-  fs.writeFile(`jhuaxes-${timeStamp}.html`, page);
+  fs.writeFile(`${reportDir}/report-jhua-${timeStamp}.html`, page);
 };
 // ########## OPERATION
 (async () => {
@@ -146,8 +146,9 @@ const webify = relArray => {
       'criticalDensityRank',
     ]);
     relArray.sort((a, b) => a.score - b.score);
-    fs.writeFile(`jhuaxes-${timeStamp}.json`, JSON.stringify(relArray, null, 2));
+    fs.writeFile(`${reportDir}/jhua-${timeStamp}.json`, JSON.stringify(relArray, null, 2));
     webify(relArray);
+    fs.copyFile('style.css', `${reportDir}/style.css`, fs.constants.COPYFILE_EXCL);
   }
   else {
     console.log('ERROR: Related array of act reports is empty');

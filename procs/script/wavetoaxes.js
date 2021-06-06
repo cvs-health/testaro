@@ -1,13 +1,21 @@
 /*
   wavetoaxes.js
-  Converts a waves script to an axes script.
+  Converts a wave1 script to an axes script.
+  This proc requires 2 arguments:
+    0. the base of the name of the wave1 script file.
+    1. The base of the name of the axes script file to be created.
 */
 // ########## IMPORTS
 // Module to access files.
 const fs = require('fs').promises;
+// ########## CONSTANTS
+// Base of the names of the files.
+const inName = process.argv[2] || 'MISSING';
+const outName = process.argv[3] || 'MISSING';
+// Script directory
+const scriptDir = process.env.SCRIPTDIR || 'MISSING';
 // ########## OPERATION
-const prefix = process.argv[2];
-fs.readFile(`doc/scripts/${prefix}wave.json`, 'utf8')
+fs.readFile(`${scriptDir}/${inName}.json`, 'utf8')
 .then(waveJSON => {
   const waveScript = JSON.parse(waveJSON);
   const axesScript = {
@@ -24,5 +32,5 @@ fs.readFile(`doc/scripts/${prefix}wave.json`, 'utf8')
       which: act.which.name
     });
   });
-  fs.writeFile(`doc/scripts/${prefix}axes.json`, `${JSON.stringify(axesScript, null, 2)}\n`);
+  fs.writeFile(`${scriptDir}/${outName}.json`, `${JSON.stringify(axesScript, null, 2)}\n`);
 });

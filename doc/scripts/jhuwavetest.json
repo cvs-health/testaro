@@ -6,21 +6,21 @@
       "which": "chromium"
     },
     {
-      "type": "waves",
+      "type": "wave1",
       "which": {
         "url": "https://jpdev.pro/blog/0004/index1.html",
         "name": "Test page 1"
       }
     },
     {
-      "type": "waves",
+      "type": "wave1",
       "which": {
         "url": "https://jpdev.pro/blog/0004/index2.html",
         "name": "Test page 2"
       }
     },
     {
-      "type": "waves",
+      "type": "wave1",
       "which": {
         "url": "https://jpdev.pro/blog/0004/index3.html",
         "name": "Test page 2"
