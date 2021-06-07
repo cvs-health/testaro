@@ -1,5 +1,5 @@
 {
-  "what": "State comparison test on CDC link",
+  "what": "State comparison test on list-item link in Chrome",
   "acts": [
     {
       "type": "launch",
@@ -7,18 +7,18 @@
     },
     {
       "type": "url",
-      "which": "https://www.cdc.gov/about/default.htm"
+      "which": "https://www.cdc.gov/about/default.htm",
+      "what": "Centers for Disease Control"
     },
     {
       "type": "focus",
-      "which": {
-        "type": "link",
-        "text": "Organization"
-      }
+      "what": "link",
+      "which": "Organization"
     },
     {
       "type": "test",
-      "which": "state"
+      "which": "state",
+      "what": "display the link with and without focus and hover"
     }
   ]
 }

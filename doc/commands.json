@@ -88,7 +88,7 @@
     }
   ],
   "wait": [
-    "Wait until something appears (which: substring of its text)",
+    "Wait until something appears (what: type of thing; which: substring of its text)",
     {
       "what": [true, "string", "isWaitable"],
       "which": [true, "string", "hasLength"]

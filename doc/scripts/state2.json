@@ -1,5 +1,5 @@
 {
-  "what": "State comparison test on CDC link in 3 browsers",
+  "what": "State comparison test on inline link in Chrome",
   "acts": [
     {
       "type": "launch",
@@ -7,56 +7,18 @@
     },
     {
       "type": "url",
-      "which": "https://www.cdc.gov/about/default.htm"
+      "which": "https://jpdev.pro/jpdev/blog/entries/0000/index.html",
+      "what": "blog page"
     },
     {
       "type": "focus",
-      "which": {
-        "type": "link",
-        "text": "Organization"
-      }
+      "what": "link",
+      "which": "experimented"
     },
     {
       "type": "test",
-      "which": "state"
-    },
-    {
-      "type": "launch",
-      "which": "firefox"
-    },
-    {
-      "type": "url",
-      "which": "https://www.cdc.gov/about/default.htm"
-    },
-    {
-      "type": "focus",
-      "which": {
-        "type": "link",
-        "text": "Organization"
-      }
-    },
-    {
-      "type": "test",
-      "which": "state"
-    },
-    {
-      "type": "launch",
-      "which": "webkit"
-    },
-    {
-      "type": "url",
-      "which": "https://www.cdc.gov/about/default.htm"
-    },
-    {
-      "type": "focus",
-      "which": {
-        "type": "link",
-        "text": "Organization"
-      }
-    },
-    {
-      "type": "test",
-      "which": "state"
+      "which": "state",
+      "what": "display the link with and without focus and hover"
     }
   ]
 }

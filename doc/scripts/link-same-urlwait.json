@@ -7,22 +7,23 @@
     },
     {
       "type": "url",
-      "which": "https://thebaffler.com/"
+      "which": "https://thebaffler.com/",
+      "what": "a publication website"
     },
     {
       "type": "link",
-      "which": "Subscribe"
+      "which": "Subscribe",
+      "what": "link to subscription form page"
     },
     {
       "type": "wait",
-      "which": {
-        "type": "url",
-        "text": "subscribe"
-      }
+      "what": "url",
+      "which": "subscribe"
     },
     {
       "type": "test",
-      "which": "simple"
+      "which": "simple",
+      "what": "trivial test"
     }
   ]
 }

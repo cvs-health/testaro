@@ -1,5 +1,5 @@
 {
-  "what": "State comparison test",
+  "what": "State comparison test on list-item link in 3 browsers",
   "acts": [
     {
       "type": "launch",
@@ -7,18 +7,56 @@
     },
     {
       "type": "url",
-      "which": "https://jpdev.pro/jpdev/blog/entries/0000/index.html"
+      "which": "https://www.cdc.gov/about/default.htm",
+      "what": "Centers for Disease Control"
     },
     {
       "type": "focus",
-      "which": {
-        "type": "link",
-        "text": "experimented"
-      }
+      "what": "link",
+      "which": "Organization"
     },
     {
       "type": "test",
-      "which": "state"
+      "which": "state",
+      "what": "display the link with and without focus and hover"
+    },
+    {
+      "type": "launch",
+      "which": "firefox"
+    },
+    {
+      "type": "url",
+      "which": "https://www.cdc.gov/about/default.htm",
+      "what": "Centers for Disease Control"
+    },
+    {
+      "type": "focus",
+      "what": "link",
+      "which": "Organization"
+    },
+    {
+      "type": "test",
+      "which": "state",
+      "what": "display the link with and without focus and hover"
+    },
+    {
+      "type": "launch",
+      "which": "webkit"
+    },
+    {
+      "type": "url",
+      "which": "https://www.cdc.gov/about/default.htm",
+      "what": "Centers for Disease Control"
+    },
+    {
+      "type": "focus",
+      "what": "link",
+      "which": "Organization"
+    },
+    {
+      "type": "test",
+      "which": "state",
+      "what": "display the link with and without focus and hover"
     }
   ]
 }
