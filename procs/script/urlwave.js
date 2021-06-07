@@ -1,10 +1,10 @@
 /*
-  orgwave.js
-  Converts a file of KickFire organization data to a wave1 script.
+  urlwave.js
+  Converts a text file of names and URLs, @-delimited, to a wave1 script.
   This proc requires 2 or 3 arguments:
     0. the base of the name of the file of data.
-    1. the base of the name of the script file to be created.
-    2. if there is no DATADIR entry in the .env file, the path of the directory of the file of data.
+    1. The base of the name of the script file to be created.
+    2. If there is no DATADIR entry in the .env file, the path of the directory of the file of data.
 */
 // ########## IMPORTS
 // Module to access files.
@@ -20,25 +20,26 @@ const dataDir = process.env.DATADIR || process.argv[4] || 'MISSING';
 // Script directory
 const scriptDir = process.env.SCRIPTDIR || 'MISSING';
 // ########## OPERATION
-fs.readFile(`${dataDir}/${inName}.json`, 'utf8')
-.then(kickFireJSON => {
-  const kickFireData = JSON.parse(kickFireJSON);
+fs.readFile(`${dataDir}/${inName}.txt`, 'utf8')
+.then(content => {
+  const commands = content
+  .split('\n')
+  .filter(line => line.includes('@'))
+  .map(urlLine => {
+    const pair = urlLine.split('@', 2);
+    return pair[1].length ? {
+      type: 'wave1',
+      which: pair[1],
+      what: pair[0]
+    } : '';
+  })
+  .filter(command => typeof command === 'object');
   const wave1Script = {
-    what: 'WAVE tests of organization webpages',
+    what: 'WAVE tests of _______________',
     acts: [{
       type: 'launch',
       which: 'chromium'
-    }]
+    }].concat(commands)
   };
-  const kickFireBests = kickFireData.map(org => org.filter(url => url.index === 0)[0]);
-  kickFireBests.forEach(org => {
-    wave1Script.acts.push({
-      type: 'wave1',
-      which: {
-        url: `https://${org.website}`,
-        name: org.orgName
-      }
-    });
-  });
   fs.writeFile(`${scriptDir}/${outName}.json`, `${JSON.stringify(wave1Script, null, 2)}\n`);
 });

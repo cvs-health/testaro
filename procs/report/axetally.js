@@ -5,6 +5,8 @@
 // ########## IMPORTS
 // Module to access files.
 const fs = require('fs').promises;
+// Module to keep secrets local.
+require('dotenv').config();
 // ########## OPERATION
 // Timestamp.
 const timeStamp = process.argv[2];

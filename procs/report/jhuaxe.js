@@ -1,11 +1,19 @@
 /*
-  jhuaxes.js
+  jhuaxe.js
   Converts an axes report to JSON and HTML JHU-Axe reports listing per-URL scores.
+  This proc requires 2 arguments:
+    0. the suffix of the base of the name of the axes report.
+    1. the suffix of the base of the name of the JHU-Axe report.
 */
 // ########## IMPORTS
 // Module to access files.
 const fs = require('fs').promises;
+// Module to keep secrets local.
+require('dotenv').config();
 // ########## CONSTANTS
+// Filenames.
+const axesSuffix = process.argv[2] || 'MISSING';
+const jhuAxeSuffix = process.argv[3] || 'MISSING';
 // Weights.
 const weights = {
   minorRank: 1,
@@ -17,22 +25,20 @@ const weights = {
   seriousDensityRank: 1.5,
   criticalDensityRank: 2,
 };
-// Timestamp.
-const timeStamp = process.argv[2];
 // Report directory.
-const reportDir = process.env.REPORTDIR || process.argv[3] || 'MISSING';
+const reportDir = process.env.REPORTDIR || 'MISSING';
 // ########## FUNCTIONS
 // Distills the report into the relevant array.
 const distill = async () => {
   // Get the report.
-  const reportJSON = await fs.readFile(`${reportDir}/report-${timeStamp}.json`, 'utf8');
+  const reportJSON = await fs.readFile(`${reportDir}/report-${axesSuffix}.json`, 'utf8');
   const report = JSON.parse(reportJSON);
   // Distill it into the relevant array.
   const relArray = report
   .acts
   .filter(act =>
     act.type === 'axes'
-    && act.which
+    && act.what
     && act.url
     && act.result
     && act.result.elementCount
@@ -45,7 +51,7 @@ const distill = async () => {
   .map((act, index) => ({
     index,
     url: act.url,
-    name: act.which,
+    name: act.what,
     elementCount: act.result.elementcount,
     minorCount: act.result.violations.minor,
     moderateCount: act.result.violations.moderate,
@@ -121,7 +127,7 @@ const webify = relArray => {
   </body>
 </html>
 `;
-  fs.writeFile(`${reportDir}/report-jhua-${timeStamp}.html`, page);
+  fs.writeFile(`${reportDir}/report-${jhuAxeSuffix}.html`, page);
 };
 // ########## OPERATION
 (async () => {
@@ -146,9 +152,8 @@ const webify = relArray => {
       'criticalDensityRank',
     ]);
     relArray.sort((a, b) => a.score - b.score);
-    fs.writeFile(`${reportDir}/jhua-${timeStamp}.json`, JSON.stringify(relArray, null, 2));
+    fs.writeFile(`${reportDir}/report-${jhuAxeSuffix}.json`, JSON.stringify(relArray, null, 2));
     webify(relArray);
-    fs.copyFile('style.css', `${reportDir}/style.css`, fs.constants.COPYFILE_EXCL);
   }
   else {
     console.log('ERROR: Related array of act reports is empty');

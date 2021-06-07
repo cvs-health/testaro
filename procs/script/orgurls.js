@@ -15,6 +15,9 @@ const https = require('https');
 // ########## CONSTANTS
 // Directory of data.
 const dataDir = process.env.DATADIR || process.argv[2] || 'MISSING';
+if (dataDir === 'MISSING') {
+  console.log('ERROR: Directory of data missing');
+}
 const isInUS = true;
 // ########## FUNCTIONS
 // Gets the URL of the website of an organization.

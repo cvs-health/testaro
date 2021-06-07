@@ -8,6 +8,8 @@
 // ########## IMPORTS
 // Module to access files.
 const fs = require('fs').promises;
+// Module to keep secrets local.
+require('dotenv').config();
 // ########## CONSTANTS
 // Base of the names of the files.
 const inName = process.argv[2] || 'MISSING';
@@ -25,11 +27,12 @@ fs.readFile(`${scriptDir}/${inName}.json`, 'utf8')
   waveScript.acts.slice(1).forEach(act => {
     axesScript.acts.push({
       type: 'url',
-      which: act.which.url
+      which: act.which,
+      what: act.what
     });
     axesScript.acts.push({
       type: 'axes',
-      which: act.which.name
+      what: act.what
     });
   });
   fs.writeFile(`${scriptDir}/${outName}.json`, `${JSON.stringify(axesScript, null, 2)}\n`);

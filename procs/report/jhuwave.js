@@ -1,35 +1,38 @@
 /*
   jhuwave.js
   Converts a wave1 report to JSON and HTML JHU-WAVE reports listing per-URL scores.
+  This proc requires 2 arguments:
+    0. the suffix of the base of the name of the wave1 report.
+    1. the suffix of the base of the name of the JHU-WAVE report.
 */
 // ########## IMPORTS
 // Module to access files.
 const fs = require('fs').promises;
+// Module to keep secrets local.
+require('dotenv').config();
 // ########## CONSTANTS
+// Filenames.
+const wave1Suffix = process.argv[2] || 'MISSING';
+const jhuWaveSuffix = process.argv[3] || 'MISSING';
 // Weights.
 const weights = {
   errorRank: 6,
   densityRank: 3,
   alertRank: 1
 };
-// Timestamp.
-const timeStamp = process.argv[2];
 // Report directory.
-const reportDir = process.env.REPORTDIR || process.argv[3] || 'MISSING';
+const reportDir = process.env.REPORTDIR || 'MISSING';
 // ########## FUNCTIONS
 // Distills the report into the relevant array.
 const distill = async () => {
   // Get the report.
-  const reportJSON = await fs.readFile(`${reportDir}/report-${timeStamp}.json`, 'utf8');
+  const reportJSON = await fs.readFile(`${reportDir}/report-${wave1Suffix}.json`, 'utf8');
   const report = JSON.parse(reportJSON);
   // Distill it into the relevant array.
   const relArray = report
   .acts
   .filter(act =>
     act.type === 'wave1'
-    && act.which
-    && act.which.url
-    && act.which.name
     && act.result
     && act.result.statistics
     && act.result.statistics.totalelements
@@ -43,8 +46,8 @@ const distill = async () => {
   )
   .map((act, index) => ({
     index,
-    url: act.which.url,
-    name: act.which.name,
+    url: act.which || act.result.statistics.pageurl,
+    name: act.what || act.result.statistics.pagetitle,
     elementCount: act.result.statistics.totalelements,
     errorCount: act.result.categories.error.count + act.result.categories.contrast.count,
     alertCount: act.result.categories.alert.count
@@ -116,8 +119,7 @@ const webify = relArray => {
   </body>
 </html>
 `;
-  fs.writeFile(`${reportDir}/report-jhuw-${timeStamp}.html`, page);
-  fs.copyFile('style.css', `${reportDir}/style.css`, fs.constants.COPYFILE_EXCL);
+  fs.writeFile(`${reportDir}/report-${jhuWaveSuffix}.html`, page);
 };
 // ########## OPERATION
 (async () => {
@@ -127,6 +129,6 @@ const webify = relArray => {
   rank(relArray, 'alertRank', a => a.alertCount);
   score(relArray, ['errorRank', 'densityRank', 'alertRank']);
   relArray.sort((a, b) => a.score - b.score);
-  fs.writeFile(`${reportDir}/report-jhuw-${timeStamp}.json`, JSON.stringify(relArray, null, 2));
+  fs.writeFile(`${reportDir}/report-${jhuWaveSuffix}.json`, JSON.stringify(relArray, null, 2));
   webify(relArray);
 })();
