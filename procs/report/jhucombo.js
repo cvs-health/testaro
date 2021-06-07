@@ -66,7 +66,6 @@ const webify = relArray => {
 </html>
 `;
   fs.writeFile(`${reportDir}/report-${comboSuffix}.html`, page);
-  fs.copyFile('style.css', `${reportDir}/style.css`, fs.constants.COPYFILE_EXCL);
 };
 // ########## OPERATION
 (async () => {
