@@ -6,6 +6,7 @@ node_modules/
 
 # Temporary files
 temp/
+screenShots/
 
 # System files
 .DS_Store
