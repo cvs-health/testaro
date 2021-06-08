@@ -12,7 +12,7 @@
     },
     {
       "type": "focus",
-      "what": "link",
+      "what": "a",
       "which": "Organization"
     },
     {

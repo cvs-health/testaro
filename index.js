@@ -54,7 +54,7 @@ const moves = {
   select: 'select',
   button: 'button',
   link: 'a',
-  focus: ''
+  focus: true
 };
 const testNames = [
   'autocom',
@@ -577,7 +577,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
           }
           // Otherwise, if the act targets a text-identified element:
           else if (moves[type]) {
-            const selector = moves[type] || act.what;
+            const selector = typeof moves[type] === 'string' ? moves[type] : act.what;
             // Identify the index of the specified element among same-type elements.
             const whichIndex = await matchIndex(page, selector, which);
             // If it exists:
