@@ -506,16 +506,15 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
         // Otherwise, if the act is a wait:
         else if (type === 'wait') {
           // Wait for the specified text to appear in the specified place.
-          await page.waitForFunction(which => {
-            const {type, text} = which;
+          await page.waitForFunction(act => {
             const {URL, title, body} = document;
             const success = {
-              url: body && URL && URL.includes(text),
-              title: body && title && title.includes(text),
-              body: body && body.textContent && body.textContent.includes(text)
+              url: body && URL && URL.includes(act.which),
+              title: body && title && title.includes(act.which),
+              body: body && body.textContent && body.textContent.includes(act.which)
             };
-            return success[type];
-          }, which, {timeout: 20000});
+            return success[act.what];
+          }, act, {timeout: 20000});
           // Add the resulting URL to the act.
           act.result = page.url();
         }
