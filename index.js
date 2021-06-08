@@ -12,6 +12,7 @@ const http = require('http');
 // Module to create an HTTPS server and client.
 const https = require('https');
 const {injectAxe, getViolations} = require('axe-playwright');
+const {commands} = require('./commands');
 // ########## CONSTANTS
 // Set debug to true to add debugging features.
 const debug = false;
@@ -52,7 +53,8 @@ const moves = {
   checkbox: 'input[type=checkbox]',
   select: 'select',
   button: 'button',
-  link: 'a'
+  link: 'a',
+  focus: ''
 };
 const testNames = [
   'autocom',
@@ -72,6 +74,7 @@ const browserTypeNames = {
   'firefox': 'Firefox',
   'webkit': 'Safari'
 };
+const waitables = ['url', 'title', 'body'];
 // ########## VARIABLES
 let browserContext;
 let browserTypeName;
@@ -350,21 +353,134 @@ const matchIndex = async (page, selector, text) => await page.$eval(
 const isBrowserType = type => ['chromium', 'firefox', 'webkit'].includes(type);
 // Validates a URL.
 const isURL = string => /^(?:https?|file):\/\/[^ ]+$/.test(string);
-// Recursively performs the acts of a script.
+// Validates a focusable tag name.
+const isTagName = string => ['a', 'button', 'input', 'select', 'option'].includes(string);
+// Returns whether a variable has a specified type.
+const areStrings = array => array.every(element => typeof element === 'string');
+// Returns whether a variable has a specified type.
+const hasType = (variable, type) => {
+  if (type === 'string') {
+    return typeof variable === 'string';
+  }
+  else if (type === 'array') {
+    return Array.isArray(variable);
+  }
+  else {
+    return false;
+  }
+};
+// Returns whether a variable has a specified type.
+const hasSubtype = (variable, subtype) => {
+  if (subtype === 'hasLength') {
+    return variable.length > 0;
+  }
+  else if (subtype === 'isURL') {
+    return isURL(variable);
+  }
+  else if (subtype === 'isBrowserType') {
+    return isBrowserType(variable);
+  }
+  else if (subtype === 'isTagName') {
+    return isTagName(variable);
+  }
+  else if (subtype === 'isCustomTest') {
+    return testNames.includes(variable);
+  }
+  else if (subtype === 'isWaitable') {
+    return waitables.includes(variable);
+  }
+  else if (subtype === 'areStrings') {
+    return areStrings(variable);
+  }
+  else {
+    return false;
+  }
+};
+// Validates a command.
+const isValid = command => {
+  // If the command has a known type:
+  if (command.type && commands[command.type]) {
+    // Identify the validation specifications of that type.
+    const validator = commands[command.type][1];
+    // If the specifications permit or require a which property:
+    if (validator.which) {
+      // If the command has a which property:
+      if (command.which) {
+        // If its value has the required type:
+        if (hasType(command.which, validator.which[1])) {
+          // If its value has the required subtype:
+          if (hasSubtype(command.which, validator.which[2])) {
+            // If the specifications permit or require a what property:
+            if (validator.what) {
+              // If the command has a what property:
+              if (command.what) {
+                // If its value has the required type:
+                if (hasType(command.what, validator.what[1])) {
+                  // Return whether its value has the required subtype:
+                  return hasSubtype(command.what, validator.what[2]);
+                }
+                // Otherwise, i.e. if its value does not have the required type:
+                else {
+                  // Return failure.
+                  return false;
+                }
+              }
+              // Otherwise, i.e. if the command does not have a what property:
+              else {
+                // Return whether a what property is optional.
+                return ! validator.what[0];
+              }
+            }
+            // Otherwise, i.e. if the specifications prohibit a what property:
+            else {
+              // Return whether the command has no what property.
+              return ! command.what;
+            }
+          }
+          // Otherwise, i.e. if the which value does not have the required subtype:
+          else {
+            // Return failure.
+            return false;
+          }
+        }
+        // Otherwise, i.e. if the which value does not have the required type:
+        else {
+          // Return failure.
+          return false;
+        }
+      }
+      // Otherwise, i.e. if the command has no which property:
+      else {
+        // Return whether a which property is optional.
+        return ! validator.which[0];
+      }
+    }
+    // Otherwise, i.e. if the specifications prohibit a which property:
+    else {
+      // Return whether the command has no which property.
+      return ! command.which;
+    }
+  }
+  // Otherwise, i.e. if the command has an unknown or no type:
+  else {
+    // Return failure.
+    return false;
+  }
+};
+// Recursively performs the acts commanded in a report.
 const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
+  // Identify the acts in the report. Their initial values are commands.
   const {acts} = report;
-  // If any acts remain unperformed:
+  // If any commands remain unperformed:
   if (actIndex < acts.length) {
-    // Identify the act (an element of report.acts) to be performed.
+    // Identify the acts to be performed.
     const act = acts[actIndex];
-    const {type, which, what} = act;
-    // If the act has the universally required property:
-    if (type) {
-      // If the act is a valid launch:
-      if (
-        type === 'launch'
-        && isBrowserType(which)
-      ) {
+    // If the command is valid:
+    if (isValid(act)) {
+      // Identify the command properties.
+      const {type, which, what} = act;
+      // If the command is a launch:
+      if (type === 'launch') {
         // Launch the specified browser, creating a browser context and a page in it.
         await launch(which);
         // Identify its only page as current.
@@ -372,8 +488,8 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
       }
       // Otherwise, if a current page exists:
       else if (page) {
-        // If the act is a valid url:
-        if (type === 'url' && isURL(which)) {
+        // If the command is a url:
+        if (type === 'url') {
           // Visit it.
           try {
             await page.goto(which);
@@ -387,14 +503,8 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
             act.result = 'ERROR';
           }
         }
-        // Otherwise, if the act is a valid wait:
-        else if (
-          type === 'wait'
-          && which
-          && which.type
-          && ['url', 'title', 'body'].includes(which.type)
-          && which.text
-        ) {
+        // Otherwise, if the act is a wait:
+        else if (type === 'wait') {
           // Wait for the specified text to appear in the specified place.
           await page.waitForFunction(which => {
             const {type, text} = which;
@@ -419,31 +529,20 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
           const result = {
             url: page.url()
           };
-          if (which) {
-            result.description = which;
-          }
           act.result = result;
         }
         // Otherwise, if the act is a valid WAVE type-1 test:
-        else if (type === 'wave1' && (page.url() || isURL(which))) {
+        else if (type === 'wave1') {
           // Conduct a WAVE test and add the result to the act.
-          if (what) {
-            act.what = what;
-          }
-          if (which) {
-            act.which = which;
-          }
           act.result = await wave1(which || page.url());
         }
-        // Otherwise, if the required page URL exists:
+        // Otherwise, if the page has a URL:
         else if (page.url() && page.url() !== 'about:blank') {
           const url = page.url();
-          // Add it to the act.
+          // Add the URL to the act.
           act.url = url;
-          // If the act is a valid custom test:
-          if (
-            type === 'test' && typeof which === 'string' && which && testNames.includes(which)
-          ) {
+          // If the act is a custom test:
+          if (type === 'test') {
             // Conduct it.
             const testReport = await require(`./tests/${which}/app`)
             .reporter(page);
@@ -473,33 +572,13 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
             act.result = await axe(page, which);
           }
           // Otherwise, if the act is an axe summary:
-          else if (type === 'axes' && page.url() !== 'about:blank') {
+          else if (type === 'axes') {
             // Conduct it and add its result to the act.
             act.result = await axes(page);
           }
-          // Otherwise, if the act is a valid focus:
-          else if (type === 'focus' && which && which.type && moves[which.type]) {
-            // Identify the index of the specified element among same-type elements.
-            const {type, text} = which;
-            const whichIndex = await matchIndex(page, moves[type], text);
-            // If it exists:
-            if (whichIndex > -1) {
-              // Focus it.
-              await page.$eval(`:nth-match(${moves[type]}, ${whichIndex + 1})`, async element => {
-                await element.focus();
-              });
-              // Add a success result to the act.
-              act.result = 'focused';
-            }
-            // Otherwise, i.e. if the element does not exist:
-            else {
-              // Add a failure result to the act.
-              act.result = 'ELEMENT NOT FOUND';
-            }
-          }
-          // Otherwise, if the act is a valid move:
-          else if (moves[type] && typeof which === 'string' && which) {
-            const selector = moves[type];
+          // Otherwise, if the act targets a text-identified element:
+          else if (moves[type]) {
+            const selector = moves[type] || act.what;
             // Identify the index of the specified element among same-type elements.
             const whichIndex = await matchIndex(page, selector, which);
             // If it exists:
@@ -509,7 +588,10 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
               // Focus it.
               await whichElement.focus();
               // Perform the act on the element and add a move description to the act.
-              if (type === 'text' && typeof value === 'string' && what) {
+              if (type === 'focus') {
+                act.result = 'focused';
+              }
+              else if (type === 'text') {
                 await whichElement.type(what);
                 act.result = 'entered';
               }
@@ -550,7 +632,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
           // Otherwise, i.e. if the act type is unknown:
           else {
             // Add the error result to the act.
-            act.result = 'INVALID ACT';
+            act.result = 'INVALID COMMAND TYPE';
           }
         }
         // Otherwise, i.e. if the required page URL does not exist:
@@ -565,10 +647,10 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
         act.result = 'NO PAGE IDENTIFIED';
       }
     }
-    // Otherwise, i.e. if the act type is missing:
+    // Otherwise, i.e. if the command is invalid:
     else {
       // Add an error result to the act.
-      act.result = 'ACT TYPE MISSING';
+      act.result = `INVALID COMMAND OF TYPE ${act.type}`;
     }
     // Update the report file.
     fs.writeFile(`${reportDir}/report-${timeStamp}.json`, JSON.stringify(report, null, 2));
