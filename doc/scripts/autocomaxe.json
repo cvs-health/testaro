@@ -7,13 +7,21 @@
     },
     {
       "type": "url",
-      "which": "file://doc/form1.html",
+      "which": "https://jpdev.pro/blog/entries/0000/form1.html",
       "what": "Form with 3 erroneous and 1 correct autocomplete"
     },
     {
+      "type": "axes"
+    },
+    {
       "type": "axe",
-      "which": ["autocomplete"],
-      "what": "Test for autocomplete errors"
+      "which": ["autocomplete-valid"],
+      "what": "Axe test for autocomplete errors"
+    },
+    {
+      "type": "axe",
+      "which": [],
+      "what": "Axe test for all errors"
     }
   ]
 }
