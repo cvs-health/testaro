@@ -1,0 +1,27 @@
+{
+  "what": "Axe test on minimal page",
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium"
+    },
+    {
+      "type": "url",
+      "which": "https://jpdev.pro/jpdev/blog/entries/0000/minimal.html",
+      "what": "Minimal page"
+    },
+    {
+      "type": "test",
+      "which": "bodytext",
+      "what": "Show which page is actually being tested"
+    },
+    {
+      "type": "axes"
+    },
+    {
+      "type": "axe",
+      "which": [],
+      "what": "Axe test for all errors"
+    }
+  ]
+}

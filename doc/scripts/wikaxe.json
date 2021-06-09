@@ -1,5 +1,5 @@
 {
-  "what": "Axe test on form with 5 autocomplete errors",
+  "what": "Axe tests on Wiktionary page",
   "acts": [
     {
       "type": "launch",
@@ -7,8 +7,8 @@
     },
     {
       "type": "url",
-      "which": "https://jpdev.pro/jpdev/blog/entries/0000/autobad.html",
-      "what": "Form with 5 erroneous and 1 correct autocomplete"
+      "which": "https://eo.wiktionary.org/wiki/austerity",
+      "what": "Wiktionary page"
     },
     {
       "type": "axes"

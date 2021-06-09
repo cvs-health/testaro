@@ -58,6 +58,7 @@ const moves = {
 };
 const testNames = [
   'autocom',
+  'bodytext',
   'imgbg',
   'imgdec',
   'imginf',
