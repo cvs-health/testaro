@@ -1,0 +1,19 @@
+{
+  "what": "Axe test for autocomplete on form with 3 errors",
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium"
+    },
+    {
+      "type": "url",
+      "which": "file://doc/form1.html",
+      "what": "Form with 3 erroneous and 1 correct autocomplete"
+    },
+    {
+      "type": "axe",
+      "which": ["autocomplete"],
+      "what": "Test for autocomplete errors"
+    }
+  ]
+}
