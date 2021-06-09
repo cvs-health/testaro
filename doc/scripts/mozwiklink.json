@@ -1,0 +1,27 @@
+{
+  "what": "Comparison of a Mozilla and a Wikipedia page on link underlining",
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium"
+    },
+    {
+      "type": "url",
+      "which": "https://developer.mozilla.org/en-US/docs/Learn",
+      "what": "Mozilla Foundation page (Learn Web Development)"
+    },
+    {
+      "type": "test",
+      "which": "linkul"
+    },
+    {
+      "type": "url",
+      "which": "https://en.wikipedia.org/wiki/Client%E2%80%93server_model",
+      "what": "Wikipedia page (Client-Server Model)"
+    },
+    {
+      "type": "test",
+      "which": "linkul"
+    }
+  ]
+}
