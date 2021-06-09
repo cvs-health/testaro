@@ -1,4 +1,4 @@
-// Reports counts and fractions of underlined links among inline links.
+// Reports counts and fractions of underlined links among inline links adn lists them.
 exports.reporter = async page => await page.$eval('body', body => {
   const isTexty = node => {
     if (node) {
@@ -18,17 +18,32 @@ exports.reporter = async page => await page.$eval('body', body => {
   };
   const links = Array.from(body.getElementsByTagName('a'));
   const inLinks = links.filter(link => isTexty(link.previousSibling) || isTexty(link.nextSibling));
-  const ulInLinks = inLinks.filter(
-    link => window.getComputedStyle(link).textDecorationLine === 'underline'
-  );
-  const ulPercent = inLinks.length ? Math.floor(100 * ulInLinks.length / inLinks.length) : 'N/A';
+  const ulInLinkTexts = [];
+  const nulInLinkTexts = [];
+  inLinks.forEach(link => {
+    if (window.getComputedStyle(link).textDecorationLine === 'underline') {
+      ulInLinkTexts.push(link.textContent);
+    }
+    else {
+      nulInLinkTexts.push(link.textContent);
+    }
+  });
+  const ulPercent = inLinks.length
+    ? Math.floor(100 * ulInLinkTexts.length / inLinks.length)
+    : 'N/A';
   return {
     result: {
-      links: links.length,
-      inline: {
-        total: inLinks.length,
-        underlined: ulInLinks.length,
-        ulPercent
+      tally: {
+        links: links.length,
+        inline: {
+          total: inLinks.length,
+          underlined: ulInLinkTexts.length,
+          ulPercent
+        }
+      },
+      list: {
+        underlined: [ulInLinkTexts],
+        plain: [nulInLinkTexts]
       }
     }
   };

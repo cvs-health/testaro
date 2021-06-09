@@ -56,21 +56,22 @@ const moves = {
   link: 'a',
   focus: true
 };
-const testNames = [
-  'autocom',
-  'bodytext',
-  'imgbg',
-  'imgdec',
-  'imginf',
-  'inlab',
-  'labclash',
-  'linkul',
-  'role',
-  'roles',
-  'simple',
-  'state',
-  'stylediff'
-];
+const tests = {
+  autocom: 'list inputs with their autocomplete attributes',
+  bodytext: 'give the text content of the page body',
+  imgbg: 'show the background images and their related texts',
+  imgdec: 'show the decorative images and their related texts',
+  imginf: 'show the informative images and their related texts',
+  inlab: 'list the inputs and their labels',
+  labclash: 'describe inconsistencies in labeling',
+  linkul: 'tabulate and list underlined and other inline links',
+  linksul: 'tabulate inline links and how many are underlined',
+  role: 'list elements having role attributes',
+  roles: 'tabulate element tag names and roles assigned to them',
+  simple: 'perfunctory trivial test for testing',
+  state: 'show an element with and without its focus and hover states in 3 browsers',
+  stylediff: 'tabulate discrepancies in styles of links, buttons, an headings'
+};
 const browserTypeNames = {
   'chromium': 'Chrome',
   'firefox': 'Firefox',
@@ -386,7 +387,7 @@ const hasSubtype = (variable, subtype) => {
     return isTagName(variable);
   }
   else if (subtype === 'isCustomTest') {
-    return testNames.includes(variable);
+    return tests[variable];
   }
   else if (subtype === 'isWaitable') {
     return waitables.includes(variable);
@@ -545,8 +546,9 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
           // If the act is a custom test:
           if (type === 'test') {
             // Conduct it.
-            const testReport = await require(`./tests/${which}/app`)
-            .reporter(page);
+            const testReport = await require(`./tests/${which}/app`).reporter(page);
+            // Add a description of the test to the act.
+            act.what = tests[which];
             // If the test produced exhibits:
             if (testReport.exhibits) {
               // Add that fact to the act.
