@@ -16,16 +16,17 @@ exports.reporter = async page => await page.$eval('body', body => {
       return false;
     }
   };
+  const compact = string => string.replace(/[\t\n]/g, '').replace(/\s{2,}/g, ' ');
   const links = Array.from(body.getElementsByTagName('a'));
   const inLinks = links.filter(link => isTexty(link.previousSibling) || isTexty(link.nextSibling));
   const ulInLinkTexts = [];
   const nulInLinkTexts = [];
   inLinks.forEach(link => {
     if (window.getComputedStyle(link).textDecorationLine === 'underline') {
-      ulInLinkTexts.push(link.textContent);
+      ulInLinkTexts.push(compact(link.textContent));
     }
     else {
-      nulInLinkTexts.push(link.textContent);
+      nulInLinkTexts.push(compact(link.textContent));
     }
   });
   const ulPercent = inLinks.length
