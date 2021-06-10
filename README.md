@@ -107,6 +107,7 @@ Other custom tests on which further development is contemplated or is taking pla
 Autotest also contains some utilities that perform useful work. These are called _procs_ and are located in the `procs` directory. Procs belong to two categories:
 - _Report procs_ convert one or more reports to different reports.
 - _Script procs_ help create scripts.
+- _Test procs_ contain code that is used by multiple tests.
 
 Comments at the beginning of each proc describe what the proc does.
 
