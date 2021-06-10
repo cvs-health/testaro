@@ -91,18 +91,7 @@ As shown in this example, each command rule is an array with two elements. The f
 
 ### Tests
 
-Autotest contains these custom tests. Each test adds 
-- autocom: Lists `autocomplete`-eligible `input` elements with their `autocomplete` attributes and accessible names.
-- imgbg: Shows background images and the tag names and text contents of their elements.
-- imgdec: Shows decorative images and the tag names and text contents of their elements.
-- imginf: Shows informative images and the tag names and text contents of their elements.
-- inlab: Lists `input` elements, their labels, and their `fieldset` `legend` text contents.
-- labclash: Lists labeling conflicts of `input` and `select` elements.
-- role: Lists `role` attributes of elements.
-- roles: Lists counts of combinations of element tag names and role attributes.
-- simple: Creates a perfunctory useless report for testing.
-- state: Shows the currently focused element in normal, focused, hovered, and focused-hovered states in 3 browsers.
-- stylediff: Lists any differences in style properties, with counts, per link, button, and heading tag name.
+Autotest contains custom tests. There is a list of the custom tests, named `tests`, in the CONSTANTS section of the `index.js` file.
 
 Other custom tests on which further development is contemplated or is taking place include:
 - links with href="#"
@@ -112,7 +101,6 @@ Other custom tests on which further development is contemplated or is taking pla
 - skip link that is never visible
 - button inside link
 - button with no text content
-- invisible focus indicator
 
 ### Procs
 
