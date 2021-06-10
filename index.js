@@ -59,6 +59,8 @@ const moves = {
 const tests = {
   autocom: 'list inputs with their autocomplete attributes',
   bodytext: 'give the text content of the page body',
+  focusoutline: 'tabulate and list focusable elements with and without focus outlines',
+  focusoutlines: 'tabulate focusable elements with and without focus outlines',
   imgbg: 'show the background images and their related texts',
   imgdec: 'show the decorative images and their related texts',
   imginf: 'show the informative images and their related texts',
