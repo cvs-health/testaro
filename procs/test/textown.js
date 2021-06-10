@@ -15,7 +15,7 @@ exports.textOwn = (page, elementHandle) => page.evaluate(element => {
   }
   // Add any explicit and implicit labels to the array.
   const labelNodeList = element.labels;
-  if (labelNodeList.length) {
+  if (labelNodeList && labelNodeList.length) {
     const labels = Array.from(labelNodeList);
     const labelTexts = labels
     .map(el => el.textContent && debloat(el.textContent))
@@ -36,6 +36,14 @@ exports.textOwn = (page, elementHandle) => page.evaluate(element => {
         }
       }
     });
+  }
+  // Add any text content to the array.
+  const ownText = element.textContent;
+  if (ownText) {
+    const minText = debloat(ownText);
+    if (minText) {
+      elementTexts.push(minText);
+    }
   }
   return elementTexts.join('; ');
 }, elementHandle);

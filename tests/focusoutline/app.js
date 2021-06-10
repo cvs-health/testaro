@@ -13,11 +13,13 @@ exports.reporter = async page => {
     // Press the Tab key.
     await page.keyboard.press('Tab');
     // Identify the newly focused element.
-    const focused = await page.evaluateHandle(() => document.activeElement).asHandle();
+    const focusedJSHandle = await page.evaluateHandle(() => document.activeElement);
+    const focused = focusedJSHandle.asElement();
     // Get its tag name.
-    const focusTagName = await focused.getProperty('tagName');
+    const focusTagNameHandle = await focused.getProperty('tagName');
+    const focusTagName = await focusTagNameHandle.jsonValue();
     // If it is a focusable element on the page:
-    if (focused && focusTagName !== 'body') {
+    if (focused && focusTagName !== 'BODY') {
       // Get its text.
       const focusedText = await textOwn(page, focused);
       // Update the result properties.
