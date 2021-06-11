@@ -58,22 +58,22 @@ const moves = {
 };
 const tests = {
   autocom: 'list inputs with their autocomplete attributes',
-  bodytext: 'give the text content of the page body',
-  focusoutline: 'tabulate and list focusable elements with and without focus outlines',
-  focusoutlines: 'tabulate focusable elements with and without focus outlines',
-  imgalt: 'list the values of the alt attributes of img elements',
-  imgbg: 'show the background images and their related texts',
-  imgdec: 'show the decorative images and their related texts',
-  imginf: 'show the informative images and their related texts',
-  inlab: 'list the inputs and their labels',
-  labclash: 'describe inconsistencies in labeling',
+  bodyText: 'give the text content of the page body',
+  focusOutline: 'tabulate and list focusable elements with and without focus outlines',
+  focusOutlineS: 'tabulate focusable elements with and without focus outlines',
+  imgAlt: 'list the values of the alt attributes of img elements',
+  imgBg: 'show the background images and their related texts',
+  imgDec: 'show the decorative images and their related texts',
+  imgInf: 'show the informative images and their related texts',
+  inLab: 'list the inputs and their labels',
+  labClash: 'describe inconsistencies in labeling',
   linkUl: 'tabulate and list underlined and other inline links',
-  linksul: 'tabulate inline links and how many are underlined',
+  linkUlS: 'tabulate inline links and how many are underlined',
   role: 'list elements having role attributes',
-  roles: 'tabulate element tag names and roles assigned to them',
+  roleS: 'tabulate element tag names and roles assigned to them',
   simple: 'perfunctory trivial test for testing',
   state: 'show an element with and without its focus and hover states in 3 browsers',
-  stylediff: 'tabulate discrepancies in styles of links, buttons, an headings'
+  styleDiff: 'tabulate discrepancies in styles of links, buttons, an headings'
 };
 const browserTypeNames = {
   'chromium': 'Chrome',
