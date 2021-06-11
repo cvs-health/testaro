@@ -1,7 +1,7 @@
 // Reports counts and fractions of underlined links among inline links.
 exports.reporter = async page => {
   // Conduct underline-link test.
-  const data = await require('../../procs/test/linkul').linkul(page);
+  const data = await require('../../procs/test/linkUl').linkUl(page);
   return {
     result: {
       tally: {

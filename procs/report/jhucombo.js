@@ -1,5 +1,5 @@
 /*
-  jhucombo.js
+  jhuCombo.js
   Converts JSON JHU-WAVE and JHU-Axe reports to an HTML JHU-Combo report.
   This proc requires 3 arguments:
     0. the suffix of the base of the name of the JHU-WAVE report.
@@ -14,7 +14,7 @@ require('dotenv').config();
 // ########## CONSTANTS
 // Filenames.
 const waveSuffix = process.argv[2] || 'MISSING';
-const axesSuffix = process.argv[3] || 'MISSING';
+const axeSSuffix = process.argv[3] || 'MISSING';
 const comboSuffix = process.argv[4] || 'MISSING';
 // Report directory.
 const reportDir = process.env.REPORTDIR || 'MISSING';
@@ -70,12 +70,12 @@ const webify = relArray => {
 // ########## OPERATION
 (async () => {
   const waveJSON = await fs.readFile(`${reportDir}/report-${waveSuffix}.json`);
-  const axesJSON = await fs.readFile(`${reportDir}/report-${axesSuffix}.json`);
+  const axeSJSON = await fs.readFile(`${reportDir}/report-${axeSSuffix}.json`);
   const waveArray = JSON.parse(waveJSON).sort((a, b) => a.index - b.index);
-  const axesArray = JSON.parse(axesJSON).sort((a, b) => a.index - b.index);
+  const axeSArray = JSON.parse(axeSJSON).sort((a, b) => a.index - b.index);
   const relArray = waveArray
   .map((act, index) => ({
-    score: act.score + axesArray[index].score,
+    score: act.score + axeSArray[index].score,
     name: act.name,
     url: act.url
   }))

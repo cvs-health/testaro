@@ -7,7 +7,7 @@ exports.reporter = async page => {
   const outlinedTexts = [];
   const plainTexts = [];
   // Import the textOwn function.
-  const {textOwn} = require('../../procs/test/textown');
+  const {allText} = require('../../procs/test/alltext');
   // As long as Tab keypresses move the focus to within the page:
   while (focusInDoc) {
     // Press the Tab key.
@@ -21,7 +21,7 @@ exports.reporter = async page => {
     // If it is a focusable element in the page:
     if (focused && focusTagName !== 'BODY') {
       // Get its text.
-      const focusedText = await textOwn(page, focused);
+      const focusedText = await allText(page, focused);
       // Update the result properties.
       const verdict = await page.evaluate(focused => {
         const outlineWidth = window.getComputedStyle(focused).outlineWidth;

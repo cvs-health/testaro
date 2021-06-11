@@ -1,5 +1,5 @@
 // Returns counts, fractions, and texts of inline links, by whether underlined.
-exports.linkul = async page => await page.$eval('body', body => {
+exports.linkUl = async page => await page.$eval('body', body => {
   // Returns whether all child elements of an element have inline display.
   const isInline = element => {
     const children = Array.from(element.children);

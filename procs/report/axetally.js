@@ -1,5 +1,5 @@
 /*
-  axetally.js
+  axeTally.js
   Converts an axe report to an all-acts tally of rule violations by severity.
 */
 // ########## IMPORTS

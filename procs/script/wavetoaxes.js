@@ -1,9 +1,9 @@
 /*
-  wavetoaxes.js
-  Converts a wave1 script to an axes script.
+  waveToAxeS.js
+  Converts a wave1 script to an axeS script.
   This proc requires 2 arguments:
     0. the base of the name of the wave1 script file.
-    1. The base of the name of the axes script file to be created.
+    1. The base of the name of the axeS script file to be created.
 */
 // ########## IMPORTS
 // Module to access files.
@@ -20,20 +20,20 @@ const scriptDir = process.env.SCRIPTDIR || 'MISSING';
 fs.readFile(`${scriptDir}/${inName}.json`, 'utf8')
 .then(waveJSON => {
   const waveScript = JSON.parse(waveJSON);
-  const axesScript = {
+  const axeSScript = {
     what: waveScript.what,
     acts: [waveScript.acts[0]]
   };
   waveScript.acts.slice(1).forEach(act => {
-    axesScript.acts.push({
+    axeSScript.acts.push({
       type: 'url',
       which: act.which,
       what: act.what
     });
-    axesScript.acts.push({
-      type: 'axes',
+    axeSScript.acts.push({
+      type: 'axeS',
       what: act.what
     });
   });
-  fs.writeFile(`${scriptDir}/${outName}.json`, `${JSON.stringify(axesScript, null, 2)}\n`);
+  fs.writeFile(`${scriptDir}/${outName}.json`, `${JSON.stringify(axeSScript, null, 2)}\n`);
 });

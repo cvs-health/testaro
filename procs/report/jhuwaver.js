@@ -1,5 +1,5 @@
 /*
-  waves.js
+  jhuWaveR.js
   Converts a wave1 report to a Rankless JHU-WAVE report listing per-URL scores.
 */
 // ########## IMPORTS

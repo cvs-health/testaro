@@ -1,49 +1,52 @@
 // Returns the text contents of an element and its labels.
-exports.textOwn = (page, elementHandle) => page.evaluate(element => {
-  // Initialize an array of the texts.
-  const elementTexts = [];
+exports.allText = (page, elementHandle) => page.evaluate(element => {
+  // Identify the element, if specified, or else the focused element.
+  const el = element || document.activeElement;
+  // Initialize an array of its texts.
+  const texts = [];
   // FUNCTION DEFINITION START
   const debloat = text => text.trim().replace(/\s+/g, ' ');
   // FUNCTION DEFINITION END
   // Add any attribute label to the array.
-  const ariaLabel = element.getAttribute('aria-label');
+  const ariaLabel = el.getAttribute('aria-label');
   if (ariaLabel) {
     const trimmedLabel = debloat(ariaLabel);
     if (trimmedLabel) {
-      elementTexts.push(trimmedLabel);
+      texts.push(trimmedLabel);
     }
   }
   // Add any explicit and implicit labels to the array.
-  const labelNodeList = element.labels;
+  const labelNodeList = el.labels;
   if (labelNodeList && labelNodeList.length) {
     const labels = Array.from(labelNodeList);
     const labelTexts = labels
-    .map(el => el.textContent && debloat(el.textContent))
+    .map(label => label.textContent && debloat(label.textContent))
     .filter(text => text);
     if (labelTexts.length) {
-      elementTexts.push(...labelTexts);
+      texts.push(...labelTexts);
     }
   }
   // Add any referenced labels to the array.
-  if (element.hasAttribute('aria-labelledby')) {
-    const labelerIDs = element.getAttribute('aria-labelledby').split(/\s+/);
+  if (el.hasAttribute('aria-labelledby')) {
+    const labelerIDs = el.getAttribute('aria-labelledby').split(/\s+/);
     labelerIDs.forEach(id => {
       const labeler = document.getElementById(id);
       if (labeler) {
         const labelerText = debloat(labeler.textContent);
         if (labelerText) {
-          elementTexts.push(labelerText);
+          texts.push(labelerText);
         }
       }
     });
   }
-  // Add any text content to the array.
+  // Add any text content of the element to the array.
   const ownText = element.textContent;
   if (ownText) {
     const minText = debloat(ownText);
     if (minText) {
-      elementTexts.push(minText);
+      texts.push(minText);
     }
   }
-  return elementTexts.join('; ');
+  // Return a concatenation of the texts in the array.
+  return texts.join('; ');
 }, elementHandle);

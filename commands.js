@@ -6,7 +6,7 @@ exports.commands = {
       'what': [false, 'string', 'hasLength']
     }
   ],
-  'axes': [
+  'axeS': [
     'Perform an Axe test with all rules and report only totals (what: description)',
     {
       'what': [false, 'string', 'hasLength']

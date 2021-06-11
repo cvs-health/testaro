@@ -1,5 +1,5 @@
 /*
-  jhuwave.js
+  jhuWave.js
   Converts a wave1 report to JSON and HTML JHU-WAVE reports listing per-URL scores.
   This proc requires 2 arguments:
     0. the suffix of the base of the name of the wave1 report.

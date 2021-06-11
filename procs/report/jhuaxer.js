@@ -1,6 +1,6 @@
 /*
-  axes.js
-  Converts an axes report to a Rankless JHU-Axe report listing per-URL scores.
+  jhuAxeR.js
+  Converts an axeS report to a Rankless JHU-Axe report listing per-URL scores.
 */
 // ########## IMPORTS
 // Module to access files.
@@ -33,7 +33,7 @@ const distill = async () => {
   const relArray = report
   .acts
   .filter(act =>
-    act.type === 'axes'
+    act.type === 'axeS'
     && act.which
     && act.url
     && act.result

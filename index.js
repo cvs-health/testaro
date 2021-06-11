@@ -67,7 +67,7 @@ const tests = {
   imginf: 'show the informative images and their related texts',
   inlab: 'list the inputs and their labels',
   labclash: 'describe inconsistencies in labeling',
-  linkul: 'tabulate and list underlined and other inline links',
+  linkUl: 'tabulate and list underlined and other inline links',
   linksul: 'tabulate inline links and how many are underlined',
   role: 'list elements having role attributes',
   roles: 'tabulate element tag names and roles assigned to them',
@@ -156,7 +156,7 @@ const axe = async (page, rules) => {
   }
 };
 // Conducts all axe tests and returns a summary.
-const axes = async page => {
+const axeS = async page => {
   // Count the elements in the page.
   const elementCount = await page.$$eval('*', elements => elements.length);
   // Inject axe-core into the page.
@@ -578,9 +578,9 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
             act.result = await axe(page, which);
           }
           // Otherwise, if the act is an axe summary:
-          else if (type === 'axes') {
+          else if (type === 'axeS') {
             // Conduct it and add its result to the act.
-            act.result = await axes(page);
+            act.result = await axeS(page);
           }
           // Otherwise, if the act targets a text-identified element:
           else if (moves[type]) {

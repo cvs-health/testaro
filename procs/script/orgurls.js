@@ -1,5 +1,5 @@
 /*
-  orgurls.js
+  orgURLs.js
   Converts a file of organization names to a file of organization names and URLs.
   This proc requires:
     0. a KickFire API key, provided by a KICKFIRE_KEY entry in the .env file.

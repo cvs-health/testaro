@@ -1,8 +1,8 @@
 /*
-  jhuaxe.js
-  Converts an axes report to JSON and HTML JHU-Axe reports listing per-URL scores.
+  jhuAxe.js
+  Converts an axeS report to JSON and HTML JHU-Axe reports listing per-URL scores.
   This proc requires 2 arguments:
-    0. the suffix of the base of the name of the axes report.
+    0. the suffix of the base of the name of the axeS report.
     1. the suffix of the base of the name of the JHU-Axe report.
 */
 // ########## IMPORTS
@@ -12,7 +12,7 @@ const fs = require('fs').promises;
 require('dotenv').config();
 // ########## CONSTANTS
 // Filenames.
-const axesSuffix = process.argv[2] || 'MISSING';
+const axeSSuffix = process.argv[2] || 'MISSING';
 const jhuAxeSuffix = process.argv[3] || 'MISSING';
 // Weights.
 const weights = {
@@ -31,13 +31,13 @@ const reportDir = process.env.REPORTDIR || 'MISSING';
 // Distills the report into the relevant array.
 const distill = async () => {
   // Get the report.
-  const reportJSON = await fs.readFile(`${reportDir}/report-${axesSuffix}.json`, 'utf8');
+  const reportJSON = await fs.readFile(`${reportDir}/report-${axeSSuffix}.json`, 'utf8');
   const report = JSON.parse(reportJSON);
   // Distill it into the relevant array.
   const relArray = report
   .acts
   .filter(act =>
-    act.type === 'axes'
+    act.type === 'axeS'
     && act.what
     && act.url
     && act.result

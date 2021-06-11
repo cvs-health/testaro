@@ -1,5 +1,5 @@
 /*
-  urlwave.js
+  urlWave.js
   Converts a text file of names and URLs, @-delimited, to a wave1 script.
   This proc requires 2 or 3 arguments:
     0. the base of the name of the file of data.
