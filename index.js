@@ -61,6 +61,7 @@ const tests = {
   bodytext: 'give the text content of the page body',
   focusoutline: 'tabulate and list focusable elements with and without focus outlines',
   focusoutlines: 'tabulate focusable elements with and without focus outlines',
+  imgalt: 'list the values of the alt attributes of img elements',
   imgbg: 'show the background images and their related texts',
   imgdec: 'show the decorative images and their related texts',
   imginf: 'show the informative images and their related texts',
