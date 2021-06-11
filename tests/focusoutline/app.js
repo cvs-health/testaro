@@ -18,7 +18,7 @@ exports.reporter = async page => {
     // Get its tag name.
     const focusTagNameHandle = await focused.getProperty('tagName');
     const focusTagName = await focusTagNameHandle.jsonValue();
-    // If it is a focusable element on the page:
+    // If it is a focusable element in the page:
     if (focused && focusTagName !== 'BODY') {
       // Get its text.
       const focusedText = await textOwn(page, focused);
