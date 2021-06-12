@@ -12,7 +12,7 @@
     },
     {
       "type": "test",
-      "which": "bodytext",
+      "which": "bodyText",
       "what": "Show which page is actually being tested"
     },
     {

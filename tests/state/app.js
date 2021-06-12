@@ -102,11 +102,15 @@ exports.reporter = async page => {
         await reportBox.elements[0].dispatchEvent('mouseout');
       }
     }
-    // Make a screen shot.
+    /*
+      Make a screen shot.
+      fullPage option must be true in about half and false in about half the cases.
+      See https://github.com/microsoft/playwright/issues/620 for a related discussion.
+    */
     await page.screenshot({
       clip: getShotBox(margin, reportBox.box),
       path: `screenShots/${unique}-${state}.png`,
-      fullPage: true
+      fullPage: false
     });
   };
   // Creates and records 2 screen shots in a browser.
@@ -162,7 +166,7 @@ exports.reporter = async page => {
     };
     const figureOf = state => `<figure><figcaption>${states[state]}</figcaption><img src="screenshots/${unique}-${state}.png" alt="${states[state]} state of image"></figure>`;
     const figures = Object.keys(states).map(state => figureOf(state)).join('\n          ');
-    const exhibits = `<h3>__browserTypeName__</h3>\n${figures}\n</h3>`;
+    const exhibits = `<h3>__browserTypeName__</h3>\n${figures}\n`;
     // Return success and the exhibits.
     return {
       result: 'screenshots made',

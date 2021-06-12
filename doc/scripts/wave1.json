@@ -7,17 +7,17 @@
     },
     {
       "type": "wave1",
-      "which": "https://jpdev.pro/blog/0004/index1.html",
+      "which": "https://jpdev.pro/jpdev/blog/entries/0000/index1.html",
       "what": "Test page 1"
     },
     {
       "type": "wave1",
-      "which": "https://jpdev.pro/blog/0004/index2.html",
+      "which": "https://jpdev.pro/jpdev/blog/entries/0000/index2.html",
       "what": "Test page 2"
     },
     {
       "type": "wave1",
-      "which": "https://jpdev.pro/blog/0004/index3.html",
+      "which": "https://jpdev.pro/jpdev/blog/entries/0000/index3.html",
       "what": "Test page 3"
     }
   ]
