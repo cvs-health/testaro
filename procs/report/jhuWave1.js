@@ -1,9 +1,9 @@
 /*
   jhuWave.js
-  Converts a wave1 report to JSON and HTML JHU-WAVE reports listing per-URL scores.
+  Converts a wave1 report to JSON and HTML jhuWave1 reports listing per-URL scores.
   This proc requires 2 arguments:
     0. the suffix of the base of the name of the wave1 report.
-    1. the suffix of the base of the name of the JHU-WAVE report.
+    1. the suffix of the base of the name of the jhuWave1 report.
 */
 // ########## IMPORTS
 // Module to access files.

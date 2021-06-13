@@ -1,10 +1,10 @@
 /*
   jhuCombo.js
-  Converts JSON JHU-WAVE and JHU-Axe reports to an HTML JHU-Combo report.
+  Converts JSON jhuWave1 and jhuAxe reports to an HTML jhuCombo report.
   This proc requires 3 arguments:
-    0. the suffix of the base of the name of the JHU-WAVE report.
-    1. the suffix of the base of the name of the JHU-Axe report.
-    2. the suffix of the base of the name of the JHU-Combo report.
+    0. the suffix of the base of the name of the jhuWave1 report.
+    1. the suffix of the base of the name of the jhuAxe report.
+    2. the suffix of the base of the name of the jhuCombo report.
 */
 // ########## IMPORTS
 // Module to access files.

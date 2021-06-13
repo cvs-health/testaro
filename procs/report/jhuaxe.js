@@ -1,9 +1,9 @@
 /*
   jhuAxe.js
-  Converts an axeS report to JSON and HTML JHU-Axe reports listing per-URL scores.
+  Converts an axeS report to JSON and HTML jhuAxe reports listing per-URL scores.
   This proc requires 2 arguments:
     0. the suffix of the base of the name of the axeS report.
-    1. the suffix of the base of the name of the JHU-Axe report.
+    1. the suffix of the base of the name of the jhuAxe report.
 */
 // ########## IMPORTS
 // Module to access files.
