@@ -6,6 +6,13 @@ exports.focusedData = async (page, groupFirst) => page.evaluate(groupFirst => {
   const focused = document.activeElement;
   // If it is a focusable element in the page:
   if (focused && focused !== document.body) {
+    // If in-group navigation is taking place:
+    if (groupFirst) {
+      // If navigation has not yet returned to the
+    }
+    if (focused !== groupFirst) {
+
+    }
   }
 }, groupFirst);
     const outlineWidth = window.getComputedStyle(focused).outlineWidth;
