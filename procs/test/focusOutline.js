@@ -6,7 +6,7 @@ exports.focusOutline = async page => {
   const outlinedTexts = [];
   const plainTexts = [];
   // Import the textOwn function.
-  const {allText} = require('./alltext');
+  const {allText} = require('./allText');
   // FUNCTION DEFINITION START
   // Identifies an ElementHandle of the focused in-body element or a failure status.
   const focused = async () => {
@@ -36,7 +36,8 @@ exports.focusOutline = async page => {
       }
     });
     // Get the failure status.
-    const status = focusJSHandle.getProperty('atFocusStatus');
+    const statusHandle = await focusJSHandle.getProperty('atFocusStatus');
+    const status = await statusHandle.jsonValue();
     // If there is one:
     if (status) {
       // Return it.
@@ -49,8 +50,6 @@ exports.focusOutline = async page => {
     }
   };
   // FUNCTION DEFINITION END
-  // Initialize the status.
-  let statusOK = true;
   // Identify the navigation-key sequence.
   const nextNavKeys = {
     Tab: ['ArrowRight', null],
@@ -61,13 +60,23 @@ exports.focusOutline = async page => {
   await page.keyboard.press('Tab');
   // Initialize the last-pressed navigation key.
   let lastNavKey = 'Tab';
-  // As long as there is no failure status:
-  while (statusOK) {
+  // FUNCTION DEFINITION START
+  // Recursively reports on focus outlines.
+  const reportOutlines = async () => {
     // Identify and mark the newly focused element or report a failure.
     const focus = await focused();
-    // If there is a newly focused element:
-    if (typeof focus === 'object') {
-      // Get its text.
+    // Identify the failure status, if any.
+    const failure = typeof focus === 'string' ? focus : null;
+    // If it is a refocused element and the last navigation key was an arrow key:
+    if (failure === 'already' && ['ArrowRight', 'ArrowDown'].includes(lastNavKey)) {
+      // Press the next post-failure navigation key.
+      await page.keyboard.press(lastNavKey = nextNavKeys[lastNavKey][1]);
+      // Process the element focused by that keypress.
+      await reportOutlines();
+    }
+    // Otherwise, if there is no failure:
+    else if (! failure) {
+      // Get the text of the newly focused element.
       const focusText = await allText(page, focus);
       // Determine whether it is outlined when focused.
       const verdict = await page.evaluate(focus => {
@@ -84,32 +93,13 @@ exports.focusOutline = async page => {
         plainTexts.push(focusText);
       }
       // Press the next post-success navigation key.
-      await page.keyboard.press(nextNavKeys[lastNavKey][0]);
+      await page.keyboard.press(lastNavKey = nextNavKeys[lastNavKey][0]);
+      // Process the element focused by that keypress.
+      await reportOutlines();
     }
-    // Otherwise, if the focused element was previously focused:
-    else if (focus === 'already') {
-      // If the last navigation key was Tab:
-      if (lastNavKey === 'Tab') {
-        // Quit.
-        statusOK = false;
-      }
-      // Otherwise, i.e. if the last navigation key was an arrow key:
-      else {
-        // Press the next post-failure navigation key.
-        await page.keyboard.press(nextNavKeys[lastNavKey][1]);
-      }
-    }
-    // Otherwise, if the focused element is not within the body:
-    else if (focus === 'no') {
-      // Quit.
-      statusOK = false;
-    }
-    // Otherwise, if there was an error:
-    else {
-      // Report it.
-      console.log('ERROR');
-    }
-  }
+  };
+  // FUNCTION DEFINITION END
+  await reportOutlines();
   // Return the result.
   return {
     result: {
