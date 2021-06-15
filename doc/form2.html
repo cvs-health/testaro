@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Page containing details elements</title>
+    <meta
+      name="description"
+      content="details tester"
+    >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <main>
+      <h1>Page containing details elements</h1>
+      <h2>This details element contains plain text.</h2>
+      <details>
+        <summary>The Earth is a planet.</summary>
+        <p>It is in the Solar System.</p>
+        <p>It is the third planet by distance from the Sun.</p>
+      </details>
+      <h2>This details element contains links.</h2>
+      <details>
+        <summary>Read about the Earth.</summary>
+        <p>It is in the <a href="https://solarsystem.nasa.gov/solar-system/our-solar-system/overview/">Solar System</a>.</p>
+        <p>It is the <a href="https://en.wikipedia.org/wiki/Ordinal_number">third</a> planet by distance from the Sun.</p>
+      </details>
+      <form>
+        <h2>This details element contains checkboxes.</h2>
+        <details>
+          <summary>Which facts are true about the Earth?</summary>
+          <p><label><input type="checkbox" name="ss"> It is in the Solar System.</label></p>
+          <p><label><input type="checkbox" name="star"> It is a star.</label></p>
+          <p><label><input type="checkbox" name="postJup"> It is farther than Jupiter from the Sun.</label></p>
+        </details>
+        <h2>This details element contains radio buttons.</h2>
+        <details>
+          <summary>Which star is the Earth a planet of?</summary>
+          <p><label><input type="radio" name="star" value="eta" checked> Eta Carinae</label></p>
+          <p><label><input type="radio" name="star" value="bet"> Betelgeuse</label></p>
+          <p><label><input type="radio" name="star" value="sun"> Sun</label></p>
+        </details>
+      </form>
+    </main>
+  </body>
+</html>

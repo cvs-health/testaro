@@ -1,12 +1,12 @@
 // Returns a tabulation, and lists of texts, of elements with and without focal outlines.
-exports.focusOutline = async page => {
+exports.focusOutline = async (page, withTexts) => {
   // Initialize the result properties.
   let focusableCount = 0;
   let outlinedCount = 0;
   const outlinedTexts = [];
   const plainTexts = [];
-  // Import the textOwn function.
-  const {allText} = require('./allText');
+  // Import the textOwn function if necessary.
+  const allText = withTexts ? require('./allText').allText : '';
   // FUNCTION DEFINITION START
   // Identifies an ElementHandle of the focused in-body element or a failure status.
   const focused = async () => {
@@ -76,8 +76,8 @@ exports.focusOutline = async page => {
     }
     // Otherwise, if there is no failure:
     else if (! failure) {
-      // Get the text of the newly focused element.
-      const focusText = await allText(page, focus);
+      // Get the text of the newly focused element if necessary.
+      const focusText = withTexts ? await allText(page, focus) : '';
       // Determine whether it is outlined when focused.
       const verdict = await page.evaluate(focus => {
         const outlineWidth = window.getComputedStyle(focus).outlineWidth;
@@ -86,11 +86,13 @@ exports.focusOutline = async page => {
       // Increment the applicable counts.
       focusableCount++;
       outlinedCount += verdict;
-      if (verdict) {
-        outlinedTexts.push(focusText);
-      }
-      else {
-        plainTexts.push(focusText);
+      if (withTexts) {
+        if (verdict) {
+          outlinedTexts.push(focusText);
+        }
+        else {
+          plainTexts.push(focusText);
+        }
       }
       // Press the next post-success navigation key.
       await page.keyboard.press(lastNavKey = nextNavKeys[lastNavKey][0]);
@@ -101,13 +103,14 @@ exports.focusOutline = async page => {
   // FUNCTION DEFINITION END
   await reportOutlines();
   // Return the result.
-  return {
-    result: {
-      focusableCount,
-      outlinedCount,
-      outlinedPercent: Math.floor(100 * outlinedCount / focusableCount),
-      outlinedTexts,
-      plainTexts
-    }
+  const result = {
+    focusableCount,
+    outlinedCount,
+    outlinedPercent: Math.floor(100 * outlinedCount / focusableCount)
   };
+  if (withTexts) {
+    result.outlinedTexts = outlinedTexts;
+    result.plainTexts = plainTexts;
+  }
+  return {result};
 };

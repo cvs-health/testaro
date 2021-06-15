@@ -498,7 +498,8 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
         if (type === 'url') {
           // Visit it.
           try {
-            await page.goto(which);
+            const resolved = which.replace('__dirname', __dirname);
+            await page.goto(resolved);
             // Wait until it is stable.
             await page.waitForLoadState('networkidle', {timeout: 20000});
             // Add the resulting URL to the act.
