@@ -1,13 +1,17 @@
-// Returns a tabulation, and lists of texts, of elements with and without focal outlines.
-exports.focusOutline = async (page, withTexts) => {
-  // Initialize the result properties.
-  let focusableCount = 0;
-  let outlinedCount = 0;
-  const outlinedTexts = [];
-  const plainTexts = [];
-  // Import the textOwn function if necessary.
-  const allText = withTexts ? require('./allText').allText : '';
-  // FUNCTION DEFINITION START
+// Marks elements that can be keyboard-focused.
+exports.markFocusable = async page => {
+
+  // ## CONSTANTS
+
+  // Navigation-key sequence.
+  const nextNavKeys = {
+    Tab: ['ArrowRight', null],
+    ArrowRight: ['ArrowRight', 'ArrowDown'],
+    ArrowDown: ['ArrowDown', 'Tab']
+  };
+
+  // ### FUNCTIONS
+
   // Identifies and marks the focused in-body element or identifies a failure status.
   const focused = async () => {
     // Identify a JSHandle of the focused element or a failure status.
@@ -49,21 +53,9 @@ exports.focusOutline = async (page, withTexts) => {
       return focusJSHandle.asElement();
     }
   };
-  // FUNCTION DEFINITION END
-  // Identify the navigation-key sequence.
-  const nextNavKeys = {
-    Tab: ['ArrowRight', null],
-    ArrowRight: ['ArrowRight', 'ArrowDown'],
-    ArrowDown: ['ArrowDown', 'Tab']
-  };
-  // Press the Tab key.
-  await page.keyboard.press('Tab');
-  // Initialize the last-pressed navigation key.
-  let lastNavKey = 'Tab';
-  // FUNCTION DEFINITION START
-  // Recursively reports on focus outlines.
-  const reportOutlines = async () => {
-    // Identify and mark the newly focused element or report a failure.
+  // Recursively focuses and marks elements.
+  const markFocused = async () => {
+    // Identify and mark the newly focused element or identify a failure.
     const focus = await focused();
     // Identify the failure status, if any.
     const failure = typeof focus === 'string' ? focus : null;
@@ -72,45 +64,24 @@ exports.focusOutline = async (page, withTexts) => {
       // Press the next post-failure navigation key.
       await page.keyboard.press(lastNavKey = nextNavKeys[lastNavKey][1]);
       // Process the element focused by that keypress.
-      await reportOutlines();
+      await markFocused();
     }
     // Otherwise, if there is no failure:
     else if (! failure) {
-      // Get the text of the newly focused element if necessary.
-      const focusText = withTexts ? await allText(page, focus) : '';
-      // Determine whether it is outlined when focused.
-      const verdict = await page.evaluate(focus => {
-        const outlineWidth = window.getComputedStyle(focus).outlineWidth;
-        return outlineWidth === '0px' ? 0 : 1;
-      }, focus);
-      // Increment the applicable counts.
-      focusableCount++;
-      outlinedCount += verdict;
-      if (withTexts) {
-        if (verdict) {
-          outlinedTexts.push(focusText);
-        }
-        else {
-          plainTexts.push(focusText);
-        }
-      }
       // Press the next post-success navigation key.
       await page.keyboard.press(lastNavKey = nextNavKeys[lastNavKey][0]);
       // Process the element focused by that keypress.
-      await reportOutlines();
+      await markFocused();
     }
   };
-  // FUNCTION DEFINITION END
-  await reportOutlines();
+
+  // ### OPERATION
+
+  // Press the Tab key and identify it as the last-pressed navigation key.
+  await page.keyboard.press('Tab');
+  let lastNavKey = 'Tab';
+  // Recursively focus and mark elements.
+  await markFocused();
   // Return the result.
-  const result = {
-    focusableCount,
-    outlinedCount,
-    outlinedPercent: Math.floor(100 * outlinedCount / focusableCount)
-  };
-  if (withTexts) {
-    result.outlinedTexts = outlinedTexts;
-    result.plainTexts = plainTexts;
-  }
-  return {result};
+  return 1;
 };
