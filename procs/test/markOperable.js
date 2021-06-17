@@ -4,12 +4,20 @@ exports.markOperable = async page => {
   // ### CONSTANTS
 
   // Operable tag names.
-  const opTags = ['a', 'button', 'input', 'option', 'select', 'textarea'];
+  const opTags = ['A', 'BUTTON', 'INPUT', 'OPTION', 'SELECT', 'TEXTAREA'];
 
   // ### FUNCTIONS
 
-  // Recursively finds and marks the operable elements.
-  const operable = async elements => {
+  // Mark an element as operable.
+  const mark = async (page, element) => {
+    await page.evaluate(element => {
+      if (! element.dataset.autotestOperable) {
+        element.setAttribute('data-autotest-operable', 1);
+      }
+    });
+  };
+  // Recursively finds and marks the elements that have operable tag names.
+  const tagOperable = async (page, elements) => {
     // If any elements remain unprocessed:
     if (elements.length) {
       // Identify the first of them.
@@ -17,6 +25,10 @@ exports.markOperable = async page => {
       // Get its tag name.
       const tagNameJSHandle = await firstElement.getProperty('tagName');
       const tagName = await tagNameJSHandle.jsonValue();
+      if (opTags.includes(tagName)) {
+        await mark(page, firstElement);
+      }
+      // Determine whether 
     }
   };
 
