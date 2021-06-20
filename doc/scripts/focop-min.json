@@ -1,0 +1,19 @@
+{
+  "what": "Test for focusability and operability on a minimal page",
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium"
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/doc/form3.html",
+      "what": "Minimal page"
+    },
+    {
+      "type": "test",
+      "which": "focop",
+      "what": "Test for focusability and operability"
+    }
+  ]
+}
