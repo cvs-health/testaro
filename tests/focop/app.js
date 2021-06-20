@@ -7,9 +7,9 @@ exports.reporter = async page => {
   // Mark the operable elements.
   await require('../../procs/test/markOperable').markOperable(page);
   // Get an array of the elements that are focusable but not operable.
-  const fNotO = await page.$$('[data-autotest-focused]not:([data-autotest-operable])');
+  const fNotO = await page.$$('[data-autotest-focused]:not([data-autotest-operable])');
   // Get an array of the elements that are operable but not focusable.
-  const oNotF = await page.$$('[data-autotest-operable]not:([data-autotest-focused])');
+  const oNotF = await page.$$('[data-autotest-operable]:not([data-autotest-focused])');
   // Get an array of the elements that are focusable and operable.
   const fAndO = await page.$$('[data-autotest-focused][data-autotest-operable])');
   // Gets the tag name and texts of an element.
