@@ -11,7 +11,7 @@ exports.reporter = async page => {
   // Get an array of the elements that are operable but not focusable.
   const oNotF = await page.$$('[data-autotest-operable]:not([data-autotest-focused])');
   // Get an array of the elements that are focusable and operable.
-  const fAndO = await page.$$('[data-autotest-focused][data-autotest-operable])');
+  const fAndO = await page.$$('[data-autotest-focused][data-autotest-operable]');
   // Gets the tag name and texts of an element.
   const tagAndText = async element => {
     const tagNameJSHandle = await element.getProperty('tagName');
