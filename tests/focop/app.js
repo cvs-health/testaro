@@ -1,7 +1,7 @@
 // Tabulates and lists focusable and operable elements.
 exports.reporter = async page => {
   // Import a module to get the texts of an element.
-  const {allText} = require('../procs/test/allText');
+  const {allText} = require('../../procs/test/allText');
   // Mark the focusable elements.
   await require('../../procs/test/markFocusable').markFocusable(page);
   // Mark the operable elements.
