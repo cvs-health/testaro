@@ -4,11 +4,11 @@ exports.markOperable = async page => {
   // ### CONSTANTS
 
   // Operable tag names.
-  const opTags = ['A', 'BUTTON', 'INPUT', 'OPTION', 'SELECT', 'TEXTAREA'];
+  const opTags = new Set(['A', 'BUTTON', 'INPUT', 'OPTION', 'SELECT', 'TEXTAREA']);
 
   // ### FUNCTIONS
 
-  // Mark an element as operable.
+  // Marks an element as operable.
   const mark = async (page, element) => {
     await page.evaluate(element => {
       if (! element.dataset.autotestOperable) {
@@ -26,7 +26,7 @@ exports.markOperable = async page => {
       const tagNameJSHandle = await firstElement.getProperty('tagName');
       const tagName = await tagNameJSHandle.jsonValue();
       // If the tag name is inherently operable:
-      if (opTags.includes(tagName)) {
+      if (opTags.has(tagName)) {
         // Mark the element as operable.
         await mark(page, firstElement);
       }
@@ -59,7 +59,7 @@ exports.markOperable = async page => {
     if (elements.length) {
       // Identify the first of them.
       const firstElement = elements[0];
-      // Get its onclick property.
+      // Get its onclick property, or null if none.
       const onclick = await firstElement.getAttribute('onclick');
       // If it exists:
       if (onclick) {
