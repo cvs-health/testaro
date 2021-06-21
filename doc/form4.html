@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Focusability and operability tester</title>
+    <meta
+      name="description"
+      content="tester"
+    >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <main>
+      <h1>Focusability and operability tester</h1>
+      <p onclick="(event => {event.currentTarget.style.color = 'red';})(event)">
+        Onclick-operable and non-focusable.
+      </p>
+      <p tabindex="0" onclick="(event => {event.currentTarget.style.color = 'red';})(event)">
+        Tabindex-focusable and onclick-operable.
+      </p>
+      <p></p>
+      <p tabindex="0">Tabindex-focusable and inoperable</p>
+      <p style="cursor: pointer">Cursor-operable ond non-focusable</p>
+      <p><button type="button">Tag-focusable and operable</button></p>
+      <p>Ordinary element (neither focusable nor operable)</p>
+    </main>
+  </body>
+</html>

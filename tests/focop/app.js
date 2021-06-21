@@ -22,9 +22,9 @@ exports.reporter = async page => {
       text
     };
   };
-  const fNotOTexts = fNotO.map(element => tagAndText(element));
-  const oNotFTexts = oNotF.map(element => tagAndText(element));
-  const fAndOTexts = fAndO.map(element => tagAndText(element));
+  const fNotOTexts = await Promise.all(fNotO.map(element => tagAndText(element)));
+  const oNotFTexts = await Promise.all(oNotF.map(element => tagAndText(element)));
+  const fAndOTexts = await Promise.all(fAndO.map(element => tagAndText(element)));
   return {
     result: {
       operableButNotFocusable: oNotFTexts,
