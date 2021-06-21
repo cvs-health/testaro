@@ -504,6 +504,8 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
             await page.goto(resolved);
             // Wait until it is stable.
             await page.waitForLoadState('networkidle', {timeout: 20000});
+            // Press the Esc key to dismiss any initial modal dialog.
+            await page.keyboard.press('Escape');
             // Add the resulting URL to the act.
             act.result = page.url();
           }

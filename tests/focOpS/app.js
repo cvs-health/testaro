@@ -10,15 +10,17 @@ exports.reporter = async page => {
   const oNotF = await page.$$('[data-autotest-operable]:not([data-autotest-focused])');
   // Get an array of the elements that are focusable and operable.
   const fAndO = await page.$$('[data-autotest-focused][data-autotest-operable]');
-  // Gets the tag name of an element.
+  // Gets the lower-cased tag name of an element.
   const tag = async element => {
     const tagNameJSHandle = await element.getProperty('tagName');
-    return await tagNameJSHandle.jsonValue();
+    const tagName = await tagNameJSHandle.jsonValue();
+    return tagName.toLowerCase();
   };
-  // Tallies an array.
+  // Returns an object of tag names, in alphabetical order, and their counts.
   const tally = tagNames => {
+    // Create an object of tag names and their counts.
     const result = {};
-    tagNames.forEach(tagName => {
+    tagNames.sort().forEach(tagName => {
       if (result[tagName]) {
         result[tagName]++;
       }
@@ -26,6 +28,7 @@ exports.reporter = async page => {
         result[tagName] = 1;
       }
     });
+    // Return the result.
     return result;
   };
   const fNotOTags = await Promise.all(fNotO.map(element => tag(element)));
