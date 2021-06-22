@@ -612,7 +612,16 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
                 await doCombo(testNames.slice(1));
               }
             };
-            await doCombo(which);
+            // Conduct the specified combination of tests.
+            await doCombo(which.slice(1));
+            // If it includes at least 1 test and a reducer is specified:
+            if (which.length > 1 && which[0].length) {
+              // Perform the reduction and add its result to the act.
+              const reducer = require(`./procs/test/${which[0]}`);
+              if (reducer) {
+                act.result.score = reducer.reduce(act.result);
+              }
+            }
           }
           // Otherwise, if the act targets a text-identified element:
           else if (moves[type]) {

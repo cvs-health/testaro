@@ -27,7 +27,7 @@ exports.commands = {
     }
   ],
   'combo': [
-    'Perform a combination of tests (which: array of test names; what: description)',
+    'Perform a combination of tests (which: array of reducer and test names; what: description)',
     {
       'which': [true, 'array', 'areStrings'],
       'what': [false, 'string', 'hasLength']
