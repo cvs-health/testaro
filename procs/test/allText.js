@@ -47,6 +47,19 @@ exports.allText = (page, elementHandle) => page.evaluate(element => {
       texts.push(minText);
     }
   }
+  // Add the values of any alt attributes to the array.
+  const altText = await element.$$eval('img[alt]:not([alt=""])', els => {
+    return els.map(el => el.alt).join('; ');
+  });
+  if (altText) {
+    texts.push(altText);
+  }
+  if (ownText) {
+    const minText = debloat(ownText);
+    if (minText) {
+      texts.push(minText);
+    }
+  }
   // Return a concatenation of the texts in the array.
   return texts.join('; ');
 }, elementHandle);
