@@ -59,6 +59,7 @@ const moves = {
 const tests = {
   autocom: 'list inputs with their autocomplete attributes',
   bodyText: 'give the text content of the page body',
+  combo: 'report results from 3 tests',
   focOp: 'tabulate and list focusable and operable elements',
   focOpS: 'tabulate focusable and operable elements',
   focusOutline: 'tabulate and list focusable elements with and without focus outlines',
@@ -586,6 +587,41 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
           else if (type === 'axeS') {
             // Conduct it and add its result to the act.
             act.result = await axeS(page);
+          }
+          // Otherwise, if the act is a combination of tests:
+          else if (type === 'combo') {
+            act.result = {
+              what: 'combination of tests'
+            };
+            // Recursively conducts an array of tests.
+            const doCombo = async testNames => {
+              if (testNames.length) {
+                const firstTest = testNames[0];
+                if (firstTest === 'axeS') {
+                  act.result.axeS = await axeS(page);
+                }
+                else if (firstTest === 'wave1') {
+                  act.result.wave1 = await wave1(page.url());
+                }
+                else if (tests[firstTest]) {
+                  act.result[firstTest] = await require(`./tests/${firstTest}/app`).reporter(page);
+                }
+                else {
+                  act.result[firstTest] = 'NO SUCH TEST';
+                }
+                await doCombo(testNames.slice(1));
+              }
+            };
+            // Conduct the specified combination of tests.
+            await doCombo(which.slice(1));
+            // If it includes at least 1 test and a reducer is specified:
+            if (which.length > 1 && which[0].length) {
+              // Perform the reduction and add its result to the act.
+              const reducer = require(`./procs/test/${which[0]}`);
+              if (reducer) {
+                act.result.score = reducer.reduce(act.result);
+              }
+            }
           }
           // Otherwise, if the act targets a text-identified element:
           else if (moves[type]) {

@@ -26,6 +26,13 @@ exports.commands = {
       'what': [false, 'string', 'hasLength']
     }
   ],
+  'combo': [
+    'Perform a combination of tests (which: array of reducer and test names; what: description)',
+    {
+      'which': [true, 'array', 'areStrings'],
+      'what': [false, 'string', 'hasLength']
+    }
+  ],
   'focus': [
     'Put the specified element into focus (what: element type; which: substring of its text)',
     {
