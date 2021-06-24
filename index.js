@@ -610,6 +610,10 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
                   act.result[firstTest] = 'NO SUCH TEST';
                 }
                 await doCombo(testNames.slice(1));
+                return Promise.resolve(1);
+              }
+              else {
+                return Promise.resolve(1);
               }
             };
             // Conduct the specified combination of tests.
