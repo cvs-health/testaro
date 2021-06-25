@@ -12,24 +12,38 @@ exports.reporter = async page => {
   const oNotF = await page.$$('[data-autotest-operable]:not([data-autotest-focused])');
   // Get an array of the elements that are focusable and operable.
   const fAndO = await page.$$('[data-autotest-focused][data-autotest-operable]');
-  // Gets the tag name and texts of an element.
-  const tagAndText = async element => {
-    const tagNameJSHandle = await element.getProperty('tagName');
-    const tagName = await tagNameJSHandle.jsonValue();
-    const text = await allText(element);
-    return {
-      tagName,
-      text
-    };
-  };
-  const fNotOTexts = await Promise.all(fNotO.map(element => tagAndText(element)));
-  const oNotFTexts = await Promise.all(oNotF.map(element => tagAndText(element)));
-  const fAndOTexts = await Promise.all(fAndO.map(element => tagAndText(element)));
-  return {
-    result: {
-      operableButNotFocusable: oNotFTexts,
-      focusableButNotOperable: fNotOTexts,
-      focusableAndOperable: fAndOTexts
+  // FUNCTION DEFINITION START
+  // Recursively adds the tag names and texts of elements to an array.
+  const tagAndText = async (elements, results) => {
+    // If any elements remain to be processed:
+    if (elements.length) {
+      // Identify the first element.
+      const firstElement = elements[0];
+      // Get its tag name.
+      const tagNameJSHandle = await firstElement.getProperty('tagName');
+      const tagName = await tagNameJSHandle.jsonValue();
+      // Get its texts.
+      const text = await allText(page, firstElement);
+      // Add its tag name and texts to the array.
+      results.push({
+        tagName,
+        text
+      });
+      // Process the remaining elements.
+      return await tagAndText(elements.slice(1), results);
+    }
+    else {
+      return Promise.resolve('');
     }
   };
+  // FUNCTION DEFINITION END
+  const report = {result: {
+    focusableButNotOperable: [],
+    operableButNotFocusable: [],
+    focusableAndOperable: []
+  }};
+  await tagAndText(fNotO, report.result.focusableButNotOperable);
+  await tagAndText(oNotF, report.result.operableButNotFocusable);
+  await tagAndText(fAndO, report.result.focusableAndOperable);
+  return report;
 };

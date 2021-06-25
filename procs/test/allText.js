@@ -1,10 +1,11 @@
 // Returns the text contents of an element and its labels.
-exports.allText = (page, elementHandle) => page.evaluate(element => {
+exports.allText = async (page, elementHandle) => await page.evaluate(element => {
   // Identify the element, if specified, or else the focused element.
   const el = element || document.activeElement;
   // Initialize an array of its texts.
   const texts = [];
   // FUNCTION DEFINITION START
+  // Removes excess spacing from a string.
   const debloat = text => text.trim().replace(/\s+/g, ' ');
   // FUNCTION DEFINITION END
   // Add any attribute label to the array.
@@ -39,21 +40,16 @@ exports.allText = (page, elementHandle) => page.evaluate(element => {
       }
     });
   }
+  // Add any image text alternatives to the array.
+  const altTexts = Array
+  .from(element.querySelectorAll('img[alt]:not([alt=""])'))
+  .map(img => debloat(img.alt))
+  .join('; ');
+  if (altTexts.length) {
+    texts.push(altTexts);
+  }
   // Add any text content of the element to the array.
   const ownText = element.textContent;
-  if (ownText) {
-    const minText = debloat(ownText);
-    if (minText) {
-      texts.push(minText);
-    }
-  }
-  // Add the values of any alt attributes to the array.
-  const altText = await element.$$eval('img[alt]:not([alt=""])', els => {
-    return els.map(el => el.alt).join('; ');
-  });
-  if (altText) {
-    texts.push(altText);
-  }
   if (ownText) {
     const minText = debloat(ownText);
     if (minText) {
