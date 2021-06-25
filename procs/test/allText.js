@@ -1,4 +1,4 @@
-// Returns the text contents of an element and its labels.
+// Returns the text associated with an element.
 exports.allText = async (page, elementHandle) => await page.evaluate(element => {
   // Identify the element, if specified, or else the focused element.
   const el = element || document.activeElement;
@@ -56,6 +56,16 @@ exports.allText = async (page, elementHandle) => await page.evaluate(element => 
       texts.push(minText);
     }
   }
+  // Identify a concatenation of the texts.
+  let textChain = texts.join('; ');
+  // If it is empty:
+  if (! textChain) {
+    // Substitute the text content of its parent element, if any.
+    textChain = `{${debloat(element.parentElement.textContent)}}`;
+    if (textChain === '{}') {
+      textChain = '';
+    }
+  }
   // Return a concatenation of the texts in the array.
-  return texts.join('; ');
+  return textChain;
 }, elementHandle);

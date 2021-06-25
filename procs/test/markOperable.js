@@ -40,13 +40,26 @@ exports.markOperable = async page => {
     if (elements.length) {
       // Identify the first of them.
       const firstElement = elements[0];
-      // Identify its cursor style.
-      const cursor = await page.evaluate(
-        element => window.getComputedStyle(element).cursor, firstElement
-      );
-      // If it is a pointer:
-      if (cursor === 'pointer') {
-        // Mark the element as operable.
+      // Determine whether it needs to be marked because of its cursor.
+      const isMarkable = await page.evaluate(element => {
+        // If it is already marked, no.
+        if (element.dataset.autotestOperable) {
+          return false;
+        }
+        // Otherwise, i.e. if it is not marked yet:
+        else {
+          // If its parent has a pointer cursor, undo that.
+          const parent = element.parentElement;
+          if (window.getComputedStyle(parent).cursor === 'pointer') {
+            parent.style.cursor = 'none';
+          }
+          // If the element cursor is a non-inherited pointer, yes; if not, no.
+          return window.getComputedStyle(element).cursor == 'pointer';
+        }
+      }, firstElement);
+      // If so:
+      if (isMarkable) {
+        // Mark it as operable.
         await mark(page, firstElement);
       }
       // Process the remaining elements.
@@ -59,11 +72,14 @@ exports.markOperable = async page => {
     if (elements.length) {
       // Identify the first of them.
       const firstElement = elements[0];
-      // Get its onclick property, or null if none.
-      const onclick = await firstElement.getAttribute('onclick');
-      // If it exists:
-      if (onclick) {
-        // Mark the element as operable.
+      // Determine whether it needs to be marked because of an onclick property.
+      const isMarkable = await page.evaluate(
+        element => ! element.dataset.autotestOperable && element.hasAttribute('onclick'),
+        firstElement
+      );
+      // If so:
+      if (isMarkable) {
+        // Mark it as operable.
         await mark(page, firstElement);
       }
       // Process the remaining elements.

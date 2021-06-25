@@ -7,11 +7,11 @@ exports.reporter = async page => {
   // Mark the operable elements.
   await require('../../procs/test/markOperable').markOperable(page);
   // Get an array of the elements that are focusable but not operable.
-  const fNotO = await page.$$('[data-autotest-focused]:not([data-autotest-operable])');
+  const fNotO = await page.$$('body [data-autotest-focused]:not([data-autotest-operable])');
   // Get an array of the elements that are operable but not focusable.
-  const oNotF = await page.$$('[data-autotest-operable]:not([data-autotest-focused])');
+  const oNotF = await page.$$('body [data-autotest-operable]:not([data-autotest-focused])');
   // Get an array of the elements that are focusable and operable.
-  const fAndO = await page.$$('[data-autotest-focused][data-autotest-operable]');
+  const fAndO = await page.$$('body [data-autotest-focused][data-autotest-operable]');
   // FUNCTION DEFINITION START
   // Recursively adds the tag names and texts of elements to an array.
   const tagAndText = async (elements, results) => {
@@ -45,6 +45,7 @@ exports.reporter = async page => {
     }
   };
   // FUNCTION DEFINITION END
+  // Initialize a report.
   const report = {result: {
     totals: {
       focusableButNotOperable: 0,
@@ -57,6 +58,7 @@ exports.reporter = async page => {
       focusableAndOperable: []
     }
   }};
+  // Populate it.
   const result = report.result;
   const totals = result.totals;
   const items = result.items;
@@ -66,5 +68,6 @@ exports.reporter = async page => {
   totals.focusableButNotOperable = items.focusableButNotOperable.length;
   totals.operableButNotFocusable = items.operableButNotFocusable.length;
   totals.focusableAndOperable = items.focusableAndOperable.length;
+  // Return it.
   return report;
 };
