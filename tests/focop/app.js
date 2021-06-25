@@ -38,12 +38,25 @@ exports.reporter = async page => {
   };
   // FUNCTION DEFINITION END
   const report = {result: {
-    focusableButNotOperable: [],
-    operableButNotFocusable: [],
-    focusableAndOperable: []
+    totals: {
+      focusableButNotOperable: 0,
+      operableButNotFocusable: 0,
+      focusableAndOperable: 0
+    },
+    items: {
+      focusableButNotOperable: [],
+      operableButNotFocusable: [],
+      focusableAndOperable: []
+    }
   }};
-  await tagAndText(fNotO, report.result.focusableButNotOperable);
-  await tagAndText(oNotF, report.result.operableButNotFocusable);
-  await tagAndText(fAndO, report.result.focusableAndOperable);
+  const result = report.result;
+  const totals = result.totals;
+  const items = result.items;
+  await tagAndText(fNotO, items.focusableButNotOperable);
+  await tagAndText(oNotF, items.operableButNotFocusable);
+  await tagAndText(fAndO, items.focusableAndOperable);
+  totals.focusableButNotOperable = result.focusableButNotOperable.length;
+  totals.operableButNotFocusable = result.operableButNotFocusable.length;
+  totals.focusableAndOperable = result.focusableButNotOperable.length;
   return report;
 };
