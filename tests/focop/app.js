@@ -19,9 +19,17 @@ exports.reporter = async page => {
     if (elements.length) {
       // Identify the first element.
       const firstElement = elements[0];
-      // Get its tag name.
+      // Get its tag name, lower-cased.
       const tagNameJSHandle = await firstElement.getProperty('tagName');
-      const tagName = await tagNameJSHandle.jsonValue();
+      let tagName = await tagNameJSHandle.jsonValue();
+      tagName = tagName.toLowerCase();
+      // If it is “input”, add its type.
+      if (tagName === 'input') {
+        const type = await firstElement.getAttribute('type');
+        if (type) {
+          tagName += `[type=${type}]`;
+        }
+      }
       // Get its texts.
       const text = await allText(page, firstElement);
       // Add its tag name and texts to the array.
@@ -55,8 +63,8 @@ exports.reporter = async page => {
   await tagAndText(fNotO, items.focusableButNotOperable);
   await tagAndText(oNotF, items.operableButNotFocusable);
   await tagAndText(fAndO, items.focusableAndOperable);
-  totals.focusableButNotOperable = result.focusableButNotOperable.length;
-  totals.operableButNotFocusable = result.operableButNotFocusable.length;
-  totals.focusableAndOperable = result.focusableButNotOperable.length;
+  totals.focusableButNotOperable = items.focusableButNotOperable.length;
+  totals.operableButNotFocusable = items.operableButNotFocusable.length;
+  totals.focusableAndOperable = items.focusableAndOperable.length;
   return report;
 };
