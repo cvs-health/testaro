@@ -86,37 +86,23 @@ exports.markOperable = async page => {
       await onclickOperable(page, elements.slice(1));
     }
   };
-  /*
-  // Recursively (and probably erroneously) finds and marks the elements that are clickable.
-  const clickOperable = async (page, elements) => {
-    // If any elements remain unprocessed:
+  // Recursively filters elements for visibility.
+  const visibles = async (elements, visibles) => {
     if (elements.length) {
-      // Identify the first of them.
-      const firstElement = elements[0];
-      // If clicking it initiates no navigation:
-      try {
-        await firstElement.click({
-          timeout: 37,
-          trial: false
-        });
-        // Do nothing.
-        '';
+      const isVisible = await elements[0].isVisible();
+      if (isVisible) {
+        visibles.push(elements[0]);
       }
-      // Otherwise, i.e. if clicking it initiates navigation:
-      catch {
-        // Mark it as operable.
-        await mark(page, firstElement);
-      }
-      // Process the remaining elements.
-      await clickOperable(page, elements.slice(1));
+      await visibles(elements.slice(1), visibles);
     }
   };
-  */
 
   // ### OPERATION
 
   // Identify the elements in the body.
-  const elements = await page.$$('body *');
+  const allElements = await page.$$('body *');
+  // Identify those that are visible.
+  const elements = await visibles(allElements, []);
   // Recursively mark elements with operable tag names as operable.
   await tagOperable(page, elements);
   // Recursively mark elements with pointer cursor styles as operable.
