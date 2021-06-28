@@ -4,7 +4,7 @@ exports.reporter = async page => await page.$eval('body', body => {
   const result = elements.map((element, index) => ({
     index,
     element: element.tagName.toLowerCase(),
-    role: element.getAttribute('role') || 'NONE'
+    role: element.getAttribute('role')
   }));
   return {
     result

@@ -1,4 +1,4 @@
-// Returns a tabulation, and lists of texts, of elements with and without focal outlines.
+// Returns counts, and texts if required, of elements with and without focal outlines.
 exports.focusOutline = async (page, withTexts) => {
   // Initialize the result properties.
   let focusableCount = 0;
