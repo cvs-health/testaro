@@ -87,13 +87,13 @@ exports.markOperable = async page => {
     }
   };
   // Recursively filters elements for visibility.
-  const visibles = async (elements, visibles) => {
+  const visiblesOf = async (elements, visibles) => {
     if (elements.length) {
       const isVisible = await elements[0].isVisible();
       if (isVisible) {
         visibles.push(elements[0]);
       }
-      await visibles(elements.slice(1), visibles);
+      await visiblesOf(elements.slice(1), visibles);
     }
   };
 
@@ -102,7 +102,7 @@ exports.markOperable = async page => {
   // Identify the elements in the body.
   const allElements = await page.$$('body *');
   // Identify those that are visible.
-  const elements = await visibles(allElements, []);
+  const elements = await visiblesOf(allElements, []);
   // Recursively mark elements with operable tag names as operable.
   await tagOperable(page, elements);
   // Recursively mark elements with pointer cursor styles as operable.
