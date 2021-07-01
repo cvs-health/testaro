@@ -91,13 +91,19 @@ exports.markOperable = async page => {
   // Recursively filters elements for visibility.
   const visiblesOf = async (elements, visibles) => {
     if (elements.length) {
-      const isVisible = await elements[0].isVisible();
+      let isVisible;
+      // Prevent the Playwright isVisible() method from throwing errors on out-of-DOM elements.
+      try {
+        isVisible = await elements[0].isVisible();
+      }
+      catch {
+        isVisible = false;
+      }
       if (isVisible) {
         visibles.push(elements[0]);
       }
       await visiblesOf(elements.slice(1), visibles);
     }
-
   };
 
   // ### OPERATION

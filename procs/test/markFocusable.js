@@ -3,7 +3,7 @@ exports.markFocusable = async page => {
 
   // ## CONSTANTS
 
-  // Navigation-key sequence.
+  // Navigation-key sequence. Next key after focus, refocus, body exit.
   const nextNavKeys = {
     'Shift+Tab': ['Shift+Tab', 'Shift+Tab', 'Tab'],
     Tab: ['ArrowRight', 'Tab', null],
