@@ -9,8 +9,10 @@ exports.markOperable = async page => {
   // ### FUNCTIONS
 
   // Marks an element as operable.
-  const mark = async (page, [element, why]) => {
-    await page.evaluate(element => {
+  const mark = async (page, element, why) => {
+    await page.evaluate(args => {
+      const element = args[0];
+      const why = args[1];
       if (! element.dataset.autotestOperable) {
         element.setAttribute('data-autotest-operable', why);
       }
@@ -28,7 +30,7 @@ exports.markOperable = async page => {
       // If the tag name is inherently operable:
       if (opTags.has(tagName)) {
         // Mark the element as operable.
-        await mark(page, [firstElement, 'tag']);
+        await mark(page, firstElement, 'tag');
       }
       // Process the remaining elements.
       await tagOperable(page, elements.slice(1));
@@ -60,7 +62,7 @@ exports.markOperable = async page => {
       // If so:
       if (isMarkable) {
         // Mark it as operable.
-        await mark(page, [firstElement, 'cursor']);
+        await mark(page, firstElement, 'cursor');
       }
       // Process the remaining elements.
       await cursorOperable(page, elements.slice(1));
@@ -80,7 +82,7 @@ exports.markOperable = async page => {
       // If so:
       if (isMarkable) {
         // Mark it as operable.
-        await mark(page, [firstElement, 'onclick']);
+        await mark(page, firstElement, 'onclick');
       }
       // Process the remaining elements.
       await onclickOperable(page, elements.slice(1));
