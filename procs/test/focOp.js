@@ -30,17 +30,58 @@ exports.focOp = async (page, withItems) => {
           tagName += `[type=${type}]`;
         }
       }
-      // Add it to the total.
+      // Add it to the grand total for its type.
       totals[attribute].total++;
-      // Get its texts or count.
-      const text = withItems ? await allText(page, firstElement) : '';
-      // Add its tag name and texts or count to the array.
-      results.push({
-        tagName,
-        text
-      });
+      // Add it to the total for its type and tag name.
+      const tagNameTotals = totals[attribute].tagName;
+      if (tagNameTotals[tagName]) {
+        tagNameTotals[tagName]++;
+      }
+      else {
+        tagNameTotals[tagName] = 1;
+      }
+      let how = '';
+      let why = '';
+      // If it is focusable:
+      if (isF) {
+        // Add it to the total for its type and focus method:
+        const howTotals = totals[attribute].focusableHow;
+        how = await firstElement.getAttribute('data-autotest-focused');
+        if (howTotals[how]) {
+          howTotals[how]++;
+        }
+        else {
+          howTotals[how] = 1;
+        }
+      }
+      // If it is operable:
+      if (isO) {
+        // Add it to the total for its type and operability evidence:
+        const whyTotals = totals[attribute].operableWhy;
+        why = await firstElement.getAttribute('data-autotest-operable');
+        if (whyTotals[why]) {
+          whyTotals[why]++;
+        }
+        else {
+          whyTotals[why] = 1;
+        }
+      }
+      // If itemization is required:
+      if (withItems) {
+        // Add the item to the itemization.
+        const item = {tagName};
+        if (isF) {
+          item.focusableHow = how;
+        }
+        if (isO) {
+          item.operableWhy = why;
+        }
+        const text = await allText(page, firstElement);
+        item.text = text;
+        items[attribute].push(item);
+      }
       // Process the remaining elements.
-      return await compile(elements.slice(1), results);
+      return await compile(elements.slice(1), totals, items, attribute, isF, isO);
     }
     else {
       return Promise.resolve('');
