@@ -111,6 +111,4 @@ exports.markOperable = async page => {
   await cursorOperable(page, elements);
   // Recursively mark elements with onclick properties as operable.
   await onclickOperable(page, elements);
-  // Return the result.
-  // return 1;
 };
