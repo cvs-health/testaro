@@ -9,12 +9,12 @@ exports.markOperable = async page => {
   // ### FUNCTIONS
 
   // Marks an element as operable.
-  const mark = async (page, element, why) => {
+  const mark = async (page, [element, why]) => {
     await page.evaluate(element => {
       if (! element.dataset.autotestOperable) {
         element.setAttribute('data-autotest-operable', why);
       }
-    }, element);
+    }, [element, why]);
   };
   // Recursively finds and marks the elements that have operable tag names.
   const tagOperable = async (page, elements) => {
