@@ -3,18 +3,23 @@ exports.markFocusable = async page => {
 
   // ## CONSTANTS
 
-  // Navigation-key sequence. Next key after focus, refocus, body exit.
+  // Navigation-key sequence. Next key after focus, refocus.
   const nextNavKeys = {
-    'Shift+Tab': ['Shift+Tab', 'Shift+Tab', 'Tab'],
-    Tab: ['ArrowRight', 'Tab', null],
-    ArrowRight: ['ArrowRight', 'ArrowDown', 'ArrowDown'],
-    ArrowDown: ['ArrowDown', 'Tab', 'Tab']
+    Tab: ['ArrowRight', null],
+    ArrowRight: ['ArrowDown', 'ArrowDown'],
+    ArrowDown: ['ArrowDown', 'Tab']
   };
+  const externalLimit = 10;
 
-  // ### FUNCTIONS
+  // ## VARIABLES
+
+  let lastNavKey = 'Tab';
+  let externalCount = 0;
+
+  // ## FUNCTIONS
 
   // Identifies and marks the focused in-body element or identifies a failure status.
-  const focused = async () => {
+  const mark = async () => {
     // Identify a JSHandle of the focused element or a failure status.
     const focusJSHandle = await page.evaluateHandle(lastNavKey => {
       // Identify the focused element.
@@ -28,31 +33,24 @@ exports.markFocusable = async page => {
           // Return it.
           return focus;
         }
-        // Otherwise, if it was previously refocused:
-        else if (focus.dataset.autotestRefocused) {
-          // Return a status message tantamount to final failure.
-          return {atFocusStatus: 'no'};
-        }
-        // Otherwise, i.e. if it was previously focused but not refocused:
+        // Otherwise, i.e. if it was previously focused:
         else {
-          // Add a refocused status to it.
-          focus.setAttribute('data-autotest-refocused', lastNavKey);
           // Return a status message.
-          return {atFocusStatus: 'already'};
+          return {status: 'already'};
         }
       }
       // Otherwise, i.e. if it does not exist or is the body itself:
       else {
         // Return a status message.
-        return {atFocusStatus: 'no'};
+        return {status: 'external'};
       }
     }, lastNavKey);
     // Get the failure status.
-    const statusHandle = await focusJSHandle.getProperty('atFocusStatus');
+    const statusHandle = await focusJSHandle.getProperty('status');
     const status = await statusHandle.jsonValue();
     // If there is one:
     if (status) {
-      // Return it.
+      // Return it as a string.
       return status;
     }
     // Otherwise, i.e. if an element within the body is newly focused:
@@ -62,17 +60,28 @@ exports.markFocusable = async page => {
     }
   };
   // Recursively focuses and marks elements.
-  const markFocused = async () => {
-    // Identify and mark the newly focused element or identify a failure.
-    const focus = await focused();
-    // Identify the next navigation key to be pressed.
-    const nextKey = nextNavKeys[lastNavKey][['already', 'no'].indexOf(focus) + 1];
-    // If it exists:
-    if (nextKey) {
-      // Press it and update the last navigation key.
-      await page.keyboard.press(lastNavKey = nextKey);
-      // Process the element focused by that keypress.
-      await markFocused();
+  const markAll = async () => {
+    // Identify and mark the newly focused element or identify a status.
+    const focOrStatus = await mark();
+    // If the status is external:
+    if (focOrStatus === 'external') {
+      // Press the Tab key, or quit if the external limit has been reached.
+      if (++externalCount < externalLimit) {
+        console.log(`External count is ${externalCount}`);
+        await page.keyboard.press(lastNavKey = 'Tab');
+      }
+    }
+    // Otherwise, i.e. if an element was focused or refocused:
+    else {
+      // Identify the next navigation key to be pressed.
+      const nextKey = nextNavKeys[lastNavKey][focOrStatus === 'already' ? 1 : 0];
+      // If it exists:
+      if (nextKey) {
+        // Press it.
+        await page.keyboard.press(lastNavKey = nextKey);
+        // Process the element focused by that keypress.
+        await markAll();
+      }
     }
   };
 
@@ -80,10 +89,7 @@ exports.markFocusable = async page => {
 
   // 
   // Press the Tab key and identify it as the last-pressed navigation key.
-  await page.keyboard.press('Shift+Tab');
-  let lastNavKey = 'Shift+Tab';
+  await page.keyboard.press('Tab');
   // Recursively focus and mark elements.
-  await markFocused();
-  // Return the result.
-  return 1;
+  await markAll();
 };
