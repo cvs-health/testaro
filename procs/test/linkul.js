@@ -35,16 +35,26 @@ exports.linkUl = async (page, withItems) => await page.$eval('body', (body, with
   const links = Array.from(body.getElementsByTagName('a'));
   // Identify those with less text than their nearest non-inline ancestors as inline.
   const inLinks = links.filter(link => isInline(link) && hasMoreText(link));
+  let underlined = 0;
   const ulInLinkTexts = [];
   const nulInLinkTexts = [];
   // For each of them:
   inLinks.forEach(link => {
-    // Add its text, if required, or a count, to its underline tally.
+    // Identify the text of the link if itemization is required.
+    const text = withItems ? compact(link.textContent) : '';
+    // If it is underlined:
     if (window.getComputedStyle(link).textDecorationLine === 'underline') {
-      ulInLinkTexts.push(withItems ? compact(link.textContent) : '');
+      // Increment the count of underlined inline links.
+      underlined++;
+      // If required, add its text to the array of their texts.
+      if (withItems) {
+        ulInLinkTexts.push(text);
+      }
     }
-    else {
-      nulInLinkTexts.push(withItems ? compact(link.textContent) : '');
+    // Otherwise, if it is not underlined and itemization is required:
+    else if (withItems) {
+      // Add its text to the array of texts of non-underlined inline links.
+      nulInLinkTexts.push(text);
     }
   });
   // Get the percentage of underlined links among all inline links.
@@ -54,6 +64,7 @@ exports.linkUl = async (page, withItems) => await page.$eval('body', (body, with
   const result = {
     linkCount: links.length,
     inLinkCount: inLinks.length,
+    underlined,
     ulPercent
   };
   if (withItems) {
