@@ -1,7 +1,7 @@
 // Returns counts, and texts if required, of (un)focusable and (in)operable elements.
 exports.focOp = async (page, withItems) => {
   // Import a module to get the texts of an element.
-  const {allText} = require('./allText');
+  const allText = withItems ? require('./allText').allText : '';
   // Mark the focusable elements.
   await require('./markFocusable').markFocusable(page);
   // Mark the operable elements.
@@ -14,7 +14,7 @@ exports.focOp = async (page, withItems) => {
   const fAndO = await page.$$('body [data-autotest-focused][data-autotest-operable]');
   // FUNCTION DEFINITION START
   // Recursively adds the tag names and texts or counts of elements to an array.
-  const addItems = async (elements, results) => {
+  const compile = async (elements, totals, items, attribute, isF, isO) => {
     // If any elements remain to be processed:
     if (elements.length) {
       // Identify the first element.
@@ -30,6 +30,8 @@ exports.focOp = async (page, withItems) => {
           tagName += `[type=${type}]`;
         }
       }
+      // Add it to the total.
+      totals[attribute].total++;
       // Get its texts or count.
       const text = withItems ? await allText(page, firstElement) : '';
       // Add its tag name and texts or count to the array.
@@ -38,7 +40,7 @@ exports.focOp = async (page, withItems) => {
         text
       });
       // Process the remaining elements.
-      return await addItems(elements.slice(1), results);
+      return await compile(elements.slice(1), results);
     }
     else {
       return Promise.resolve('');
@@ -48,13 +50,44 @@ exports.focOp = async (page, withItems) => {
   // Initialize a report.
   const report = {result: {
     totals: {
-      focusableButNotOperable: 0,
-      operableButNotFocusable: 0,
-      focusableAndOperable: 0
+      focusableNotOperable: {
+        total: 0,
+        tagName: {},
+        focusableHow: {
+          Tab: 0,
+          'Shift+Tab': 0,
+          ArrowRight: 0,
+          ArrowDown: 0
+        }
+      },
+      operableNotFocusable: {
+        total: 0,
+        tagName: {},
+        operableWhy: {
+          tag: 0,
+          cursor: 0,
+          onclick: 0
+        }
+      },
+      focusableAndOperable: {
+        total: 0,
+        tagName: {},
+        focusableHow: {
+          Tab: 0,
+          'Shift+Tab': 0,
+          ArrowRight: 0,
+          ArrowDown: 0
+        },
+        operableWhy: {
+          tag: 0,
+          cursor: 0,
+          onclick: 0
+        }
+      }
     },
     items: {
-      focusableButNotOperable: [],
-      operableButNotFocusable: [],
+      focusableNotOperable: [],
+      operableNotFocusable: [],
       focusableAndOperable: []
     }
   }};
@@ -62,12 +95,9 @@ exports.focOp = async (page, withItems) => {
   const result = report.result;
   const totals = result.totals;
   const items = result.items;
-  await addItems(fNotO, items.focusableButNotOperable);
-  await addItems(oNotF, items.operableButNotFocusable);
-  await addItems(fAndO, items.focusableAndOperable);
-  totals.focusableButNotOperable = items.focusableButNotOperable.length;
-  totals.operableButNotFocusable = items.operableButNotFocusable.length;
-  totals.focusableAndOperable = items.focusableAndOperable.length;
+  await compile(fNotO, totals, items, 'focusableNotOperable', true, false);
+  await compile(oNotF, totals, items, 'operableNotFocusable', false, true);
+  await compile(fAndO, totals, items, 'focusableAndOperable', true, true);
   // Return it.
   return report;
 };

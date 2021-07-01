@@ -24,7 +24,7 @@ exports.markFocusable = async page => {
         // If it was not previously focused:
         if (! focus.dataset.autotestFocused) {
           // Change its status to previously focused.
-          focus.setAttribute('data-autotest-focused', '1');
+          focus.setAttribute('data-autotest-focused', lastNavKey);
           // Return it.
           return focus;
         }
@@ -36,7 +36,7 @@ exports.markFocusable = async page => {
         // Otherwise, i.e. if it was previously focused but not refocused:
         else {
           // Add a refocused status to it.
-          focus.setAttribute('data-autotest-refocused', '1');
+          focus.setAttribute('data-autotest-refocused', lastNavKey);
           // Return a status message.
           return {atFocusStatus: 'already'};
         }
