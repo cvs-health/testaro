@@ -95,6 +95,7 @@ exports.markOperable = async page => {
       }
       await visiblesOf(elements.slice(1), visibles);
     }
+
   };
 
   // ### OPERATION
@@ -102,7 +103,8 @@ exports.markOperable = async page => {
   // Identify the elements in the body.
   const allElements = await page.$$('body *');
   // Identify those that are visible.
-  const elements = await visiblesOf(allElements, []);
+  const elements = [];
+  await visiblesOf(allElements, elements);
   // Recursively mark elements with operable tag names as operable.
   await tagOperable(page, elements);
   // Recursively mark elements with pointer cursor styles as operable.
@@ -110,5 +112,5 @@ exports.markOperable = async page => {
   // Recursively mark elements with onclick properties as operable.
   await onclickOperable(page, elements);
   // Return the result.
-  return 1;
+  // return 1;
 };
