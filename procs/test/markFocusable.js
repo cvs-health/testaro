@@ -16,7 +16,7 @@ exports.markFocusable = async page => {
   // Identifies and marks the focused in-body element or identifies a failure status.
   const focused = async () => {
     // Identify a JSHandle of the focused element or a failure status.
-    const focusJSHandle = await page.evaluateHandle(() => {
+    const focusJSHandle = await page.evaluateHandle(lastNavKey => {
       // Identify the focused element.
       const focus = document.activeElement;
       // If it exists and is within the body:
@@ -46,7 +46,7 @@ exports.markFocusable = async page => {
         // Return a status message.
         return {atFocusStatus: 'no'};
       }
-    });
+    }, lastNavKey);
     // Get the failure status.
     const statusHandle = await focusJSHandle.getProperty('atFocusStatus');
     const status = await statusHandle.jsonValue();
