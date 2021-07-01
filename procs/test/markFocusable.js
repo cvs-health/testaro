@@ -9,7 +9,8 @@ exports.markFocusable = async page => {
     ArrowRight: ['ArrowDown', 'ArrowDown'],
     ArrowDown: ['ArrowDown', 'Tab']
   };
-  const externalLimit = 10;
+  // Maximum consecutive external foci (1 suffices for Chrome).
+  const externalLimit = 3;
 
   // ## VARIABLES
 
@@ -66,8 +67,7 @@ exports.markFocusable = async page => {
     // If the status is external:
     if (focOrStatus === 'external') {
       // Press the Tab key, or quit if the external limit has been reached.
-      if (++externalCount < externalLimit) {
-        console.log(`External count is ${externalCount}`);
+      if (externalCount++ < externalLimit) {
         await page.keyboard.press(lastNavKey = 'Tab');
       }
     }
