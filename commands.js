@@ -66,6 +66,12 @@ exports.commands = {
       'what': [false, 'string', 'hasLength']
     }
   ],
+  'reveal': [
+    'Make all elements visible (what: description)',
+    {
+      'what': [false, 'string', 'hasLength']
+    }
+  ],
   'select': [
     'Select a select option (which: substring of list text; what: substring of option text)',
     {

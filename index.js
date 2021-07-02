@@ -552,8 +552,24 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
           const url = page.url();
           // Add the URL to the act.
           act.url = url;
+          // If the act is a revelation:
+          if (type === 'reveal') {
+            // Make all elements in the page visible.
+            await page.$$eval('body *', elements => {
+              elements.forEach(el => {
+                const elStyleDec = window.getComputedStyle(el);
+                if (elStyleDec.display === 'none') {
+                  el.style.display = 'initial';
+                }
+                if (['hidden', 'collapse'].includes(elStyleDec.visibility)) {
+                  el.style.visibility = 'inherit';
+                }
+              });
+            });
+            act.result = 'All elements visible.';
+          }
           // If the act is a custom test:
-          if (type === 'test') {
+          else if (type === 'test') {
             // Conduct it.
             const testReport = await require(`./tests/${which}/app`).reporter(page);
             // Add a description of the test to the act.
