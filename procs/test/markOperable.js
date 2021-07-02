@@ -1,5 +1,5 @@
 // Marks elements that can be operated. See README.md for notes.
-exports.markOperable = async page => {
+exports.markOperable = async (page, onlyVisible) => {
 
   // ### CONSTANTS
 
@@ -110,9 +110,14 @@ exports.markOperable = async page => {
 
   // Identify the elements in the body.
   const allElements = await page.$$('body *');
-  // Identify those that are visible.
-  const elements = [];
-  await visiblesOf(allElements, elements);
+  // Identify those eligible for marking.
+  let elements = [];
+  if (onlyVisible) {
+    await visiblesOf(allElements, elements);
+  }
+  else {
+    elements = allElements;
+  }
   // Recursively mark elements with operable tag names as operable.
   await tagOperable(page, elements);
   // Recursively mark elements with pointer cursor styles as operable.

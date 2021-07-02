@@ -1,11 +1,11 @@
 // Returns counts, and texts if required, of (un)focusable and (in)operable elements.
-exports.focOp = async (page, withItems) => {
+exports.focOp = async (page, withItems, opOnlyVisible) => {
   // Import a module to get the texts of an element.
   const allText = withItems ? require('./allText').allText : '';
+  // Mark the operable elements.
+  await require('./markOperable').markOperable(page, opOnlyVisible);
   // Mark the focusable elements.
   await require('./markFocusable').markFocusable(page);
-  // Mark the operable elements.
-  await require('./markOperable').markOperable(page);
   // Get an array of the elements that are focusable but not operable.
   const fNotO = await page.$$('body [data-autotest-focused]:not([data-autotest-operable])');
   // Get an array of the elements that are operable but not focusable.
