@@ -1,5 +1,5 @@
-// Lists labeling conflicts of input and select elements.
-exports.labClash = async (page, withItems) => await page.$eval('body', body => {
+// Tabulates and lists labeling conflicts of labelable form controls.
+exports.labClash = async (page, withItems) => await page.$eval('body', (body, withItems) => {
   // FUNCTION DEFINITION START
   const debloat = text => text.trim().replace(/\s+/g, ' ');
   // FUNCTION DEFINITION END
@@ -8,29 +8,31 @@ exports.labClash = async (page, withItems) => await page.$eval('body', body => {
     totals: {
       wellLabeled: 0,
       unlabeled: 0,
-      clashLabeled: 0
+      mislabeled: 0
     }
   };
   if (withItems) {
     result.items = [];
   }
-  // Get data on the inputs and select lists.
-  const labelees = Array.from(body.querySelectorAll('input, select'));
+  // Get data on the labelable form controls.
+  const labelees = Array.from(
+    body.querySelectorAll('button, input:not([type=hidden]), select, textarea')
+  );
   // For each one:
   labelees.forEach((labelee, index) => {
     // Determine whether it has any or clashing labels and, if required, the label texts.
     let labelTypes = [];
-    let texts = [];
+    let texts = {};
     if (labelee.hasAttribute('aria-label')) {
       labelTypes.push('aria-label');
       if (withItems) {
-        texts = [labelee.getAttribute('aria-label')];
+        texts.attribute = labelee.getAttribute('aria-label');
       }
     }
     if (labelee.hasAttribute('aria-labelledby')) {
       labelTypes.push('aria-labelledby');
-      const labelerIDs = debloat(labelee.getAttribute('aria-labelledby')).split(' ');
       if (withItems) {
+        const labelerIDs = debloat(labelee.getAttribute('aria-labelledby')).split(' ');
         const labelerTexts = labelerIDs
         .map(id => {
           const labeler = document.getElementById(id);
@@ -38,7 +40,7 @@ exports.labClash = async (page, withItems) => await page.$eval('body', body => {
         })
         .filter(text => text);
         if (labelerTexts.length) {
-          texts.push(...labelerTexts);
+          texts.referred = labelerTexts;
         }
       }
     }
@@ -48,19 +50,28 @@ exports.labClash = async (page, withItems) => await page.$eval('body', body => {
       if (withItems) {
         const labelTexts = labels.map(label => debloat(label.textContent)).filter(text => text);
         if (labelTexts.length) {
-          texts.push(...labelTexts);
+          texts.label = labelTexts;
         }
+      }
+    }
+    if (withItems && labelee.tagName === 'button') {
+      const content = debloat(labelee.textContent);
+      if (content) {
+        texts.content = content;
       }
     }
     const totals = result.totals;
     const labelTypeCount = labelTypes.length;
     // If it is well labeled:
-    if (labelTypeCount === 1) {
+    if (
+      labelTypeCount === 1
+      || ! labelTypeCount && labelee.tagName === 'button' && debloat(labelee.textContent).length
+    ) {
       // Increment the count of well-labeled items in the report.
       totals.wellLabeled++;
     }
     // Otherwise, if it is unlabeled:
-    else if (labelTypeCount === 0) {
+    else if (! labelTypeCount) {
       // Increment the count of unlabeled items in the report.
       totals.unlabeled++;
       // Add data on the item to the report, if required.
@@ -73,9 +84,9 @@ exports.labClash = async (page, withItems) => await page.$eval('body', body => {
       }
     }
     // Otherwise, if it has clashing labels:
-    else if (labelTypes.length > 1) {
+    else if (labelTypeCount > 1) {
       // Increment the count of labeling clashes in the report.
-      totals.clashLabeled++;
+      totals.mislabeled++;
       // Add the data on the item to the report, if required.
       if (withItems) {
         result.items.push({
@@ -88,4 +99,4 @@ exports.labClash = async (page, withItems) => await page.$eval('body', body => {
     }
   });
   return {result};
-});
+}, withItems);
