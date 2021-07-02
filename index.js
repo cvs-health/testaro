@@ -62,6 +62,8 @@ const tests = {
   combo: 'report results from 3 tests',
   focOp: 'tabulate and list focusable and operable elements',
   focOpS: 'tabulate focusable and operable elements',
+  focOpVis: 'tabulate and list focusable and visible operable elements',
+  focOpVisS: 'tabulate focusable and visible operable elements',
   focusOutline: 'tabulate and list focusable elements with and without focus outlines',
   focusOutlineS: 'tabulate focusable elements with and without focus outlines',
   imgAlt: 'list the values of the alt attributes of img elements',
