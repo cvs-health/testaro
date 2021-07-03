@@ -12,7 +12,11 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
     }
   };
   if (withItems) {
-    result.items = [];
+    result.items = {
+      wellLabeled: [],
+      unlabeled: [],
+      mislabeled: []
+    };
   }
   // Get data on the labelable form controls.
   const labelees = Array.from(
@@ -54,7 +58,7 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
         }
       }
     }
-    if (withItems && labelee.tagName === 'button') {
+    if (withItems && labelee.tagName === 'BUTTON') {
       const content = debloat(labelee.textContent);
       if (content) {
         texts.content = content;
@@ -65,10 +69,19 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
     // If it is well labeled:
     if (
       labelTypeCount === 1
-      || ! labelTypeCount && labelee.tagName === 'button' && debloat(labelee.textContent).length
+      || ! labelTypeCount && labelee.tagName === 'BUTTON' && debloat(labelee.textContent).length
     ) {
       // Increment the count of well-labeled items in the report.
       totals.wellLabeled++;
+      // Add data on the item to the report, if required.
+      if (withItems) {
+        result.items.wellLabeled.push({
+          index,
+          type: labelee.type,
+          labelType: labelTypes[0],
+          texts
+        });
+      }
     }
     // Otherwise, if it is unlabeled:
     else if (! labelTypeCount) {
@@ -76,11 +89,14 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
       totals.unlabeled++;
       // Add data on the item to the report, if required.
       if (withItems) {
-        result.items.push({
+        const item = {
           index,
-          type: labelee.type,
-          labelTypes: 'None'
-        });
+          type: labelee.type
+        };
+        if (labelee.tagName === 'BUTTON') {
+          item.content = texts.content || 'NONE';
+        }
+        result.items.unlabeled.push(item);
       }
     }
     // Otherwise, if it has clashing labels:
@@ -89,7 +105,7 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
       totals.mislabeled++;
       // Add the data on the item to the report, if required.
       if (withItems) {
-        result.items.push({
+        result.items.mislabeled.push({
           index,
           type: labelee.type,
           labelTypes,
