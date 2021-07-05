@@ -643,9 +643,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
               try {
                 const reducer = require(`./procs/test/${which[0]}`);
                 if (reducer) {
-                  console.log('Proc found');
                   act.result.deficit = reducer.reduce(act.result);
-                  console.log('Done');
                 }
               }
               catch (error) {
