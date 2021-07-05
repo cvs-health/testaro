@@ -35,6 +35,7 @@ exports.linkUl = async (page, withItems) => await page.$eval('body', (body, with
   const links = Array.from(body.getElementsByTagName('a'));
   // Identify those with less text than their nearest non-inline ancestors as inline.
   const inLinks = links.filter(link => isInline(link) && hasMoreText(link));
+  const inLinkCount = inLinks.length;
   let underlined = 0;
   const ulInLinkTexts = [];
   const nulInLinkTexts = [];
@@ -58,12 +59,10 @@ exports.linkUl = async (page, withItems) => await page.$eval('body', (body, with
     }
   });
   // Get the percentage of underlined links among all inline links.
-  const ulPercent = inLinks.length
-    ? Math.floor(100 * ulInLinkTexts.length / inLinks.length)
-    : 'N/A';
+  const ulPercent = inLinkCount ? Math.floor(100 * underlined / inLinkCount) : 'N/A';
   const data = {
     linkCount: links.length,
-    inLinkCount: inLinks.length,
+    inLinkCount,
     underlined,
     ulPercent
   };
