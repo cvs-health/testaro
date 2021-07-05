@@ -37,7 +37,7 @@ exports.reduce = result => {
     // labClashS
     facts = result.labClashS && result.labClashS.result && result.labClashS.result.totals;
     if (facts) {
-      deficit.labClashS = 2 * facts.misLabeled + 4 * facts.unlabeled;
+      deficit.labClashS = 2 * facts.mislabeled + 4 * facts.unlabeled;
       deficit.total += deficit.labClashS;
     }
   }
