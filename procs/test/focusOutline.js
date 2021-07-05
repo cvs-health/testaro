@@ -1,70 +1,32 @@
 // Returns counts, and texts if required, of elements with and without focal outlines.
 exports.focusOutline = async (page, withTexts) => {
-  // Initialize the result properties.
-  let focusableCount = 0;
-  let outlinedCount = 0;
-  const outlinedTexts = [];
-  const plainTexts = [];
-  // Import the allText function if necessary.
-  const allText = withTexts ? require('./allText').allText : '';
-  // FUNCTION DEFINITION START
-  // Identifies and marks the focused in-body element or identifies a failure status.
-  const focused = async () => {
-    // Identify a JSHandle of the focused element or a failure status.
-    const focusJSHandle = await page.evaluateHandle(() => {
-      // Identify the focused element.
-      const focus = document.activeElement;
-      // If it exists and is within the body:
-      if (focus && focus !== document.body) {
-        // If it has not previously been focused:
-        if (! focus.dataset.autotestFocused) {
-          // Mark it as previously focused.
-          focus.setAttribute('data-autotest-focused', '1');
-          // Return it.
-          return focus;
-        }
-        // Otherwise, i.e. if it has been previously focused:
-        else {
-          // Return a status message.
-          return {atFocusStatus: 'already'};
-        }
-      }
-      // Otherwise, i.e. if it does not exist or is the body itself:
-      else {
-        // Return a status message.
-        return {atFocusStatus: 'no'};
-      }
-    });
-    // Get the failure status.
-    const statusHandle = await focusJSHandle.getProperty('atFocusStatus');
-    const status = await statusHandle.jsonValue();
-    // If there is one:
-    if (status) {
-      // Return it.
-      return status;
-    }
-    // Otherwise, i.e. if an element within the body is newly focused:
-    else {
-      // Return its ElementHandle.
-      return focusJSHandle.asElement();
-    }
-  };
-  // FUNCTION DEFINITION END
-  // Identify the navigation-key sequence.
+
+  // CONSTANTS
+
+  // Navigation-key sequence.
   const nextNavKeys = {
     Tab: ['ArrowRight', null],
     ArrowRight: ['ArrowRight', 'ArrowDown'],
     ArrowDown: ['ArrowDown', 'Tab']
   };
-  // Press the Tab key.
-  await page.keyboard.press('Tab');
-  // Initialize the last-pressed navigation key.
+
+  // VARIABLES
+
   let lastNavKey = 'Tab';
-  // FUNCTION DEFINITION START
+  // Result properties.
+  let focusableCount = 0;
+  let outlinedCount = 0;
+  const outlinedTexts = [];
+  const plainTexts = [];
+
+  // FUNCTIONS
+
+  const allText = withTexts ? require('./allText').allText : '';
+  const {focusMark} = require('./focusMark');
   // Recursively reports on focus outlines.
   const reportOutlines = async () => {
     // Identify and mark the newly focused element or report a failure.
-    const focus = await focused();
+    const focus = await focusMark(page, lastNavKey);
     // Identify the failure status, if any.
     const failure = typeof focus === 'string' ? focus : null;
     // If it is a refocused element and the last navigation key was an arrow key:
@@ -100,17 +62,22 @@ exports.focusOutline = async (page, withTexts) => {
       await reportOutlines();
     }
   };
-  // FUNCTION DEFINITION END
+
+  // OPERATION
+
+  // Press the Tab key.
+  await page.keyboard.press('Tab');
+  // Report the focus outlines.
   await reportOutlines();
   // Return the result.
-  const result = {
+  const data = {
     focusableCount,
     outlinedCount,
     outlinedPercent: Math.floor(100 * outlinedCount / focusableCount)
   };
   if (withTexts) {
-    result.outlinedTexts = outlinedTexts;
-    result.plainTexts = plainTexts;
+    data.outlinedTexts = outlinedTexts;
+    data.plainTexts = plainTexts;
   }
-  return {result};
+  return data;
 };

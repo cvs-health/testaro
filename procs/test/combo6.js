@@ -1,28 +1,40 @@
 // Reduces results of 6 tests to a score.
 exports.reduce = result => {
   // Initialize the score.
-  let score = 0;
-  let bads;
-  // Add weighted absolute test results to the score.
-  // axeS
-  const {elementCount} = result.axeS;
-  bads = result.axeS.violations;
-  score += 2 * bads.minor + 3 * bads.moderate + 4 * bads.serious + 5 * bads.critical;
-  // wave1
-  bads = result.wave1.categories;
-  score += 2 * bads.alert.count + 3 * bads.contrast.count + 4 * bads.error.count;
-  // linkUlS
-  bads = result.linkUlS.result.inline;
-  score += 3 * (bads.total - bads.underlined);
-  // focusOutlineS
-  bads = result.focusOutlineS.result;
-  score += 4 * (bads.focusableCount - bads.outlinedCount);
-  // focOpS
-  bads = result.focOpS.result;
-  score += 4 * bads.operableButNotFocusable.total + 2 * bads.focusableButNotOperable.total;
-  // labClashS
-  // Add a relative amount to the score.
-  score += Math.floor(8 * score / result.axeS.elementCount);
-  // Add the score to the result.
-  return score;
+  let deficit = 0;
+  let facts;
+  if (typeof result === 'object') {
+    // axeS
+    facts = result.axeS && result.axeS.violations;
+    if (facts) {
+      deficit += 2 * facts.minor + 3 * facts.moderate + 4 * facts.serious + 5 * facts.critical;
+    }
+    // wave1
+    facts = result.wave1 && result.wave1.categories;
+    if (facts) {
+      deficit += 2 * facts.alert.count + 3 * facts.contrast.count + 4 * facts.error.count;
+    }
+    // linkUlS
+    facts = result.linkUlS && result.linkUlS.result;
+    if (facts) {
+      deficit += 3 * (facts.inLinkCount - facts.underlined);
+    }
+    // focusOutlineS
+    facts = result.focusOutlineS && result.focusOutlineS.result;
+    if (facts) {
+      deficit += 4 * (facts.focusableCount - facts.outlinedCount);
+    }
+    // focOpS
+    facts = result.focOpS && result.focOpS.result;
+    if (facts) {
+      deficit += 4 * facts.operableNotFocusable.total + 1 * facts.focusableNotOperable.total;
+    }
+    // labClashS
+    facts = result.labClashS && result.labClashS.result && result.labClashS.result.totals;
+    if (facts) {
+      deficit += 2 * facts.misLabeled + 4 * facts.unlabeled;
+    }
+  }
+  // Return the score.
+  return deficit;
 };

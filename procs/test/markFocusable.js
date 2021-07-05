@@ -19,51 +19,12 @@ exports.markFocusable = async page => {
 
   // ## FUNCTIONS
 
-  // Identifies and marks the focused in-body element or identifies a failure status.
-  const mark = async () => {
-    // Identify a JSHandle of the focused element or a failure status.
-    const focusJSHandle = await page.evaluateHandle(lastNavKey => {
-      // Identify the focused element.
-      const focus = document.activeElement;
-      // If it exists and is within the body:
-      if (focus && focus !== document.body) {
-        // If it was not previously focused:
-        if (! focus.dataset.autotestFocused) {
-          // Change its status to previously focused.
-          focus.setAttribute('data-autotest-focused', lastNavKey);
-          // Return it.
-          return focus;
-        }
-        // Otherwise, i.e. if it was previously focused:
-        else {
-          // Return a status message.
-          return {status: 'already'};
-        }
-      }
-      // Otherwise, i.e. if it does not exist or is the body itself:
-      else {
-        // Return a status message.
-        return {status: 'external'};
-      }
-    }, lastNavKey);
-    // Get the failure status.
-    const statusHandle = await focusJSHandle.getProperty('status');
-    const status = await statusHandle.jsonValue();
-    // If there is one:
-    if (status) {
-      // Return it as a string.
-      return status;
-    }
-    // Otherwise, i.e. if an element within the body is newly focused:
-    else {
-      // Return its ElementHandle.
-      return focusJSHandle.asElement();
-    }
-  };
+  // Marks and returns the focused in-body element or returns a status.
+  const {focusMark} = require('./focusMark');
   // Recursively focuses and marks elements.
   const markAll = async () => {
     // Identify and mark the newly focused element or identify a status.
-    const focOrStatus = await mark();
+    const focOrStatus = await focusMark(page, lastNavKey);
     // If the status is external:
     if (focOrStatus === 'external') {
       // Press the Tab key, or quit if the external limit has been reached.
@@ -87,7 +48,7 @@ exports.markFocusable = async page => {
 
   // ### OPERATION
 
-  // 
+  //
   // Press the Tab key and identify it as the last-pressed navigation key.
   await page.keyboard.press('Tab');
   // Recursively focus and mark elements.

@@ -61,15 +61,15 @@ exports.linkUl = async (page, withItems) => await page.$eval('body', (body, with
   const ulPercent = inLinks.length
     ? Math.floor(100 * ulInLinkTexts.length / inLinks.length)
     : 'N/A';
-  const result = {
+  const data = {
     linkCount: links.length,
     inLinkCount: inLinks.length,
     underlined,
     ulPercent
   };
   if (withItems) {
-    result.ulInLinkTexts = ulInLinkTexts;
-    result.nulInLinkTexts = nulInLinkTexts;
+    data.ulInLinkTexts = ulInLinkTexts;
+    data.nulInLinkTexts = nulInLinkTexts;
   }
-  return result;
+  return data;
 }, withItems);

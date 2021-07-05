@@ -4,7 +4,7 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
   const debloat = text => text.trim().replace(/\s+/g, ' ');
   // FUNCTION DEFINITION END
   // Initialize a report.
-  const result = {
+  const data = {
     totals: {
       wellLabeled: 0,
       unlabeled: 0,
@@ -12,7 +12,7 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
     }
   };
   if (withItems) {
-    result.items = {
+    data.items = {
       wellLabeled: [],
       unlabeled: [],
       mislabeled: []
@@ -64,7 +64,7 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
         texts.content = content;
       }
     }
-    const totals = result.totals;
+    const {totals} = data;
     const labelTypeCount = labelTypes.length;
     // If it is well labeled:
     if (
@@ -75,7 +75,7 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
       totals.wellLabeled++;
       // Add data on the item to the report, if required.
       if (withItems) {
-        result.items.wellLabeled.push({
+        data.items.wellLabeled.push({
           index,
           type: labelee.type,
           labelType: labelTypes[0],
@@ -96,7 +96,7 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
         if (labelee.tagName === 'BUTTON') {
           item.content = texts.content || 'NONE';
         }
-        result.items.unlabeled.push(item);
+        data.items.unlabeled.push(item);
       }
     }
     // Otherwise, if it has clashing labels:
@@ -105,7 +105,7 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
       totals.mislabeled++;
       // Add the data on the item to the report, if required.
       if (withItems) {
-        result.items.mislabeled.push({
+        data.items.mislabeled.push({
           index,
           type: labelee.type,
           labelTypes,
@@ -114,5 +114,5 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
       }
     }
   });
-  return {result};
+  return data;
 }, withItems);

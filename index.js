@@ -641,7 +641,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
               // Perform the reduction and add its result to the act.
               const reducer = require(`./procs/test/${which[0]}`);
               if (reducer) {
-                act.result.score = reducer.reduce(act.result);
+                act.result.deficit = reducer.reduce(act.result);
               }
             }
           }

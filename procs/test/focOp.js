@@ -88,8 +88,8 @@ exports.focOp = async (page, withItems, opOnlyVisible) => {
     }
   };
   // FUNCTION DEFINITION END
-  // Initialize a report.
-  const report = {result: {
+  // Initialize the data.
+  const data = {
     totals: {
       focusableNotOperable: {
         total: 0,
@@ -131,14 +131,13 @@ exports.focOp = async (page, withItems, opOnlyVisible) => {
       operableNotFocusable: [],
       focusableAndOperable: []
     }
-  }};
-  // Populate it.
-  const result = report.result;
-  const totals = result.totals;
-  const items = result.items;
+  };
+  // Populate them.
+  const totals = data.totals;
+  const items = data.items;
   await compile(fNotO, totals, items, 'focusableNotOperable', true, false);
   await compile(oNotF, totals, items, 'operableNotFocusable', false, true);
   await compile(fAndO, totals, items, 'focusableAndOperable', true, true);
   // Return it.
-  return report;
+  return data;
 };
