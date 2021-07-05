@@ -1,6 +1,5 @@
 // Reduces results of 6 tests to a score.
 exports.reduce = result => {
-  console.log('Starting combo6');
   // Initialize the score.
   let deficit = 0;
   let facts;
@@ -37,6 +36,5 @@ exports.reduce = result => {
     }
   }
   // Return the score.
-  console.log(`Deficit is ${JSON.stringify(deficit, null, 2)}`);
   return deficit;
 };
