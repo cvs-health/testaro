@@ -71,7 +71,8 @@ const tests = {
   imgDec: 'show the decorative images and their related texts',
   imgInf: 'show the informative images and their related texts',
   inLab: 'list the inputs and their labels',
-  labClash: 'describe inconsistencies in labeling',
+  labClash: 'tabulate and describe inconsistencies in labeling',
+  labClashS: 'tabulate inconsistencies in labeling',
   linkUl: 'tabulate and list underlined and other inline links',
   linkUlS: 'tabulate inline links and how many are underlined',
   role: 'list elements having role attributes',
@@ -639,9 +640,16 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
             // If it includes at least 1 test and a reducer is specified:
             if (which.length > 1 && which[0].length) {
               // Perform the reduction and add its result to the act.
-              const reducer = require(`./procs/test/${which[0]}`);
-              if (reducer) {
-                act.result.deficit = reducer.reduce(act.result);
+              try {
+                const reducer = require(`./procs/test/${which[0]}`);
+                if (reducer) {
+                  console.log('Proc found');
+                  act.result.deficit = reducer.reduce(act.result);
+                  console.log('Done');
+                }
+              }
+              catch (error) {
+                act.result = `ERROR: ${error.message}`;
               }
             }
           }
