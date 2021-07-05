@@ -73,7 +73,7 @@ exports.focusOutline = async (page, withTexts) => {
   const data = {
     focusableCount,
     outlinedCount,
-    outlinedPercent: Math.floor(100 * outlinedCount / focusableCount)
+    outlinedPercent: focusableCount ? Math.floor(100 * outlinedCount / focusableCount) : 'N.A.'
   };
   if (withTexts) {
     data.outlinedTexts = outlinedTexts;
