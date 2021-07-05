@@ -5,7 +5,7 @@ exports.focusOutline = async (page, withTexts) => {
   let outlinedCount = 0;
   const outlinedTexts = [];
   const plainTexts = [];
-  // Import the textOwn function if necessary.
+  // Import the allText function if necessary.
   const allText = withTexts ? require('./allText').allText : '';
   // FUNCTION DEFINITION START
   // Identifies and marks the focused in-body element or identifies a failure status.
