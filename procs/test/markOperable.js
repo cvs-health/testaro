@@ -4,7 +4,7 @@ exports.markOperable = async (page, onlyVisible) => {
   // ### CONSTANTS
 
   // Operable tag names.
-  const opTags = new Set(['A', 'BUTTON', 'INPUT', 'OPTION', 'SELECT', 'TEXTAREA']);
+  const opTags = new Set(['A', 'BUTTON', 'INPUT', 'SELECT', 'TEXTAREA']);
 
   // ### FUNCTIONS
 
