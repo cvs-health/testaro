@@ -137,7 +137,15 @@ Axe integration depends on the [axe-playwright](https://www.npmjs.com/package/ax
 
 #### WAVE
 
-WAVE integration depends on the user having a WAVE API key. Use of the WAVE API depletes the user’s WAVE API credits. The `waves` command performs a WAVE test with `reporttype=1` on a specified URL. Such a test costs 1 credit ($0.04, or less in quantity). When you register with WebAIM and obtain a WAVE API key, you must add a line to your `.env` file, in the format `WAVE_KEY=x0x0x0x0x0x0x` (where `x0x0x0x0x0x0x` represents your key).
+WAVE integration depends on the user having a WAVE API key. Use of the WAVE API depletes the user’s WAVE API credits. The `wave1` command performs a WAVE test with `reporttype=1` on a specified URL. Such a test costs 1 credit ($0.04, or less in quantity). When you register with WebAIM and obtain a WAVE API key, you must add a line to your `.env` file, in the format `WAVE_KEY=x0x0x0x0x0x0x` (where `x0x0x0x0x0x0x` represents your key).
+
+##### WAVE versus Axe
+
+Axe and WAVE are both combinations of multiple accessibility tests. They partly overlap. Where they do, they sometimes agree and sometimes disagree on severity.
+
+For example, when a `button` is empty and unlabeled, or an `input` is unlabeled, Axe reports a <q>critical</q> violation and WAVE reports an <q>error</q>. However, when a `select` is unlabeled, Axe reports a <q>critical</q> violation and WAVE reports only an <q>alert</q>.
+
+An example of a difference in coverage: When a form control has an explicit label (a `label` element referencing the control with a `for` attribute), but that label is nullified by a higher-precedence label (an `aria-label` or `aria-labelledby` attribute), WAVE reports an <q>alert</q>, but Axe does not report a violation at all.
 
 ##### JHU-WAVE
 
