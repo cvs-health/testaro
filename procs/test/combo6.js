@@ -34,10 +34,10 @@ exports.reduce = result => {
       deficit.focOpS = 4 * facts.operableNotFocusable.total + 1 * facts.focusableNotOperable.total;
       deficit.total += deficit.focOpS;
     }
-    // labClashS
+    // labClashS (facts.unlabeled disregarded because covered by axeS)
     facts = result.labClashS && result.labClashS.result && result.labClashS.result.totals;
     if (facts) {
-      deficit.labClashS = 2 * facts.mislabeled + 4 * facts.unlabeled;
+      deficit.labClashS = 2 * facts.mislabeled + 0 * facts.unlabeled;
       deficit.total += deficit.labClashS;
     }
   }
