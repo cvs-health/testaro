@@ -40,6 +40,12 @@ exports.reduce = result => {
       deficit.labClashS = 2 * facts.mislabeled + 0 * facts.unlabeled;
       deficit.total += deficit.labClashS;
     }
+    // radioSetS
+    facts = result.radioSetS && result.radioSetS.result && result.radioSetS.result.totals;
+    if (facts) {
+      deficit.radioSetS = 3 * (facts.total - facts.inSet);
+      deficit.total += deficit.radioSetS;
+    }
   }
   // Return the score.
   return deficit;

@@ -1,6 +1,12 @@
 /*
   Lists autocomplete-eligible input elements with their autocomplete attributes and
   accessible names.
+
+  The rules for the autocomplete attribute are complex, and most actual autocomplete
+  errors violate rules of semantic classification that cannot be reliably tested
+  unless the artifact is subject to a design system that dictates labeling.
+
+  Therefore, this test merely outputs information.
 */
 exports.reporter = async page => await page.$eval('body', body => {
   // Get an array of autocomplete-eligible inputs.

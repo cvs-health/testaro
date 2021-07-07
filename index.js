@@ -75,6 +75,8 @@ const tests = {
   labClashS: 'tabulate inconsistencies in labeling',
   linkUl: 'tabulate and list underlined and other inline links',
   linkUlS: 'tabulate inline links and how many are underlined',
+  radioSet: 'tabulate and list radio buttons in and not in accessible fieldsets',
+  radioSetS: 'tabulate radio buttons in and not in accessible fieldsets',
   role: 'list elements having role attributes',
   roleS: 'tabulate element tag names and roles assigned to them',
   simple: 'perfunctory trivial test for testing',
