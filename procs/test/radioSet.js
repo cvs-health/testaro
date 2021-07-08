@@ -66,7 +66,7 @@ exports.radioSet = async (page, withItems) => {
     const totals = data.totals;
     totals.total = allRadios.length;
     totals.inSet = setRadios.length;
-    totals.percent = Math.floor(totals.total ? 100 * totals.inSet / totals.total : 'N.A.');
+    totals.percent = totals.total ? Math.floor(100 * totals.inSet / totals.total) : 'N.A.';
     // If itemization is required:
     if (withItems) {
       // Add it to the results.
