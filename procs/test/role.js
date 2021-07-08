@@ -125,7 +125,7 @@ exports.role = async page => await page.$eval('body', body => {
   const roleElements = Array.from(body.querySelectorAll('[role]'));
   // Identify those with roles that are either deprecated or invalid.
   const bads = roleElements.filter(element => {
-    const role = element.role;
+    const role = element.getAttribute('role');
     return badRoles.has(role) || ! goodRoles.has(role);
   });
   // Initialize the result.
