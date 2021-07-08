@@ -138,8 +138,8 @@ exports.role = async page => await page.$eval('body', body => {
   bads.forEach(element => {
     // Identify its facts.
     const tagName = element.tagName;
-    const role = element.role;
-    // Add it to the result.
+    const role = element.getAttribute('role');
+    // Add them to the result.
     if (data.tagNames[tagName]) {
       if (data.tagNames[tagName][role]) {
         data.tagNames[tagName][role]++;
