@@ -55,7 +55,7 @@ exports.reduce = result => {
     // bulk
     facts = result.bulk && result.bulk.result;
     if (facts) {
-      deficit.bulk = Math.floor(Math.sqrt(facts.visibleElements - 150));
+      deficit.bulk = Math.floor(Math.sqrt(Math.max(0, facts.visibleElements - 150)));
       deficit.total += deficit.bulk;
     }
   }
