@@ -46,6 +46,12 @@ exports.reduce = result => {
       deficit.radioSetS = 3 * (facts.total - facts.inSet);
       deficit.total += deficit.radioSetS;
     }
+    // roleS
+    facts = result.roleS && result.roleS.result;
+    if (facts) {
+      deficit.roleS = 3 * facts.badRoleElements;
+      deficit.total += deficit.roleS;
+    }
   }
   // Return the score.
   return deficit;

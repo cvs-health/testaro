@@ -1,6 +1,7 @@
 // Returns counts, fractions, and texts of inline links, by whether underlined.
 exports.role = async page => await page.$eval('body', body => {
   // CONSTANTS
+  // The math role has been removed, because of poor adoption and exclusion from HTML5.
   // Deprecated roles (from https://www.w3.org/TR/html-aria/).
   const badRoles = new Set([
     'article',
@@ -24,7 +25,6 @@ exports.role = async page => await page.$eval('body', body => {
     'listbox',
     'listitem',
     'main',
-    'math',
     'navigation',
     'option',
     'presentation',
@@ -76,7 +76,6 @@ exports.role = async page => await page.$eval('body', body => {
     'log',
     'main',
     'marquee',
-    'math',
     'menu',
     'menubar',
     'menuitem',
