@@ -2,7 +2,7 @@
 exports.role = async page => await page.$eval('body', body => {
   // CONSTANTS
   // Deprecated roles (from https://www.w3.org/TR/html-aria/).
-  const badRoles = [
+  const badRoles = new Set([
     'article',
     'button',
     'cell',
@@ -42,11 +42,93 @@ exports.role = async page => await page.$eval('body', body => {
     'table',
     'term',
     'textbox'
-  ];
+  ]);
+  // All non-abstract roles (from https://www.w3.org/TR/wai-aria/#roles_categorization).
+  const goodRoles = new Set([
+    'alert',
+    'alertdialog',
+    'application',
+    'article',
+    'banner',
+    'button',
+    'cell',
+    'checkbox',
+    'columnheader',
+    'combobox',
+    'complementary',
+    'contentinfo',
+    'definition',
+    'dialog',
+    'directory',
+    'document',
+    'feed',
+    'figure',
+    'form',
+    'grid',
+    'gridcell',
+    'group',
+    'heading',
+    'img',
+    'link',
+    'list',
+    'listbox',
+    'listitem',
+    'log',
+    'main',
+    'marquee',
+    'math',
+    'menu',
+    'menubar',
+    'menuitem',
+    'menuitemcheckbox',
+    'menuitemradio',
+    'navigation',
+    'none',
+    'note',
+    'option',
+    'presentation',
+    'progressbar',
+    'radio',
+    'radiogroup',
+    'region',
+    'row',
+    'rowgroup',
+    'rowheader',
+    'scrollbar',
+    'search',
+    'searchbox',
+    'separator',
+    'separator',
+    'slider',
+    'spinbutton',
+    'status',
+    'switch',
+    'tab',
+    'table',
+    'tablist',
+    'tabpanel',
+    'term',
+    'textbox',
+    'timer',
+    'toolbar',
+    'tooltip',
+    'tree',
+    'treegrid',
+    'treeitem',
+  ]);
+  // Remove the deprecated roles from the non-abstract roles.
+  goodRoles.forEach(role => {
+    if (badRoles.has(role)) {
+      goodRoles.delete(role);
+    }
+  });
   // Identify all elements with role attributes.
   const roleElements = Array.from(body.querySelectorAll('[role]'));
-  // Identify those with deprecated roles.
-  const bads = roleElements.filter(element => badRoles.includes(element.role));
+  // Identify those with roles that are either deprecated or invalid.
+  const bads = roleElements.filter(element => {
+    const role = element.role;
+    return badRoles.has(role) || ! goodRoles.has(role);
+  });
   // Initialize the result.
   const data = {
     roleElements: roleElements.length,
@@ -54,7 +136,7 @@ exports.role = async page => await page.$eval('body', body => {
     tagNames: {}
   };
   // For each element with a deprecated role:
-  badRoleElements.forEach(element => {
+  bads.forEach(element => {
     // Identify its facts.
     const tagName = element.tagName;
     const role = element.role;
@@ -68,34 +150,8 @@ exports.role = async page => await page.$eval('body', body => {
       }
     }
     else {
-      data.tagNames[tagName] = {[role]: 1}
-    }
-    // If it is underlined:
-    if (window.getComputedStyle(link).textDecorationLine === 'underline') {
-      // Increment the count of underlined inline links.
-      underlined++;
-      // If required, add its text to the array of their texts.
-      if (withItems) {
-        ulInLinkTexts.push(text);
-      }
-    }
-    // Otherwise, if it is not underlined and itemization is required:
-    else if (withItems) {
-      // Add its text to the array of texts of non-underlined inline links.
-      nulInLinkTexts.push(text);
+      data.tagNames[tagName] = {[role]: 1};
     }
   });
-  // Get the percentage of underlined links among all inline links.
-  const ulPercent = inLinkCount ? Math.floor(100 * underlined / inLinkCount) : 'N/A';
-  const data = {
-    linkCount: links.length,
-    inLinkCount,
-    underlined,
-    ulPercent
-  };
-  if (withItems) {
-    data.ulInLinkTexts = ulInLinkTexts;
-    data.nulInLinkTexts = nulInLinkTexts;
-  }
   return data;
-}, withItems);
+});
