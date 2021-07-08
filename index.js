@@ -77,8 +77,8 @@ const tests = {
   linkUlS: 'tabulate inline links and how many are underlined',
   radioSet: 'tabulate and list radio buttons in and not in accessible fieldsets',
   radioSetS: 'tabulate radio buttons in and not in accessible fieldsets',
-  role: 'list elements having role attributes',
-  roleS: 'tabulate element tag names and roles assigned to them',
+  roleList: 'list elements having role attributes',
+  roleListS: 'tabulate element tag names and roles assigned to them',
   simple: 'perfunctory trivial test for testing',
   state: 'show an element with and without its focus and hover states in 3 browsers',
   styleDiff: 'tabulate discrepancies in styles of links, buttons, an headings'
