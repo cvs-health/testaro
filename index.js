@@ -59,6 +59,7 @@ const moves = {
 const tests = {
   autocom: 'list inputs with their autocomplete attributes',
   bodyText: 'give the text content of the page body',
+  bulk: 'report the count of visible elements',
   combo: 'report results and a score from multiple tests',
   focOp: 'tabulate and list focusable and operable elements',
   focOpS: 'tabulate focusable and operable elements',

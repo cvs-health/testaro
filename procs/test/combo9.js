@@ -52,6 +52,12 @@ exports.reduce = result => {
       deficit.roleS = 3 * facts.badRoleElements;
       deficit.total += deficit.roleS;
     }
+    // bulk
+    facts = result.bulk && result.bulk.result;
+    if (facts) {
+      deficit.bulk = Math.floor(Math.sqrt(facts.visibleElements - 150));
+      deficit.total += deficit.bulk;
+    }
   }
   // Return the score.
   return deficit;
