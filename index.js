@@ -83,7 +83,8 @@ const tests = {
   roleS: 'tabulate elements with inaccessible roles',
   simple: 'perfunctory trivial test for testing',
   state: 'show an element with and without its focus and hover states in 3 browsers',
-  styleDiff: 'tabulate discrepancies in styles of links, buttons, an headings'
+  styleDiff: 'tabulate and list style inconsistencies',
+  styleDiffS: 'tabulate style inconsistencies'
 };
 const browserTypeNames = {
   'chromium': 'Chrome',
