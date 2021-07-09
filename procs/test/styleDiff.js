@@ -9,7 +9,7 @@ exports.styleDiff = async (page, withDetails) => await page.$eval('body', (body,
   // For each of them:
   tagNames.forEach(tagName => {
     // Get the elements with it.
-    const elements = body.getElementsByTagName(tagName);
+    const elements = Array.from(body.getElementsByTagName(tagName));
     const elementCount = elements.length;
     // If there are any:
     if (elementCount) {
