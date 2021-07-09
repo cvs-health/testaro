@@ -1,5 +1,5 @@
 // Tabulates and lists style inconsistencies.
-exports.reporter = async (page, withDetails) => await page.$eval('body', (body, withDetails) => {
+exports.styleDiff = async (page, withDetails) => await page.$eval('body', (body, withDetails) => {
   const data = {totals: {}};
   if (withDetails) {
     data.details = {};
