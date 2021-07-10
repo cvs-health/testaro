@@ -66,7 +66,7 @@ exports.reduce = result => {
           return testDeficit;
         }
       }, 0);
-      deficit.total += deficit.styleDiffS;
+      deficit.total += Math.floor(deficit.styleDiffS);
     }
     // bulk
     facts = result.bulk && result.bulk.result;

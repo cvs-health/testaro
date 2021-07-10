@@ -15,6 +15,11 @@ exports.styleDiff = async (page, withDetails) => await page.$eval('body', (body,
     if (elementCount) {
       const styleProps = {};
       const styleTexts = {};
+      if (withDetails) {
+        if (! data.details[tagName]) {
+          data.details[tagName] = {};
+        }
+      }
       // For each of them:
       elements.forEach(element => {
         // Get its style properties.
@@ -60,11 +65,14 @@ exports.styleDiff = async (page, withDetails) => await page.$eval('body', (body,
           }
           // Otherwise:
           else {
+            if (! data.details[tagName][styleProp]) {
+              data.details[tagName][styleProp] = {};
+            }
             // Sort the values in order of decreasing count.
             const sortedEntries = Object.entries(styleProps[styleProp]).sort((a, b) => b[1] - a[1]);
-            data.details[tagName] = {[styleProp]: {}};
             sortedEntries.forEach(entry => {
-              data.details[tagName][styleProp][entry[0]] = entry[1];
+              const propData = data.details[tagName][styleProp];
+              propData[entry[0]] = (propData[entry[0]] || 0) + entry[1];
             });
           }
         });
