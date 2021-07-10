@@ -17,18 +17,23 @@ exports.styleDiff = async (page, withDetails) => await page.$eval('body', (body,
       const styleTexts = {};
       // For each of them:
       elements.forEach(element => {
-        // Get its style declaration.
-        const style = window.getComputedStyle(element);
+        // Get its style properties.
+        const style = {};
+        Object.assign(style, window.getComputedStyle(element));
+        Object.keys(style).forEach(key => {
+          if (/^\d/.test(key) || key.startsWith('webkit')) {
+            delete style[key];
+          }
+        });
         // Get a text representation of the style declaration.
-        const styleText = style.cssText;
+        const styleText = JSON.stringify(style);
         // Increment the total of elements with that style declaration.
         styleTexts[styleText] = ++styleTexts[styleText] || 1;
         // If details are required:
         if (withDetails) {
           // For each style property:
-          for (let i = 0; i < style.length; i++) {
-            const styleName = style[i];
-            const styleValue = style.getPropertyValue(styleName);
+          Object.keys(style).forEach(styleName => {
+            const styleValue = style[styleName];
             // Increment the total of elements with the same value on it as the element.
             if (styleProps[styleName]) {
               styleProps[styleName][styleValue] = ++styleProps[styleName][styleValue] || 1;
@@ -36,11 +41,15 @@ exports.styleDiff = async (page, withDetails) => await page.$eval('body', (body,
             else {
               styleProps[styleName] = {[styleValue]: 1};
             }
-          }
+          });
         }
       });
       // Add the totals to the result.
-      data.totals[tagName] = Object.values(styleTexts).sort((a, b) => b - a);
+      data.totals[tagName] = {total: elementCount};
+      const styleCounts = Object.values(styleTexts);
+      if (styleCounts.length > 1) {
+        data.totals[tagName].subtotals = styleCounts.sort((a, b) => b - a);
+      }
       // If details are required:
       if (withDetails) {
         // For each style property:
@@ -55,7 +64,7 @@ exports.styleDiff = async (page, withDetails) => await page.$eval('body', (body,
             const sortedEntries = Object.entries(styleProps[styleProp]).sort((a, b) => b[1] - a[1]);
             data.details[tagName] = {[styleProp]: {}};
             sortedEntries.forEach(entry => {
-              data.details[tagName][styleProp][entry[0] = entry[1]];
+              data.details[tagName][styleProp][entry[0]] = entry[1];
             });
           }
         });

@@ -52,6 +52,22 @@ exports.reduce = result => {
       deficit.roleS = 3 * facts.badRoleElements;
       deficit.total += deficit.roleS;
     }
+    // styleDiffS
+    facts = result.styleDiffS && result.styleDiffS.result && result.styleDiffS.result.totals;
+    if (facts) {
+      const items = Object.values(facts);
+      deficit.styleDiffs = items.reduce((testDeficit, currentItem) => {
+        if (currentItem.subtotals) {
+          return testDeficit + currentItem.subtotals.reduce((itemDeficit, currentSub) => {
+            return itemDeficit + currentSub * (Math.sqrt(currentItem.total / currentSub) - 1);
+          }, 0);
+        }
+        else {
+          return testDeficit;
+        }
+      }, 0);
+      deficit.total += deficit.styleDiffS;
+    }
     // bulk
     facts = result.bulk && result.bulk.result;
     if (facts) {
