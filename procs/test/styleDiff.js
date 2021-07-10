@@ -9,10 +9,12 @@ exports.styleDiff = async (page, withDetails) => await page.$eval('body', (body,
     'border',
     'color',
     'font',
+    'lineHeight',
     'maxHeight',
     'maxWidth',
     'minHeight',
     'minWidth',
+    'opacity',
     'outline',
     'textDecoration'
   ];
