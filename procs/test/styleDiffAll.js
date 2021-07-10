@@ -4,18 +4,6 @@ exports.styleDiff = async (page, withDetails) => await page.$eval('body', (body,
   if (withDetails) {
     data.details = {};
   }
-  // Identify the settable styles to be compared.
-  const mainStyles = [
-    'border',
-    'color',
-    'font',
-    'maxHeight',
-    'maxWidth',
-    'minHeight',
-    'minWidth',
-    'outline',
-    'textDecoration'
-  ];
   // Identify the tag names to be analyzed.
   const tagNames = ['a', 'button', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
   // For each of them:
@@ -34,20 +22,22 @@ exports.styleDiff = async (page, withDetails) => await page.$eval('body', (body,
       }
       // For each of them:
       elements.forEach(element => {
-        // Get its values on the style properties to be compared.
-        const styleDec = window.getComputedStyle(element);
+        // Get its style properties.
         const style = {};
-        mainStyles.forEach(styleName => {
-          style[styleName] = styleDec[styleName];
+        Object.assign(style, window.getComputedStyle(element));
+        Object.keys(style).forEach(key => {
+          if (/^\d/.test(key) || key.startsWith('webkit')) {
+            delete style[key];
+          }
         });
-        // Get a text representation of the style.
+        // Get a text representation of the style declaration.
         const styleText = JSON.stringify(style);
         // Increment the total of elements with that style declaration.
         styleTexts[styleText] = ++styleTexts[styleText] || 1;
         // If details are required:
         if (withDetails) {
           // For each style property:
-          mainStyles.forEach(styleName => {
+          Object.keys(style).forEach(styleName => {
             const styleValue = style[styleName];
             // Increment the total of elements with the same value on it as the element.
             if (styleProps[styleName]) {
