@@ -914,7 +914,7 @@ const requestHandler = (request, response) => {
             && acts[0].type === 'launch'
             && acts.length > 1
             && (
-              acts[1].type === 'url' && acts.length > 2
+              acts[1].type === 'url'
               || (acts[1].type === 'wave1' && isURL(acts[1].which))
             )
           ) {
