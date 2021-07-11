@@ -507,12 +507,13 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
       else if (page) {
         // If the command is a url:
         if (type === 'url') {
-          // Visit it.
+          // Visit it and wait until it is stable.
           try {
             const resolved = which.replace('__dirname', __dirname);
-            await page.goto(resolved);
-            // Wait until it is stable.
-            await page.waitForLoadState('networkidle', {timeout: 20000});
+            await page.goto(resolved, {
+              timeout: 5000,
+              waitUntil: 'load'
+            });
             // Press the Esc key to dismiss any initial modal dialog.
             await page.keyboard.press('Escape');
             // Add the resulting URL to the act.
