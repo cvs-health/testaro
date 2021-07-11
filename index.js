@@ -511,7 +511,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
           try {
             const resolved = which.replace('__dirname', __dirname);
             await page.goto(resolved, {
-              timeout: 5000,
+              timeout: 7000,
               waitUntil: 'load'
             });
             // Press the Esc key to dismiss any initial modal dialog.

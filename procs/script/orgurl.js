@@ -1,5 +1,5 @@
 /*
-  orgurl.js
+  orgURL.js
   Converts a file of KickFire organization data to a url script.
   This proc requires 2 or 3 arguments:
     0. the base of the name of the file of data.
