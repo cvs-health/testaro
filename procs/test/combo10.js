@@ -56,7 +56,7 @@ exports.reduce = result => {
     facts = result.styleDiffS && result.styleDiffS.result && result.styleDiffS.result.totals;
     if (facts) {
       const items = Object.values(facts);
-      deficit.styleDiffs = items.reduce((testDeficit, currentItem) => {
+      deficit.styleDiffS = Math.floor(items.reduce((testDeficit, currentItem) => {
         if (currentItem.subtotals) {
           return testDeficit + currentItem.subtotals.reduce((itemDeficit, currentSub) => {
             return itemDeficit + currentSub * (Math.sqrt(currentItem.total / currentSub) - 1);
@@ -65,8 +65,8 @@ exports.reduce = result => {
         else {
           return testDeficit;
         }
-      }, 0);
-      deficit.total += Math.floor(deficit.styleDiffS);
+      }, 0));
+      deficit.total += deficit.styleDiffS;
     }
     // bulk
     facts = result.bulk && result.bulk.result;

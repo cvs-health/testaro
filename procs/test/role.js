@@ -27,7 +27,6 @@ exports.role = async page => await page.$eval('body', body => {
     'main',
     'navigation',
     'option',
-    'presentation',
     'progressbar',
     'radio',
     'region',
