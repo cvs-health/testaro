@@ -138,6 +138,8 @@ exports.focOp = async (page, withItems, opOnlyVisible) => {
   await compile(fNotO, totals, items, 'focusableNotOperable', true, false);
   await compile(oNotF, totals, items, 'operableNotFocusable', false, true);
   await compile(fAndO, totals, items, 'focusableAndOperable', true, true);
+  // Reload the page to undo the focus and attribute changes.
+  await page.reload();
   // Return it.
   return data;
 };

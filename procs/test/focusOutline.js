@@ -69,6 +69,8 @@ exports.focusOutline = async (page, withTexts) => {
   await page.keyboard.press('Tab');
   // Report the focus outlines.
   await reportOutlines();
+  // Reload the page to undo the focus changes.
+  await page.reload();
   // Return the result.
   const data = {
     focusableCount,
