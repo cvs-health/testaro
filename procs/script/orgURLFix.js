@@ -22,21 +22,24 @@ const dataDir = process.env.DATADIR || 'MISSING';
 fs.readFile(`${dataDir}/${inName}.json`, 'utf8')
 .then(inJSON => {
   const data = JSON.parse(inJSON);
-  fs.readFile(`${dataDir}../reports/script/${reportName}.json`, 'utf8')
+  fs.readFile(`${dataDir}/../reports/script/${reportName}.json`, 'utf8')
   .then(reportJSON => {
     const reportActs = JSON.parse(reportJSON).acts.filter(act => act.result !== 'ERROR');
     const converter = {};
     reportActs.forEach(act => {
       converter[act.which] = act.result;
     });
-    data.forEach(orgViews => {
-      orgViews.forEach(orgView => {
-        const url = converter[orgView.website];
-        if (url) {
-          orgView.url = url;
-        }
-      });
-      orgViews = orgViews.filter(orgView => orgView.url);
+    data.forEach((orgViews, index) => {
+      if (Array.isArray(orgViews)) {
+        orgViews.forEach(orgView => {
+          const url = converter[`https://${orgView.website}`];
+          if (url) {
+            orgView.url = url;
+          }
+        });
+        const goodViews = orgViews.filter(orgView => orgView.url);
+        data[index] = goodViews;
+      }
     });
     fs.writeFile(`${dataDir}/${outName}.json`, `${JSON.stringify(data, null, 2)}\n`);
   });
