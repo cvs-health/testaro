@@ -12,6 +12,13 @@ exports.commands = {
       'what': [false, 'string', 'hasLength']
     }
   ],
+  'batch': [
+    'Execute a script once for each URL; which: base of name of file of URLs; what: script)',
+    {
+      'which': [true, 'string', 'hasLength'],
+      'what': [true, 'string', 'hasLength']
+    }
+  ],
   'button': [
     'Click a button (which: substring of its text; what: description)',
     {
