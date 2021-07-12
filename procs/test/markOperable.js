@@ -50,9 +50,9 @@ exports.markOperable = async (page, onlyVisible) => {
         }
         // Otherwise, i.e. if it is not marked yet:
         else {
-          // If its parent has a pointer cursor, undo that.
+          // If its parent exists and has a pointer cursor, undo that.
           const parent = element.parentElement;
-          if (window.getComputedStyle(parent).cursor === 'pointer') {
+          if (parent && window.getComputedStyle(parent).cursor === 'pointer') {
             parent.style.cursor = 'none';
           }
           // If the element cursor is a non-inherited pointer, yes; if not, no.
