@@ -794,13 +794,20 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
   }
 };
 // Handles a script request.
-const scriptHandler = async (scriptName, what, acts, query, stage, urlIndex, response) => {
-  const report = {
-    scriptName,
-    what,
-    timeStamp: query.timeStamp,
-    acts
-  };
+const scriptHandler = async (
+  isScript, scriptName, what, acts, query, stage, urlIndex, response
+) => {
+  const report = {};
+  if (isScript) {
+    report.script = scriptName;
+  }
+  else {
+    report.commands = scriptName;
+    report.batch = query.batchName;
+  }
+  report.what = what;
+  report.timeStamp = query.timeStamp;
+  report.acts = acts;
   const urlSuffix = urlIndex > -1 ? `-${urlIndex.toString().padStart(3, '0')}` : '';
   // Perform the specified acts and add the results and exhibits to the report.
   await doActs(report, 0, null, `${query.timeStamp}${urlSuffix}`, query.reportDir);
@@ -1045,7 +1052,7 @@ const requestHandler = (request, response) => {
             )
           ) {
             // Process it.
-            scriptHandler(scriptName, what, acts, query, 'all', -1, response);
+            scriptHandler(true, scriptName, what, acts, query, 'all', -1, response);
           }
           // Otherwise, i.e. if the script is invalid:
           else {
@@ -1130,7 +1137,9 @@ const requestHandler = (request, response) => {
                     else {
                       stage = urls.length > 1 ? 'more' : 'end';
                     }
-                    await scriptHandler(batchCmdName, what, acts, query, stage, urlIndex, response);
+                    await scriptHandler(
+                      false, batchCmdName, what, acts, query, stage, urlIndex, response
+                    );
                     // Process the remaining URLs.
                     await doBatch(urls.slice(1), false, urlIndex + 1);
                   }
