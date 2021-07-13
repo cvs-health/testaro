@@ -23,14 +23,14 @@
           <form method="POST" action="/autotest/batchNames">
             <input type="hidden" name="batchDir" value="__batchDir__">
             <input type="hidden" name="batchCmdDir" value="__batchCmdDir__">
-            <input type="hidden" name="batchReportDir" value="__batchReportDir__">
+            <input type="hidden" name="reportDir" value="__reportDir__">
             <h2>Batch</h2>
-            <select id="BatchName" name="batchName" size="__batchNameSize__">
+            <select id="BatchName" name="batchName" size="__batchSize__">
               __batchNames__
             </select>
             <h2>Commands</h2>
-            <select id="cmdFileName" name="cmdFileName" size="__cmdFileNameSize__">
-              __cmdFileNames__
+            <select id="batchCmdName" name="batchCmdName" size="__batchCmdSize__">
+              __batchCmdNames__
             </select>
             <p><button>Submit</button></p>
           </form>

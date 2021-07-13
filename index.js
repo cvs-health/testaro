@@ -287,7 +287,10 @@ const serveMessage = (msg, response) => {
 };
 // Serves the start of a page.
 const startPage = (content, newURL, mimeType, response) => {
-  response.setHeader('Content-Type', mimeType);
+  response.setHeader('Content-Type', `${mimeType}; charset=UTF-8`);
+  // Set headers to tell the browser to render content chunks as they arrive.
+  response.setHeader('Transfer-Encoding', 'chunked');
+  response.setHeader('X-Content-Type-Options', 'nosniff');
   if (newURL) {
     response.setHeader('Content-Location', newURL);
   }
@@ -299,11 +302,11 @@ const morePage = (content, response) => {
 };
 // Serves an increment of a page.
 const endPage = (content, response) => {
-  response.end(content);
+  response.end(`${content}\nDone\n`);
 };
 // Serves a page.
 const servePage = (content, newURL, mimeType, response) => {
-  response.setHeader('Content-Type', mimeType);
+  response.setHeader('Content-Type', `${mimeType}; charset=UTF-8`);
   if (newURL) {
     response.setHeader('Content-Location', newURL);
   }
@@ -338,19 +341,24 @@ const render = (path, stage, which, query, response) => {
     // Otherwise, if a plain-text page is ready to start:
     else if (stage === 'start') {
       // Serve it.
-      startPage('Processing URL 000', `/${path}-out.txt`, 'text/plain', response);
+      startPage(
+        `Report timestamp: ${query.timeStamp}\n\nProcessing URL 0\n`,
+        `/${path}-out.txt`,
+        'text/plain',
+        response
+      );
       return '';
     }
     // Otherwise, if a plain-text page is ready to continue:
     else if (stage === 'more') {
       // Serve it.
-      morePage(`Processing URL ${query.urlIndex}`, response);
+      morePage(`Processing URL ${query.urlIndex}\n`, response);
       return '';
     }
     // Otherwise, if a plain-text page is ready to end:
     else if (stage === 'end') {
       // Serve it.
-      endPage(`Processing URL ${query.urlIndex}`, response);
+      endPage(`Processing URL ${query.urlIndex}\n`, response);
       return '';
     }
     else {
@@ -549,10 +557,12 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
           // Visit it and wait until it is stable.
           try {
             const resolved = which.replace('__dirname', __dirname);
+            console.log(`About to go to ${resolved}`);
             await page.goto(resolved, {
               timeout: 7000,
               waitUntil: 'load'
             });
+            console.log(`URL is ${page.url()}`);
             // Press the Esc key to dismiss any initial modal dialog.
             await page.keyboard.press('Escape');
             // Add the resulting URL to the act.
@@ -788,13 +798,12 @@ const scriptHandler = async (scriptName, what, acts, query, stage, urlIndex, res
   const report = {
     scriptName,
     what,
+    timeStamp: query.timeStamp,
     acts
   };
-  // Define a timeStamp for the report file.
-  const timeStamp = Math.floor((Date.now() - Date.UTC(2021, 4)) / 10000).toString(36);
   const urlSuffix = urlIndex > -1 ? `-${urlIndex.toString().padStart(3, '0')}` : '';
   // Perform the specified acts and add the results and exhibits to the report.
-  await doActs(report, 0, null, `${timeStamp}${urlSuffix}`, query.reportDir);
+  await doActs(report, 0, null, `${query.timeStamp}${urlSuffix}`, query.reportDir);
   // If any exhibits have been added to the report, move them to the query.
   if (report.exhibits) {
     query.exhibits = report.exhibits;
@@ -904,6 +913,8 @@ const requestHandler = (request, response) => {
       searchParams.forEach((value, name) => {
         query[name] = value;
       });
+      // Add a timeStamp for any required report file to the query.
+      query.timeStamp = Math.floor((Date.now() - Date.UTC(2021, 4)) / 10000).toString(36);
       // If the path and the request specify an operation type:
       if (pathName === '/opType' && ['script', 'batch'].includes(query.opType)) {
         const {opType} = query;
@@ -911,7 +922,7 @@ const requestHandler = (request, response) => {
         if (opType === 'script') {
           // Add properties to the query.
           query.scriptDir = process.env.SCRIPTDIR || '';
-          query.reportDir = process.env.REPORTDIR || '';
+          query.reportDir = process.env.SCRIPTREPORTDIR || '';
           // Render the script-directories page.
           render('', 'all', 'scriptDirs', query, response);
         }
@@ -926,7 +937,7 @@ const requestHandler = (request, response) => {
         }
       }
       // Otherwise, if the path and the request specify script directories:
-      else if (pathName === '/scriptDirs' && query.scriptDir && query.scriptReportDir) {
+      else if (pathName === '/scriptDirs' && query.scriptDir && query.reportDir) {
         const {scriptDir} = query;
         // Request an array of the names of the files in the script directory.
         const fileNames = await fs.readdir(scriptDir);
@@ -956,7 +967,7 @@ const requestHandler = (request, response) => {
       }
       // Otherwise, if the path and the request specify batch directories:
       else if (
-        pathName === '/batchDirs' && query.batchDir && query.batchCmdDir && query.batchReportDir
+        pathName === '/batchDirs' && query.batchDir && query.batchCmdDir && query.reportDir
       ) {
         const {batchDir, batchCmdDir} = query;
         // Request an array of the names of the files in the batch directory.
@@ -1010,7 +1021,7 @@ const requestHandler = (request, response) => {
       }
       // Otherwise, if the path and the request specify a script:
       else if (
-        pathName === '/scriptName' && query.scriptDir && query.scriptReportDir && query.scriptName
+        pathName === '/scriptName' && query.scriptDir && query.reportDir && query.scriptName
       ) {
         const {scriptDir, scriptName} = query;
         // Get the content of the script.
@@ -1055,7 +1066,7 @@ const requestHandler = (request, response) => {
         pathName === '/batchNames'
         && query.batchDir
         && query.batchCmdDir
-        && query.batchReportDir
+        && query.reportDir
         && query.batchName
         && query.batchCmdName
       ) {
@@ -1111,18 +1122,18 @@ const requestHandler = (request, response) => {
                     const firstURL = urls[0];
                     acts[1].which = firstURL.which;
                     acts[1].what = firstURL.what;
+                    // Process the commands on the URL.
+                    let stage = 'more';
+                    if (isFirst) {
+                      stage = urls.length > 1 ? 'start' : 'all';
+                    }
+                    else {
+                      stage = urls.length > 1 ? 'more' : 'end';
+                    }
+                    await scriptHandler(batchCmdName, what, acts, query, stage, urlIndex, response);
+                    // Process the remaining URLs.
+                    await doBatch(urls.slice(1), false, urlIndex + 1);
                   }
-                  // Process the commands on the URL.
-                  let stage = 'more';
-                  if (isFirst) {
-                    stage = urls.length > 1 ? 'start' : 'all';
-                  }
-                  else {
-                    stage = urls.length > 1 ? 'more' : 'end';
-                  }
-                  await scriptHandler(batchCmdName, what, acts, query, stage, urlIndex, response);
-                  // Process the remaining URLs.
-                  await doBatch(urls.slice(1), false, urlIndex + 1);
                 };
                 // FUNCTION DEFINITION END
                 // Process the commands on the URLs.

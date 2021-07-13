@@ -25,8 +25,12 @@
           <form method="POST" action="/autotest/opType">
             <p><fieldset>
               <legend>Which operation?</legend>
-              <p><label><input type="radio" name="opType" value="script" selected>Script</label></p>
-              <p><label><input type="radio" name="opType" value="batch" selected>Batch</label></p>
+              <p><label>
+                <input type="radio" name="opType" value="script" checked> <span>Script</span>
+              </label></p>
+              <p><label>
+                <input type="radio" name="opType" value="batch"> <span>Batch</span>
+              </label></p>
             <p><button>Continue</button></p>
           </form>
         </section>
