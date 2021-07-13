@@ -285,38 +285,85 @@ const serveMessage = (msg, response) => {
   }
   return '';
 };
+// Serves the start of a page.
+const startPage = (content, newURL, mimeType, response) => {
+  response.setHeader('Content-Type', `${mimeType}; charset=UTF-8`);
+  // Set headers to tell the browser to render content chunks as they arrive.
+  response.setHeader('Transfer-Encoding', 'chunked');
+  response.setHeader('X-Content-Type-Options', 'nosniff');
+  if (newURL) {
+    response.setHeader('Content-Location', newURL);
+  }
+  response.write(content);
+};
+// Serves an increment of a page.
+const morePage = (content, response) => {
+  response.write(content);
+};
+// Serves an increment of a page.
+const endPage = (content, response) => {
+  response.end(`${content}\nDone\n`);
+};
 // Serves a page.
 const servePage = (content, newURL, mimeType, response) => {
-  response.setHeader('Content-Type', mimeType);
+  response.setHeader('Content-Type', `${mimeType}; charset=UTF-8`);
   if (newURL) {
     response.setHeader('Content-Location', newURL);
   }
   response.end(content);
 };
-// Replaces the placeholders in a result page and serves or returns the page.
-const render = (path, isServable, which, query, response) => {
+// Serves or returns part of all of an HTML or plain-text page.
+const render = (path, stage, which, query, response) => {
   if (! response.writableEnded) {
-    // Get the page.
-    return fs.readFile(`./${path}/${which}.html`, 'utf8')
-    .then(
-      // When it arrives:
-      page => {
-        // Replace its placeholders with eponymous query parameters.
-        const renderedPage = page.replace(/__([a-zA-Z]+)__/g, (ph, qp) => query[qp]);
-        // If the page is ready to serve:
-        if (isServable) {
-          // Serve it.
-          servePage(renderedPage, `/${path}-out.html`, 'text/html', response);
-          return '';
-        }
-        // Otherwise, i.e. if the page needs modification before it is served:
-        else {
-          // Return the rendered page.
-          return renderedPage;
-        }
-      },
-      error => serveError(new Error(error), response)
-    );
+    // If an HTML page is to be rendered:
+    if (['all', 'raw'].includes(stage)) {
+      // Get the page.
+      return fs.readFile(`./${path}/${which}.html`, 'utf8')
+      .then(
+        // When it arrives:
+        page => {
+          // Replace its placeholders with eponymous query parameters.
+          const renderedPage = page.replace(/__([a-zA-Z]+)__/g, (ph, qp) => query[qp]);
+          // If the page is ready to serve in its entirety:
+          if (stage === 'all') {
+            // Serve it.
+            servePage(renderedPage, `/${path}-out.html`, 'text/html', response);
+            return '';
+          }
+          // Otherwise, i.e. if the page needs modification before it is served:
+          else {
+            return renderedPage;
+          }
+        },
+        error => serveError(new Error(error), response)
+      );
+    }
+    // Otherwise, if a plain-text page is ready to start:
+    else if (stage === 'start') {
+      // Serve it.
+      startPage(
+        `Report timestamp: ${query.timeStamp}\n\nProcessing URL 0\n`,
+        `/${path}-out.txt`,
+        'text/plain',
+        response
+      );
+      return '';
+    }
+    // Otherwise, if a plain-text page is ready to continue:
+    else if (stage === 'more') {
+      // Serve it.
+      morePage(`Processing URL ${query.urlIndex}\n`, response);
+      return '';
+    }
+    // Otherwise, if a plain-text page is ready to end:
+    else if (stage === 'end') {
+      // Serve it.
+      endPage(`Processing URL ${query.urlIndex}\n`, response);
+      return '';
+    }
+    else {
+      serveError('ERROR: Invalid stage.', response);
+    }
   }
 };
 // Returns the index of an element matching a text, among elements of a type.
@@ -510,10 +557,12 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
           // Visit it and wait until it is stable.
           try {
             const resolved = which.replace('__dirname', __dirname);
+            console.log(`About to go to ${resolved}`);
             await page.goto(resolved, {
               timeout: 7000,
               waitUntil: 'load'
             });
+            console.log(`URL is ${page.url()}`);
             // Press the Esc key to dismiss any initial modal dialog.
             await page.keyboard.press('Escape');
             // Add the resulting URL to the act.
@@ -745,16 +794,23 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
   }
 };
 // Handles a script request.
-const scriptHandler = async (scriptName, what, acts, query, response) => {
-  const report = {
-    scriptName,
-    what,
-    acts
-  };
-  // Define a timeStamp for the report file.
-  const timeStamp = Math.floor((Date.now() - Date.UTC(2021, 4)) / 10000).toString(36);
+const scriptHandler = async (
+  isScript, scriptName, what, acts, query, stage, urlIndex, response
+) => {
+  const report = {};
+  if (isScript) {
+    report.script = scriptName;
+  }
+  else {
+    report.commands = scriptName;
+    report.batch = query.batchName;
+  }
+  report.what = what;
+  report.timeStamp = query.timeStamp;
+  report.acts = acts;
+  const urlSuffix = urlIndex > -1 ? `-${urlIndex.toString().padStart(3, '0')}` : '';
   // Perform the specified acts and add the results and exhibits to the report.
-  await doActs(report, 0, null, timeStamp, query.reportDir);
+  await doActs(report, 0, null, `${query.timeStamp}${urlSuffix}`, query.reportDir);
   // If any exhibits have been added to the report, move them to the query.
   if (report.exhibits) {
     query.exhibits = report.exhibits;
@@ -762,13 +818,14 @@ const scriptHandler = async (scriptName, what, acts, query, response) => {
   }
   // Otherwise, i.e. if no exhibits have been added to the report:
   else {
-    // Add an empty exhibit to the query.
+    // Add properties to the query.
     query.exhibits = '<p><strong>None</strong></p>';
+    query.urlIndex = urlIndex;
   }
   // Convert the report to JSON.
   query.report = JSON.stringify(report, null, 2).replace(/</g, '&lt;');
   // Render and serve the output.
-  render('', true, 'out', query, response);
+  render('', stage, 'out', query, response);
 };
 // Recursively gets an object of file-name bases and property values from JSON object files.
 const getWhats = async (path, baseNames, result) => {
@@ -846,12 +903,8 @@ const requestHandler = (request, response) => {
       }
       // Otherwise, if the initial form was requested:
       else if (pathName === '/' || pathName === '/index.html') {
-        const query = {
-          scriptDir: process.env.SCRIPTDIR || '',
-          reportDir: process.env.REPORTDIR || ''
-        };
         // Render it.
-        render('', true, 'index', query, response);
+        render('', 'all', 'index', query, response);
       }
       // Otherwise, i.e. if the URL is invalid:
       else {
@@ -867,9 +920,32 @@ const requestHandler = (request, response) => {
       searchParams.forEach((value, name) => {
         query[name] = value;
       });
-      const {scriptDir, reportDir, scriptName} = query;
-      // If the path and the request specify directories:
-      if (pathName === '/dirs' && scriptDir && reportDir) {
+      // Add a timeStamp for any required report file to the query.
+      query.timeStamp = Math.floor((Date.now() - Date.UTC(2021, 4)) / 10000).toString(36);
+      // If the path and the request specify an operation type:
+      if (pathName === '/opType' && ['script', 'batch'].includes(query.opType)) {
+        const {opType} = query;
+        // If it is script:
+        if (opType === 'script') {
+          // Add properties to the query.
+          query.scriptDir = process.env.SCRIPTDIR || '';
+          query.reportDir = process.env.SCRIPTREPORTDIR || '';
+          // Render the script-directories page.
+          render('', 'all', 'scriptDirs', query, response);
+        }
+        // Otherwise, i.e. if it is batch:
+        else {
+          // Add properties to the query.
+          query.batchDir = process.env.BATCHDIR || '';
+          query.batchCmdDir = process.env.BATCHCMDDIR || '';
+          query.reportDir = process.env.BATCHREPORTDIR || '';
+          // Render the batch-directories page.
+          render('', 'all', 'batchDirs', query, response);
+        }
+      }
+      // Otherwise, if the path and the request specify script directories:
+      else if (pathName === '/scriptDirs' && query.scriptDir && query.reportDir) {
+        const {scriptDir} = query;
         // Request an array of the names of the files in the script directory.
         const fileNames = await fs.readdir(scriptDir);
         // When the array arrives, get an array of script names from it.
@@ -888,7 +964,7 @@ const requestHandler = (request, response) => {
             return `<option ${state}value="${pair[0]}">${pair[0]}: ${pair[1]}</option>`;
           }).join('\n              ');
           // Render the script-selection page.
-          render('', true, 'script', query, response);
+          render('', 'all', 'script', query, response);
         }
         // Otherwise, i.e. if no scripts exist in the specified directory:
         else {
@@ -896,8 +972,65 @@ const requestHandler = (request, response) => {
           serveMessage(`ERROR: No scripts in ${scriptDir}.`, response);
         }
       }
+      // Otherwise, if the path and the request specify batch directories:
+      else if (
+        pathName === '/batchDirs' && query.batchDir && query.batchCmdDir && query.reportDir
+      ) {
+        const {batchDir, batchCmdDir} = query;
+        // Request an array of the names of the files in the batch directory.
+        const fileNames = await fs.readdir(batchDir);
+        // When the array arrives, get an array of batch names from it.
+        const batchNames = fileNames
+        .filter(name => name.endsWith('.json'))
+        .map(name => name.slice(0, -5));
+        // If any exist:
+        if (batchNames.length) {
+          // Add their count to the query.
+          query.batchSize = batchNames.length;
+          // Get their descriptions.
+          const nameWhats = await getWhats(batchDir, batchNames, []);
+          // When the descriptions arrive, add them as options to the query.
+          query.batchNames = nameWhats.map((pair, index) => {
+            const state = index === 0 ? 'selected ' : '';
+            return `<option ${state}value="${pair[0]}">${pair[0]}: ${pair[1]}</option>`;
+          }).join('\n              ');
+          // Request an array of the names of the files in the command directory.
+          const fileNames = await fs.readdir(batchCmdDir);
+          // When the array arrives, get an array of command-list names from it.
+          const batchCmdNames = fileNames
+          .filter(name => name.endsWith('.json'))
+          .map(name => name.slice(0, -5));
+          // If any exist:
+          if (batchCmdNames.length) {
+            // Add their count to the query.
+            query.batchCmdSize = batchCmdNames.length;
+            // Get their descriptions.
+            const nameWhats = await getWhats(batchCmdDir, batchCmdNames, []);
+            // When the descriptions arrive, add them as options to the query.
+            query.batchCmdNames = nameWhats.map((pair, index) => {
+              const state = index === 0 ? 'selected ' : '';
+              return `<option ${state}value="${pair[0]}">${pair[0]}: ${pair[1]}</option>`;
+            }).join('\n              ');
+            // Render the batch-selection page.
+            render('', 'all', 'batch', query, response);
+          }
+          // Otherwise, i.e. if no command lists exist in the specified directory:
+          else {
+            // Serve an error message.
+            serveMessage(`ERROR: No command files in ${batchCmdDir}.`, response);
+          }
+        }
+        // Otherwise, i.e. if no batches exist in the specified directory:
+        else {
+          // Serve an error message.
+          serveMessage(`ERROR: No batches in ${batchDir}.`, response);
+        }
+      }
       // Otherwise, if the path and the request specify a script:
-      else if (pathName === '/scriptName' && scriptDir && reportDir && scriptName) {
+      else if (
+        pathName === '/scriptName' && query.scriptDir && query.reportDir && query.scriptName
+      ) {
+        const {scriptDir, scriptName} = query;
         // Get the content of the script.
         const scriptJSON = await fs.readFile(`${scriptDir}/${scriptName}.json`, 'utf8');
         // When the content arrives, if there is any:
@@ -919,7 +1052,7 @@ const requestHandler = (request, response) => {
             )
           ) {
             // Process it.
-            scriptHandler(scriptName, what, acts, query, response);
+            scriptHandler(true, scriptName, what, acts, query, 'all', -1, response);
           }
           // Otherwise, i.e. if the script is invalid:
           else {
@@ -932,6 +1065,114 @@ const requestHandler = (request, response) => {
           // Serve an error message.
           serveMessage(
             `ERROR: No script found in ${scriptDir}/${scriptName}.json.`, response
+          );
+        }
+      }
+      // Otherwise, if the path and the request specify a batch:
+      else if (
+        pathName === '/batchNames'
+        && query.batchDir
+        && query.batchCmdDir
+        && query.reportDir
+        && query.batchName
+        && query.batchCmdName
+      ) {
+        const {batchDir, batchCmdDir, batchName, batchCmdName} = query;
+        // Get the content of the batch.
+        const batchJSON = await fs.readFile(`${batchDir}/${batchName}.json`, 'utf8');
+        // When the content arrives, if there is any:
+        if (batchJSON) {
+          // Get the batch data.
+          const batch = JSON.parse(batchJSON);
+          const batchWhat = batch.what;
+          const {urls} = batch;
+          // If the batch is valid:
+          if (
+            batchWhat
+            && urls
+            && typeof batchWhat === 'string'
+            && Array.isArray(urls)
+            && urls.every(url => url.which && url.what)
+          ) {
+            // Get the content of the commands.
+            const cmdJSON = await fs.readFile(`${batchCmdDir}/${batchCmdName}.json`, 'utf8');
+            // When the content arrives, if there is any:
+            if (cmdJSON) {
+              // Get the command data.
+              const cmds = JSON.parse(cmdJSON);
+              const {what, acts} = cmds;
+              // If the command list is valid:
+              if (
+                what
+                && acts
+                && typeof what === 'string'
+                && Array.isArray(acts)
+                && acts.length
+                && acts.every(act => isValid(act) && ! ['launch', 'url'].includes(act.type))
+              ) {
+                // Prepend launch and generic url acts to the commands.
+                acts.unshift(
+                  {
+                    type: 'launch',
+                    which: 'chromium'
+                  },
+                  {
+                    type: 'url',
+                    which: '',
+                    what: ''
+                  }
+                );
+                // FUNCTION DEFINITION START
+                // Recursively process commands on URLs.
+                const doBatch = async (urls, isFirst, urlIndex) => {
+                  if (urls.length) {
+                    const firstURL = urls[0];
+                    acts[1].which = firstURL.which;
+                    acts[1].what = firstURL.what;
+                    // Process the commands on the URL.
+                    let stage = 'more';
+                    if (isFirst) {
+                      stage = urls.length > 1 ? 'start' : 'all';
+                    }
+                    else {
+                      stage = urls.length > 1 ? 'more' : 'end';
+                    }
+                    await scriptHandler(
+                      false, batchCmdName, what, acts, query, stage, urlIndex, response
+                    );
+                    // Process the remaining URLs.
+                    await doBatch(urls.slice(1), false, urlIndex + 1);
+                  }
+                };
+                // FUNCTION DEFINITION END
+                // Process the commands on the URLs.
+                doBatch(urls, true, 0);
+              }
+              // Otherwise, i.e. if the command list is invalid:
+              else {
+                // Serve an error message.
+                serveMessage(`ERROR: Command list ${batchCmdName} invalid.`, response);
+              }
+            }
+            // Otherwise, i.e. if the command list has no content:
+            else {
+              // Serve an error message.
+              serveMessage(
+                `ERROR: No commands found in ${batchCmdDir}/${batchCmdName}.json.`, response
+              );
+            }
+          }
+          // Otherwise, i.e. if the batch is invalid:
+          else {
+            // Serve an error message.
+            serveMessage(`ERROR: Batch ${batchName} invalid.`, response);
+          }
+        }
+        // Otherwise, i.e. if the batch has no content:
+        else {
+          // Serve an error message.
+          serveMessage(
+            `ERROR: No batch found in ${batchDir}/${batchName}.json.`, response
           );
         }
       }
