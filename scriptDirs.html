@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Script directories | Autotest</title>
+    <meta
+      name="description"
+      content="Accessibility test automation"
+    >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="favicon.png">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main>
+      <h1>Autotest script directories</h1>
+      <section class="head">
+        <h2 class="headText">Introduction</h2>
+        <p>You have chosen to run an Autotest script. Where is it?</p>
+      </section>
+      <div class="etc">
+        <section>
+          <h2>Directories (both answers are required)</h2>
+          <form method="POST" action="/autotest/scriptDirs">
+            <p><label>
+              <span>Where are your scripts?</span>
+              <input
+                name="scriptDir"
+                type="text"
+                size="40"
+                maxlength="60"
+                value="__scriptDir__"
+                required
+              >
+            </label></p>
+            <p><label>
+              <span>Where are your script reports?</span>
+              <input
+                name="scriptReportDir"
+                type="text"
+                size="40"
+                maxlength="60"
+                value="__scriptReportDir__"
+                required
+              >
+            </label></p>
+            <p><button>Submit</button></p>
+          </form>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>

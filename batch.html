@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Choose commands and a batch | Autotest</title>
+    <meta
+      name="description"
+      content="Accessibility test automation"
+    >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="favicon.png">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main>
+      <h1>Autotest: Choose commands and a batch</h1>
+      <section class="head">
+        <h2 class="headText">Instructions</h2>
+        <p>Autotest will perform commands on each page in a batch.</p>
+      </section>
+      <div class="etc">
+        <section>
+          <form method="POST" action="/autotest/batchNames">
+            <input type="hidden" name="batchDir" value="__batchDir__">
+            <input type="hidden" name="batchCmdDir" value="__batchCmdDir__">
+            <input type="hidden" name="batchReportDir" value="__batchReportDir__">
+            <h2>Batch</h2>
+            <select id="BatchName" name="batchName" size="__batchNameSize__">
+              __batchNames__
+            </select>
+            <h2>Commands</h2>
+            <select id="cmdFileName" name="cmdFileName" size="__cmdFileNameSize__">
+              __cmdFileNames__
+            </select>
+            <p><button>Submit</button></p>
+          </form>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>

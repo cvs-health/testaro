@@ -846,10 +846,6 @@ const requestHandler = (request, response) => {
       }
       // Otherwise, if the initial form was requested:
       else if (pathName === '/' || pathName === '/index.html') {
-        const query = {
-          scriptDir: process.env.SCRIPTDIR || '',
-          reportDir: process.env.REPORTDIR || ''
-        };
         // Render it.
         render('', true, 'index', query, response);
       }
@@ -867,9 +863,30 @@ const requestHandler = (request, response) => {
       searchParams.forEach((value, name) => {
         query[name] = value;
       });
-      const {scriptDir, reportDir, scriptName} = query;
-      // If the path and the request specify directories:
-      if (pathName === '/dirs' && scriptDir && reportDir) {
+      // If the path and the request specify an operation type:
+      if (pathName === '/opType' && ['script', 'batch'].includes(query.opType)) {
+        const {opType} = query;
+        // If it is script:
+        if (opType === 'script') {
+          // Add properties to the query.
+          query.scriptDir = process.env.SCRIPTDIR || '';
+          query.scriptReportDir = process.env.REPORTDIR || '';
+          // Render the script-directories page.
+          render('', true, 'scriptDirs', query, response);
+        }
+        // Otherwise, i.e. if it is batch:
+        else {
+          // Add properties to the query.
+          query.batchDir = process.env.BATCHDIR || '';
+          query.batchCmdDir = process.env.BATCHCMDDIR || '';
+          query.batchReportDir = process.env.BATCHREPORTDIR || '';
+          // Render the batch-directories page.
+          render('', true, 'batchDirs', query, response);
+        }
+      }
+      // Otherwise, if the path and the request specify script directories:
+      else if (pathName === '/scriptDirs' && query.scriptDir && query.scriptReportDir) {
+        const {scriptDir} = query;
         // Request an array of the names of the files in the script directory.
         const fileNames = await fs.readdir(scriptDir);
         // When the array arrives, get an array of script names from it.
@@ -896,8 +913,113 @@ const requestHandler = (request, response) => {
           serveMessage(`ERROR: No scripts in ${scriptDir}.`, response);
         }
       }
+      // Otherwise, if the path and the request specify batch directories:
+      else if (
+        pathName === '/batchDirs' && query.batchDir && query.batchCmdDir && query.batchReportDir
+      ) {
+        const {batchDir, batchCmdDir} = query;
+        // Request an array of the names of the files in the batch directory.
+        const fileNames = await fs.readdir(batchDir);
+        // When the array arrives, get an array of batch names from it.
+        const batchNames = fileNames
+        .filter(name => name.endsWith('.json'))
+        .map(name => name.slice(0, -5));
+        // If any exist:
+        if (batchNames.length) {
+          // Add their count to the query.
+          query.batchSize = batchNames.length;
+          // Get their descriptions.
+          const nameWhats = await getWhats(batchDir, batchNames, []);
+          // When the descriptions arrive, add them as options to the query.
+          query.batchNames = nameWhats.map((pair, index) => {
+            const state = index === 0 ? 'selected ' : '';
+            return `<option ${state}value="${pair[0]}">${pair[0]}: ${pair[1]}</option>`;
+          }).join('\n              ');
+          // Request an array of the names of the files in the command directory.
+          const fileNames = await fs.readdir(batchCmdDir);
+          // When the array arrives, get an array of command-list names from it.
+          const batchCmdNames = fileNames
+          .filter(name => name.endsWith('.json'))
+          .map(name => name.slice(0, -5));
+          // If any exist:
+          if (batchCmdNames.length) {
+            // Add their count to the query.
+            query.batchCmdSize = batchCmdNames.length;
+            // Get their descriptions.
+            const nameWhats = await getWhats(batchCmdDir, batchCmdNames, []);
+            // When the descriptions arrive, add them as options to the query.
+            query.batchCmdNames = nameWhats.map((pair, index) => {
+              const state = index === 0 ? 'selected ' : '';
+              return `<option ${state}value="${pair[0]}">${pair[0]}: ${pair[1]}</option>`;
+            }).join('\n              ');
+            // Render the batch-selection page.
+            render('', true, 'batch', query, response);
+          }
+          // Otherwise, i.e. if no command lists exist in the specified directory:
+          else {
+            // Serve an error message.
+            serveMessage(`ERROR: No command files in ${batchCmdDir}.`, response);
+          }
+        }
+        // Otherwise, i.e. if no batches exist in the specified directory:
+        else {
+          // Serve an error message.
+          serveMessage(`ERROR: No batches in ${batchDir}.`, response);
+        }
+      }
       // Otherwise, if the path and the request specify a script:
-      else if (pathName === '/scriptName' && scriptDir && reportDir && scriptName) {
+      else if (
+        pathName === '/scriptName' && query.scriptDir && query.scriptReportDir && query.scriptName
+      ) {
+        const {scriptDir, scriptName} = query;
+        // Get the content of the script.
+        const scriptJSON = await fs.readFile(`${scriptDir}/${scriptName}.json`, 'utf8');
+        // When the content arrives, if there is any:
+        if (scriptJSON) {
+          // Get the script data.
+          const script = JSON.parse(scriptJSON);
+          const {what, acts} = script;
+          // If the script is valid:
+          if (
+            what
+            && acts
+            && typeof what === 'string'
+            && Array.isArray(acts)
+            && acts[0].type === 'launch'
+            && acts.length > 1
+            && (
+              acts[1].type === 'url'
+              || (acts[1].type === 'wave1' && isURL(acts[1].which))
+            )
+          ) {
+            // Process it.
+            scriptHandler(scriptName, what, acts, query, response);
+          }
+          // Otherwise, i.e. if the script is invalid:
+          else {
+            // Serve an error message.
+            serveMessage(`ERROR: Script ${scriptName} invalid.`, response);
+          }
+        }
+        // Otherwise, i.e. if there is no content:
+        else {
+          // Serve an error message.
+          serveMessage(
+            `ERROR: No script found in ${scriptDir}/${scriptName}.json.`, response
+          );
+        }
+      }
+      // Otherwise, if the path and the request specify a batch:
+      else if (
+        pathName === '/batchNames'
+        && query.batchDir
+        && query.batchCmdDir
+        && query.batchReportDir
+        && query.batchName
+        && query.batchCmdName
+      ) {
+        const {batchDir, batchName, batchCmdDir, batchCmdName} = query;
+        // Get the content of the command.
         // Get the content of the script.
         const scriptJSON = await fs.readFile(`${scriptDir}/${scriptName}.json`, 'utf8');
         // When the content arrives, if there is any:
