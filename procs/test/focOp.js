@@ -11,10 +11,10 @@ exports.focOp = async (page, withItems, revealAll) => {
       hiddenElements.forEach(element => element.setAttribute('vsibility', 'unset'));
     });
   }
-  // Mark the visible operable elements.
-  await require('./markOperable').markOperable(page);
   // Mark the focusable elements.
   await require('./markFocusable').markFocusable(page);
+  // Mark the operable elements, if visible or focused-marked.
+  await require('./markOperable').markOperable(page);
   // Get an array of the elements that are focusable but not operable.
   const fNotO = await page.$$('body [data-autotest-focused]:not([data-autotest-operable])');
   // Get an array of the elements that are operable but not focusable.

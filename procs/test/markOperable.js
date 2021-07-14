@@ -91,8 +91,8 @@ exports.markOperable = async page => {
 
   // ### OPERATION
 
-  // Identify the visible elements in the body.
-  const elements = await page.$$('body *:visible');
+  // Identify the visible elements and the focused-marked elements in the body.
+  const elements = await page.$$('body *:visible, body [data-autotest-focused]');
   // Recursively mark elements with operable tag names as operable.
   await tagOperable(page, elements);
   // Recursively mark elements with pointer cursor styles as operable.

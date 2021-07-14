@@ -5,9 +5,10 @@ exports.markFocusable = async page => {
 
   // Navigation-key sequence. Next key after focus, refocus.
   const nextNavKeys = {
-    Tab: ['ArrowRight', null],
-    ArrowRight: ['ArrowDown', 'ArrowDown'],
-    ArrowDown: ['ArrowDown', 'Tab']
+    Tab: ['ArrowDown', null],
+    // ArrowRight: ['ArrowDown', 'ArrowDown'],
+    ArrowDown: ['ArrowDown', 'Escape'],
+    Escape: ['Tab', 'Tab']
   };
   // Maximum consecutive external foci (1 suffices for Chrome).
   const externalLimit = 3;
