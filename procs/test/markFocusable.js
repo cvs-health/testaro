@@ -20,6 +20,13 @@ exports.markFocusable = async page => {
 
   // ## FUNCTIONS
 
+  // Determines the next navigation key.
+  const nextNavKey = await page.evaluate(lastNavKey => {
+    const focalElement = document.activeElement;
+    if (focalElement) {
+      const blah = 1;
+    }
+  }, lastNavKey);
   // Marks and returns the focused in-body element or returns a status.
   const {focusMark} = require('./focusMark');
   // Recursively focuses and marks elements.
