@@ -1,9 +1,18 @@
 // Returns counts, and texts if required, of (un)focusable and (in)operable elements.
-exports.focOp = async (page, withItems, opOnlyVisible) => {
+exports.focOp = async (page, withItems, revealAll) => {
   // Import a module to get the texts of an element.
   const allText = withItems ? require('./allText').allText : '';
-  // Mark the operable elements.
-  await require('./markOperable').markOperable(page, opOnlyVisible);
+  // If all elements are to be revealed:
+  if (revealAll) {
+    await page.evaluate(() => {
+      const noneElements = Array.from(document.body.querySelectorAll('[display=none]'));
+      noneElements.forEach(element => element.setAttribute('display', 'unset'));
+      const hiddenElements = Array.from(document.body.querySelectorAll('[visibility=hidden]'));
+      hiddenElements.forEach(element => element.setAttribute('vsibility', 'unset'));
+    });
+  }
+  // Mark the visible operable elements.
+  await require('./markOperable').markOperable(page);
   // Mark the focusable elements.
   await require('./markFocusable').markFocusable(page);
   // Get an array of the elements that are focusable but not operable.

@@ -1,5 +1,5 @@
 // Marks elements that can be operated. See README.md for notes.
-exports.markOperable = async (page, onlyVisible) => {
+exports.markOperable = async page => {
 
   // ### CONSTANTS
 
@@ -88,36 +88,11 @@ exports.markOperable = async (page, onlyVisible) => {
       await onclickOperable(page, elements.slice(1));
     }
   };
-  // Recursively filters elements for visibility.
-  const visiblesOf = async (elements, visibles) => {
-    if (elements.length) {
-      let isVisible;
-      // Prevent the Playwright isVisible() method from throwing errors on out-of-DOM elements.
-      try {
-        isVisible = await elements[0].isVisible();
-      }
-      catch {
-        isVisible = false;
-      }
-      if (isVisible) {
-        visibles.push(elements[0]);
-      }
-      await visiblesOf(elements.slice(1), visibles);
-    }
-  };
 
   // ### OPERATION
 
-  // Identify the elements in the body.
-  const allElements = await page.$$('body *');
-  // Identify those eligible for marking.
-  let elements = [];
-  if (onlyVisible) {
-    await visiblesOf(allElements, elements);
-  }
-  else {
-    elements = allElements;
-  }
+  // Identify the visible elements in the body.
+  const elements = await page.$$('body *:visible');
   // Recursively mark elements with operable tag names as operable.
   await tagOperable(page, elements);
   // Recursively mark elements with pointer cursor styles as operable.
