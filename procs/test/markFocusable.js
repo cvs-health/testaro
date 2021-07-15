@@ -3,15 +3,8 @@ exports.markFocusable = async page => {
 
   // ## CONSTANTS
 
-  // Navigation-key sequence. Next key after focus, refocus.
-  const nextNavKeys = {
-    Tab: ['ArrowDown', null],
-    // ArrowRight: ['ArrowDown', 'ArrowDown'],
-    ArrowDown: ['ArrowDown', 'Escape'],
-    Escape: ['Tab', 'Tab']
-  };
   // Maximum consecutive external foci (1 suffices for Chrome).
-  const externalLimit = 3;
+  const externalLimit = 2;
 
   // ## VARIABLES
 
@@ -21,49 +14,68 @@ exports.markFocusable = async page => {
   // ## FUNCTIONS
 
   // Determines the next navigation key.
-  const nextNavKey = await page.evaluate(lastNavKey => {
-    const focus = document.activeElement;
-    if (focus && focus.tagName !== 'BODY') {
-      const alreadyFocused = focus.datalist.autotestFocused;
-      if (alreadyFocused) {
-        if (lastNavKey === 'ArrowDown' && focus.getAttribute('role') === 'menuitem') {
-          return 'Escape';
-        }
-        else if (
-          lastNavKey === 'Escape' && focus.getAttribute('role') === 'menuitem' && focus.ariaHasPopup
-        ) {
-          return 'ArrowRight';
-        }
-        else if (
-          lastNavKey === 'ArrowDown'
-          && focus.tagName === 'INPUT'
-          && focus.type === 'radio'
-        ) {
-          return 'Tab';
-        }
+  const nextNavKey = async (lastNavKey, focus, status) => await page.evaluate(args => {
+    const lastNavKey = args[0];
+    const focus = args[1];
+    const status = args[2];
+    // If the focal element had been focused before:
+    if (status === 'already') {
+      if (lastNavKey === 'ArrowDown' && focus.getAttribute('role') === 'menuitem') {
+        return 'Escape';
+      }
+      else if (
+        lastNavKey === 'Escape' && focus.getAttribute('role') === 'menuitem' && focus.ariaHasPopup
+      ) {
+        return 'ArrowRight';
+      }
+      else if (
+        lastNavKey === 'ArrowDown' && focus.tagName === 'INPUT' && focus.type === 'radio'
+      ) {
+        return 'Tab';
+      }
+      else if (lastNavKey === 'ArrowRight') {
+        return 'Tab';
+      }
+      else {
+        return null;
       }
     }
-    if (focus) {
-      const blah = 1;
+    // Otherwise, i.e. if the focal element has been newly focused:
+    else {
+      if (lastNavKey === 'Tab' && focus.ariaHasPopup) {
+        return 'ArrowDown';
+      }
+      else if (lastNavKey === 'ArrowDown' && focus.ariaHasPopup) {
+        return 'ArrowRight';
+      }
+      else if (lastNavKey === 'ArrowRight') {
+        return 'ArrowDown';
+      }
+      else {
+        return 'Tab';
+      }
     }
-  }, lastNavKey);
-  // Marks and returns the focused in-body element or returns a status.
+  }, [lastNavKey, focus, status]);
+  // Marks and returns the focused in-body element, if any, and a status.
   const {focusMark} = require('./focusMark');
   // Recursively focuses and marks elements.
   const markAll = async () => {
-    // Identify and mark the newly focused element or identify a status.
-    const focOrStatus = await focusMark(page, lastNavKey);
+    // Identify and mark the newly focused element, if any, and identify the status.
+    const focusAndStatus = await focusMark(page, lastNavKey);
     // If the status is external:
-    if (focOrStatus === 'external') {
-      // Press the Tab key, or quit if the external limit has been reached.
+    if (focusAndStatus[1] === 'external') {
+      // If the external limit has not been reached:
       if (externalCount++ < externalLimit) {
+        // Press the Tab key.
         await page.keyboard.press(lastNavKey = 'Tab');
+        // Process the element focused by that keypress.
+        await markAll();
       }
     }
-    // Otherwise, i.e. if an element was focused or refocused:
+    // Otherwise, i.e. if the status is new or already:
     else {
       // Identify the next navigation key to be pressed.
-      const nextKey = nextNavKeys[lastNavKey][focOrStatus === 'already' ? 1 : 0];
+      const nextKey = nextNavKey(lastNavKey, ...focusAndStatus);
       // If it exists:
       if (nextKey) {
         // Press it.
