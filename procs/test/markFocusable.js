@@ -42,11 +42,24 @@ exports.markFocusable = async page => {
     }
     // Otherwise, i.e. if the focal element has been newly focused:
     else {
-      if (lastNavKey === 'Tab' && focus.ariaHasPopup) {
-        return 'ArrowDown';
+      if (lastNavKey === 'Tab') {
+        if (focus.ariaHasPopup) {
+          return 'ArrowDown';
+        }
+        else if (focus.tagName === 'INPUT' && focus.type === 'radio') {
+          return 'ArrowDown';
+        }
+        else {
+          return 'Tab';
+        }
       }
-      else if (lastNavKey === 'ArrowDown' && focus.ariaHasPopup) {
-        return 'ArrowRight';
+      else if (lastNavKey === 'ArrowDown') {
+        if (focus.ariaHasPopup) {
+          return 'ArrowRight';
+        }
+        else {
+          return 'ArrowDown';
+        }
       }
       else if (lastNavKey === 'ArrowRight') {
         return 'ArrowDown';
