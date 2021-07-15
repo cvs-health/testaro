@@ -25,7 +25,7 @@ exports.focusMark = async (page, lastNavKey) => {
     }
   }, lastNavKey);
   // Get the status.
-  const jsHandleMap = await jsHandle.getProperties;
+  const jsHandleMap = await jsHandle.getProperties();
   const focusJSHandle = jsHandleMap.get('0');
   const statusJSHandle = jsHandleMap.get('1');
   const focus = focusJSHandle ? await focusJSHandle.asElement() : null;

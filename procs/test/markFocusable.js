@@ -75,7 +75,7 @@ exports.markFocusable = async page => {
     // Otherwise, i.e. if the status is new or already:
     else {
       // Identify the next navigation key to be pressed.
-      const nextKey = nextNavKey(lastNavKey, ...focusAndStatus);
+      const nextKey = await nextNavKey(lastNavKey, ...focusAndStatus);
       // If it exists:
       if (nextKey) {
         // Press it.
