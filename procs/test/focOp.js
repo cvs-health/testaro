@@ -8,7 +8,7 @@ exports.focOp = async (page, withItems, revealAll) => {
       const noneElements = Array.from(document.body.querySelectorAll('[display=none]'));
       noneElements.forEach(element => element.setAttribute('display', 'unset'));
       const hiddenElements = Array.from(document.body.querySelectorAll('[visibility=hidden]'));
-      hiddenElements.forEach(element => element.setAttribute('vsibility', 'unset'));
+      hiddenElements.forEach(element => element.setAttribute('visibility', 'unset'));
     });
   }
   // Mark the focusable elements.
