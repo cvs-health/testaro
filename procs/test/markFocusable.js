@@ -24,7 +24,9 @@ exports.markFocusable = async page => {
         return 'Escape';
       }
       else if (
-        lastNavKey === 'Escape' && focus.getAttribute('role') === 'menuitem' && focus.ariaHasPopup
+        lastNavKey === 'Escape'
+        && focus.getAttribute('role') === 'menuitem'
+        && ['true', 'menu'].includes(focus.ariaHasPopup)
       ) {
         return 'ArrowRight';
       }
@@ -43,7 +45,7 @@ exports.markFocusable = async page => {
     // Otherwise, i.e. if the focal element has been newly focused:
     else {
       if (lastNavKey === 'Tab') {
-        if (focus.ariaHasPopup) {
+        if (['true', 'menu'].includes(focus.ariaHasPopup)) {
           return 'ArrowDown';
         }
         else if (focus.tagName === 'INPUT' && focus.type === 'radio') {
@@ -54,7 +56,7 @@ exports.markFocusable = async page => {
         }
       }
       else if (lastNavKey === 'ArrowDown') {
-        if (focus.ariaHasPopup) {
+        if (['true', 'menu'].includes(focus.ariaHasPopup)) {
           return 'ArrowRight';
         }
         else {
