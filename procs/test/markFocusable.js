@@ -22,8 +22,28 @@ exports.markFocusable = async page => {
 
   // Determines the next navigation key.
   const nextNavKey = await page.evaluate(lastNavKey => {
-    const focalElement = document.activeElement;
-    if (focalElement) {
+    const focus = document.activeElement;
+    if (focus && focus.tagName !== 'BODY') {
+      const alreadyFocused = focus.datalist.autotestFocused;
+      if (alreadyFocused) {
+        if (lastNavKey === 'ArrowDown' && focus.getAttribute('role') === 'menuitem') {
+          return 'Escape';
+        }
+        else if (
+          lastNavKey === 'Escape' && focus.getAttribute('role') === 'menuitem' && focus.ariaHasPopup
+        ) {
+          return 'ArrowRight';
+        }
+        else if (
+          lastNavKey === 'ArrowDown'
+          && focus.tagName === 'INPUT'
+          && focus.type === 'radio'
+        ) {
+          return 'Tab';
+        }
+      }
+    }
+    if (focus) {
       const blah = 1;
     }
   }, lastNavKey);
