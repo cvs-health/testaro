@@ -4,11 +4,18 @@ exports.focOp = async (page, withItems, revealAll) => {
   const allText = withItems ? require('./allText').allText : '';
   // If all elements are to be revealed:
   if (revealAll) {
+    // Make them all visible.
     await page.evaluate(() => {
-      const noneElements = Array.from(document.body.querySelectorAll('[display=none]'));
-      noneElements.forEach(element => element.setAttribute('display', 'unset'));
-      const hiddenElements = Array.from(document.body.querySelectorAll('[visibility=hidden]'));
-      hiddenElements.forEach(element => element.setAttribute('visibility', 'unset'));
+      const elements = Array.from(document.body.querySelectorAll('*'));
+      elements.forEach(element => {
+        const styleDec = window.getComputedStyle(element);
+        if (styleDec.display === 'none') {
+          element.style.display = 'unset';
+        }
+        if (styleDec.visibility === 'hidden') {
+          element.style.visibility = 'unset';
+        }
+      });
     });
   }
   // Mark the focusable elements.
