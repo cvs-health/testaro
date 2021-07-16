@@ -11,6 +11,7 @@ exports.role = async page => await page.$eval('body', body => {
     'columnheader',
     'combobox',
     'complementary',
+    'contentinfo',
     'definition',
     'dialog',
     'document',
