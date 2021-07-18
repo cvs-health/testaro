@@ -116,11 +116,11 @@ Tests that perform clicks on elements appear difficult to diagnose. No method ha
 
 The Playwright “Receives Events” actionability check does **not** check whether an event is dispatched on an element. It checks only whether a click on the location of the element makes the element the target of that click, rather than some other element occupying the same location.
 
-The `markOperable` test proc and the `focop` test that uses it therefore approximate operability testing, but does not test definitively for operability.
+The `markOperable` test proc and the `focop` test that uses it therefore approximate operability testing, but do not test definitively for operability.
 
 ### Procs
 
-Autotest also contains some utilities that perform useful work. These are called _procs_ and are located in the `procs` directory. Procs belong to two categories:
+Autotest also contains some utilities that perform useful work. These are called _procs_ and are located in the `procs` directory. Procs belong to three categories:
 - _Report procs_ convert one or more reports to different reports.
 - _Script procs_ help create scripts.
 - _Test procs_ contain code that is used by multiple tests.
