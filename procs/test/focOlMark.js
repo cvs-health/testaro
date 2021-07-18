@@ -1,7 +1,7 @@
-// Marks the focused in-body element, if any, and returns it and a status.
-exports.focusMark = async (page, lastNavKey) => {
+// Marks the focused in-body element, if any, as outlined or not, and returns it and a status.
+exports.focOlMark = async page => {
   // Identify a JSHandle of the focused element, if any, and a status.
-  const jsHandle = await page.evaluateHandle(lastNavKey => {
+  const jsHandle = await page.evaluateHandle(() => {
     // Identify the focused element.
     const focus = document.activeElement;
     // If it exists and is within the body:
@@ -10,8 +10,10 @@ exports.focusMark = async (page, lastNavKey) => {
       let status = 'already';
       // If it was not previously focused:
       if (! focus.dataset.autotestFocused) {
-        // Mark it as focused and how.
-        focus.setAttribute('data-autotest-focused', lastNavKey);
+        // Determine whether it is outlined.
+        const outlineWidth = window.getComputedStyle(focus).outlineWidth;
+        // Mark it as focused and whether outlined.
+        focus.setAttribute('data-autotest-focused', outlineWidth === '0px' ? '0' : '1');
         // Revise the status.
         status = 'new';
       }
@@ -23,7 +25,7 @@ exports.focusMark = async (page, lastNavKey) => {
       // Return that fact and a status.
       return [null, 'external'];
     }
-  }, lastNavKey);
+  });
   // Get the status.
   const jsHandleMap = await jsHandle.getProperties();
   const focusJSHandle = jsHandleMap.get('0');

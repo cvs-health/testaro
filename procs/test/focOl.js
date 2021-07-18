@@ -1,5 +1,5 @@
-// Returns counts, and texts if required, of (un)focusable and (in)operable elements.
-exports.focOp = async (page, withItems, revealAll) => {
+// Returns counts, and texts if required, of focusable elements with and without focal outlines.
+exports.focOl = async (page, withItems, revealAll) => {
   // Import a module to get the texts of an element.
   const allText = withItems ? require('./allText').allText : '';
   // If all elements are to be revealed:
@@ -19,18 +19,14 @@ exports.focOp = async (page, withItems, revealAll) => {
     });
   }
   // Mark the focusable elements.
-  await require('./focusables').focusables(page, 'focusMark');
-  // Mark the operable elements, if visible or focused-marked.
-  await require('./markOperable').markOperable(page);
-  // Get an array of the elements that are focusable but not operable.
-  const fNotO = await page.$$('body [data-autotest-focused]:not([data-autotest-operable])');
-  // Get an array of the elements that are operable but not focusable.
-  const oNotF = await page.$$('body [data-autotest-operable]:not([data-autotest-focused])');
-  // Get an array of the elements that are focusable and operable.
-  const fAndO = await page.$$('body [data-autotest-focused][data-autotest-operable]');
+  await require('./focusables').focusables(page, 'focOlMark');
+  // Get an array of the elements that are focusable but not outlined.
+  const fNotO = await page.$$('body [data-autotest-focused=0])');
+  // Get an array of the elements that are focusable and outlined.
+  const fAndO = await page.$$('body [data-autotest-focused=1]');
   // FUNCTION DEFINITION START
   // Recursively adds the tag names and texts or counts of elements to an array.
-  const compile = async (elements, totals, items, attribute, isF, isO) => {
+  const compile = async (elements, totals, items, attribute, isF) => {
     // If any elements remain to be processed:
     if (elements.length) {
       // Identify the first element.
@@ -56,48 +52,16 @@ exports.focOp = async (page, withItems, revealAll) => {
       else {
         tagNameTotals[tagName] = 1;
       }
-      let how = '';
-      let why = '';
-      // If it is focusable:
-      if (isF) {
-        // Add it to the total for its type and focus method:
-        const howTotals = totals[attribute].focusableHow;
-        how = await firstElement.getAttribute('data-autotest-focused');
-        if (howTotals[how]) {
-          howTotals[how]++;
-        }
-        else {
-          howTotals[how] = 1;
-        }
-      }
-      // If it is operable:
-      if (isO) {
-        // Add it to the total for its type and operability evidence:
-        const whyTotals = totals[attribute].operableWhy;
-        why = await firstElement.getAttribute('data-autotest-operable');
-        if (whyTotals[why]) {
-          whyTotals[why]++;
-        }
-        else {
-          whyTotals[why] = 1;
-        }
-      }
       // If itemization is required:
       if (withItems) {
         // Add the item to the itemization.
         const item = {tagName};
-        if (isF) {
-          item.focusableHow = how;
-        }
-        if (isO) {
-          item.operableWhy = why;
-        }
         const text = await allText(page, firstElement);
         item.text = text;
         items[attribute].push(item);
       }
       // Process the remaining elements.
-      return await compile(elements.slice(1), totals, items, attribute, isF, isO);
+      return await compile(elements.slice(1), totals, items, attribute, isF);
     }
     else {
       return Promise.resolve('');
@@ -107,7 +71,7 @@ exports.focOp = async (page, withItems, revealAll) => {
   // Initialize the data.
   const data = {
     totals: {
-      focusableNotOperable: {
+      focusableNotOutlined: {
         total: 0,
         tagName: {},
         focusableHow: {
@@ -116,42 +80,26 @@ exports.focOp = async (page, withItems, revealAll) => {
           ArrowDown: 0
         }
       },
-      operableNotFocusable: {
-        total: 0,
-        tagName: {},
-        operableWhy: {
-          tag: 0,
-          cursor: 0,
-          onclick: 0
-        }
-      },
-      focusableAndOperable: {
+      focusableAndOutlined: {
         total: 0,
         tagName: {},
         focusableHow: {
           Tab: 0,
           ArrowRight: 0,
           ArrowDown: 0
-        },
-        operableWhy: {
-          tag: 0,
-          cursor: 0,
-          onclick: 0
         }
       }
     },
     items: {
-      focusableNotOperable: [],
-      operableNotFocusable: [],
-      focusableAndOperable: []
+      focusableNotOutlined: [],
+      focusableAndOutlined: []
     }
   };
   // Populate them.
   const totals = data.totals;
   const items = data.items;
-  await compile(fNotO, totals, items, 'focusableNotOperable', true, false);
-  await compile(oNotF, totals, items, 'operableNotFocusable', false, true);
-  await compile(fAndO, totals, items, 'focusableAndOperable', true, true);
+  await compile(fNotO, totals, items, 'focusableNotOutlined', true, false);
+  await compile(fAndO, totals, items, 'focusableAndOutlined', true, true);
   // Reload the page to undo the focus and attribute changes.
   await page.reload();
   // Return it.
