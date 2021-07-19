@@ -73,21 +73,11 @@ exports.focOl = async (page, withItems, revealAll) => {
     totals: {
       focusableNotOutlined: {
         total: 0,
-        tagName: {},
-        focusableHow: {
-          Tab: 0,
-          ArrowRight: 0,
-          ArrowDown: 0
-        }
+        tagName: {}
       },
       focusableAndOutlined: {
         total: 0,
-        tagName: {},
-        focusableHow: {
-          Tab: 0,
-          ArrowRight: 0,
-          ArrowDown: 0
-        }
+        tagName: {}
       }
     },
     items: {
