@@ -21,9 +21,9 @@ exports.focOl = async (page, withItems, revealAll) => {
   // Mark the focusable elements.
   await require('./focusables').focusables(page, 'focOlMark');
   // Get an array of the elements that are focusable but not outlined.
-  const fNotO = await page.$$('body [data-autotest-focused=0])');
+  const fNotO = await page.$$('body [data-autotest-focused="0"]');
   // Get an array of the elements that are focusable and outlined.
-  const fAndO = await page.$$('body [data-autotest-focused=1]');
+  const fAndO = await page.$$('body [data-autotest-focused="1"]');
   // FUNCTION DEFINITION START
   // Recursively adds the tag names and texts or counts of elements to an array.
   const compile = async (elements, totals, items, attribute, isF) => {
