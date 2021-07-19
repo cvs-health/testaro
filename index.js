@@ -163,7 +163,7 @@ const axe = async (page, rules) => {
   // Otherwise, i.e. if there are no violations:
   else {
     // Return a success report.
-    return 'NONE';
+    return 'O.K.';
   }
 };
 // Conducts all axe tests and returns a summary.
