@@ -557,12 +557,10 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
           // Visit it and wait until it is stable.
           try {
             const resolved = which.replace('__dirname', __dirname);
-            console.log(`About to go to ${resolved}`);
             await page.goto(resolved, {
               timeout: 7000,
               waitUntil: 'load'
             });
-            console.log(`URL is ${page.url()}`);
             // Press the Esc key to dismiss any initial modal dialog.
             await page.keyboard.press('Escape');
             // Add the resulting URL to the act.
