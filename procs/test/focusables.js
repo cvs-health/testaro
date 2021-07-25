@@ -34,10 +34,13 @@ exports.focusables = async (page, operation) => {
       ) {
         return 'ArrowRight';
       }
-      else if (
-        lastNavKey === 'ArrowDown' && focus.tagName === 'INPUT' && focus.type === 'radio'
-      ) {
-        return 'Tab';
+      else if (lastNavKey === 'ArrowDown') {
+        if (
+          focus.tagName === 'INPUT' && focus.type === 'radio'
+          || focus.hasAttribute('aria-activedescendant')
+        ) {
+          return 'Tab';
+        }
       }
       else if (lastNavKey === 'ArrowRight') {
         return 'Tab';
@@ -105,7 +108,6 @@ exports.focusables = async (page, operation) => {
 
   // ### OPERATION
 
-  //
   // Press the Tab key and identify it as the last-pressed navigation key.
   await page.keyboard.press('Tab');
   // Recursively focus and mark elements.

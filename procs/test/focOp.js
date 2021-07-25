@@ -18,8 +18,17 @@ exports.focOp = async (page, withItems, revealAll) => {
       });
     });
   }
-  // Mark the focusable elements.
+  // Mark any focusable elements.
   await require('./focusables').focusables(page, 'focusMark');
+  // Mark any other pseudofocusable elements as focusable.
+  await page.evaluate(() => {
+    const managees = document.body.querySelectorAll(
+      '[aria-activedescendant] [role=menuitem]:not([data-autotest-focused])'
+    );
+    managees.forEach(managee => {
+      managee.dataset.autotestFocused = 'Pseudo';
+    });
+  });
   // Mark the operable elements, if visible or focused-marked.
   await require('./markOperable').markOperable(page);
   // Get an array of the elements that are focusable but not operable.
