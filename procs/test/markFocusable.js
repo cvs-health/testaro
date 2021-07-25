@@ -108,4 +108,13 @@ exports.markFocusable = async page => {
   await page.keyboard.press('Tab');
   // Recursively focus and mark elements.
   await markAll();
+  // Mark as focusable all other elements whose pseudofocus is managed.
+  await page.evaluate(() => {
+    const managees = document.body.querySelectorAll(
+      '[aria-activedescendant] [role=menuitem]:not([data-autotest-focused])'
+    );
+    managees.forEach(managee => {
+      managee.dataset.autotestFocused = 'Pseudo';
+    });
+  });
 };

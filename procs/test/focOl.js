@@ -79,12 +79,14 @@ exports.focOl = async (page, withItems, revealAll) => {
         total: 0,
         tagName: {}
       }
-    },
-    items: {
-      focusableNotOutlined: [],
-      focusableAndOutlined: []
     }
   };
+  if (withItems) {
+    data.items = {
+      focusableNotOutlined: [],
+      focusableAndOutlined: []
+    };
+  }
   // Populate them.
   const totals = data.totals;
   const items = data.items;
@@ -92,6 +94,6 @@ exports.focOl = async (page, withItems, revealAll) => {
   await compile(fAndO, totals, items, 'focusableAndOutlined', true, true);
   // Reload the page to undo the focus and attribute changes.
   await page.reload();
-  // Return it.
+  // Return the data.
   return data;
 };
