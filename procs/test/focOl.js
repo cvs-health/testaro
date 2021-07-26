@@ -76,23 +76,29 @@ exports.focOl = async (page, withItems, revealAll) => {
   const data = {
     totals: {
       outliningWrong: {
-        requiredButAbsent: {
-          total: 0,
-          tagName: {}
-        },
-        illicitButPresent: {
-          total: 0,
-          tagName: {}
+        total: 0,
+        types: {
+          requiredButAbsent: {
+            total: 0,
+            tagName: {}
+          },
+          illicitButPresent: {
+            total: 0,
+            tagName: {}
+          }
         }
       },
       outliningRight: {
-        requiredAndPresent: {
-          total: 0,
-          tagName: {}
-        },
-        illicitAndAbsent: {
-          total: 0,
-          tagName: {}
+        total: 0,
+        types: {
+          requiredAndPresent: {
+            total: 0,
+            tagName: {}
+          },
+          illicitAndAbsent: {
+            total: 0,
+            tagName: {}
+          }
         }
       }
     }
@@ -106,13 +112,20 @@ exports.focOl = async (page, withItems, revealAll) => {
     };
   }
   // Populate them.
-  const rightTotals = data.totals.outliningRight;
-  const wrongTotals = data.totals.outliningWrong;
+  const rightTotals = data.totals.outliningRight.types;
+  const wrongTotals = data.totals.outliningWrong.types;
   const items = data.items;
   await compile(focOutYY, rightTotals, items, 'requiredAndPresent');
   await compile(focOutYN, wrongTotals, items, 'requiredButAbsent');
   await compile(focOutNY, wrongTotals, items, 'illicitButPresent');
   await compile(focOutNN, rightTotals, items, 'illicitAndAbsent');
+  const totals = data.totals;
+  totals.outliningWrong.total =
+    wrongTotals.requiredButAbsent.total
+    + wrongTotals.illicitButPresent.total;
+  totals.outliningRight.total =
+    rightTotals.requiredAndPresent.total
+    + rightTotals.illicitAndAbsent.total;
   // Reload the page to undo the focus and attribute changes.
   await page.reload();
   // Return the data.
