@@ -1,4 +1,4 @@
-// Finds elements that can be keyboard-focused and performs an operation on them.
+// Finds and operates on elements that can be keyboard-focused (not pseudofocused).
 exports.focusables = async (page, operation) => {
 
   // ## IMPORTS
@@ -24,55 +24,19 @@ exports.focusables = async (page, operation) => {
     const status = args[2];
     // If the focal element had been focused before:
     if (status === 'already') {
-      if (lastNavKey === 'ArrowDown' && focus.getAttribute('role') === 'menuitem') {
-        return 'Escape';
-      }
-      else if (
-        lastNavKey === 'Escape'
-        && focus.getAttribute('role') === 'menuitem'
-        && ['true', 'menu'].includes(focus.ariaHasPopup)
-      ) {
-        return 'ArrowRight';
-      }
-      else if (lastNavKey === 'ArrowDown') {
-        if (
-          focus.tagName === 'INPUT' && focus.type === 'radio'
-          || focus.hasAttribute('aria-activedescendant')
-        ) {
-          return 'Tab';
-        }
-      }
-      else if (lastNavKey === 'ArrowRight') {
-        return 'Tab';
-      }
-      else {
-        return null;
-      }
+      // Return Tab if the focus is on a widget item, or null otherwise.
+      return lastNavKey === 'ArrowDown' ? 'Tab' : null;
     }
     // Otherwise, i.e. if the focal element has been newly focused:
     else {
-      if (lastNavKey === 'Tab') {
-        if (['true', 'menu'].includes(focus.ariaHasPopup)) {
-          return 'ArrowDown';
-        }
-        else if (focus.tagName === 'INPUT' && focus.type === 'radio') {
-          return 'ArrowDown';
-        }
-        else {
-          return 'Tab';
-        }
-      }
-      else if (lastNavKey === 'ArrowDown') {
-        if (['true', 'menu'].includes(focus.ariaHasPopup)) {
-          return 'ArrowRight';
-        }
-        else {
-          return 'ArrowDown';
-        }
-      }
-      else if (lastNavKey === 'ArrowRight') {
+      // If it is a radio button or menu button, return ArrowDown.
+      if (
+        focus.tagName === 'INPUT' && focus.type === 'radio'
+        || ['menu', 'true'].includes(focus.ariaHasPopup)
+      ) {
         return 'ArrowDown';
       }
+      // Otherwise, return Tab.
       else {
         return 'Tab';
       }
@@ -110,6 +74,6 @@ exports.focusables = async (page, operation) => {
 
   // Press the Tab key and identify it as the last-pressed navigation key.
   await page.keyboard.press('Tab');
-  // Recursively focus and mark elements.
+  // Recursively focus and operate on elements.
   await opAll();
 };

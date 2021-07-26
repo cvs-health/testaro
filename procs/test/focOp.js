@@ -29,7 +29,7 @@ exports.focOp = async (page, withItems, revealAll) => {
       managee.dataset.autotestFocused = 'Pseudo';
     });
   });
-  // Mark the operable elements, if visible or focused-marked.
+  // Mark the operable elements that are visible or focused-marked.
   await require('./markOperable').markOperable(page);
   // Get an array of the elements that are focusable but not operable.
   const fNotO = await page.$$('body [data-autotest-focused]:not([data-autotest-operable])');
