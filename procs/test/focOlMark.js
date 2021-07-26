@@ -1,4 +1,4 @@
-// Marks the focused in-body element, if any, as outlined or not, and returns it and a status.
+// Marks the focused in-body element’s outline status and returns it and a focus status.
 exports.focOlMark = async page => {
   // Identify a JSHandle of the focused element, if any, and a status.
   const jsHandle = await page.evaluateHandle(() => {
@@ -10,10 +10,15 @@ exports.focOlMark = async page => {
       let status = 'already';
       // If it was not previously focused:
       if (! focus.dataset.autotestFocused) {
+        // Determine whether it is exempt from being outlined.
+        const isExempt = focus.hasAttribute('aria-activedescendant');
         // Determine whether it is outlined.
         const outlineWidth = window.getComputedStyle(focus).outlineWidth;
-        // Mark it as focused and whether outlined.
-        focus.setAttribute('data-autotest-focused', outlineWidth === '0px' ? '0' : '1');
+        const isOutlined = outlineWidth.length && outlineWidth !== '0px';
+        // Mark it as focused and whether it must be and is outlined.
+        focus.setAttribute(
+          'data-autotest-focused', `${isExempt ? 'N' : 'Y'}${isOutlined ? 'Y' : 'N'}`
+        );
         // Revise the status.
         status = 'new';
       }
