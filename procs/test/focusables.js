@@ -29,10 +29,11 @@ exports.focusables = async (page, operation) => {
     }
     // Otherwise, i.e. if the focal element has been newly focused:
     else {
-      // If it is a radio button or menu button, return ArrowDown.
+      // If it is a radio button, menu button, or menu item, return ArrowDown.
       if (
         focus.tagName === 'INPUT' && focus.type === 'radio'
         || ['menu', 'true'].includes(focus.ariaHasPopup)
+        || focus.getAttribute('role') === 'menuitem'
       ) {
         return 'ArrowDown';
       }
