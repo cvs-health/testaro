@@ -17,6 +17,22 @@ exports.focusables = async (page, operation) => {
 
   // ## FUNCTIONS
 
+  // Recursively returns the type of menu an element is a descendant of.
+  const inMenuType = element => {
+    if (element === document.body) {
+      return null;
+    }
+    else {
+      const parent = element.parentElement;
+      const parentRole = parent.getAttribute('role');
+      if (['menu', 'menubar'].includes(parentRole)) {
+        return parentRole;
+      }
+      else {
+        return inMenuType(parent);
+      }
+    }
+  };
   // Determines the next navigation key.
   const nextNavKey = async (lastNavKey, focus, status) => await page.evaluate(args => {
     const lastNavKey = args[0];
@@ -25,17 +41,21 @@ exports.focusables = async (page, operation) => {
     // If the focal element had been focused before:
     if (status === 'already') {
       // Return Tab if the focus is on a widget item, or null otherwise.
-      return lastNavKey === 'ArrowDown' ? 'Tab' : null;
+      return ['ArrowDown', 'ArrowRight'].includes(lastNavKey) ? 'Tab' : null;
     }
     // Otherwise, i.e. if the focal element has been newly focused:
     else {
-      // If it is a radio button, menu button, or menu item, return ArrowDown.
+      // If it is a radio button, menu button, or vertical menu item, return ArrowDown.
       if (
         focus.tagName === 'INPUT' && focus.type === 'radio'
         || ['menu', 'true'].includes(focus.ariaHasPopup)
-        || focus.getAttribute('role') === 'menuitem'
+        || focus.getAttribute('role') === 'menuitem' && inMenuType(focus) === 'menu'
       ) {
         return 'ArrowDown';
+      }
+      // Otherwise, if it is a horizontal menu item, return ArrowRight.
+      else if (focus.getAttribute('role') === 'menuitem' && inMenuType(focus) === 'menubar') {
+        return 'ArrowRight';
       }
       // Otherwise, return Tab.
       else {
