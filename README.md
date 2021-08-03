@@ -112,11 +112,11 @@ No method for the comprehensive testing of element operability has been found ye
 
 Ideally, such a test would not require actually clicking the element location, because doing so could change the page and/or its URL, thereby preventing the conduct of tests on any not-yet-tested elements. But no method is known for such a test.
 
-Tests that perform clicks on elements appear difficult to diagnose. No method has been found for determining whether such a click dispatches an event or whether code is executed in the browser immediately after such a click. One experiment was able to distinguish an operable element from an inoperable element by setting the timeout on an `elementHandle.click()` method to 37 milliseconds. At 35 milliseconds, the method did not return within the timeout on any element. At 40 seconds, it returned within the timeout on all elements. But at 37 milliseconds it returned within the timeout on inoperable elements but not on an operable element. However, it seems reasonable to assume that the threshold timeout depends on the event(s) dispatched by a click and there is therefore no uniform timeout distinguishing operable from inoperable elements.
+Tests that perform clicks on elements appear difficult to diagnose. No method has been found for determining whether such a click dispatches an event or whether code is executed in the browser immediately after such a click. One experiment was able to distinguish an operable element from an inoperable element by setting the timeout on an `elementHandle.click()` method to 37 milliseconds. At 35 milliseconds, the method did not return within the timeout on any element. At 40 milliseconds, it returned within the timeout on all elements. But at 37 milliseconds it returned within the timeout on inoperable elements but not on an operable element. However, it seems reasonable to assume that the threshold timeout depends on the event(s) dispatched by a click and there is therefore no uniform timeout distinguishing operable from inoperable elements.
 
 The Playwright “Receives Events” actionability check does **not** check whether an event is dispatched on an element. It checks only whether a click on the location of the element makes the element the target of that click, rather than some other element occupying the same location.
 
-The `markOperable` test proc and the `focop` test that uses it therefore approximate operability testing, but do not test definitively for operability.
+The `markOperable` test proc and the `focOp` test that uses it therefore approximate operability testing, but do not test definitively for operability.
 
 ### Procs
 
