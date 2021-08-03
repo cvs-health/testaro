@@ -17,22 +17,6 @@ exports.focusables = async (page, operation) => {
 
   // ## FUNCTIONS
 
-  // Recursively returns the type of menu an element is a descendant of.
-  const inMenuType = element => {
-    if (element === document.body) {
-      return null;
-    }
-    else {
-      const parent = element.parentElement;
-      const parentRole = parent.getAttribute('role');
-      if (['menu', 'menubar'].includes(parentRole)) {
-        return parentRole;
-      }
-      else {
-        return inMenuType(parent);
-      }
-    }
-  };
   // Determines the next navigation key.
   const nextNavKey = async (lastNavKey, focus, status) => await page.evaluate(args => {
     const lastNavKey = args[0];
@@ -45,6 +29,24 @@ exports.focusables = async (page, operation) => {
     }
     // Otherwise, i.e. if the focal element has been newly focused:
     else {
+      // FUNCTION DEFINITION START
+      // Recursively returns the type of menu an element is a descendant of.
+      const inMenuType = element => {
+        if (element === document.body) {
+          return null;
+        }
+        else {
+          const parent = element.parentElement;
+          const parentRole = parent.getAttribute('role');
+          if (['menu', 'menubar'].includes(parentRole)) {
+            return parentRole;
+          }
+          else {
+            return inMenuType(parent);
+          }
+        }
+      };
+      // FUNCTION DEFINITION END
       // If it is a radio button, menu button, or vertical menu item, return ArrowDown.
       if (
         focus.tagName === 'INPUT' && focus.type === 'radio'

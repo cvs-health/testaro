@@ -8,17 +8,22 @@ exports.markOperable = async page => {
       const opTags = new Set(['A', 'BUTTON', 'INPUT', 'SELECT', 'TEXTAREA']);
       // For each of them:
       elements.forEach(element => {
-        // If deemed operable because of its tag name, mark it as such.
-        if (opTags.has(element.tagName)) {
+        // If it has an operable tag name and has no menu-item parent, mark it.
+        if (
+          opTags.has(element.tagName) && element.parentElement.getAttribute('role') !== 'menuitem'
+        ) {
           element.dataset.autotestOperable = 'tag';
+        }
+        // Otherwise, if it is a menu-item parent of an element with an operable tag name, mark it.
+        else if (
+          element.getAttribute('role') === 'menuitem'
+          && opTags.has(element.firstElementChild.tagName)
+        ) {
+          element.dataset.autotestOperable = 'menuitem';
         }
         // Otherwise, if it has an onclick attribute, mark it.
         else if (element.hasAttribute('onclick')) {
           element.dataset.autotestOperable = 'onclick';
-        }
-        // Otherwise, if it has an aria-activedescendant attribute, mark it.
-        else if (element.hasAttribute('aria-activedescendant')) {
-          element.dataset.autotestOperable = 'pseudo';
         }
         // Otherwise, if it has a pointer cursor:
         else if ((styleDec = window.getComputedStyle(element)).cursor == 'pointer') {
