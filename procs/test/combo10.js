@@ -22,11 +22,11 @@ exports.reduce = result => {
       deficit.linkUlS = 3 * (facts.total - facts.underlined);
       deficit.total += deficit.linkUlS;
     }
-    // focusOutlineS
-    facts = result.focusOutlineS && result.focusOutlineS.result;
+    // focOlS
+    facts = result.focOlS && result.focOlS.result && result.focOlS.result.totals;
     if (facts) {
-      deficit.focusOutlineS = 4 * (facts.focusableCount - facts.outlinedCount);
-      deficit.total += deficit.focusOutlineS;
+      deficit.focOlS = 4 * facts.outliningWrong.total;
+      deficit.total += deficit.focOlS;
     }
     // focOpS
     facts = result.focOpS && result.focOpS.result && result.focOpS.result.totals;
