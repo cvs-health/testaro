@@ -19,9 +19,20 @@ exports.styleDiff = async (page, withDetails) => await page.$eval('body', (body,
     'textDecoration'
   ];
   // Identify the tag names to be analyzed.
-  const tagNames = ['a', 'button', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+  const tagNames = ['a:inline', 'a:block', 'button', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
   // For each of them:
   tagNames.forEach(tagName => {
+    const elements = [];
+    // If it has a modifier:
+    if (tagName.includes(':')) {
+      const modifiedName = tagName.split(':');
+      // Get all elements with the tag name.
+      const allElements = Array.from(body.getElementsByTagName(modifiedName[0]));
+      // If the modifier is inline:
+      if (modifiedName[1] === 'inline') {
+
+      }
+    }
     // Get the elements with it.
     const elements = Array.from(body.getElementsByTagName(tagName));
     const elementCount = elements.length;

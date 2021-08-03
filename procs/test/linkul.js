@@ -10,7 +10,7 @@ exports.linkUl = async (page, withItems) => await page.$eval('body', (body, with
   const despace = text => text.replace(/\s/g, '');
   // Returns whether one element has more text than another and both have real text.
   const hasMoreText = element => {
-  // Recursively returns the first ancestor element with non-inline display.
+    // Recursively returns the first ancestor element with non-inline display.
     const blockOf = node => {
       const parentElement = node.parentElement;
       if (window.getComputedStyle(parentElement).display.startsWith('inline')) {

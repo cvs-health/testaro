@@ -1,0 +1,111 @@
+/*
+  Returns an object classifying the elements in an array of elements as inline or block.
+  Argument: allElements.
+  The content of this file can be used as the second argument in a Function constructor,
+  with 'allElements' being the first argument.
+*/
+// FUNCTION DEFINITIONS START
+// Returns whether all child elements of an element have inline display.
+const isInline = element => {
+  const children = Array.from(element.children);
+  return children.every(child => window.getComputedStyle(child).display.startsWith('inline'));
+};
+// Removes spacing characters from a text.
+const despace = text => text.replace(/\s/g, '');
+// Returns whether one element has more text than another and both have real text.
+const hasMoreText = element => {
+  // Recursively returns the first ancestor element with non-inline display.
+  const blockOf = node => {
+    const parentElement = node.parentElement;
+    if (window.getComputedStyle(parentElement).display.startsWith('inline')) {
+      return blockOf(parentElement);
+    }
+    else {
+      return parentElement;
+    }
+  };
+  const elementText = despace(element.textContent);
+  if (elementText) {
+    return despace(blockOf(element).textContent).length > elementText.length;
+  }
+  else {
+    return false;
+  }
+};
+// Returns a space-minimized copy of a string.
+const compact = string => string.replace(/[\t\n]/g, '').replace(/\s{2,}/g, ' ').trim();
+// FUNCTION DEFINITIONS END
+// Identify all links.
+const links = Array.from(body.getElementsByTagName('a'));
+// Identify those with less text than their nearest non-inline ancestors as inline.
+const inLinks = links.filter(link => isInline(link) && hasMoreText(link));
+
+
+// Identify the element, if specified, or else the focused element.
+const el = element || document.activeElement;
+// Initialize an array of its texts.
+const texts = [];
+// FUNCTION DEFINITION START
+// Removes excess spacing from a string.
+const debloat = text => text.trim().replace(/\s+/g, ' ');
+// FUNCTION DEFINITION END
+// Add any attribute label to the array.
+const ariaLabel = el.getAttribute('aria-label');
+if (ariaLabel) {
+  const trimmedLabel = debloat(ariaLabel);
+  if (trimmedLabel) {
+    texts.push(trimmedLabel);
+  }
+}
+// Add any explicit and implicit labels to the array.
+const labelNodeList = el.labels;
+if (labelNodeList && labelNodeList.length) {
+  const labels = Array.from(labelNodeList);
+  const labelTexts = labels
+  .map(label => label.textContent && debloat(label.textContent))
+  .filter(text => text);
+  if (labelTexts.length) {
+    texts.push(...labelTexts);
+  }
+}
+// Add any referenced labels to the array.
+if (el.hasAttribute('aria-labelledby')) {
+  const labelerIDs = el.getAttribute('aria-labelledby').split(/\s+/);
+  labelerIDs.forEach(id => {
+    const labeler = document.getElementById(id);
+    if (labeler) {
+      const labelerText = debloat(labeler.textContent);
+      if (labelerText) {
+        texts.push(labelerText);
+      }
+    }
+  });
+}
+// Add any image text alternatives to the array.
+const altTexts = Array
+.from(element.querySelectorAll('img[alt]:not([alt=""])'))
+.map(img => debloat(img.alt))
+.join('; ');
+if (altTexts.length) {
+  texts.push(altTexts);
+}
+// Add any text content of the element to the array.
+const ownText = element.textContent;
+if (ownText) {
+  const minText = debloat(ownText);
+  if (minText) {
+    texts.push(minText);
+  }
+}
+// Identify a concatenation of the texts.
+let textChain = texts.join('; ');
+// If it is empty:
+if (! textChain) {
+  // Substitute the text content of its parent element, if any.
+  textChain = `{${debloat(element.parentElement.textContent)}}`;
+  if (textChain === '{}') {
+    textChain = '';
+  }
+}
+// Return a concatenation of the texts in the array.
+return textChain;
