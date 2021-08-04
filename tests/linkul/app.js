@@ -4,7 +4,7 @@ exports.reporter = async page => {
   const data = await require('../../procs/test/linkUl').linkUl(page, true);
   return {
     result: {
-      tally: {
+      totals: {
         links: data.linkCount,
         inline: {
           total: data.inLinkCount,
