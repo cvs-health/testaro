@@ -1,7 +1,7 @@
 // Tabulates and lists style inconsistencies.
 exports.styleDiff = async (page, withDetails) => {
   const linkTypes = await require('./linksByType').linksByType(page);
-  await page.$eval('body', (body, args) => {
+  return await page.$eval('body', (body, args) => {
     const withDetails = args[0];
     const linkTypes = args[1];
     const data = {totals: {}};
@@ -32,7 +32,7 @@ exports.styleDiff = async (page, withDetails) => {
     // For each nonlink tag name:
     tagNames.forEach(tagName => {
       // Add its elements to the object.
-      elementClasses[tagName] = body.getElementsByTagName(tagName);
+      elementClasses[tagName] = Array.from(body.getElementsByTagName(tagName));
     });
     // For each element class:
     Object.keys(elementClasses).forEach(tagName => {
