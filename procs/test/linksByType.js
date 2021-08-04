@@ -1,4 +1,4 @@
-// Returns an array of the links in a page, classified as inline or block.
+// Returns an object classifying the links in a page as inline or block.
 exports.linksByType = async page => await page.evaluateHandle(() => {
   // FUNCTION DEFINITIONS START
   // Returns whether all child elements of an element have inline display.
