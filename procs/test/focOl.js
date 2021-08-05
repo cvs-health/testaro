@@ -1,7 +1,7 @@
 // IMPORTS
 
 // Import a module to get the texts of an element.
-const allText = withItems => withItems ? require('./allText').allText : '';
+const allText = require('./allText').allText;
 
 // FUNCTIONS
 

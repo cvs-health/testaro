@@ -24,15 +24,15 @@ exports.focusables = async (page, operation) => {
     const status = args[2];
     // If the focal element had been focused before, return:
     if (status === 'already') {
-      // Escape if the focus is on a menu item in a closable menu.
-      if (focus.getAttribute('role') === 'menuitem' && focus.parentElement.hasPopup) {
-        return 'Escape';
-      }
-      // ArrowRight if the focus is on a just-closed submenu.
-      else if (focus.hasPopup && lastNavKey === 'Escape') {
+      // ArrowRight if the last key tried (successfully or not) to close a menu.
+      if (focus.getAttribute('role') === 'menuitem' && lastNavKey === 'Escape') {
         return 'ArrowRight';
       }
-      // Tab if the focus is otherwise on a widget item.
+      // Escape if the focus is otherwise on a menu item.
+      else if (focus.getAttribute('role') === 'menuitem') {
+        return 'Escape';
+      }
+      // Tab if the last key navigated within a widget.
       else if (['ArrowDown', 'ArrowRight'].includes(lastNavKey)) {
         return 'Tab';
       }
@@ -51,13 +51,31 @@ exports.focusables = async (page, operation) => {
       else if (['menu', 'true'].includes(focus.ariaHasPopup)) {
         return 'ArrowDown';
       }
-      // ArrowDown if the focus is on a vertical or ArrowRight if on a horizontal menu item.
+      // ArrowDown or ArrowRight if the focus is on another menu item.
       else if (focus.getAttribute('role') === 'menuitem') {
-        const parentRole = focus.parentElement.getAttribute('role');
-        if (parentRole === 'menu') {
+        // Returns the role of the menu that a menu item is an item of.
+        const owningMenuRole = menuItem => {
+          const parent = menuItem.parentElement;
+          const parentRole = parent.getAttribute('role');
+          if (parentRole.startsWith('menu')){
+            return parentRole;
+          }
+          else {
+            const grandparent = parent.parentElement;
+            const grandparentRole = grandparent.getAttribute('role');
+            if (grandparentRole.startsWith('menu')) {
+              return grandparentRole;
+            }
+            else {
+              return '';
+            }
+          }
+        };
+        const menuRole = owningMenuRole(focus);
+        if (menuRole === 'menu') {
           return 'ArrowDown';
         }
-        else if (parentRole === 'menubar') {
+        else if (menuRole === 'menubar') {
           return 'ArrowRight';
         }
         else {
