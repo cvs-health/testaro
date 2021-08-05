@@ -2,10 +2,14 @@
 exports.focusMark = async (page, lastNavKey) => {
   // Identify a JSHandle of the focused element, if any, and a status.
   const jsHandle = await page.evaluateHandle(lastNavKey => {
-    // Identify the focused element.
-    const focus = document.activeElement;
+    // Initialize the focused element.
+    let focus = document.activeElement;
     // If it exists and is within the body:
     if (focus && focus !== document.body) {
+      // Change it to the effectively focused element if different.
+      if (focus.hasAttribute('aria-activedescendant')) {
+        focus = document.getElementById(focus.getAttribute('aria-activedescendant'));
+      }
       // Initialize the status.
       let status = 'already';
       // If it was not previously focused:
@@ -24,12 +28,6 @@ exports.focusMark = async (page, lastNavKey) => {
       return [null, 'external'];
     }
   }, lastNavKey);
-  // Get the status.
-  const jsHandleMap = await jsHandle.getProperties();
-  const focusJSHandle = jsHandleMap.get('0');
-  const statusJSHandle = jsHandleMap.get('1');
-  const focus = focusJSHandle ? await focusJSHandle.asElement() : null;
-  const status = await statusJSHandle.jsonValue();
-  // Return the focused element, if any, and the status.
-  return [focus, status];
+  // Return the focused element and the status.
+  return await require('./jsHandleProps').jsHandleProps(jsHandle, [true, false]);
 };
