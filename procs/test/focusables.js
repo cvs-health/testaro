@@ -34,7 +34,7 @@ exports.focusables = async (page, operation) => {
         else if (lastNavKey === 'Escape') {
           return 'ArrowRight';
         }
-        // Tab if the last key navigated horizontally.
+        // Tab if the last key tried (successfully or not) to navigate horizontally.
         else if (lastNavKey === 'ArrowRight') {
           return 'Tab';
         }

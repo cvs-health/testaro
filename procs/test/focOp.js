@@ -20,21 +20,6 @@ exports.focOp = async (page, withItems, revealAll) => {
   }
   // Mark any focusable elements.
   await require('./focusables').focusables(page, 'focusMark');
-  // Mark any other pseudofocusable elements as focusable.
-  await page.evaluate(() => {
-    const managees = Array.from(
-      document.body.querySelectorAll('[aria-activedescendant] [role=menuitem]')
-    );
-    const pseudofocusables = managees.map(item => {
-      const itemChild = item.firstElementChild;
-      return itemChild && ['A', 'BUTTON'].includes(itemChild.tagName) ? itemChild : item;
-    });
-    pseudofocusables.forEach(element => {
-      if (! element.dataset.autotestFocused) {
-        element.dataset.autotestFocused = 'Pseudo';
-      }
-    });
-  });
   // Mark the operable elements that are visible or focused-marked.
   await require('./markOperable').markOperable(page);
   // Get an array of the elements that are focusable but not operable.
