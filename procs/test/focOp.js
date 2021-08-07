@@ -27,7 +27,7 @@ exports.focOp = async (page, withItems, revealAll) => {
     );
     const pseudofocusables = managees.map(item => {
       const itemChild = item.firstElementChild;
-      return ['A', 'BUTTON'].includes(itemChild.tagName) ? itemChild : item;
+      return itemChild && ['A', 'BUTTON'].includes(itemChild.tagName) ? itemChild : item;
     });
     pseudofocusables.forEach(element => {
       if (! element.dataset.autotestFocused) {

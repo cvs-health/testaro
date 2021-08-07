@@ -24,15 +24,22 @@ exports.focusables = async (page, operation) => {
     const status = args[2];
     // If the focal element had been focused before, return:
     if (status === 'already') {
-      // ArrowRight if the last key tried (successfully or not) to close a menu.
-      if (focus.getAttribute('role') === 'menuitem' && lastNavKey === 'Escape') {
-        return 'ArrowRight';
+      // If the focus is on a menu item:
+      if (focus.getAttribute('role') === 'menuitem') {
+        // Escape if the last key navigated vertically.
+        if (lastNavKey === 'ArrowDown') {
+          return 'Escape';
+        }
+        // ArrowRight if the last key tried (successfully or not) to close a menu.
+        else if (lastNavKey === 'Escape') {
+          return 'ArrowRight';
+        }
+        // Tab if the last key navigated horizontally.
+        else if (lastNavKey === 'ArrowRight') {
+          return 'Tab';
+        }
       }
-      // Escape if the focus is otherwise on a menu item.
-      else if (focus.getAttribute('role') === 'menuitem') {
-        return 'Escape';
-      }
-      // Tab if the last key navigated within a widget.
+      // Tab if the last key navigated within a non-menu widget.
       else if (['ArrowDown', 'ArrowRight'].includes(lastNavKey)) {
         return 'Tab';
       }
