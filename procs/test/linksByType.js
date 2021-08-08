@@ -1,23 +1,28 @@
 // Returns an object classifying the links in a page by layout.
 exports.linksByType = async page => await page.evaluateHandle(() => {
   // FUNCTION DEFINITIONS START
-  // Returns whether all child elements of an element have inline or flex display.
+  // Returns whether an element has fluid display.
+  const hasFluidDisplay = element => {
+    const display = window.getComputedStyle(element).display;
+    return display.startsWith('inline') || display.startsWith('flex');
+  };
+  // Returns whether and element and its children have fluid display.
   const isFluid = element => {
-    const children = Array.from(element.children);
-    return children.every(child => {
-      const childDisplay = window.getComputedStyle(child).display;
-      return childDisplay.startsWith('inline') || childDisplay.startsWith('flex');
-    });
+    if (hasFluidDisplay(element)) {
+      return hasFluidDisplay(Array.from(element.children));
+    }
+    else {
+      return false;
+    }
   };
   // Removes spacing characters from a text.
   const despace = text => text.replace(/\s/g, '');
-  // Returns whether the nearest block has more text than an element and both have real text.
+  // Returns whether the nearest ancestor block has more text than an element.
   const hasAdjacentText = element => {
     // Recursively returns the first ancestor element with non-fluid display.
     const blockOf = node => {
       const parentElement = node.parentElement;
-      const parentDisplay = window.getComputedStyle(parentElement).display;
-      if (parentDisplay.startsWith('inline') || parentDisplay.startsWith('flex')) {
+      if (hasFluidDisplay(parentElement)) {
         return blockOf(parentElement);
       }
       else {
