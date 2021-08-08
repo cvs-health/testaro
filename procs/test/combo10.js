@@ -17,21 +17,21 @@ exports.reduce = result => {
       deficit.total += deficit.wave1;
     }
     // Identify the object containing the scorable results of a custom test.
-    const resultOf = (test, prop) => {
-      let result = result[test] && result[test].result;
-      if (result && prop) {
-        result = result[prop];
+    const scorablesOf = (test, prop) => {
+      let scorables = result[test] && result[test].result;
+      if (scorables && prop) {
+        scorables = scorables[prop];
       }
-      return result;
+      return scorables;
     };
     // linkUlS
-    facts = resultOf('linkUlS', 'inline');
+    facts = scorablesOf('linkUlS', 'inline');
     if (facts) {
       deficit.linkUlS = 3 * (facts.total - facts.underlined) || 0;
       deficit.total += deficit.linkUlS;
     }
     // focOlS
-    facts = resultOf('focOlS', 'totals');
+    facts = scorablesOf('focOlS', 'totals');
     facts = facts ? facts.types : null;
     facts = facts ? facts.outlineMissing : null;
     if (facts) {
@@ -39,32 +39,32 @@ exports.reduce = result => {
       deficit.total += deficit.focOlS;
     }
     // focOpS
-    facts = resultOf('focOpS', 'totals');
+    facts = scorablesOf('focOpS', 'totals');
     if (facts) {
       deficit.focOpS
         = 4 * facts.operableNotFocusable.total + 1 * facts.focusableNotOperable.total || 0;
       deficit.total += deficit.focOpS;
     }
     // labClashS (facts.unlabeled disregarded because covered by axeS)
-    facts = resultOf('labClashS', 'totals');
+    facts = scorablesOf('labClashS', 'totals');
     if (facts) {
       deficit.labClashS = 2 * facts.mislabeled + 0 * facts.unlabeled || 0;
       deficit.total += deficit.labClashS;
     }
     // radioSetS
-    facts = resultOf('radioSetS', 'totals');
+    facts = scorablesOf('radioSetS', 'totals');
     if (facts) {
       deficit.radioSetS = 3 * (facts.total - facts.inSet) || 0;
       deficit.total += deficit.radioSetS;
     }
     // roleS
-    facts = resultOf('roleS', '');
+    facts = scorablesOf('roleS', '');
     if (facts) {
       deficit.roleS = 3 * facts.badRoleElements || 0;
       deficit.total += deficit.roleS;
     }
     // styleDiffS
-    facts = resultOf('styleDiffS', 'totals');
+    facts = scorablesOf('styleDiffS', 'totals');
     if (facts) {
       // Identify an array of objects having tag-name totals and style distributions as values.
       const tagNameCounts = Object.values(facts);
@@ -88,7 +88,7 @@ exports.reduce = result => {
       deficit.total += deficit.styleDiffS;
     }
     // bulk
-    facts = resultOf('bulk', '');
+    facts = scorablesOf('bulk', '');
     if (facts) {
       // Deficit: square root of the excess of the element count over 150.
       deficit.bulk = Math.floor(Math.sqrt(Math.max(0, facts.visibleElements - 150))) || 0;
