@@ -9,7 +9,7 @@ exports.linksByType = async page => await page.evaluateHandle(() => {
   // Returns whether and element and its children have fluid display.
   const isFluid = element => {
     if (hasFluidDisplay(element)) {
-      return hasFluidDisplay(Array.from(element.children));
+      return Array.from(element.children).every(child => hasFluidDisplay(child));
     }
     else {
       return false;
