@@ -74,10 +74,12 @@ exports.styleDiff = async (page, withDetails) => {
             });
           }
         });
-        // Add the totals to the result.
+        // Add the total to the result.
         data.totals[tagName] = {total: elementCount};
         const styleCounts = Object.values(styleTexts);
+        // If the elements in the element class differ in style:
         if (styleCounts.length > 1) {
+          // Add the distribution of its style counts to the result.
           data.totals[tagName].subtotals = styleCounts.sort((a, b) => b - a);
         }
         // If details are required:
