@@ -46,7 +46,9 @@ exports.linksByType = async page => await page.evaluateHandle(() => {
   };
   // FUNCTION DEFINITIONS END
   // Get the links in the page.
-  const links = Array.from(document.body.getElementsByTagName('a'));
+  const links = Array
+  .from(document.body.getElementsByTagName('a'))
+  .filter(element => ! element.hasAttribute('role'));
   // Initialize an object classifying the links.
   const linkTypes = {
     inline: [],
