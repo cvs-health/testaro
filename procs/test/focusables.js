@@ -63,17 +63,17 @@ exports.focusables = async (page, operation) => {
       }
       // ArrowDown or ArrowRight if the focus is on another menu item.
       else if (focus.getAttribute('role') === 'menuitem') {
-        // Returns the role of the menu that a menu item is an item of.
+        // Returns the explicit role, if any, of the menu that a menu item is an item of.
         const owningMenuRole = menuItem => {
           const parent = menuItem.parentElement;
           const parentRole = parent.getAttribute('role');
-          if (parentRole.startsWith('menu')){
+          if (parentRole && ['menu', 'menubar'].includes(parentRole)) {
             return parentRole;
           }
           else {
             const grandparent = parent.parentElement;
             const grandparentRole = grandparent.getAttribute('role');
-            if (grandparentRole.startsWith('menu')) {
+            if (grandparentRole && ['menu', 'menubar'].includes(grandparentRole)) {
               return grandparentRole;
             }
             else {
