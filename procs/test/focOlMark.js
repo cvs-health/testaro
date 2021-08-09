@@ -1,5 +1,16 @@
 // Marks the focused in-body element’s outline status and returns it and a focus status.
 exports.focOlMark = async page => {
+  // Wait 0.1 second for an outline to appear on the focused element.
+  try {
+    await page.waitForFunction(
+      () => window.getComputedStyle(document.activeElement).outlineWidth !== '0px',
+      null,
+      {timeout: 100}
+    );
+  }
+  catch (error) {
+    1;
+  }
   // Identify a JSHandle of the focused element, if any, and a status.
   const jsHandle = await page.evaluateHandle(() => {
     // Initialize the focused element.
@@ -12,7 +23,7 @@ exports.focOlMark = async page => {
       }
       // Initialize the status.
       let status = 'already';
-      // If it was not previously focused:
+      // If the element was not previously focused:
       if (! focus.dataset.autotestFocused) {
         // Determine whether it is outlined.
         const outlineWidth = window.getComputedStyle(focus).outlineWidth;

@@ -239,7 +239,7 @@ const launch = async typeName => {
       await browser.close();
     }
     // Launch it.
-    browser = await browserType.launch(debug ? {headless: false, slowMo: 3000} : {});
+    browser = await browserType.launch(debug ? {headless: false, slowMo: 1000} : {});
     // Create a new context (window) in it.
     browserContext = await browser.newContext();
     // When a page is added to the browser context:

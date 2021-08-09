@@ -66,7 +66,7 @@ exports.focOl = async (page, withItems, revealAll) => {
       });
     });
   }
-  // Mark the focusable elements.
+  // Mark the focusable elements as outlined or not outlined.
   await require('./focusables').focusables(page, 'focOlMark');
   // Get an array of the focusable elements that are not outlined.
   const focOutN = await page.$$('body [data-autotest-focused="N"]');
