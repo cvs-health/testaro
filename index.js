@@ -1098,12 +1098,14 @@ const requestHandler = (request, response) => {
             if (cmdJSON) {
               // Get the command data.
               const cmds = JSON.parse(cmdJSON);
-              const {what, acts} = cmds;
+              const {what, browser, acts} = cmds;
               // If the command list is valid:
               if (
                 what
+                && browser
                 && acts
                 && typeof what === 'string'
+                && ['chromium', 'firefox', 'webkit'].includes(browser)
                 && Array.isArray(acts)
                 && acts.length
                 && acts.every(act => isValid(act) && ! ['launch', 'url'].includes(act.type))
@@ -1112,7 +1114,7 @@ const requestHandler = (request, response) => {
                 acts.unshift(
                   {
                     type: 'launch',
-                    which: 'chromium'
+                    which: browser
                   },
                   {
                     type: 'url',
