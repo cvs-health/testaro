@@ -54,8 +54,11 @@ exports.focusables = async (page, operation) => {
       if (focus.tagName === 'INPUT' && focus.type === 'radio') {
         return 'ArrowDown';
       }
-      // ArrowDown if the focus is on a menu button.
-      else if (['menu', 'true'].includes(focus.ariaHasPopup)) {
+      // ArrowDown if the focus is on a content-expanding button.
+      else if (
+        ['menu', 'true'].includes(focus.ariaHasPopup)
+        || (focus.hasAttribute('aria-controls') && focus.ariaExpanded === 'false')
+      ) {
         return 'ArrowDown';
       }
       // ArrowDown or ArrowRight if the focus is on another menu item.
