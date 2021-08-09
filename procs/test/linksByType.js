@@ -15,6 +15,28 @@ exports.linksByType = async page => await page.evaluateHandle(() => {
       return false;
     }
   };
+  // Returns whether all siblings of an element have fluid display.
+  const hasFluidSiblings = element => {
+    const preSib = element.previousElementSibling;
+    if (preSib) {
+      const postSib = element.nextElementSibling;
+      if (postSib) {
+        return isFluid(preSib) && isFluid(postSib);
+      }
+      else {
+        return isFluid(preSib);
+      }
+    }
+    else {
+      const postSib = element.nextElementSibling;
+      if (postSib) {
+        return isFluid(postSib);
+      }
+      else {
+        return true;
+      }
+    }
+  };
   // Removes spacing characters from a text.
   const despace = text => text.replace(/\s/g, '');
   // Returns whether an element has text that is less than its nearest nonfluid ancestor’s.
@@ -56,7 +78,7 @@ exports.linksByType = async page => await page.evaluateHandle(() => {
   };
   // Populate it.
   links.forEach(link => {
-    if (isFluid(link) && hasAdjacentText(link)) {
+    if (isFluid(link) && hasFluidSiblings(link) && hasAdjacentText(link)) {
       linkTypes.inline.push(link);
     }
     else {
