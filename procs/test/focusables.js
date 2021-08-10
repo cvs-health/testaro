@@ -43,6 +43,10 @@ exports.focusables = async (page, operation) => {
       else if (['ArrowDown', 'ArrowRight'].includes(lastNavKey)) {
         return 'Tab';
       }
+      // Tab if the focus is in an iframe.
+      else if (focus.tagName === 'IFRAME') {
+        return 'Tab';
+      }
       // Null otherwise, to stop the navigation.
       else {
         return null;

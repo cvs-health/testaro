@@ -342,7 +342,7 @@ const render = (path, stage, which, query, response) => {
     else if (stage === 'start') {
       // Serve it.
       startPage(
-        `Report timestamp: ${query.timeStamp}\n\nProcessing URL 0\n`,
+        `Report timestamp: ${query.timeStamp}\n\nProcessed URL 0\n`,
         `/${path}-out.txt`,
         'text/plain',
         response
@@ -352,13 +352,13 @@ const render = (path, stage, which, query, response) => {
     // Otherwise, if a plain-text page is ready to continue:
     else if (stage === 'more') {
       // Serve it.
-      morePage(`Processing URL ${query.urlIndex}\n`, response);
+      morePage(`Processed URL ${query.urlIndex}\n`, response);
       return '';
     }
     // Otherwise, if a plain-text page is ready to end:
     else if (stage === 'end') {
       // Serve it.
-      endPage(`Processing URL ${query.urlIndex}\n`, response);
+      endPage(`Processed URL ${query.urlIndex}\n`, response);
       return '';
     }
     else {

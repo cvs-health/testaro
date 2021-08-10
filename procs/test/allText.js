@@ -48,13 +48,18 @@ exports.allText = async (page, elementHandle) => await page.evaluate(element => 
   if (altTexts.length) {
     texts.push(altTexts);
   }
-  // Add any text content of the element to the array.
+  // Add the first 100 characters of any text content of the element to the array.
   const ownText = element.textContent;
   if (ownText) {
     const minText = debloat(ownText);
     if (minText) {
-      texts.push(minText);
+      texts.push(minText.slice(0, 100));
     }
+  }
+  // Add any ID of the element to the array.
+  const id = element.id;
+  if (id) {
+    texts.push(`#${id}`);
   }
   // Identify a concatenation of the texts.
   let textChain = texts.join('; ');
