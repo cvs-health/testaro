@@ -22,10 +22,11 @@ exports.focusables = async (page, operation) => {
     const lastNavKey = args[0];
     const focus = args[1];
     const status = args[2];
+    const role = focus.getAttribute('role');
     // If the focal element had been focused before, return:
     if (status === 'already') {
       // If the focus is on a menu item:
-      if (focus.getAttribute('role') === 'menuitem') {
+      if (role === 'menuitem') {
         // Escape if the last key navigated vertically.
         if (lastNavKey === 'ArrowDown') {
           return 'Escape';
@@ -39,7 +40,7 @@ exports.focusables = async (page, operation) => {
           return 'Tab';
         }
       }
-      // Tab if the last key navigated within a non-menu widget.
+      // Tab if the last key navigated within another widget, including a tab list.
       else if (['ArrowDown', 'ArrowRight'].includes(lastNavKey)) {
         return 'Tab';
       }
@@ -66,7 +67,7 @@ exports.focusables = async (page, operation) => {
         return 'ArrowDown';
       }
       // ArrowDown or ArrowRight if the focus is on another menu item.
-      else if (focus.getAttribute('role') === 'menuitem') {
+      else if (role === 'menuitem') {
         // Returns the explicit role, if any, of the menu that a menu item is an item of.
         const owningMenuRole = menuItem => {
           const parent = menuItem.parentElement;
@@ -95,6 +96,29 @@ exports.focusables = async (page, operation) => {
         else {
           return 'Tab';
         }
+      }
+      // ArrowDown or ArrowRight if the focus is on a tab.
+      else if (role === 'tab') {
+        // Returns the orientation of the tab list that a tab is in.
+        const tabListOrientationOf = tab => {
+          const parent = tab.parentElement;
+          const parentRole = parent.getAttribute('role');
+          if (parentRole === 'tablist') {
+            return parent.ariaOrientation;
+          }
+          else {
+            const grandparent = parent.parentElement;
+            const grandparentRole = grandparent.getAttribute('role');
+            if (grandparentRole === 'tablist') {
+              return grandparent.ariaOrientation;
+            }
+            else {
+              return '';
+            }
+          }
+        };
+        const tabListOrientation = tabListOrientationOf(focus);
+        return tabListOrientation === 'vertical' ? 'ArrowDown' : 'ArrowRight';
       }
       // Tab otherwise.
       else {

@@ -558,7 +558,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
           try {
             const resolved = which.replace('__dirname', __dirname);
             await page.goto(resolved, {
-              timeout: 7000,
+              timeout: 10000,
               waitUntil: 'load'
             });
             // Press the Esc key to dismiss any initial modal dialog.
@@ -566,9 +566,9 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
             // Add the resulting URL to the act.
             act.result = page.url();
           }
-          catch {
+          catch (error) {
             await page.goto('about:blank');
-            act.result = 'ERROR';
+            act.result = `ERROR: ${error.message}`;
           }
         }
         // Otherwise, if the act is a wait:
