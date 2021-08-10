@@ -65,8 +65,8 @@ exports.allText = async (page, elementHandle) => await page.evaluate(element => 
   let textChain = texts.join('; ');
   // If it is empty:
   if (! textChain) {
-    // Substitute the text content of its parent element, if any.
-    textChain = `{${debloat(element.parentElement.textContent)}}`;
+    // Substitute the HTML of the element.
+    textChain = `{${debloat(element.outerHTML)}}`;
     if (textChain === '{}') {
       textChain = '';
     }
