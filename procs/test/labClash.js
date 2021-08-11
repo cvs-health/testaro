@@ -94,6 +94,7 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
       if (withItems) {
         data.items.wellLabeled.push({
           index,
+          tagName: labelee.tagName,
           type: labelee.type,
           labelType: labelTypes[0],
           texts
@@ -128,6 +129,7 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
       if (withItems) {
         data.items.mislabeled.push({
           index,
+          tagName: labelee.tagName,
           type: labelee.type,
           labelTypes,
           texts
