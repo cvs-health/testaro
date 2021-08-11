@@ -110,8 +110,11 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
           index,
           type: labelee.type
         };
-        if (labelee.tagName === 'BUTTON') {
-          item.content = texts.content || 'NONE';
+        if (
+          labelee.tagName === 'BUTTON'
+          || (labelee.tagName === 'INPUT' && labelee.type === 'submit')
+        ) {
+          item.content = texts.content || `{${debloat(labelee.outerHTML)}}`;
         }
         data.items.unlabeled.push(item);
       }
