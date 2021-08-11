@@ -108,6 +108,7 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
       if (withItems) {
         const item = {
           index,
+          tagName: labelee.tagName,
           type: labelee.type
         };
         if (
