@@ -27,12 +27,14 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
     // Determine whether it has any or clashing labels and, if required, the label texts.
     let labelTypes = [];
     let texts = {};
+    // Attribute label.
     if (labelee.hasAttribute('aria-label')) {
       labelTypes.push('aria-label');
       if (withItems) {
         texts.attribute = labelee.getAttribute('aria-label');
       }
     }
+    // Reference label.
     if (labelee.hasAttribute('aria-labelledby')) {
       labelTypes.push('aria-labelledby');
       if (withItems) {
@@ -48,6 +50,7 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
         }
       }
     }
+    // Explicit and implicit labels.
     const labels = Array.from(labelee.labels);
     if (labels.length) {
       labelTypes.push('label');
@@ -58,10 +61,21 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
         }
       }
     }
-    if (withItems && labelee.tagName === 'BUTTON') {
-      const content = debloat(labelee.textContent);
-      if (content) {
-        texts.content = content;
+    // Content label if details required.
+    if (withItems) {
+      // Of button.
+      if (labelee.tagName === 'BUTTON') {
+        const content = debloat(labelee.textContent);
+        if (content) {
+          texts.content = content;
+        }
+      }
+      // Of submit input.
+      else if (labelee.tagName === 'INPUT' && labelee.type === 'submit' && labelee.value) {
+        const content = debloat(labelee.value);
+        if (content) {
+          texts.content = content;
+        }
       }
     }
     const {totals} = data;
@@ -69,7 +83,10 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
     // If it is well labeled:
     if (
       labelTypeCount === 1
-      || ! labelTypeCount && labelee.tagName === 'BUTTON' && debloat(labelee.textContent).length
+      || ! labelTypeCount && (
+        labelee.tagName === 'BUTTON' && debloat(labelee.textContent).length
+        || labelee.tagName === 'INPUT' && labelee.type === 'submit' && labelee.value
+      )
     ) {
       // Increment the count of well-labeled items in the report.
       totals.wellLabeled++;
