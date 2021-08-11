@@ -1,8 +1,13 @@
 // Returns counts, fractions, and texts of inline links, by whether underlined.
 exports.role = async page => await page.$eval('body', body => {
   // CONSTANTS
-  // The math role has been removed, because of poor adoption and exclusion from HTML5.
-  // Deprecated roles (from https://www.w3.org/TR/html-aria/).
+  /*
+    The math role has been removed, because of poor adoption and exclusion from HTML5.
+    The img role has accessibility uses
+    (https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/Role_Img),
+    so is not classified as deprecated.
+    Deprecated roles (from https://www.w3.org/TR/html-aria/).
+  */
   const badRoles = new Set([
     'article',
     'button',
@@ -20,7 +25,6 @@ exports.role = async page => await page.$eval('body', body => {
     'gridcell',
     'group',
     'heading',
-    'img',
     'link',
     'list',
     'listbox',
