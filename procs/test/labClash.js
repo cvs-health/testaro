@@ -6,16 +6,16 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
   // Initialize a report.
   const data = {
     totals: {
-      wellLabeled: 0,
+      mislabeled: 0,
       unlabeled: 0,
-      mislabeled: 0
+      wellLabeled: 0
     }
   };
   if (withItems) {
     data.items = {
-      wellLabeled: [],
+      mislabeled: [],
       unlabeled: [],
-      mislabeled: []
+      wellLabeled: []
     };
   }
   // Get data on the labelable form controls.
