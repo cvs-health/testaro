@@ -69,11 +69,11 @@ exports.reduce = result => {
       // Identify an array of objects having tag-name totals and style distributions as values.
       const tagNameCounts = Object.values(facts);
       /*
-        Deficit: sum of the tag-name deficits, where a tag-name deficit is the sum of its
-        style deficits, where a style deficit is 1 less than the square root of the quotient
-        of the count of the elements with the tag name and the count of those elements with
-        the style. Example: 3 h1 elements are partitioned by style into 1 and 2. Style deficits
-        are sqrt(3) - 1 and sqrt(1.5) - 1. Deficit for h1 is the sum of those.
+        Deficit: sum of element deficits, where an element deficit is the quotient of the
+        count of the elements with the tag name and the count of those elements with
+        the style of the element. Example: 3 h1 elements are partitioned by style into 1 and 2.
+        Element deficits are sqrt(3) - 1 and 2 * (sqrt(1.5) - 1). Deficit for h1 is the sum of
+        those.
       */
       deficit.styleDiffS = Math.floor(tagNameCounts.reduce((testDeficit, currentItem) => {
         if (currentItem.subtotals) {
