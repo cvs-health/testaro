@@ -555,8 +555,8 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
         // If the command is a url:
         if (type === 'url') {
           // Visit it and wait until it is stable.
+          const resolved = which.replace('__dirname', __dirname);
           try {
-            const resolved = which.replace('__dirname', __dirname);
             await page.goto(resolved, {
               timeout: 10000,
               waitUntil: 'load'
@@ -568,7 +568,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
           }
           catch (error) {
             await page.goto('about:blank');
-            act.result = `ERROR: ${error.message}`;
+            act.result = `ERROR visiting ${resolved}: ${error.message}`;
           }
         }
         // Otherwise, if the act is a wait:
@@ -693,14 +693,14 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
             // If it includes at least 1 test and a reducer is specified:
             if (which.length > 1 && which[0].length) {
               // Perform the reduction and add its result to the act.
+              const reducer = require(`./procs/test/${which[0]}`);
               try {
-                const reducer = require(`./procs/test/${which[0]}`);
                 if (reducer) {
                   act.result.deficit = reducer.reduce(act.result);
                 }
               }
               catch (error) {
-                act.result = `ERROR: ${error.message}`;
+                act.result = `ERROR performing ${which[0]} proc: ${error.message}`;
               }
             }
           }

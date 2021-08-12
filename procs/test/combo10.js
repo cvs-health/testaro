@@ -68,23 +68,17 @@ exports.reduce = result => {
     if (facts) {
       // Identify an array of objects having tag-name totals and style distributions as values.
       const tagNameCounts = Object.values(facts);
-      /*
-        Deficit: sum of element deficits, where an element deficit is the quotient of the
-        count of the elements with the tag name and the count of those elements with
-        the style of the element. Example: 3 h1 elements are partitioned by style into 1 and 2.
-        Element deficits are sqrt(3) - 1 and 2 * (sqrt(1.5) - 1). Deficit for h1 is the sum of
-        those.
-      */
-      deficit.styleDiffS = Math.floor(tagNameCounts.reduce((testDeficit, currentItem) => {
-        if (currentItem.subtotals) {
-          return testDeficit + currentItem.subtotals.reduce((itemDeficit, currentSub) => {
-            return itemDeficit + currentSub * (Math.sqrt(currentItem.total / currentSub) - 1);
-          }, 0);
+      // Identify an array of pairs of counts of (1) excess styles and (2) nonplurality elements.
+      const deficits = tagNameCounts.map(
+        item => {
+          const subtotals = item.subtotals ? item.subtotals : [item.total];
+          return [subtotals.length - 1, item.total - subtotals[0]];
         }
-        else {
-          return testDeficit;
-        }
-      }, 0));
+      );
+      // Deficit: 2 per excess style + 0.2 per nonplurality element.
+      deficit.styleDiffS = Math.floor(deficits.reduce(
+        (total, currentPair) => total + 2 * currentPair[0] + 0.2 * currentPair[1], 0
+      ));
       deficit.total += deficit.styleDiffS;
     }
     // bulk
