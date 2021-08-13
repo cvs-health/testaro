@@ -168,15 +168,12 @@ const axe = async (page, rules) => {
 };
 // Conducts all axe tests and returns a summary.
 const axeS = async page => {
-  // Count the elements in the page.
-  const elementCount = await page.$$eval('*', elements => elements.length);
   // Inject axe-core into the page.
   await injectAxe(page);
   // Get the data on the elements violating axe-core rules.
   const axeReport = await getViolations(page);
   // Initialize a summary.
   const report = {
-    elementCount,
     warnings: 0,
     violations: {
       minor: 0,
