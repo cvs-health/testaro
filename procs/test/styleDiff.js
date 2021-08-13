@@ -8,19 +8,25 @@ exports.styleDiff = async (page, withDetails) => {
     if (withDetails) {
       data.details = {};
     }
-    // Identify the settable styles to be compared.
+    // Identify the settable style properties to be compared.
     const mainStyles = [
-      'border',
+      'borderStyle',
+      'borderWidth',
       'color',
-      'font',
+      'fontStyle',
+      'fontWeight',
       'lineHeight',
       'maxHeight',
       'maxWidth',
       'minHeight',
       'minWidth',
       'opacity',
-      'outline',
-      'textDecoration'
+      'outlineOffset',
+      'outlineStyle',
+      'outlineWidth',
+      'textDecorationLine',
+      'textDecorationStyle',
+      'textDecorationThickness'
     ];
     // Identify the nonlink tag names to be analyzed.
     const tagNames = ['button', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
