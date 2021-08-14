@@ -52,7 +52,6 @@ exports.linkUl = async (page, withItems) => {
         nulInLinkTexts
       };
     }
-    console.log(`linkUl data: ${JSON.stringify(data, null, 2)}`);
     return data;
   }, [withItems, linkTypes]);
 };
