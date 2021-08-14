@@ -25,7 +25,8 @@ exports.reduce = result => {
       return scorables;
     };
     // linkUlS
-    facts = scorablesOf('linkUlS', 'inline');
+    facts = scorablesOf('linkUlS', 'totals');
+    facts = facts ? facts.inline : null;
     if (facts) {
       deficit.linkUlS = 3 * (facts.total - facts.underlined) || 0;
       deficit.total += deficit.linkUlS;

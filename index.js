@@ -103,18 +103,30 @@ const redirect = (url, response) => {
   response.end();
 };
 // Conducts an axe test.
-const axe = async (page, rules = []) => {
+const axe = async (page, withItems, rules = []) => {
   // Inject axe-core into the page.
   await injectAxe(page);
+  // Initialize the report.
+  const report = {
+    warnings: 0,
+    violations: {
+      minor: 0,
+      moderate: 0,
+      serious: 0,
+      critical: 0
+    }
+  };
+  if (withItems) {
+    report.items = [];
+  }
   // Get the data on the elements violating the specified axe-core rules.
   const axeOptions = {};
   if (rules.length) {
     axeOptions.runOnly = rules;
   }
   const axeReport = await getViolations(page, null, {axeOptions});
-  // If there are any:
+  // If there are any such elements:
   if (axeReport.length) {
-    const report = [];
     // FUNCTION DEFINITIONS START
     // Compacts a check violation.
     const compactCheck = checkObj => {
@@ -139,23 +151,31 @@ const axe = async (page, rules = []) => {
       return out;
     };
     // Compacts a violated rule.
-    const compactRule = (ruleObj) => {
+    const compactRule = rule => {
       const out = {
-        rule: ruleObj.id,
-        description: ruleObj.description,
-        impact: ruleObj.impact,
+        rule: rule.id,
+        description: rule.description,
+        impact: rule.impact,
         elements: {}
       };
-      if (ruleObj.nodes && ruleObj.nodes.length) {
-        out.elements = ruleObj.nodes.map(el => compactViolator(el));
+      if (rule.nodes && rule.nodes.length) {
+        out.elements = rule.nodes.map(el => compactViolator(el));
       }
       return out;
     };
     // FUNCTION DEFINITIONS END
     // For each rule violated:
     axeReport.forEach(rule => {
-      // Add it to the report.
-      report.push(compactRule(rule));
+      // For each element violating the rule:
+      rule.nodes.forEach(element => {
+        // Increment the element count of the impact of its violation.
+        report.violations[element.impact]++;
+      });
+      // If details are required:
+      if (withItems) {
+        // Add it to the report.
+        report.items.push(compactRule(rule));
+      }
     });
     // Return the report.
     return report;
@@ -165,33 +185,6 @@ const axe = async (page, rules = []) => {
     // Return a success report.
     return 'O.K.';
   }
-};
-// Conducts all axe tests and returns a summary.
-const axeS = async page => {
-  // Inject axe-core into the page.
-  await injectAxe(page);
-  // Get the data on the elements violating axe-core rules.
-  const axeReport = await getViolations(page);
-  // Initialize a summary.
-  const report = {
-    warnings: 0,
-    violations: {
-      minor: 0,
-      moderate: 0,
-      serious: 0,
-      critical: 0
-    }
-  };
-  // For each rule violated:
-  axeReport.forEach(rule => {
-    // For each element violating the rule:
-    rule.nodes.forEach(element => {
-      // Increment the element count of the impact of its violation.
-      report.violations[element.impact]++;
-    });
-  });
-  // Return the report.
-  return report;
 };
 // Conducts a WAVE test and returns a Promise of a result.
 const wave1 = url => {
@@ -655,7 +648,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
           // Otherwise, if the act is an axe summary:
           else if (type === 'axeS') {
             // Conduct it and add its result to the act.
-            act.result = await axeS(page);
+            act.result = await axe(page, false, []);
           }
           // Otherwise, if the act is a combination of tests:
           else if (type === 'combo') {
@@ -667,10 +660,10 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
               if (testNames.length) {
                 const firstTest = testNames[0];
                 if (firstTest === 'axe') {
-                  act.result.axe = await axe(page, []);
+                  act.result.axe = await axe(page, true, []);
                 }
                 else if (firstTest === 'axeS') {
-                  act.result.axeS = await axeS(page);
+                  act.result.axeS = await axe(page, false, []);
                 }
                 else if (firstTest === 'wave1') {
                   act.result.wave1 = await wave1(page.url());

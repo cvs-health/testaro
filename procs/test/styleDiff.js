@@ -1,14 +1,14 @@
 // Tabulates and lists style inconsistencies.
-exports.styleDiff = async (page, withDetails) => {
+exports.styleDiff = async (page, withItems) => {
   // Get an object with arrays of block and inline links as properties.
   const linkTypes = await require('./linksByType').linksByType(page);
   return await page.$eval('body', (body, args) => {
-    const withDetails = args[0];
+    const withItems = args[0];
     const linkTypes = args[1];
     // Initialize the data to be returned.
     const data = {totals: {}};
-    if (withDetails) {
-      data.details = {};
+    if (withItems) {
+      data.items = {};
     }
     // Identify the settable style properties to be compared for all tag names.
     const mainStyles = [
@@ -65,9 +65,9 @@ exports.styleDiff = async (page, withDetails) => {
         if (elementCount) {
           const styleProps = {};
           const styleTexts = {};
-          if (withDetails) {
-            if (! data.details[tagName]) {
-              data.details[tagName] = {};
+          if (withItems) {
+            if (! data.items[tagName]) {
+              data.items[tagName] = {};
             }
           }
           // For each of them:
@@ -88,7 +88,7 @@ exports.styleDiff = async (page, withDetails) => {
             // Increment the total of elements with that style declaration.
             styleTexts[styleText] = ++styleTexts[styleText] || 1;
             // If details are required:
-            if (withDetails) {
+            if (withItems) {
               // For each style property:
               styles.forEach(styleName => {
                 const styleValue = style[styleName];
@@ -111,7 +111,7 @@ exports.styleDiff = async (page, withDetails) => {
             data.totals[tagName].subtotals = styleCounts.sort((a, b) => b - a);
           }
           // If details are required:
-          if (withDetails) {
+          if (withItems) {
             // For each style property:
             Object.keys(styleProps).forEach(styleProp => {
               // Ignore it if all the elements have the same value.
@@ -120,13 +120,13 @@ exports.styleDiff = async (page, withDetails) => {
               }
               // Otherwise:
               else {
-                if (! data.details[tagName][styleProp]) {
-                  data.details[tagName][styleProp] = {};
+                if (! data.items[tagName][styleProp]) {
+                  data.items[tagName][styleProp] = {};
                 }
                 // Sort the values in order of decreasing count.
                 const sortedEntries = Object.entries(styleProps[styleProp]).sort((a, b) => b[1] - a[1]);
                 sortedEntries.forEach(entry => {
-                  const propData = data.details[tagName][styleProp];
+                  const propData = data.items[tagName][styleProp];
                   propData[entry[0]] = (propData[entry[0]] || 0) + entry[1];
                 });
               }
@@ -136,5 +136,5 @@ exports.styleDiff = async (page, withDetails) => {
       });
     });
     return data;
-  }, [withDetails, linkTypes]);
+  }, [withItems, linkTypes]);
 };

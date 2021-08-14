@@ -35,16 +35,22 @@ exports.linkUl = async (page, withItems) => {
       }
     });
     // Get the percentage of underlined links among all inline links.
-    const ulPercent = inLinkCount ? Math.floor(100 * underlined / inLinkCount) : 'N/A';
+    const underlinedPercent = inLinkCount ? Math.floor(100 * underlined / inLinkCount) : 'N/A';
     const data = {
-      linkCount: inLinks.length + linkTypes.block.length,
-      inLinkCount,
-      underlined,
-      ulPercent
+      totals: {
+        links: inLinks.length + linkTypes.block.length,
+        inline: {
+          total: inLinkCount,
+          underlined,
+          underlinedPercent
+        }
+      }
     };
     if (withItems) {
-      data.ulInLinkTexts = ulInLinkTexts;
-      data.nulInLinkTexts = nulInLinkTexts;
+      data.items = {
+        ulInLinkTexts,
+        nulInLinkTexts
+      };
     }
     return data;
   }, [withItems, linkTypes]);
