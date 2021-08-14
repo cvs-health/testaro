@@ -4,11 +4,11 @@ exports.reduce = result => {
   let deficit = {total: 0};
   let facts;
   if (typeof result === 'object') {
-    // axeS
-    facts = result.axeS && result.axeS.violations;
+    // axe
+    facts = result.axe && result.axe.violations;
     if (facts) {
-      deficit.axeS = 2 * facts.minor + 3 * facts.moderate + 4 * facts.serious + 5 * facts.critical;
-      deficit.total += deficit.axeS;
+      deficit.axe = 2 * facts.minor + 3 * facts.moderate + 4 * facts.serious + 5 * facts.critical;
+      deficit.total += deficit.axe;
     }
     // wave1
     facts = result.wave1 && result.wave1.categories;

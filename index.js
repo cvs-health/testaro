@@ -103,7 +103,7 @@ const redirect = (url, response) => {
   response.end();
 };
 // Conducts an axe test.
-const axe = async (page, rules) => {
+const axe = async (page, rules = []) => {
   // Inject axe-core into the page.
   await injectAxe(page);
   // Get the data on the elements violating the specified axe-core rules.
@@ -667,7 +667,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
               if (testNames.length) {
                 const firstTest = testNames[0];
                 if (firstTest === 'axe') {
-                  act.result.axe = await axe(page);
+                  act.result.axe = await axe(page, []);
                 }
                 else if (firstTest === 'axeS') {
                   act.result.axeS = await axeS(page);
