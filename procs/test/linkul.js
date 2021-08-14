@@ -48,8 +48,8 @@ exports.linkUl = async (page, withItems) => {
     };
     if (withItems) {
       data.items = {
-        ulInLinkTexts,
-        nulInLinkTexts
+        underlined: ulInLinkTexts,
+        notUnderlined: nulInLinkTexts
       };
     }
     return data;
