@@ -666,7 +666,10 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
             const doCombo = async testNames => {
               if (testNames.length) {
                 const firstTest = testNames[0];
-                if (firstTest === 'axeS') {
+                if (firstTest === 'axe') {
+                  act.result.axe = await axe(page);
+                }
+                else if (firstTest === 'axeS') {
                   act.result.axeS = await axeS(page);
                 }
                 else if (firstTest === 'wave1') {
