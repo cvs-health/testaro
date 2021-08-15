@@ -18,7 +18,8 @@ const data = JSON.parse(dataJSON);
 const tableStartLines = [
   '<table>',
   '  <thead>',
-  '    <tr><th>Page</th><th>Deficit</th><th>URL</th></tr>',
+  '    <tr><th rowspan="2">Page</th><th colspan="2">Deficit as a</th></tr>',
+  '    <tr><th>Number</th><th>Bar</th>',
   '  </thead>',
   '  <tbody>'
 ];
@@ -26,16 +27,16 @@ const tableEndLines = [
   '  </tbody>',
   '</table>'
 ];
-const maxDeficit = data.reduce((max, currentItem) => Math.max(max, currentItem.deficit));
+const maxDeficit = data.reduce((max, currentItem) => Math.max(max, currentItem.deficit), 0);
 const tableMidLines = data.map(item => {
-  const orgCell = `<td class="right">${item.org}</td>`;
+  const pageCell = `<td class="right">${item.org}<br>${item.url}</td>`;
   const deficitCell = `<td class="right">${item.deficit}</td>`;
-  const barWidth = 100 * item.deficit / maxDeficit;
-  const bar = `<rect height="100%" width="${barWidth}% fill="red"></rect>`;
+  const barWidth = maxDeficit ? 100 * item.deficit / maxDeficit : 0;
+  const bar = `<rect height="100%" width="${barWidth}%" fill="red"></rect>`;
   const barCell = `<td><svg width="100%" height="100%">${bar}</svg></td>`;
-  const row = `    <tr>${orgCell}${deficitCell}${barCell}</tr>`;
+  const row = `    <tr>${pageCell}${deficitCell}${barCell}</tr>`;
   return row;
 });
 const tableLines = tableStartLines.concat(tableMidLines, tableEndLines);
-const table = tableLines.join('\n ');
+const table = tableLines.join('\n');
 fs.writeFileSync(`${reportDir}/${reportSubdir}/${fileID}.html`, `${table}\n`);
