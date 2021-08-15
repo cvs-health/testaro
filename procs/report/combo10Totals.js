@@ -31,11 +31,20 @@ fromFileNames.forEach(fn => {
   };
   result.push(summary);
 });
+// Identifies the applicable sorter.
+const sorter = item => {
+  if (sortBy === 'deficit' && withSubtotals) {
+    return item.deficit.total;
+  }
+  else {
+    return item[sortBy];
+  }
+};
 result.sort((a, b) => {
-  if (a[sortBy] < b[sortBy]) {
+  if (sorter(a) < sorter(b)) {
     return -1;
   }
-  else if (a[sortBy] > b[sortBy]) {
+  else if (sorter(a) > sorter(b)) {
     return 1;
   }
   else {
