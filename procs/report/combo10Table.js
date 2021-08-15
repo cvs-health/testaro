@@ -21,7 +21,7 @@ const tableStartLines = [
   '    <tr><th rowspan="2">Page</th><th colspan="2">Deficit as a</th></tr>',
   '    <tr><th>Number</th><th>Bar</th>',
   '  </thead>',
-  '  <tbody>'
+  '  <tbody class="firstCellRight">'
 ];
 const tableEndLines = [
   '  </tbody>',
@@ -29,12 +29,12 @@ const tableEndLines = [
 ];
 const maxDeficit = data.reduce((max, currentItem) => Math.max(max, currentItem.deficit), 0);
 const tableMidLines = data.map(item => {
-  const pageCell = `<td class="right">${item.org}<br>${item.url}</td>`;
-  const deficitCell = `<td class="right">${item.deficit}</td>`;
+  const pageCell = `<th><a href="${item.url}">${item.org}</a></th>`;
+  const numCell = `<td>${item.deficit}</td>`;
   const barWidth = maxDeficit ? 100 * item.deficit / maxDeficit : 0;
   const bar = `<rect height="100%" width="${barWidth}%" fill="red"></rect>`;
-  const barCell = `<td><svg width="100%" height="100%">${bar}</svg></td>`;
-  const row = `    <tr>${pageCell}${deficitCell}${barCell}</tr>`;
+  const barCell = `<td><svg width="100%" height="1rem">${bar}</svg></td>`;
+  const row = `    <tr>${pageCell}${numCell}${barCell}</tr>`;
   return row;
 });
 const tableLines = tableStartLines.concat(tableMidLines, tableEndLines);
