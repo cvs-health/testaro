@@ -4,7 +4,7 @@
 */
 // ########## IMPORTS
 // Module to access files.
-const fs = require('fs').promises;
+const fs = require('fs');
 // Module to keep secrets local.
 require('dotenv').config();
 // ########## OPERATION
