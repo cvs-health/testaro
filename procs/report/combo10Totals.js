@@ -13,7 +13,8 @@ const fromDir = process.env.BATCHREPORTDIR;
 const fromSubdir = process.argv[2];
 const toSubdir = process.argv[3];
 const fileID = process.argv[4];
-const sortBy = process.argv[5] || 'deficit';
+const withSubtotals = process.argv[5] === 'true';
+const sortBy = process.argv[6] || 'deficit';
 // Initialize the result.
 const result = [];
 // Populate it.
@@ -21,10 +22,12 @@ const fromFileNames = fs.readdirSync(`${fromDir}/${fromSubdir}`);
 fromFileNames.forEach(fn => {
   const reportJSON = fs.readFileSync(`${fromDir}/${fromSubdir}/${fn}`, 'utf8');
   const report = JSON.parse(reportJSON);
+  const deficits = report.acts[2].result.deficit;
   const summary = {
+    fileName: fn,
     org: report.acts[1].what,
     url: report.acts[1].result,
-    deficit: report.acts[2].result.deficit.total
+    deficit: withSubtotals ? deficits : deficits.total
   };
   result.push(summary);
 });
