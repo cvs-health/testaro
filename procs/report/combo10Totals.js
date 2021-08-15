@@ -39,6 +39,6 @@ result.sort((a, b) => {
     return 0;
   }
 });
-fs.writeFile(
+fs.writeFileSync(
   `${fromDir}/${toSubdir}/totals-${fileID}.json`, `${JSON.stringify(result, null, 2)}\n`
 );
