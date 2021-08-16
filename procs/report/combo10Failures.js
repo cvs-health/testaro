@@ -37,5 +37,5 @@ data.forEach(page => {
   });
 });
 fs.writeFileSync(
-  `${fromDir}/${subdir}/failures-${fileID}.json`, `${JSON.stringify(result, null, 2)}\n`
+  `${fromDir}/${subdir}/failures.json`, `${JSON.stringify(result, null, 2)}\n`
 );
