@@ -13,7 +13,7 @@ const reportDir = process.env.BATCHREPORTDIR;
 const reportSubdir = process.argv[2];
 const fileID = process.argv[3];
 // Populate it.
-const dataJSON = fs.readFileSync(`${reportDir}/${reportSubdir}/${fileID}.json`, 'utf8');
+const dataJSON = fs.readFileSync(`${reportDir}/${reportSubdir}/totals-${fileID}.json`, 'utf8');
 const data = JSON.parse(dataJSON);
 const tableStartLines = [
   '<table>',
@@ -39,4 +39,4 @@ const tableMidLines = data.map(item => {
 });
 const tableLines = tableStartLines.concat(tableMidLines, tableEndLines);
 const table = tableLines.join('\n');
-fs.writeFileSync(`${reportDir}/${reportSubdir}/${fileID}.html`, `${table}\n`);
+fs.writeFileSync(`${reportDir}/${reportSubdir}/totals-${fileID}.html`, `${table}\n`);
