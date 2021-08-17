@@ -1,2 +1,5 @@
 // Reports counts and fractions of underlined links among inline links.
-exports.reporter = async page => await require('../../procs/test/linkUl').linkUl(page, false);
+exports.reporter = async page => {
+  const result = await require('../../procs/test/linkUl').linkUl(page, false);
+  return {result};
+};

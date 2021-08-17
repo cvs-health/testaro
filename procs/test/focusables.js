@@ -9,11 +9,14 @@ exports.focusables = async (page, operation) => {
 
   // Maximum consecutive external foci (1 suffices for Chrome).
   const externalLimit = 2;
+  // Maximum count of repeated foci.
+  const alreadyLimit = 3;
 
   // ## VARIABLES
 
   let lastNavKey = 'Tab';
   let externalCount = 0;
+  let alreadyCount = 0;
 
   // ## FUNCTIONS
 
@@ -48,9 +51,9 @@ exports.focusables = async (page, operation) => {
       else if (focus.tagName === 'IFRAME') {
         return 'Tab';
       }
-      // Null otherwise, to stop the navigation.
+      // Tab otherwise.
       else {
-        return null;
+        return 'Tab';
       }
     }
     // Otherwise, i.e. if the focal element is newly focused, return:
@@ -132,18 +135,9 @@ exports.focusables = async (page, operation) => {
     const focusAndStatus = await op(page, lastNavKey);
     const focus = focusAndStatus[0];
     const status = focusAndStatus[1];
-    // If the status is external:
-    if (status === 'external') {
-      // If the external limit has not been reached, increment the count and:
-      if (externalCount++ < externalLimit) {
-        // Press the Tab key.
-        await page.keyboard.press(lastNavKey = 'Tab');
-        // Process the element focused by that keypress.
-        await opAll();
-      }
-    }
-    // Otherwise, i.e. if the status is new or already:
-    else {
+    // FUNCTION DEFINITIONS START
+    // Identifies and presses the next navigation key and processes the focused element.
+    const doNext = async () => {
       // Identify the next navigation key to be pressed.
       const nextKey = await nextNavKey(lastNavKey, focus, status);
       // If it exists:
@@ -153,6 +147,44 @@ exports.focusables = async (page, operation) => {
         // Process the element focused by that keypress.
         await opAll();
       }
+    };
+    // Presses the Tab key and processes the focused element.
+    const tabDoNext = async () => {
+      // Press the Tab key.
+      await page.keyboard.press(lastNavKey = 'Tab');
+      // Process the element focused by that keypress.
+      await opAll();
+    };
+    // FUNCTION DEFINITIONS END
+    // If the status is external:
+    if (status === 'external') {
+      // Increment the count. If the external limit has not been reached:
+      if (externalCount++ < externalLimit) {
+        // Press the Tab key and process the focused element.
+        await tabDoNext();
+      }
+    }
+    // Otherwise, if the status is already:
+    else if (status === 'already') {
+      // Increment the count.
+      alreadyCount++;
+      // If this is the first already:
+      if (alreadyCount === 1) {
+        // Identify and press the next navigation key and process the focused element.
+        await doNext();
+      }
+      // Otherwise, if it is not the first but the already limit has not been reached:
+      else if (alreadyCount < alreadyLimit) {
+        // Press the Tab key and process the focused element.
+        await tabDoNext();
+      }
+    }
+    // Otherwise, i.e. if the status is new:
+    else {
+      // Reinitialize the already count.
+      alreadyCount = 0;
+      // Identify and press the next navigation key and process the focused element.
+      await doNext();
     }
   };
 
