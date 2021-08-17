@@ -16,6 +16,7 @@ const {commands} = require('./commands');
 // ########## CONSTANTS
 // Set debug to true to add debugging features.
 const debug = false;
+const waits = 0;
 const protocol = process.env.PROTOCOL || 'https';
 // Files servable without modification.
 const statics = {
@@ -229,7 +230,14 @@ const launch = async typeName => {
       await browser.close();
     }
     // Launch it.
-    browser = await browserType.launch(debug ? {headless: false, slowMo: 1000} : {});
+    const browserOptions = {};
+    if (debug) {
+      browserOptions.headless = false;
+    }
+    if (waits) {
+      browserOptions.slowMo = waits;
+    }
+    browser = await browserType.launch(browserOptions);
     // Create a new context (window) in it.
     browserContext = await browser.newContext();
     // When a page is added to the browser context:
