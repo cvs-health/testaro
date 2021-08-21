@@ -1,6 +1,6 @@
 // Finds and marks navigation elements that can be hover-disclosed.
 exports.hover = async (page, withItems) => {
-  const triggers = await page.$$('block button, block li, block nav, block [role=navigation]');
+  const triggers = await page.$$('body button, body li, body nav, body [role=navigation]');
   const data = {
     triggers: 0,
     targets: 0
@@ -35,8 +35,8 @@ exports.hover = async (page, withItems) => {
           data.items.push(triggerData);
         }
       }
+      await find(triggers.slice(1));
     }
-    await find(triggers.slice(1));
   };
   await find(triggers);
   return data;
