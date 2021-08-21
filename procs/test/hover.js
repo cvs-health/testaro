@@ -26,12 +26,14 @@ exports.hover = async (page, withItems) => {
         const postVisibles = await firstGP.$$(':visible');
         if (postVisibles.length > preVisibles.length) {
           data.triggers++;
-          data.targets += postVisibles.length - preVisibles.length;
+          const targetCount = postVisibles.length - preVisibles.length;
+          data.targets += targetCount;
           if (withItems) {
             const triggerDataJSHandle = await page.evaluateHandle(trigger => ({
               tagName: trigger.tagName,
               id: trigger.id || 'NONE',
-              text: trigger.textContent || `{${trigger.outerHTML.slice(0, 100)}}`
+              text: trigger.textContent || `{${trigger.outerHTML.slice(0, 100)}}`,
+              targetCount
             }), firstTrigger);
             const triggerData = await triggerDataJSHandle.jsonValue();
             data.items.push(triggerData);
