@@ -28,11 +28,12 @@ exports.hover = async (page, withItems) => {
           data.triggers++;
           data.targets += postVisibles.length - preVisibles.length;
           if (withItems) {
-            const triggerData = await page.evaluateHandle(trigger => ({
+            const triggerDataJSHandle = await page.evaluateHandle(trigger => ({
               tagName: trigger.tagName,
               id: trigger.id || 'NONE',
               text: trigger.textContent || `{${trigger.outerHTML.slice(0, 100)}}`
             }), firstTrigger);
+            const triggerData = await triggerDataJSHandle.jsonValue();
             data.items.push(triggerData);
           }
         }
