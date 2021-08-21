@@ -1,6 +1,7 @@
 // Finds and marks navigation elements that can be hover-disclosed.
 exports.hover = async (page, withItems) => {
   const triggers = await page.$$('body button, body li, body nav, body [role=navigation]');
+  const targetSelectors = 'a:visible, button:visible, input:visible, [role=menuitem]:visible';
   const data = {
     triggers: 0,
     targets: 0
@@ -17,13 +18,13 @@ exports.hover = async (page, withItems) => {
         firstTrigger => firstTrigger.parentElement.parentElement, firstTrigger
       );
       const firstGP = firstGPJSHandle.asElement();
-      const preVisibles = await firstGP.$$(':visible');
+      const preVisibles = await firstGP.$$(targetSelectors);
       try {
         await firstTrigger.hover({
           force: true,
           timeout: 700
         });
-        const postVisibles = await firstGP.$$(':visible');
+        const postVisibles = await firstGP.$$(targetSelectors);
         if (postVisibles.length > preVisibles.length) {
           data.triggers++;
           const targetCount = postVisibles.length - preVisibles.length;
