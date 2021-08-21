@@ -18,22 +18,27 @@ exports.hover = async (page, withItems) => {
       );
       const firstGP = firstGPJSHandle.asElement();
       const preVisibles = await firstGP.$$(':visible');
-      await firstTrigger.hover({
-        force: true,
-        timeout: 700
-      });
-      const postVisibles = await firstGP.$$(':visible');
-      if (postVisibles.length > preVisibles.length) {
-        data.triggers++;
-        data.targets += postVisibles.length - preVisibles.length;
-        if (withItems) {
-          const triggerData = await page.evaluateHandle(trigger => ({
-            tagName: trigger.tagName,
-            id: trigger.id || 'NONE',
-            text: trigger.textContent || `{${trigger.outerHTML.slice(0, 100)}}`
-          }), firstTrigger);
-          data.items.push(triggerData);
+      try {
+        await firstTrigger.hover({
+          force: true,
+          timeout: 700
+        });
+        const postVisibles = await firstGP.$$(':visible');
+        if (postVisibles.length > preVisibles.length) {
+          data.triggers++;
+          data.targets += postVisibles.length - preVisibles.length;
+          if (withItems) {
+            const triggerData = await page.evaluateHandle(trigger => ({
+              tagName: trigger.tagName,
+              id: trigger.id || 'NONE',
+              text: trigger.textContent || `{${trigger.outerHTML.slice(0, 100)}}`
+            }), firstTrigger);
+            data.items.push(triggerData);
+          }
         }
+      }
+      catch (error) {
+        1;
       }
       await find(triggers.slice(1));
     }
