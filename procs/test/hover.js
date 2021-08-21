@@ -1,6 +1,6 @@
 // Finds and marks navigation elements that can be hover-disclosed.
 exports.hover = async (page, withItems) => {
-  const triggers = await page.$$('body button, body li');
+  const triggers = await page.$$('body button:visible, body li:visible');
   const targetSelectors = 'a:visible, button:visible, input:visible, [role=menuitem]:visible';
   const data = {
     triggers: 0,
@@ -51,6 +51,9 @@ exports.hover = async (page, withItems) => {
             data.items.push(triggerData);
           }
         }
+        await page.evaluate(
+          trigger => trigger.dispatchEvent(new MouseEvent('mouseout')), firstTrigger
+        );
       }
       catch (error) {
         1;
