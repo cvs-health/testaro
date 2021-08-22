@@ -69,7 +69,7 @@ const tests = {
   focOpAllS: 'tabulate focusable and operable elements after making all visible',
   focOpS: 'tabulate visible focusable and operable elements',
   hover: 'tabulate and list hover-caused context additions',
-  hoverS: 'ttabulate hover-caused context additions',
+  hoverS: 'tabulate hover-caused context additions',
   imgAlt: 'list the values of the alt attributes of img elements',
   imgBg: 'show the background images and their related texts',
   imgDec: 'show the decorative images and their related texts',
