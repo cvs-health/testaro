@@ -61,6 +61,13 @@ exports.hover = async (page, withItems) => {
           if (withItems) {
             // Report them.
             const triggerDataJSHandle = await page.evaluateHandle(args => {
+              const textOf = (element, limit) => {
+                let text = element.textContent.trim();
+                if (text) {
+                  text = text.replace(/\n.*/s, '');
+                }
+                return (text ? text : element.outerHTML).slice(0, limit);
+              };
               const trigger = args[0];
               const preVisibles = args[1];
               const postVisibles = args[2];
@@ -68,12 +75,12 @@ exports.hover = async (page, withItems) => {
               .filter(el => ! preVisibles.includes(el))
               .map(el => ({
                 tagName: el.tagName,
-                text: el.textContent.trim() || el.outerHTML
+                text: textOf(el, 50)
               }));
               return {
                 tagName: trigger.tagName,
                 id: trigger.id || 'NONE',
-                text: trigger.textContent.trim() || `{${trigger.outerHTML.slice(0, 100)}}`,
+                text: textOf(trigger, 50),
                 newVisibles
               };
             }, [firstTrigger, preVisibles, postVisibles]);
