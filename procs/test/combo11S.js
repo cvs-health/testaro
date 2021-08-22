@@ -1,14 +1,14 @@
-// Reduces results of 10 tests to a score.
+// Reduces results of 11 tests to a score.
 exports.reduce = result => {
   // Initialize the score.
   let deficit = {total: 0};
   let facts;
   if (typeof result === 'object') {
-    // axe
-    facts = result.axe && result.axe.violations;
+    // axeS
+    facts = result.axeS && result.axeS.violations;
     if (facts) {
-      deficit.axe = 2 * facts.minor + 3 * facts.moderate + 4 * facts.serious + 5 * facts.critical;
-      deficit.total += deficit.axe;
+      deficit.axeS = 2 * facts.minor + 3 * facts.moderate + 4 * facts.serious + 5 * facts.critical;
+      deficit.total += deficit.axeS;
     }
     // wave1
     facts = result.wave1 && result.wave1.categories;
@@ -24,39 +24,39 @@ exports.reduce = result => {
       }
       return scorables;
     };
-    // linkUl
-    facts = scorablesOf('linkUl', 'totals');
+    // linkUlS
+    facts = scorablesOf('linkUlS', 'totals');
     facts = facts ? facts.inline : null;
     if (facts) {
-      deficit.linkUl = 3 * (facts.total - facts.underlined) || 0;
-      deficit.total += deficit.linkUl;
+      deficit.linkUlS = 3 * (facts.total - facts.underlined) || 0;
+      deficit.total += deficit.linkUlS;
     }
     // focOlS
-    facts = scorablesOf('focOl', 'totals');
+    facts = scorablesOf('focOlS', 'totals');
     facts = facts ? facts.types : null;
     facts = facts ? facts.outlineMissing : null;
     if (facts) {
-      deficit.focOl = 4 * facts.total || 0;
-      deficit.total += deficit.focOl;
+      deficit.focOlS = 4 * facts.total || 0;
+      deficit.total += deficit.focOlS;
     }
     // focOpS
-    facts = scorablesOf('focOp', 'totals');
+    facts = scorablesOf('focOpS', 'totals');
     if (facts) {
-      deficit.focOp
+      deficit.focOpS
         = 4 * facts.operableNotFocusable.total + 1 * facts.focusableNotOperable.total || 0;
-      deficit.total += deficit.focOp;
+      deficit.total += deficit.focOpS;
     }
     // labClashS (facts.unlabeled disregarded because covered by axeS)
-    facts = scorablesOf('labClash', 'totals');
+    facts = scorablesOf('labClashS', 'totals');
     if (facts) {
-      deficit.labClash = 2 * facts.mislabeled + 0 * facts.unlabeled || 0;
-      deficit.total += deficit.labClash;
+      deficit.labClashS = 2 * facts.mislabeled + 0 * facts.unlabeled || 0;
+      deficit.total += deficit.labClashS;
     }
     // radioSetS
-    facts = scorablesOf('radioSet', 'totals');
+    facts = scorablesOf('radioSetS', 'totals');
     if (facts) {
-      deficit.radioSet = 3 * (facts.total - facts.inSet) || 0;
-      deficit.total += deficit.radioSet;
+      deficit.radioSetS = 3 * (facts.total - facts.inSet) || 0;
+      deficit.total += deficit.radioSetS;
     }
     // roleS
     facts = scorablesOf('roleS', '');
@@ -65,7 +65,7 @@ exports.reduce = result => {
       deficit.total += deficit.roleS;
     }
     // styleDiffS
-    facts = scorablesOf('styleDiff', 'totals');
+    facts = scorablesOf('styleDiffS', 'totals');
     if (facts) {
       // Identify an array of objects having tag-name totals and style distributions as values.
       const tagNameCounts = Object.values(facts);
@@ -77,10 +77,16 @@ exports.reduce = result => {
         }
       );
       // Deficit: 2 per excess style + 0.2 per nonplurality element.
-      deficit.styleDiff = Math.floor(deficits.reduce(
+      deficit.styleDiffS = Math.floor(deficits.reduce(
         (total, currentPair) => total + 2 * currentPair[0] + 0.2 * currentPair[1], 0
       ));
-      deficit.total += deficit.styleDiff;
+      deficit.total += deficit.styleDiffS;
+    }
+    // hover
+    facts = scorablesOf('hoverS', 'totals');
+    if (facts) {
+      deficit.hover = 4 * facts.triggers + 2 * facts.targets || 0;
+      deficit.total += deficit.hoverS;
     }
     // bulk
     facts = scorablesOf('bulk', '');

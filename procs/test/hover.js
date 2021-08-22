@@ -8,8 +8,10 @@ exports.hover = async (page, withItems) => {
   const targetSelectors = 'a:visible, button:visible, input:visible, [role=menuitem]:visible';
   // Initialize the result.
   const data = {
-    triggers: 0,
-    targets: 0
+    totals: {
+      triggers: 0,
+      targets: 0
+    }
   };
   if (withItems) {
     data.items = [];
@@ -54,9 +56,9 @@ exports.hover = async (page, withItems) => {
           await page.waitForTimeout(200);
           await root.waitForElementState('stable');
           // Increment the counts of triggers and targets.
-          data.triggers++;
+          data.totals.triggers++;
           const targetCount = postVisibles.length - preVisibles.length;
-          data.targets += targetCount;
+          data.totals.targets += targetCount;
           // If details are to be reported:
           if (withItems) {
             // Report them.

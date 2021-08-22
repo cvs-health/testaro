@@ -1,4 +1,4 @@
-// Reduces results of 10 tests to a score.
+// Reduces results of 11 tests to a score.
 exports.reduce = result => {
   // Initialize the score.
   let deficit = {total: 0};
@@ -81,6 +81,12 @@ exports.reduce = result => {
         (total, currentPair) => total + 2 * currentPair[0] + 0.2 * currentPair[1], 0
       ));
       deficit.total += deficit.styleDiff;
+    }
+    // hover
+    facts = scorablesOf('hover', 'totals');
+    if (facts) {
+      deficit.hover = 4 * facts.triggers + 2 * facts.targets || 0;
+      deficit.total += deficit.hover;
     }
     // bulk
     facts = scorablesOf('bulk', '');
