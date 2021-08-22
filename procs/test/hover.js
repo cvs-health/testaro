@@ -1,7 +1,9 @@
 // Finds and marks navigation elements that can be hover-disclosed.
 exports.hover = async (page, withItems) => {
   // Identify the elements that are likely to trigger disclosures on hover.
-  const triggers = await page.$$('body button:visible, body li:visible');
+  const triggers = await page.$$(
+    'body button:visible, body li:visible, body [onmouseenter]:visible, body [onmouseover]:visible'
+  );
   // Identify the selectors of active elements likely to be disclosed by a hover.
   const targetSelectors = 'a:visible, button:visible, input:visible, [role=menuitem]:visible';
   // Initialize the result.
@@ -19,27 +21,38 @@ exports.hover = async (page, withItems) => {
     if (triggers.length) {
       // Identify the first of them.
       const firstTrigger = triggers[0];
-      // Identify its grandparent element.
-      const firstGPJSHandle = await page.evaluateHandle(
-        firstTrigger => firstTrigger.parentElement.parentElement, firstTrigger
-      );
-      const firstGP = firstGPJSHandle.asElement();
-      // Identify the visible active descendants of the grandparent.
-      const preVisibles = await firstGP.$$(targetSelectors);
+      const tagNameJSHandle = await firstTrigger.getProperty('tagName');
+      const tagName = await tagNameJSHandle.jsonValue();
+      // Identify it or, if it is a link or button, its parent element.
+      let root = firstTrigger;
+      if (['a', 'button'].includes(tagName)) {
+        const rootJSHandle = await page.evaluateHandle(
+          firstTrigger => firstTrigger.parentElement, firstTrigger
+        );
+        root = rootJSHandle.asElement();
+      }
+      // Identify the visible active descendants.
+      const preVisibles = await root.$$(targetSelectors);
       try {
         // Hover over the potential trigger.
         await firstTrigger.hover();
-        // Identify the visible active descendants of the grandparent.
-        const postVisibles = await firstGP.$$(targetSelectors);
-        // Hover over the upper-left corner of the page, to undo any current disclosures.
-        await page.hover('body', {
-          position: {
-            x: 0,
-            y: 0
-          }
-        });
-        // If hovering disclosed any element
+        // Wait for any delayed and/or slowed hover reaction.
+        await page.waitForTimeout(200);
+        await root.waitForElementState('stable');
+        // Identify the visible active descendants.
+        const postVisibles = await root.$$(targetSelectors);
+        // If hovering disclosed any element:
         if (postVisibles.length > preVisibles.length) {
+          // Hover over the upper-left corner of the page, to undo any current disclosures.
+          await page.hover('body', {
+            position: {
+              x: 0,
+              y: 0
+            }
+          });
+          // Wait for any delayed and/or slowed hover reaction.
+          await page.waitForTimeout(200);
+          await root.waitForElementState('stable');
           // Increment the counts of triggers and targets.
           data.triggers++;
           const targetCount = postVisibles.length - preVisibles.length;
