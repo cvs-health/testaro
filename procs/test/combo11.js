@@ -24,12 +24,12 @@ exports.reduce = result => {
       }
       return scorables;
     };
-    // linkUl
-    facts = scorablesOf('linkUl', 'totals');
-    facts = facts ? facts.inline : null;
+    // bulk
+    facts = scorablesOf('bulk', '');
     if (facts) {
-      deficit.linkUl = 3 * (facts.total - facts.underlined) || 0;
-      deficit.total += deficit.linkUl;
+      // Deficit: square root of the excess of the element count over 150.
+      deficit.bulk = Math.floor(Math.sqrt(Math.max(0, facts.visibleElements - 150))) || 0;
+      deficit.total += deficit.bulk;
     }
     // focOl
     facts = scorablesOf('focOl', 'totals');
@@ -46,11 +46,24 @@ exports.reduce = result => {
         = 4 * facts.operableNotFocusable.total + 1 * facts.focusableNotOperable.total || 0;
       deficit.total += deficit.focOp;
     }
+    // hover
+    facts = scorablesOf('hover', 'totals');
+    if (facts) {
+      deficit.hover = 4 * facts.triggers + 2 * facts.targets || 0;
+      deficit.total += deficit.hover;
+    }
     // labClash (facts.unlabeled disregarded because covered by axeS)
     facts = scorablesOf('labClash', 'totals');
     if (facts) {
       deficit.labClash = 2 * facts.mislabeled + 0 * facts.unlabeled || 0;
       deficit.total += deficit.labClash;
+    }
+    // linkUl
+    facts = scorablesOf('linkUl', 'totals');
+    facts = facts ? facts.inline : null;
+    if (facts) {
+      deficit.linkUl = 3 * (facts.total - facts.underlined) || 0;
+      deficit.total += deficit.linkUl;
     }
     // radioSet
     facts = scorablesOf('radioSet', 'totals');
@@ -81,19 +94,6 @@ exports.reduce = result => {
         (total, currentPair) => total + 2 * currentPair[0] + 0.2 * currentPair[1], 0
       ));
       deficit.total += deficit.styleDiff;
-    }
-    // hover
-    facts = scorablesOf('hover', 'totals');
-    if (facts) {
-      deficit.hover = 4 * facts.triggers + 2 * facts.targets || 0;
-      deficit.total += deficit.hover;
-    }
-    // bulk
-    facts = scorablesOf('bulk', '');
-    if (facts) {
-      // Deficit: square root of the excess of the element count over 150.
-      deficit.bulk = Math.floor(Math.sqrt(Math.max(0, facts.visibleElements - 150))) || 0;
-      deficit.total += deficit.bulk;
     }
   }
   // Return the score.
