@@ -1,6 +1,6 @@
 /*
-  combo10Totals.js
-  Extracts the deficit totals from the reports of a combo10 or combo10Details batch.
+  comboTotals.js
+  Extracts the deficit totals from the reports of a combo batch.
 */
 // ########## IMPORTS
 // Module to access files.
@@ -52,5 +52,5 @@ result.sort((a, b) => {
   }
 });
 fs.writeFileSync(
-  `${fromDir}/${toSubdir}/totals-${fileID}.json`, `${JSON.stringify(result, null, 2)}\n`
+  `${fromDir}/${toSubdir}/${fileID}.json`, `${JSON.stringify(result, null, 2)}\n`
 );

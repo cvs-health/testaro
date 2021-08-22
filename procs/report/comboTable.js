@@ -1,6 +1,6 @@
 /*
-  combo10Table.js
-  Converts combo10 data from JSON to an HTML table.
+  comboTable.js
+  Converts combo data from JSON to an HTML table.
 */
 // ########## IMPORTS
 // Module to access files.
@@ -12,9 +12,10 @@ require('dotenv').config();
 const reportDir = process.env.BATCHREPORTDIR;
 const reportSubdir = process.argv[2];
 const fileID = process.argv[3];
-// Populate it.
-const dataJSON = fs.readFileSync(`${reportDir}/${reportSubdir}/totals-${fileID}.json`, 'utf8');
+// Get the data.
+const dataJSON = fs.readFileSync(`${reportDir}/${reportSubdir}/${fileID}.json`, 'utf8');
 const data = JSON.parse(dataJSON);
+// Identify the containing code.
 const tableStartLines = [
   '<table>',
   '  <thead>',
@@ -27,7 +28,9 @@ const tableEndLines = [
   '  </tbody>',
   '</table>'
 ];
+// Calibrate the bar widths.
 const maxDeficit = data.reduce((max, currentItem) => Math.max(max, currentItem.deficit), 0);
+// Compile the code representing the data.
 const tableMidLines = data.map(item => {
   const pageCell = `<th><a href="${item.url}">${item.org}</a></th>`;
   const numCell = `<td>${item.deficit}</td>`;
@@ -37,6 +40,8 @@ const tableMidLines = data.map(item => {
   const row = `    <tr>${pageCell}${numCell}${barCell}</tr>`;
   return row;
 });
+// Combine the containing and contained lines of code.
 const tableLines = tableStartLines.concat(tableMidLines, tableEndLines);
 const table = tableLines.join('\n');
-fs.writeFileSync(`${reportDir}/${reportSubdir}/totals-${fileID}.html`, `${table}\n`);
+// Create the file.
+fs.writeFileSync(`${reportDir}/${reportSubdir}/${fileID}.html`, `${table}\n`);
