@@ -37,15 +37,15 @@ exports.hover = async (page, withItems) => {
       const preVisibles = await root.$$(targetSelectors);
       try {
         // Hover over the potential trigger.
-        await firstTrigger.hover();
-        // Wait for any delayed and/or slowed hover reaction.
-        await page.waitForTimeout(200);
+        await firstTrigger.hover({timeout: 700});
+        // Wait for any delayed and/or slowed hover reaction. (Some test pages require 290+.)
+        await page.waitForTimeout(350);
         await root.waitForElementState('stable');
         // Identify the visible active descendants.
         const postVisibles = await root.$$(targetSelectors);
         // If hovering disclosed any element:
         if (postVisibles.length > preVisibles.length) {
-          // Hover over the upper-left corner of the page, to undo any current disclosures.
+          // Hover over the upper-left corner of the page, to undo any hover reactions.
           await page.hover('body', {
             position: {
               x: 0,
