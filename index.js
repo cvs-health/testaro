@@ -107,8 +107,10 @@ const redirect = (url, response) => {
 };
 // Conducts an axe test.
 const axe = async (page, withItems, rules = []) => {
+  console.log('Starting axe');
   // Inject axe-core into the page.
   await injectAxe(page);
+  console.log('Axe injected');
   // Initialize the report.
   const report = {
     warnings: 0,
@@ -127,7 +129,9 @@ const axe = async (page, withItems, rules = []) => {
   if (rules.length) {
     axeOptions.runOnly = rules;
   }
-  const axeReport = await getViolations(page, null, {axeOptions});
+  console.log('About to get violations');
+  const axeReport = await getViolations(page, null, axeOptions);
+  console.log('Got report');
   // If there are any such elements:
   if (axeReport.length) {
     // FUNCTION DEFINITIONS START
@@ -543,6 +547,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
     if (isValid(act)) {
       // Identify the command properties.
       const {type, which, what} = act;
+      console.log(`Starting ${type} ${which}`);
       // If the command is a launch:
       if (type === 'launch') {
         // Launch the specified browser, creating a browser context and a page in it.
@@ -669,6 +674,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
             const doCombo = async testNames => {
               if (testNames.length) {
                 const firstTest = testNames[0];
+                console.log(`About to run ${firstTest}`);
                 if (firstTest === 'axe') {
                   act.result.axe = await axe(page, true, []);
                 }
