@@ -161,6 +161,17 @@ The JHU-WAVE rule is defined as follows:
 4.  For each page, multiply its error-total rank by 6, multiply its error-density rank by 3, and multiply its alert rank by 1.
 5.  Total those three products. That total is the page’s score. The smaller the score, the better the page, according to the JHU-WAVE rule.
 
+#### bbc-a11y
+
+The [BBC Accessibility Standards Checker](https://github.com/bbc/bbc-a11y) is a Node.js project that might be added to Autotest. However, the package (`bbc-a11y`) was last updated in 2018 and has accumulated several severe vulnerabilities, including:
+- `electron` (IPC messages delivered to the wrong frame)
+- `httpism`
+- `trim-newlines` (regular expression denial of service)
+- `underscore` (arbitrary code execution)
+- `meow`
+
+For this reason, it is not incorporated into Autotest.
+
 ## Repository exclusions
 
 The files in the `temp` directory are presumed ephemeral and are not tracked by `git`.
