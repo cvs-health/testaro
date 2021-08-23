@@ -25,11 +25,11 @@ exports.hover = async (page, withItems) => {
       const firstTrigger = triggers[0];
       const tagNameJSHandle = await firstTrigger.getProperty('tagName');
       const tagName = await tagNameJSHandle.jsonValue();
-      // Identify it or, if it is a link or button, its parent element.
+      // Identify the root of a subtree that (empirically) may contain disclosed elements.
       let root = firstTrigger;
       if (['a', 'button'].includes(tagName)) {
         const rootJSHandle = await page.evaluateHandle(
-          firstTrigger => firstTrigger.parentElement, firstTrigger
+          firstTrigger => firstTrigger.parentElement.parentElement, firstTrigger
         );
         root = rootJSHandle.asElement();
       }

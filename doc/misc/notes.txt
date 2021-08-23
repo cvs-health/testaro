@@ -1,0 +1,21 @@
+Pages that pop up submenus on hover use various techniques to accomplish this. On the basis of inspections of some A11yHeros pages, the prevailing strategy is to use CSS to change the properties of a descendant element of an element depending on whether that element is hovered over. The target element is generally an <li>. The element whose property is changed is generally a <ul>. The <ul> may be constrained to be a child of the <li> or be permitted to be any descendant.
+
+The properties that are changed can be any of these:
+
+1. display=none vs display=block
+2. visibility=hidden vs visibility=visible
+3. opacity=0 vs opacitity=1
+
+A combination of properties 2 and 3 has also been encountered.
+
+It is reasonable for Autotest to judge all such hover-triggered changes of context to be accessibility faults. They cause surprise, make submenu-item selection pointer-path-dependent, penalize users with erratic hand movements, create risks of failure to provide full eqivalence of functionality for keyboard users, and greatly complicate testing.
+
+Pages that a hover-popup test should be tested on include:
+
+PEAT
+Equal Entry
+Mozilla
+Converge Accessibility
+American Printing House
+
+https://www.aetna.com/individuals-families.html uses a different technique for the vertical menus “Shop for a plan” and “Member support”. Hovering over a button of one of those menus changes the display style property of the <ul> element that is a descendant of the grandparent of the button from none to block.
