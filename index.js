@@ -707,12 +707,12 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
           // Otherwise, if the act is an IBM test:
           else if (type === 'ibm') {
             // Conduct it and add its result to the act.
-            act.result = await ibm(page, true);
+            act.result = await ibm(page, which, true);
           }
           // Otherwise, if the act is an axe summary:
           else if (type === 'ibmS') {
             // Conduct it and add its result to the act.
-            act.result = await ibm(page, false);
+            act.result = await ibm(page, which, false);
           }
           // Otherwise, if the act is a combination of tests:
           else if (type === 'combo') {

@@ -1,0 +1,2280 @@
+{
+    "results": [
+        {
+            "ruleId": "WCAG20_Img_PresentationImgHasNonNullAlt",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/section[2]/div[1]/ul[1]/li[3]/img[1]",
+                "aria": "/document[1]/region[3]/list[1]/listitem[3]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Image designated as decorative has non-null 'alt' attribute",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 620,
+                "top": 1608,
+                "height": 50,
+                "width": 50
+            },
+            "snippet": "<img alt=\"Expand market reach\" src=\"/images/template/icons/society.svg\" data-lazyload-ignore=\"true\" role=\"presentation\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "WCAG20_Img_PresentationImgHasNonNullAlt",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/section[2]/div[1]/ul[1]/li[1]/img[1]",
+                "aria": "/document[1]/region[3]/list[1]/listitem[1]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Image designated as decorative has non-null 'alt' attribute",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 130,
+                "top": 1608,
+                "height": 50,
+                "width": 50
+            },
+            "snippet": "<img alt=\"Open the internet\" src=\"/images/template/icons/rocket.svg\" data-lazyload-ignore=\"true\" role=\"presentation\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "WCAG20_A_HasText",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/footer[1]/div[1]/div[2]/div[2]/a[5]",
+                "aria": "/document[1]/contentinfo[1]/link[7]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Hyperlink has no link text, label or image with a text alternative",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 715,
+                "top": 12232,
+                "height": 35,
+                "width": 35
+            },
+            "snippet": "<a href=\"https://www.youtube.com/accessibe\" target=\"_blank\" class=\"social-link flex flex-center social-link-youtube\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "WCAG20_A_HasText",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/footer[1]/div[1]/div[2]/div[2]/a[2]",
+                "aria": "/document[1]/contentinfo[1]/link[4]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Hyperlink has no link text, label or image with a text alternative",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 580,
+                "top": 12232,
+                "height": 35,
+                "width": 35
+            },
+            "snippet": "<a href=\"https://www.linkedin.com/company/accessibe\" target=\"_blank\" class=\"social-link flex flex-center social-link-linkedin\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "WCAG20_A_HasText",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/footer[1]/div[1]/div[2]/div[2]/a[1]",
+                "aria": "/document[1]/contentinfo[1]/link[3]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Hyperlink has no link text, label or image with a text alternative",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 535,
+                "top": 12232,
+                "height": 35,
+                "width": 35
+            },
+            "snippet": "<a href=\"https://www.facebook.com/accessibe\" target=\"_blank\" class=\"social-link flex flex-center social-link-facebook\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/p[1]",
+                "aria": "/document[1]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 200,
+                "top": 1210,
+                "height": 54,
+                "width": 400
+            },
+            "snippet": "<p class=\"text\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[9]/a[1]",
+                "aria": "/document[1]/link[13]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 725,
+                "top": 1293,
+                "height": 23,
+                "width": 105
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.abbott.com/#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[8]/a[1]",
+                "aria": "/document[1]/link[12]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 577,
+                "top": 1289,
+                "height": 30,
+                "width": 100
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.oreo.com#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[7]/a[1]",
+                "aria": "/document[1]/link[11]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 423,
+                "top": 1293,
+                "height": 21,
+                "width": 105
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://shop.foxnews.com/#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[6]/a[1]",
+                "aria": "/document[1]/link[10]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 291,
+                "top": 1289,
+                "height": 30,
+                "width": 68
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.barilla.com/en-us#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[5]/a[1]",
+                "aria": "/document[1]/link[9]"
+            },
+            "ruleTime": 1,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 139,
+                "top": 1289,
+                "height": 30,
+                "width": 71
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.mobileye.com#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[48]/a[1]",
+                "aria": "/document[1]/link[52]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 6607,
+                "top": 1289,
+                "height": 30,
+                "width": 100
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.oreo.com#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[47]/a[1]",
+                "aria": "/document[1]/link[51]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 6453,
+                "top": 1293,
+                "height": 21,
+                "width": 105
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://shop.foxnews.com/#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[46]/a[1]",
+                "aria": "/document[1]/link[50]"
+            },
+            "ruleTime": 1,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 6321,
+                "top": 1289,
+                "height": 30,
+                "width": 68
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.barilla.com/en-us#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[45]/a[1]",
+                "aria": "/document[1]/link[49]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 6169,
+                "top": 1289,
+                "height": 30,
+                "width": 71
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.mobileye.com#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[44]/a[1]",
+                "aria": "/document[1]/link[48]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 6001,
+                "top": 1289,
+                "height": 30,
+                "width": 105
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.ellesse.com/#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[43]/a[1]",
+                "aria": "/document[1]/link[47]"
+            },
+            "ruleTime": 1,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 5857,
+                "top": 1292,
+                "height": 23,
+                "width": 92
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://avon.com#showacsb\" class=\"shorter\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[42]/a[1]",
+                "aria": "/document[1]/link[46]"
+            },
+            "ruleTime": 1,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 5714,
+                "top": 1289,
+                "height": 30,
+                "width": 76
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://grammystore.com/#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[41]/a[1]",
+                "aria": "/document[1]/link[45]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 5539,
+                "top": 1290,
+                "height": 28,
+                "width": 125
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.floridabar.org/#showacsb\" class=\"wider\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[40]/a[1]",
+                "aria": "/document[1]/link[44]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 5398,
+                "top": 1297,
+                "height": 14,
+                "width": 105
+            },
+            "snippet": "<a target=\"_blank\" href=\"http://fish.shimano.com#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[4]/a[1]",
+                "aria": "/document[1]/link[8]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": -29,
+                "top": 1289,
+                "height": 30,
+                "width": 105
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.ellesse.com/#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[39]/a[1]",
+                "aria": "/document[1]/link[43]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 5247,
+                "top": 1293,
+                "height": 22,
+                "width": 105
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.seikoclocksusa.com#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[38]/a[1]",
+                "aria": "/document[1]/link[42]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 5117,
+                "top": 1292,
+                "height": 23,
+                "width": 66
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://thenextweb.com/#showacsb\" class=\"shorter\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[37]/a[1]",
+                "aria": "/document[1]/link[41]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 4936,
+                "top": 1294,
+                "height": 19,
+                "width": 125
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.yokohamatire.com/#showacsb\" class=\"wider\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[36]/a[1]",
+                "aria": "/document[1]/link[40]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 4795,
+                "top": 1292,
+                "height": 23,
+                "width": 105
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.intexcorp.com#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[35]/a[1]",
+                "aria": "/document[1]/link[39]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 4644,
+                "top": 1292,
+                "height": 24,
+                "width": 105
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.themessistore.com/#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[34]/a[1]",
+                "aria": "/document[1]/link[38]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 4506,
+                "top": 1292,
+                "height": 23,
+                "width": 82
+            },
+            "snippet": "<a target=\"_blank\" href=\"http://learn.fiverr.com/#showacsb\" class=\"shorter\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[33]/a[1]",
+                "aria": "/document[1]/link[37]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 4343,
+                "top": 1292,
+                "height": 24,
+                "width": 105
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://kappa-usa.com/#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[32]/a[1]",
+                "aria": "/document[1]/link[36]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 4223,
+                "top": 1282,
+                "height": 43,
+                "width": 43
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.lotuscars.com/#showacsb\" class=\"higher\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[31]/a[1]",
+                "aria": "/document[1]/link[35]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 4041,
+                "top": 1297,
+                "height": 15,
+                "width": 105
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.billabong.com/mens/#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[30]/a[1]",
+                "aria": "/document[1]/link[34]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 3915,
+                "top": 1289,
+                "height": 30,
+                "width": 57
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.landroversanfrancisco.com/#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[3]/a[1]",
+                "aria": "/document[1]/link[7]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": -173,
+                "top": 1292,
+                "height": 23,
+                "width": 92
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://avon.com#showacsb\" class=\"shorter\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[29]/a[1]",
+                "aria": "/document[1]/link[33]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 3740,
+                "top": 1291,
+                "height": 27,
+                "width": 105
+            },
+            "snippet": "<a target=\"_blank\" href=\"http://ldh.la.gov/#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[28]/a[1]",
+                "aria": "/document[1]/link[32]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 3589,
+                "top": 1295,
+                "height": 17,
+                "width": 105
+            },
+            "snippet": "<a target=\"_blank\" href=\"http://fredperry.com#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[27]/a[1]",
+                "aria": "/document[1]/link[31]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 3456,
+                "top": 1289,
+                "height": 30,
+                "width": 69
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.rcwilley.com/#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[26]/a[1]",
+                "aria": "/document[1]/link[30]"
+            },
+            "ruleTime": 1,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 3289,
+                "top": 1292,
+                "height": 23,
+                "width": 102
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.hstern.net#showacsb\" class=\"shorter\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[25]/a[1]",
+                "aria": "/document[1]/link[29]"
+            },
+            "ruleTime": 1,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 3134,
+                "top": 1289,
+                "height": 30,
+                "width": 112
+            },
+            "snippet": "<a target=\"_blank\" href=\"http://www.miamisao.com/#showacsb\" class=\"wider\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[24]/a[1]",
+                "aria": "/document[1]/link[28]"
+            },
+            "ruleTime": 1,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 2986,
+                "top": 1294,
+                "height": 21,
+                "width": 105
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.payless.com/#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[23]/a[1]",
+                "aria": "/document[1]/link[27]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 2835,
+                "top": 1289,
+                "height": 29,
+                "width": 105
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.belkin.com/my/#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[22]/a[1]",
+                "aria": "/document[1]/link[26]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 2713,
+                "top": 1282,
+                "height": 43,
+                "width": 50
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.illy.com#showacsb\" class=\"higher\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[21]/a[1]",
+                "aria": "/document[1]/link[25]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 2554,
+                "top": 1292,
+                "height": 23,
+                "width": 66
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.knoll.com/#showacsb\" class=\"shorter\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[20]/a[1]",
+                "aria": "/document[1]/link[24]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 2373,
+                "top": 1294,
+                "height": 20,
+                "width": 125
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.tupperware.com/#showacsb\" class=\"wider\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[2]/a[1]",
+                "aria": "/document[1]/link[6]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": -316,
+                "top": 1289,
+                "height": 30,
+                "width": 76
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://grammystore.com/#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[19]/a[1]",
+                "aria": "/document[1]/link[23]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 2260,
+                "top": 1289,
+                "height": 30,
+                "width": 51
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.everlast.com/#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[18]/a[1]",
+                "aria": "/document[1]/link[22]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 2082,
+                "top": 1283,
+                "height": 42,
+                "width": 105
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.playmobil.us/#showacsb\" class=\"higher\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[17]/a[1]",
+                "aria": "/document[1]/link[21]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 1921,
+                "top": 1294,
+                "height": 20,
+                "width": 125
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.pacificlife.com/#showacsb\" class=\"wider\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[16]/a[1]",
+                "aria": "/document[1]/link[20]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 1770,
+                "top": 1293,
+                "height": 21,
+                "width": 125
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://highlifeshop.com/#showacsb\" class=\"wider\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[15]/a[1]",
+                "aria": "/document[1]/link[19]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 1633,
+                "top": 1292,
+                "height": 23,
+                "width": 98
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://us.tomy.com/#showacsb\" class=\"shorter\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[14]/a[1]",
+                "aria": "/document[1]/link[18]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 1510,
+                "top": 1282,
+                "height": 43,
+                "width": 43
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.pillsburybaking.com/#showacsb\" class=\"higher\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[13]/a[1]",
+                "aria": "/document[1]/link[17]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 1337,
+                "top": 1282,
+                "height": 43,
+                "width": 87
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.lonelyplanet.com/#showacsb\" class=\"higher\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[12]/a[1]",
+                "aria": "/document[1]/link[16]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 1183,
+                "top": 1289,
+                "height": 30,
+                "width": 93
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.energizer.com/#showacsb\" class=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[11]/a[1]",
+                "aria": "/document[1]/link[15]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 1016,
+                "top": 1297,
+                "height": 14,
+                "width": 125
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.quiksilver.com/#showacsb\" class=\"wider\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[10]/a[1]",
+                "aria": "/document[1]/link[14]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 911,
+                "top": 1282,
+                "height": 43,
+                "width": 34
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://porscheexperience.ca/#showacsb\" class=\"higher\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/div[1]/div[1]/div[1]/div[1]/a[1]",
+                "aria": "/document[1]/link[5]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": -491,
+                "top": 1290,
+                "height": 28,
+                "width": 125
+            },
+            "snippet": "<a target=\"_blank\" href=\"https://www.floridabar.org/#showacsb\" class=\"wider\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_OrphanedContent_Native_Host_Sematics",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[3]/div[1]/div[1]/div[1]/a[1]",
+                "aria": "/document[1]/link[1]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 50,
+                "top": 10,
+                "height": 15,
+                "width": 700
+            },
+            "snippet": "<a href=\"https://accessibe.com/blog/news/28-million-series-a-funding\" class=\"content-desktop\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "IBMA_Color_Contrast_WCAG2AA",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[6]/div[1]/div[1]/form[1]/div[1]/span[1]",
+                "aria": "/document[1]/form[1]"
+            },
+            "ruleTime": 1,
+            "reasonId": "Fail_1",
+            "message": "Text contrast of 3.78 with its background is less than the WCAG AA minimum requirements for text of size 14px and weight of 700",
+            "messageArgs": [
+                "3.78",
+                14,
+                700,
+                "#136ef8",
+                "#deebfe",
+                false,
+                false
+            ],
+            "apiArgs": [],
+            "bounds": {
+                "left": 277,
+                "top": 10084,
+                "height": 30,
+                "width": 248
+            },
+            "snippet": "<span class=\"ribbon ribbon-medium \">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "IBMA_Color_Contrast_WCAG2AA",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/section[9]/div[1]/div[1]/span[1]",
+                "aria": "/document[1]/region[10]"
+            },
+            "ruleTime": 1,
+            "reasonId": "Fail_1",
+            "message": "Text contrast of 3.78 with its background is less than the WCAG AA minimum requirements for text of size 14px and weight of 700",
+            "messageArgs": [
+                "3.78",
+                14,
+                700,
+                "#136ef8",
+                "#deebfe",
+                false,
+                false
+            ],
+            "apiArgs": [],
+            "bounds": {
+                "left": 279,
+                "top": 9512,
+                "height": 30,
+                "width": 244
+            },
+            "snippet": "<span class=\"ribbon ribbon-medium \">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "IBMA_Color_Contrast_WCAG2AA",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/section[7]/div[1]/div[3]/div[1]/div[1]/span[1]",
+                "aria": "/document[1]/region[8]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Text contrast of 3.78 with its background is less than the WCAG AA minimum requirements for text of size 14px and weight of 700",
+            "messageArgs": [
+                "3.78",
+                14,
+                700,
+                "#136ef8",
+                "#deebfe",
+                false,
+                false
+            ],
+            "apiArgs": [],
+            "bounds": {
+                "left": 304,
+                "top": 8522,
+                "height": 30,
+                "width": 194
+            },
+            "snippet": "<span class=\"ribbon ribbon-medium \">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "IBMA_Color_Contrast_WCAG2AA",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/section[7]/div[1]/div[2]/div[1]/div[1]/span[1]",
+                "aria": "/document[1]/region[8]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Text contrast of 3.78 with its background is less than the WCAG AA minimum requirements for text of size 14px and weight of 700",
+            "messageArgs": [
+                "3.78",
+                14,
+                700,
+                "#136ef8",
+                "#deebfe",
+                false,
+                false
+            ],
+            "apiArgs": [],
+            "bounds": {
+                "left": 295,
+                "top": 8006,
+                "height": 30,
+                "width": 210
+            },
+            "snippet": "<span class=\"ribbon ribbon-medium \">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "IBMA_Color_Contrast_WCAG2AA",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/section[7]/div[1]/div[1]/div[1]/div[1]/span[1]",
+                "aria": "/document[1]/region[8]"
+            },
+            "ruleTime": 1,
+            "reasonId": "Fail_1",
+            "message": "Text contrast of 3.78 with its background is less than the WCAG AA minimum requirements for text of size 14px and weight of 700",
+            "messageArgs": [
+                "3.78",
+                14,
+                700,
+                "#136ef8",
+                "#deebfe",
+                false,
+                false
+            ],
+            "apiArgs": [],
+            "bounds": {
+                "left": 261,
+                "top": 7434,
+                "height": 30,
+                "width": 280
+            },
+            "snippet": "<span class=\"ribbon ribbon-medium \">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "IBMA_Color_Contrast_WCAG2AA",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/section[6]/div[1]/div[1]/div[1]/span[1]",
+                "aria": "/document[1]/region[7]"
+            },
+            "ruleTime": 1,
+            "reasonId": "Fail_1",
+            "message": "Text contrast of 3.78 with its background is less than the WCAG AA minimum requirements for text of size 14px and weight of 700",
+            "messageArgs": [
+                "3.78",
+                14,
+                700,
+                "#136ef8",
+                "#deebfe",
+                false,
+                false
+            ],
+            "apiArgs": [],
+            "bounds": {
+                "left": 290,
+                "top": 6406,
+                "height": 30,
+                "width": 221
+            },
+            "snippet": "<span class=\"ribbon ribbon-medium \">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "IBMA_Color_Contrast_WCAG2AA",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/section[5]/div[1]/div[3]/div[1]/div[1]/span[1]",
+                "aria": "/document[1]/region[6]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Text contrast of 3.78 with its background is less than the WCAG AA minimum requirements for text of size 13px and weight of 700",
+            "messageArgs": [
+                "3.78",
+                13,
+                700,
+                "#136ef8",
+                "#deebfe",
+                false,
+                false
+            ],
+            "apiArgs": [],
+            "bounds": {
+                "left": 283,
+                "top": 5351,
+                "height": 29,
+                "width": 235
+            },
+            "snippet": "<span class=\"ribbon\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "IBMA_Color_Contrast_WCAG2AA",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/section[5]/div[1]/div[2]/div[1]/div[1]/div[2]/div[1]/a[1]",
+                "aria": "/document[1]/region[6]/link[1]"
+            },
+            "ruleTime": 1,
+            "reasonId": "Fail_1",
+            "message": "Text contrast of 4.18 with its background is less than the WCAG AA minimum requirements for text of size 15px and weight of 600",
+            "messageArgs": [
+                "4.18",
+                15,
+                600,
+                "#136ef8",
+                "#f1f6f9",
+                false,
+                false
+            ],
+            "apiArgs": [],
+            "bounds": {
+                "left": 292,
+                "top": 4828,
+                "height": 15,
+                "width": 217
+            },
+            "snippet": "<a href=\"/product/artificial-intelligence\" class=\"text-button\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "IBMA_Color_Contrast_WCAG2AA",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/section[5]/div[1]/div[1]/span[1]",
+                "aria": "/document[1]/region[6]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Text contrast of 3.78 with its background is less than the WCAG AA minimum requirements for text of size 14px and weight of 700",
+            "messageArgs": [
+                "3.78",
+                14,
+                700,
+                "#136ef8",
+                "#deebfe",
+                false,
+                false
+            ],
+            "apiArgs": [],
+            "bounds": {
+                "left": 230,
+                "top": 3823,
+                "height": 30,
+                "width": 342
+            },
+            "snippet": "<span class=\"ribbon ribbon-medium \">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "IBMA_Color_Contrast_WCAG2AA",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/section[3]/div[1]/div[2]/div[1]/div[2]/div[1]/span[1]",
+                "aria": "/document[1]/region[4]"
+            },
+            "ruleTime": 1,
+            "reasonId": "Fail_1",
+            "message": "Text contrast of 3.78 with its background is less than the WCAG AA minimum requirements for text of size 14px and weight of 700",
+            "messageArgs": [
+                "3.78",
+                14,
+                700,
+                "#136ef8",
+                "#deebfe",
+                false,
+                false
+            ],
+            "apiArgs": [],
+            "bounds": {
+                "left": 260,
+                "top": 2269,
+                "height": 30,
+                "width": 281
+            },
+            "snippet": "<span class=\"ribbon ribbon-medium \">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "IBMA_Color_Contrast_WCAG2AA",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/section[1]/div[1]/div[1]/span[1]",
+                "aria": "/document[1]/region[2]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Text contrast of 3.78 with its background is less than the WCAG AA minimum requirements for text of size 14px and weight of 700",
+            "messageArgs": [
+                "3.78",
+                14,
+                700,
+                "#136ef8",
+                "#deebfe",
+                false,
+                false
+            ],
+            "apiArgs": [],
+            "bounds": {
+                "left": 228,
+                "top": 150,
+                "height": 30,
+                "width": 346
+            },
+            "snippet": "<span class=\"ribbon ribbon-medium ribbon-standard\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "IBMA_Color_Contrast_WCAG2AA",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/section[1]/div[1]/div[1]/div[1]/a[2]",
+                "aria": "/document[1]/region[2]/link[2]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Text contrast of 4.18 with its background is less than the WCAG AA minimum requirements for text of size 14px and weight of 600",
+            "messageArgs": [
+                "4.18",
+                14,
+                600,
+                "#136ef8",
+                "#f1f6f9",
+                false,
+                false
+            ],
+            "apiArgs": [],
+            "bounds": {
+                "left": 403,
+                "top": 554,
+                "height": 44,
+                "width": 170
+            },
+            "snippet": "<a href=\"#popup-demo\" class=\"button button-transparent button-icon-flip\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "IBMA_Color_Contrast_WCAG2AA",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/div[1]/p[1]/span[1]",
+                "aria": "/document[1]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Text contrast of 3.78 with its background is less than the WCAG AA minimum requirements for text of size 15px and weight of 600",
+            "messageArgs": [
+                "3.78",
+                15,
+                600,
+                "#136ef8",
+                "#deebfe",
+                false,
+                false
+            ],
+            "apiArgs": [],
+            "bounds": {
+                "left": 319,
+                "top": 1210,
+                "height": 29,
+                "width": 80
+            },
+            "snippet": "<span class=\"ribbon\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "aria_semantics_role",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/section[5]/div[1]/div[2]/div[1]/div[1]/div[1]/video[1]",
+                "aria": "/document[1]/region[6]/img[1]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "The WAI-ARIA role 'img' is not valid for the element <video>",
+            "messageArgs": [
+                "img",
+                "video"
+            ],
+            "apiArgs": [],
+            "bounds": {
+                "left": 50,
+                "top": 4144,
+                "height": 459,
+                "width": 700
+            },
+            "snippet": "<video poster=\"https://accessibe.com/images/home/screen-reader.jpg\" aria-label=\"A quick animation of a screen-reader session with accessiBe on and off\" role=\"img\" playsinline=\"\" muted=\"\" autoplay=\"\" loop=\"\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "aria_semantics_role",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/section[2]/div[1]/ul[1]/li[3]/img[1]",
+                "aria": "/document[1]/region[3]/list[1]/listitem[3]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_2",
+            "message": "The WAI-ARIA role 'presentation' is not valid for the element <img> and may be ignored by the browser since the element is focusable",
+            "messageArgs": [
+                "presentation",
+                "img"
+            ],
+            "apiArgs": [],
+            "bounds": {
+                "left": 620,
+                "top": 1608,
+                "height": 50,
+                "width": 50
+            },
+            "snippet": "<img alt=\"Expand market reach\" src=\"/images/template/icons/society.svg\" data-lazyload-ignore=\"true\" role=\"presentation\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "aria_semantics_role",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[5]/div[33]/section[2]/div[1]/ul[1]/li[1]/img[1]",
+                "aria": "/document[1]/region[3]/list[1]/listitem[1]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_2",
+            "message": "The WAI-ARIA role 'presentation' is not valid for the element <img> and may be ignored by the browser since the element is focusable",
+            "messageArgs": [
+                "presentation",
+                "img"
+            ],
+            "apiArgs": [],
+            "bounds": {
+                "left": 130,
+                "top": 1608,
+                "height": 50,
+                "width": 50
+            },
+            "snippet": "<img alt=\"Open the internet\" src=\"/images/template/icons/rocket.svg\" data-lazyload-ignore=\"true\" role=\"presentation\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation"
+        },
+        {
+            "ruleId": "Rpt_Aria_ContentinfoWithNoMain_Implicit",
+            "value": [
+                "RECOMMENDATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/footer[1]",
+                "aria": "/document[1]/contentinfo[1]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "The element with \"contentinfo\" role is present without an element with \"main\" role",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 0,
+                "top": 10716,
+                "height": 1621,
+                "width": 800
+            },
+            "snippet": "<footer class=\"footer inner-space\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "recommendation"
+        }
+    ],
+    "numExecuted": 14986,
+    "nls": {
+        "WCAG20_Html_HasLang": {
+            "0": "Page must identify the default language of the document with a 'lang' attribute",
+            "Pass_0": "Page language detected as \"{0}\""
+        },
+        "RPT_Html_SkipNav": {
+            "0": "Provide a way to bypass blocks of content that are repeated on multiple Web pages",
+            "Pass_0": "Rule Passed",
+            "Potential_1": "Verify there is a way to bypass blocks of content that are repeated on multiple Web pages"
+        },
+        "WCAG20_Doc_HasTitle": {
+            "0": "The page should have a title that correctly identifies the subject of the page",
+            "Pass_0": "Rule Passed"
+        },
+        "WCAG20_Elem_Lang_Valid": {
+            "0": "The language of content must be valid and specified in accordance with BCP 47",
+            "Pass_0": "Lang has a valid primary lang and conforms to BCP 47"
+        },
+        "Valerie_Elem_DirValid": {
+            "0": "'dir' attribute value must be \"ltr\", \"rtl\", or \"auto\"",
+            "Pass_0": "Rule Passed"
+        },
+        "HAAC_BackgroundImg_HasTextOrTitle": {
+            "0": "Background images that convey important information must have a text alternative that describes the image",
+            "Pass_0": "Rule Passed"
+        },
+        "RPT_List_UseMarkup": {
+            "0": "Use proper HTML list elements to create lists",
+            "Pass_0": "Rule Passed"
+        },
+        "WCAG20_Text_Emoticons": {
+            "0": "Emoticons must have a short text alternative that describes their purpose",
+            "Pass_0": "Rule Passed"
+        },
+        "WCAG20_Text_LetterSpacing": {
+            "0": "Use CSS 'letter-spacing' to control spacing within a word",
+            "Pass_0": "Rule Passed"
+        },
+        "RPT_Blockquote_WrapsTextQuote": {
+            "0": "Quotations should be marked with <q> or <blockquote> elements",
+            "Pass_0": "Rule Passed"
+        },
+        "IBMA_Color_Contrast_WCAG2AA_PV": {
+            "0": "The contrast ratio of text with its background (i.e. background with a color gradient or a background image) must meet WCAG 2.1 AA requirements",
+            "Pass_0": "Rule Passed"
+        },
+        "Rpt_Aria_OrphanedContent_Native_Host_Sematics": {
+            "0": "All content must reside within an element with a landmark role",
+            "Pass_0": "Rule Passed",
+            "Fail_1": "Content is not within a landmark element"
+        },
+        "RPT_Title_Valid": {
+            "0": "Page <title> should be a descriptive title, rather than a filename",
+            "Pass_0": "Rule Passed"
+        },
+        "RPT_Style_Trigger2": {
+            "0": "Windows high contrast mode must be supported when using CSS to include, position or alter non-decorative content",
+            "Pass_0": "Rule Passed",
+            "Manual_1": "Confirm Windows high contrast mode is supported when using CSS to include, position or alter non-decorative content"
+        },
+        "RPT_Style_ColorSemantics1": {
+            "0": "Combine color and descriptive markup to convey information",
+            "Pass_0": "Rule Passed",
+            "Potential_1": "Verify color is not used as the only visual means of conveying information"
+        },
+        "WCAG20_Style_BeforeAfter": {
+            "0": "Do not use CSS '::before' and '::after' pseudo-elements to insert non-decorative content",
+            "Pass_0": "Rule Passed",
+            "Potential_1": "Verify the '::before' and '::after' pseudo-elements do not insert non-decorative content"
+        },
+        "WCAG21_Style_Viewport": {
+            "0": "Text must scale up to 200% without loss of content or functionality",
+            "Pass_0": "Rule Passed"
+        },
+        "RPT_Elem_UniqueId": {
+            "0": "Element 'id' attribute values must be unique within a document",
+            "Pass_0": "Rule Passed"
+        },
+        "RPT_Text_SensoryReference": {
+            "0": "Instructions must be meaningful without shape or location words",
+            "Pass_0": "Rule Passed",
+            "Potential_1": "If the word(s) '{0}' is part of instructions for using page content, check it is still understandable without this location or shape information"
+        },
+        "WCAG20_Body_FirstASkips_Native_Host_Sematics": {
+            "0": "Pages must provide a way to skip directly to the main content",
+            "Pass_0": "Rule Passed"
+        },
+        "Rpt_Aria_MultipleDocumentRoles": {
+            "0": "All elements with a \"document\" role must have unique labels",
+            "Pass_0": "Rule Passed"
+        },
+        "WCAG20_Body_FirstAContainsSkipText_Native_Host_Sematics": {
+            "0": "The description of a hyperlink used to skip content must communicate where it links to",
+            "Pass_0": "Rule Passed",
+            "Potential_1": "Verify that if this hyperlink skips content, the description communicates where it links to"
+        },
+        "HAAC_Application_Role_Text": {
+            "0": "Non-decorative static text and image content within an element with \"application\" role must be accessible",
+            "Pass_0": "Rule Passed"
+        },
+        "Rpt_Aria_ValidRole": {
+            "0": "Elements must have a valid 'role' per WAI-ARIA specification",
+            "Pass_0": "Rule Passed"
+        },
+        "Rpt_Aria_ValidProperty": {
+            "0": "WAI-ARIA attributes must be valid for the element's role",
+            "Pass_0": "Rule Passed"
+        },
+        "Rpt_Aria_ValidPropertyValue": {
+            "0": "WAI-ARIA property values must be valid",
+            "Pass_0": "Rule Passed"
+        },
+        "WCAG20_Input_ExplicitLabel": {
+            "0": "Each form control must have an associated label",
+            "Pass_0": "Rule Passed"
+        },
+        "WCAG21_Label_Accessible": {
+            "0": "Accessible name must match or contain the visible label text",
+            "Pass_0": "Rule Passed"
+        },
+        "Rpt_Aria_RequiredChildren_Native_Host_Sematics": {
+            "0": "An element with a WAI-ARIA role must contain required children",
+            "Pass_0": "Rule Passed"
+        },
+        "Rpt_Aria_MissingKeyboardHandler": {
+            "0": "Interactive WAI_ARIA UI components must provide keyboard access",
+            "Pass_0": "Rule Passed"
+        },
+        "aria_semantics_role": {
+            "0": "WAI-ARIA roles must be valid for the element to which they are assigned",
+            "Pass_0": "Rule Passed",
+            "Fail_2": "The WAI-ARIA role '{0}' is not valid for the element <{1}> and may be ignored by the browser since the element is focusable",
+            "Fail_1": "The WAI-ARIA role '{0}' is not valid for the element <{1}>"
+        },
+        "aria_semantics_attribute": {
+            "0": "WAI-ARIA attributes must be valid for the element and WAI-ARIA role to which they are assigned",
+            "Pass_0": "Rule Passed"
+        },
+        "RPT_Block_ShouldBeHeading": {
+            "0": "Heading text must use a heading element",
+            "Pass_0": "Rule Passed",
+            "Potential_1": "Check if this text should be marked up as a heading: {0}"
+        },
+        "RPT_Style_BackgroundImage": {
+            "0": "Images included by using CSS alone must not convey important information",
+            "Pass_0": "Rule Passed"
+        },
+        "RPT_Style_HinderFocus1": {
+            "0": "The keyboard focus indicator must be highly visible when default border or outline is modified by CSS",
+            "Pass_0": "Rule Passed",
+            "Potential_1": "Check the keyboard focus indicator is highly visible when using CSS elements for border or outline"
+        },
+        "Rpt_Aria_RegionLabel_Implicit": {
+            "0": "Each element with \"region\" role must have a label that describes its purpose",
+            "Pass_0": "Rule Passed"
+        },
+        "RPT_Blink_CSSTrigger1": {
+            "0": "Do not use the \"blink\" value of the 'text-decoration' property for longer than five seconds",
+            "Pass_0": "Rule Passed"
+        },
+        "IBMA_Color_Contrast_WCAG2AA": {
+            "0": "The contrast ratio of text with its background must meet WCAG 2.1 AA requirements",
+            "Potential_1": "The foreground text and its background color are both detected as {3}. Verify the text meets the WCAG 2.1 AA requirements for minimum contrast",
+            "Pass_0": "Rule Passed",
+            "Fail_1": "Text contrast of {0} with its background is less than the WCAG AA minimum requirements for text of size {1}px and weight of {2}"
+        },
+        "WCAG20_A_HasText": {
+            "0": "Hyperlinks must have a text description of their purpose",
+            "Pass_0": "Hyperlink has a description of its purpose",
+            "Fail_1": "Hyperlink has no link text, label or image with a text alternative"
+        },
+        "Rpt_Aria_OneBannerInSiblingSet_Implicit": {
+            "0": "There must be only one element with \"banner\" role on the page",
+            "Pass_0": "Rule Passed"
+        },
+        "WCAG20_Img_HasAlt": {
+            "0": "Images must have an 'alt' attribute with a short text alternative if they convey meaning, or 'alt=\"\" if decorative",
+            "Pass_0": "Rule Passed"
+        },
+        "WCAG20_Img_PresentationImgHasNonNullAlt": {
+            "0": "Image designated as decorative must have 'alt=\"\"",
+            "Pass_0": "Rule Passed",
+            "Fail_1": "Image designated as decorative has non-null 'alt' attribute"
+        },
+        "WCAG20_Img_LinkTextNotRedundant": {
+            "0": "The text alternative for an image within a link should not repeat the link text or adjacent link text",
+            "Pass_0": "Rule Passed"
+        },
+        "RPT_Img_AltCommonMisuse": {
+            "0": "'alt' attribute value must be a good inline replacement for the image",
+            "Pass_0": "Rule Passed"
+        },
+        "RPT_Media_AltBrief": {
+            "0": "Alternative text in 'alt' attribute should be brief (<150 characters)",
+            "Pass_0": "Rule Passed"
+        },
+        "WCAG20_A_TargetAndText": {
+            "0": "Users should be warned in advance if their input action will open a new window or otherwise change their context",
+            "Potential_1": "Inform the user when their input action will open a new window or otherwise change their context"
+        },
+        "RPT_Header_HasContent": {
+            "0": "Heading elements must provide descriptive text",
+            "Pass_0": "Rule Passed"
+        },
+        "RPT_Headers_FewWords": {
+            "0": "Heading elements must not be used for presentation",
+            "Pass_0": "Rule Passed"
+        },
+        "RPT_List_Misuse": {
+            "0": "List elements should only be used for lists of related items",
+            "Pass_0": "Rule Passed"
+        },
+        "RPT_Blockquote_HasCite": {
+            "0": "Use <blockquote> only for quotations, not indentation",
+            "Potential_1": "Verify that <blockquote> is used only for quotations, not indentation"
+        },
+        "HAAC_Video_HasNoTrack": {
+            "0": "A <video> element must have a text alternative for any meaningful audio content",
+            "Potential_1": "Verify that captions are available for any meaningful audio or provide a caption track for the <video> element"
+        },
+        "HAAC_Audio_Video_Trigger": {
+            "0": "Media using <audio> and/or <video> elements must have keyboard accessible controls",
+            "Manual_1": "Verify media using <audio> and/or <video> elements have keyboard accessible controls"
+        },
+        "HAAC_Aria_ImgAlt": {
+            "0": "An element with \"img\" role must have a non-empty label",
+            "Pass_0": "Rule Passed"
+        },
+        "RPT_Font_ColorInForm": {
+            "0": "Combine color and descriptive markup to indicate required form fields",
+            "Pass_0": "Rule Passed"
+        },
+        "WCAG20_Form_HasSubmit": {
+            "0": "A <form> element should have a submit button or an image button",
+            "Pass_0": "Rule Passed"
+        },
+        "WCAG20_Input_InFieldSet": {
+            "0": "Groups of logically related input elements should be contained within a <fieldset> element",
+            "Pass_0": "Rule Passed"
+        },
+        "WCAG20_Input_HasOnchange": {
+            "0": "Verify that any changes of context are explained in advance to the user",
+            "Pass_0": "Rule Passed"
+        },
+        "HAAC_Input_Placeholder": {
+            "0": "HTML5 'placeholder' attribute must not be used as a visible label replacement",
+            "Potential_1": "HTML5 placeholder is the only visible label"
+        },
+        "HAAC_Aria_Or_HTML5_Attr": {
+            "0": "HTML5 attributes must not conflict with the associated WAI-ARIA attribute used on an input element",
+            "Pass_0": "Rule Passed"
+        },
+        "WCAG20_Input_VisibleLabel": {
+            "0": "An input element must have an associated visible label",
+            "Potential_1": "The input element does not have an associated visible label"
+        },
+        "Rpt_Aria_MultipleContentinfoInSiblingSet_Implicit": {
+            "0": "A page, document or application should only have one element with \"contentinfo\" role",
+            "Pass_0": "Rule Passed"
+        },
+        "Rpt_Aria_ContentinfoWithNoMain_Implicit": {
+            "0": "An element with \"contentinfo\" role is only permitted with an element with \"main\" role",
+            "Fail_1": "The element with \"contentinfo\" role is present without an element with \"main\" role"
+        },
+        "Valerie_Frame_SrcHtml": {
+            "0": "A <frame> containing non-HTML content must be made accessible",
+            "Potential_1": "Verify <frame> content is accessible"
+        }
+    },
+    "summary": {
+        "counts": {
+            "violation": 71,
+            "recommendation": 1,
+            "ignored": 0
+        },
+        "scanTime": 2233,
+        "ruleArchive": "Latest Deployment (latest)",
+        "policies": [
+            "IBM_Accessibility"
+        ],
+        "reportLevels": [
+            "violation",
+            "recommendation"
+        ],
+        "startScan": 1630014082536,
+        "URL": "https://accessibe.com/"
+    },
+    "scanID": "036fc436-e948-463b-9b17-4e5b950cf444",
+    "toolID": "accessibility-checker-v3.1.9",
+    "label": "IBMAccessibilityChecker"
+}
