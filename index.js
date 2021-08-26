@@ -12,6 +12,7 @@ const http = require('http');
 // Module to create an HTTPS server and client.
 const https = require('https');
 const {injectAxe, getViolations} = require('axe-playwright');
+const {getCompliance} = require('accessibility-checker');
 const {commands} = require('./commands');
 // ########## CONSTANTS
 // Set debug to true to add debugging features.
@@ -107,10 +108,8 @@ const redirect = (url, response) => {
 };
 // Conducts an axe test.
 const axe = async (page, withItems, rules = []) => {
-  console.log('Starting axe');
   // Inject axe-core into the page.
   await injectAxe(page);
-  console.log('Axe injected');
   // Initialize the report.
   const report = {
     warnings: 0,
@@ -129,9 +128,7 @@ const axe = async (page, withItems, rules = []) => {
   if (rules.length) {
     axeOptions.runOnly = rules;
   }
-  console.log('About to get violations');
   const axeReport = await getViolations(page, null, axeOptions);
-  console.log('Got report');
   // If there are any such elements:
   if (axeReport.length) {
     // FUNCTION DEFINITIONS START
@@ -192,6 +189,26 @@ const axe = async (page, withItems, rules = []) => {
     // Return a success report.
     return 'O.K.';
   }
+};
+// Conducts an IBM test.
+const ibm = async (page, withItems) => {
+  const result = await getCompliance(page.url(), 'IBMAccessibilityChecker');
+  const report = {
+    totals: result.report.summary.counts
+  };
+  if (withItems) {
+    report.items = result.report.results;
+    report.items.forEach(item => {
+      delete item.apiArgs;
+      delete item.category;
+      delete item.ignored;
+      delete item.messageArgs;
+      delete item.reasonId;
+      delete item.ruleTime;
+      delete item.value;
+    });
+  }
+  return report;
 };
 // Conducts a WAVE test and returns a Promise of a result.
 const wave1 = url => {
@@ -547,7 +564,13 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
     if (isValid(act)) {
       // Identify the command properties.
       const {type, which, what} = act;
-      console.log(`Starting ${type} ${which}`);
+      const props = [type];
+      [which, what].forEach(prop => {
+        if (prop) {
+          props.push(prop);
+        }
+      });
+      console.log(`Starting ${props.join('/')}`);
       // If the command is a launch:
       if (type === 'launch') {
         // Launch the specified browser, creating a browser context and a page in it.
@@ -658,12 +681,22 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
           // Otherwise, if the act is an axe test:
           else if (type === 'axe') {
             // Conduct it and add its result to the act.
-            act.result = await axe(page, which);
+            act.result = await axe(page, true, which);
           }
           // Otherwise, if the act is an axe summary:
           else if (type === 'axeS') {
             // Conduct it and add its result to the act.
             act.result = await axe(page, false, []);
+          }
+          // Otherwise, if the act is an IBM test:
+          else if (type === 'ibm') {
+            // Conduct it and add its result to the act.
+            act.result = await ibm(page, true);
+          }
+          // Otherwise, if the act is an axe summary:
+          else if (type === 'ibmS') {
+            // Conduct it and add its result to the act.
+            act.result = await ibm(page, false);
           }
           // Otherwise, if the act is a combination of tests:
           else if (type === 'combo') {

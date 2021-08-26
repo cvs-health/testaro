@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/jrpool/autotest#readme",
   "dependencies": {
+    "accessibility-checker": "*",
     "axe-playwright": "*",
     "dotenv": "*",
     "playwright": "^1.14.0"

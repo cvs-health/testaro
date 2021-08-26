@@ -47,6 +47,18 @@ exports.commands = {
       'which': [true, 'string', 'hasLength']
     }
   ],
+  'ibm': [
+    'Perform an IBM test (what: description)',
+    {
+      'what': [false, 'string', 'hasLength']
+    }
+  ],
+  'ibmS': [
+    'Perform an IBM test and report only totals (what: description)',
+    {
+      'what': [false, 'string', 'hasLength']
+    }
+  ],
   'launch': [
     'Launch a Playwright browser (which: chromium, firefox, or webkit)',
     {
