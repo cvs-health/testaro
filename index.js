@@ -506,7 +506,7 @@ const isValid = command => {
     // If the specifications permit or require a which property:
     if (validator.which) {
       // If the command has a which property:
-      if (command.which) {
+      if (typeof command.which !== 'undefined') {
         // If its value has the required type:
         if (hasType(command.which, validator.which[1])) {
           // If its value has the required subtype:
