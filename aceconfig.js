@@ -1,11 +1,7 @@
 module.exports = {
   reportLevels: [
     'violation',
-    'potentialviolation',
-    'recommendation',
-    'potentialrecommendation',
-    'manual',
-    'pass'
+    'recommendation'
   ],
   outputFolder: 'ibmReports'
 };

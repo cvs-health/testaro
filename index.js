@@ -191,8 +191,16 @@ const axe = async (page, withItems, rules = []) => {
   }
 };
 // Conducts an IBM test.
-const ibm = async (page, withItems) => {
-  const result = await getCompliance(page.url(), 'IBMAccessibilityChecker');
+const ibm = async (page, isNew, withItems) => {
+  // Identify whether this test should refetch the page (increasing the violation count).
+  let content;
+  if (isNew) {
+    content = page.url();
+  }
+  else {
+    content = await page.content();
+  }
+  const result = await getCompliance(content, 'IBMAccessibilityChecker');
   const report = {
     totals: result.report.summary.counts
   };
@@ -450,35 +458,43 @@ const hasType = (variable, type) => {
   else if (type === 'array') {
     return Array.isArray(variable);
   }
+  else if (type === 'boolean') {
+    return typeof variable === 'boolean';
+  }
   else {
     return false;
   }
 };
-// Returns whether a variable has a specified type.
+// Returns whether a variable has any specified type.
 const hasSubtype = (variable, subtype) => {
-  if (subtype === 'hasLength') {
-    return variable.length > 0;
-  }
-  else if (subtype === 'isURL') {
-    return isURL(variable);
-  }
-  else if (subtype === 'isBrowserType') {
-    return isBrowserType(variable);
-  }
-  else if (subtype === 'isTagName') {
-    return isTagName(variable);
-  }
-  else if (subtype === 'isCustomTest') {
-    return tests[variable];
-  }
-  else if (subtype === 'isWaitable') {
-    return waitables.includes(variable);
-  }
-  else if (subtype === 'areStrings') {
-    return areStrings(variable);
+  if (subtype) {
+    if (subtype === 'hasLength') {
+      return variable.length > 0;
+    }
+    else if (subtype === 'isURL') {
+      return isURL(variable);
+    }
+    else if (subtype === 'isBrowserType') {
+      return isBrowserType(variable);
+    }
+    else if (subtype === 'isTagName') {
+      return isTagName(variable);
+    }
+    else if (subtype === 'isCustomTest') {
+      return tests[variable];
+    }
+    else if (subtype === 'isWaitable') {
+      return waitables.includes(variable);
+    }
+    else if (subtype === 'areStrings') {
+      return areStrings(variable);
+    }
+    else {
+      return false;
+    }
   }
   else {
-    return false;
+    return true;
   }
 };
 // Validates a command.

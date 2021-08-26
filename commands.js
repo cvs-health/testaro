@@ -48,14 +48,16 @@ exports.commands = {
     }
   ],
   'ibm': [
-    'Perform an IBM test (what: description)',
+    'Perform an IBM test (which: fetch a new page?; what: description)',
     {
+      'which': [true, 'boolean'],
       'what': [false, 'string', 'hasLength']
     }
   ],
   'ibmS': [
-    'Perform an IBM test and report only totals (what: description)',
+    'Perform an IBM test and report only totals (which: fetch new page?; what: description)',
     {
+      'which': [true, 'boolean'],
       'what': [false, 'string', 'hasLength']
     }
   ],
