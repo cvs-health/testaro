@@ -52,6 +52,12 @@ exports.reduce = result => {
       deficit.hoverS = 4 * facts.triggers + 2 * facts.targets || 0;
       deficit.total += deficit.hoverS;
     }
+    // ibmS
+    facts = scorablesOf('ibmS', 'totals');
+    if (facts) {
+      deficit.ibmS = 4 * facts.violation + 2 * facts.recommendation || 0;
+      deficit.total += deficit.ibmS;
+    }
     // labClashS (facts.unlabeled disregarded because covered by axeS)
     facts = scorablesOf('labClashS', 'totals');
     if (facts) {

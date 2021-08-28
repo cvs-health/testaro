@@ -709,7 +709,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
             // Conduct it and add its result to the act.
             act.result = await ibm(page, which, true);
           }
-          // Otherwise, if the act is an axe summary:
+          // Otherwise, if the act is an IBM summary:
           else if (type === 'ibmS') {
             // Conduct it and add its result to the act.
             act.result = await ibm(page, which, false);
@@ -732,6 +732,12 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
                 }
                 else if (firstTest === 'wave1') {
                   act.result.wave1 = await wave1(page.url());
+                }
+                else if (firstTest === 'ibm') {
+                  act.result.ibm = await ibm(page.url(), false, true);
+                }
+                else if (firstTest === 'ibmS') {
+                  act.result.ibm = await ibm(page.url(), false, false);
                 }
                 else if (tests[firstTest]) {
                   act.result[firstTest] = await require(`./tests/${firstTest}/app`).reporter(page);
@@ -1184,10 +1190,11 @@ const requestHandler = (request, response) => {
                 // Recursively process commands on URLs.
                 const doBatch = async (urls, isFirst, urlIndex) => {
                   if (urls.length) {
+                    // Identify the first URL.
                     const firstURL = urls[0];
                     acts[1].which = firstURL.which;
                     acts[1].what = firstURL.what;
-                    // Process the commands on the URL.
+                    // Process the commands on it.
                     let stage = 'more';
                     if (isFirst) {
                       stage = urls.length > 1 ? 'start' : 'all';

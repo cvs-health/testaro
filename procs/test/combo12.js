@@ -4,11 +4,11 @@ exports.reduce = result => {
   let deficit = {total: 0};
   let facts;
   if (typeof result === 'object') {
-    // axeS
-    facts = result.axeS && result.axeS.violations;
+    // axe
+    facts = result.axe && result.axe.violations;
     if (facts) {
-      deficit.axeS = 2 * facts.minor + 3 * facts.moderate + 4 * facts.serious + 5 * facts.critical;
-      deficit.total += deficit.axeS;
+      deficit.axe = 2 * facts.minor + 3 * facts.moderate + 4 * facts.serious + 5 * facts.critical;
+      deficit.total += deficit.axe;
     }
     // wave1
     facts = result.wave1 && result.wave1.categories;
@@ -31,45 +31,51 @@ exports.reduce = result => {
       deficit.bulk = Math.floor(Math.sqrt(Math.max(0, facts.visibleElements - 150))) || 0;
       deficit.total += deficit.bulk;
     }
-    // focOlS
-    facts = scorablesOf('focOlS', 'totals');
+    // focOl
+    facts = scorablesOf('focOl', 'totals');
     facts = facts ? facts.types : null;
     facts = facts ? facts.outlineMissing : null;
     if (facts) {
-      deficit.focOlS = 4 * facts.total || 0;
-      deficit.total += deficit.focOlS;
+      deficit.focOl = 4 * facts.total || 0;
+      deficit.total += deficit.focOl;
     }
-    // focOpS
-    facts = scorablesOf('focOpS', 'totals');
+    // focOp
+    facts = scorablesOf('focOp', 'totals');
     if (facts) {
-      deficit.focOpS
+      deficit.focOp
         = 4 * facts.operableNotFocusable.total + 1 * facts.focusableNotOperable.total || 0;
-      deficit.total += deficit.focOpS;
+      deficit.total += deficit.focOp;
     }
-    // hoverS
-    facts = scorablesOf('hoverS', 'totals');
+    // hover
+    facts = scorablesOf('hover', 'totals');
     if (facts) {
-      deficit.hoverS = 4 * facts.triggers + 2 * facts.targets || 0;
-      deficit.total += deficit.hoverS;
+      deficit.hover = 4 * facts.triggers + 2 * facts.targets || 0;
+      deficit.total += deficit.hover;
     }
-    // labClashS (facts.unlabeled disregarded because covered by axeS)
-    facts = scorablesOf('labClashS', 'totals');
+    // ibm
+    facts = scorablesOf('ibm', 'totals');
     if (facts) {
-      deficit.labClashS = 2 * facts.mislabeled + 0 * facts.unlabeled || 0;
-      deficit.total += deficit.labClashS;
+      deficit.ibm = 4 * facts.violation + 2 * facts.recommendation || 0;
+      deficit.total += deficit.ibm;
     }
-    // linkUlS
-    facts = scorablesOf('linkUlS', 'totals');
+    // labClash (facts.unlabeled disregarded because covered by axeS)
+    facts = scorablesOf('labClash', 'totals');
+    if (facts) {
+      deficit.labClash = 2 * facts.mislabeled + 0 * facts.unlabeled || 0;
+      deficit.total += deficit.labClash;
+    }
+    // linkUl
+    facts = scorablesOf('linkUl', 'totals');
     facts = facts ? facts.inline : null;
     if (facts) {
-      deficit.linkUlS = 3 * (facts.total - facts.underlined) || 0;
-      deficit.total += deficit.linkUlS;
+      deficit.linkUl = 3 * (facts.total - facts.underlined) || 0;
+      deficit.total += deficit.linkUl;
     }
-    // radioSetS
-    facts = scorablesOf('radioSetS', 'totals');
+    // radioSet
+    facts = scorablesOf('radioSet', 'totals');
     if (facts) {
-      deficit.radioSetS = 3 * (facts.total - facts.inSet) || 0;
-      deficit.total += deficit.radioSetS;
+      deficit.radioSet = 3 * (facts.total - facts.inSet) || 0;
+      deficit.total += deficit.radioSet;
     }
     // roleS
     facts = scorablesOf('roleS', '');
@@ -77,8 +83,8 @@ exports.reduce = result => {
       deficit.roleS = 3 * facts.badRoleElements || 0;
       deficit.total += deficit.roleS;
     }
-    // styleDiffS
-    facts = scorablesOf('styleDiffS', 'totals');
+    // styleDiff
+    facts = scorablesOf('styleDiff', 'totals');
     if (facts) {
       // Identify an array of objects having tag-name totals and style distributions as values.
       const tagNameCounts = Object.values(facts);
@@ -90,10 +96,10 @@ exports.reduce = result => {
         }
       );
       // Deficit: 2 per excess style + 0.2 per nonplurality element.
-      deficit.styleDiffS = Math.floor(deficits.reduce(
+      deficit.styleDiff = Math.floor(deficits.reduce(
         (total, currentPair) => total + 2 * currentPair[0] + 0.2 * currentPair[1], 0
       ));
-      deficit.total += deficit.styleDiffS;
+      deficit.total += deficit.styleDiff;
     }
   }
   // Return the score.
