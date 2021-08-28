@@ -192,7 +192,7 @@ const axe = async (page, withItems, rules = []) => {
 };
 // Conducts an IBM test.
 const ibm = async (page, isNew, withItems) => {
-  // Identify whether this test should refetch the page (increasing the violation count).
+  // Identify whether this test should refetch the page.
   let content;
   if (isNew) {
     content = page.url();
@@ -200,13 +200,19 @@ const ibm = async (page, isNew, withItems) => {
   else {
     content = await page.content();
   }
-  const result = await getCompliance(content, 'IBMAccessibilityChecker');
+  // Run the test and get the result. Delete the report file.
+  const nowLabel = (new Date()).toISOString().slice(0, 19);
+  const result = await getCompliance(content, nowLabel);
+  fs.rm('ibmtemp', {recursive: true});
+  // Identify a report of the result.
   const report = {
-    totals: result.report.summary.counts
+    result: {
+      totals: result.report.summary.counts
+    }
   };
   if (withItems) {
-    report.items = result.report.results;
-    report.items.forEach(item => {
+    report.result.items = result.report.results;
+    report.result.items.forEach(item => {
       delete item.apiArgs;
       delete item.category;
       delete item.ignored;
@@ -216,6 +222,7 @@ const ibm = async (page, isNew, withItems) => {
       delete item.value;
     });
   }
+  // Return it.
   return report;
 };
 // Conducts a WAVE test and returns a Promise of a result.
@@ -723,7 +730,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
             const doCombo = async testNames => {
               if (testNames.length) {
                 const firstTest = testNames[0];
-                console.log(`About to run ${firstTest}`);
+                console.log(`Combo progress: about to run test ${firstTest}`);
                 if (firstTest === 'axe') {
                   act.result.axe = await axe(page, true, []);
                 }
@@ -734,10 +741,10 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
                   act.result.wave1 = await wave1(page.url());
                 }
                 else if (firstTest === 'ibm') {
-                  act.result.ibm = await ibm(page.url(), false, true);
+                  act.result.ibm = await ibm(page, false, true);
                 }
                 else if (firstTest === 'ibmS') {
-                  act.result.ibm = await ibm(page.url(), false, false);
+                  act.result.ibm = await ibm(page, false, false);
                 }
                 else if (tests[firstTest]) {
                   act.result[firstTest] = await require(`./tests/${firstTest}/app`).reporter(page);
@@ -1192,6 +1199,7 @@ const requestHandler = (request, response) => {
                   if (urls.length) {
                     // Identify the first URL.
                     const firstURL = urls[0];
+                    console.log(`Batch progress: about to process ${firstURL}`);
                     acts[1].which = firstURL.which;
                     acts[1].what = firstURL.what;
                     // Process the commands on it.
