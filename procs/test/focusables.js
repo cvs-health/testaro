@@ -164,8 +164,8 @@ exports.focusables = async (page, operation) => {
         await tabDoNext();
       }
     }
-    // Otherwise, if the status is already:
-    else if (status === 'already') {
+    // Otherwise, if the status is already and the last navigation key was Tab:
+    else if (status === 'already' && lastNavKey === 'Tab') {
       // Increment the count.
       alreadyCount++;
       // If this is the first already:
