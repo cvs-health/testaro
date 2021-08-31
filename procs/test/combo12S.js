@@ -1,21 +1,9 @@
-// Reduces results of 11 tests to a score.
+// Reduces results of 12 tests to a score.
 exports.reduce = result => {
   // Initialize the score.
   let deficit = {total: 0};
   let facts;
   if (typeof result === 'object') {
-    // axeS
-    facts = result.axeS && result.axeS.violations;
-    if (facts) {
-      deficit.axeS = 2 * facts.minor + 3 * facts.moderate + 4 * facts.serious + 5 * facts.critical;
-      deficit.total += deficit.axeS;
-    }
-    // wave1
-    facts = result.wave1 && result.wave1.categories;
-    if (facts) {
-      deficit.wave1 = 2 * facts.alert.count + 3 * facts.contrast.count + 4 * facts.error.count;
-      deficit.total += deficit.wave1;
-    }
     // Identify the object containing the scorable results of a custom test.
     const scorablesOf = (test, prop) => {
       let scorables = result[test] && result[test].result;
@@ -24,6 +12,26 @@ exports.reduce = result => {
       }
       return scorables;
     };
+    // axeS
+    facts = result.axeS && result.axeS.violations;
+    if (facts) {
+      deficit.axeS
+        = 2 * facts.minor + 3 * facts.moderate + 4 * facts.serious + 5 * facts.critical
+        || 0;
+      deficit.total += deficit.axeS;
+    }
+    // ibmS
+    facts = scorablesOf('ibmS', 'totals');
+    if (facts) {
+      deficit.ibmS = 4 * facts.violation + 2 * facts.recommendation || 0;
+      deficit.total += deficit.ibmS;
+    }
+    // wave1
+    facts = result.wave1 && result.wave1.categories;
+    if (facts) {
+      deficit.wave1 = 2 * facts.alert.count + 3 * facts.contrast.count + 4 * facts.error.count || 0;
+      deficit.total += deficit.wave1;
+    }
     // bulk
     facts = scorablesOf('bulk', '');
     if (facts) {
@@ -51,12 +59,6 @@ exports.reduce = result => {
     if (facts) {
       deficit.hoverS = 4 * facts.triggers + 2 * facts.targets || 0;
       deficit.total += deficit.hoverS;
-    }
-    // ibmS
-    facts = scorablesOf('ibmS', 'totals');
-    if (facts) {
-      deficit.ibmS = 4 * facts.violation + 2 * facts.recommendation || 0;
-      deficit.total += deficit.ibmS;
     }
     // labClashS (facts.unlabeled disregarded because covered by axeS)
     facts = scorablesOf('labClashS', 'totals');
