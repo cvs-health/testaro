@@ -5,7 +5,9 @@ exports.hover = async (page, withItems) => {
     'body button:visible, body li:visible, body [onmouseenter]:visible, body [onmouseover]:visible'
   );
   // Identify the selectors of active elements likely to be disclosed by a hover.
-  const targetSelectors = 'a:visible, button:visible, input:visible, [role=menuitem]:visible';
+  const targetSelectors = ['a', 'button', 'input', '[role=menuitem]', 'span']
+  .map(selector => `${selector}:visible`)
+  .join(', ');
   // Initialize the result.
   const data = {
     totals: {
