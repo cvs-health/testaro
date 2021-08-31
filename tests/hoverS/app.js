@@ -1,4 +1,4 @@
-// Tabulates elements with inaccessible roles.
+// Tabulates elements that add to the page content when hovered over.
 exports.reporter = async page => {
   const data = await require('../../procs/test/hover').hover(page, false);
   return {result: data};
