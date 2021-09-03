@@ -134,5 +134,19 @@ exports.commands = {
       'which': [false, 'string', 'isURL'],
       'what': [false, 'string', 'hasLength']
     }
+  ],
+  'wave2': [
+    'Perform a type-2 WAVE test (which: URL if not the current; what: description)',
+    {
+      'which': [false, 'string', 'isURL'],
+      'what': [false, 'string', 'hasLength']
+    }
+  ],
+  'wave4': [
+    'Perform a type-4 WAVE test (which: URL if not the current; what: description)',
+    {
+      'which': [false, 'string', 'isURL'],
+      'what': [false, 'string', 'hasLength']
+    }
   ]
 };

@@ -137,7 +137,7 @@ Axe integration depends on the [axe-playwright](https://www.npmjs.com/package/ax
 
 #### WAVE
 
-WAVE integration depends on the user having a WAVE API key. Use of the WAVE API depletes the user’s WAVE API credits. The `wave1` command performs a WAVE test with `reporttype=1` on a specified URL. Such a test costs 1 credit ($0.04, or less in quantity). When you register with WebAIM and obtain a WAVE API key, you must add a line to your `.env` file, in the format `WAVE_KEY=x0x0x0x0x0x0x` (where `x0x0x0x0x0x0x` represents your key).
+WAVE integration depends on the user having a WAVE API key. Use of the WAVE API depletes the user’s WAVE API credits. The `wave1`, `wave2`, and `wave4` commands perform WAVE tests with respective `reporttype` values on a specified URL. Such a test costs 1, 2, or 3 credits, respectively ($0.04 per credit, or less in quantity). When you register with WebAIM and obtain a WAVE API key, you must add a line to your `.env` file, in the format `WAVE_KEY=x0x0x0x0x0x0x` (where `x0x0x0x0x0x0x` represents your key).
 
 ##### WAVE versus Axe
 

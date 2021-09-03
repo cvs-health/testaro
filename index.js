@@ -226,14 +226,14 @@ const ibm = async (page, isNew, withItems) => {
   return report;
 };
 // Conducts a WAVE test and returns a Promise of a result.
-const wave1 = url => {
+const wave = (url, reportType) => {
   const waveKey = process.env.WAVE_KEY;
   // Get the data from a WAVE test.
   return new Promise(resolve => {
     https.get(
       {
         host: 'wave.webaim.org',
-        path: `/api/request?key=${waveKey}&url=${url}`,
+        path: `/api/request?key=${waveKey}&url=${url}&reporttype=${reportType}`,
         protocol: 'https:'
       },
       response => {
@@ -244,7 +244,12 @@ const wave1 = url => {
         // When the data arrive, return them as an object.
         response.on('end', () => {
           try {
-            return resolve(JSON.parse(report));
+            const result = JSON.parse(report);
+            const categories = result.categories;
+            delete categories.feature;
+            delete categories.structure;
+            delete categories.aria;
+            return resolve(result);
           }
           catch (error) {
             return resolve({
@@ -652,7 +657,17 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
         // Otherwise, if the act is a valid WAVE type-1 test:
         else if (type === 'wave1') {
           // Conduct a WAVE test and add the result to the act.
-          act.result = await wave1(which || page.url());
+          act.result = await wave(which || page.url(), '1');
+        }
+        // Otherwise, if the act is a valid WAVE type-2 test:
+        else if (type === 'wave2') {
+          // Conduct a WAVE test and add the result to the act.
+          act.result = await wave(which || page.url(), '2');
+        }
+        // Otherwise, if the act is a valid WAVE type-4 test:
+        else if (type === 'wave4') {
+          // Conduct a WAVE test and add the result to the act.
+          act.result = await wave(which || page.url(), '4');
         }
         // Otherwise, if the page has a URL:
         else if (page.url() && page.url() !== 'about:blank') {
@@ -738,7 +753,13 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
                   act.result.axeS = await axe(page, false, []);
                 }
                 else if (firstTest === 'wave1') {
-                  act.result.wave1 = await wave1(page.url());
+                  act.result.wave1 = await wave(page.url(), '1');
+                }
+                else if (firstTest === 'wave2') {
+                  act.result.wave2 = await wave(page.url(), '2');
+                }
+                else if (firstTest === 'wave4') {
+                  act.result.wave4 = await wave(page.url(), '4');
                 }
                 else if (firstTest === 'ibm') {
                   act.result.ibm = await ibm(page, false, true);
@@ -1117,7 +1138,7 @@ const requestHandler = (request, response) => {
             && acts.length > 1
             && (
               acts[1].type === 'url'
-              || (acts[1].type === 'wave1' && isURL(acts[1].which))
+              || (['wave1', 'wave2', 'wave4'].includes(acts[1].type) && isURL(acts[1].which))
             )
           ) {
             // Process it.
