@@ -60,10 +60,10 @@ exports.reduce = result => {
       deficit.hoverS = 4 * facts.triggers + 2 * facts.targets || 0;
       deficit.total += deficit.hoverS;
     }
-    // labClashS (facts.unlabeled disregarded because covered by axeS)
+    // labClashS
     facts = scorablesOf('labClashS', 'totals');
     if (facts) {
-      deficit.labClashS = 2 * facts.mislabeled + 0 * facts.unlabeled || 0;
+      deficit.labClashS = 2 * facts.mislabeled + 4 * facts.unlabeled || 0;
       deficit.total += deficit.labClashS;
     }
     // linkUlS
