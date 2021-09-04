@@ -1,4 +1,4 @@
-// Reduces results of 12 tests to a score.
+// Reduces the results of 12 tests to a score, without discounts for duplicate reporting.
 exports.reduce = result => {
   // Initialize the score.
   let deficit = {total: 0};

@@ -92,7 +92,7 @@ WAVE:
   Fieldset missing legend (legend_missing): 2
   Missing fieldset (fieldset_missing): 3
   Orphaned form label (label_orphaned): 3
-  Empty link (link_empty): 3
 Custom:
   labClash/unlabeled: 3
   radioSet: 2
+  roleS: 2
