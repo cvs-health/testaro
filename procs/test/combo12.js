@@ -48,9 +48,6 @@ exports.reduce = result => {
     // axe
     facts = result.axe && result.axe.violations;
     if (facts) {
-      deficit.axe
-        = 2 * facts.minor + 3 * facts.moderate + 4 * facts.serious + 5 * facts.critical
-        || 0;
       const rules = result.axe.items;
       let totalDiscount = 0;
       rules.forEach(rule => {
@@ -59,12 +56,18 @@ exports.reduce = result => {
           totalDiscount += ruleDiscount * rule.elements.length;
         }
       });
-      deficit.total += deficit.axe - totalDiscount;
+      deficit.axe
+        = 2 * facts.minor
+        + 3 * facts.moderate
+        + 4 * facts.serious
+        + 5 * facts.critical
+        - totalDiscount
+        || 0;
+      deficit.total += deficit.axe;
     }
     // ibm
     facts = scorablesOf('ibm', 'totals');
     if (facts) {
-      deficit.ibm = 4 * facts.violation + 2 * facts.recommendation || 0;
       const rules = result.ibm.result.items;
       let totalDiscount = 0;
       rules.forEach(rule => {
@@ -73,12 +76,12 @@ exports.reduce = result => {
           totalDiscount += ruleDiscount;
         }
       });
-      deficit.total += deficit.ibm - totalDiscount;
+      deficit.ibm = 4 * facts.violation + 2 * facts.recommendation - totalDiscount || 0;
+      deficit.total += deficit.ibm;
     }
     // wave4
     facts = result.wave4 && result.wave4.categories;
     if (facts) {
-      deficit.wave4 = 2 * facts.alert.count + 3 * facts.contrast.count + 4 * facts.error.count || 0;
       let totalDiscount = 0;
       ['error', 'contrast', 'alert'].forEach(level => {
         const items = facts[level].items;
@@ -90,7 +93,10 @@ exports.reduce = result => {
           }
         });
       });
-      deficit.total += deficit.wave4 - totalDiscount;
+      deficit.wave4
+        = 2 * facts.alert.count + 3 * facts.contrast.count + 4 * facts.error.count - totalDiscount
+        || 0;
+      deficit.total += deficit.wave4;
     }
     // bulk
     facts = scorablesOf('bulk', '');
