@@ -620,7 +620,7 @@ const typeReport = async (tempTypeName, testName, act, page) => {
   // Visit the current URL.
   await visit(act, tempPage, url);
   // Conduct and report the test.
-  act.result[testName] = await require(`./tests/${testName}/app.`).reporter(tempPage);
+  act.result[testName] = await require(`./tests/${testName}/app`).reporter(tempPage);
   // Launch the previous browser for any subsequent acts.
   await launch(oldBrowserTypeName);
   // Visit the page with it.
