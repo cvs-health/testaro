@@ -11,18 +11,21 @@ require('dotenv').config();
 const http = require('http');
 // Module to create an HTTPS server and client.
 const https = require('https');
-const {injectAxe, getViolations} = require('axe-playwright');
+// Accessibility-testing packages.
 const {getCompliance} = require('accessibility-checker');
+// Requirements for commands.
 const {commands} = require('./commands');
 // ########## CONSTANTS
 // Set debug to true to add debugging features.
 const debug = false;
+// Set waits to a positive number to insert delays (in ms).
 const waits = 0;
 const protocol = process.env.PROTOCOL || 'https';
 // Files servable without modification.
 const statics = {
   '/style.css': 'text/css'
 };
+// URLs to be redirected.
 const redirects = {
   '/': '/autotest/index.html'
 };
@@ -48,7 +51,7 @@ const errorPageEnd = [
 ];
 const customErrorPage = customErrorPageStart.concat(...errorPageEnd);
 const systemErrorPage = systemErrorPageStart.concat(...errorPageEnd);
-// CSS selectors for actions.
+// CSS selectors for targets of moves.
 const moves = {
   text: 'input[type=text]',
   radio: 'input[type=radio]',
@@ -58,6 +61,7 @@ const moves = {
   link: 'a',
   focus: true
 };
+// Names and descriptions of custom tests.
 const tests = {
   autocom: 'list inputs with their autocomplete attributes',
   bodyText: 'give the text content of the page body',
@@ -91,13 +95,16 @@ const tests = {
   styleDiff: 'tabulate and list style inconsistencies',
   styleDiffS: 'tabulate style inconsistencies'
 };
+// Browser types available in PlayWright.
 const browserTypeNames = {
   'chromium': 'Chrome',
   'firefox': 'Firefox',
   'webkit': 'Safari'
 };
+// Items that may be waited for.
 const waitables = ['url', 'title', 'body'];
 // ########## VARIABLES
+// Facts about the current browser.
 let browserContext;
 let browserTypeName;
 // ########## FUNCTIONS
@@ -107,92 +114,8 @@ const redirect = (url, response) => {
   response.setHeader('Location', url);
   response.end();
 };
-// Conducts an axe test.
-const axe = async (page, withItems, rules = []) => {
-  // Inject axe-core into the page.
-  await injectAxe(page);
-  // Initialize the report.
-  const report = {
-    warnings: 0,
-    violations: {
-      minor: 0,
-      moderate: 0,
-      serious: 0,
-      critical: 0
-    }
-  };
-  if (withItems) {
-    report.items = [];
-  }
-  // Get the data on the elements violating the specified axe-core rules.
-  const axeOptions = {};
-  if (rules.length) {
-    axeOptions.runOnly = rules;
-  }
-  const axeReport = await getViolations(page, null, axeOptions);
-  // If there are any such elements:
-  if (axeReport.length) {
-    // FUNCTION DEFINITIONS START
-    // Compacts a check violation.
-    const compactCheck = checkObj => {
-      return {
-        check: checkObj.id,
-        description: checkObj.message,
-        impact: checkObj.impact
-      };
-    };
-    // Compacts a violating element.
-    const compactViolator = elObj => {
-      const out = {
-        selector: elObj.target[0],
-        impact: elObj.impact
-      };
-      if (elObj.any && elObj.any.length) {
-        out['must pass any of'] = elObj.any.map(checkObj => compactCheck(checkObj));
-      }
-      if (elObj.none && elObj.none.length) {
-        out['must pass all of'] = elObj.none.map(checkObj => compactCheck(checkObj));
-      }
-      return out;
-    };
-    // Compacts a violated rule.
-    const compactRule = rule => {
-      const out = {
-        rule: rule.id,
-        description: rule.description,
-        impact: rule.impact,
-        elements: {}
-      };
-      if (rule.nodes && rule.nodes.length) {
-        out.elements = rule.nodes.map(el => compactViolator(el));
-      }
-      return out;
-    };
-    // FUNCTION DEFINITIONS END
-    // For each rule violated:
-    axeReport.forEach(rule => {
-      // For each element violating the rule:
-      rule.nodes.forEach(element => {
-        // Increment the element count of the impact of its violation.
-        report.violations[element.impact]++;
-      });
-      // If details are required:
-      if (withItems) {
-        // Add it to the report.
-        report.items.push(compactRule(rule));
-      }
-    });
-    // Return the report.
-    return report;
-  }
-  // Otherwise, i.e. if there are no violations:
-  else {
-    // Return a success report.
-    return 'O.K.';
-  }
-};
 // Conducts an IBM test.
-const ibm = async (page, isNew, withItems) => {
+const ibm = async (page, withItems, isNew) => {
   // Identify whether this test should refetch the page.
   let content;
   if (isNew) {
@@ -478,7 +401,7 @@ const hasType = (variable, type) => {
     return false;
   }
 };
-// Returns whether a variable has any specified type.
+// Restrictions on property values in the commands file.
 const hasSubtype = (variable, subtype) => {
   if (subtype) {
     if (subtype === 'hasLength') {
@@ -585,6 +508,7 @@ const isValid = command => {
 const visit = async (act, page, url) => {
   // Visit the URL and wait until it is stable.
   const resolved = url.replace('__dirname', __dirname);
+  console.log(`resolved is ${resolved}`);
   try {
     await page.goto(resolved, {
       timeout: 10000,
@@ -624,7 +548,8 @@ const typeReport = async (tempTypeName, testName, act, page) => {
   // Launch the previous browser for any subsequent acts.
   await launch(oldBrowserTypeName);
   // Visit the page with it.
-  await visit('', browserContext.pages[0], url);
+  console.log(`browserContext page count is ${browserContext.pages().length}`);
+  await visit('', browserContext.pages()[0], url);
 };
 // Recursively performs the acts commanded in a report.
 const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
@@ -722,49 +647,36 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
             });
             act.result = 'All elements visible.';
           }
-          // If the act is a custom test:
+          // If the act is a test:
           else if (type === 'test') {
             // Add a description of the test to the act.
             act.what = tests[which];
-            // If the test is motion:
-            if (which === 'motion') {
-              // Conduct and report it with Safari.
-              await typeReport('webkit', 'motion', act, page);
+            // Identify the argument(s).
+            const args = [page];
+            if (act.args) {
+              args.push(...act.args);
             }
-            // Otherwise, i.e. if the test is any other custom test:
-            else {
-              // Conduct and report it.
-              const testReport = await require(`./tests/${which}/app`).reporter(page);
-              // If the test produced exhibits:
-              if (testReport.exhibits) {
-                // Add that fact to the act.
-                act.exhibits = 'appended';
-                // Replace any browser-type placeholder in the exhibits.
-                const newExhibits = testReport.exhibits.replace(
-                  /__browserTypeName__/g, browserTypeNames[browserTypeName]
-                );
-                // Append the exhibits to the exhibits in the report.
-                if (report.exhibits) {
-                  report.exhibits += `\n${newExhibits}`;
-                }
-                else {
-                  report.exhibits = newExhibits;
-                }
+            // Conduct and report the test.
+            const testReport = await require(`./tests/${which}/app`).reporter(...args);
+            // If the test produced exhibits:
+            if (testReport.exhibits) {
+              // Add that fact to the act.
+              act.exhibits = 'appended';
+              // Replace any browser-type placeholder in the exhibits.
+              const newExhibits = testReport.exhibits.replace(
+                /__browserTypeName__/g, browserTypeNames[browserTypeName]
+              );
+              // Append the exhibits to the exhibits in the report.
+              if (report.exhibits) {
+                report.exhibits += `\n${newExhibits}`;
               }
-              // Add the result object (possibly an array) to the act.
-              const resultCount = Object.keys(testReport.result).length;
-              act.result = resultCount ? testReport.result : 'NONE';
+              else {
+                report.exhibits = newExhibits;
+              }
             }
-          }
-          // Otherwise, if the act is an axe test:
-          else if (type === 'axe') {
-            // Conduct it and add its result to the act.
-            act.result = await axe(page, true, which);
-          }
-          // Otherwise, if the act is an axe summary:
-          else if (type === 'axeS') {
-            // Conduct it and add its result to the act.
-            act.result = await axe(page, false, []);
+            // Add the result object (possibly an array) to the act.
+            const resultCount = Object.keys(testReport.result).length;
+            act.result = resultCount ? testReport.result : 'NONE';
           }
           // Otherwise, if the act is an IBM test:
           else if (type === 'ibm') {
@@ -839,7 +751,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
               }
             }
           }
-          // Otherwise, if the act targets a text-identified element:
+          // Otherwise, if the act is a move:
           else if (moves[type]) {
             const selector = typeof moves[type] === 'string' ? moves[type] : act.what;
             // Identify the index of the specified element among same-type elements.

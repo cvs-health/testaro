@@ -101,9 +101,10 @@ exports.commands = {
     }
   ],
   'test': [
-    'Perform a custom test (which: test name; what: description)',
+    'Perform a test (which: test name; args: arguments; what: description)',
     {
       'which': [true, 'string', 'isCustomTest'],
+      'args': [false, 'array', 'areStrings'],
       'what': [false, 'string', 'hasLength']
     }
   ],
