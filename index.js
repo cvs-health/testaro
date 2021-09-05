@@ -16,7 +16,7 @@ const {getCompliance} = require('accessibility-checker');
 const {commands} = require('./commands');
 // ########## CONSTANTS
 // Set debug to true to add debugging features.
-const debug = true;
+const debug = false;
 const waits = 0;
 const protocol = process.env.PROTOCOL || 'https';
 // Files servable without modification.
@@ -592,13 +592,39 @@ const visit = async (act, page, url) => {
     });
     // Press the Esc key to dismiss any initial modal dialog.
     await page.keyboard.press('Escape');
-    // Add the resulting URL to the act.
-    act.result = page.url();
+    // Add the resulting URL to the act, if any.
+    if (act) {
+      act.result = page.url();
+    }
   }
   catch (error) {
     await page.goto('about:blank');
-    act.result = `ERROR visiting ${resolved}: ${error.message}`;
+    if (act) {
+      act.result = `ERROR visiting ${resolved}: ${error.message}`;
+    }
+    else {
+      console.log(`ERROR visiting ${resolved}`);
+    }
   }
+};
+// Conduct and report a custom test with a temporary specific browser type.
+const typeReport = async (tempTypeName, testName, act, page) => {
+  // Save the URL.
+  const url = page.url();
+  // Save the existing browser type name.
+  const oldBrowserTypeName = browserTypeName;
+  // Launch a browser of the specified type, changing the browser variables.
+  await launch(tempTypeName);
+  // Identify its only page as current.
+  const tempPage = browserContext.pages()[0];
+  // Visit the current URL.
+  await visit(act, tempPage, url);
+  // Conduct and report the test.
+  act.result[testName] = await require(`./tests/${testName}/app.`).reporter(tempPage);
+  // Launch the previous browser for any subsequent acts.
+  await launch(oldBrowserTypeName);
+  // Visit the page with it.
+  await visit('', browserContext.pages[0], url);
 };
 // Recursively performs the acts commanded in a report.
 const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
@@ -698,29 +724,37 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
           }
           // If the act is a custom test:
           else if (type === 'test') {
-            // Conduct it.
-            const testReport = await require(`./tests/${which}/app`).reporter(page);
             // Add a description of the test to the act.
             act.what = tests[which];
-            // If the test produced exhibits:
-            if (testReport.exhibits) {
-              // Add that fact to the act.
-              act.exhibits = 'appended';
-              // Replace any browser-type placeholder in the exhibits.
-              const newExhibits = testReport.exhibits.replace(
-                /__browserTypeName__/g, browserTypeNames[browserTypeName]
-              );
-              // Append the exhibits to the exhibits in the report.
-              if (report.exhibits) {
-                report.exhibits += `\n${newExhibits}`;
-              }
-              else {
-                report.exhibits = newExhibits;
-              }
+            // If the test is motion:
+            if (which === 'motion') {
+              // Conduct and report it with Safari.
+              await typeReport('webkit', 'motion', act, page);
             }
-            // Add the result object (possibly an array) to the act.
-            const resultCount = Object.keys(testReport.result).length;
-            act.result = resultCount ? testReport.result : 'NONE';
+            // Otherwise, i.e. if the test is any other custom test:
+            else {
+              // Conduct and report it.
+              const testReport = await require(`./tests/${which}/app`).reporter(page);
+              // If the test produced exhibits:
+              if (testReport.exhibits) {
+                // Add that fact to the act.
+                act.exhibits = 'appended';
+                // Replace any browser-type placeholder in the exhibits.
+                const newExhibits = testReport.exhibits.replace(
+                  /__browserTypeName__/g, browserTypeNames[browserTypeName]
+                );
+                // Append the exhibits to the exhibits in the report.
+                if (report.exhibits) {
+                  report.exhibits += `\n${newExhibits}`;
+                }
+                else {
+                  report.exhibits = newExhibits;
+                }
+              }
+              // Add the result object (possibly an array) to the act.
+              const resultCount = Object.keys(testReport.result).length;
+              act.result = resultCount ? testReport.result : 'NONE';
+            }
           }
           // Otherwise, if the act is an axe test:
           else if (type === 'axe') {
@@ -774,17 +808,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
                   act.result.ibm = await ibm(page, false, false);
                 }
                 else if (firstTest === 'motion') {
-                  /*
-                    Launch Safari, creating a browser context and a page in it, because Chrome
-                    fails to render some moving images.
-                  */
-                  await launch('webkit');
-                  // Identify its only page as current.
-                  const motionPage = browserContext.pages()[0];
-                  // Visit the current URL with Safari.
-                  await visit(act, motionPage, page.url());
-                  // Conduct and report the motion test.
-                  act.result.motion = await require('./tests/motion/app.').reporter(motionPage);
+                  await typeReport('webkit', 'motion', act, page);
                 }
                 else if (tests[firstTest]) {
                   act.result[firstTest] = await require(`./tests/${firstTest}/app`).reporter(page);
