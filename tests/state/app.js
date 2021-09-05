@@ -1,6 +1,5 @@
 /*
-  Shows the currently focused element in normal, focused, hovered, and focused-hovered states in
-  3 browsers.
+  Shows the currently focused element in normal, focused, hovered, and focused-hovered states.
 */
 exports.reporter = async page => {
   // CONSTANTS AND VARIABLES
@@ -154,7 +153,7 @@ exports.reporter = async page => {
     }
   };
   // FUNCTION DEFINITIONS END
-  // Make the screen shots in Chrome.
+  // Make the screen shots.
   const shot = await shootAll();
   // If the shooting succeeded:
   if (shot) {

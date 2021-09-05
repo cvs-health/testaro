@@ -16,7 +16,7 @@ const {getCompliance} = require('accessibility-checker');
 const {commands} = require('./commands');
 // ########## CONSTANTS
 // Set debug to true to add debugging features.
-const debug = false;
+const debug = true;
 const waits = 0;
 const protocol = process.env.PROTOCOL || 'https';
 // Files servable without modification.
@@ -80,6 +80,7 @@ const tests = {
   labClashS: 'tabulate inconsistencies in labeling',
   linkUl: 'tabulate and list underlined and other inline links',
   linkUlS: 'tabulate inline links and how many are underlined',
+  motion: 'report motion',
   radioSet: 'tabulate and list radio buttons in and not in accessible fieldsets',
   radioSetS: 'tabulate radio buttons in and not in accessible fieldsets',
   roleList: 'list elements having role attributes',
@@ -580,6 +581,25 @@ const isValid = command => {
     return false;
   }
 };
+// Visits a URL.
+const visit = async (act, page, url) => {
+  // Visit the URL and wait until it is stable.
+  const resolved = url.replace('__dirname', __dirname);
+  try {
+    await page.goto(resolved, {
+      timeout: 10000,
+      waitUntil: 'load'
+    });
+    // Press the Esc key to dismiss any initial modal dialog.
+    await page.keyboard.press('Escape');
+    // Add the resulting URL to the act.
+    act.result = page.url();
+  }
+  catch (error) {
+    await page.goto('about:blank');
+    act.result = `ERROR visiting ${resolved}: ${error.message}`;
+  }
+};
 // Recursively performs the acts commanded in a report.
 const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
   // Identify the acts in the report. Their initial values are commands.
@@ -611,21 +631,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
         // If the command is a url:
         if (type === 'url') {
           // Visit it and wait until it is stable.
-          const resolved = which.replace('__dirname', __dirname);
-          try {
-            await page.goto(resolved, {
-              timeout: 10000,
-              waitUntil: 'load'
-            });
-            // Press the Esc key to dismiss any initial modal dialog.
-            await page.keyboard.press('Escape');
-            // Add the resulting URL to the act.
-            act.result = page.url();
-          }
-          catch (error) {
-            await page.goto('about:blank');
-            act.result = `ERROR visiting ${resolved}: ${error.message}`;
-          }
+          await visit(act, page, which);
         }
         // Otherwise, if the act is a wait:
         else if (type === 'wait') {
@@ -766,6 +772,19 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
                 }
                 else if (firstTest === 'ibmS') {
                   act.result.ibm = await ibm(page, false, false);
+                }
+                else if (firstTest === 'motion') {
+                  /*
+                    Launch Safari, creating a browser context and a page in it, because Chrome
+                    fails to render some moving images.
+                  */
+                  await launch('webkit');
+                  // Identify its only page as current.
+                  const motionPage = browserContext.pages()[0];
+                  // Visit the current URL with Safari.
+                  await visit(act, motionPage, page.url());
+                  // Conduct and report the motion test.
+                  act.result.motion = await require('./tests/motion/app.').reporter(motionPage);
                 }
                 else if (tests[firstTest]) {
                   act.result[firstTest] = await require(`./tests/${firstTest}/app`).reporter(page);
