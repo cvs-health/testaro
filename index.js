@@ -813,7 +813,7 @@ const requestHandler = (request, response) => {
             // If there is no batch:
             if (batchName === 'None') {
               // Process the script.
-              scriptHandler(true, scriptName, what, acts, query, 'all', -1, response);
+              scriptHandler(what, acts, query, 'all', -1, response);
             }
             // Otherwise, i.e. if there is a batch:
             else {
@@ -855,9 +855,7 @@ const requestHandler = (request, response) => {
                       else {
                         stage = hosts.length > 1 ? 'more' : 'end';
                       }
-                      await scriptHandler(
-                        false, scriptName, what, acts, query, stage, hostIndex, response
-                      );
+                      await scriptHandler(what, acts, query, stage, hostIndex, response);
                       // Process the remaining hosts.
                       await doBatch(hosts.slice(1), false, hostIndex + 1);
                     }
