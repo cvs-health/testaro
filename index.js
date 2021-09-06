@@ -287,7 +287,7 @@ const isBrowserType = type => ['chromium', 'firefox', 'webkit'].includes(type);
 const isURL = string => /^(?:https?|file):\/\/[^ ]+$/.test(string);
 // Validates a focusable tag name.
 const isFocusable = string => ['a', 'button', 'input', 'select', 'option'].includes(string);
-// Returns whether a variable has a specified type.
+// Returns whether all elements of an array are strings.
 const areStrings = array => array.every(element => typeof element === 'string');
 // Returns whether a variable has a specified type.
 const hasType = (variable, type) => {
@@ -307,7 +307,7 @@ const hasType = (variable, type) => {
     return false;
   }
 };
-// Restrictions on property values in the commands file.
+// Returns whether a variable has a specified subtype.
 const hasSubtype = (variable, subtype) => {
   if (subtype) {
     if (subtype === 'hasLength') {
@@ -344,7 +344,7 @@ const isValid = command => {
   // Identify the type of the command.
   const type = command.type;
   // If the type exists and is known:
-  if (type && commands[type]) {
+  if (type && commands.etc[type]) {
     // Initialize the validators of the command.
     let validator = {};
     // If the type is test:
@@ -354,11 +354,11 @@ const isValid = command => {
       // If it is known:
       if (testName && tests[testName]) {
         // Add its validator(s).
-        validator = commands.tests.all[1];
-        const extraVal = commands.tests.some[testName][1];
+        validator = commands.etc.test[1];
+        const extraVal = commands.tests[testName];
         if (extraVal) {
-          Object.keys(extraVal).forEach(key => {
-            validator[key] = extraVal[key];
+          Object.keys(extraVal[1]).forEach(key => {
+            validator[key] = extraVal[1][key];
           });
         }
       }
@@ -366,7 +366,7 @@ const isValid = command => {
     // Otherwise, i.e. if the type is not test:
     else {
       // Add its validator.
-      validator = commands[type][1];
+      validator = commands.etc[type][1];
     }
     // Return whether the command is valid.
     return Object.keys(validator).every(property => {
@@ -491,7 +491,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
             // Initialize the arguments.
             const args = [page];
             // Identify the additional validator of the test.
-            const testValidator = commands.tests.some[act.which];
+            const testValidator = commands.tests[act.which];
             // If it exists:
             if (testValidator) {
               // Identify its argument properties.
