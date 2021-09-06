@@ -637,7 +637,7 @@ const scriptHandler = async (
   // Render and serve the output.
   render('', stage, 'out', query, response);
 };
-// Recursively gets an object of file-name bases and property values from JSON object files.
+// Recursively gets an array of file-name base/property-value arrays from JSON object files.
 const getWhats = async (path, baseNames, result) => {
   if (baseNames.length) {
     const firstName = baseNames[0];
@@ -761,14 +761,14 @@ const requestHandler = (request, response) => {
           // When the array arrives, get an array of batch names from it.
           const batchNames = batchFileNames
           .filter(name => name.endsWith('.json'))
-          .map(name => name.slice(0, -5))
-          .concat('None');
-          // Add their count to the query.
-          query.batchSize = batchNames.length;
+          .map(name => name.slice(0, -5));
           // Get their descriptions.
           const batchWhats = await getWhats(batchDir, batchNames, []);
-          batchWhats.unshift('Perform the script without a batch');
-          // When the descriptions arrive, add them as options to the query.
+          // Prepend a no-batch option to the name/description array.
+          batchWhats.unshift(['None', 'Perform the script without a batch']);
+          // Add the count of batches to the query.
+          query.batchSize = batchWhats.length;
+          // Add the batch names and descriptions as options to the query.
           query.batchNames = batchWhats.map((pair, index) => {
             const state = index === 0 ? 'selected ' : '';
             return `<option ${state}value="${pair[0]}">${pair[0]}: ${pair[1]}</option>`;
