@@ -418,9 +418,6 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
     const act = acts[actIndex];
     // If it is valid:
     if (isValid(act)) {
-      // Identify its properties.
-      const props = Object.keys(act);
-      console.log(`Starting ${props.join('/')}`);
       // If the command is a launch:
       if (act.type === 'launch') {
         // Launch the specified browser, creating a browser context and a page in it.
