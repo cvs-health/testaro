@@ -1,153 +1,153 @@
 exports.commands = {
-  'axe': [
+  axe: [
     'Perform an Axe test (which: names of rules, or empty if all; what: description)',
     {
-      'which': [true, 'array', 'areStrings'],
-      'what': [false, 'string', 'hasLength']
+      which: [true, 'array', 'areStrings'],
+      what: [false, 'string', 'hasLength']
     }
   ],
-  'axeS': [
+  axeS: [
     'Perform an Axe test with all rules and report only totals (what: description)',
     {
-      'what': [false, 'string', 'hasLength']
+      what: [false, 'string', 'hasLength']
     }
   ],
-  'batch': [
+  batch: [
     'Execute a script once for each URL; which: base of name of file of URLs; what: script)',
     {
-      'which': [true, 'string', 'hasLength'],
-      'what': [true, 'string', 'hasLength']
+      which: [true, 'string', 'hasLength'],
+      what: [true, 'string', 'hasLength']
     }
   ],
-  'button': [
+  button: [
     'Click a button (which: substring of its text; what: description)',
     {
-      'which': [true, 'string', 'hasLength'],
-      'what': [false, 'string', 'hasLength']
+      which: [true, 'string', 'hasLength'],
+      what: [false, 'string', 'hasLength']
     }
   ],
-  'checkbox': [
+  checkbox: [
     'Check a checkbox (which: substring of its text; what: description)',
     {
-      'which': [true, 'string', 'hasLength'],
-      'what': [false, 'string', 'hasLength']
+      which: [true, 'string', 'hasLength'],
+      what: [false, 'string', 'hasLength']
     }
   ],
-  'combo': [
+  combo: [
     'Perform a combination of tests (which: array of reducer and test names; what: description)',
     {
-      'which': [true, 'array', 'areStrings'],
-      'what': [false, 'string', 'hasLength']
+      which: [true, 'array', 'areStrings'],
+      what: [false, 'string', 'hasLength']
     }
   ],
-  'focus': [
+  focus: [
     'Put the specified element into focus (what: element type; which: substring of its text)',
     {
-      'what': [true, 'string', 'isTagName'],
-      'which': [true, 'string', 'hasLength']
+      what: [true, 'string', 'isTagName'],
+      which: [true, 'string', 'hasLength']
     }
   ],
-  'ibm': [
+  ibm: [
     'Perform an IBM test (which: fetch a new page?; what: description)',
     {
-      'which': [true, 'boolean'],
-      'what': [false, 'string', 'hasLength']
+      which: [true, 'boolean'],
+      what: [false, 'string', 'hasLength']
     }
   ],
-  'ibmS': [
+  ibmS: [
     'Perform an IBM test and report only totals (which: fetch new page?; what: description)',
     {
-      'which': [true, 'boolean'],
-      'what': [false, 'string', 'hasLength']
+      which: [true, 'boolean'],
+      what: [false, 'string', 'hasLength']
     }
   ],
-  'launch': [
+  launch: [
     'Launch a Playwright browser (which: chromium, firefox, or webkit)',
     {
-      'which': [true, 'string', 'isBrowserType']
+      which: [true, 'string', 'isBrowserType']
     }
   ],
-  'link': [
+  link: [
     'Click a link (which: substring of its text; what: description)',
     {
-      'which': [true, 'string', 'hasLength'],
-      'what': [false, 'string', 'hasLength']
+      which: [true, 'string', 'hasLength'],
+      what: [false, 'string', 'hasLength']
     }
   ],
-  'page': [
+  page: [
     'Switch to the last-opened browser tab (what: description)',
     {
-      'what': [false, 'string', 'hasLength']
+      what: [false, 'string', 'hasLength']
     }
   ],
-  'radio': [
+  radio: [
     'Check a radio button (which: substring of its text; what: description)',
     {
-      'which': [true, 'string', 'hasLength'],
-      'what': [false, 'string', 'hasLength']
+      which: [true, 'string', 'hasLength'],
+      what: [false, 'string', 'hasLength']
     }
   ],
-  'reveal': [
+  reveal: [
     'Make all elements visible (what: description)',
     {
-      'what': [false, 'string', 'hasLength']
+      what: [false, 'string', 'hasLength']
     }
   ],
-  'select': [
+  select: [
     'Select a select option (which: substring of list text; what: substring of option text)',
     {
-      'which': [true, 'string', 'hasLength'],
-      'what': [true, 'string', 'hasLength']
+      which: [true, 'string', 'hasLength'],
+      what: [true, 'string', 'hasLength']
     }
   ],
-  'test': [
+  test: [
     'Perform a test (which: test name; args: arguments; what: description)',
     {
-      'which': [true, 'string', 'isCustomTest'],
-      'args': [false, 'array', 'areStrings'],
-      'what': [false, 'string', 'hasLength']
+      which: [true, 'string', 'isCustomTest'],
+      args: [false, 'array'],
+      what: [false, 'string', 'hasLength']
     }
   ],
-  'text': [
+  text: [
     'Enter text into a text input (which: substring of its text; what: text to enter)',
     {
-      'which': [true, 'string', 'hasLength'],
-      'what': [true, 'string', 'hasLength']
+      which: [true, 'string', 'hasLength'],
+      what: [true, 'string', 'hasLength']
     }
   ],
-  'url': [
+  url: [
     'Navigate with the current page to a new URL (which: URL; what: description)',
     {
-      'which': [true, 'string', 'isURL'],
-      'what': [false, 'string', 'hasLength']
+      which: [true, 'string', 'isURL'],
+      what: [false, 'string', 'hasLength']
     }
   ],
-  'wait': [
+  wait: [
     'Wait until something appears (what: type of thing; which: substring of its text)',
     {
-      'what': [true, 'string', 'isWaitable'],
-      'which': [true, 'string', 'hasLength']
+      what: [true, 'string', 'isWaitable'],
+      which: [true, 'string', 'hasLength']
     }
   ],
-  'wave1': [
+  wave1: [
     'Perform a type-1 WAVE test (which: URL if not the current; what: description)',
     {
-      'which': [false, 'string', 'isURL'],
-      'what': [false, 'string', 'hasLength']
+      which: [false, 'string', 'isURL'],
+      what: [false, 'string', 'hasLength']
     }
   ],
-  'wave2': [
+  wave2: [
     'Perform a type-2 WAVE test (which: URL if not the current; what: description)',
     {
-      'which': [false, 'string', 'isURL'],
-      'what': [false, 'string', 'hasLength']
+      which: [false, 'string', 'isURL'],
+      what: [false, 'string', 'hasLength']
     }
   ],
-  'wave4': [
+  wave4: [
     'Perform a type-4 WAVE test (which: URL if not the current; what: description)',
     {
-      'which': [false, 'string', 'isURL'],
-      'what': [false, 'string', 'hasLength']
+      which: [false, 'string', 'isURL'],
+      what: [false, 'string', 'hasLength']
     }
   ]
 };

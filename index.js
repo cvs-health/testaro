@@ -11,8 +11,6 @@ require('dotenv').config();
 const http = require('http');
 // Module to create an HTTPS server and client.
 const https = require('https');
-// Accessibility-testing packages.
-const {getCompliance} = require('accessibility-checker');
 // Requirements for commands.
 const {commands} = require('./commands');
 // ########## CONSTANTS
@@ -113,41 +111,6 @@ const redirect = (url, response) => {
   response.statusCode = 303;
   response.setHeader('Location', url);
   response.end();
-};
-// Conducts an IBM test.
-const ibm = async (page, withItems, isNew) => {
-  // Identify whether this test should refetch the page.
-  let content;
-  if (isNew) {
-    content = page.url();
-  }
-  else {
-    content = await page.content();
-  }
-  // Run the test and get the result. Delete the report file.
-  const nowLabel = (new Date()).toISOString().slice(0, 19);
-  const result = await getCompliance(content, nowLabel);
-  fs.rm('ibmtemp', {recursive: true});
-  // Identify a report of the result.
-  const report = {
-    result: {
-      totals: result.report.summary.counts
-    }
-  };
-  if (withItems) {
-    report.result.items = result.report.results;
-    report.result.items.forEach(item => {
-      delete item.apiArgs;
-      delete item.category;
-      delete item.ignored;
-      delete item.messageArgs;
-      delete item.reasonId;
-      delete item.ruleTime;
-      delete item.value;
-    });
-  }
-  // Return it.
-  return report;
 };
 // Conducts a WAVE test and returns a Promise of a result.
 const wave = (url, reportType) => {
