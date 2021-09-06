@@ -43,7 +43,7 @@ const compile = async (page, elements, totals, items, itemProp, withItems) => {
   }
 };
 // Returns counts, and texts if required, of focusable elements with and without focal outlines.
-exports.focOl = async (page, withItems, revealAll) => {
+exports.reporter = async (page, withItems, revealAll) => {
   // If all elements are to be revealed:
   if (revealAll) {
     // Make them all visible.
@@ -60,13 +60,6 @@ exports.focOl = async (page, withItems, revealAll) => {
       });
     });
   }
-};
-// Tabulates and lists focusable elements with and without outlines when focused.
-exports.reporter = async page => {
-  const data = await require('../../procs/test/focOl').focOl(page, true, false);
-  return {result: data};
-};
-
   // Mark the focusable elements as outlined or not outlined.
   await require('../procs/test/focusables').focusables(page, 'focOlMark');
   // Get an array of the focusable elements that are not outlined.
@@ -105,5 +98,5 @@ exports.reporter = async page => {
   // Reload the page to undo the focus and attribute changes.
   await page.reload();
   // Return the data.
-  return data;
+  return {result: data};
 };

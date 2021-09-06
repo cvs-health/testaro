@@ -1,5 +1,5 @@
 // Returns counts, fractions, and texts of inline links, by whether underlined.
-exports.role = async page => await page.$eval('body', body => {
+exports.reporter = async page => await page.$eval('body', body => {
   // CONSTANTS
   /*
     The math role has been removed, because of poor adoption and exclusion from HTML5.
@@ -156,5 +156,5 @@ exports.role = async page => await page.$eval('body', body => {
       data.tagNames[tagName] = {[role]: 1};
     }
   });
-  return data;
+  return {result: data};
 });

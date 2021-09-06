@@ -1,6 +1,6 @@
-const fs = require('fs').promises;
+const fs = require('fs/promises');
 // Tabulates and lists radio buttons in and not in accessible field sets.
-exports.radioSet = async (page, withItems) => {
+exports.reporter = async (page, withItems) => {
   // Initialize the argument array to be passed to the page function.
   const args = [withItems];
   // If itemization is required:
@@ -75,7 +75,7 @@ exports.radioSet = async (page, withItems) => {
       items.inSet = setRadios.map(radio => textOf(radio));
       items.notInSet = nonSetRadios.map(radio => textOf(radio));
     }
-    return data;
+    return {result: data};
   }, args);
   return await dataJSHandle.jsonValue();
 };

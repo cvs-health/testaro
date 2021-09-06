@@ -1,7 +1,7 @@
 // Returns counts, and texts if required, of (un)focusable and (in)operable elements.
-exports.focOp = async (page, withItems, revealAll) => {
+exports.reporter = async (page, withItems, revealAll) => {
   // Import a module to get the texts of an element.
-  const allText = withItems ? require('./allText').allText : '';
+  const allText = withItems ? require('../procs/test/allText').allText : '';
   // If all elements are to be revealed:
   if (revealAll) {
     // Make them all visible.
@@ -19,9 +19,9 @@ exports.focOp = async (page, withItems, revealAll) => {
     });
   }
   // Mark any focusable elements.
-  await require('./focusables').focusables(page, 'focusMark');
+  await require('../procs/test/focusables').focusables(page, 'focusMark');
   // Mark the operable elements that are visible or focused-marked.
-  await require('./markOperable').markOperable(page);
+  await require('../procs/test/markOperable').markOperable(page);
   // Get an array of the elements that are focusable but not operable.
   const fNotO = await page.$$('body [data-autotest-focused]:not([data-autotest-operable])');
   // Get an array of the elements that are operable but not focusable.
@@ -155,5 +155,5 @@ exports.focOp = async (page, withItems, revealAll) => {
   // Reload the page to undo the focus and attribute changes.
   await page.reload();
   // Return it.
-  return data;
+  return {result: data};
 };

@@ -17,14 +17,15 @@ exports.tests = {
     focOl: [
       'Perform a focOl test',
       {
-        withItems: [true, 'boolean']
+        withItems: [true, 'boolean'],
+        revealAll: [true, 'boolean']
       }
     ],
     focOp: [
       'Perform a focOp test',
       {
         withItems: [true, 'boolean'],
-        withHidden: [true, 'boolean']
+        revealAll: [true, 'boolean']
       }
     ],
     hover: [
@@ -96,7 +97,7 @@ exports.etc = {
   focus: [
     'Put the specified element into focus (what: element type; which: substring of its text)',
     {
-      what: [true, 'string', 'isTagName'],
+      what: [true, 'string', 'isFocusable'],
       which: [true, 'string', 'hasLength']
     }
   ],

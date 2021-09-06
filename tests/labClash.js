@@ -1,5 +1,5 @@
 // Tabulates and lists labeling conflicts of labelable form controls.
-exports.labClash = async (page, withItems) => await page.$eval('body', (body, withItems) => {
+exports.reporter = async (page, withItems) => await page.$eval('body', (body, withItems) => {
   // FUNCTION DEFINITION START
   const debloat = text => text.trim().replace(/\s+/g, ' ');
   // FUNCTION DEFINITION END
@@ -137,5 +137,5 @@ exports.labClash = async (page, withItems) => await page.$eval('body', (body, wi
       }
     }
   });
-  return data;
+  return {result: data};
 }, withItems);

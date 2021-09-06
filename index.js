@@ -59,7 +59,7 @@ const moves = {
   link: 'a',
   focus: true
 };
-// Names and descriptions of custom tests.
+// Names and descriptions of tests.
 const tests = {
   autocom: 'list inputs with their autocomplete attributes',
   axe: 'conduct and report an Axe test',
@@ -170,25 +170,6 @@ const serveMessage = (msg, response) => {
   }
   return '';
 };
-// Serves the start of a page.
-const startPage = (content, newURL, mimeType, response) => {
-  response.setHeader('Content-Type', `${mimeType}; charset=UTF-8`);
-  // Set headers to tell the browser to render content chunks as they arrive.
-  response.setHeader('Transfer-Encoding', 'chunked');
-  response.setHeader('X-Content-Type-Options', 'nosniff');
-  if (newURL) {
-    response.setHeader('Content-Location', newURL);
-  }
-  response.write(content);
-};
-// Serves an increment of a page.
-const morePage = (content, response) => {
-  response.write(content);
-};
-// Serves an increment of a page.
-const endPage = (content, response) => {
-  response.end(`${content}\nDone\n`);
-};
 // Serves a page.
 const servePage = (content, newURL, mimeType, response) => {
   response.setHeader('Content-Type', `${mimeType}; charset=UTF-8`);
@@ -225,25 +206,27 @@ const render = (path, stage, which, query, response) => {
     }
     // Otherwise, if a plain-text page is ready to start:
     else if (stage === 'start') {
-      // Serve it.
-      startPage(
-        `Report timestamp: ${query.timeStamp}\n\nProcessed URL 0\n`,
-        `/${path}-out.txt`,
-        'text/plain',
-        response
-      );
+      // Serve its start.
+      response.setHeader('Content-Type', 'text/plain; charset=UTF-8');
+      // Set headers to tell the browser to render content chunks as they arrive.
+      response.setHeader('Transfer-Encoding', 'chunked');
+      response.setHeader('X-Content-Type-Options', 'nosniff');
+      if (path) {
+        response.setHeader('Content-Location', `/${path}-out.txt`);
+      }
+      response.write(`Report timestamp: ${query.timeStamp}\n\nProcessed URL 0\n`);
       return '';
     }
     // Otherwise, if a plain-text page is ready to continue:
     else if (stage === 'more') {
-      // Serve it.
-      morePage(`Processed URL ${query.urlIndex}\n`, response);
+      // Serve its continuation.
+      response.write(`Processed URL ${query.urlIndex}\n`);
       return '';
     }
     // Otherwise, if a plain-text page is ready to end:
     else if (stage === 'end') {
-      // Serve it.
-      endPage(`Processed URL ${query.urlIndex}\n`, response);
+      // Serve its end.
+      response.end(`Processed URL ${query.urlIndex}\n`);
       return '';
     }
     else {
@@ -303,7 +286,7 @@ const isBrowserType = type => ['chromium', 'firefox', 'webkit'].includes(type);
 // Validates a URL.
 const isURL = string => /^(?:https?|file):\/\/[^ ]+$/.test(string);
 // Validates a focusable tag name.
-const isTagName = string => ['a', 'button', 'input', 'select', 'option'].includes(string);
+const isFocusable = string => ['a', 'button', 'input', 'select', 'option'].includes(string);
 // Returns whether a variable has a specified type.
 const areStrings = array => array.every(element => typeof element === 'string');
 // Returns whether a variable has a specified type.
@@ -316,6 +299,9 @@ const hasType = (variable, type) => {
   }
   else if (type === 'boolean') {
     return typeof variable === 'boolean';
+  }
+  else if (type === 'number') {
+    return typeof variable === 'number';
   }
   else {
     return false;
@@ -333,8 +319,8 @@ const hasSubtype = (variable, subtype) => {
     else if (subtype === 'isBrowserType') {
       return isBrowserType(variable);
     }
-    else if (subtype === 'isTagName') {
-      return isTagName(variable);
+    else if (subtype === 'isFocusable') {
+      return isFocusable(variable);
     }
     else if (subtype === 'isCustomTest') {
       return tests[variable];
@@ -355,68 +341,40 @@ const hasSubtype = (variable, subtype) => {
 };
 // Validates a command.
 const isValid = command => {
-  // If the command has a known type:
-  if (command.type && commands[command.type]) {
-    // Identify the validation specifications of that type.
-    const validator = commands[command.type][1];
-    // If the specifications permit or require a which property:
-    if (validator.which) {
-      // If the command has a which property:
-      if (typeof command.which !== 'undefined') {
-        // If its value has the required type:
-        if (hasType(command.which, validator.which[1])) {
-          // If its value has the required subtype:
-          if (hasSubtype(command.which, validator.which[2])) {
-            // If the specifications permit or require a what property:
-            if (validator.what) {
-              // If the command has a what property:
-              if (command.what) {
-                // If its value has the required type:
-                if (hasType(command.what, validator.what[1])) {
-                  // Return whether its value has the required subtype:
-                  return hasSubtype(command.what, validator.what[2]);
-                }
-                // Otherwise, i.e. if its value does not have the required type:
-                else {
-                  // Return failure.
-                  return false;
-                }
-              }
-              // Otherwise, i.e. if the command does not have a what property:
-              else {
-                // Return whether a what property is optional.
-                return ! validator.what[0];
-              }
-            }
-            // Otherwise, i.e. if the specifications prohibit a what property:
-            else {
-              // Return whether the command has no what property.
-              return ! command.what;
-            }
-          }
-          // Otherwise, i.e. if the which value does not have the required subtype:
-          else {
-            // Return failure.
-            return false;
-          }
+  // Identify the type of the command.
+  const type = command.type;
+  // If the type exists and is known:
+  if (type && commands[type]) {
+    // Initialize the validators of the command.
+    let validator = {};
+    // If the type is test:
+    if (type === 'test') {
+      // Identify the test.
+      const testName = command.which;
+      // If it is known:
+      if (testName && tests[testName]) {
+        // Add its validator(s).
+        validator = commands.tests.all[1];
+        const extraVal = commands.tests.some[testName][1];
+        if (extraVal) {
+          Object.keys(extraVal).forEach(key => {
+            validator[key] = extraVal[key];
+          });
         }
-        // Otherwise, i.e. if the which value does not have the required type:
-        else {
-          // Return failure.
-          return false;
-        }
-      }
-      // Otherwise, i.e. if the command has no which property:
-      else {
-        // Return whether a which property is optional.
-        return ! validator.which[0];
       }
     }
-    // Otherwise, i.e. if the specifications prohibit a which property:
+    // Otherwise, i.e. if the type is not test:
     else {
-      // Return whether the command has no which property.
-      return ! command.which;
+      // Add its validator.
+      validator = commands[type][1];
     }
+    // Return whether the command is valid.
+    return Object.keys(validator).every(property => {
+      const vP = validator[property];
+      const cP = command[property];
+      // If it is optional and omitted or present and valid:
+      return ! vP[0] && ! cP || cP && hasType(cP, vP[1]) && hasSubtype(cP, vP[2]);
+    });
   }
   // Otherwise, i.e. if the command has an unknown or no type:
   else {
@@ -425,9 +383,9 @@ const isValid = command => {
   }
 };
 // Visits a URL.
-const visit = async (act, page, url) => {
+const visit = async (act, page) => {
   // Visit the URL and wait until it is stable.
-  const resolved = url.replace('__dirname', __dirname);
+  const resolved = act.which.replace('__dirname', __dirname);
   console.log(`resolved is ${resolved}`);
   try {
     await page.goto(resolved, {
@@ -451,61 +409,35 @@ const visit = async (act, page, url) => {
     }
   }
 };
-// Conduct and report a custom test with a temporary specific browser type.
-const typeReport = async (tempTypeName, testName, act, page) => {
-  // Save the URL.
-  const url = page.url();
-  // Save the existing browser type name.
-  const oldBrowserTypeName = browserTypeName;
-  // Launch a browser of the specified type, changing the browser variables.
-  await launch(tempTypeName);
-  // Identify its only page as current.
-  const tempPage = browserContext.pages()[0];
-  // Visit the current URL.
-  await visit(act, tempPage, url);
-  // Conduct and report the test.
-  act.result[testName] = await require(`./tests/${testName}/app`).reporter(tempPage);
-  // Launch the previous browser for any subsequent acts.
-  await launch(oldBrowserTypeName);
-  // Visit the page with it.
-  console.log(`browserContext page count is ${browserContext.pages().length}`);
-  await visit('', browserContext.pages()[0], url);
-};
-// Recursively performs the acts commanded in a report.
+// Recursively performs the commands in a report.
 const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
-  // Identify the acts in the report. Their initial values are commands.
+  // Identify the commands in the report.
   const {acts} = report;
   // If any commands remain unperformed:
   if (actIndex < acts.length) {
-    // Identify the acts to be performed.
+    // Identify the command to be performed.
     const act = acts[actIndex];
-    // If the command is valid:
+    // If it is valid:
     if (isValid(act)) {
-      // Identify the command properties.
-      const {type, which, what} = act;
-      const props = [type];
-      [which, what].forEach(prop => {
-        if (prop) {
-          props.push(prop);
-        }
-      });
+      // Identify its properties.
+      const props = Object.keys(act);
       console.log(`Starting ${props.join('/')}`);
       // If the command is a launch:
-      if (type === 'launch') {
+      if (act.type === 'launch') {
         // Launch the specified browser, creating a browser context and a page in it.
-        await launch(which);
+        await launch(act.which);
         // Identify its only page as current.
         page = browserContext.pages()[0];
       }
       // Otherwise, if a current page exists:
       else if (page) {
         // If the command is a url:
-        if (type === 'url') {
+        if (act.type === 'url') {
           // Visit it and wait until it is stable.
-          await visit(act, page, which);
+          await visit(act, page);
         }
         // Otherwise, if the act is a wait:
-        else if (type === 'wait') {
+        else if (act.type === 'wait') {
           // Wait for the specified text to appear in the specified place.
           await page.waitForFunction(act => {
             const {URL, title, body} = document;
@@ -520,7 +452,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
           act.result = page.url();
         }
         // Otherwise, if the act is a page switch:
-        else if (type === 'page') {
+        else if (act.type === 'page') {
           // Wait for a page to be created and identify it as current.
           page = await browserContext.waitForEvent('page');
           // Wait until it is stable and thus ready for the next act.
@@ -537,7 +469,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
           // Add the URL to the act.
           act.url = url;
           // If the act is a revelation:
-          if (type === 'reveal') {
+          if (act.type === 'reveal') {
             // Make all elements in the page visible.
             await page.$$eval('body *', elements => {
               elements.forEach(el => {
@@ -552,17 +484,23 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
             });
             act.result = 'All elements visible.';
           }
-          // If the act is a test:
-          else if (type === 'test') {
+          // Otherwise, if the act is a test:
+          else if (act.type === 'test') {
             // Add a description of the test to the act.
-            act.what = tests[which];
-            // Identify the argument(s).
+            act.what = tests[act.which];
+            // Initialize the arguments.
             const args = [page];
-            if (act.args) {
-              args.push(...act.args);
+            // Identify the additional validator of the test.
+            const testValidator = commands.tests.some[act.which];
+            // If it exists:
+            if (testValidator) {
+              // Identify its argument properties.
+              const argProperties = Object.keys(testValidator[1]);
+              // Add their values to the arguments.
+              args.push(...argProperties.map(propName => act[propName]));
             }
             // Conduct and report the test.
-            const testReport = await require(`./tests/${which}/app`).reporter(...args);
+            const testReport = await require(`./tests/${act.which}`).reporter(...args);
             // If the test produced exhibits:
             if (testReport.exhibits) {
               // Add that fact to the act.
@@ -571,7 +509,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
               const newExhibits = testReport.exhibits.replace(
                 /__browserTypeName__/g, browserTypeNames[browserTypeName]
               );
-              // Append the exhibits to the exhibits in the report.
+              // Append the exhibits to any existing ones.
               if (report.exhibits) {
                 report.exhibits += `\n${newExhibits}`;
               }
@@ -583,53 +521,11 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
             const resultCount = Object.keys(testReport.result).length;
             act.result = resultCount ? testReport.result : 'NONE';
           }
-          // Otherwise, if the act is a combination of tests:
-          else if (type === 'combo') {
-            act.result = {
-              what: 'combination of tests'
-            };
-            // Recursively conducts an array of tests.
-            const doCombo = async testNames => {
-              if (testNames.length) {
-                const firstTest = testNames[0];
-                console.log(`Combo progress: about to run test ${firstTest}`);
-                if (firstTest === 'motion') {
-                  await typeReport('webkit', 'motion', act, page);
-                }
-                else if (tests[firstTest]) {
-                  act.result[firstTest] = await require(`./tests/${firstTest}/app`).reporter(page);
-                }
-                else {
-                  act.result[firstTest] = 'NO SUCH TEST';
-                }
-                await doCombo(testNames.slice(1));
-                return Promise.resolve(1);
-              }
-              else {
-                return Promise.resolve(1);
-              }
-            };
-            // Conduct the specified combination of tests.
-            await doCombo(which.slice(1));
-            // If it includes at least 1 test and a reducer is specified:
-            if (which.length > 1 && which[0].length) {
-              // Perform the reduction and add its result to the act.
-              const reducer = require(`./procs/test/${which[0]}`);
-              try {
-                if (reducer) {
-                  act.result.deficit = reducer.reduce(act.result);
-                }
-              }
-              catch (error) {
-                act.result = `ERROR performing ${which[0]} proc: ${error.message}`;
-              }
-            }
-          }
           // Otherwise, if the act is a move:
-          else if (moves[type]) {
-            const selector = typeof moves[type] === 'string' ? moves[type] : act.what;
+          else if (moves[act.type]) {
+            const selector = typeof moves[act.type] === 'string' ? moves[act.type] : act.what;
             // Identify the index of the specified element among same-type elements.
-            const whichIndex = await matchIndex(page, selector, which);
+            const whichIndex = await matchIndex(page, selector, act.which);
             // If it exists:
             if (whichIndex > -1) {
               // Get its ElementHandle.
@@ -637,19 +533,19 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
               // Focus it.
               await whichElement.focus();
               // Perform the act on the element and add a move description to the act.
-              if (type === 'focus') {
+              if (act.type === 'focus') {
                 act.result = 'focused';
               }
-              else if (type === 'text') {
-                await whichElement.type(what);
+              else if (act.type === 'text') {
+                await whichElement.type(act.what);
                 act.result = 'entered';
               }
-              else if (['radio', 'checkbox'].includes(type)) {
+              else if (['radio', 'checkbox'].includes(act.type)) {
                 await whichElement.check();
                 act.result = 'checked';
               }
-              else if (type === 'select') {
-                await whichElement.selectOption({what});
+              else if (act.type === 'select') {
+                await whichElement.selectOption({what: act.what});
                 const optionText = await whichElement.$eval(
                   'option:selected', el => el.textContent
                 );
@@ -657,11 +553,11 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
                   ? `&ldquo;${optionText}}&rdquo; selected`
                   : 'OPTION NOT FOUND';
               }
-              else if (type === 'button') {
+              else if (act.type === 'button') {
                 await whichElement.click();
                 act.result = 'clicked';
               }
-              else if (type === 'link') {
+              else if (act.type === 'link') {
                 const href = await whichElement.getAttribute('href');
                 const target = await whichElement.getAttribute('target');
                 await whichElement.click();
@@ -714,16 +610,11 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
 };
 // Handles a script request.
 const scriptHandler = async (
-  isScript, scriptName, what, acts, query, stage, urlIndex, response
+  what, acts, query, stage, urlIndex, response
 ) => {
   const report = {};
-  if (isScript) {
-    report.script = scriptName;
-  }
-  else {
-    report.commands = scriptName;
-    report.batch = query.batchName;
-  }
+  report.script = query.scriptName;
+  report.batch = query.batchName;
   report.what = what;
   report.timeStamp = query.timeStamp;
   report.acts = acts;
@@ -820,9 +711,13 @@ const requestHandler = (request, response) => {
         response.write(content, 'binary');
         response.end();
       }
-      // Otherwise, if the initial form was requested:
+      // Otherwise, if the initial page was requested:
       else if (pathName === '/' || pathName === '/index.html') {
-        // Render it.
+        // Add properties to the query.
+        query.scriptDir = process.env.SCRIPTDIR || '';
+        query.batchDir = process.env.BATCHDIR || '';
+        query.reportDir = process.env.REPORTDIR || '';
+        // Render the page.
         render('', 'all', 'index', query, response);
       }
       // Otherwise, i.e. if the URL is invalid:
@@ -841,34 +736,13 @@ const requestHandler = (request, response) => {
       });
       // Add a timeStamp for any required report file to the query.
       query.timeStamp = Math.floor((Date.now() - Date.UTC(2021, 4)) / 10000).toString(36);
-      // If the path and the request specify an operation type:
-      if (pathName === '/opType' && ['script', 'batch'].includes(query.opType)) {
-        const {opType} = query;
-        // If it is script:
-        if (opType === 'script') {
-          // Add properties to the query.
-          query.scriptDir = process.env.SCRIPTDIR || '';
-          query.reportDir = process.env.SCRIPTREPORTDIR || '';
-          // Render the script-directories page.
-          render('', 'all', 'scriptDirs', query, response);
-        }
-        // Otherwise, i.e. if it is batch:
-        else {
-          // Add properties to the query.
-          query.batchDir = process.env.BATCHDIR || '';
-          query.batchCmdDir = process.env.BATCHCMDDIR || '';
-          query.reportDir = process.env.BATCHREPORTDIR || '';
-          // Render the batch-directories page.
-          render('', 'all', 'batchDirs', query, response);
-        }
-      }
-      // Otherwise, if the path and the request specify script directories:
-      else if (pathName === '/scriptDirs' && query.scriptDir && query.reportDir) {
-        const {scriptDir} = query;
+      // If the request submitted the directory form:
+      if (pathName === '/where' && query.scriptDir && query.batchDir && query.reportDir) {
+        const {scriptDir, batchDir} = query;
         // Request an array of the names of the files in the script directory.
-        const fileNames = await fs.readdir(scriptDir);
+        const scriptFileNames = await fs.readdir(scriptDir);
         // When the array arrives, get an array of script names from it.
-        const scriptNames = fileNames
+        const scriptNames = scriptFileNames
         .filter(name => name.endsWith('.json'))
         .map(name => name.slice(0, -5));
         // If any exist:
@@ -876,80 +750,48 @@ const requestHandler = (request, response) => {
           // Add their count to the query.
           query.scriptSize = scriptNames.length;
           // Get their descriptions.
-          const nameWhats = await getWhats(scriptDir, scriptNames, []);
+          const scriptWhats = await getWhats(scriptDir, scriptNames, []);
           // When the descriptions arrive, add them as options to the query.
-          query.scriptNames = nameWhats.map((pair, index) => {
+          query.scriptNames = scriptWhats.map((pair, index) => {
             const state = index === 0 ? 'selected ' : '';
             return `<option ${state}value="${pair[0]}">${pair[0]}: ${pair[1]}</option>`;
           }).join('\n              ');
-          // Render the script-selection page.
-          render('', 'all', 'script', query, response);
+          // Request an array of the names of the files in the batch directory.
+          const batchFileNames = await fs.readdir(batchDir);
+          // When the array arrives, get an array of batch names from it.
+          const batchNames = batchFileNames
+          .filter(name => name.endsWith('.json'))
+          .map(name => name.slice(0, -5))
+          .concat('None');
+          // Add their count to the query.
+          query.batchSize = batchNames.length;
+          // Get their descriptions.
+          const batchWhats = await getWhats(batchDir, batchNames, []);
+          batchWhats.unshift('Perform the script without a batch');
+          // When the descriptions arrive, add them as options to the query.
+          query.batchNames = batchWhats.map((pair, index) => {
+            const state = index === 0 ? 'selected ' : '';
+            return `<option ${state}value="${pair[0]}">${pair[0]}: ${pair[1]}</option>`;
+          }).join('\n              ');
+          // Render the choice page.
+          render('', 'all', 'which', query, response);
         }
-        // Otherwise, i.e. if no scripts exist in the specified directory:
+        // Otherwise, i.e. if no scripts exist in the script directory:
         else {
           // Serve an error message.
           serveMessage(`ERROR: No scripts in ${scriptDir}.`, response);
         }
       }
-      // Otherwise, if the path and the request specify batch directories:
+      // Otherwise, if the request submitted the choice form:
       else if (
-        pathName === '/batchDirs' && query.batchDir && query.batchCmdDir && query.reportDir
+        pathName === '/which'
+        && query.scriptDir
+        && query.batchDir
+        && query.reportDir
+        && query.scriptName
+        && query.batchName
       ) {
-        const {batchDir, batchCmdDir} = query;
-        // Request an array of the names of the files in the batch directory.
-        const fileNames = await fs.readdir(batchDir);
-        // When the array arrives, get an array of batch names from it.
-        const batchNames = fileNames
-        .filter(name => name.endsWith('.json'))
-        .map(name => name.slice(0, -5));
-        // If any exist:
-        if (batchNames.length) {
-          // Add their count to the query.
-          query.batchSize = batchNames.length;
-          // Get their descriptions.
-          const nameWhats = await getWhats(batchDir, batchNames, []);
-          // When the descriptions arrive, add them as options to the query.
-          query.batchNames = nameWhats.map((pair, index) => {
-            const state = index === 0 ? 'selected ' : '';
-            return `<option ${state}value="${pair[0]}">${pair[0]}: ${pair[1]}</option>`;
-          }).join('\n              ');
-          // Request an array of the names of the files in the command directory.
-          const fileNames = await fs.readdir(batchCmdDir);
-          // When the array arrives, get an array of command-list names from it.
-          const batchCmdNames = fileNames
-          .filter(name => name.endsWith('.json'))
-          .map(name => name.slice(0, -5));
-          // If any exist:
-          if (batchCmdNames.length) {
-            // Add their count to the query.
-            query.batchCmdSize = batchCmdNames.length;
-            // Get their descriptions.
-            const nameWhats = await getWhats(batchCmdDir, batchCmdNames, []);
-            // When the descriptions arrive, add them as options to the query.
-            query.batchCmdNames = nameWhats.map((pair, index) => {
-              const state = index === 0 ? 'selected ' : '';
-              return `<option ${state}value="${pair[0]}">${pair[0]}: ${pair[1]}</option>`;
-            }).join('\n              ');
-            // Render the batch-selection page.
-            render('', 'all', 'batch', query, response);
-          }
-          // Otherwise, i.e. if no command lists exist in the specified directory:
-          else {
-            // Serve an error message.
-            serveMessage(`ERROR: No command files in ${batchCmdDir}.`, response);
-          }
-        }
-        // Otherwise, i.e. if no batches exist in the specified directory:
-        else {
-          // Serve an error message.
-          serveMessage(`ERROR: No batches in ${batchDir}.`, response);
-        }
-      }
-      // Otherwise, if the path and the request specify a script:
-      else if (
-        pathName === '/scriptName' && query.scriptDir && query.reportDir && query.scriptName
-      ) {
-        const {scriptDir, scriptName} = query;
+        const {scriptDir, batchDir, scriptName, batchName} = query;
         // Get the content of the script.
         const scriptJSON = await fs.readFile(`${scriptDir}/${scriptName}.json`, 'utf8');
         // When the content arrives, if there is any:
@@ -965,13 +807,77 @@ const requestHandler = (request, response) => {
             && Array.isArray(acts)
             && acts[0].type === 'launch'
             && acts.length > 1
-            && (
-              acts[1].type === 'url'
-              || (['wave1', 'wave2', 'wave4'].includes(acts[1].type) && isURL(acts[1].which))
-            )
+            && acts[1].type === 'url'
+            && isURL(acts[1].which)
           ) {
-            // Process it.
-            scriptHandler(true, scriptName, what, acts, query, 'all', -1, response);
+            // If there is no batch:
+            if (batchName === 'None') {
+              // Process the script.
+              scriptHandler(true, scriptName, what, acts, query, 'all', -1, response);
+            }
+            // Otherwise, i.e. if there is a batch:
+            else {
+              // Get its content.
+              const batchJSON = await fs.readFile(`${batchDir}/${batchName}.json`, 'utf8');
+              // When the content arrives, if there is any:
+              if (batchJSON) {
+                // Get the batch data.
+                const batch = JSON.parse(batchJSON);
+                const batchWhat = batch.what;
+                const {hosts} = batch;
+                // If the batch is valid:
+                if (
+                  batchWhat
+                  && hosts
+                  && typeof batchWhat === 'string'
+                  && Array.isArray(hosts)
+                  && hosts.every(host => host.which && host.what && isURL(host.which))
+                ) {
+                  // FUNCTION DEFINITION START
+                  // Recursively process commands on the hosts of a batch.
+                  const doBatch = async (hosts, isFirst, hostIndex) => {
+                    if (hosts.length) {
+                      // Identify the first host.
+                      const firstHost = hosts[0];
+                      console.log(`Batch progress: about to process ${firstHost.what}`);
+                      // Replace all hosts in the script with it.
+                      acts.forEach(act => {
+                        if (act.type === 'url') {
+                          act.which = firstHost.which;
+                          act.what = firstHost.what;
+                        }
+                      });
+                      // Process the commands on it.
+                      let stage = 'more';
+                      if (isFirst) {
+                        stage = hosts.length > 1 ? 'start' : 'all';
+                      }
+                      else {
+                        stage = hosts.length > 1 ? 'more' : 'end';
+                      }
+                      await scriptHandler(
+                        false, scriptName, what, acts, query, stage, hostIndex, response
+                      );
+                      // Process the remaining hosts.
+                      await doBatch(hosts.slice(1), false, hostIndex + 1);
+                    }
+                  };
+                  // FUNCTION DEFINITION END
+                  // Process the script on the batch.
+                  doBatch(hosts, true, 0);
+                }
+                // Otherwise, i.e. if the batch is invalid:
+                else {
+                  // Serve an error message.
+                  serveMessage(`ERROR: Batch ${batchName} invalid.`, response);
+                }
+              }
+              // Otherwise, i.e. if the batch has no content:
+              else {
+                // Serve an error message.
+                serveMessage(`ERROR: Batch ${batchName} empty.`, response);
+              }
+            }
           }
           // Otherwise, i.e. if the script is invalid:
           else {
@@ -979,127 +885,13 @@ const requestHandler = (request, response) => {
             serveMessage(`ERROR: Script ${scriptName} invalid.`, response);
           }
         }
-        // Otherwise, i.e. if there is no content:
+        // Otherwise, i.e. if the script has no content:
         else {
           // Serve an error message.
-          serveMessage(
-            `ERROR: No script found in ${scriptDir}/${scriptName}.json.`, response
-          );
+          serveMessage(`ERROR: Script ${scriptName} empty`, response);
         }
       }
-      // Otherwise, if the path and the request specify a batch:
-      else if (
-        pathName === '/batchNames'
-        && query.batchDir
-        && query.batchCmdDir
-        && query.reportDir
-        && query.batchName
-        && query.batchCmdName
-      ) {
-        const {batchDir, batchCmdDir, batchName, batchCmdName} = query;
-        // Get the content of the batch.
-        const batchJSON = await fs.readFile(`${batchDir}/${batchName}.json`, 'utf8');
-        // When the content arrives, if there is any:
-        if (batchJSON) {
-          // Get the batch data.
-          const batch = JSON.parse(batchJSON);
-          const batchWhat = batch.what;
-          const {urls} = batch;
-          // If the batch is valid:
-          if (
-            batchWhat
-            && urls
-            && typeof batchWhat === 'string'
-            && Array.isArray(urls)
-            && urls.every(url => url.which && url.what)
-          ) {
-            // Get the content of the commands.
-            const cmdJSON = await fs.readFile(`${batchCmdDir}/${batchCmdName}.json`, 'utf8');
-            // When the content arrives, if there is any:
-            if (cmdJSON) {
-              // Get the command data.
-              const cmds = JSON.parse(cmdJSON);
-              const {what, browser, acts} = cmds;
-              // If the command list is valid:
-              if (
-                what
-                && browser
-                && acts
-                && typeof what === 'string'
-                && ['chromium', 'firefox', 'webkit'].includes(browser)
-                && Array.isArray(acts)
-                && acts.length
-                && acts.every(act => isValid(act) && ! ['launch', 'url'].includes(act.type))
-              ) {
-                // Prepend launch and generic url acts to the commands.
-                acts.unshift(
-                  {
-                    type: 'launch',
-                    which: browser
-                  },
-                  {
-                    type: 'url',
-                    which: '',
-                    what: ''
-                  }
-                );
-                // FUNCTION DEFINITION START
-                // Recursively process commands on URLs.
-                const doBatch = async (urls, isFirst, urlIndex) => {
-                  if (urls.length) {
-                    // Identify the first URL.
-                    const firstURL = urls[0];
-                    console.log(`Batch progress: about to process ${firstURL}`);
-                    acts[1].which = firstURL.which;
-                    acts[1].what = firstURL.what;
-                    // Process the commands on it.
-                    let stage = 'more';
-                    if (isFirst) {
-                      stage = urls.length > 1 ? 'start' : 'all';
-                    }
-                    else {
-                      stage = urls.length > 1 ? 'more' : 'end';
-                    }
-                    await scriptHandler(
-                      false, batchCmdName, what, acts, query, stage, urlIndex, response
-                    );
-                    // Process the remaining URLs.
-                    await doBatch(urls.slice(1), false, urlIndex + 1);
-                  }
-                };
-                // FUNCTION DEFINITION END
-                // Process the commands on the URLs.
-                doBatch(urls, true, 0);
-              }
-              // Otherwise, i.e. if the command list is invalid:
-              else {
-                // Serve an error message.
-                serveMessage(`ERROR: Command list ${batchCmdName} invalid.`, response);
-              }
-            }
-            // Otherwise, i.e. if the command list has no content:
-            else {
-              // Serve an error message.
-              serveMessage(
-                `ERROR: No commands found in ${batchCmdDir}/${batchCmdName}.json.`, response
-              );
-            }
-          }
-          // Otherwise, i.e. if the batch is invalid:
-          else {
-            // Serve an error message.
-            serveMessage(`ERROR: Batch ${batchName} invalid.`, response);
-          }
-        }
-        // Otherwise, i.e. if the batch has no content:
-        else {
-          // Serve an error message.
-          serveMessage(
-            `ERROR: No batch found in ${batchDir}/${batchName}.json.`, response
-          );
-        }
-      }
-      // Otherwise, i.e. if the path or the request is invalid:
+      // Otherwise, i.e. if the request is invalid:
       else {
         // Serve an error message.
         serveMessage('ERROR: Form submission invalid.', response);

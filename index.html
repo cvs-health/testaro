@@ -21,18 +21,52 @@
       </section>
       <div class="etc">
         <section>
-          <h2>Operation type</h2>
-          <form method="POST" action="/autotest/opType">
-            <p><fieldset>
-              <legend>Which operation?</legend>
-              <p><label>
-                <input type="radio" name="opType" value="script" checked> <span>Script</span>
-              </label></p>
-              <p><label>
-                <input type="radio" name="opType" value="batch"> <span>Batch</span>
-              </label></p>
-            <p><button>Continue</button></p>
-          </form>
+          <h1>Autotest batch directories</h1>
+          <section class="head">
+            <h2 class="headText">Introduction</h2>
+            <p>You have chosen to run an Autotest batch. Where is it?</p>
+          </section>
+          <div class="etc">
+            <section>
+              <h2>Directories (all answers are required)</h2>
+              <form method="POST" action="/autotest/where">
+                <p><label>
+                  <span>Where are your scripts?</span>
+                  <input
+                    name="scriptDir"
+                    type="text"
+                    size="40"
+                    maxlength="60"
+                    value="__scriptDir__"
+                    required
+                  >
+                </label></p>
+                <p><label>
+                    <span>Where are your batches?</span>
+                  <input
+                    name="batchDir"
+                    type="text"
+                    size="40"
+                    maxlength="60"
+                    value="__batchDir__"
+                    required
+                  >
+                </label></p>
+                <p><label>
+                  <span>Where do you want your reports?</span>
+                  <input
+                    name="reportDir"
+                    type="text"
+                    size="40"
+                    maxlength="60"
+                    value="__reportDir__"
+                    required
+                  >
+                </label></p>
+                <p><button>Submit</button></p>
+              </form>
+            </section>
+          </div>
         </section>
       </div>
     </main>

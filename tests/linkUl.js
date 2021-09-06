@@ -1,7 +1,7 @@
 // Returns counts, fractions, and texts of inline links, by whether underlined.
-exports.linkUl = async (page, withItems) => {
+exports.reporter = async (page, withItems) => {
   // Identify the links in the page, by type.
-  const linkTypes = await require('./linksByType').linksByType(page);
+  const linkTypes = await require('../procs/test/linksByType').linksByType(page);
   return await page.evaluate(args => {
     const withItems = args[0];
     const linkTypes = args[1];
@@ -52,6 +52,6 @@ exports.linkUl = async (page, withItems) => {
         notUnderlined: nulInLinkTexts
       };
     }
-    return data;
+    return {result: data};
   }, [withItems, linkTypes]);
 };

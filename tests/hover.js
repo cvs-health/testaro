@@ -1,5 +1,5 @@
-// Finds and marks navigation elements that can be hover-disclosed.
-exports.hover = async (page, withItems) => {
+// Finds and reports navigation elements that can be hover-disclosed.
+exports.reporter = async (page, withItems) => {
   // Identify the elements that are likely to trigger disclosures on hover.
   const triggers = await page.$$(
     'body button:visible, body li:visible, body [onmouseenter]:visible, body [onmouseover]:visible'
@@ -103,5 +103,5 @@ exports.hover = async (page, withItems) => {
   // Find and document the hover-triggered disclosures.
   await find(triggers);
   // Return the result.
-  return data;
+  return {result: data};
 };
