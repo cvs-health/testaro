@@ -142,7 +142,7 @@ exports.commands = {
     test: [
       'Perform a test (which: test name; what: description)',
       {
-        which: [true, 'string', 'isCustomTest'],
+        which: [true, 'string', 'isTest'],
         what: [false, 'string', 'hasLength']
       }
     ],

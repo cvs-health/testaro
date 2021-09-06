@@ -322,7 +322,7 @@ const hasSubtype = (variable, subtype) => {
     else if (subtype === 'isFocusable') {
       return isFocusable(variable);
     }
-    else if (subtype === 'isCustomTest') {
+    else if (subtype === 'isTest') {
       return tests[variable];
     }
     else if (subtype === 'isWaitable') {
@@ -373,7 +373,7 @@ const isValid = command => {
       const vP = validator[property];
       const cP = command[property];
       // If it is optional and omitted or present and valid:
-      return ! vP[0] && ! cP || cP && hasType(cP, vP[1]) && hasSubtype(cP, vP[2]);
+      return ! vP[0] && ! cP || cP !== undefined && hasType(cP, vP[1]) && hasSubtype(cP, vP[2]);
     });
   }
   // Otherwise, i.e. if the command has an unknown or no type:
