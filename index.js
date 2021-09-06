@@ -386,7 +386,6 @@ const isValid = command => {
 const visit = async (act, page) => {
   // Visit the URL and wait until it is stable.
   const resolved = act.which.replace('__dirname', __dirname);
-  console.log(`resolved is ${resolved}`);
   try {
     await page.goto(resolved, {
       timeout: 10000,
