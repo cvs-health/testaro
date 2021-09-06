@@ -1,10 +1,5 @@
-// IMPORTS
-
 // Import a module to get the texts of an element.
-const allText = require('./allText').allText;
-
-// FUNCTIONS
-
+const allText = require('../procs/test/allText').allText;
 // Recursively adds the tag names and texts or counts of elements to an array.
 const compile = async (page, elements, totals, items, itemProp, withItems) => {
   // If any elements remain to be processed:
@@ -47,7 +42,6 @@ const compile = async (page, elements, totals, items, itemProp, withItems) => {
     return Promise.resolve('');
   }
 };
-
 // Returns counts, and texts if required, of focusable elements with and without focal outlines.
 exports.focOl = async (page, withItems, revealAll) => {
   // If all elements are to be revealed:
@@ -66,8 +60,15 @@ exports.focOl = async (page, withItems, revealAll) => {
       });
     });
   }
+};
+// Tabulates and lists focusable elements with and without outlines when focused.
+exports.reporter = async page => {
+  const data = await require('../../procs/test/focOl').focOl(page, true, false);
+  return {result: data};
+};
+
   // Mark the focusable elements as outlined or not outlined.
-  await require('./focusables').focusables(page, 'focOlMark');
+  await require('../procs/test/focusables').focusables(page, 'focOlMark');
   // Get an array of the focusable elements that are not outlined.
   const focOutN = await page.$$('body [data-autotest-focused="N"]');
   // Get an array of the focusable elements that are outlined.

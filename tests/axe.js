@@ -1,6 +1,6 @@
 const {injectAxe, getViolations} = require('axe-playwright');
-// Returns results of an Axe test.
-exports.axe = async (page, withItems, rules = []) => {
+// Conducts and reports an Axe test.
+exports.reporter = async (page, withItems, rules = []) => {
   // Inject axe-core into the page.
   await injectAxe(page);
   // Initialize the report.
@@ -75,11 +75,11 @@ exports.axe = async (page, withItems, rules = []) => {
       }
     });
     // Return the report.
-    return report;
+    return {result: report};
   }
   // Otherwise, i.e. if there are no violations:
   else {
     // Return a success report.
-    return 'O.K.';
+    return {result: 'O.K.'};
   }
 };

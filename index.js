@@ -62,36 +62,30 @@ const moves = {
 // Names and descriptions of custom tests.
 const tests = {
   autocom: 'list inputs with their autocomplete attributes',
+  axe: 'conduct and report an Axe test',
   bodyText: 'give the text content of the page body',
   bulk: 'report the count of visible elements',
   combo: 'report results and a score from multiple tests',
   focOl: 'tabulate and list focusable elements with and without focus outlines',
-  focOlS: 'tabulate focusable elements with and without focus outlines',
   focOp: 'tabulate and list visible focusable and operable elements',
   focOpAll: 'tabulate and list focusable and operable elements after making all visible',
-  focOpAllS: 'tabulate focusable and operable elements after making all visible',
-  focOpS: 'tabulate visible focusable and operable elements',
   hover: 'tabulate and list hover-caused context additions',
-  hoverS: 'tabulate hover-caused context additions',
+  ibm: 'conduct and report an IBM test',
   imgAlt: 'list the values of the alt attributes of img elements',
   imgBg: 'show the background images and their related texts',
   imgDec: 'show the decorative images and their related texts',
   imgInf: 'show the informative images and their related texts',
   inLab: 'list the inputs and their labels',
   labClash: 'tabulate and describe inconsistencies in labeling',
-  labClashS: 'tabulate inconsistencies in labeling',
   linkUl: 'tabulate and list underlined and other inline links',
-  linkUlS: 'tabulate inline links and how many are underlined',
   motion: 'report motion',
   radioSet: 'tabulate and list radio buttons in and not in accessible fieldsets',
-  radioSetS: 'tabulate radio buttons in and not in accessible fieldsets',
   roleList: 'list elements having role attributes',
-  roleListS: 'tabulate element tag names and roles assigned to them',
   roleS: 'tabulate elements with inaccessible roles',
   simple: 'perfunctory trivial test for testing',
   state: 'show an element with and without its focus and hover states in 3 browsers',
   styleDiff: 'tabulate and list style inconsistencies',
-  styleDiffS: 'tabulate style inconsistencies'
+  wave: 'conduct and report a WAVE test'
 };
 // Browser types available in PlayWright.
 const browserTypeNames = {
@@ -111,43 +105,6 @@ const redirect = (url, response) => {
   response.statusCode = 303;
   response.setHeader('Location', url);
   response.end();
-};
-// Conducts a WAVE test and returns a Promise of a result.
-const wave = (url, reportType) => {
-  const waveKey = process.env.WAVE_KEY;
-  // Get the data from a WAVE test.
-  return new Promise(resolve => {
-    https.get(
-      {
-        host: 'wave.webaim.org',
-        path: `/api/request?key=${waveKey}&url=${url}&reporttype=${reportType}`,
-        protocol: 'https:'
-      },
-      response => {
-        let report = '';
-        response.on('data', chunk => {
-          report += chunk;
-        });
-        // When the data arrive, return them as an object.
-        response.on('end', () => {
-          try {
-            const result = JSON.parse(report);
-            const categories = result.categories;
-            delete categories.feature;
-            delete categories.structure;
-            delete categories.aria;
-            return resolve(result);
-          }
-          catch (error) {
-            return resolve({
-              error: 'WAVE did not return JSON.',
-              report
-            });
-          }
-        });
-      }
-    );
-  });
 };
 // Launches a browser.
 const launch = async typeName => {
@@ -574,21 +531,6 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
           };
           act.result = result;
         }
-        // Otherwise, if the act is a valid WAVE type-1 test:
-        else if (type === 'wave1') {
-          // Conduct a WAVE test and add the result to the act.
-          act.result = await wave(which || page.url(), '1');
-        }
-        // Otherwise, if the act is a valid WAVE type-2 test:
-        else if (type === 'wave2') {
-          // Conduct a WAVE test and add the result to the act.
-          act.result = await wave(which || page.url(), '2');
-        }
-        // Otherwise, if the act is a valid WAVE type-4 test:
-        else if (type === 'wave4') {
-          // Conduct a WAVE test and add the result to the act.
-          act.result = await wave(which || page.url(), '4');
-        }
         // Otherwise, if the page has a URL:
         else if (page.url() && page.url() !== 'about:blank') {
           const url = page.url();
@@ -641,16 +583,6 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
             const resultCount = Object.keys(testReport.result).length;
             act.result = resultCount ? testReport.result : 'NONE';
           }
-          // Otherwise, if the act is an IBM test:
-          else if (type === 'ibm') {
-            // Conduct it and add its result to the act.
-            act.result = await ibm(page, which, true);
-          }
-          // Otherwise, if the act is an IBM summary:
-          else if (type === 'ibmS') {
-            // Conduct it and add its result to the act.
-            act.result = await ibm(page, which, false);
-          }
           // Otherwise, if the act is a combination of tests:
           else if (type === 'combo') {
             act.result = {
@@ -661,28 +593,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
               if (testNames.length) {
                 const firstTest = testNames[0];
                 console.log(`Combo progress: about to run test ${firstTest}`);
-                if (firstTest === 'axe') {
-                  act.result.axe = await axe(page, true, []);
-                }
-                else if (firstTest === 'axeS') {
-                  act.result.axeS = await axe(page, false, []);
-                }
-                else if (firstTest === 'wave1') {
-                  act.result.wave1 = await wave(page.url(), '1');
-                }
-                else if (firstTest === 'wave2') {
-                  act.result.wave2 = await wave(page.url(), '2');
-                }
-                else if (firstTest === 'wave4') {
-                  act.result.wave4 = await wave(page.url(), '4');
-                }
-                else if (firstTest === 'ibm') {
-                  act.result.ibm = await ibm(page, false, true);
-                }
-                else if (firstTest === 'ibmS') {
-                  act.result.ibm = await ibm(page, false, false);
-                }
-                else if (firstTest === 'motion') {
+                if (firstTest === 'motion') {
                   await typeReport('webkit', 'motion', act, page);
                 }
                 else if (tests[firstTest]) {
