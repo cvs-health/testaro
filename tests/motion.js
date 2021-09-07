@@ -1,5 +1,5 @@
 // Reports motion in a page.
-exports.reporter = async page => {
+exports.reporter = async (page, delay, interval) => {
   // FUNCTION DEFINITIONS START
   // Creates and returns a screen shot.
   const shoot = async (page, fileName) => {
@@ -7,7 +7,7 @@ exports.reporter = async page => {
     return await page.screenshot({
       fullPage: false,
       omitBackground: true,
-      path: `${fileName}.png`
+      path: `${process.env.REPORTDIR}/motion/${fileName}.png`
     });
   };
   // Creates and returns 2 screen shots after a wait and at a time interval in ms.
@@ -21,7 +21,7 @@ exports.reporter = async page => {
   };
   // FUNCTION DEFINITIONS END
   // Make 2 screen shots 3 seconds apart after 2 seconds.
-  const shots = await shootTwice(page, 2000, 3000);
+  const shots = await shootTwice(page, delay, interval);
   // If the shooting succeeded:
   if (shots.length === 2) {
     // Return the result.

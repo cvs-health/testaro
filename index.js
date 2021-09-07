@@ -383,12 +383,12 @@ const isValid = command => {
 };
 // Visits a URL.
 const visit = async (act, page) => {
-  // Visit the URL and wait until it is stable.
+  // Visit the URL and wait until it is stable. (Wait for load times out on some URLs.)
   const resolved = act.which.replace('__dirname', __dirname);
   try {
     await page.goto(resolved, {
       timeout: 10000,
-      waitUntil: 'load'
+      waitUntil: 'domcontentloaded'
     });
     // Press the Esc key to dismiss any initial modal dialog.
     await page.keyboard.press('Escape');

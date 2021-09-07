@@ -46,6 +46,13 @@ exports.commands = {
         withItems: [true, 'boolean']
       }
     ],
+    motion: [
+      'Perform a motion test',
+      {
+        delay: [true, 'number'],
+        interval: [true, 'number']
+      }
+    ],
     radioSet: [
       'Perform a radioSet test',
       {
