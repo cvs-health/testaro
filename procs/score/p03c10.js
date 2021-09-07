@@ -155,7 +155,6 @@ exports.scorer = acts => {
         }
       }
       else if (which === 'linkUl') {
-        console.log('Doing linkUl scoring');
         facts = test.result && test.result.totals;
         facts = facts ? facts.inline : null;
         if (facts) {
