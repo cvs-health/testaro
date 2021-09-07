@@ -17,23 +17,20 @@ exports.reporter = async page => {
     const beforeBuffer = await shoot(page, 'before');
     await page.waitForTimeout(interval);
     const afterBuffer = await shoot(page, 'after');
-    // const beforePNG = beforeBuffer.toString('base64');
-    // const afterPNG = afterBuffer.toString('base64');
     return [beforeBuffer, afterBuffer];
   };
   // FUNCTION DEFINITIONS END
-  // Make 2 screen shots 3 seconds apart.
+  // Make 2 screen shots 3 seconds apart after 2 seconds.
   const shots = await shootTwice(page, 2000, 3000);
   // If the shooting succeeded:
   if (shots.length === 2) {
-    console.log(`First screen shot has length ${shots[0].length}`);
-    console.log(`Second screen shot has length ${shots[1].length}`);
-    // console.log(`First buffer length is ${beforeBuffer.length}`);
-    // console.log(`Second buffer length is ${afterBuffer.length}`);
-    console.log(`Buffers identical? ${Buffer.compare(shots[0], shots[1])}`);
-    // Return success and the exhibits.
+    // Return the result.
+    const sizes = [shots[0].length, shots[1].length];
     return {
-      result: 'screenshots made',
+      result: {
+        sizes,
+        ratio: (sizes[0] > sizes[1] ? sizes[0] / sizes[1] : sizes[1] / sizes[0]).toFixed(2)
+      }
     };
   }
   // Otherwise, i.e. if the shooting failed:
