@@ -424,6 +424,12 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
         // Identify its only page as current.
         page = browserContext.pages()[0];
       }
+      // Otherwise, if it is a score:
+      else if (act.type === 'score') {
+        // Compute and report the score.
+        const {scorer} = require(`procs/score/${act.which}`);
+        act.result = scorer ? scorer(report) : 'ERROR: SCORE FILE NOT FOUND';
+      }
       // Otherwise, if a current page exists:
       else if (page) {
         // If the command is a url:
