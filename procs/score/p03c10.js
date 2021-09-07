@@ -164,7 +164,7 @@ exports.scorer = acts => {
       else if (type === 'motion') {
         facts = act.result && act.result.ratio;
         if (facts) {
-          deficit.motion += 50 * (facts - 1) || 0;
+          deficit.motion += Math.floor(50 * (facts - 1));
           deficit.total += deficit.motion;
         }
       }
