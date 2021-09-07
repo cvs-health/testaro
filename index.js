@@ -427,8 +427,13 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
       // Otherwise, if it is a score:
       else if (act.type === 'score') {
         // Compute and report the score.
-        const {scorer} = require(`procs/score/${act.which}`);
-        act.result = scorer ? scorer(report) : 'ERROR: SCORE FILE NOT FOUND';
+        try {
+          const {scorer} = require(`./procs/score/${act.which}`);
+          act.result = scorer(acts);
+        }
+        catch (error) {
+          act.result = `ERROR: ${error.message}`;
+        }
       }
       // Otherwise, if a current page exists:
       else if (page) {

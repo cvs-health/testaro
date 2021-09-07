@@ -19,6 +19,7 @@ exports.scorer = acts => {
   };
   let facts;
   if (Array.isArray(acts)) {
+    const tests = acts.filter(act => act.type === 'test');
     // Discounts from deficit scores based on multi-test reporting of the same faults.
     const ruleDiscounts = {
       axe: {
@@ -52,12 +53,12 @@ exports.scorer = acts => {
         'select_missing_label': 1
       }
     };
-    acts.forEach(act => {
-      const {type} = act;
-      if (type === 'axe') {
-        facts = act.result && act.result.violations;
+    tests.forEach(test => {
+      const {which} = test;
+      if (which === 'axe') {
+        facts = test.result && test.result.violations;
         if (facts) {
-          const rules = act.result.items || [];
+          const rules = test.result.items || [];
           let totalDiscount = 0;
           rules.forEach(rule => {
             const ruleDiscount = ruleDiscounts.axe[rule.rule];
@@ -75,10 +76,10 @@ exports.scorer = acts => {
           deficit.total += deficit.axe;
         }
       }
-      else if (type === 'ibm') {
-        facts = act.result && act.result.totals;
+      else if (which === 'ibm') {
+        facts = test.result && test.result.totals;
         if (facts) {
-          const rules = act.result.items || [];
+          const rules = test.result.items || [];
           let totalDiscount = 0;
           rules.forEach(rule => {
             const ruleDiscount = ruleDiscounts.ibm[rule.ruleId];
@@ -90,8 +91,8 @@ exports.scorer = acts => {
           deficit.total += deficit.ibm;
         }
       }
-      else if (type === 'wave4') {
-        facts = act.result && act.result.categories;
+      else if (which === 'wave4') {
+        facts = test.result && test.result.categories;
         if (facts) {
           let totalDiscount = 0;
           ['error', 'contrast', 'alert'].forEach(level => {
@@ -113,16 +114,16 @@ exports.scorer = acts => {
           deficit.total += deficit.wave4;
         }
       }
-      else if (type === 'bulk') {
-        facts = act.result;
+      else if (which === 'bulk') {
+        facts = test.result;
         if (facts) {
           // Deficit: square root of the excess of the element count over 150.
           deficit.bulk += Math.floor(Math.sqrt(Math.max(0, facts.visibleElements - 150))) || 0;
           deficit.total += deficit.bulk;
         }
       }
-      else if (type === 'focOl') {
-        facts = act.result && act.result.totals;
+      else if (which === 'focOl') {
+        facts = test.result && test.result.totals;
         facts = facts ? facts.types : null;
         facts = facts ? facts.outlineMissing : null;
         if (facts) {
@@ -130,62 +131,63 @@ exports.scorer = acts => {
           deficit.total += deficit.focOl;
         }
       }
-      else if (type === 'focOp') {
-        facts = act.result && act.result.totals;
+      else if (which === 'focOp') {
+        facts = test.result && test.result.totals;
         if (facts) {
           deficit.focOp
             += 4 * facts.operableNotFocusable.total + 1 * facts.focusableNotOperable.total || 0;
           deficit.total += deficit.focOp;
         }
       }
-      else if (type === 'hover') {
-        facts = act.result && act.result.totals;
+      else if (which === 'hover') {
+        facts = test.result && test.result.totals;
         if (facts) {
           deficit.hover += 4 * facts.triggers + 2 * facts.targets || 0;
           deficit.total += deficit.hover;
         }
       }
-      else if (type === 'labClash') {
-        facts = act.result && act.result.totals;
+      else if (which === 'labClash') {
+        facts = test.result && test.result.totals;
         if (facts) {
           // Unlabeled elements discounted.
           deficit.labClash += 2 * facts.mislabeled + 2 * facts.unlabeled || 0;
           deficit.total += deficit.labClash;
         }
       }
-      else if (type === 'linkUl') {
-        facts = act.result && act.result.totals;
+      else if (which === 'linkUl') {
+        console.log('Doing linkUl scoring');
+        facts = test.result && test.result.totals;
         facts = facts ? facts.inline : null;
         if (facts) {
           deficit.linkUl += 3 * (facts.total - facts.underlined) || 0;
           deficit.total += deficit.linkUl;
         }
       }
-      else if (type === 'motion') {
-        facts = act.result && act.result.ratio;
+      else if (which === 'motion') {
+        facts = test.result && test.result.ratio;
         if (facts) {
           deficit.motion += Math.floor(50 * (facts - 1));
           deficit.total += deficit.motion;
         }
       }
-      else if (type === 'radioSet') {
-        facts = act.result && act.result.totals;
+      else if (which === 'radioSet') {
+        facts = test.result && test.result.totals;
         if (facts) {
           // Defects discounted.
           deficit.radioSet += 2 * (facts.total - facts.inSet) || 0;
           deficit.total += deficit.radioSet;
         }
       }
-      else if (type === 'role') {
-        facts = act.result;
+      else if (which === 'role') {
+        facts = test.result;
         if (facts) {
           // Defects discounted.
           deficit.role += 2 * facts.badRoleElements || 0;
           deficit.total += deficit.role;
         }
       }
-      else if (type === 'styleDiff') {
-        facts = act.result && act.result.totals;
+      else if (which === 'styleDiff') {
+        facts = test.result && test.result.totals;
         if (facts) {
           // Identify an array of objects having tag-name totals and style distributions as values.
           const tagNameCounts = Object.values(facts);
