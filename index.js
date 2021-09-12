@@ -80,7 +80,7 @@ const tests = {
   motion: 'report motion',
   radioSet: 'tabulate and list radio buttons in and not in accessible fieldsets',
   roleList: 'list elements having role attributes',
-  roleS: 'tabulate elements with inaccessible roles',
+  role: 'tabulate elements with inaccessible roles',
   simple: 'perfunctory trivial test for testing',
   state: 'show an element with and without its focus and hover states in 3 browsers',
   styleDiff: 'tabulate and list style inconsistencies',
