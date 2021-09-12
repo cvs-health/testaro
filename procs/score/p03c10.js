@@ -163,9 +163,10 @@ exports.scorer = acts => {
         }
       }
       else if (which === 'motion') {
-        facts = test.result && test.result.ratio;
-        if (facts) {
-          deficit.motion += Math.floor(50 * (facts - 1));
+        facts = test.result;
+        if (facts && facts.sizes && facts.ratio) {
+          deficit.motion
+            += 5 * (facts.sizes[1] !== facts.sizes[0]) + Math.floor(60 * (facts.ratio - 1));
           deficit.total += deficit.motion;
         }
       }
