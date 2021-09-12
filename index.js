@@ -345,7 +345,7 @@ const isValid = command => {
   // If the type exists and is known:
   if (type && commands.etc[type]) {
     // Initialize the validator of the command.
-    let validator = commands.etc[type];
+    let validator = commands.etc[type][1];
     // If the type is test:
     if (type === 'test') {
       // Identify the test.
@@ -355,7 +355,7 @@ const isValid = command => {
         // If it has special properties:
         if (commands.tests[testName]) {
           // Add them to the validator.
-          Object.assign(validator, commands.tests[testName]);
+          Object.assign(validator, commands.tests[testName][1]);
         }
       }
       // Otherwise, i.e. if no or an unknown test was specified:
