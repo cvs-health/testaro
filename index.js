@@ -344,28 +344,25 @@ const isValid = command => {
   const type = command.type;
   // If the type exists and is known:
   if (type && commands.etc[type]) {
-    // Initialize the validators of the command.
-    let validator = {};
+    // Initialize the validator of the command.
+    let validator = commands.etc[type];
     // If the type is test:
     if (type === 'test') {
       // Identify the test.
       const testName = command.which;
-      // If it is known:
+      // If one was specified and is known:
       if (testName && tests[testName]) {
-        // Add its validator(s).
-        validator = commands.etc.test[1];
-        const extraVal = commands.tests[testName];
-        if (extraVal) {
-          Object.keys(extraVal[1]).forEach(key => {
-            validator[key] = extraVal[1][key];
-          });
+        // If it has special properties:
+        if (commands.tests[testName]) {
+          // Add them to the validator.
+          Object.assign(validator, commands.tests[testName]);
         }
       }
-    }
-    // Otherwise, i.e. if the type is not test:
-    else {
-      // Add its validator.
-      validator = commands.etc[type][1];
+      // Otherwise, i.e. if no or an unknown test was specified:
+      else {
+        // Return invalidity.
+        return false;
+      }
     }
     // Return whether the command is valid.
     return Object.keys(validator).every(property => {
@@ -377,7 +374,7 @@ const isValid = command => {
   }
   // Otherwise, i.e. if the command has an unknown or no type:
   else {
-    // Return failure.
+    // Return invalidity.
     return false;
   }
 };
