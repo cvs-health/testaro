@@ -28,5 +28,5 @@ exports.reporter = async (page, withItems, withNewContent) => {
     });
   }
   // Return it.
-  return {result: data};
+  return data;
 };
