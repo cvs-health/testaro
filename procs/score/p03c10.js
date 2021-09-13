@@ -163,9 +163,13 @@ exports.scorer = acts => {
         }
       }
       else if (which === 'motion') {
-        facts = test.result && test.result.ratio;
+        facts = test.result;
         if (facts) {
-          deficit.motion += Math.floor(50 * (facts - 1));
+          deficit.motion += Math.floor(
+            20 * (facts.meanLocalRatio - 1)
+            + 20 * (facts.maxLocalRatio - 1)
+            + 20 * (facts.globalRatio - 1)
+          );
           deficit.total += deficit.motion;
         }
       }

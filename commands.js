@@ -50,7 +50,8 @@ exports.commands = {
       'Perform a motion test',
       {
         delay: [true, 'number'],
-        interval: [true, 'number']
+        interval: [true, 'number'],
+        count: [true, 'number']
       }
     ],
     radioSet: [

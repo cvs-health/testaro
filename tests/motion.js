@@ -1,5 +1,5 @@
 // Reports motion in a page.
-exports.reporter = async (page, delay, interval) => {
+exports.reporter = async (page, delay, interval, count) => {
   // FUNCTION DEFINITIONS START
   // Creates and returns a screen shot.
   const shoot = async (page, fileName) => {
@@ -10,26 +10,41 @@ exports.reporter = async (page, delay, interval) => {
       path: `${process.env.REPORTDIR}/motion/${fileName}.png`
     });
   };
-  // Creates and returns 2 screen shots after a wait and at a time interval in ms.
-  const shootTwice = async (page, wait, interval) => {
-    // Make 2 screen shots of the page.
-    await page.waitForTimeout(wait);
-    const beforeBuffer = await shoot(page, 'before');
-    await page.waitForTimeout(interval);
-    const afterBuffer = await shoot(page, 'after');
-    return [beforeBuffer, afterBuffer];
+  // Recursively creates and returns screen shots.
+  const shootAll = async (page, delay, interval, count, toDo, buffers) => {
+    // Wait.
+    await page.waitForTimeout(toDo === count ? delay : interval);
+    // Make a screen shot.
+    const buffer = await shoot(page, `motion-${count - toDo}`);
+    buffers.push(buffer);
+    if (toDo > 1) {
+      shootAll(page, delay, interval, count, toDo - 1, buffers);
+    }
+    else {
+      return buffers;
+    }
   };
   // FUNCTION DEFINITIONS END
   // Make 2 screen shots 3 seconds apart after 2 seconds.
-  const shots = await shootTwice(page, delay, interval);
+  const shots = await shootAll(page, delay, interval, count, count, []);
   // If the shooting succeeded:
-  if (shots.length === 2) {
+  if (shots.length === count) {
     // Return the result.
-    const sizes = [shots[0].length, shots[1].length];
+    const sizes = shots.map(shot => shot.length);
+    const localRatios = sizes.slice(1).map((size, index) => (
+      size > sizes[index -1] ? size / sizes[index - 1] : sizes[index - 1] / size
+    ).toFixed(2));
+    const maxLocalRatio = Math.max(localRatios);
+    const globalRatio = (Math.max(sizes) / Math.min(sizes)).toFixed(2);
+    const meanLocalRatio = (
+      localRatios.reduce((mean, currentRatio) => mean + currentRatio) / localRatios.length
+    ).toFixed(2);
     return {
       result: {
         sizes,
-        ratio: (sizes[0] > sizes[1] ? sizes[0] / sizes[1] : sizes[1] / sizes[0]).toFixed(2)
+        meanLocalRatio,
+        maxLocalRatio,
+        globalRatio
       }
     };
   }
