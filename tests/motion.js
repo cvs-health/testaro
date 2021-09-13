@@ -18,7 +18,7 @@ exports.reporter = async (page, delay, interval, count) => {
     const buffer = await shoot(page, `motion-${count - toDo}`);
     buffers.push(buffer);
     if (toDo > 1) {
-      shootAll(page, delay, interval, count, toDo - 1, buffers);
+      return shootAll(page, delay, interval, count, toDo - 1, buffers);
     }
     else {
       return buffers;
@@ -31,17 +31,18 @@ exports.reporter = async (page, delay, interval, count) => {
   if (shots.length === count) {
     // Return the result.
     const sizes = shots.map(shot => shot.length);
-    const localRatios = sizes.slice(1).map((size, index) => (
-      size > sizes[index -1] ? size / sizes[index - 1] : sizes[index - 1] / size
-    ).toFixed(2));
-    const maxLocalRatio = Math.max(localRatios);
-    const globalRatio = (Math.max(sizes) / Math.min(sizes)).toFixed(2);
-    const meanLocalRatio = (
-      localRatios.reduce((mean, currentRatio) => mean + currentRatio) / localRatios.length
-    ).toFixed(2);
+    const localRatios = sizes.slice(1).map((size, index) => 0.01 * Math.round(
+      100 * (size > sizes[index] ? size / sizes[index] : sizes[index] / size)
+    ));
+    const meanLocalRatio = 0.01 * Math.round(
+      100 * localRatios.reduce((sum, currentRatio) => sum + currentRatio) / localRatios.length
+    );
+    const maxLocalRatio = Math.max(...localRatios);
+    const globalRatio = 0.01 * Math.round(100 * (Math.max(...sizes) / Math.min(...sizes)));
     return {
       result: {
         sizes,
+        localRatios,
         meanLocalRatio,
         maxLocalRatio,
         globalRatio

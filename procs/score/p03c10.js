@@ -166,9 +166,9 @@ exports.scorer = acts => {
         facts = test.result;
         if (facts) {
           deficit.motion += Math.floor(
-            20 * (facts.meanLocalRatio - 1)
-            + 20 * (facts.maxLocalRatio - 1)
-            + 20 * (facts.globalRatio - 1)
+            30 * (facts.meanLocalRatio - 1)
+            + 30 * (facts.maxLocalRatio - 1)
+            + 30 * (facts.globalRatio - 1)
           );
           deficit.total += deficit.motion;
         }
