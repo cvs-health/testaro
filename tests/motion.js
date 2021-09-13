@@ -20,7 +20,9 @@ exports.reporter = async (page, delay, interval) => {
     return [beforeBuffer, afterBuffer];
   };
   // FUNCTION DEFINITIONS END
-  // Make 2 screen shots 3 seconds apart after 2 seconds.
+  // Reload the page to reveal any temporary motion.
+  await page.reload();
+  // Make 2 screen shots.
   const shots = await shootTwice(page, delay, interval);
   // If the shooting succeeded:
   if (shots.length === 2) {
