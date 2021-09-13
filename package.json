@@ -26,6 +26,7 @@
     "accessibility-checker": "*",
     "axe-playwright": "*",
     "dotenv": "*",
+    "pixelmatch": "*",
     "playwright": "^1.14.0"
   },
   "devDependencies": {

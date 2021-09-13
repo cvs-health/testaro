@@ -1,3 +1,4 @@
+const pixelmatch = require('pixelmatch');
 // Reports motion in a page.
 exports.reporter = async (page, delay, interval, count) => {
   // FUNCTION DEFINITIONS START
@@ -25,10 +26,12 @@ exports.reporter = async (page, delay, interval, count) => {
     }
   };
   // FUNCTION DEFINITIONS END
-  // Make screen shots.
+  // Make screen shots and get their image buffers.
   const shots = await shootAll(page, delay, interval, count, count, []);
   // If the shooting succeeded:
   if (shots.length === count) {
+    // Get the count of differing pixels between the first and last images.
+    const diffCount = pixelmatch(shots[0], shots[shots.length - 1], null, )
     // Return the result.
     const sizes = shots.map(shot => shot.length);
     const localRatios = sizes.slice(1).map((size, index) => 0.01 * Math.round(
