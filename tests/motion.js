@@ -25,7 +25,7 @@ exports.reporter = async (page, delay, interval, count) => {
     }
   };
   // FUNCTION DEFINITIONS END
-  // Make 2 screen shots 3 seconds apart after 2 seconds.
+  // Make screen shots.
   const shots = await shootAll(page, delay, interval, count, count, []);
   // If the shooting succeeded:
   if (shots.length === count) {
