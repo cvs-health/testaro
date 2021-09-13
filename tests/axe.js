@@ -74,11 +74,15 @@ exports.reporter = async (page, withItems, rules = []) => {
         report.items.push(compactRule(rule));
       }
     });
+    // Reload the page to undo the DOM changes made by Axe.
+    await page.reload();
     // Return the report.
     return {result: report};
   }
   // Otherwise, i.e. if there are no violations:
   else {
+    // Reload the page to undo the DOM changes made by Axe.
+    await page.reload();
     // Return a success report.
     return {result: 'O.K.'};
   }

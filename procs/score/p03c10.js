@@ -91,7 +91,7 @@ exports.scorer = acts => {
           deficit.total += deficit.ibm;
         }
       }
-      else if (which === 'wave4') {
+      else if (which === 'wave') {
         facts = test.result && test.result.categories;
         if (facts) {
           let totalDiscount = 0;

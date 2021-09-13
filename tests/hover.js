@@ -102,6 +102,8 @@ exports.reporter = async (page, withItems) => {
   };
   // Find and document the hover-triggered disclosures.
   await find(triggers);
+  // Reload the page to undo the hover-triggered content changes.
+  await page.reload();
   // Return the result.
   return {result: data};
 };

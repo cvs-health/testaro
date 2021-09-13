@@ -80,7 +80,7 @@ const tests = {
   motion: 'report motion',
   radioSet: 'tabulate and list radio buttons in and not in accessible fieldsets',
   roleList: 'list elements having role attributes',
-  roleS: 'tabulate elements with inaccessible roles',
+  role: 'tabulate elements with inaccessible roles',
   simple: 'perfunctory trivial test for testing',
   state: 'show an element with and without its focus and hover states in 3 browsers',
   styleDiff: 'tabulate and list style inconsistencies',
@@ -344,28 +344,25 @@ const isValid = command => {
   const type = command.type;
   // If the type exists and is known:
   if (type && commands.etc[type]) {
-    // Initialize the validators of the command.
-    let validator = {};
+    // Copy the validator of the type for possible expansion.
+    const validator = Object.assign({}, commands.etc[type][1]);
     // If the type is test:
     if (type === 'test') {
       // Identify the test.
       const testName = command.which;
-      // If it is known:
+      // If one was specified and is known:
       if (testName && tests[testName]) {
-        // Add its validator(s).
-        validator = commands.etc.test[1];
-        const extraVal = commands.tests[testName];
-        if (extraVal) {
-          Object.keys(extraVal[1]).forEach(key => {
-            validator[key] = extraVal[1][key];
-          });
+        // If it has special properties:
+        if (commands.tests[testName]) {
+          // Expand the validator by adding them.
+          Object.assign(validator, commands.tests[testName][1]);
         }
       }
-    }
-    // Otherwise, i.e. if the type is not test:
-    else {
-      // Add its validator.
-      validator = commands.etc[type][1];
+      // Otherwise, i.e. if no or an unknown test was specified:
+      else {
+        // Return invalidity.
+        return false;
+      }
     }
     // Return whether the command is valid.
     return Object.keys(validator).every(property => {
@@ -377,7 +374,7 @@ const isValid = command => {
   }
   // Otherwise, i.e. if the command has an unknown or no type:
   else {
-    // Return failure.
+    // Return invalidity.
     return false;
   }
 };
