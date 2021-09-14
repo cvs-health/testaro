@@ -1,4 +1,5 @@
 const pixelmatch = require('pixelmatch');
+const {PNG} = require('pngjs');
 // Reports motion in a page.
 exports.reporter = async (page, delay, interval, count) => {
   // FUNCTION DEFINITIONS START
@@ -17,6 +18,7 @@ exports.reporter = async (page, delay, interval, count) => {
     await page.waitForTimeout(toDo === count ? delay : interval);
     // Make a screen shot.
     const buffer = await shoot(page, `motion-${count - toDo}`);
+    // Get its dimensions.
     buffers.push(buffer);
     if (toDo > 1) {
       return shootAll(page, delay, interval, count, toDo - 1, buffers);
@@ -25,31 +27,54 @@ exports.reporter = async (page, delay, interval, count) => {
       return buffers;
     }
   };
+  // Returns a number rounded to 2 decimal digits.
+  const round = (num, precision) => Number.parseFloat(num.toPrecision(precision));
   // FUNCTION DEFINITIONS END
   // Make screen shots and get their image buffers.
   const shots = await shootAll(page, delay, interval, count, count, []);
   // If the shooting succeeded:
   if (shots.length === count) {
-    // Get the count of differing pixels between the first and last images.
-    const diffCount = pixelmatch(shots[0], shots[shots.length - 1], null, 1280, 720);
-    console.log(`Count of differing pixels is ${diffCount}`);
-    // Return the result.
-    const sizes = shots.map(shot => shot.length);
-    const localRatios = sizes.slice(1).map((size, index) => 0.01 * Math.round(
-      100 * (size > sizes[index] ? size / sizes[index] : sizes[index] / size)
+    // Get the sizes of the shots in bytes of code.
+    const bytes = shots.map(shot => shot.length);
+    // Get their ratios between adjacent pairs of shots.
+    const localRatios = bytes.slice(1).map((size, index) => round(
+      (size > bytes[index] ? size / bytes[index] : bytes[index] / size), 4
     ));
-    const meanLocalRatio = 0.01 * Math.round(
-      100 * localRatios.reduce((sum, currentRatio) => sum + currentRatio) / localRatios.length
+    // Get the mean and maximum of those ratios.
+    const meanLocalRatio = round(
+      localRatios.reduce((sum, currentRatio) => sum + currentRatio) / localRatios.length, 4
     );
     const maxLocalRatio = Math.max(...localRatios);
-    const globalRatio = 0.01 * Math.round(100 * (Math.max(...sizes) / Math.min(...sizes)));
+    // Get the ratio between the largest and smallest shot.
+    const globalRatio = round((Math.max(...bytes) / Math.min(...bytes)), 4);
+    // Get the shots as PNG images.
+    const pngs = shots.map(shot => PNG.sync.read(shot));
+    // Get their dimensions.
+    const {width, height} = pngs[0];
+    // Get the counts of differing pixels between adjacent pairs of shots.
+    const pixelChanges = pngs
+    .slice(1)
+    .map((png, index) => pixelmatch(pngs[index].data, png.data, null, width, height));
+    // Get the mean and maximum of those counts.
+    const meanPixelChange = Math.floor(
+      pixelChanges.reduce((sum, currentChange) => sum + currentChange) / pixelChanges.length
+    );
+    const maxPixelChange = Math.max(...pixelChanges);
+    const changeFrequency = round(
+      pixelChanges.reduce((count, change) => count + (change ? 1 : 0), 0) / pixelChanges.length, 2
+    );
+    // Return the result.
     return {
       result: {
-        sizes,
+        bytes,
         localRatios,
         meanLocalRatio,
         maxLocalRatio,
-        globalRatio
+        globalRatio,
+        pixelChanges,
+        meanPixelChange,
+        maxPixelChange,
+        changeFrequency
       }
     };
   }

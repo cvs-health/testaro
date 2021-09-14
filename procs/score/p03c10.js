@@ -166,9 +166,12 @@ exports.scorer = acts => {
         facts = test.result;
         if (facts) {
           deficit.motion += Math.floor(
-            30 * (facts.meanLocalRatio - 1)
-            + 30 * (facts.maxLocalRatio - 1)
-            + 30 * (facts.globalRatio - 1)
+            15 * (facts.meanLocalRatio - 1)
+            + 15 * (facts.maxLocalRatio - 1)
+            + 15 * (facts.globalRatio - 1)
+            + facts.meanPixelChange / 25000
+            + facts.maxPixelChange / 25000
+            + 10 * facts.changeFrequency
           );
           deficit.total += deficit.motion;
         }
