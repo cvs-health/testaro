@@ -5,7 +5,7 @@ exports.scorer = acts => {
     total: 0,
     axe: 0,
     ibm: 0,
-    wave4: 0,
+    wave: 0,
     bulk: 0,
     focOl: 0,
     focOp: 0,
@@ -105,13 +105,13 @@ exports.scorer = acts => {
               }
             });
           });
-          deficit.wave4
+          deficit.wave
             += 2 * facts.alert.count
             + 3 * facts.contrast.count
             + 4 * facts.error.count
             - totalDiscount
             || 0;
-          deficit.total += deficit.wave4;
+          deficit.total += deficit.wave;
         }
       }
       else if (which === 'bulk') {

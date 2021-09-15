@@ -96,7 +96,9 @@ exports.reporter = async (page, withItems, revealAll) => {
   await compile(page, focOutY, good, items, 'outlinePresent', withItems);
   data.totals.total = bad.total + good.total;
   // Reload the page to undo the focus and attribute changes.
-  await page.reload();
+  await page.reload().catch(error => {
+    console.log(error.message, error.stack);
+  });
   // Return the data.
   return {result: data};
 };
