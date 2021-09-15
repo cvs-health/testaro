@@ -88,7 +88,9 @@ exports.reporter = async (page, withItems, rules = []) => {
     data.result = 'ERROR: Axe failed.';
   }
   // Reload the page to undo the DOM changes made by Axe.
-  await page.reload();
+  await page.reload().catch(error => {
+    console.log(error.message, error.stack);
+  });
   // Return the result.
   return {result: data};
 };

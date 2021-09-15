@@ -28,7 +28,9 @@ exports.reporter = async (page, withItems, withNewContent) => {
     });
   }
   // Reload the page to undo any DOM changes made by IBM.
-  await page.reload();
+  await page.reload().catch(error => {
+    console.log(error.message, error.stack);
+  });
   // Return it.
   return data;
 };
