@@ -102,9 +102,10 @@ exports.commands = {
       }
     ],
     launch: [
-      'Launch a Playwright browser (which: chromium, firefox, or webkit)',
+      'Launch a Playwright browser (which: chromium, firefox, or webkit; what: comment)',
       {
-        which: [true, 'string', 'isBrowserType']
+        which: [true, 'string', 'isBrowserType'],
+        what: [false, 'string', 'hasLength']
       }
     ],
     link: [
