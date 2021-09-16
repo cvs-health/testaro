@@ -4,12 +4,21 @@ const {PNG} = require('pngjs');
 exports.reporter = async (page, delay, interval, count) => {
   // FUNCTION DEFINITIONS START
   // Creates and returns a screen shot.
-  const shoot = async (page, fileName) => {
+  const shoot = async (page, fileName, tryAgain) => {
     // Make a screen shot as a buffer.
     return await page.screenshot({
       fullPage: false,
       omitBackground: true,
       path: `${process.env.REPORTDIR}/motion/${fileName}.png`
+    })
+    .catch(async error => {
+      console.log(`ERROR MAKING SCREEN SHOT: ${error.message}`);
+      if (tryAgain) {
+        return await shoot(page, fileName, false);
+      }
+      else {
+        return '';
+      }
     });
   };
   // Recursively creates and returns screen shots.
@@ -19,12 +28,17 @@ exports.reporter = async (page, delay, interval, count) => {
     // Make a screen shot.
     const buffer = await shoot(page, `motion-${count - toDo}`);
     // Get its dimensions.
-    buffers.push(buffer);
-    if (toDo > 1) {
-      return shootAll(page, delay, interval, count, toDo - 1, buffers);
+    if (buffer.length) {
+      buffers.push(buffer);
+      if (toDo > 1) {
+        return shootAll(page, delay, interval, count, toDo - 1, buffers);
+      }
+      else {
+        return buffers;
+      }
     }
     else {
-      return buffers;
+      return '';
     }
   };
   // Returns a number rounded to 2 decimal digits.

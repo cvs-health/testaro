@@ -3,7 +3,10 @@ const fs = require('fs/promises');
 const {getCompliance} = require('accessibility-checker');
 // Returns results of an IBM test.
 exports.reporter = async (page, withItems, withNewContent) => {
-  // Identify whether this test should refetch the page.
+  /*
+    Identify whether this test should refetch the page. Some pages crash this test unless
+    withNewContent is true.
+  */
   const content = withNewContent ? page.url() : await page.content();
   // Run the test and get the result. Delete the report file.
   const nowLabel = (new Date()).toISOString().slice(0, 19);
@@ -28,8 +31,8 @@ exports.reporter = async (page, withItems, withNewContent) => {
     });
   }
   // Reload the page to undo any DOM changes made by IBM.
-  await page.reload().catch(error => {
-    console.log(error.message, error.stack);
+  await page.reload({timeout: 10000}).catch(error => {
+    console.log(`ERROR RELOADING PAGE AFTER IBM: ${error.message}`);
   });
   // Return it.
   return data;
