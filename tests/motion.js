@@ -4,21 +4,16 @@ const {PNG} = require('pngjs');
 exports.reporter = async (page, delay, interval, count) => {
   // FUNCTION DEFINITIONS START
   // Creates and returns a screen shot.
-  const shoot = async (page, fileName, tryAgain) => {
+  const shoot = async (page, fileName) => {
     // Make a screen shot as a buffer.
     return await page.screenshot({
       fullPage: false,
       omitBackground: true,
       path: `${process.env.REPORTDIR}/motion/${fileName}.png`
     })
-    .catch(async error => {
-      console.log(`ERROR MAKING SCREEN SHOT: ${error.message}`);
-      if (tryAgain) {
-        return await shoot(page, fileName, false);
-      }
-      else {
-        return '';
-      }
+    .catch(error => {
+      console.log(`ERROR: SCREEN SHOT FOR ${fileName} FAILED: ${error.message}`);
+      return '';
     });
   };
   // Recursively creates and returns screen shots.
@@ -26,7 +21,7 @@ exports.reporter = async (page, delay, interval, count) => {
     // Wait.
     await page.waitForTimeout(toDo === count ? delay : interval);
     // Make a screen shot.
-    const buffer = await shoot(page, `motion-${count - toDo}`, true);
+    const buffer = await shoot(page, `motion-${count - toDo}`);
     // Get its dimensions.
     if (buffer.length) {
       buffers.push(buffer);

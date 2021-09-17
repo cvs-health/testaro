@@ -2,7 +2,7 @@
 exports.reporter = async (page, withItems) => {
   // Identify the elements that are likely to trigger disclosures on hover.
   const triggers = await page.$$(
-    'body button:visible, body li:visible, body [onmouseenter]:visible, body [onmouseover]:visible'
+    'body a:visible, body button:visible, body li:visible, body [onmouseenter]:visible, body [onmouseover]:visible'
   );
   // Identify the selectors of active elements likely to be disclosed by a hover.
   const targetSelectors = ['a', 'button', 'input', '[role=menuitem]', 'span']
@@ -29,19 +29,21 @@ exports.reporter = async (page, withItems) => {
       const tagName = await tagNameJSHandle.jsonValue();
       // Identify the root of a subtree that (empirically) may contain disclosed elements.
       let root = firstTrigger;
-      if (['a', 'button'].includes(tagName)) {
+      if (['A', 'BUTTON'].includes(tagName)) {
         const rootJSHandle = await page.evaluateHandle(
           firstTrigger => firstTrigger.parentElement.parentElement, firstTrigger
         );
         root = rootJSHandle.asElement();
       }
+      const innerHTML = await root.innerHTML();
       // Identify the visible active descendants.
       const preVisibles = await root.$$(targetSelectors);
       try {
         // Hover over the potential trigger.
+        const ftText = await firstTrigger.textContent();
         await firstTrigger.hover({timeout: 700});
         // Wait for any delayed and/or slowed hover reaction. (Some test pages require 290+.)
-        await page.waitForTimeout(350);
+        await page.waitForTimeout(1000);
         await root.waitForElementState('stable');
         // Identify the visible active descendants.
         const postVisibles = await root.$$(targetSelectors);

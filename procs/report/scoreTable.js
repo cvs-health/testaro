@@ -1,6 +1,8 @@
 /*
   scoreTable.js
   Converts scoreAgg output from JSON to an HTML bar-graph table.
+  Arguments:
+    0. Subdirectory of report directory.
 */
 // ########## IMPORTS
 // Module to access files.
