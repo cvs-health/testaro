@@ -397,10 +397,10 @@ const visit = async (act, page) => {
   catch (error) {
     await page.goto('about:blank');
     if (act) {
-      act.result = `ERROR visiting ${resolved}: ${error.message}`;
+      act.result = `ERROR VISITING ${resolved}: ${error.message}`;
     }
     else {
-      console.log(`ERROR visiting ${resolved}`);
+      console.log(`ERROR VISITING ${resolved}`);
     }
   }
 };

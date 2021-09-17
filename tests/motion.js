@@ -26,7 +26,7 @@ exports.reporter = async (page, delay, interval, count) => {
     // Wait.
     await page.waitForTimeout(toDo === count ? delay : interval);
     // Make a screen shot.
-    const buffer = await shoot(page, `motion-${count - toDo}`);
+    const buffer = await shoot(page, `motion-${count - toDo}`, true);
     // Get its dimensions.
     if (buffer.length) {
       buffers.push(buffer);
