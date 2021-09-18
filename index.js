@@ -15,7 +15,7 @@ const https = require('https');
 const {commands} = require('./commands');
 // ########## CONSTANTS
 // Set debug to true to add debugging features.
-const debug = true;
+const debug = false;
 // Set waits to a positive number to insert delays (in ms).
 const waits = 0;
 const protocol = process.env.PROTOCOL || 'https';
@@ -502,8 +502,11 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
               // Add their values to the arguments.
               args.push(...argProperties.map(propName => act[propName]));
             }
-            // Conduct and report the test.
+            // Conduct, report, and time the test.
+            const startTime = Date.now();
             const testReport = await require(`./tests/${act.which}`).reporter(...args);
+            report.testTimes.push([act.which, Math.round((Date.now() - startTime) / 1000)]);
+            report.testTimes.sort((a, b) => b[1] - a[1]);
             // If the test produced exhibits:
             if (testReport.exhibits) {
               // Add that fact to the act.
@@ -621,6 +624,7 @@ const scriptHandler = async (
   report.what = what;
   report.timeStamp = query.timeStamp;
   report.acts = acts;
+  report.testTimes = [];
   const urlSuffix = urlIndex > -1 ? `-${urlIndex.toString().padStart(3, '0')}` : '';
   // Perform the specified acts and add the results and exhibits to the report.
   await doActs(report, 0, null, `${query.timeStamp}${urlSuffix}`, query.reportDir);

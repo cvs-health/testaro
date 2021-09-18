@@ -27,20 +27,27 @@ exports.reporter = async (page, withItems) => {
       const firstTrigger = triggers[0];
       const tagNameJSHandle = await firstTrigger.getProperty('tagName');
       const tagName = await tagNameJSHandle.jsonValue();
-      // Identify the root of a subtree that (empirically) may contain disclosed elements.
+      // Identify the root of a subtree likely to contain disclosed elements.
       let root = firstTrigger;
       if (['A', 'BUTTON'].includes(tagName)) {
         const rootJSHandle = await page.evaluateHandle(
-          firstTrigger => firstTrigger.parentElement.parentElement, firstTrigger
+          firstTrigger => {
+            const parent = firstTrigger.parentElement;
+            if (parent) {
+              return parent.parentElement || parent;
+            }
+            else {
+              return firstTrigger;
+            }
+          },
+          firstTrigger
         );
         root = rootJSHandle.asElement();
       }
-      const innerHTML = await root.innerHTML();
       // Identify the visible active descendants.
       const preVisibles = await root.$$(targetSelectors);
       try {
         // Hover over the potential trigger.
-        const ftText = await firstTrigger.textContent();
         await firstTrigger.hover({timeout: 700});
         // Wait for any delayed and/or slowed hover reaction. (Some test pages require 290+.)
         await page.waitForTimeout(1000);
