@@ -10,10 +10,10 @@ exports.reporter = async (page, withItems, withNewContent) => {
   const content = withNewContent ? page.url() : await page.content();
   // Run the test and get the result. Delete the report file.
   const nowLabel = (new Date()).toISOString().slice(0, 19);
-  const result = await Promise.race(
+  const result = await Promise.race([
     getCompliance(content, nowLabel),
     new Promise(resolve => setTimeout(() => resolve(''), 20000))
-  );
+  ]);
   fs.rm('ibmtemp', {recursive: true});
   // Identify a report of the result.
   const data = {};
