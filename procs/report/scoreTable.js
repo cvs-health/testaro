@@ -18,12 +18,12 @@ const data = JSON.parse(dataJSON);
 const result = data.result;
 // Identify the containing HTML code.
 const tableStartLines = [
-  '<table>',
+  '<table class="allBorder">',
   '  <thead>',
   '    <tr><th rowspan="2">Page</th><th colspan="2">Deficit as a</th></tr>',
   '    <tr><th>Number</th><th>Bar</th>',
   '  </thead>',
-  '  <tbody class="firstCellRight">'
+  '  <tbody class="secondCellRight">'
 ];
 const tableEndLines = [
   '  </tbody>',
