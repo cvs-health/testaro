@@ -19,6 +19,7 @@ const result = data.result;
 // Identify the containing HTML code.
 const tableStartLines = [
   '<table class="allBorder">',
+  '  <caption>Accessibility deficits of web pages</caption>',
   '  <thead>',
   '    <tr><th rowspan="2">Page</th><th colspan="2">Deficit as a</th></tr>',
   '    <tr><th>Number</th><th>Bar</th>',

@@ -10,25 +10,30 @@ exports.reporter = async (page, withItems, withNewContent) => {
   const content = withNewContent ? page.url() : await page.content();
   // Run the test and get the result. Delete the report file.
   const nowLabel = (new Date()).toISOString().slice(0, 19);
-  const result = await getCompliance(content, nowLabel);
+  const result = await Promise.race(
+    getCompliance(content, nowLabel),
+    new Promise(resolve => setTimeout(() => resolve(''), 20000))
+  );
   fs.rm('ibmtemp', {recursive: true});
   // Identify a report of the result.
-  const data = {
-    result: {
-      totals: result.report.summary.counts
+  const data = {};
+  if (result) {
+    data.result = {totals: result.report.summary.counts};
+    if (withItems) {
+      data.result.items = result.report.results;
+      data.result.items.forEach(item => {
+        delete item.apiArgs;
+        delete item.category;
+        delete item.ignored;
+        delete item.messageArgs;
+        delete item.reasonId;
+        delete item.ruleTime;
+        delete item.value;
+      });
     }
-  };
-  if (withItems) {
-    data.result.items = result.report.results;
-    data.result.items.forEach(item => {
-      delete item.apiArgs;
-      delete item.category;
-      delete item.ignored;
-      delete item.messageArgs;
-      delete item.reasonId;
-      delete item.ruleTime;
-      delete item.value;
-    });
+  }
+  else {
+    data.result = 'ERROR: IBM TEST FAILED';
   }
   // Reload the page to undo any DOM changes made by IBM.
   await page.reload({timeout: 10000}).catch(error => {

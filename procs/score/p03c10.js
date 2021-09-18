@@ -3,19 +3,19 @@ exports.scorer = acts => {
   // Initialize the score.
   let deficit = {
     total: 0,
-    axe: 0,
-    ibm: 0,
-    wave: 0,
-    bulk: 0,
-    focOl: 0,
-    focOp: 0,
-    hover: 0,
-    labClash: 0,
-    linkUl: 0,
-    motion: 0,
-    radioSet: 0,
-    role: 0,
-    styleDiff: 0
+    axe: null,
+    ibm: null,
+    wave: null,
+    bulk: null,
+    focOl: null,
+    focOp: null,
+    hover: null,
+    labClash: null,
+    linkUl: null,
+    motion: null,
+    radioSet: null,
+    role: null,
+    styleDiff: null
   };
   let facts;
   if (Array.isArray(acts)) {
@@ -67,7 +67,7 @@ exports.scorer = acts => {
             }
           });
           deficit.axe
-            += 2 * facts.minor
+            = 2 * facts.minor
             + 3 * facts.moderate
             + 4 * facts.serious
             + 5 * facts.critical
@@ -87,7 +87,7 @@ exports.scorer = acts => {
               totalDiscount += ruleDiscount;
             }
           });
-          deficit.ibm += 4 * facts.violation + 2 * facts.recommendation - totalDiscount || 0;
+          deficit.ibm = 4 * facts.violation + 2 * facts.recommendation - totalDiscount || 0;
           deficit.total += deficit.ibm;
         }
       }
@@ -106,7 +106,7 @@ exports.scorer = acts => {
             });
           });
           deficit.wave
-            += 2 * facts.alert.count
+            = 2 * facts.alert.count
             + 3 * facts.contrast.count
             + 4 * facts.error.count
             - totalDiscount
@@ -118,7 +118,7 @@ exports.scorer = acts => {
         facts = test.result;
         if (facts) {
           // Deficit: square root of the excess of the element count over 150.
-          deficit.bulk += Math.floor(Math.sqrt(Math.max(0, facts.visibleElements - 150))) || 0;
+          deficit.bulk = Math.floor(Math.sqrt(Math.max(0, facts.visibleElements - 150))) || 0;
           deficit.total += deficit.bulk;
         }
       }
@@ -127,7 +127,7 @@ exports.scorer = acts => {
         facts = facts ? facts.types : null;
         facts = facts ? facts.outlineMissing : null;
         if (facts) {
-          deficit.focOl += 4 * facts.total || 0;
+          deficit.focOl = 4 * facts.total || 0;
           deficit.total += deficit.focOl;
         }
       }
@@ -135,14 +135,14 @@ exports.scorer = acts => {
         facts = test.result && test.result.totals;
         if (facts) {
           deficit.focOp
-            += 4 * facts.operableNotFocusable.total + 1 * facts.focusableNotOperable.total || 0;
+            = 4 * facts.operableNotFocusable.total + 1 * facts.focusableNotOperable.total || 0;
           deficit.total += deficit.focOp;
         }
       }
       else if (which === 'hover') {
         facts = test.result && test.result.totals;
         if (facts) {
-          deficit.hover += 4 * facts.triggers + 2 * facts.targets || 0;
+          deficit.hover = 4 * facts.triggers + 2 * facts.targets || 0;
           deficit.total += deficit.hover;
         }
       }
@@ -150,7 +150,7 @@ exports.scorer = acts => {
         facts = test.result && test.result.totals;
         if (facts) {
           // Unlabeled elements discounted.
-          deficit.labClash += 2 * facts.mislabeled + 2 * facts.unlabeled || 0;
+          deficit.labClash = 2 * facts.mislabeled + 2 * facts.unlabeled || 0;
           deficit.total += deficit.labClash;
         }
       }
@@ -158,7 +158,7 @@ exports.scorer = acts => {
         facts = test.result && test.result.totals;
         facts = facts ? facts.inline : null;
         if (facts) {
-          deficit.linkUl += 3 * (facts.total - facts.underlined) || 0;
+          deficit.linkUl = 3 * (facts.total - facts.underlined) || 0;
           deficit.total += deficit.linkUl;
         }
       }
@@ -173,14 +173,14 @@ exports.scorer = acts => {
             + facts.maxPixelChange / 25000
             + 10 * facts.changeFrequency
           );
-          deficit.total += deficit.motion;
+          deficit.total = deficit.motion;
         }
       }
       else if (which === 'radioSet') {
         facts = test.result && test.result.totals;
         if (facts) {
           // Defects discounted.
-          deficit.radioSet += 2 * (facts.total - facts.inSet) || 0;
+          deficit.radioSet = 2 * (facts.total - facts.inSet) || 0;
           deficit.total += deficit.radioSet;
         }
       }
@@ -188,7 +188,7 @@ exports.scorer = acts => {
         facts = test.result;
         if (facts) {
           // Defects discounted.
-          deficit.role += 2 * facts.badRoleElements || 0;
+          deficit.role = 2 * facts.badRoleElements || 0;
           deficit.total += deficit.role;
         }
       }
@@ -205,7 +205,7 @@ exports.scorer = acts => {
             }
           );
           // Deficit: 2 per excess style + 0.2 per nonplurality element.
-          deficit.styleDiff += Math.floor(deficits.reduce(
+          deficit.styleDiff = Math.floor(deficits.reduce(
             (total, currentPair) => total + 2 * currentPair[0] + 0.2 * currentPair[1], 0
           ));
           deficit.total += deficit.styleDiff;
