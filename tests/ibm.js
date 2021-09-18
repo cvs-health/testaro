@@ -14,10 +14,10 @@ exports.reporter = async (page, withItems, withNewContent) => {
     getCompliance(content, nowLabel),
     new Promise(resolve => setTimeout(() => resolve(''), 20000))
   ]);
-  fs.rm('ibmtemp', {recursive: true});
   // Identify a report of the result.
   const data = {};
   if (result) {
+    fs.rm('ibmtemp', {recursive: true});
     data.result = {totals: result.report.summary.counts};
     if (withItems) {
       data.result.items = result.report.results;
