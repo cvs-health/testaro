@@ -27,7 +27,16 @@ exports.focusMark = async (page, lastNavKey) => {
       // Return that fact and a status.
       return [null, 'external'];
     }
-  }, lastNavKey);
+  }, lastNavKey)
+  .catch(error => {
+    console.log(`ERROR: FOCUS MARKING FAILED (${error.message})`);
+    return '';
+  });
   // Return the focused element and the status.
-  return await require('./jsHandleProps').jsHandleProps(jsHandle, [true, false]);
+  if (typeof jsHandle === 'string') {
+    return [null, 'external'];
+  }
+  else {
+    return await require('./jsHandleProps').jsHandleProps(jsHandle, [true, false]);
+  }
 };

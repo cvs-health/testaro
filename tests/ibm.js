@@ -12,7 +12,7 @@ exports.reporter = async (page, withItems, withNewContent) => {
   const nowLabel = (new Date()).toISOString().slice(0, 19);
   const result = await Promise.race([
     getCompliance(content, nowLabel),
-    new Promise(resolve => setTimeout(() => resolve(''), 20000))
+    new Promise(resolve => setTimeout(() => resolve(''), 15000))
   ]);
   // Identify a report of the result.
   const data = {};

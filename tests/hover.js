@@ -49,7 +49,7 @@ exports.reporter = async (page, withItems) => {
       try {
         // Hover over the potential trigger.
         await firstTrigger.hover({timeout: 700});
-        // Wait for any delayed and/or slowed hover reaction. (Some test pages require 290+.)
+        // Wait for any delayed and/or slowed hover reaction. (Some test pages wait almost 1000.)
         await page.waitForTimeout(1000);
         await root.waitForElementState('stable');
         // Identify the visible active descendants.

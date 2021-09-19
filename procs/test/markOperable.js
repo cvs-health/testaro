@@ -17,6 +17,7 @@ exports.markOperable = async page => {
         // Otherwise, if it is a menu-item parent of an element with an operable tag name, mark it.
         else if (
           element.getAttribute('role') === 'menuitem'
+          && element.firstElementChild
           && opTags.has(element.firstElementChild.tagName)
         ) {
           element.dataset.autotestOperable = 'menuitem';

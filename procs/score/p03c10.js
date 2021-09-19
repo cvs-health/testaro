@@ -212,6 +212,11 @@ exports.scorer = acts => {
         }
       }
     });
+    // If the IBM test failed, infer the mean of the Axe and WAVE deficits, plus 100 penalty.
+    if (deficit.ibm === 'null' && deficit.axe && deficit.wave) {
+      deficit.ibm = Math.floor((deficit.axe + deficit.wave) / 2) + 100;
+      deficit.total += deficit.ibm;
+    }
   }
   // Return the score.
   return deficit;

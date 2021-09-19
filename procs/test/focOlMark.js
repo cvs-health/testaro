@@ -41,7 +41,16 @@ exports.focOlMark = async page => {
       // Return that fact and a status.
       return [null, 'external'];
     }
+  })
+  .catch(error => {
+    console.log(`ERROR: FOCUS OUTLINE MARKING FAILED (${error.message})`);
+    return '';
   });
   // Return the focused element and the status.
-  return await require('./jsHandleProps').jsHandleProps(jsHandle, [true, false]);
+  if (typeof jsHandle === 'string') {
+    return [null, 'external'];
+  }
+  else {
+    return await require('./jsHandleProps').jsHandleProps(jsHandle, [true, false]);
+  }
 };
