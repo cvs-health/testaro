@@ -164,7 +164,7 @@ exports.scorer = acts => {
       }
       else if (which === 'motion') {
         facts = test.result;
-        if (facts) {
+        if (facts && facts.bytes) {
           deficit.motion += Math.floor(
             15 * (facts.meanLocalRatio - 1)
             + 15 * (facts.maxLocalRatio - 1)
