@@ -805,22 +805,22 @@ const requestHandler = (request, response) => {
         if (scriptJSON) {
           // Get the script data.
           const script = JSON.parse(scriptJSON);
-          const {what, acts} = script;
+          const {what, commands} = script;
           // If the script is valid:
           if (
             what
-            && acts
+            && commands
             && typeof what === 'string'
-            && Array.isArray(acts)
-            && acts[0].type === 'launch'
-            && acts.length > 1
-            && acts[1].type === 'url'
-            && isURL(acts[1].which)
+            && Array.isArray(commands)
+            && commands[0].type === 'launch'
+            && commands.length > 1
+            && commands[1].type === 'url'
+            && isURL(commands[1].which)
           ) {
             // If there is no batch:
             if (batchName === 'None') {
-              // Process the script.
-              scriptHandler(what, acts, query, 'all', -1, response);
+              // Process the script, using the commands as the initial acts.
+              scriptHandler(what, commands, query, 'all', -1, response);
             }
             // Otherwise, i.e. if there is a batch:
             else {
@@ -846,15 +846,15 @@ const requestHandler = (request, response) => {
                     if (hosts.length) {
                       // Identify the first host.
                       const firstHost = hosts[0];
-                      console.log(`Batch progress: about to process ${firstHost.what}`);
+                      console.log(`>>>>> About to process ${firstHost.what} in batch`);
                       // Replace all hosts in the script with it.
-                      acts.forEach(act => {
-                        if (act.type === 'url') {
-                          act.which = firstHost.which;
-                          act.what = firstHost.what;
+                      commands.forEach(command => {
+                        if (command.type === 'url') {
+                          command.which = firstHost.which;
+                          command.what = firstHost.what;
                         }
                       });
-                      // Process the commands on it.
+                      // Identify the stage of the host.
                       let stage = 'more';
                       if (isFirst) {
                         stage = hosts.length > 1 ? 'start' : 'all';
@@ -862,6 +862,9 @@ const requestHandler = (request, response) => {
                       else {
                         stage = hosts.length > 1 ? 'more' : 'end';
                       }
+                      // Initialize an array of the acts as a copy of the commands.
+                      const acts = JSON.parse(JSON.stringify(commands));
+                      // Process the commands on the host.
                       await scriptHandler(what, acts, query, stage, hostIndex, response);
                       // Process the remaining hosts.
                       await doBatch(hosts.slice(1), false, hostIndex + 1);
