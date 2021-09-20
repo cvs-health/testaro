@@ -395,7 +395,9 @@ const visit = async (act, page) => {
     }
   }
   catch (error) {
-    await page.goto('about:blank');
+    await page.goto('about:blank').catch(error => {
+      console.log(`ERROR OPENING BLANK PAGE (${error.message})`);
+    });
     if (act) {
       act.result = `ERROR VISITING ${resolved}: ${error.message}`;
     }
