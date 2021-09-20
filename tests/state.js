@@ -176,7 +176,7 @@ exports.reporter = async page => {
   else {
     // Return failure.
     return {
-      result: 'screenshots failed'
+      result: 'ERROR: SCREENSHOTS FAILED'
     };
   }
 };

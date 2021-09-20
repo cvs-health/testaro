@@ -91,7 +91,7 @@ exports.reporter = async (page, delay, interval, count) => {
   else {
     // Return failure.
     return {
-      result: 'screenshots failed'
+      result: 'ERROR: SCREENSHOTS FAILED'
     };
   }
 };
