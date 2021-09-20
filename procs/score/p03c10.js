@@ -212,11 +212,27 @@ exports.scorer = acts => {
         }
       }
     });
-    // If the IBM test failed, infer the mean of the Axe and WAVE deficits, plus 100 penalty.
-    if (deficit.ibm === null && deficit.axe && deficit.wave) {
-      deficit.ibm = Math.floor((deficit.axe + deficit.wave) / 2) + 100;
-      deficit.total += deficit.ibm;
-    }
+    // If at least 1 test package but not all test packages failed, assign penalty deficits.
+    const estimate = (tests, penalty) => {
+      const packageScores = tests.map(test => deficit[test]).filter(score => score !== null);
+      const scoreCount = packageScores.length;
+      let meanScore;
+      if (scoreCount) {
+        meanScore = Math.floor(
+          packageScores.reduce((sum, current) => sum + current) / packageScores.length
+        );
+      }
+      else {
+        meanScore = 100;
+      }
+      tests.forEach(test => {
+        if (deficit[test] === null) {
+          deficit[test] = meanScore + penalty;
+          deficit.total += deficit[test];
+        }
+      });
+    };
+    estimate(['axe', 'ibm', 'wave'], 100);
   }
   // Return the score.
   return deficit;
