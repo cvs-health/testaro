@@ -1,7 +1,7 @@
 // Marks elements that can be operated. See README.md for notes.
 exports.markOperable = async page => {
   // Identify visible elements and other elements marked focusable.
-  await page.$$eval('body :visible, body [data-autotest-focused]', elements => {
+  return await page.$$eval('body :visible, body [data-autotest-focused]', elements => {
     // If there are any:
     if (elements.length) {
       let styleDec;
@@ -40,5 +40,10 @@ exports.markOperable = async page => {
         }
       });
     }
+    return true;
+  })
+  .catch(error => {
+    console.log(`ERROR: OPERABLE ELEMENTS NOT MARKABLE ${error.message}`);
+    return false;
   });
 };

@@ -233,6 +233,11 @@ exports.scorer = acts => {
       });
     };
     estimate(['axe', 'ibm', 'wave'], 100);
+    // If focOp failed, assign a penalty deficit.
+    if (deficit.focOp === null) {
+      deficit.focOp = 150;
+      deficit.total += deficit.focOp;
+    }
   }
   // Return the score.
   return deficit;
