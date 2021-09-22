@@ -35,7 +35,7 @@ const maxDeficit = result.reduce((max, thisItem) => Math.max(max, thisItem.defic
 // Compile the HTML code representing the data.
 const tableMidLines = result.map(item => {
   const pageCell = `<th><a href="${item.url}">${item.org}</a></th>`;
-  const numCell = `<td>${item.deficits.total}</td>`;
+  const numCell = `<td><a href="data/${item.fileName}>${item.deficits.total}</a></td>`;
   const barWidth = maxDeficit ? 100 * item.deficits.total / maxDeficit : 0;
   const bar = `<rect height="100%" width="${barWidth}%" fill="red"></rect>`;
   const barCell = `<td><svg width="100%" height="1rem">${bar}</svg></td>`;
