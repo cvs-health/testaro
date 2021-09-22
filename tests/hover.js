@@ -1,5 +1,7 @@
 // Finds and reports navigation elements that can be hover-disclosed.
 exports.reporter = async (page, withItems) => {
+  // Initialize a counter.
+  let elementsChecked = 0;
   // Identify the elements that are likely to trigger disclosures on hover.
   const triggers = await page.$$(
     'body a:visible, body button:visible, body li:visible, body [onmouseenter]:visible, body [onmouseover]:visible'
@@ -49,13 +51,17 @@ exports.reporter = async (page, withItems) => {
       try {
         // Hover over the potential trigger.
         await firstTrigger.hover({timeout: 700});
-        // Wait for any delayed and/or slowed hover reaction. (Some test pages wait almost 1000.)
-        await page.waitForTimeout(1000);
+        // Wait for any delayed and/or slowed hover reaction, longer initially.
+        await page.waitForTimeout(elementsChecked++ < 10 ? 1000 : 200);
         await root.waitForElementState('stable');
         // Identify the visible active descendants.
         const postVisibles = await root.$$(targetSelectors);
         // If hovering disclosed any element:
         if (postVisibles.length > preVisibles.length) {
+          // Preserve the lengthened reaction wait, if any, for the next 5 tries.
+          if (elementsChecked < 11) {
+            elementsChecked = 5;
+          }
           // Hover over the upper-left corner of the page, to undo any hover reactions.
           await page.hover('body', {
             position: {
@@ -112,7 +118,7 @@ exports.reporter = async (page, withItems) => {
   // Find and document the hover-triggered disclosures.
   await find(triggers);
   // Reload the page to undo the hover-triggered content changes.
-  await page.reload({timeout: 10000}).catch(error => {
+  await page.reload({timeout: 18000}).catch(error => {
     console.log(error.message, error.stack.slice(0, 1000));
   });
   // Return the result.
