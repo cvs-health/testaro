@@ -608,7 +608,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
       act.result = `INVALID COMMAND OF TYPE ${act.type}`;
     }
     // Update the report file.
-    fs.writeFile(`${reportDir}/report-${timeStamp}.json`, JSON.stringify(report, null, 2));
+    await fs.writeFile(`${reportDir}/report-${timeStamp}.json`, JSON.stringify(report, null, 2));
     // Perform the remaining acts.
     await doActs(report, actIndex + 1, page, timeStamp, reportDir);
   }
