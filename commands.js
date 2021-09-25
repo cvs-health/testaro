@@ -7,6 +7,12 @@ exports.commands = {
         rules: [true, 'array', 'areStrings']
       }
     ],
+    embAc: [
+      'Perform an embAc test',
+      {
+        withItems: [true, 'boolean']
+      }
+    ],
     focOl: [
       'Perform a focOl test',
       {

@@ -65,6 +65,7 @@ const tests = {
   axe: 'conduct and report an Axe test',
   bodyText: 'give the text content of the page body',
   bulk: 'report the count of visible elements',
+  embAc: 'tabulate and list links and buttons contained by links or buttons',
   focOl: 'tabulate and list focusable elements with and without focus outlines',
   focOp: 'tabulate and list visible focusable and operable elements',
   focOpAll: 'tabulate and list focusable and operable elements after making all visible',
