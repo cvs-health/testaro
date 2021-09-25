@@ -144,6 +144,8 @@ An example of a packaged test is:
 
 In this case, Autosest runs the WAVE test with report type 1.
 
+An example of an Autotest-provided test is:
+
 ```json
 {
   "type": "test",
@@ -157,11 +159,13 @@ In this case, Autosest runs the WAVE test with report type 1.
 
 In this case, Autotest runs the `motion` test with the specified parameters.
 
+Near the top of the `index.js` file is an object named `tests`. It describes all available tests.
+
 ### Batches
 
 A script can be the complete specification of an Autotest job.
 
-However, if you want to perform the same set of commands repeatedly, changing only the URL from one run to another, you can combine a script with a **batch**. A batch is a list of URLs. A batch is a JSON file with this format:
+However, if you want to perform the same set of commands repeatedly, changing only the URL from one run to another, you can combine a script with a **batch**. A batch is a JSON file with this format:
 
 ```json
 {
@@ -175,69 +179,28 @@ However, if you want to perform the same set of commands repeatedly, changing on
       "which": "https://www.w3.org/WAI/standards-guidelines/aria/",
       "what": "W3C WAI-ARIA"
     }
-}
-```
-
-After you install Autotest and its dependencies, to run Autotest you open a command shell (a terminal), navigate to the Autotest directory, and enter the command `node index`. That causes Autotest’s server to start. The server listens for requests on port 3000 of your computer, `localhost`.
-
-To make requests to Autotest, you visit `localhost:3000/autotest` with a web browser and follow the instructions displayed by Autotest.
-
-The sequence is:
-
-1. Autotest asks you for the locations and names of the directories that you want it to use. If you have put lines into the `.env` file defining these directories, Autotest will propose the paths from those lines, and you can accept or change them. The lines take these forms (where you supply paths of your choice after the `=`):
-   - `SCRIPTDIR=../autotest-my-x/scripts`
-   - `REPORTDIR=../autotest-my-x/reports/script`
-   - `BATCHDIR=../autotest-my-x/batches`
-1. Autotest shows you a list of the scripts in the script directory you specified and a list of the batches in the batch directory that you specified.
-1. You choose one of those scripts.
-1. You also choose a batch to run the script on, or “None” if the script will run without a batch.
-1. Autotest performs the acts specified by the commands in the script. If you also specified a batch, Autotest repeats the acts for all of the URLs in the batch.
-1. Autotest outputs a new page to your browser. If you specified a script without a batch, or with a batch containing only one URL, the page contains a report. If you specified a batch with two or more URLs, the page logs progress but does not contain any reports.
-1. Autotest also writes files into its project directory:
-   - a report file for the script, or one report file per URL if there was a batch
-   - image files if necessary for exhibits in reports (i.e. if the images cannot be linked to)
-   - image files from screen shots made in tests for motion
-1. When you have finished using Autotest, you stop it by entering <kbd>CTRL-c</kbd>.
-
-## How do scripts work?
-
-Autotest requires a script as the source of the commands that it obeys.
-
-A script is a JSON file containing an array of commands.
-
-Each command is an object, with at least a `type` property, identifying the command type. The rules for command validity are contained in a `commands.js` file.
-
-A script file has this structure:
-
-
-The first command launches a browser. The second command uses that browser to visit a URL. Subsequent commands do whatever you choose.
-
-## How do batches work?
-
-A batch file is a JSON file with this structure:
-
-```json
-{
-  "what": "Description of the batch",
-  "hosts": [
-    {
-      "which": "https://abc.def",
-      "what": "Description of this URL"
-    },
-    …
   ]
 }
 ```
 
-The `hosts` property is an array of objects that specify URLs and their descriptions.
-
-If you specify a batch for a script to run on, the script is run once for each of the hosts. Before each execution, the URL of the host is substituted into the script, replacing the value of the `which` property of each command of type `url`.
-
-## To batch or not to batch?
+When you combine a script with a batch, Autotest performs the script, replacing the `which` and `what` properties of all `url` commands with the values in the first object in the `hosts` array, then again with the values in the second object, and so on.
 
 A batch offers an efficient way to perform a uniform set of commands on every URL in a set of URLs. Running the same set of tests on multiple web pages is an example.
 
 A no-batch script offers a way to carry out a complex operation. The script can click, press keyboard keys, hover, wait for reactions, follow links, go to specific new URLs, take screen shots, and perform tests.
+
+## Execution
+
+Open a command shell (a terminal), navigate to the Autotest directory, and enter `node index`. That starts Autotest’s server, which listens for requests on port 3000 of `localhost`.
+
+To make requests to Autotest, visit `localhost:3000/autotest` with a web browser and follow the instructions displayed by Autotest.
+
+Autotest outputs a report to your browser window, or a progress report if you are using a batch with two or more hosts. It also writes files into the project directory:
+   - a report file for the script, or one report file per URL if there was a batch
+   - image files if necessary for exhibits in reports (i.e. if the images cannot be linked to)
+   - image files from screen shots made in tests for motion
+
+When you have finished using Autotest, you stop it by entering <kbd>CTRL-c</kbd>.
 
 ## What tests can be run?
 
