@@ -1,5 +1,5 @@
 // Reports links, buttons, and inputs contained by tables.
-const cntr = 'table:not(role=grid):not(role=treegrid)';
+const cntr = 'table:not([role=grid]):not([role=treegrid])';
 exports.reporter = async (page, withItems) => await page.$$eval(
   `${cntr} a, ${cntr} button, ${cntr} input, ${cntr} select`, (bads, withItems) => {
     // FUNCTION DEFINITION START
