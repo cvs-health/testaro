@@ -1,8 +1,6 @@
 // Reports links and buttons contained by links or buttons.
-exports.reporter = async (page, withItems) => {
-  return await page.$$('a a, a button, button a, button button', args => {
-    const bads = args[0];
-    const withItems = args[1];
+exports.reporter = async (page, withItems) => await page.$$eval(
+  'a a, a button, button a, button button', (bads, withItems) => {
     // FUNCTION DEFINITION START
     // Returns a space-minimized copy of a string.
     const compact = string => string.replace(/[\t\n]/g, '').replace(/\s{2,}/g, ' ').trim();
@@ -31,5 +29,5 @@ exports.reporter = async (page, withItems) => {
       data.items = items;
     }
     return {result: data};
-  }, withItems);
-};
+  }, withItems
+);

@@ -508,7 +508,6 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
             // Conduct, report, and time the test.
             const startTime = Date.now();
             const testReport = await require(`./tests/${act.which}`).reporter(...args);
-            console.log(`testReport is ${JSON.stringify(testReport, null, 2)}`);
             report.testTimes.push([act.which, Math.round((Date.now() - startTime) / 1000)]);
             report.testTimes.sort((a, b) => b[1] - a[1]);
             // If the test produced exhibits:
