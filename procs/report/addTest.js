@@ -21,7 +21,6 @@ const reportNames = fs.readdirSync(`${dir}/reports`);
 const newFileNames = fs.readdirSync(`${dir}/newTest`);
 const finder = {};
 newFileNames.forEach(fn => {
-  console.log(`Processing ${fn}`);
   const who = JSON.parse(fs.readFileSync(`${dir}/newTest/${fn}`))
   .acts
   .filter(act => act.type === 'url')[0]
@@ -35,11 +34,12 @@ reportNames.forEach(rn => {
   const newReportName = finder[who];
   if (newReportName) {
     const newReportData = JSON.parse(fs.readFileSync(`${dir}/newTest/${newReportName}`, 'utf8'));
+    reportData.acts.splice(-1, 0, newReportData.acts.filter(act => act.type === 'test')[0]);
     const newScore = newReportData.acts.filter(act => act.type === 'score')[0].result[newTest];
     const scoreResult = reportData.acts.filter(act => act.type === 'score')[0].result;
     scoreResult[newTest] = newScore;
     scoreResult.total += newScore || 0;
-    fs.writeFileSync(`${dir}/newReports/rn`, `${JSON.stringify(reportData, null, 2)}\n`);
+    fs.writeFileSync(`${dir}/newReports/${rn}`, `${JSON.stringify(reportData, null, 2)}\n`);
   }
   else {
     console.log(`No new test result found for ${who} (${rn})`);
