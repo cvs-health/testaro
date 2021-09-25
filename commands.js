@@ -78,6 +78,12 @@ exports.commands = {
         withItems: [true, 'boolean']
       }
     ],
+    tblAc: [
+      'Perform an embAc test',
+      {
+        withItems: [true, 'boolean']
+      }
+    ],
     wave: [
       'Perform a WAVE test',
       {

@@ -1,7 +1,7 @@
-// Reports interactive elements contained by links or buttons.
+// Reports links, buttons, and inputs contained by tables.
+const cntr = 'table:not(role=grid):not(role=treegrid)';
 exports.reporter = async (page, withItems) => await page.$$eval(
-  'a a, a button, a input, a select, button a, button button, button input, button select',
-  (bads, withItems) => {
+  `${cntr} a, ${cntr} button, ${cntr} input, ${cntr} select`, (bads, withItems) => {
     // FUNCTION DEFINITION START
     // Returns a space-minimized copy of a string.
     const compact = string => string.replace(/[\t\n]/g, '').replace(/\s{2,}/g, ' ').trim();

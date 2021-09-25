@@ -65,7 +65,7 @@ const tests = {
   axe: 'conduct and report an Axe test',
   bodyText: 'give the text content of the page body',
   bulk: 'report the count of visible elements',
-  embAc: 'tabulate and list links and buttons contained by links or buttons',
+  embAc: 'tabulate and list active elements contained by links or buttons',
   focOl: 'tabulate and list focusable elements with and without focus outlines',
   focOp: 'tabulate and list visible focusable and operable elements',
   focOpAll: 'tabulate and list focusable and operable elements after making all visible',
@@ -85,6 +85,7 @@ const tests = {
   simple: 'perfunctory trivial test for testing',
   state: 'show an element with and without its focus and hover states in 3 browsers',
   styleDiff: 'tabulate and list style inconsistencies',
+  tblAc: 'tabulate and list active elements contained by tables',
   wave: 'conduct and report a WAVE test'
 };
 // Browser types available in PlayWright.
