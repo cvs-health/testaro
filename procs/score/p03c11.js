@@ -16,8 +16,7 @@ exports.scorer = acts => {
     motion: null,
     radioSet: null,
     role: null,
-    styleDiff: null,
-    tblAc: null
+    styleDiff: null
   };
   let facts;
   if (Array.isArray(acts)) {
@@ -218,13 +217,6 @@ exports.scorer = acts => {
             (total, currentPair) => total + 2 * currentPair[0] + 0.2 * currentPair[1], 0
           ));
           deficit.total += deficit.styleDiff;
-        }
-      }
-      else if (which === 'tblAc') {
-        facts = test.result && test.result.totals;
-        if (facts) {
-          deficit.tblAc = 4 * (facts.links + facts.buttons + facts.inputs + facts.selects) || 0;
-          deficit.total += deficit.tblAc;
         }
       }
     });
