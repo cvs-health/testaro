@@ -9,6 +9,7 @@ exports.reporter = async (page, delay, interval, count) => {
     return await page.screenshot({
       fullPage: false,
       omitBackground: true,
+      timeout: 3000,
       path: `${process.env.REPORTDIR}/motion/${fileName}.png`
     })
     .catch(error => {
