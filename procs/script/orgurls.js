@@ -18,7 +18,7 @@ const dataDir = process.env.DATADIR || process.argv[2] || 'MISSING';
 if (dataDir === 'MISSING') {
   console.log('ERROR: Directory of data missing');
 }
-const isInUS = true;
+const isInUS = false;
 // ########## FUNCTIONS
 // Gets the URL of the website of an organization.
 const getURL = orgName => {
@@ -29,7 +29,8 @@ const getURL = orgName => {
     https.get(
       {
         host: 'api.kickfire.com',
-        path: `/v1/name2website?key=${kickFireKey}&name=${encodeURIComponent(orgName)}${countryParam}`,
+        path:
+          `/v1/name2website?key=${kickFireKey}&name=${encodeURIComponent(orgName)}${countryParam}`,
         protocol: 'https:'
       },
       response => {
