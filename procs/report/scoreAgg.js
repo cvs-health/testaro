@@ -29,7 +29,7 @@ fileNames.forEach((fn, index) => {
   const summary = {
     fileName: fn,
     org: orgData.what,
-    url: orgData.result,
+    url: orgData.which,
     deficits: deficitData.result
   };
   result.push(summary);
