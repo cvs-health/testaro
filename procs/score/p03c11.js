@@ -120,7 +120,7 @@ exports.scorer = acts => {
         deficit.bulk = 100;
         if (facts) {
           // Deficit: square root of the excess of the element count over 150.
-          deficit.bulk = Math.floor(Math.sqrt(Math.max(0, facts.visibleElements - 150))) || 100;
+          deficit.bulk = Math.floor(Math.sqrt(Math.max(0, facts.visibleElements - 150)));
         }
         deficit.total += deficit.bulk;
       }
@@ -128,7 +128,7 @@ exports.scorer = acts => {
         facts = test.result && test.result.totals;
         deficit.embAc = 100;
         if (facts) {
-          deficit.embAc = 4 * (facts.links + facts.buttons + facts.inputs + facts.selects) || 100;
+          deficit.embAc = 4 * (facts.links + facts.buttons + facts.inputs + facts.selects);
         }
         deficit.total += deficit.embAc;
       }
@@ -138,7 +138,7 @@ exports.scorer = acts => {
         facts = facts ? facts.outlineMissing : null;
         deficit.focOl = 150;
         if (facts) {
-          deficit.focOl = 4 * facts.total || 150;
+          deficit.focOl = 4 * facts.total;
         }
         deficit.total += deficit.focOl;
       }
@@ -147,7 +147,7 @@ exports.scorer = acts => {
         deficit.focOp = 150;
         if (facts) {
           deficit.focOp
-            = 4 * facts.operableNotFocusable.total + 1 * facts.focusableNotOperable.total || 150;
+            = 4 * facts.operableNotFocusable.total + 1 * facts.focusableNotOperable.total;
         }
         deficit.total += deficit.focOp;
       }
@@ -155,7 +155,7 @@ exports.scorer = acts => {
         facts = test.result && test.result.totals;
         deficit.hover = 150;
         if (facts) {
-          deficit.hover = 4 * facts.triggers + 2 * facts.targets || 150;
+          deficit.hover = 4 * facts.triggers + 2 * facts.targets;
         }
         deficit.total += deficit.hover;
       }
@@ -164,7 +164,7 @@ exports.scorer = acts => {
         deficit.labClash = 100;
         if (facts) {
           // Unlabeled elements discounted.
-          deficit.labClash = 2 * facts.mislabeled + 2 * facts.unlabeled || 100;
+          deficit.labClash = 2 * facts.mislabeled + 2 * facts.unlabeled;
         }
         deficit.total += deficit.labClash;
       }
@@ -173,7 +173,7 @@ exports.scorer = acts => {
         facts = facts ? facts.inline : null;
         deficit.linkUl = 150;
         if (facts) {
-          deficit.linkUl = 3 * (facts.total - facts.underlined) || 150;
+          deficit.linkUl = 3 * (facts.total - facts.underlined);
         }
         deficit.total += deficit.linkUl;
       }
@@ -188,7 +188,6 @@ exports.scorer = acts => {
             + facts.meanPixelChange / 25000
             + facts.maxPixelChange / 25000
             + 10 * facts.changeFrequency
-            || 150
           );
         }
         deficit.total = deficit.motion;
@@ -198,7 +197,7 @@ exports.scorer = acts => {
         deficit.radioSet = 100;
         if (facts) {
           // Defects discounted.
-          deficit.radioSet = 2 * (facts.total - facts.inSet) || 100;
+          deficit.radioSet = 2 * (facts.total - facts.inSet);
         }
         deficit.total += deficit.radioSet;
       }
@@ -207,7 +206,7 @@ exports.scorer = acts => {
         deficit.role = 100;
         if (facts) {
           // Defects discounted.
-          deficit.role = 2 * facts.badRoleElements || 100;
+          deficit.role = 2 * facts.badRoleElements;
         }
         deficit.total += deficit.role;
       }
