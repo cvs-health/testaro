@@ -915,9 +915,11 @@ const requestHandler = (request, response) => {
 // ########## SERVER
 const serve = (protocolModule, options) => {
   const server = protocolModule.createServer(options, requestHandler);
-  const port = process.env.PORT || '3000';
+  const host = process.env.HOST || 'localhost';
+  // Choose the port specified by the argument or the .env file.
+  const port = process.argv[2] || process.env.PORT || '3000';
   server.listen(port, () => {
-    console.log(`Server listening at ${protocol}://localhost:${port}.`);
+    console.log(`Server listening at ${protocol}://${host}:${port}.`);
   });
 };
 if (protocol === 'http') {
