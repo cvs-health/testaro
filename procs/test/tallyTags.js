@@ -1,5 +1,5 @@
 // Import a module to get the texts of an element.
-const allText = require('../procs/test/allText').allText;
+const allText = require('./allText').allText;
 // Recursively adds the tag names and texts or counts of elements to an array.
 const tallyTags = async (page, elements, totals, items, itemProp, withItems) => {
   // If any elements remain to be processed:
