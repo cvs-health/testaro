@@ -1,22 +1,10 @@
 // Recursively adds the tag names and texts or counts of elements to an array.
 const tallyTags = require('../procs/test/tallyTags').tallyTags;
-// Returns counts, and texts if required, of focusable elements with and without focal outlines.
+// Returns counts, and texts if required, of focusable elements with and without indicators.
 exports.reporter = async (page, withItems, revealAll) => {
-  // If all elements are to be revealed:
+  // If required, make all elements visible.
   if (revealAll) {
-    // Make them all visible.
-    await page.evaluate(() => {
-      const elements = Array.from(document.body.querySelectorAll('*'));
-      elements.forEach(element => {
-        const styleDec = window.getComputedStyle(element);
-        if (styleDec.display === 'none') {
-          element.style.display = 'unset';
-        }
-        if (styleDec.visibility === 'hidden') {
-          element.style.visibility = 'unset';
-        }
-      });
-    });
+    await require('../procs/test/allVis').allVis(page);
   }
   // Mark the focusable elements as indicated or not indicated.
   await require('../procs/test/focusables').focusables(page, 'focIndMark');
@@ -29,11 +17,11 @@ exports.reporter = async (page, withItems, revealAll) => {
     totals: {
       total: 0,
       types: {
-        outlineMissing: {
+        indicatorMissing: {
           total: 0,
           tagNames: {}
         },
-        outlinePresent: {
+        indicatorPresent: {
           total: 0,
           tagNames: {}
         }
@@ -42,13 +30,13 @@ exports.reporter = async (page, withItems, revealAll) => {
   };
   if (withItems) {
     data.items = {
-      outlineMissing: [],
-      outlinePresent: []
+      indicatorMissing: [],
+      indicatorPresent: []
     };
   }
   // Populate them.
-  const bad = data.totals.types.outlineMissing;
-  const good = data.totals.types.outlinePresent;
+  const bad = data.totals.types.indicatorMissing;
+  const good = data.totals.types.indicatorPresent;
   const items = data.items;
   await tallyTags(page, focOutN, bad, items, 'indicatorMissing', withItems);
   await tallyTags(page, focOutY, good, items, 'indicatorPresent', withItems);

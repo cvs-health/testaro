@@ -66,6 +66,7 @@ const tests = {
   bodyText: 'give the text content of the page body',
   bulk: 'report the count of visible elements',
   embAc: 'tabulate and list active elements contained by links or buttons',
+  focInd: 'tabulate and list focusable elements with and without focus indicators',
   focOl: 'tabulate and list focusable elements with and without focus outlines',
   focOp: 'tabulate and list visible focusable and operable elements',
   focOpAll: 'tabulate and list focusable and operable elements after making all visible',

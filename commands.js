@@ -13,6 +13,13 @@ exports.commands = {
         withItems: [true, 'boolean']
       }
     ],
+    focInd: [
+      'Perform a focInd test',
+      {
+        withItems: [true, 'boolean'],
+        revealAll: [true, 'boolean']
+      }
+    ],
     focOl: [
       'Perform a focOl test',
       {
