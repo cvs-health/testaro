@@ -16,11 +16,13 @@ exports.focIndMark = async page => {
   const jsHandle = await page.evaluateHandle(args => {
     const priorElement = args[0];
     const priorFocusStyle = args[1];
-    // Compare the previously focused element’s previous and current styles.
-    const priorStyleNow = priorElement.getComputedStyle();
-    const changed = JSON.stringify(priorStyleNow) !== JSON.stringify(priorFocusStyle);
-    // Mark it accordingly.
-    priorElement.setAttribute('data-autotest-focused', `${changed ? 'Y' : 'N'}`);
+    // Compare the previous and current styles of the previously focused element, if any.
+    if (priorElement) {
+      const priorStyleNow = priorElement.getComputedStyle();
+      const changed = JSON.stringify(priorStyleNow) !== JSON.stringify(priorFocusStyle);
+      // Mark it accordingly.
+      priorElement.setAttribute('data-autotest-focused', `${changed ? 'Y' : 'N'}`);
+    }
     // Initialize the focused element.
     let focus = document.activeElement;
     // If it exists and is within the body:
@@ -54,7 +56,7 @@ exports.focIndMark = async page => {
     console.log(`ERROR: FOCUS OUTLINE MARKING FAILED (${error.message})`);
     return '';
   });
-  // Return the focused element and the status.
+  // Record the newly focused element and its style and return the focused element and the status.
   if (typeof jsHandle === 'string') {
     page.custom.priorFocus.element = null;
     page.custom.priorFocus.focusStyle = null;
