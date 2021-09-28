@@ -14,11 +14,21 @@ exports.focIndMark = async page => {
   // Identify a JSHandle of the focused element, if any, and a status.
   const jsHandle = await page.evaluateHandle(args => {
     const priorElement = args[0];
-    const priorFocusStyle = args[1];
+    const styleF = args[1];
     // Compare the previous and current styles of the previously focused element, if any.
     if (priorElement) {
-      const priorStyleNow = window.getComputedStyle(priorElement);
-      const changed = JSON.stringify(priorStyleNow) !== JSON.stringify(priorFocusStyle);
+      const styleN = window.getComputedStyle(priorElement);
+      const diff = prop => styleF[prop] !== styleN[prop];
+      const changed
+        = diff('borderStyle')
+        || (styleF.borderStyle !== 'none' && diff('borderWidth'))
+        || diff('outlineStyle')
+        || (styleF.outlineStyle !== 'none' && diff('outlineWidth'))
+        || diff('fontSize')
+        || diff('fontStyle')
+        || diff('textDecorationLine')
+        || diff('textDecorationStyle')
+        || diff('textDecorationThickness');
       // Mark it accordingly.
       priorElement.setAttribute('data-autotest-focused', `${changed ? 'Y' : 'N'}`);
     }
