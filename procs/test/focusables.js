@@ -133,7 +133,7 @@ exports.focusables = async (page, operation) => {
   const opAll = async () => {
     // Identify and operate on the newly focused element, if any, and return it and a status.
     console.log(`About to run ${operation}`);
-    const focusAndStatus = await op(page, lastNavKey);
+    const focusAndStatus = await op(page);
     const focus = focusAndStatus[0];
     const status = focusAndStatus[1];
     console.log(`Status was ${status}`);
