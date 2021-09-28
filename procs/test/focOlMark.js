@@ -1,6 +1,5 @@
 // Marks the focused in-body element’s outline status and returns it and a focus status.
 exports.focOlMark = async page => {
-  console.log('Starting focOlMark');
   // Wait 0.1 second for an outline to appear on the focused element.
   try {
     await page.waitForFunction(

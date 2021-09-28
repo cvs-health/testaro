@@ -131,12 +131,13 @@ exports.focusables = async (page, operation) => {
   }, [lastNavKey, focus, status]);
   // Recursively focuses elements and performs an operation on them.
   const opAll = async () => {
-    // Identify and operate on the newly focused element, if any, and return it and a status.
-    console.log(`About to run ${operation}`);
+    /*
+      Identify and operate on the newly focused element, if any, and return the effective focus
+      and a status.
+    */
     const focusAndStatus = await op(page);
     const focus = focusAndStatus[0];
     const status = focusAndStatus[1];
-    console.log(`Status was ${status}`);
     // FUNCTION DEFINITIONS START
     // Identifies and presses the next navigation key and processes the focused element.
     const doNext = async () => {

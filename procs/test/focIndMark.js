@@ -3,7 +3,6 @@
   focused in-body element and a focus status.
 */
 exports.focIndMark = async page => {
-  console.log('Starting focIndMark');
   if (! page.custom) {
     page.custom = {};
   }
@@ -67,6 +66,6 @@ exports.focIndMark = async page => {
     .jsHandleProps(jsHandle, [true, false, true, false]);
     page.custom.priorFocus.element = props[2];
     page.custom.priorFocus.focusStyle = props[3];
-    return props[0, 1];
+    return props.slice(0, 2);
   }
 };
