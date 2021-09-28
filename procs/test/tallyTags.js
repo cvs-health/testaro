@@ -42,4 +42,4 @@ const tallyTags = async (page, elements, totals, items, itemProp, withItems) => 
     return Promise.resolve('');
   }
 };
-exports = {tallyTags};
+exports.tallyTags = tallyTags;

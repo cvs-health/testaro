@@ -1,5 +1,5 @@
 // Recursively adds the tag names and texts or counts of elements to an array.
-const tallyTags = require('../procs/test/tallyTags').tallyTags;
+const {tallyTags} = require('../procs/test/tallyTags');
 // Returns counts, and texts if required, of focusable elements with and without focal outlines.
 exports.reporter = async (page, withItems, revealAll) => {
   // If required, make all elements visible.
