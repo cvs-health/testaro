@@ -18,7 +18,7 @@ exports.focIndMark = async page => {
     const priorFocusStyle = args[1];
     // Compare the previous and current styles of the previously focused element, if any.
     if (priorElement) {
-      const priorStyleNow = priorElement.getComputedStyle();
+      const priorStyleNow = window.getComputedStyle(priorElement);
       const changed = JSON.stringify(priorStyleNow) !== JSON.stringify(priorFocusStyle);
       // Mark it accordingly.
       priorElement.setAttribute('data-autotest-focused', `${changed ? 'Y' : 'N'}`);
@@ -39,7 +39,7 @@ exports.focIndMark = async page => {
       if (! focus.dataset.autotestFocused) {
         // Identify it and its style.
         newElement = focus;
-        newFocusStyle = focus.getComputedStyle();
+        newFocusStyle = window.getComputedStyle(focus);
         // Revise the status.
         status = 'new';
       }
