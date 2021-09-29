@@ -64,13 +64,17 @@ Replace the bracketed numbers above with the applicable values, such as:
 SCRIPTDIR=../my-autotest/scripts
 ```
 
+In this example, your script directory would be a subdirectory of a `my-autotest` directory, which would be a sibling of the `autotest` project directory.
+
 ## Specification
+
+Before running Autotest, you must specify what it should do. You do this by creating at least one script, and optionally one or more batches.
 
 ### Scripts
 
-Autotest performs the **commands** in a **script**. When you run Autotest, it lists your scripts and asks you which one it should execute.
+#### Introduction
 
-So, before running Autotest, you must create at least one script.
+Autotest performs the **commands** in a **script**. When you run Autotest, it lists your scripts and asks you which one it should execute.
 
 A script is a JSON file with 2 properties:
 
@@ -81,7 +85,76 @@ A script is a JSON file with 2 properties:
 }
 ```
 
-The `commands` property’s value is an array of commands. Each command has a `type` property and other properties specifying the command. You can look up the command types and their required and optional properties in the `commands.js` file.
+#### Commands
+
+##### Commands in general
+
+The `commands` property’s value is an array of commands.
+
+Each command has a `type` property and other properties specifying the command.
+
+You can look up the command types and their required and optional properties in the `commands.js` file. That file defines two objects, named `tests` and `etc`.
+
+The properties of the `etc` object specify the validity requirements for the possible command types. Here is one example:
+
+```js
+link: [
+  'Click a link (which: substring of its text; what: description)',
+  {
+    which: [true, 'string', 'hasLength'],
+    what: [false, 'string', 'hasLength']
+  }
+]
+```
+
+As this example illustrates, an `etc` property has a `type` value as its key. Here, the type is `link`. The value is an array with two elements: a string describing the command and an object containing property requirements.
+
+A property requirement, such as `which: [true, 'string', 'hasLength']`, has a property key as its key and an array of requirement elements as its value. The requirement elements are:
+- 0. Is the property required (`true` or `false`)?
+- 1. What format must the property value have (`'string'`, `'array'`, `'boolean'`, or `'number'`)?
+- 2. What other validity criterion applies (if any)?
+
+That other validity criterion may be any of these:
+- `'hasLength'`: is not a blank string
+- `'isURL`': has the format of a URL
+- `'isBrowserType'`: is `'chromium'`, `'firefox'`, or `'webkit'`
+- `'isFocusable'`: is `'a'`, `'button'`, `'input'`, `'select'`, or `'option'`
+- `'isTest'`: is the name of a test
+- `'isWaitable'`: is `'url'`, `'title'`, or `'body'`
+- `'areStrings'`: is an array of strings
+
+##### Test commands
+
+Commands of type `test` may have additional validity requirements. They must always conform to the `test` object in `etc`, namely:
+
+```js
+test: [
+  'Perform a test (which: test name; what: description)',
+  {
+    which: [true, 'string', 'isTest'],
+    what: [false, 'string', 'hasLength']
+  }
+]
+```
+
+If the `tests` object of `commands.js` includes a test type, then any test of that type must also conform to the requirements given there. For example, one property of `tests` is:
+
+```js
+motion: [
+  'Perform a motion test (delay: ms until start; interval: ms between; count: of screenshots)',
+  {
+    delay: [true, 'number'],
+    interval: [true, 'number'],
+    count: [true, 'number']
+  }
+]
+```
+
+Therefore, any `motion` test must have a `which` property and may have a `what` property, and moreover must have `delay`, `interval`, and `count` properties.
+
+The meanings of the extra properties of test commands are stated in the first element of the array, except for the `withItems` property. The `true` or `false` value of that property, in any test requiring it, specifies whether the report of the results of the test should itemize the successes and failures.
+
+##### Command sequence
 
 The first two commands have the types `launch` and `url`, respectively. They launch a browser and then use it to visit a URL. For example:
 
@@ -101,9 +174,11 @@ The first two commands have the types `launch` and `url`, respectively. They lau
 }
 ```
 
+##### Command types
+
 The subsequent commands can tell Autotest to perform any of:
 - moves (clicks, text inputs, hovers, etc.)
-- navigations (visits to other URLs, waits for conditions on a page, etc.)
+- navigations (browser launches, visits to other URLs, waits for page conditions, etc.)
 - tests (imported from packages or created by Autotest)
 - scoring (aggregating test results into total scores)
 
@@ -117,7 +192,7 @@ An example of a move is:
 }
 ```
 
-In this case, Autosest clicks the first button whose text content includes the string “Close” (case-insensitively).
+In this case, Autotest clicks the first button whose text content includes the string “Close” (case-insensitively).
 
 An example of a navigation is the command of type `url` above. Another is:
 
@@ -161,6 +236,22 @@ In this case, Autotest runs the `motion` test with the specified parameters.
 
 Near the top of the `index.js` file is an object named `tests`. It describes all available tests.
 
+An example of a scoring command is:
+
+```json
+{
+  "type": "score",
+  "which": "p03c13",
+  "what": "3 packages and 13 custom tests, with duplication discounts"
+}
+```
+
+In this case, Autotest executes the procedure specified in the `p03c13` score proc to compute a total score for the script. The proc is a JavaScript module whose `scorer` function returns an object containing a total score and the itemized scores that yield the total.
+
+The `scorer` function inspects the script report to find the required data, applies specific weights and formulas to yield the itemized scores, and combines the itemized scores to yield the total score.
+
+The data for scores can include not only test results, but also log statistics. Autotest includes in each report a total count of log items and an aggregate count of the characters in all the log messages for the script. A score proc can use them in computing a total score.
+
 ### Batches
 
 A script can be the complete specification of an Autotest job.
@@ -185,9 +276,9 @@ However, if you want to perform the same set of commands repeatedly, changing on
 
 When you combine a script with a batch, Autotest performs the script, replacing the `which` and `what` properties of all `url` commands with the values in the first object in the `hosts` array, then again with the values in the second object, and so on.
 
-A batch offers an efficient way to perform a uniform set of commands on every URL in a set of URLs. Running the same set of tests on multiple web pages is an example.
+A batch offers an efficient way to perform a uniform set of commands on every host in a set of hosts. Running the same set of tests on multiple web pages is an example. Autotest writes a report file for each host.
 
-A no-batch script offers a way to carry out a complex operation. The script can click, press keyboard keys, hover, wait for reactions, follow links, go to specific new URLs, take screen shots, and perform tests.
+A no-batch script offers a way to carry out a complex operation, which can include navigating from one host to another, which is not possible with a batch.
 
 ## Execution
 
@@ -199,51 +290,24 @@ Autotest outputs a report to your browser window, or a progress report if you ar
    - a report file for the script, or one report file per URL if there was a batch
    - image files if necessary for exhibits in reports (i.e. if the images cannot be linked to)
    - image files from screen shots made in tests for motion
+   - temporary files required by some tests
 
 When you have finished using Autotest, you stop it by entering <kbd>CTRL-c</kbd>.
 
-## What tests can be run?
-
-Near the top of the `index.js` file is an object named `tests`. It describes all asailable tests.
-
-## How are test results aggregated into scores?
-
-One of the commands listed in `commands.js` is `score`.
-
-Here is an example of a command rule from `commands.json`:
-
-<pre>"test": [
-  "Perform a custom test (what: description)",
-  {
-    "which": [true, "string", "isCustomTest"],
-    "what": [false, "string", "hasLength"]
-  }
-]</pre>
-
-In this example, the command type is `test`, and the purpose of the command is to perform a custom test. A command of this type **must** have a `which` property and **may** optionally have a `what` property (the `true` and `false` values specify whether the property is required). Both properties must have string values (they cannot be numbers, arrays, or other objects). The `which` property must satisfy the `isCustomTest` requirement, which means that its value must be the name of a custom test. The `what` property, if it exists, must satisfy the `hasLength` requirement, which means it must not be a blank string.
-
-As shown in this example, each command rule is an array with two elements. The first element is a description of what a command of that type does. The second element is an object that has the properties that commands of that type may or must have. Each property has an array value. The first element is a boolean value, specifying whether the property is required (`true`) or optional (`false`). The second element is a string identifying the type of value the property must have (`string`, `number`, `array`, or `object`). If there is a third element, it identifies a validity criterion.
-
 ## Other features
 
-### Tests
-
-Autotest contains custom tests. There is a list of the custom tests, named `tests`, in the CONSTANTS section of the `index.js` file.
-
-#### Future work
+### Future work
 
 Other custom tests on which further development is contemplated or is taking place include:
 - links with href="#"
-- links and buttons that are not reachable with keyboard navigation
 - links and buttons styled non-distinguishably
 - first focused element not first focusable element in DOM
 - skip link that is never visible
-- button inside link
 - button with no text content
 
-#### Testing obstacles
+## Testing obstacles
 
-##### Operability
+### Operability
 
 No method for the comprehensive testing of element operability has been found yet. Such a test would report whether clicking the location of any particular element would dispatch any event.
 
@@ -257,7 +321,7 @@ The `markOperable` test proc and the `focOp` test that uses it therefore approxi
 
 ### Test-package integrations
 
-Autotest provides opportunities to integrate two accessibility test packages, [Axe](https://github.com/dequelabs/axe-core) and [WAVE](https://wave.webaim.org/), into scripts. The rules governing their commands in scripts are described above.
+Autotest integrate three accessibility test packages: [Axe](https://github.com/dequelabs/axe-core), [IBM Equal Access Accessibility Checker](https://github.com/IBMa/equal-access), and [WAVE](https://wave.webaim.org/). The rules governing their commands in scripts are described above.
 
 #### Axe
 
@@ -267,38 +331,19 @@ Axe integration depends on the [axe-playwright](https://www.npmjs.com/package/ax
 
 WAVE integration depends on the user having a WAVE API key. Use of the WAVE API depletes the user’s WAVE API credits. The `wave1`, `wave2`, and `wave4` commands perform WAVE tests with respective `reporttype` values on a specified URL. Such a test costs 1, 2, or 3 credits, respectively ($0.04 per credit, or less in quantity). When you register with WebAIM and obtain a WAVE API key, you must add a line to your `.env` file, in the format `WAVE_KEY=x0x0x0x0x0x0x` (where `x0x0x0x0x0x0x` represents your key).
 
-##### WAVE versus Axe
+#### Test-package duplication
 
-Axe and WAVE are both combinations of multiple accessibility tests. They partly overlap. Where they do, they sometimes agree and sometimes disagree on severity.
+Test packages sometimes do redundant testing, in that two or more packages test for the same issues. The testing and reporting are not necessarily identical.
 
-For example, when a `button` is empty and unlabeled, or an `input` is unlabeled, Axe reports a <q>critical</q> violation and WAVE reports an <q>error</q>. However, when a `select` is unlabeled, Axe reports a <q>critical</q> violation and WAVE reports only an <q>alert</q>.
+For example, when a `button` is empty and unlabeled, or an `input` is unlabeled, Axe reports a <q>critical</q> violation and WAVE reports an <q>error</q>. However, when a `select` is unlabeled, Axe reports a <q>critical</q> violation and WAVE reports only an <q>alert</q>. When a form control has an explicit label (a `label` element referencing the control with a `for` attribute), but that label is nullified by a higher-precedence label (an `aria-label` or `aria-labelledby` attribute), WAVE reports an <q>alert</q>, but Axe does not report any issue.
 
-An example of a difference in coverage: When a form control has an explicit label (a `label` element referencing the control with a `for` attribute), but that label is nullified by a higher-precedence label (an `aria-label` or `aria-labelledby` attribute), WAVE reports an <q>alert</q>, but Axe does not report a violation at all.
+To compensate for test-package duplication, scoring procs can adjust the weights they apply to particular findings of test packages.
 
-##### JHU-WAVE
+#### Omitted test packages
 
-One of the Autotest procs implements the <dfn>JHU-WAVE</dfn> rule. That is an algorithm comparing web pages that have been subjected to the `waves` test in a script. The rule is used by the Johns Hopkins University (_JHU_) Disability Health Research Center in its [Vaccine Website Accessibility](https://disabilityhealth.jhu.edu/vaccinedashboard/webaccess/) dashboard. The rule is described summarily on the cited page. Missing details were obtained from WebAIM, which conducted the testing for JHU.
-
-The proc is `procs/report/jhuwave.js`. By executing the command `node procs/report/jhuwave xxx` (where `xxx` represents the timeStamp of a report file or another string that you have changed the timestamp to), you can apply the rule to the pages whose `waves` test results are recorded in the report file.
-
-The JHU-WAVE rule is defined as follows:
-
-1.  Give each page a rank, on the basis of its error total, namely the total of its <q>Errors</q> and its <q>Contrast Errors</q>, with 0 being the best rank (i.e. the smallest total). If there is a tie for the next rank, use that rank for all of the tied pages, but then skip ranks so that the used rank plus the skipped ranks are equal in number to the number of tied pages.
-2.  Give each page a rank, on the basis of its error density, namely its error total divided by the total number of its elements. Use the same rule for ties.
-3.  Give each page a rank, on the basis of its alert total. Use the same rule for ties.
-4.  For each page, multiply its error-total rank by 6, multiply its error-density rank by 3, and multiply its alert rank by 1.
-5.  Total those three products. That total is the page’s score. The smaller the score, the better the page, according to the JHU-WAVE rule.
-
-#### bbc-a11y
-
-The [BBC Accessibility Standards Checker](https://github.com/bbc/bbc-a11y) is a Node.js project that might be added to Autotest. However, the package (`bbc-a11y`) was last updated in 2018 and has accumulated several severe vulnerabilities, including:
-- `electron` (IPC messages delivered to the wrong frame)
-- `httpism`
-- `trim-newlines` (regular expression denial of service)
-- `underscore` (arbitrary code execution)
-- `meow`
-
-For this reason, it is not incorporated into Autotest.
+Other test packages that may be integrated into Autotest in the future include:
+- `bbc-a11y` (not updated since 2018; has vulnerable dependencies)
+- `html codesniffer`
 
 ## Repository exclusions
 
@@ -306,4 +351,4 @@ The files in the `temp` directory are presumed ephemeral and are not tracked by 
 
 ## More information
 
-The `doc` directory contains additional information, including some examples of scripts that you can test with.
+The `doc` directory contains additional information, including some examples of scripts.

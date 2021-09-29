@@ -14,21 +14,21 @@ exports.commands = {
       }
     ],
     focInd: [
-      'Perform a focInd test',
+      'Perform a focInd test (revealAll: whether to make all elements visible)',
       {
         withItems: [true, 'boolean'],
         revealAll: [true, 'boolean']
       }
     ],
     focOl: [
-      'Perform a focOl test',
+      'Perform a focOl test (revealAll: whether to make all elements visible)',
       {
         withItems: [true, 'boolean'],
         revealAll: [true, 'boolean']
       }
     ],
     focOp: [
-      'Perform a focOp test',
+      'Perform a focOp test (revealAll: whether to make all elements visible)',
       {
         withItems: [true, 'boolean'],
         revealAll: [true, 'boolean']
@@ -41,7 +41,7 @@ exports.commands = {
       }
     ],
     ibm: [
-      'Perform an IBM test',
+      'Perform an IBM test (withNewContent: whether to run on the URL, not the existing content)',
       {
         withItems: [true, 'boolean'],
         withNewContent: [true, 'boolean']
@@ -60,7 +60,7 @@ exports.commands = {
       }
     ],
     motion: [
-      'Perform a motion test',
+      'Perform a motion test (delay: ms until start; interval: ms between; count: of screenshots)',
       {
         delay: [true, 'number'],
         interval: [true, 'number'],
@@ -86,7 +86,7 @@ exports.commands = {
       }
     ],
     wave: [
-      'Perform a WAVE test',
+      'Perform a WAVE test (reportType: 1, 2, 3, or 4, per WAVE API documentation)',
       {
         reportType: [true, 'number']
       }
