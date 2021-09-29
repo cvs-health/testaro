@@ -104,6 +104,7 @@ let logSize = 0;
 // Facts about the current browser.
 let browserContext;
 let browserTypeName;
+let requestedURL = '';
 // ########## FUNCTIONS
 // Serves a redirection.
 const redirect = (url, response) => {
@@ -393,6 +394,7 @@ const isValid = command => {
 const visit = async (act, page) => {
   // Visit the URL and wait until it is stable. (Wait for load times out on some URLs.)
   const resolved = act.which.replace('__dirname', __dirname);
+  requestedURL = resolved;
   try {
     await page.goto(resolved, {
       timeout: 20000,
@@ -403,6 +405,9 @@ const visit = async (act, page) => {
     // Add the resulting URL to the act, if any.
     if (act) {
       act.result = page.url();
+      if (act.isStrict && act.result !== resolved) {
+        console.log(`ERROR VISITING ${resolved}; REDIRECTED TO ${page.url()}`);
+      }
     }
   }
   catch (error) {
@@ -487,121 +492,127 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
         // Otherwise, if the page has a URL:
         else if (page.url() && page.url() !== 'about:blank') {
           const url = page.url();
-          // Add the URL to the act.
-          act.url = url;
-          // If the act is a revelation:
-          if (act.type === 'reveal') {
-            // Make all elements in the page visible.
-            await page.$$eval('body *', elements => {
-              elements.forEach(el => {
-                const elStyleDec = window.getComputedStyle(el);
-                if (elStyleDec.display === 'none') {
-                  el.style.display = 'initial';
-                }
-                if (['hidden', 'collapse'].includes(elStyleDec.visibility)) {
-                  el.style.visibility = 'inherit';
-                }
+          if (url === requestedURL) {
+            // Add the URL to the act.
+            act.url = url;
+            // If the act is a revelation:
+            if (act.type === 'reveal') {
+              // Make all elements in the page visible.
+              await page.$$eval('body *', elements => {
+                elements.forEach(el => {
+                  const elStyleDec = window.getComputedStyle(el);
+                  if (elStyleDec.display === 'none') {
+                    el.style.display = 'initial';
+                  }
+                  if (['hidden', 'collapse'].includes(elStyleDec.visibility)) {
+                    el.style.visibility = 'inherit';
+                  }
+                });
               });
-            });
-            act.result = 'All elements visible.';
-          }
-          // Otherwise, if the act is a test:
-          else if (act.type === 'test') {
-            // Add a description of the test to the act.
-            act.what = tests[act.which];
-            // Initialize the arguments.
-            const args = [page];
-            // Identify the additional validator of the test.
-            const testValidator = commands.tests[act.which];
-            // If it exists:
-            if (testValidator) {
-              // Identify its argument properties.
-              const argProperties = Object.keys(testValidator[1]);
-              // Add their values to the arguments.
-              args.push(...argProperties.map(propName => act[propName]));
+              act.result = 'All elements visible.';
             }
-            // Conduct, report, and time the test.
-            const startTime = Date.now();
-            const testReport = await require(`./tests/${act.which}`).reporter(...args);
-            report.testTimes.push([act.which, Math.round((Date.now() - startTime) / 1000)]);
-            report.testTimes.sort((a, b) => b[1] - a[1]);
-            // If the test produced exhibits:
-            if (testReport.exhibits) {
-              // Add that fact to the act.
-              act.exhibits = 'appended';
-              // Replace any browser-type placeholder in the exhibits.
-              const newExhibits = testReport.exhibits.replace(
-                /__browserTypeName__/g, browserTypeNames[browserTypeName]
-              );
-              // Append the exhibits to any existing ones.
-              if (report.exhibits) {
-                report.exhibits += `\n${newExhibits}`;
+            // Otherwise, if the act is a test:
+            else if (act.type === 'test') {
+              // Add a description of the test to the act.
+              act.what = tests[act.which];
+              // Initialize the arguments.
+              const args = [page];
+              // Identify the additional validator of the test.
+              const testValidator = commands.tests[act.which];
+              // If it exists:
+              if (testValidator) {
+                // Identify its argument properties.
+                const argProperties = Object.keys(testValidator[1]);
+                // Add their values to the arguments.
+                args.push(...argProperties.map(propName => act[propName]));
               }
-              else {
-                report.exhibits = newExhibits;
-              }
-            }
-            // Add the result object (possibly an array) to the act.
-            const resultCount = Object.keys(testReport.result).length;
-            act.result = resultCount ? testReport.result : 'NONE';
-          }
-          // Otherwise, if the act is a move:
-          else if (moves[act.type]) {
-            const selector = typeof moves[act.type] === 'string' ? moves[act.type] : act.what;
-            // Identify the index of the specified element among same-type elements.
-            const whichIndex = await matchIndex(page, selector, act.which);
-            // If it exists:
-            if (whichIndex > -1) {
-              // Get its ElementHandle.
-              const whichElement = await page.$(`:nth-match(${selector}, ${whichIndex + 1})`);
-              // Focus it.
-              await whichElement.focus();
-              // Perform the act on the element and add a move description to the act.
-              if (act.type === 'focus') {
-                act.result = 'focused';
-              }
-              else if (act.type === 'text') {
-                await whichElement.type(act.what);
-                act.result = 'entered';
-              }
-              else if (['radio', 'checkbox'].includes(act.type)) {
-                await whichElement.check();
-                act.result = 'checked';
-              }
-              else if (act.type === 'select') {
-                await whichElement.selectOption({what: act.what});
-                const optionText = await whichElement.$eval(
-                  'option:selected', el => el.textContent
+              // Conduct, report, and time the test.
+              const startTime = Date.now();
+              const testReport = await require(`./tests/${act.which}`).reporter(...args);
+              report.testTimes.push([act.which, Math.round((Date.now() - startTime) / 1000)]);
+              report.testTimes.sort((a, b) => b[1] - a[1]);
+              // If the test produced exhibits:
+              if (testReport.exhibits) {
+                // Add that fact to the act.
+                act.exhibits = 'appended';
+                // Replace any browser-type placeholder in the exhibits.
+                const newExhibits = testReport.exhibits.replace(
+                  /__browserTypeName__/g, browserTypeNames[browserTypeName]
                 );
-                act.result = optionText
-                  ? `&ldquo;${optionText}}&rdquo; selected`
-                  : 'OPTION NOT FOUND';
+                // Append the exhibits to any existing ones.
+                if (report.exhibits) {
+                  report.exhibits += `\n${newExhibits}`;
+                }
+                else {
+                  report.exhibits = newExhibits;
+                }
               }
-              else if (act.type === 'button') {
-                await whichElement.click();
-                act.result = 'clicked';
-              }
-              else if (act.type === 'link') {
-                const href = await whichElement.getAttribute('href');
-                const target = await whichElement.getAttribute('target');
-                await whichElement.click();
-                act.result = {
-                  href: href || 'NONE',
-                  target: target || 'NONE',
-                  move: 'clicked'
-                };
-              }
-              // Otherwise, i.e. if the specified element was not identified:
-              else {
-                // Return an error result.
-                return 'NOT FOUND';
+              // Add the result object (possibly an array) to the act.
+              const resultCount = Object.keys(testReport.result).length;
+              act.result = resultCount ? testReport.result : 'NONE';
+            }
+            // Otherwise, if the act is a move:
+            else if (moves[act.type]) {
+              const selector = typeof moves[act.type] === 'string' ? moves[act.type] : act.what;
+              // Identify the index of the specified element among same-type elements.
+              const whichIndex = await matchIndex(page, selector, act.which);
+              // If it exists:
+              if (whichIndex > -1) {
+                // Get its ElementHandle.
+                const whichElement = await page.$(`:nth-match(${selector}, ${whichIndex + 1})`);
+                // Focus it.
+                await whichElement.focus();
+                // Perform the act on the element and add a move description to the act.
+                if (act.type === 'focus') {
+                  act.result = 'focused';
+                }
+                else if (act.type === 'text') {
+                  await whichElement.type(act.what);
+                  act.result = 'entered';
+                }
+                else if (['radio', 'checkbox'].includes(act.type)) {
+                  await whichElement.check();
+                  act.result = 'checked';
+                }
+                else if (act.type === 'select') {
+                  await whichElement.selectOption({what: act.what});
+                  const optionText = await whichElement.$eval(
+                    'option:selected', el => el.textContent
+                  );
+                  act.result = optionText
+                    ? `&ldquo;${optionText}}&rdquo; selected`
+                    : 'OPTION NOT FOUND';
+                }
+                else if (act.type === 'button') {
+                  await whichElement.click();
+                  act.result = 'clicked';
+                }
+                else if (act.type === 'link') {
+                  const href = await whichElement.getAttribute('href');
+                  const target = await whichElement.getAttribute('target');
+                  await whichElement.click();
+                  act.result = {
+                    href: href || 'NONE',
+                    target: target || 'NONE',
+                    move: 'clicked'
+                  };
+                }
+                // Otherwise, i.e. if the specified element was not identified:
+                else {
+                  // Return an error result.
+                  return 'NOT FOUND';
+                }
               }
             }
+            // Otherwise, i.e. if the act type is unknown:
+            else {
+              // Add the error result to the act.
+              act.result = 'INVALID COMMAND TYPE';
+            }
           }
-          // Otherwise, i.e. if the act type is unknown:
+          // Otherwise, i.e. if the page URL is not the requested one:
           else {
-            // Add the error result to the act.
-            act.result = 'INVALID COMMAND TYPE';
+            act.result = 'PAGE URL WRONG';
           }
         }
         // Otherwise, i.e. if the required page URL does not exist:

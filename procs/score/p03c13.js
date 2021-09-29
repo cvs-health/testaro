@@ -1,6 +1,6 @@
 // Computes and reports a score from 3 packages and 13 custom tests, with discounts.
 exports.scorer = acts => {
-  // Initialize the score, including weights for the log test.
+  // Initialize the score, including weights for the log statistics.
   let deficit = {
     total: 0,
     axe: null,
@@ -18,8 +18,8 @@ exports.scorer = acts => {
     radioSet: null,
     role: null,
     styleDiff: null,
-    logCount: 1,
-    logSize: 0.01
+    logCount: 1.5,
+    logSize: 0.02
   };
   let facts;
   if (Array.isArray(acts)) {
