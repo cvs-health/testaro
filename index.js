@@ -416,6 +416,10 @@ const visit = async (act, page) => {
     }
   }
 };
+// Updates the report file.
+const reportFileUpdate = async (reportDir, timeStamp, report) => {
+  await fs.writeFile(`${reportDir}/report-${timeStamp}.json`, JSON.stringify(report, null, 2));
+};
 // Recursively performs the commands in a report.
 const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
   // Identify the commands in the report.
@@ -616,7 +620,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
       act.result = `INVALID COMMAND OF TYPE ${act.type}`;
     }
     // Update the report file.
-    await fs.writeFile(`${reportDir}/report-${timeStamp}.json`, JSON.stringify(report, null, 2));
+    await reportFileUpdate(reportDir, timeStamp, report);
     // Perform the remaining acts.
     await doActs(report, actIndex + 1, page, timeStamp, reportDir);
   }
@@ -669,6 +673,8 @@ const scriptHandler = async (
   }
   // Convert the report to JSON.
   query.report = JSON.stringify(report, null, 2).replace(/</g, '&lt;');
+  // Update the report file.
+  await reportFileUpdate(query.reportDir, query.timeStamp, report);
   // Render and serve the output.
   render('', stage, 'out', query, response);
 };
