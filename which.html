@@ -31,7 +31,9 @@
           <select id="batchName" name="batchName" size="__batchSize__">
             __batchNames__
           </select>
-          <p><button>Run script</button></p>
+          <p><button onclick="(() => {this.style.visibility = 'hidden'})()">
+            Run script
+          </button></p>
         </form>
       </section>
     </main>

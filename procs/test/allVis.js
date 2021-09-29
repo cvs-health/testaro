@@ -11,5 +11,8 @@ exports.allVis = async page => {
         element.style.visibility = 'unset';
       }
     });
+  })
+  .catch(error => {
+    console.log(`ERROR MAKING ALL ELEMENTS VISIBLE (${error.message})`);
   });
 };
