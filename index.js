@@ -136,9 +136,10 @@ const launch = async typeName => {
     browserContext.on('page', page => {
       // Make its console messages appear in the Playwright console.
       page.on('console', msg => {
-        console.log(msg.text());
+        const msgText = msg.text();
+        console.log(msgText);
         logCount++;
-        logSize += msg.length;
+        logSize += msgText.length;
       });
     });
     // Open the first page of the context.
