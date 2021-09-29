@@ -229,13 +229,13 @@ const render = (path, stage, which, query, response) => {
     // Otherwise, if a plain-text page is ready to continue:
     else if (stage === 'more') {
       // Serve its continuation.
-      response.write(`Processed URL ${query.urlIndex}\n`);
+      response.write(`Processed URL ${query.hostIndex}\n`);
       return '';
     }
     // Otherwise, if a plain-text page is ready to end:
     else if (stage === 'end') {
       // Serve its end.
-      response.end(`Processed URL ${query.urlIndex}\n`);
+      response.end(`Processed URL ${query.hostIndex}\n`);
       return '';
     }
     else {
@@ -417,12 +417,12 @@ const visit = async (act, page) => {
   }
 };
 // Updates the report file.
-const reportFileUpdate = async (reportDir, timeStamp, report, isJSON) => {
+const reportFileUpdate = async (reportDir, nameSuffix, report, isJSON) => {
   const fileReport = isJSON ? report : JSON.stringify(report, null, 2);
-  await fs.writeFile(`${reportDir}/report-${timeStamp}.json`, fileReport);
+  await fs.writeFile(`${reportDir}/report-${nameSuffix}.json`, fileReport);
 };
 // Recursively performs the commands in a report.
-const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
+const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
   // Identify the commands in the report.
   const {acts} = report;
   // If any commands remain unperformed:
@@ -621,9 +621,9 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
       act.result = `INVALID COMMAND OF TYPE ${act.type}`;
     }
     // Update the report file.
-    await reportFileUpdate(reportDir, timeStamp, report, false);
+    await reportFileUpdate(reportDir, reportSuffix, report, false);
     // Perform the remaining acts.
-    await doActs(report, actIndex + 1, page, timeStamp, reportDir);
+    await doActs(report, actIndex + 1, page, reportSuffix, reportDir);
   }
   // Otherwise, i.e. if all acts have been performed:
   else {
@@ -633,7 +633,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
 };
 // Handles a script request.
 const scriptHandler = async (
-  what, acts, query, stage, urlIndex, response
+  what, acts, query, stage, hostIndex, response
 ) => {
   const report = {};
   report.script = query.scriptName;
@@ -644,9 +644,10 @@ const scriptHandler = async (
   report.logSize = 0;
   report.acts = acts;
   report.testTimes = [];
-  const urlSuffix = urlIndex > -1 ? `-${urlIndex.toString().padStart(3, '0')}` : '';
+  const hostSuffix = hostIndex > -1 ? `-${hostIndex.toString().padStart(3, '0')}` : '';
+  const reportSuffix = `${query.timeStamp}${hostSuffix}`;
   // Perform the specified acts and add the results and exhibits to the report.
-  await doActs(report, 0, null, `${query.timeStamp}${urlSuffix}`, query.reportDir);
+  await doActs(report, 0, null, reportSuffix, query.reportDir);
   // Report, score for, and reset the log statistics.
   report.logCount = logCount;
   report.logSize = logSize;
@@ -670,13 +671,13 @@ const scriptHandler = async (
   else {
     // Add properties to the query.
     query.exhibits = '<p><strong>None</strong></p>';
-    query.urlIndex = urlIndex;
+    query.hostIndex = hostIndex;
   }
   // Convert the report to JSON and add it to the query.
   const reportJSON = JSON.stringify(report, null, 2);
   query.report = reportJSON.replace(/</g, '&lt;');
   // Update the report file.
-  await reportFileUpdate(query.reportDir, query.timeStamp, reportJSON, true);
+  await reportFileUpdate(query.reportDir, reportSuffix, reportJSON, true);
   // Render and serve the output.
   render('', stage, 'out', query, response);
 };
