@@ -645,9 +645,9 @@ const scriptHandler = async (
   // Report, score for, and reset the log statistics.
   report.logCount = logCount;
   report.logSize = logSize;
-  const scores = report.acts.filter(act => act.type === 'score');
-  if (scores.length) {
-    const scoreTable = scores[0];
+  const scoreTables = report.acts.filter(act => act.type === 'score');
+  if (scoreTables.length) {
+    const scoreTable = scoreTables[0];
     const {result} = scoreTable;
     if (result && result.logCount && result.logSize) {
       result.logCount = Math.floor(result.logCount * logCount);
