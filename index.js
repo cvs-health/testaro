@@ -417,8 +417,9 @@ const visit = async (act, page) => {
   }
 };
 // Updates the report file.
-const reportFileUpdate = async (reportDir, timeStamp, report) => {
-  await fs.writeFile(`${reportDir}/report-${timeStamp}.json`, JSON.stringify(report, null, 2));
+const reportFileUpdate = async (reportDir, timeStamp, report, isJSON) => {
+  const fileReport = isJSON ? report : JSON.stringify(report, null, 2);
+  await fs.writeFile(`${reportDir}/report-${timeStamp}.json`, fileReport);
 };
 // Recursively performs the commands in a report.
 const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
@@ -620,7 +621,7 @@ const doActs = async (report, actIndex, page, timeStamp, reportDir) => {
       act.result = `INVALID COMMAND OF TYPE ${act.type}`;
     }
     // Update the report file.
-    await reportFileUpdate(reportDir, timeStamp, report);
+    await reportFileUpdate(reportDir, timeStamp, report, false);
     // Perform the remaining acts.
     await doActs(report, actIndex + 1, page, timeStamp, reportDir);
   }
@@ -671,10 +672,11 @@ const scriptHandler = async (
     query.exhibits = '<p><strong>None</strong></p>';
     query.urlIndex = urlIndex;
   }
-  // Convert the report to JSON.
-  query.report = JSON.stringify(report, null, 2).replace(/</g, '&lt;');
+  // Convert the report to JSON and add it to the query.
+  const reportJSON = JSON.stringify(report, null, 2);
+  query.report = reportJSON.replace(/</g, '&lt;');
   // Update the report file.
-  await reportFileUpdate(query.reportDir, query.timeStamp, report);
+  await reportFileUpdate(query.reportDir, query.timeStamp, reportJSON, true);
   // Render and serve the output.
   render('', stage, 'out', query, response);
 };
