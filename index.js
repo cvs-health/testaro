@@ -98,6 +98,9 @@ const browserTypeNames = {
 // Items that may be waited for.
 const waitables = ['url', 'title', 'body'];
 // ########## VARIABLES
+// Facts about the current session.
+let logCount = 0;
+let logSize = 0;
 // Facts about the current browser.
 let browserContext;
 let browserTypeName;
@@ -132,7 +135,11 @@ const launch = async typeName => {
     // When a page is added to the browser context:
     browserContext.on('page', page => {
       // Make its console messages appear in the Playwright console.
-      page.on('console', msg => console.log(msg.text()));
+      page.on('console', msg => {
+        console.log(msg.text());
+        logCount++;
+        logSize += msg.length;
+      });
     });
     // Open the first page of the context.
     const page = await browserContext.newPage();
@@ -628,11 +635,27 @@ const scriptHandler = async (
   report.batch = query.batchName;
   report.what = what;
   report.timeStamp = query.timeStamp;
+  report.logCount = 0;
+  report.logSize = 0;
   report.acts = acts;
   report.testTimes = [];
   const urlSuffix = urlIndex > -1 ? `-${urlIndex.toString().padStart(3, '0')}` : '';
   // Perform the specified acts and add the results and exhibits to the report.
   await doActs(report, 0, null, `${query.timeStamp}${urlSuffix}`, query.reportDir);
+  // Report, score for, and reset the log statistics.
+  report.logCount = logCount;
+  report.logSize = logSize;
+  const scores = report.acts.filter(act => act.type === 'score');
+  if (scores.length) {
+    const scoreTable = scores[0];
+    const {result} = scoreTable;
+    if (result && result.logCount && result.logSize) {
+      result.logCount = Math.floor(result.logCount * logCount);
+      result.logSize = Math.floor(result.logSize * logSize);
+      result.total += result.logCount + result.logSize;
+    }
+  }
+  logSize = logCount = 0;
   // If any exhibits have been added to the report, move them to the query.
   if (report.exhibits) {
     query.exhibits = report.exhibits;

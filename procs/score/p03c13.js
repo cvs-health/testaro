@@ -1,6 +1,6 @@
-// Computes and reports a score from 3 packages and 10 custom tests, with discounts.
+// Computes and reports a score from 3 packages and 13 custom tests, with discounts.
 exports.scorer = acts => {
-  // Initialize the score.
+  // Initialize the score, including weights for the log test.
   let deficit = {
     total: 0,
     axe: null,
@@ -17,7 +17,9 @@ exports.scorer = acts => {
     motion: null,
     radioSet: null,
     role: null,
-    styleDiff: null
+    styleDiff: null,
+    logCount: 1,
+    logSize: 0.01
   };
   let facts;
   if (Array.isArray(acts)) {
@@ -269,6 +271,6 @@ exports.scorer = acts => {
       deficit.total += deficit.focOp;
     }
   }
-  // Return the score.
+  // Return the score, except for the log test.
   return deficit;
 };

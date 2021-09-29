@@ -23,7 +23,7 @@ exports.reporter = async (page, delay, interval, count) => {
     await page.waitForTimeout(toDo === count ? delay : interval);
     // Make a screen shot.
     const buffer = await shoot(
-      page, `${page.url().replace(/^.+\/\//, '').replace(/\//g, '+')}-${count - toDo}`
+      page, `${page.url().replace(/^.+\/\/|\/$/, '').replace(/\//g, '+')}-${count - toDo}`
     );
     // Get its dimensions.
     if (buffer.length) {
