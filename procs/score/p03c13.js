@@ -121,7 +121,7 @@ exports.scorer = acts => {
       else if (which === 'bulk') {
         facts = test.result;
         deficit.bulk = 100;
-        if (facts) {
+        if (facts && typeof facts.visibleElements === 'number') {
           // Deficit: square root of the excess of the element count over 150.
           deficit.bulk = Math.floor(Math.sqrt(Math.max(0, facts.visibleElements - 150)));
         }
