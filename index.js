@@ -492,7 +492,8 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
         // Otherwise, if the page has a URL:
         else if (page.url() && page.url() !== 'about:blank') {
           const url = page.url();
-          if (url === requestedURL) {
+          // If redirection is permitted or did not occur:
+          if (! report.strict || url === requestedURL) {
             // Add the URL to the act.
             act.url = url;
             // If the act is a revelation:
@@ -610,8 +611,9 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
               act.result = 'INVALID COMMAND TYPE';
             }
           }
-          // Otherwise, i.e. if the page URL is not the requested one:
+          // Otherwise, i.e. if redirection is prohibited but occurred:
           else {
+            // Add the error result to the act.
             act.result = `PAGE URL WRONG (${url})`;
           }
         }
@@ -645,12 +647,13 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
 };
 // Handles a script request.
 const scriptHandler = async (
-  what, acts, query, stage, hostIndex, response
+  what, strict, acts, query, stage, hostIndex, response
 ) => {
   const report = {};
   report.script = query.scriptName;
   report.batch = query.batchName;
   report.what = what;
+  report.strict = strict;
   report.timeStamp = query.timeStamp;
   report.logCount = 0;
   report.logSize = 0;
@@ -854,10 +857,11 @@ const requestHandler = (request, response) => {
         if (scriptJSON) {
           // Get the script data.
           const script = JSON.parse(scriptJSON);
-          const {what, commands} = script;
+          const {what, strict, commands} = script;
           // If the script is valid:
           if (
             what
+            && strict
             && commands
             && typeof what === 'string'
             && Array.isArray(commands)
@@ -869,7 +873,7 @@ const requestHandler = (request, response) => {
             // If there is no batch:
             if (batchName === 'None') {
               // Process the script, using the commands as the initial acts.
-              scriptHandler(what, commands, query, 'all', -1, response);
+              scriptHandler(what, strict, commands, query, 'all', -1, response);
             }
             // Otherwise, i.e. if there is a batch:
             else {
@@ -914,7 +918,7 @@ const requestHandler = (request, response) => {
                       // Initialize an array of the acts as a copy of the commands.
                       const acts = JSON.parse(JSON.stringify(commands));
                       // Process the commands on the host.
-                      await scriptHandler(what, acts, query, stage, hostIndex, response);
+                      await scriptHandler(what, strict, acts, query, stage, hostIndex, response);
                       // Process the remaining hosts.
                       await doBatch(hosts.slice(1), false, hostIndex + 1);
                     }
