@@ -179,7 +179,6 @@ exports.commands = {
       'Navigate to a new URL (which: URL; isStrict: reject redirection; what: description)',
       {
         which: [true, 'string', 'isURL'],
-        isStrict: [true, 'boolean'],
         what: [false, 'string', 'hasLength']
       }
     ],
