@@ -217,7 +217,7 @@ exports.scorer = acts => {
       else if (which === 'role') {
         facts = test.result;
         deficit.role = 100;
-        if (facts) {
+        if (facts && typeof facts === 'object') {
           // Defects discounted.
           deficit.role = 2 * facts.badRoleElements;
         }

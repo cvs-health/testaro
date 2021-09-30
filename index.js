@@ -612,7 +612,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
           }
           // Otherwise, i.e. if the page URL is not the requested one:
           else {
-            act.result = 'PAGE URL WRONG';
+            act.result = `PAGE URL WRONG (${url})`;
           }
         }
         // Otherwise, i.e. if the required page URL does not exist:
