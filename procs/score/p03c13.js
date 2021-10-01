@@ -1,5 +1,11 @@
 // Computes and reports a score from 3 packages and 13 custom tests, with discounts.
 exports.scorer = acts => {
+  // Define the log weights.
+  const logWeights = {
+    count: 1.5,
+    size: 0.02
+  };
+  const inferences = {};
   // Initialize the score, including weights for the log statistics.
   let deficit = {
     total: 0,
@@ -18,8 +24,8 @@ exports.scorer = acts => {
     radioSet: null,
     role: null,
     styleDiff: null,
-    logCount: 1.5,
-    logSize: 0.02
+    logCount: null,
+    logSize: null
   };
   let facts;
   if (Array.isArray(acts)) {
@@ -57,6 +63,9 @@ exports.scorer = acts => {
         'select_missing_label': 1
       }
     };
+    const increment = test => {
+      deficit.total += deficit[test] || inferences[test];
+    };
     tests.forEach(test => {
       const {which} = test;
       if (which === 'axe') {
@@ -75,8 +84,7 @@ exports.scorer = acts => {
             + 3 * facts.moderate
             + 4 * facts.serious
             + 5 * facts.critical
-            - totalDiscount
-            || 0;
+            - totalDiscount;
           deficit.total += deficit.axe;
         }
       }
@@ -91,7 +99,7 @@ exports.scorer = acts => {
               totalDiscount += ruleDiscount;
             }
           });
-          deficit.ibm = 4 * facts.violation + 2 * facts.recommendation - totalDiscount || 0;
+          deficit.ibm = 4 * facts.violation + 2 * facts.recommendation - totalDiscount;
           deficit.total += deficit.ibm;
         }
       }
@@ -113,86 +121,100 @@ exports.scorer = acts => {
             = 2 * facts.alert.count
             + 3 * facts.contrast.count
             + 4 * facts.error.count
-            - totalDiscount
-            || 0;
+            - totalDiscount;
           deficit.total += deficit.wave;
         }
       }
       else if (which === 'bulk') {
-        facts = test.result;
-        deficit.bulk = 100;
-        if (facts && typeof facts.visibleElements === 'number') {
-          // Deficit: square root of the excess of the element count over 150.
-          deficit.bulk = Math.floor(Math.sqrt(Math.max(0, facts.visibleElements - 150)));
+        facts = test.result && test.result.visibleElements;
+        if (typeof facts === 'number') {
+          // Deficit: 15% of the excess, to the 0.9th power, of the element count over 150.
+          deficit.bulk = Math.floor(0.15 * Math.pow(Math.max(0, facts.visibleElements - 150), 0.9));
         }
-        deficit.total += deficit.bulk;
+        else {
+          inferences.bulk = 100;
+        }
+        increment('bulk');
       }
       else if (which === 'embAc') {
         facts = test.result && test.result.totals;
-        deficit.embAc = 100;
         if (facts) {
           deficit.embAc = 4 * (facts.links + facts.buttons + facts.inputs + facts.selects);
         }
-        deficit.total += deficit.embAc;
+        else {
+          inferences.embAc = 100;
+        }
+        increment('embAc');
       }
       else if (which === 'focInd') {
         facts = test.result && test.result.totals;
         facts = facts ? facts.types : null;
         facts = facts ? facts.indicatorMissing : null;
-        deficit.focInd = 150;
         if (facts) {
           deficit.focInd = 5 * facts.total;
         }
-        deficit.total += deficit.focInd;
+        else {
+          inferences.focInd = 150;
+        }
+        increment('focInd');
       }
       else if (which === 'focOl') {
         facts = test.result && test.result.totals;
         facts = facts ? facts.types : null;
         facts = facts ? facts.outlineMissing : null;
-        deficit.focOl = 100;
         if (facts) {
           deficit.focOl = 3 * facts.total;
         }
-        deficit.total += deficit.focOl;
+        else {
+          inferences.focOl = 100;
+        }
+        increment('focOl');
       }
       else if (which === 'focOp') {
         facts = test.result && test.result.totals;
-        deficit.focOp = 150;
         if (facts) {
           deficit.focOp
             = 4 * facts.operableNotFocusable.total + 1 * facts.focusableNotOperable.total;
         }
-        deficit.total += deficit.focOp;
+        else {
+          inferences.focOp = 150;
+        }
+        increment('focOp');
       }
       else if (which === 'hover') {
         facts = test.result && test.result.totals;
-        deficit.hover = 150;
         if (facts) {
           deficit.hover = 4 * facts.triggers + 2 * facts.targets;
         }
-        deficit.total += deficit.hover;
+        else {
+          inferences.hover = 150;
+        }
+        increment('hover');
       }
       else if (which === 'labClash') {
         facts = test.result && test.result.totals;
-        deficit.labClash = 100;
         if (facts) {
           // Unlabeled elements discounted.
           deficit.labClash = 2 * facts.mislabeled + 2 * facts.unlabeled;
         }
-        deficit.total += deficit.labClash;
+        else {
+          inferences.labClash = 100;
+        }
+        increment('labClash');
       }
       else if (which === 'linkUl') {
         facts = test.result && test.result.totals;
         facts = facts ? facts.inline : null;
-        deficit.linkUl = 150;
         if (facts) {
           deficit.linkUl = 3 * (facts.total - facts.underlined);
         }
-        deficit.total += deficit.linkUl;
+        else {
+          inferences.linkUl = 150;
+        }
+        increment('linkUl');
       }
       else if (which === 'motion') {
         facts = test.result;
-        deficit.motion = 150;
         if (facts && facts.bytes) {
           deficit.motion = Math.floor(
             15 * (facts.meanLocalRatio - 1)
@@ -203,29 +225,35 @@ exports.scorer = acts => {
             + 10 * facts.changeFrequency
           );
         }
-        deficit.total = deficit.motion;
+        else {
+          inferences.motion = 150;
+        }
+        increment('motion');
       }
       else if (which === 'radioSet') {
         facts = test.result && test.result.totals;
-        deficit.radioSet = 100;
         if (facts) {
           // Defects discounted.
           deficit.radioSet = 2 * (facts.total - facts.inSet);
         }
-        deficit.total += deficit.radioSet;
+        else {
+          inferences.radioSet = 100;
+        }
+        increment('radioSet');
       }
       else if (which === 'role') {
-        facts = test.result;
-        deficit.role = 100;
-        if (facts && typeof facts === 'object') {
+        facts = test.result && facts.badRoleElements;
+        if (typeof facts === 'number') {
           // Defects discounted.
-          deficit.role = 2 * facts.badRoleElements;
+          deficit.role = 2 * facts;
         }
-        deficit.total += deficit.role;
+        else {
+          inferences.role = 100;
+        }
+        increment('role');
       }
       else if (which === 'styleDiff') {
         facts = test.result && test.result.totals;
-        deficit.styleDiff = 100;
         if (facts) {
           // Identify an array of objects having tag-name totals and style distributions as values.
           const tagNameCounts = Object.values(facts);
@@ -239,9 +267,12 @@ exports.scorer = acts => {
           // Deficit: 2 per excess style + 0.2 per nonplurality element.
           deficit.styleDiff = Math.floor(deficits.reduce(
             (total, currentPair) => total + 2 * currentPair[0] + 0.2 * currentPair[1], 0
-          )) || 100;
+          ));
         }
-        deficit.total += deficit.styleDiff;
+        else {
+          inferences.styleDiff = 100;
+        }
+        increment('styleDiff');
       }
     });
     // If at least 1 test package but not all test packages failed, assign penalty deficits.
@@ -259,18 +290,17 @@ exports.scorer = acts => {
       }
       tests.forEach(test => {
         if (deficit[test] === null) {
-          deficit[test] = meanScore + penalty;
-          deficit.total += deficit[test];
+          inferences[test] = meanScore + penalty;
+          deficit.total += inferences[test];
         }
       });
     };
     estimate(['axe', 'ibm', 'wave'], 100);
-    // If focOp failed, assign a penalty deficit.
-    if (deficit.focOp === null) {
-      deficit.focOp = 150;
-      deficit.total += deficit.focOp;
-    }
   }
   // Return the score, except for the log test.
-  return deficit;
+  return {
+    logWeights,
+    inferences,
+    deficit
+  };
 };
