@@ -22,6 +22,7 @@ exports.reporter = async (page, withItems, revealAll) => {
   await require('../procs/test/focusables').focusables(page, 'focusMark');
   // Mark the operable elements that are visible or focused-marked.
   const opMarked = await require('../procs/test/markOperable').markOperable(page);
+  const data = {};
   if (opMarked) {
     // Get an array of the elements that are focusable but not operable.
     const fNotO = await page.$$('body [data-autotest-focused]:not([data-autotest-operable])');
@@ -106,47 +107,47 @@ exports.reporter = async (page, withItems, revealAll) => {
     };
     // FUNCTION DEFINITION END
     // Initialize the data.
-    const data = {
-      totals: {
-        focusableNotOperable: {
-          total: 0,
-          tagName: {},
-          focusableHow: {
-            Tab: 0,
-            ArrowRight: 0,
-            ArrowDown: 0
-          }
-        },
-        operableNotFocusable: {
-          total: 0,
-          tagName: {},
-          operableWhy: {
-            tag: 0,
-            cursor: 0,
-            onclick: 0
-          }
-        },
-        focusableAndOperable: {
-          total: 0,
-          tagName: {},
-          focusableHow: {
-            Tab: 0,
-            ArrowRight: 0,
-            ArrowDown: 0
-          },
-          operableWhy: {
-            tag: 0,
-            cursor: 0,
-            onclick: 0
-          }
+    data.totals = {
+      focusableNotOperable: {
+        total: 0,
+        tagName: {},
+        focusableHow: {
+          Tab: 0,
+          ArrowRight: 0,
+          ArrowDown: 0
         }
       },
-      items: {
+      operableNotFocusable: {
+        total: 0,
+        tagName: {},
+        operableWhy: {
+          tag: 0,
+          cursor: 0,
+          onclick: 0
+        }
+      },
+      focusableAndOperable: {
+        total: 0,
+        tagName: {},
+        focusableHow: {
+          Tab: 0,
+          ArrowRight: 0,
+          ArrowDown: 0
+        },
+        operableWhy: {
+          tag: 0,
+          cursor: 0,
+          onclick: 0
+        }
+      }
+    };
+    if (withItems) {
+      data.items = {
         focusableNotOperable: [],
         operableNotFocusable: [],
         focusableAndOperable: []
-      }
-    };
+      };
+    }
     // Populate them.
     const totals = data.totals;
     const items = data.items;
@@ -161,6 +162,7 @@ exports.reporter = async (page, withItems, revealAll) => {
     return {result: data};
   }
   else {
-    return {result: 'OPERABLE MARKING FAILED'};
+    data.error = 'ERROR: operable marking failed';
+    return {result: data};
   }
 };

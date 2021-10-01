@@ -7,7 +7,7 @@ exports.reporter = async (page, withItems, rules = []) => {
   await injectAxe(page)
   .catch(error => {
     console.log(`ERROR: Axe injection failed (${error.message})`);
-    data.result = 'AXE INJECTION FAILED';
+    data.result = 'ERROR: axe injection failed';
   });
   // If the injection succeeded:
   if (! data.result) {
@@ -91,7 +91,8 @@ exports.reporter = async (page, withItems, rules = []) => {
     // Otherwise, i.e. if the test failed:
     else {
       // Report this.
-      data.result = 'ERROR: AXE FAILED';
+      data.error = 'ERROR: axe failed';
+      console.log('ERROR: axe failed');
     }
     // Reload the page to undo the DOM changes made by Axe.
     await page.reload({timeout: 10000}).catch(error => {

@@ -118,7 +118,7 @@ exports.reporter = async (page, withItems) => {
   // Find and document the hover-triggered disclosures.
   await find(triggers);
   // Reload the page to undo the hover-triggered content changes.
-  await page.reload({timeout: 18000}).catch(error => {
+  await page.reload({timeout: 10000}).catch(error => {
     console.log(error.message, error.stack.slice(0, 1000));
   });
   // Return the result.

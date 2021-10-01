@@ -1,10 +1,13 @@
 // Reports the count of visible elements.
 exports.reporter = async page => {
+  const data = {};
   await page.waitForSelector('body', {timeout: 10000})
   .catch(error => {
-    console.log(`ERROR AWAITING BODY (${error.message})`);
-    return {result: 'BULK TEST TIMED OUT'};
+    console.log(`ERROR (${error.message})`);
+    data.error = 'ERROR: bulk timed out';
+    return {result: data};
   });
   const visibleElements = await page.$$('body :visible');
-  return {result: {visibleElements: visibleElements.length}};
+  data.visibleElements = visibleElements.length;
+  return {result: data};
 };

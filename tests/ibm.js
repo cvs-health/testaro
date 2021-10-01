@@ -18,10 +18,10 @@ exports.reporter = async (page, withItems, withNewContent) => {
   const data = {};
   if (result) {
     fs.rm('ibmtemp', {recursive: true});
-    data.result = {totals: result.report.summary.counts};
+    data.totals = result.report.summary.counts;
     if (withItems) {
-      data.result.items = result.report.results;
-      data.result.items.forEach(item => {
+      data.items = result.report.results;
+      data.items.forEach(item => {
         delete item.apiArgs;
         delete item.category;
         delete item.ignored;
@@ -33,11 +33,11 @@ exports.reporter = async (page, withItems, withNewContent) => {
     }
   }
   else {
-    data.result = 'ERROR: IBM TEST FAILED';
+    data.error = 'ERROR: ibm test failed';
   }
   // Reload the page to undo any DOM changes made by IBM.
   await page.reload({timeout: 10000}).catch(error => {
-    console.log(`ERROR RELOADING PAGE AFTER IBM: ${error.message}`);
+    console.log(error.message, error.stack.slice(0, 1000));
   });
   // Return it.
   return data;
