@@ -36,9 +36,7 @@ exports.reporter = async (page, withItems, withNewContent) => {
     data.error = 'ERROR: ibm test failed';
   }
   // Reload the page to undo any DOM changes made by IBM.
-  await page.reload({timeout: 10000}).catch(error => {
-    console.log(error.message, error.stack.slice(0, 1000));
-  });
+  await require('../procs/test/reload').reload(page);
   // Return it.
   return {result: data};
 };

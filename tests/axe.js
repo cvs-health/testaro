@@ -95,9 +95,7 @@ exports.reporter = async (page, withItems, rules = []) => {
       console.log('ERROR: axe failed');
     }
     // Reload the page to undo the DOM changes made by Axe.
-    await page.reload({timeout: 10000}).catch(error => {
-      console.log(error.message, error.stack.slice(0, 1000));
-    });
+    await require('../procs/test/reload').reload(page);
   }
   // Return the result.
   return {result: data};

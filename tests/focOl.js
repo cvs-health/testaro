@@ -42,9 +42,7 @@ exports.reporter = async (page, withItems, revealAll) => {
   await tallyTags(page, focOutY, good, items, 'outlinePresent', withItems);
   data.totals.total = bad.total + good.total;
   // Reload the page to undo the focus and attribute changes.
-  await page.reload({timeout: 10000}).catch(error => {
-    console.log(error.message, error.stack.slice(0, 1000));
-  });
+  await require('../procs/test/reload').reload(page);
   // Return the data.
   return {result: data};
 };
