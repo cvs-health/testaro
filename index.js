@@ -452,7 +452,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
           act.result = scorer(acts);
         }
         catch (error) {
-          act.result = `ERROR: ${error.message}`;
+          act.error = `ERROR: ${error.message}`;
         }
       }
       // Otherwise, if a current page exists:

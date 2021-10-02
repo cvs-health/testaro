@@ -90,9 +90,9 @@ exports.scorer = acts => {
         facts = test.result && test.result.violations;
         if (facts) {
           rules.axe = 'multiply minor by 2, moderate by 3, serious by 4, critical by 5; sum; subtract discounts';
-          const rules = test.result.items || [];
+          const axeRules = test.result.items || [];
           let totalDiscount = 0;
-          rules.forEach(rule => {
+          axeRules.forEach(rule => {
             const ruleDiscount = ruleDiscounts.axe[rule.rule];
             if (ruleDiscount) {
               totalDiscount += ruleDiscount * rule.elements.length;
@@ -333,6 +333,7 @@ exports.scorer = acts => {
   // Return the score, except for the log test.
   return {
     ruleDiscounts,
+    rules,
     diffStyles,
     logWeights,
     inferences,
