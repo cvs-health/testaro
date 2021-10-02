@@ -135,7 +135,7 @@ exports.focusables = async (page, operation) => {
       Identify and operate on the newly focused element, if any, and return the effective focus
       and a status.
     */
-    const focusAndStatus = await op(page);
+    const focusAndStatus = await op(page, lastNavKey);
     const focus = focusAndStatus[0];
     const status = focusAndStatus[1];
     // FUNCTION DEFINITIONS START
