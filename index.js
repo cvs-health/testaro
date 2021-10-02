@@ -677,9 +677,8 @@ const scriptHandler = async (
     const {result} = scoreTable;
     const {logWeights, deficit} = result;
     if (result && logWeights) {
-      deficit.logCount = Math.floor(logWeights.count * logCount);
-      deficit.logSize = Math.floor(logWeights.size * logSize);
-      deficit.total += deficit.logCount + deficit.logSize;
+      deficit.log = Math.floor(logWeights.count * logCount + logWeights.size * logSize);
+      deficit.total += deficit.log;
     }
   }
   // If any exhibits have been added to the report, move them to the query.

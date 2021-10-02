@@ -16,10 +16,12 @@ exports.scorer = acts => {
     ibm: '',
     labClash: '',
     linkUl: '',
+    log: 'multiply log messages by logWeights.count, sum of characters in log messages by logWeights.size',
     motion: '',
     radioSet: '',
     role: '',
-    styleDiff: ''
+    styleDiff: '',
+    wave: ''
   };
   const ruleDiscounts = {};
   const diffStyles = [
@@ -45,22 +47,21 @@ exports.scorer = acts => {
   let deficit = {
     total: 0,
     axe: null,
-    ibm: null,
-    wave: null,
     bulk: null,
     embAc: null,
     focInd: null,
     focOl: null,
     focOp: null,
     hover: null,
+    ibm: null,
     labClash: null,
     linkUl: null,
+    log: null,
     motion: null,
     radioSet: null,
     role: null,
     styleDiff: null,
-    logCount: null,
-    logSize: null
+    wave: null
   };
   let facts;
   if (Array.isArray(acts)) {
