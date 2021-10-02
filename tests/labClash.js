@@ -1,15 +1,16 @@
 // Tabulates and lists labeling conflicts of labelable form controls.
 exports.reporter = async (page, withItems) => {
-  const data = {};
-  await page.$eval('body', (body, withItems) => {
+  return await page.$eval('body', (body, withItems) => {
     // FUNCTION DEFINITION START
     const debloat = text => text.trim().replace(/\s+/g, ' ');
     // FUNCTION DEFINITION END
     // Initialize a report.
-    data.totals = {
-      mislabeled: 0,
-      unlabeled: 0,
-      wellLabeled: 0
+    const data = {
+      totals: {
+        mislabeled: 0,
+        unlabeled: 0,
+        wellLabeled: 0
+      }
     };
     if (withItems) {
       data.items = {
@@ -141,9 +142,7 @@ exports.reporter = async (page, withItems) => {
   }, withItems)
   .catch(error => {
     console.log(`ERROR: labClash failed (${error.message})`);
-    delete data.totals;
-    delete data.items;
-    data.error = 'ERROR: labClash failed';
+    const data = {error: 'ERROR: labClash failed'};
     return {result: data};
   });
 };

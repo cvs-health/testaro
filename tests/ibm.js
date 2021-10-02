@@ -40,5 +40,5 @@ exports.reporter = async (page, withItems, withNewContent) => {
     console.log(error.message, error.stack.slice(0, 1000));
   });
   // Return it.
-  return data;
+  return {result: data};
 };
