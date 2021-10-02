@@ -82,7 +82,7 @@ exports.scorer = acts => {
       'select_missing_label': 1
     };
     const increment = test => {
-      deficit.total += deficit[test] || inferences[test];
+      deficit.total += typeof deficit[test] === 'number' ? deficit[test] : inferences[test];
     };
     tests.forEach(test => {
       const {which} = test;
