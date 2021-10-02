@@ -5,7 +5,22 @@ exports.scorer = acts => {
     count: 1.5,
     size: 0.02
   };
-  const rules = {};
+  const rules = {
+    axe: '',
+    bulk: '',
+    embAc: '',
+    focInd: '',
+    focOl: '',
+    focOp: '',
+    hover: '',
+    ibm: '',
+    labClash: '',
+    linkUl: '',
+    motion: '',
+    radioSet: '',
+    role: '',
+    styleDiff: ''
+  };
   const ruleDiscounts = {};
   const diffStyles = [
     'borderStyle',
