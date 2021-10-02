@@ -5,7 +5,27 @@ exports.scorer = acts => {
     count: 1.5,
     size: 0.02
   };
+  const rules = {};
   const inferences = {};
+  const ruleDiscounts = {};
+  const diffStyles = [
+    'borderStyle',
+    'borderWidth',
+    'fontStyle',
+    'fontWeight',
+    'lineHeight',
+    'maxHeight',
+    'maxWidth',
+    'minHeight',
+    'minWidth',
+    'opacity',
+    'outlineOffset',
+    'outlineStyle',
+    'outlineWidth',
+    'textDecorationLine',
+    'textDecorationStyle',
+    'textDecorationThickness'
+  ];
   // Initialize the score, including weights for the log statistics.
   let deficit = {
     total: 0,
@@ -31,37 +51,35 @@ exports.scorer = acts => {
   if (Array.isArray(acts)) {
     const tests = acts.filter(act => act.type === 'test');
     // Discounts from deficit scores based on multi-test reporting of the same faults.
-    const ruleDiscounts = {
-      axe: {
-        'aria-allowed-role': 1,
-        'aria-roles': 2,
-        'color-contrast': 2,
-        'image-redundant-alt': 1,
-        'label': 3,
-        'link-name': 2,
-        'region': 1
-      },
-      ibm: {
-        'aria_semantics_role': 2,
-        'IBMA_Color_Contrast_WCAG2AA': 2,
-        'Rpt_Aria_OrphanedContent_Native_Host_Sematics': 2,
-        'Rpt_Aria_ValidIdRef': 2,
-        'Rpt_Aria_ValidRole': 2,
-        'WCAG20_A_HasText': 2,
-        'WCAG20_Fieldset_HasLegend': 3,
-        'WCAG20_Input_ExplicitLabel': 2,
-        'WCAG20_Input_RadioChkInFieldSet': 3
-      },
-      wave4: {
-        'alt_redundant': 1,
-        'aria_reference_broken': 2,
-        'contrast': 1,
-        'fieldset_missing': 1,
-        'label_orphaned': 1,
-        'legend_missing': 1,
-        'link_empty': 2,
-        'select_missing_label': 1
-      }
+    ruleDiscounts.axe = {
+      'aria-allowed-role': 1,
+      'aria-roles': 2,
+      'color-contrast': 2,
+      'image-redundant-alt': 1,
+      'label': 3,
+      'link-name': 2,
+      'region': 1
+    };
+    ruleDiscounts.ibm = {
+      'aria_semantics_role': 2,
+      'IBMA_Color_Contrast_WCAG2AA': 2,
+      'Rpt_Aria_OrphanedContent_Native_Host_Sematics': 2,
+      'Rpt_Aria_ValidIdRef': 2,
+      'Rpt_Aria_ValidRole': 2,
+      'WCAG20_A_HasText': 2,
+      'WCAG20_Fieldset_HasLegend': 3,
+      'WCAG20_Input_ExplicitLabel': 2,
+      'WCAG20_Input_RadioChkInFieldSet': 3
+    };
+    ruleDiscounts.wave = {
+      'alt_redundant': 1,
+      'aria_reference_broken': 2,
+      'contrast': 1,
+      'fieldset_missing': 1,
+      'label_orphaned': 1,
+      'legend_missing': 1,
+      'link_empty': 2,
+      'select_missing_label': 1
     };
     const increment = test => {
       deficit.total += deficit[test] || inferences[test];
@@ -71,6 +89,7 @@ exports.scorer = acts => {
       if (which === 'axe') {
         facts = test.result && test.result.violations;
         if (facts) {
+          rules.axe = 'multiply minor by 2, moderate by 3, serious by 4, critical by 5; sum; subtract discounts';
           const rules = test.result.items || [];
           let totalDiscount = 0;
           rules.forEach(rule => {
@@ -91,9 +110,10 @@ exports.scorer = acts => {
       else if (which === 'ibm') {
         facts = test.result && test.result.totals;
         if (facts) {
-          const rules = test.result.items || [];
+          rules.ibm = 'multiply violations by 4, recommendatons by 2; sum; subtract discounts';
+          const ibmRules = test.result.items || [];
           let totalDiscount = 0;
-          rules.forEach(rule => {
+          ibmRules.forEach(rule => {
             const ruleDiscount = ruleDiscounts.ibm[rule.ruleId];
             if (ruleDiscount) {
               totalDiscount += ruleDiscount;
@@ -106,12 +126,13 @@ exports.scorer = acts => {
       else if (which === 'wave') {
         facts = test.result && test.result.categories;
         if (facts) {
+          rules.wave = 'multiply alerts by 2, contrast errors by 3, errors by 4; sum; subtract discounts';
           let totalDiscount = 0;
           ['error', 'contrast', 'alert'].forEach(level => {
             const items = facts[level].items;
-            const rules = Object.keys(items);
-            rules.forEach(rule => {
-              const ruleDiscount = ruleDiscounts.wave4[rule] * items[rule].count;
+            const waveRules = Object.keys(items);
+            waveRules.forEach(rule => {
+              const ruleDiscount = ruleDiscounts.wave[rule] * items[rule].count;
               if (ruleDiscount) {
                 totalDiscount += ruleDiscount;
               }
@@ -128,8 +149,9 @@ exports.scorer = acts => {
       else if (which === 'bulk') {
         facts = test.result && test.result.visibleElements;
         if (typeof facts === 'number') {
+          rules.bulk = 'subtract 150 from visible elements; make 0 if negative; raise to 0.9th power; multiply by 0.15';
           // Deficit: 15% of the excess, to the 0.9th power, of the element count over 150.
-          deficit.bulk = Math.floor(0.15 * Math.pow(Math.max(0, facts.visibleElements - 150), 0.9));
+          deficit.bulk = Math.floor(0.15 * Math.pow(Math.max(0, facts - 150), 0.9));
         }
         else {
           inferences.bulk = 100;
@@ -139,6 +161,7 @@ exports.scorer = acts => {
       else if (which === 'embAc') {
         facts = test.result && test.result.totals;
         if (facts) {
+          rules.embAc = 'multiply link- or button-contained links, buttons, inputs, and selects by 4';
           deficit.embAc = 4 * (facts.links + facts.buttons + facts.inputs + facts.selects);
         }
         else {
@@ -151,6 +174,7 @@ exports.scorer = acts => {
         facts = facts ? facts.types : null;
         facts = facts ? facts.indicatorMissing : null;
         if (facts) {
+          rules.focInd = 'multiply indicatorless-when-focused elements by 5';
           deficit.focInd = 5 * facts.total;
         }
         else {
@@ -163,6 +187,7 @@ exports.scorer = acts => {
         facts = facts ? facts.types : null;
         facts = facts ? facts.outlineMissing : null;
         if (facts) {
+          rules.focOl = 'multiply outlineless-when-focused elements by 3';
           deficit.focOl = 3 * facts.total;
         }
         else {
@@ -173,6 +198,7 @@ exports.scorer = acts => {
       else if (which === 'focOp') {
         facts = test.result && test.result.totals;
         if (facts) {
+          rules.focOp = 'multiply nonfocusable operable elements by 4, nonoperable focusable by 1; sum';
           deficit.focOp
             = 4 * facts.operableNotFocusable.total + 1 * facts.focusableNotOperable.total;
         }
@@ -184,6 +210,7 @@ exports.scorer = acts => {
       else if (which === 'hover') {
         facts = test.result && test.result.totals;
         if (facts) {
+          rules.hover = 'multiply elements adding visible content when hovered by 4, elements made visible by 2; sum';
           deficit.hover = 4 * facts.triggers + 2 * facts.targets;
         }
         else {
@@ -194,6 +221,7 @@ exports.scorer = acts => {
       else if (which === 'labClash') {
         facts = test.result && test.result.totals;
         if (facts) {
+          rules.labClash = 'multiply conflictually labeled elements by 2, unlabeled elements by 2; sum';
           // Unlabeled elements discounted.
           deficit.labClash = 2 * facts.mislabeled + 2 * facts.unlabeled;
         }
@@ -206,6 +234,7 @@ exports.scorer = acts => {
         facts = test.result && test.result.totals;
         facts = facts ? facts.inline : null;
         if (facts) {
+          rules.linkUl = 'multiply nonunderlined inline links by 3';
           deficit.linkUl = 3 * (facts.total - facts.underlined);
         }
         else {
@@ -216,6 +245,7 @@ exports.scorer = acts => {
       else if (which === 'motion') {
         facts = test.result;
         if (facts && facts.bytes) {
+          rules.motion = 'get PNG screenshot sizes (sss); get differing-pixel counts between adjacent PNG screenshots (pd); “sssd” = sss difference ÷ smaller sss; multiply mean adjacent sssd, maximum adjacent sssd, maximum over-all ssd by 15; divide mean pd, maximum pd by 25,000; multiply count of non-0 pd by 10; sum';
           deficit.motion = Math.floor(
             15 * (facts.meanLocalRatio - 1)
             + 15 * (facts.maxLocalRatio - 1)
@@ -233,6 +263,7 @@ exports.scorer = acts => {
       else if (which === 'radioSet') {
         facts = test.result && test.result.totals;
         if (facts) {
+          rules.radioSet = 'multiply radio buttons not in fieldsets with legends and no other-name radio buttons by 2';
           // Defects discounted.
           deficit.radioSet = 2 * (facts.total - facts.inSet);
         }
@@ -244,6 +275,7 @@ exports.scorer = acts => {
       else if (which === 'role') {
         facts = test.result && facts.badRoleElements;
         if (typeof facts === 'number') {
+          rules.role = 'multiple role attributes with invalid or native-HTML-equivalent values by 2';
           // Defects discounted.
           deficit.role = 2 * facts;
         }
@@ -255,7 +287,8 @@ exports.scorer = acts => {
       else if (which === 'styleDiff') {
         facts = test.result && test.result.totals;
         if (facts) {
-          // Identify an array of objects having tag-name totals and style distributions as values.
+          rules.styleDiff = 'for each of element classes block a, inline a, button, h1, h2, h3, h4, h5, and h6, get diffStyles-distinct styles; multiply their count minus 1 by 2; multiply count of elements with non-plurality styles by 0.2; sum';
+          // Identify objects having the tag-name totals and style distributions as properties.
           const tagNameCounts = Object.values(facts);
           // Identify an array of pairs of counts of excess styles and nonplurality elements.
           const deficits = tagNameCounts.map(
@@ -299,6 +332,8 @@ exports.scorer = acts => {
   }
   // Return the score, except for the log test.
   return {
+    ruleDiscounts,
+    diffStyles,
     logWeights,
     inferences,
     deficit
