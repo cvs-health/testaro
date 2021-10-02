@@ -649,34 +649,37 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
 const scriptHandler = async (
   what, strict, acts, query, stage, hostIndex, response
 ) => {
+  // Reinitialize the log statistics.
+  logCount = 0;
+  logSize = 0;
+  // Initialize a script report.
   const report = {};
   report.script = query.scriptName;
   report.batch = query.batchName;
   report.what = what;
   report.strict = strict;
   report.timeStamp = query.timeStamp;
-  report.logCount = 0;
-  report.logSize = 0;
   report.acts = acts;
   report.testTimes = [];
   const hostSuffix = hostIndex > -1 ? `-${hostIndex.toString().padStart(3, '0')}` : '';
   const reportSuffix = `${query.timeStamp}${hostSuffix}`;
   // Perform the specified acts and add the results and exhibits to the report.
   await doActs(report, 0, null, reportSuffix, query.reportDir);
-  // Report, score for, and reset the log statistics.
+  // Add the log statistics to the report.
   report.logCount = logCount;
   report.logSize = logSize;
+  // If logs are to be scored, do so.
   const scoreTables = report.acts.filter(act => act.type === 'score');
   if (scoreTables.length) {
     const scoreTable = scoreTables[0];
     const {result} = scoreTable;
-    if (result && result.logCount && result.logSize) {
-      result.logCount = Math.floor(result.logCount * logCount);
-      result.logSize = Math.floor(result.logSize * logSize);
-      result.total += result.logCount + result.logSize;
+    const {logWeights, deficit} = result;
+    if (result && logWeights) {
+      deficit.logCount = Math.floor(logWeights.count * logCount);
+      deficit.logSize = Math.floor(logWeights.size * logSize);
+      deficit.total += deficit.logCount + deficit.logSize;
     }
   }
-  logSize = logCount = 0;
   // If any exhibits have been added to the report, move them to the query.
   if (report.exhibits) {
     query.exhibits = report.exhibits;

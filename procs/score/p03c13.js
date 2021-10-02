@@ -1,12 +1,11 @@
 // Computes and reports a score from 3 packages and 13 custom tests, with discounts.
 exports.scorer = acts => {
-  // Define the log weights.
+  // Define the configuration disclosures.
   const logWeights = {
     count: 1.5,
     size: 0.02
   };
   const rules = {};
-  const inferences = {};
   const ruleDiscounts = {};
   const diffStyles = [
     'borderStyle',
@@ -26,7 +25,8 @@ exports.scorer = acts => {
     'textDecorationStyle',
     'textDecorationThickness'
   ];
-  // Initialize the score, including weights for the log statistics.
+  // Initialize the score.
+  const inferences = {};
   let deficit = {
     total: 0,
     axe: null,
@@ -273,7 +273,7 @@ exports.scorer = acts => {
         increment('radioSet');
       }
       else if (which === 'role') {
-        facts = test.result && facts.badRoleElements;
+        facts = test.result && test.result.badRoleElements;
         if (typeof facts === 'number') {
           rules.role = 'multiple role attributes with invalid or native-HTML-equivalent values by 2';
           // Defects discounted.
