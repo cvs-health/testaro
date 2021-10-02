@@ -2,8 +2,8 @@
 exports.scorer = acts => {
   // Define the configuration disclosures.
   const logWeights = {
-    count: 1.5,
-    size: 0.02
+    count: 0.5,
+    size: 0.01
   };
   const rules = {
     axe: '',
