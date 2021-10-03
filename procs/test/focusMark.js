@@ -29,7 +29,7 @@ exports.focusMark = async (page, lastNavKey) => {
     }
   }, lastNavKey)
   .catch(error => {
-    console.log(`ERROR: FOCUS MARKING FAILED (${error.message})`);
+    console.log(`ERROR: Focus marking failed (${error.message})`);
     return '';
   });
   // Return the focused element and the status.

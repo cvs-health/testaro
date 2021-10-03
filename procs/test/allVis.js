@@ -13,6 +13,6 @@ exports.allVis = async page => {
     });
   })
   .catch(error => {
-    console.log(`ERROR MAKING ALL ELEMENTS VISIBLE (${error.message})`);
+    console.log(`ERROR making all elements visible (${error.message})`);
   });
 };

@@ -43,7 +43,7 @@ exports.markOperable = async page => {
     return true;
   })
   .catch(error => {
-    console.log(`ERROR: OPERABLE ELEMENTS NOT MARKABLE ${error.message}`);
+    console.log(`ERROR: Operable elements not markable ${error.message}`);
     return false;
   });
 };

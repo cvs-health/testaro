@@ -156,6 +156,6 @@ const webify = relArray => {
     webify(relArray);
   }
   else {
-    console.log('ERROR: Related array of act reports is empty');
+    console.log('ERROR: Related array of act reports empty');
   }
 })();

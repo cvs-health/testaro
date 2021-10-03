@@ -62,7 +62,7 @@ exports.focIndMark = async page => {
     }
   }, [page.custom.priorFocus.element, page.custom.priorFocus.focusStyle])
   .catch(error => {
-    console.log(`ERROR: FOCUS OUTLINE MARKING FAILED (${error.message})`);
+    console.log(`ERROR: Focus indicator marking failed (${error.message})`);
     return '';
   });
   // Record the newly focused element and its style and return the focused element and the status.

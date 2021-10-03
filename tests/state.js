@@ -82,7 +82,7 @@ exports.reporter = async page => {
       height: box.height + marginTop + margin
     };
   };
-  // Creates and records a screen shot.
+  // Creates and records a screenshot.
   const shoot = async (page, reportBox, state) => {
     // If an element exists:
     if (reportBox.elements.length) {
@@ -102,7 +102,7 @@ exports.reporter = async page => {
       }
     }
     /*
-      Make a screen shot.
+      Make a screenshot.
       fullPage option must be true in about half and false in about half the cases.
       See https://github.com/microsoft/playwright/issues/620 for a related discussion.
     */
@@ -112,7 +112,7 @@ exports.reporter = async page => {
       fullPage: false
     });
   };
-  // Creates and records 2 screen shots in a browser.
+  // Creates and records 2 screenshots in a browser.
   const shootAll = async () => {
     // Identify a JSHandle of the specified element.
     const elementJS = await page.evaluateHandle(() => document.activeElement);
@@ -126,7 +126,7 @@ exports.reporter = async page => {
         const reportBox = await getReportBox(element);
         // If it exists:
         if (reportBox.box.width) {
-          // Make 4 screen shots of the element.
+          // Make 4 screenshots of the element.
           await shoot(page, reportBox, 'normal');
           await shoot(page, reportBox, 'focus');
           await shoot(page, reportBox, 'hover');
@@ -153,7 +153,7 @@ exports.reporter = async page => {
     }
   };
   // FUNCTION DEFINITIONS END
-  // Make the screen shots.
+  // Make the screenshots.
   const shot = await shootAll();
   // If the shooting succeeded:
   if (shot) {

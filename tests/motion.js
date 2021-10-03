@@ -3,9 +3,9 @@ const {PNG} = require('pngjs');
 // Reports motion in a page.
 exports.reporter = async (page, delay, interval, count) => {
   // FUNCTION DEFINITIONS START
-  // Creates and returns a screen shot.
+  // Creates and returns a screenshot.
   const shoot = async (page, fileName) => {
-    // Make a screen shot as a buffer.
+    // Make a screenshot as a buffer.
     return await page.screenshot({
       fullPage: false,
       omitBackground: true,
@@ -13,15 +13,15 @@ exports.reporter = async (page, delay, interval, count) => {
       path: `${process.env.REPORTDIR}/motion/${fileName}.png`
     })
     .catch(error => {
-      console.log(`ERROR: SCREEN SHOT FOR ${fileName} FAILED: ${error.message}`);
+      console.log(`ERROR: Screen shot for ${fileName} failed(${error.message})`);
       return '';
     });
   };
-  // Recursively creates and returns screen shots.
+  // Recursively creates and returns screenshots.
   const shootAll = async (page, delay, interval, count, toDo, buffers) => {
     // Wait.
     await page.waitForTimeout(toDo === count ? delay : interval);
-    // Make a screen shot.
+    // Make a screenshot.
     const buffer = await shoot(
       page, `${page.url().replace(/^.+\/\/|\/$/g, '').replace(/\//g, '+')}-${count - toDo}`
     );
@@ -42,7 +42,7 @@ exports.reporter = async (page, delay, interval, count) => {
   // Returns a number rounded to 2 decimal digits.
   const round = (num, precision) => Number.parseFloat(num.toPrecision(precision));
   // FUNCTION DEFINITIONS END
-  // Make screen shots and get their image buffers.
+  // Make screenshots and get their image buffers.
   const shots = await shootAll(page, delay, interval, count, count, []);
   // If the shooting succeeded:
   if (shots.length === count) {

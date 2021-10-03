@@ -289,7 +289,7 @@ To make requests to Autotest, visit `localhost:3000/autotest` with a web browser
 Autotest outputs a report to your browser window, or a progress report if you are using a batch with two or more hosts. It also writes files into the project directory:
    - a report file for the script, or one report file per URL if there was a batch
    - image files if necessary for exhibits in reports (i.e. if the images cannot be linked to)
-   - image files from screen shots made in tests for motion
+   - image files from screenshots made in tests for motion
    - temporary files required by some tests
 
 When you have finished using Autotest, you stop it by entering <kbd>CTRL-c</kbd>.

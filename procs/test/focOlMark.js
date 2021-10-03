@@ -43,7 +43,7 @@ exports.focOlMark = async page => {
     }
   })
   .catch(error => {
-    console.log(`ERROR: FOCUS OUTLINE MARKING FAILED (${error.message})`);
+    console.log(`ERROR: Focus outline marking failed (${error.message})`);
     return '';
   });
   // Return the focused element and the status.

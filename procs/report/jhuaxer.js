@@ -127,6 +127,6 @@ const webify = relArray => {
     fs.copyFile('style.css', `${reportDir}/style.css`, fs.constants.COPYFILE_EXCL);
   }
   else {
-    console.log('ERROR: Related array of act reports is empty');
+    console.log('ERROR: Related array of act reports empty');
   }
 })();
