@@ -92,8 +92,8 @@ const tests = {
 // Browser types available in PlayWright.
 const browserTypeNames = {
   'chromium': 'Chrome',
-  'firefox': 'Firefox',
-  'webkit': 'Safari'
+  'webkit': 'Safari',
+  'firefox': 'Firefox'
 };
 // Items that may be waited for.
 const waitables = ['url', 'title', 'body'];
@@ -146,7 +146,7 @@ const launch = async typeName => {
     // Open the first page of the context.
     const page = await browserContext.newPage();
     // Wait until it is stable.
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     // Update the name of the current browser type.
     browserTypeName = typeName;
   }
@@ -392,15 +392,52 @@ const isValid = command => {
 };
 // Visits a URL.
 const visit = async (act, page) => {
-  // Visit the URL and wait until it is stable. (Wait for load times out on some URLs.)
+  // Identify the URL.
   const resolved = act.which.replace('__dirname', __dirname);
   requestedURL = resolved;
   try {
-    await page.goto(resolved, {
-      timeout: 25000,
+    // Visit it and wait until it is stable (wait for 'load' times out on some URLs).
+    let response = await page.goto(resolved, {
+      timeout: 20000,
       waitUntil: 'domcontentloaded'
     });
-    // Press the Esc key to dismiss any initial modal dialog.
+    let status = response.status();
+    // If the visit failed:
+    if (status !== 200) {
+      console.log(`ERROR visiting ${resolved}; status ${status}`);
+      // Try again.
+      response = await page.goto(resolved, {
+        timeout: 20000,
+        waitUntil: 'domcontentloaded'
+      });
+      status = response.status();
+      // If the visit failed:
+      if (status !== 200) {
+        console.log(`ERROR retrying visit to ${resolved}; status ${status}`);
+        // Launch another browser type.
+        const newBrowserName = Object.keys(browserTypeNames)
+        .find(name => name !== browserTypeName);
+        console.log(`Launching ${newBrowserName} instead`);
+        await launch(newBrowserName);
+        // Identify its only page as current.
+        page = browserContext.pages()[0];
+        // Visit the URL with it.
+        response = await page.goto(resolved, {
+          timeout: 20000,
+          waitUntil: 'domcontentloaded'
+        });
+        status = response.status();
+        // If the visit failed:
+        if (status !== 200) {
+          // Give up.
+          console.log(`ERROR visiting ${resolved}; status ${status}`);
+          act.result = `ERROR: Visit to ${resolved} failed with status ${status}`;
+          await page.goto('about:blank');
+          return;
+        }
+      }
+    }
+    // Press the Escape key to dismiss any initial modal dialog.
     await page.keyboard.press('Escape');
     // Add the resulting URL to the act, if any.
     if (act) {
@@ -409,6 +446,7 @@ const visit = async (act, page) => {
         console.log(`NOTICE: ${resolved} redirected to ${page.url()}`);
       }
     }
+    return page;
   }
   catch (error) {
     await page.goto('about:blank').catch(error => {
@@ -457,7 +495,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
         // If the command is a url:
         if (act.type === 'url') {
           // Visit it and wait until it is stable.
-          await visit(act, page);
+          page = await visit(act, page);
         }
         // Otherwise, if the act is a wait:
         else if (act.type === 'wait') {
@@ -612,25 +650,25 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
           // Otherwise, i.e. if redirection is prohibited but occurred:
           else {
             // Add the error result to the act.
-            act.result = `PAGE URL WRONG (${url})`;
+            act.result = `ERROR: Page URL wrong (${url})`;
           }
         }
         // Otherwise, i.e. if the required page URL does not exist:
         else {
           // Add an error result to the act.
-          act.result = 'PAGE HAS NO URL';
+          act.result = 'ERROR: Page has no URL';
         }
       }
       // Otherwise, i.e. if no page exists:
       else {
         // Add an error result to the act.
-        act.result = 'NO PAGE IDENTIFIED';
+        act.result = 'ERROR: No page identified';
       }
     }
     // Otherwise, i.e. if the command is invalid:
     else {
       // Add an error result to the act.
-      act.result = `INVALID COMMAND OF TYPE ${act.type}`;
+      act.result = `ERROR: Invalid command of type ${act.type}`;
     }
     // Update the report file.
     await reportFileUpdate(reportDir, reportSuffix, report, false);
