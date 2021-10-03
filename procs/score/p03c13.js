@@ -226,8 +226,8 @@ exports.scorer = acts => {
       else if (which === 'hover') {
         facts = test.result && test.result.totals;
         if (facts) {
-          rules.hover = 'multiply elements adding visible content when hovered by 4, elements made visible by 2; sum';
-          deficit.hover = 4 * facts.triggers + 2 * facts.targets;
+          rules.hover = 'multiply elements adding visible content when hovered by 4, elements made visible by 2, elements with opacity changes by 1; sum';
+          deficit.hover = 4 * facts.triggers + 2 * facts.visibilityTargets + facts.opacityTargets;
         }
         else {
           inferences.hover = 150;

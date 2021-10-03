@@ -13,9 +13,9 @@ require('dotenv').config();
 // Directory.
 const dir = `${process.env.REPORTDIR}/${process.argv[2]}`;
 // Get the data.
-const dataJSON = fs.readFileSync(`${dir}/deficits.json`, 'utf8');
+const dataJSON = fs.readFileSync(`${dir}/deficit.json`, 'utf8');
 const data = JSON.parse(dataJSON);
-const result = data.result;
+const result = data.deficit;
 // Identify the containing HTML code.
 const tableStartLines = [
   '<table class="allBorder">',
@@ -31,11 +31,11 @@ const tableEndLines = [
   '</table>'
 ];
 // Calibrate the bar widths.
-const maxDeficit = result.reduce((max, thisItem) => Math.max(max, thisItem.deficits.total), 0);
+const maxDeficit = result.reduce((max, thisItem) => Math.max(max, thisItem.total), 0);
 // Compile the HTML code representing the data.
 const tableMidLines = result.map(item => {
   const pageCell = `<th><a href="${item.url}">${item.org}</a></th>`;
-  const numCell = `<td><a href="data/${item.fileName}">${item.deficits.total}</a></td>`;
+  const numCell = `<td><a href="data/${item.fileName}">${item.deficit.total}</a></td>`;
   const barWidth = maxDeficit ? 100 * item.deficits.total / maxDeficit : 0;
   const bar = `<rect height="100%" width="${barWidth}%" fill="red"></rect>`;
   const barCell = `<td><svg width="100%" height="1rem">${bar}</svg></td>`;

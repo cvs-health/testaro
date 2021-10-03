@@ -30,15 +30,15 @@ fileNames.forEach((fn, index) => {
     fileName: fn,
     org: orgData.what,
     url: orgData.which,
-    deficits: deficitData.result
+    deficit: deficitData.result.deficit
   };
   result.push(summary);
 });
-result.sort((a, b) => a.deficits.total - b.deficits.total);
+result.sort((a, b) => a.deficit.total - b.deficit.total);
 const data = {
   batchData,
   result
 };
 fs.writeFileSync(
-  `${dir}/deficits.json`, `${JSON.stringify(data, null, 2)}\n`
+  `${dir}/deficit.json`, `${JSON.stringify(data, null, 2)}\n`
 );

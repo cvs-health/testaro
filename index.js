@@ -15,7 +15,7 @@ const https = require('https');
 const {commands} = require('./commands');
 // ########## CONSTANTS
 // Set debug to true to add debugging features.
-const debug = false;
+const debug = true;
 // Set waits to a positive number to insert delays (in ms).
 const waits = 0;
 const protocol = process.env.PROTOCOL || 'https';
@@ -397,29 +397,25 @@ const visit = async (act, page) => {
   requestedURL = resolved;
   try {
     await page.goto(resolved, {
-      timeout: 20000,
-      waitUntil: debug ? 'networkidle' : 'domcontentloaded'
+      timeout: 25000,
+      waitUntil: 'domcontentloaded'
     });
     // Press the Esc key to dismiss any initial modal dialog.
     await page.keyboard.press('Escape');
     // Add the resulting URL to the act, if any.
     if (act) {
       act.result = page.url();
-      if (act.isStrict && act.result !== resolved) {
-        console.log(`ERROR VISITING ${resolved}; REDIRECTED TO ${page.url()}`);
+      if (act.result !== resolved) {
+        console.log(`NOTICE: ${resolved} redirected to ${page.url()}`);
       }
     }
   }
   catch (error) {
     await page.goto('about:blank').catch(error => {
-      console.log(`ERROR OPENING BLANK PAGE (${error.message})`);
+      console.log(`ERROR opening blank page (${error.message})`);
     });
-    if (act) {
-      act.result = `ERROR VISITING ${resolved}: ${error.message}`;
-    }
-    else {
-      console.log(`ERROR VISITING ${resolved}`);
-    }
+    act.result = `ERROR: visit to ${resolved} failed`;
+    console.log(`ERROR: visit to ${resolved} failed (${error.message})`);
   }
 };
 // Updates the report file.
@@ -437,6 +433,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
     const act = acts[actIndex];
     // If it is valid:
     if (isValid(act)) {
+      console.log(`>>>> ${act.type}`);
       // If the command is a launch:
       if (act.type === 'launch') {
         // Launch the specified browser, creating a browser context and a page in it.
@@ -514,6 +511,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
             }
             // Otherwise, if the act is a test:
             else if (act.type === 'test') {
+              console.log(`>> ${act.which}`);
               // Add a description of the test to the act.
               act.what = tests[act.which];
               // Initialize the arguments.
@@ -903,7 +901,7 @@ const requestHandler = (request, response) => {
                     if (hosts.length) {
                       // Identify the first host.
                       const firstHost = hosts[0];
-                      console.log(`>>>>> About to process ${firstHost.what} in batch`);
+                      console.log(`>>>>>> ${firstHost.what}`);
                       // Replace all hosts in the script with it.
                       commands.forEach(command => {
                         if (command.type === 'url') {

@@ -137,12 +137,16 @@ exports.focusables = async (page, operation) => {
     */
     const focusAndStatus = await op(page, lastNavKey);
     const focus = focusAndStatus[0];
+    if (focus) {
+      console.log(`> Focus is on ${await focus.textContent()}`);
+    }
     const status = focusAndStatus[1];
     // FUNCTION DEFINITIONS START
     // Identifies and presses the next navigation key and processes the focused element.
     const doNext = async () => {
       // Identify the next navigation key to be pressed.
       const nextKey = await nextNavKey(lastNavKey, focus, status);
+      console.log(`> Next key is ${nextKey}`);
       // If it exists:
       if (nextKey) {
         // Press it.
