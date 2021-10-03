@@ -390,6 +390,31 @@ const isValid = command => {
     return false;
   }
 };
+// Makes a final effort to visit a URL with a different browser type.
+const rescueVisit = async (act, page, url) => {
+  // Launch another browser type.
+  const newBrowserName = Object.keys(browserTypeNames)
+  .find(name => name !== browserTypeName);
+  console.log(`Launching ${newBrowserName} instead`);
+  await launch(newBrowserName);
+  // Identify its only page as current.
+  page = browserContext.pages()[0];
+  // Visit the URL with it.
+  const response = await page.goto(url, {
+    timeout: 20000,
+    waitUntil: 'domcontentloaded'
+  });
+  const status = response.status();
+  console.log(`Status is ${status}`);
+  // If the visit failed:
+  if (status !== 200) {
+    // Give up.
+    console.log(`ERROR visiting ${url}; status ${status}`);
+    act.result = `ERROR: Visit to ${url} failed with status ${status}`;
+    await page.goto('about:blank');
+  }
+  return [page, status];
+};
 // Visits a URL.
 const visit = async (act, page) => {
   // Identify the URL.
@@ -414,33 +439,15 @@ const visit = async (act, page) => {
       // If the visit failed:
       if (status !== 200) {
         console.log(`ERROR retrying visit to ${resolved}; status ${status}`);
-        // Launch another browser type.
-        const newBrowserName = Object.keys(browserTypeNames)
-        .find(name => name !== browserTypeName);
-        console.log(`Launching ${newBrowserName} instead`);
-        await launch(newBrowserName);
-        // Identify its only page as current.
-        page = browserContext.pages()[0];
-        // Visit the URL with it.
-        response = await page.goto(resolved, {
-          timeout: 20000,
-          waitUntil: 'domcontentloaded'
-        });
-        status = response.status();
-        // If the visit failed:
-        if (status !== 200) {
-          // Give up.
-          console.log(`ERROR visiting ${resolved}; status ${status}`);
-          act.result = `ERROR: Visit to ${resolved} failed with status ${status}`;
-          await page.goto('about:blank');
-          return;
-        }
+        // Try again with another browser type.
+        [page, status] = await rescueVisit(act, page, resolved);
       }
     }
-    // Press the Escape key to dismiss any initial modal dialog.
-    await page.keyboard.press('Escape');
-    // Add the resulting URL to the act, if any.
-    if (act) {
+    // If one of the visits succeeded:
+    if (status === 200) {
+      // Press the Escape key to dismiss any initial modal dialog.
+      await page.keyboard.press('Escape');
+      // Add the resulting URL to the act.
       act.result = page.url();
       if (act.result !== resolved) {
         console.log(`NOTICE: ${resolved} redirected to ${page.url()}`);
@@ -449,11 +456,9 @@ const visit = async (act, page) => {
     return page;
   }
   catch (error) {
-    await page.goto('about:blank').catch(error => {
-      console.log(`ERROR opening blank page (${error.message})`);
-    });
-    act.result = `ERROR: visit to ${resolved} failed`;
     console.log(`ERROR: visit to ${resolved} failed (${error.message})`);
+    const pageAndStatus = await rescueVisit(act, page, resolved);
+    return pageAndStatus[0];
   }
 };
 // Updates the report file.
