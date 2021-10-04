@@ -13,7 +13,11 @@ exports.reporter = async (page, withItems, withNewContent) => {
   const result = await Promise.race([
     getCompliance(content, nowLabel),
     new Promise(resolve => setTimeout(() => resolve(''), 15000))
-  ]);
+  ])
+  .catch(error => {
+    console.log(`ERROR running ibm test (${error.message})`);
+    return null;
+  });
   // Identify a report of the result.
   const data = {};
   if (result) {
