@@ -390,12 +390,19 @@ const isValid = command => {
     return false;
   }
 };
+// Adds visit information to an act.
+const addURL = (act, requestedURL, url) => {
+  act.result = url;
+  if (url !== requestedURL) {
+    console.log(`NOTICE: ${requestedURL} redirected to ${url}`);
+  }
+};
 // Makes a final effort to visit a URL with a different browser type.
 const rescueVisit = async (act, page, url) => {
   // Launch another browser type.
   const newBrowserName = Object.keys(browserTypeNames)
   .find(name => name !== browserTypeName);
-  console.log(`Launching ${newBrowserName} instead`);
+  console.log(`>> Launching ${newBrowserName} instead`);
   await launch(newBrowserName);
   // Identify its only page as current.
   page = browserContext.pages()[0];
@@ -405,9 +412,17 @@ const rescueVisit = async (act, page, url) => {
     waitUntil: 'domcontentloaded'
   });
   const status = response.status();
-  console.log(`Status is ${status}`);
-  // If the visit failed:
-  if (status !== 200) {
+  console.log(`>> Status is ${status}`);
+  // If the visit succeeded:
+  if (status === 200) {
+    // Add the resulting URL to the act.
+    act.result = page.url();
+    if (act.result !== url) {
+      console.log(`NOTICE: ${url} redirected to ${act.result}`);
+    }
+  }
+  // Otherwise, i.e. if the visit failed:
+  else {
     // Give up.
     console.log(`ERROR visiting ${url}; status ${status}`);
     act.result = `ERROR: Visit to ${url} failed with status ${status}`;
@@ -457,8 +472,11 @@ const visit = async (act, page) => {
   }
   catch (error) {
     console.log(`ERROR: visit to ${resolved} failed (${error.message})`);
-    const pageAndStatus = await rescueVisit(act, page, resolved);
-    return pageAndStatus[0];
+    const [page, status] = await rescueVisit(act, page, resolved);
+    if (status === 200) {
+      addURL(act, resolved, page.url());
+    }
+    return page;
   }
 };
 // Updates the report file.
