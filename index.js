@@ -410,6 +410,10 @@ const rescueVisit = async (act, page, url) => {
   const response = await page.goto(url, {
     timeout: 20000,
     waitUntil: 'domcontentloaded'
+  })
+  .catch(error => {
+    console.log(`ERROR visiting ${url} (${error.message})`);
+    return [null, null];
   });
   const status = response.status();
   console.log(`>> Status is ${status}`);
