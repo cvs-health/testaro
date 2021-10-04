@@ -10,12 +10,12 @@ exports.jsHandleProps = async (jsHandle, areElements) => {
     const propHandle = jsHandleMap.get(i.toString());
     // Add its value to the result.
     if (areElements[i]) {
-      props.push(propHandle ? await propHandle.asElement() : null);
+      props.push(propHandle ? propHandle.asElement() : null);
     }
     else {
-      props.push(propHandle ? await propHandle.jsonValue() : null);
+      props.push(propHandle ? propHandle.jsonValue() : null);
     }
   }
   // Return the result.
-  return props;
+  return Promise.all(props);
 };
