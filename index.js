@@ -472,11 +472,11 @@ const visit = async (act, page) => {
   }
   catch (error) {
     console.log(`ERROR: visit to ${resolved} failed (${error.message})`);
-    const [page, status] = await rescueVisit(act, page, resolved);
+    const [newPage, status] = await rescueVisit(act, page, resolved);
     if (status === 200) {
-      addURL(act, resolved, page.url());
+      addURL(act, resolved, newPage.url());
     }
-    return page;
+    return newPage;
   }
 };
 // Updates the report file.
