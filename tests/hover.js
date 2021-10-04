@@ -34,7 +34,11 @@ exports.reporter = async (page, withItems) => {
       // Identify the first of them.
       const firstTrigger = triggers[0];
       const firstTriggerTag = firstTrigger.tagName;
-      const tagNameJSHandle = await firstTrigger.getProperty('tagName');
+      const tagNameJSHandle = await firstTrigger.getProperty('tagName')
+      .catch(error =>{
+        console.log(`ERROR getting trigger tag name (${error.message})`);
+        return 1;
+      });
       const tagName = await tagNameJSHandle.jsonValue();
       // Identify the root of a subtree likely to contain disclosed elements.
       let root = firstTrigger;
