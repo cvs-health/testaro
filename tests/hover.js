@@ -5,7 +5,11 @@ exports.reporter = async (page, withItems) => {
   // Identify the elements that are likely to trigger disclosures on hover.
   const triggers = await page.$$(
     'body a:visible, body button:visible, body li:visible, body [onmouseenter]:visible, body [onmouseover]:visible'
-  );
+  )
+  .catch(error => {
+    console.log(`ERROR getting hover triggers (${error.message})`);
+    return [];
+  });
   // Identify the selectors of active elements likely to be disclosed by a hover.
   const targetSelectors = ['a', 'button', 'input', '[role=menuitem]', 'span']
   .map(selector => `${selector}:visible`)
