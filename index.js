@@ -241,7 +241,7 @@ const render = (path, stage, which, query, response) => {
       return '';
     }
     else {
-      serveError('ERROR: Invalid stage.', response);
+      serveError('ERROR: Invalid stage', response);
     }
   }
 };
@@ -829,7 +829,7 @@ const requestHandler = (request, response) => {
       }
       // Otherwise, i.e. if the URL is invalid:
       else {
-        serveMessage('ERROR: Invalid URL.', response);
+        serveMessage('ERROR: Invalid URL', response);
       }
     }
     // Otherwise, if the request method is POST:
@@ -886,7 +886,7 @@ const requestHandler = (request, response) => {
         // Otherwise, i.e. if no scripts exist in the script directory:
         else {
           // Serve an error message.
-          serveMessage(`ERROR: No scripts in ${scriptDir}.`, response);
+          serveMessage(`ERROR: No scripts in ${scriptDir}`, response);
         }
       }
       // Otherwise, if the request submitted the choice form:
@@ -978,20 +978,20 @@ const requestHandler = (request, response) => {
                 // Otherwise, i.e. if the batch is invalid:
                 else {
                   // Serve an error message.
-                  serveMessage(`ERROR: Batch ${batchName} invalid.`, response);
+                  serveMessage(`ERROR: Batch ${batchName} invalid`, response);
                 }
               }
               // Otherwise, i.e. if the batch has no content:
               else {
                 // Serve an error message.
-                serveMessage(`ERROR: Batch ${batchName} empty.`, response);
+                serveMessage(`ERROR: Batch ${batchName} empty`, response);
               }
             }
           }
           // Otherwise, i.e. if the script is invalid:
           else {
             // Serve an error message.
-            serveMessage(`ERROR: Script ${scriptName} invalid.`, response);
+            serveMessage(`ERROR: Script ${scriptName} invalid`, response);
           }
         }
         // Otherwise, i.e. if the script has no content:
@@ -1003,7 +1003,7 @@ const requestHandler = (request, response) => {
       // Otherwise, i.e. if the request is invalid:
       else {
         // Serve an error message.
-        serveMessage('ERROR: Form submission invalid.', response);
+        serveMessage('ERROR: Form submission invalid', response);
       }
     }
   });

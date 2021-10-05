@@ -13,7 +13,7 @@ exports.reporter = async (page, delay, interval, count) => {
       path: `${process.env.REPORTDIR}/motion/${fileName}.png`
     })
     .catch(error => {
-      console.log(`ERROR: Screen shot for ${fileName} failed(${error.message})`);
+      console.log(`ERROR: Screenshot for ${fileName} failed(${error.message})`);
       return '';
     });
   };

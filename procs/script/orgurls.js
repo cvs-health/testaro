@@ -100,11 +100,11 @@ const createData = async () => {
       console.log(`File ${dataDir}/orgurls.json created.`);
     }
     else {
-      console.log('ERROR: No organization names found.');
+      console.log('ERROR: No organization names found');
     }
   }
   else {
-    console.log('ERROR: Organization names file empty.');
+    console.log('ERROR: Organization names file empty');
   }
 };
 // ########## OPERATION
