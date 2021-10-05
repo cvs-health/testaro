@@ -20,12 +20,12 @@ const data = JSON.parse(dataJSON);
 const result = data.result;
 // Identify the containing HTML code.
 const axeHead0 = withAxe ? '<th colspan="2">Axe as a</th>' : '';
-const axeHead1 = withAxe ? '<tr><th>Number</th><th>Bar</th>' : '';
+const axeHead1 = withAxe ? '<th>Number</th><th>Bar</th>' : '';
 const tableStartLines = [
   '<table class="allBorder">',
   '  <caption>Accessibility deficits of web pages</caption>',
   '  <thead>',
-  `    <tr><th rowspan="2">Page</th><th colspan="2">Deficit as a</th></tr>${axeHead0}`,
+  `    <tr><th rowspan="2">Page</th><th colspan="2">Deficit as a</th>${axeHead0}</tr>`,
   `    <tr><th>Number</th><th>Bar</th>${axeHead1}`,
   '  </thead>',
   `  <tbody class="secondCellRight${withAxe ? ' fourthCellRight' : ''}">`
