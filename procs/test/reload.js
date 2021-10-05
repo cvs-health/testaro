@@ -1,28 +1,42 @@
 // Tries to reload.
 const tryReload = async (page, url, timeout, awaitIdle) => {
   const waitUntil = awaitIdle ? 'networkidle' : 'domcontentloaded';
+  // Reload.
   const response = await page.reload(url, {
     timeout,
     waitUntil
   })
+  // If the reload times out:
   .catch(error => {
     console.log(`ERROR: Reload timed out before ${waitUntil} (${error.message})`);
+    // Return a failure.
     return null;
   });
-  const httpStatus = response.status();
-  if (httpStatus === 200) {
-    const actualURL = page.url();
-    if (actualURL !== url) {
-      console.log(`ERROR: Reload redirected from ${url} to ${actualURL}`);
+  // If the reload succeeded:
+  if (response) {
+    const httpStatus = response.status();
+    // If the HTTP status was success or cache-is-current:
+    if ([200, 304].includes(httpStatus)) {
+      // Identify the URL.
+      const actualURL = page.url();
+      // If it has changed:
+      if (actualURL !== url) {
+        console.log(`ERROR: Reload redirected from ${url} to ${actualURL}`);
+        // Return a failure.
+        return null;
+      }
+      // Otherwise, i.e. if the URL has not changed:
+      else {
+        // Return a success.
+        return true;
+      }
+    }
+    // Otherwise, i.e. if the HTTP status was wrong:
+    else {
+      console.log(`ERROR: Reload got status ${httpStatus}`);
+      // Return a failure.
       return null;
     }
-    else {
-      return true;
-    }
-  }
-  else {
-    console.log(`ERROR: Reload got status ${httpStatus}`);
-    return null;
   }
 };
 // Reloads a page.
