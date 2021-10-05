@@ -390,97 +390,78 @@ const isValid = command => {
     return false;
   }
 };
-// Adds visit information to an act.
-const addURL = (act, requestedURL, url) => {
-  act.result = url;
-  if (url !== requestedURL) {
-    console.log(`NOTICE: ${requestedURL} redirected to ${url}`);
-  }
-};
-// Makes a final effort to visit a URL with a different browser type.
-const rescueVisit = async (act, page, url) => {
-  // Launch another browser type.
-  const newBrowserName = Object.keys(browserTypeNames)
-  .find(name => name !== browserTypeName);
-  console.log(`>> Launching ${newBrowserName} instead`);
-  await launch(newBrowserName);
-  // Identify its only page as current.
-  page = browserContext.pages()[0];
-  // Visit the URL with it.
+// Tries to visit a URL.
+const goto = async (page, url, timeout, awaitIdle, isStrict) => {
+  const waitUntil = awaitIdle ? 'networkidle' : 'domcontentloaded';
   const response = await page.goto(url, {
-    timeout: 20000,
-    waitUntil: 'domcontentloaded'
+    timeout,
+    waitUntil
   })
   .catch(error => {
-    console.log(`ERROR visiting ${url} (${error.message})`);
-    return [null, null];
+    console.log(`ERROR: Visit to ${url} timed out before ${waitUntil} (${error.message})`);
+    return null;
   });
-  const status = response.status();
-  console.log(`>> Status is ${status}`);
-  // If the visit succeeded:
-  if (status === 200) {
-    // Add the resulting URL to the act.
-    act.result = page.url();
-    if (act.result !== url) {
-      console.log(`NOTICE: ${url} redirected to ${act.result}`);
+  const httpStatus = response.status();
+  if (httpStatus === 200) {
+    const actualURL = page.url();
+    if (isStrict && actualURL !== url) {
+      console.log(`ERROR: Visit to ${url} redirected to ${actualURL}`);
+      return null;
+    }
+    else {
+      return response;
     }
   }
-  // Otherwise, i.e. if the visit failed:
   else {
-    // Give up.
-    console.log(`ERROR visiting ${url}; status ${status}`);
-    act.result = `ERROR: Visit to ${url} failed with status ${status}`;
-    await page.goto('about:blank');
+    console.log(`ERROR: Visit to ${url} got status ${httpStatus}`);
+    return null;
   }
-  return [page, status];
 };
-// Visits a URL.
-const visit = async (act, page) => {
+// Visits the URL that is the value of the “which” property of an act.
+const visit = async (act, page, isStrict) => {
   // Identify the URL.
   const resolved = act.which.replace('__dirname', __dirname);
   requestedURL = resolved;
-  try {
-    // Visit it and wait until it is stable (wait for 'load' times out on some URLs).
-    let response = await page.goto(resolved, {
-      timeout: 20000,
-      waitUntil: 'domcontentloaded'
-    });
-    let status = response.status();
-    // If the visit failed:
-    if (status !== 200) {
-      console.log(`ERROR visiting ${resolved}; status ${status}`);
-      // Try again.
-      response = await page.goto(resolved, {
-        timeout: 20000,
-        waitUntil: 'domcontentloaded'
-      });
-      status = response.status();
-      // If the visit failed:
-      if (status !== 200) {
-        console.log(`ERROR retrying visit to ${resolved}; status ${status}`);
-        // Try again with another browser type.
-        [page, status] = await rescueVisit(act, page, resolved);
+  // Visit it and wait 15 seconds or until the network is idle.
+  let response = await goto(page, requestedURL, 15000, true, isStrict);
+  // If the visit fails:
+  if (! response) {
+    // Try again, but waiting until the DOM is loaded.
+    response = await goto(page, requestedURL, 15000, false, isStrict);
+    // If the visit fails:
+    if (! response) {
+      // Launch another browser type.
+      const newBrowserName = Object.keys(browserTypeNames)
+      .find(name => name !== browserTypeName);
+      console.log(`>> Launching ${newBrowserName} instead`);
+      await launch(newBrowserName);
+      // Identify its only page as current.
+      page = browserContext.pages()[0];
+      // Try again, waiting until the network is idle.
+      response = await goto(page, requestedURL, 15000, true, isStrict);
+      // If the visit fails:
+      if (! response) {
+        // Try again, but waiting until the DOM is loaded.
+        response = await goto(page, requestedURL, 15000, false, isStrict);
+        // If the visit fails:
+        if (! response) {
+          // Give up.
+          console.log(`ERROR: Visits to ${requestedURL} failed`);
+          act.result = `ERROR: Visit to ${requestedURL} failed`;
+          await page.goto('about:blank');
+          return null;
+        }
       }
     }
-    // If one of the visits succeeded:
-    if (status === 200) {
-      // Press the Escape key to dismiss any initial modal dialog.
-      await page.keyboard.press('Escape');
-      // Add the resulting URL to the act.
-      act.result = page.url();
-      if (act.result !== resolved) {
-        console.log(`NOTICE: ${resolved} redirected to ${page.url()}`);
-      }
-    }
-    return page;
   }
-  catch (error) {
-    console.log(`ERROR: visit to ${resolved} failed (${error.message})`);
-    const [newPage, status] = await rescueVisit(act, page, resolved);
-    if (status === 200) {
-      addURL(act, resolved, newPage.url());
-    }
-    return newPage;
+  // If one of the visits succeeded:
+  if (response) {
+    // Press the Escape key to dismiss any initial modal dialog.
+    await page.keyboard.press('Escape');
+    // Add the resulting URL to the act.
+    act.result = page.url();
+    // Return the page.
+    return page;
   }
 };
 // Updates the report file.
@@ -522,7 +503,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
         // If the command is a url:
         if (act.type === 'url') {
           // Visit it and wait until it is stable.
-          page = await visit(act, page);
+          page = await visit(act, page, report.strict);
         }
         // Otherwise, if the act is a wait:
         else if (act.type === 'wait') {
