@@ -48,9 +48,9 @@ const tableMidLines = result.map(item => {
   const barCell = `<td><svg width="100%" height="1rem">${bar}</svg></td>`;
   let axeNumCell = '';
   let axeBarCell = '';
+  const axeDeficit = item.deficit.axe;
   if (withAxe && typeof axeDeficit === 'number') {
-    const axeDeficit = item.deficit.axe;
-    axeNumCell = `<td><a href="data/${item.fileName}">${axeDeficit}</a></td>`;
+    axeNumCell = `<td>${axeDeficit}</td>`;
     const axeBarWidth = maxAxeDeficit ? 100 * axeDeficit / maxAxeDeficit : 0;
     const axeBar = `<rect height="100%" width="${axeBarWidth}%" fill="red"></rect>`;
     axeBarCell = `<td><svg width="100%" height="1rem">${axeBar}</svg></td>`;
