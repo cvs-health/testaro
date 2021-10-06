@@ -2,7 +2,7 @@
 const fs = require('fs/promises');
 const {getCompliance} = require('accessibility-checker');
 // Returns results of an IBM test.
-exports.reporter = async (page, withItems, withNewContent) => {
+exports.reporter = async (page, withItems, withNewContent = true) => {
   /*
     Identify whether this test should refetch the page. Some pages crash this test unless
     withNewContent is true.

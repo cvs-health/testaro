@@ -949,6 +949,21 @@ const requestHandler = (request, response) => {
                   && Array.isArray(hosts)
                   && hosts.every(host => host.which && host.what && isURL(host.which))
                 ) {
+                  // Inject an alternate ibm test if necessary.
+                  const ibmIndexes = commands.map((command, index) =>
+                    command.type === 'test' && command.which === 'ibm' ? index : -1
+                  )
+                  .filter(index => index > -1);
+                  const firstIndex = ibmIndexes[0];
+                  const firstCommand = commands[firstIndex];
+                  if (
+                    ibmIndexes.length === 1
+                    && ! Object.prototype.hasOwnProperty.call(firstCommand, 'withNewContent')
+                  ) {
+                    firstCommand.withNewContent = true;
+                    commands.splice(firstIndex + 1, 0, Object.assign({}, firstCommand));
+                    commands[firstIndex + 1].withNewContent = false;
+                  }
                   // Inject url commands where necessary.
                   let injectMore = true;
                   while (injectMore) {

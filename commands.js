@@ -44,7 +44,7 @@ exports.commands = {
       'Perform an IBM test (withNewContent: whether to run on the URL, not the existing content)',
       {
         withItems: [true, 'boolean'],
-        withNewContent: [true, 'boolean']
+        withNewContent: [false, 'boolean']
       }
     ],
     labClash: [
