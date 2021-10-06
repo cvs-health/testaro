@@ -403,7 +403,7 @@ const goto = async (page, url, timeout, awaitIdle, isStrict) => {
   });
   if (response) {
     const httpStatus = response.status();
-    if (httpStatus === 200) {
+    if ([200, 304].includes(httpStatus)) {
       const actualURL = page.url();
       if (isStrict && actualURL !== url) {
         console.log(`ERROR: Visit to ${url} redirected to ${actualURL}`);
