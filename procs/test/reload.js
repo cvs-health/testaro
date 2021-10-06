@@ -47,7 +47,7 @@ exports.reload = async page => {
   let success = await tryReload(page, url, 15000, true);
   // If the reload fails:
   if (! success) {
-    // Try again, but waiting until the DOM is loaded.
+    // Try again, but wait until the DOM is loaded.
     success = await tryReload(page, url, 15000, false);
     // If the reload fails:
     if (! success) {
