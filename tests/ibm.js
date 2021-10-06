@@ -9,18 +9,31 @@ exports.reporter = async (page, withItems, withNewContent) => {
   */
   const content = withNewContent ? page.url() : await page.content();
   // Run the test and get the result. Delete the report file.
-  const nowLabel = (new Date()).toISOString().slice(0, 19);
-  const result = await Promise.race([
+  let nowLabel = (new Date()).toISOString().slice(0, 19);
+  let result = await Promise.race([
     getCompliance(content, nowLabel),
-    new Promise(resolve => setTimeout(() => resolve(''), 15000))
+    new Promise(resolve => setTimeout(() => resolve(''), 20000))
   ])
   .catch(error => {
     console.log(`ERROR running ibm test (${error.message})`);
     return null;
   });
-  // Identify a report of the result.
   const data = {};
+  if (! result) {
+    console.log(' ERROR: ibm test failed; trying again');
+    nowLabel = (new Date()).toISOString().slice(0, 19);
+    result = await Promise.race([
+      getCompliance(content, nowLabel),
+      new Promise(resolve => setTimeout(() => resolve(''), 20000))
+    ])
+    .catch(error => {
+      console.log(`ERROR: ibm retest failed (${error.message})`);
+      return null;
+    });
+  }
+  // If the test succeeded on either the first or second try:
   if (result) {
+    // Identify a report of the result.
     fs.rm('ibmtemp', {recursive: true});
     data.totals = result.report.summary.counts;
     if (withItems) {
@@ -37,7 +50,7 @@ exports.reporter = async (page, withItems, withNewContent) => {
     }
   }
   else {
-    data.error = 'ERROR: ibm test failed';
+    data.error = 'ERROR: ibm test failed again';
   }
   // Return it.
   return {result: data};

@@ -428,7 +428,7 @@ const visit = async (act, page, isStrict) => {
   const resolved = act.which.replace('__dirname', __dirname);
   requestedURL = resolved;
   // Visit it and wait 15 seconds or until the network is idle.
-  let response = await goto(page, requestedURL, 15000, true, isStrict);
+  let response = await goto(page, requestedURL, 20000, true, isStrict);
   // If the visit fails:
   if (! response) {
     // Try again, but waiting until the DOM is loaded.
@@ -923,6 +923,7 @@ const requestHandler = (request, response) => {
             && commands[1].type === 'url'
             && isURL(commands[1].which)
           ) {
+            console.log(`>>>>>>>> ${scriptName}: ${what}`);
             // If there is no batch:
             if (batchName === 'None') {
               // Process the script, using the commands as the initial acts.
