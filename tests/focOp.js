@@ -154,8 +154,6 @@ exports.reporter = async (page, withItems, revealAll) => {
     await compile(fNotO, totals, items, 'focusableNotOperable', true, false);
     await compile(oNotF, totals, items, 'operableNotFocusable', false, true);
     await compile(fAndO, totals, items, 'focusableAndOperable', true, true);
-    // Reload the page to undo the focus and attribute changes.
-    await require('../procs/test/reload').reload(page);
     // Return it.
     return {result: data};
   }

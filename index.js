@@ -401,19 +401,24 @@ const goto = async (page, url, timeout, awaitIdle, isStrict) => {
     console.log(`ERROR: Visit to ${url} timed out before ${waitUntil} (${error.message})`);
     return null;
   });
-  const httpStatus = response.status();
-  if (httpStatus === 200) {
-    const actualURL = page.url();
-    if (isStrict && actualURL !== url) {
-      console.log(`ERROR: Visit to ${url} redirected to ${actualURL}`);
-      return null;
+  if (response) {
+    const httpStatus = response.status();
+    if (httpStatus === 200) {
+      const actualURL = page.url();
+      if (isStrict && actualURL !== url) {
+        console.log(`ERROR: Visit to ${url} redirected to ${actualURL}`);
+        return null;
+      }
+      else {
+        return response;
+      }
     }
     else {
-      return response;
+      console.log(`ERROR: Visit to ${url} got status ${httpStatus}`);
+      return null;
     }
   }
   else {
-    console.log(`ERROR: Visit to ${url} got status ${httpStatus}`);
     return null;
   }
 };

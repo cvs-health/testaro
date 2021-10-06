@@ -41,8 +41,6 @@ exports.reporter = async (page, withItems, revealAll) => {
   await tallyTags(page, focOutN, bad, items, 'outlineMissing', withItems);
   await tallyTags(page, focOutY, good, items, 'outlinePresent', withItems);
   data.totals.total = bad.total + good.total;
-  // Reload the page to undo the focus and attribute changes.
-  await require('../procs/test/reload').reload(page);
   // Return the data.
   return {result: data};
 };

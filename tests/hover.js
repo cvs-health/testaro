@@ -151,7 +151,7 @@ exports.reporter = async (page, withItems) => {
           }
         }
         catch (error) {
-          console.log(`ERROR hovering (${error.message})`);
+          console.log('ERROR hovering');
         }
         triggerTag = firstTriggerTag;
       }
@@ -161,8 +161,6 @@ exports.reporter = async (page, withItems) => {
   };
   // Find and document the hover-triggered disclosures.
   await find(triggers);
-  // Reload the page to undo the hover-triggered content changes.
-  await require('../procs/test/reload').reload(page);
   // Return the result.
   return {result: data};
 };
