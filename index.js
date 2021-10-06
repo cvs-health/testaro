@@ -69,7 +69,6 @@ const tests = {
   focInd: 'tabulate and list focusable elements with and without focus indicators',
   focOl: 'tabulate and list focusable elements with and without focus outlines',
   focOp: 'tabulate and list visible focusable and operable elements',
-  focOpAll: 'tabulate and list focusable and operable elements after making all visible',
   hover: 'tabulate and list hover-caused context additions',
   ibm: 'conduct and report an IBM test',
   imgAlt: 'list the values of the alt attributes of img elements',
@@ -89,6 +88,9 @@ const tests = {
   tblAc: 'tabulate and list active elements contained by tables',
   wave: 'conduct and report a WAVE test'
 };
+const domChangers = new Set([
+  'axe', 'focInd', 'focOl', 'focOp', 'hover', 'ibm', 'state', 'wave'
+]);
 // Browser types available in PlayWright.
 const browserTypeNames = {
   'chromium': 'Chrome',
@@ -947,6 +949,26 @@ const requestHandler = (request, response) => {
                   && Array.isArray(hosts)
                   && hosts.every(host => host.which && host.what && isURL(host.which))
                 ) {
+                  // Inject url commands where necessary.
+                  let injectMore = true;
+                  while (injectMore) {
+                    const injectIndex = commands.findIndex((command, index) =>
+                      index < commands.length - 1
+                      && command.type === 'test'
+                      && commands[index + 1].type === 'test'
+                      && domChangers.has(command.which)
+                    );
+                    if (injectIndex === -1) {
+                      injectMore = false;
+                    }
+                    else {
+                      commands.splice(injectIndex + 1, 0, {
+                        type: 'url',
+                        which: 'https://*',
+                        what: 'URL'
+                      });
+                    }
+                  }
                   // FUNCTION DEFINITION START
                   // Recursively process commands on the hosts of a batch.
                   const doBatch = async (hosts, isFirst, hostIndex) => {
