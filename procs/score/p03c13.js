@@ -13,7 +13,8 @@ exports.scorer = acts => {
     focOl: '',
     focOp: '',
     hover: '',
-    ibm: '',
+    ibm0: '',
+    ibm1: '',
     labClash: '',
     linkUl: '',
     log: 'multiply log messages by logWeights.count, sum of characters in log messages by logWeights.size',
@@ -55,6 +56,7 @@ exports.scorer = acts => {
     hover: null,
     ibm0: null,
     ibm1: null,
+    ibm: null,
     labClash: null,
     linkUl: null,
     log: null,
@@ -138,8 +140,11 @@ exports.scorer = acts => {
             }
           });
           deficit[ibmN] = 4 * facts.violation + 2 * facts.recommendation - totalDiscount;
-          if (ibmN === 'ibm1') {
-            deficit.total += Math.max(deficit.ibm0, deficit.ibm1);
+        }
+        if (ibmN === 'ibm1') {
+          if (deficit.ibm0 !== null || deficit.ibm1 !== null) {
+            deficit.ibm = Math.max(deficit.ibm0 || 0, deficit.ibm1 || 0);
+            deficit.total += deficit.ibm;
           }
         }
       }
