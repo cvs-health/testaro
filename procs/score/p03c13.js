@@ -124,9 +124,10 @@ exports.scorer = acts => {
         }
       }
       else if (which === 'ibm') {
+        const ibmN = rules.ibm0 ? 'ibm1' : 'ibm0';
         facts = test.result && test.result.totals;
         if (facts) {
-          rules.ibm = 'multiply violations by 4, recommendatons by 2; sum; subtract discounts';
+          rules[ibmN] = 'multiply violations by 4, recommendatons by 2; sum; subtract discounts';
           const ibmRules = test.result.items || [];
           let totalDiscount = 0;
           ibmRules.forEach(rule => {
@@ -135,8 +136,10 @@ exports.scorer = acts => {
               totalDiscount += ruleDiscount;
             }
           });
-          deficit.ibm = 4 * facts.violation + 2 * facts.recommendation - totalDiscount;
-          deficit.total += deficit.ibm;
+          deficit[ibmN] = 4 * facts.violation + 2 * facts.recommendation - totalDiscount;
+          if (ibmN === 'ibm1') {
+            deficit.total += Math.max(deficit.ibm0, deficit.ibm1);
+          }
         }
       }
       else if (which === 'wave') {
