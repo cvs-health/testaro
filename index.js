@@ -429,7 +429,7 @@ const visit = async (act, page, isStrict) => {
   // Identify the URL.
   const resolved = act.which.replace('__dirname', __dirname);
   requestedURL = resolved;
-  // Visit it and wait 15 seconds or until the network is idle.
+  // Visit it and wait 20 seconds or until the network is idle.
   let response = await goto(page, requestedURL, 20000, true, isStrict);
   // If the visit fails:
   if (! response) {
@@ -444,12 +444,12 @@ const visit = async (act, page, isStrict) => {
       await launch(newBrowserName);
       // Identify its only page as current.
       page = browserContext.pages()[0];
-      // Try again, waiting until the network is idle.
+      // Try again, waiting 15 seconds or until the network is idle.
       response = await goto(page, requestedURL, 15000, true, isStrict);
       // If the visit fails:
       if (! response) {
-        // Try again, but waiting until the DOM is loaded.
-        response = await goto(page, requestedURL, 15000, false, isStrict);
+        // Try again, but waiting 10 seconds or until the DOM is loaded.
+        response = await goto(page, requestedURL, 10000, false, isStrict);
         // If the visit fails:
         if (! response) {
           // Give up.
