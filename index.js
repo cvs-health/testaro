@@ -726,10 +726,12 @@ const scriptHandler = async (
   if (scoreTables.length) {
     const scoreTable = scoreTables[0];
     const {result} = scoreTable;
-    const {logWeights, deficit} = result;
-    if (result && logWeights) {
-      deficit.log = Math.floor(logWeights.count * logCount + logWeights.size * logSize);
-      deficit.total += deficit.log;
+    if (result) {
+      const {logWeights, deficit} = result;
+      if (logWeights && deficit) {
+        deficit.log = Math.floor(logWeights.count * logCount + logWeights.size * logSize);
+        deficit.total += deficit.log;
+      }
     }
   }
   // If any exhibits have been added to the report, move them to the query.
