@@ -502,7 +502,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
           act.result = scorer(acts);
         }
         catch (error) {
-          act.error = `ERROR: ${error.message}`;
+          act.error = `ERROR: ${error.message}\n${error.stack}`;
         }
       }
       // Otherwise, if a current page exists:
@@ -723,6 +723,7 @@ const scriptHandler = async (
   report.logSize = logSize;
   // If logs are to be scored, do so.
   const scoreTables = report.acts.filter(act => act.type === 'score');
+  console.log(`scoreTables are ${JSON.stringify(scoreTables, null, 2)}`);
   if (scoreTables.length) {
     const scoreTable = scoreTables[0];
     const {result} = scoreTable;

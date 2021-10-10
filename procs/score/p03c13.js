@@ -135,15 +135,17 @@ exports.scorer = acts => {
           };
           ['content', 'url'].forEach(type => {
             const totals = facts[type].totals;
-            const ibmRules = test.result[type].items || [];
-            let totalDiscount = 0;
-            ibmRules.forEach(rule => {
-              const ruleDiscount = ruleDiscounts.ibm[rule.ruleId];
-              if (ruleDiscount) {
-                totalDiscount += ruleDiscount;
-              }
-            });
-            scores[type] = 4 * totals.violation + 2 * totals.recommendation - totalDiscount;
+            if (totals) {
+              const ibmRules = test.result[type].items || [];
+              let totalDiscount = 0;
+              ibmRules.forEach(rule => {
+                const ruleDiscount = ruleDiscounts.ibm[rule.ruleId];
+                if (ruleDiscount) {
+                  totalDiscount += ruleDiscount;
+                }
+              });
+              scores[type] = 4 * totals.violation + 2 * totals.recommendation - totalDiscount;
+            }
           });
           if (scores.content || scores.url) {
             deficit.ibm = Math.max(scores.content || 0, scores.url || 0);
