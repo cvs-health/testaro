@@ -97,9 +97,11 @@ exports.scorer = acts => {
       'link_empty': 2,
       'select_missing_label': 1
     };
+    // Adds the actual or inferred score of a test to the total score.
     const increment = test => {
       deficit.total += typeof deficit[test] === 'number' ? deficit[test] : inferences[test];
     };
+    // Compute the scores of all tests and compile the total score.
     tests.forEach(test => {
       const {which} = test;
       if (which === 'axe') {
@@ -327,7 +329,7 @@ exports.scorer = acts => {
         increment('styleDiff');
       }
     });
-    // If at least 1 test package but not all test packages failed, assign penalty deficits.
+    // Compute the inferred scores of package tests that failed and adjust the total score.
     const estimate = (tests, penalty) => {
       const packageScores = tests.map(test => deficit[test]).filter(score => score !== null);
       const scoreCount = packageScores.length;
@@ -349,7 +351,7 @@ exports.scorer = acts => {
     };
     estimate(['axe', 'ibm', 'wave'], 100);
   }
-  // Return the score, except for the log test.
+  // Return the score facts, except for the log test.
   return {
     ruleDiscounts,
     rules,
