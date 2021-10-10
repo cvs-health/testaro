@@ -45,7 +45,7 @@ exports.reporter = async (page, withItems, withNewContent) => {
     // Conduct and report it.
     const content = await page.content();
     const result = await run(content);
-    all.existingContent = report(result, withItems);
+    all.content = report(result, withItems);
   }
   // If the test is to be conducted with a URL:
   if ([true, undefined].includes(withNewContent)) {

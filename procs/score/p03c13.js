@@ -13,8 +13,7 @@ exports.scorer = acts => {
     focOl: '',
     focOp: '',
     hover: '',
-    ibm0: '',
-    ibm1: '',
+    ibm: '',
     labClash: '',
     linkUl: '',
     log: 'multiply log messages by logWeights.count, sum of characters in log messages by logWeights.size',
@@ -54,8 +53,6 @@ exports.scorer = acts => {
     focOl: null,
     focOp: null,
     hover: null,
-    ibm0: null,
-    ibm1: null,
     ibm: null,
     labClash: null,
     linkUl: null,
@@ -129,23 +126,27 @@ exports.scorer = acts => {
         }
       }
       else if (which === 'ibm') {
-        const ibmN = rules.ibm0 ? 'ibm1' : 'ibm0';
-        facts = test.result && test.result.totals;
-        if (facts) {
-          rules[ibmN] = 'multiply violations by 4, recommendatons by 2; sum; subtract discounts';
-          const ibmRules = test.result.items || [];
-          let totalDiscount = 0;
-          ibmRules.forEach(rule => {
-            const ruleDiscount = ruleDiscounts.ibm[rule.ruleId];
-            if (ruleDiscount) {
-              totalDiscount += ruleDiscount;
-            }
+        facts = test.result;
+        if (facts && (test.result.content.totals || test.result.url.totals)) {
+          rules.ibm = 'multiply violations by 4, recommendatons by 2; sum; subtract discounts';
+          const scores = {
+            content: null,
+            url: null
+          };
+          ['content', 'url'].forEach(type => {
+            const totals = facts[type].totals;
+            const ibmRules = test.result[type].items || [];
+            let totalDiscount = 0;
+            ibmRules.forEach(rule => {
+              const ruleDiscount = ruleDiscounts.ibm[rule.ruleId];
+              if (ruleDiscount) {
+                totalDiscount += ruleDiscount;
+              }
+            });
+            scores[type] = 4 * totals.violation + 2 * totals.recommendation - totalDiscount;
           });
-          deficit[ibmN] = 4 * facts.violation + 2 * facts.recommendation - totalDiscount;
-        }
-        if (ibmN === 'ibm1') {
-          if (deficit.ibm0 !== null || deficit.ibm1 !== null) {
-            deficit.ibm = Math.max(deficit.ibm0 || 0, deficit.ibm1 || 0);
+          if (scores.content || scores.url) {
+            deficit.ibm = Math.max(scores.content || 0, scores.url || 0);
             deficit.total += deficit.ibm;
           }
         }
