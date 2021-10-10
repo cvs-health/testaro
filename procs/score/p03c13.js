@@ -126,19 +126,29 @@ exports.scorer = acts => {
         }
       }
       else if (which === 'ibm') {
-        facts = test.result && test.result.totals;
-        if (facts) {
+        facts = test.result;
+        if (facts && (test.result.content.totals || test.result.url.totals)) {
           rules.ibm = 'multiply violations by 4, recommendatons by 2; sum; subtract discounts';
-          const ibmRules = test.result.items || [];
-          let totalDiscount = 0;
-          ibmRules.forEach(rule => {
-            const ruleDiscount = ruleDiscounts.ibm[rule.ruleId];
-            if (ruleDiscount) {
-              totalDiscount += ruleDiscount;
-            }
+          const scores = {
+            content: null,
+            url: null
+          };
+          ['content', 'url'].forEach(type => {
+            const totals = facts[type].totals;
+            const ibmRules = test.result[type].items || [];
+            let totalDiscount = 0;
+            ibmRules.forEach(rule => {
+              const ruleDiscount = ruleDiscounts.ibm[rule.ruleId];
+              if (ruleDiscount) {
+                totalDiscount += ruleDiscount;
+              }
+            });
+            scores[type] = 4 * totals.violation + 2 * totals.recommendation - totalDiscount;
           });
-          deficit.ibm = 4 * facts.violation + 2 * facts.recommendation - totalDiscount;
-          deficit.total += deficit.ibm;
+          if (scores.content || scores.url) {
+            deficit.ibm = Math.max(scores.content || 0, scores.url || 0);
+            deficit.total += deficit.ibm;
+          }
         }
       }
       else if (which === 'wave') {

@@ -69,7 +69,6 @@ const tests = {
   focInd: 'tabulate and list focusable elements with and without focus indicators',
   focOl: 'tabulate and list focusable elements with and without focus outlines',
   focOp: 'tabulate and list visible focusable and operable elements',
-  focOpAll: 'tabulate and list focusable and operable elements after making all visible',
   hover: 'tabulate and list hover-caused context additions',
   ibm: 'conduct and report an IBM test',
   imgAlt: 'list the values of the alt attributes of img elements',
@@ -89,6 +88,9 @@ const tests = {
   tblAc: 'tabulate and list active elements contained by tables',
   wave: 'conduct and report a WAVE test'
 };
+const domChangers = new Set([
+  'axe', 'focInd', 'focOl', 'focOp', 'hover', 'ibm', 'state', 'wave'
+]);
 // Browser types available in PlayWright.
 const browserTypeNames = {
   'chromium': 'Chrome',
@@ -427,7 +429,7 @@ const visit = async (act, page, isStrict) => {
   // Identify the URL.
   const resolved = act.which.replace('__dirname', __dirname);
   requestedURL = resolved;
-  // Visit it and wait 15 seconds or until the network is idle.
+  // Visit it and wait 20 seconds or until the network is idle.
   let response = await goto(page, requestedURL, 20000, true, isStrict);
   // If the visit fails:
   if (! response) {
@@ -442,12 +444,12 @@ const visit = async (act, page, isStrict) => {
       await launch(newBrowserName);
       // Identify its only page as current.
       page = browserContext.pages()[0];
-      // Try again, waiting until the network is idle.
+      // Try again, waiting 15 seconds or until the network is idle.
       response = await goto(page, requestedURL, 15000, true, isStrict);
       // If the visit fails:
       if (! response) {
-        // Try again, but waiting until the DOM is loaded.
-        response = await goto(page, requestedURL, 15000, false, isStrict);
+        // Try again, but waiting 10 seconds or until the DOM is loaded.
+        response = await goto(page, requestedURL, 10000, false, isStrict);
         // If the visit fails:
         if (! response) {
           // Give up.
@@ -947,6 +949,26 @@ const requestHandler = (request, response) => {
                   && Array.isArray(hosts)
                   && hosts.every(host => host.which && host.what && isURL(host.which))
                 ) {
+                  // Inject url commands where necessary to undo DOM changes.
+                  let injectMore = true;
+                  while (injectMore) {
+                    const injectIndex = commands.findIndex((command, index) =>
+                      index < commands.length - 1
+                      && command.type === 'test'
+                      && commands[index + 1].type === 'test'
+                      && domChangers.has(command.which)
+                    );
+                    if (injectIndex === -1) {
+                      injectMore = false;
+                    }
+                    else {
+                      commands.splice(injectIndex + 1, 0, {
+                        type: 'url',
+                        which: 'https://*',
+                        what: 'URL'
+                      });
+                    }
+                  }
                   // FUNCTION DEFINITION START
                   // Recursively process commands on the hosts of a batch.
                   const doBatch = async (hosts, isFirst, hostIndex) => {
