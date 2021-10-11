@@ -114,17 +114,21 @@ const redirect = (url, response) => {
   response.setHeader('Location', url);
   response.end();
 };
+// Closes any existing browser.
+const closeBrowser = async () => {
+  const browser = browserContext && browserContext.browser();
+  if (browser) {
+    await browser.close();
+  }
+};
 // Launches a browser.
 const launch = async typeName => {
   const browserType = require('playwright')[typeName];
   // If the specified browser type exists:
   if (browserType) {
     // Close any existing browser.
-    let browser = browserContext && browserContext.browser();
-    if (browser) {
-      await browser.close();
-    }
-    // Launch it.
+    await closeBrowser();
+    // Launch a browser of the specified type.
     const browserOptions = {};
     if (debug) {
       browserOptions.headless = false;
@@ -132,7 +136,7 @@ const launch = async typeName => {
     if (waits) {
       browserOptions.slowMo = waits;
     }
-    browser = await browserType.launch(browserOptions);
+    const browser = await browserType.launch(browserOptions);
     // Create a new context (window) in it.
     browserContext = await browser.newContext();
     // When a page is added to the browser context:
@@ -718,6 +722,8 @@ const scriptHandler = async (
   const reportSuffix = `${query.timeStamp}${hostSuffix}`;
   // Perform the specified acts and add the results and exhibits to the report.
   await doActs(report, 0, null, reportSuffix, query.reportDir);
+  // Close the browser.
+  await closeBrowser();
   // Add the log statistics to the report.
   report.logCount = logCount;
   report.logSize = logSize;
