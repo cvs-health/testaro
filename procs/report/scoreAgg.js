@@ -26,13 +26,18 @@ fileNames.forEach((fn, index) => {
     batchData.proc = deficitData.which;
     batchData.description = deficitData.what;
   }
-  const summary = {
-    fileName: fn,
-    org: orgData.what,
-    url: orgData.which,
-    deficit: deficitData.result.deficit
-  };
-  result.push(summary);
+  if (deficitData.result && deficitData.result.deficit) {
+    const summary = {
+      fileName: fn,
+      org: orgData.what,
+      url: orgData.which,
+      deficit: deficitData.result.deficit
+    };
+    result.push(summary);
+  }
+  else {
+    console.log(`ERROR: No deficit in ${fn}`);
+  }
 });
 result.sort((a, b) => a.deficit.total - b.deficit.total);
 const data = {
