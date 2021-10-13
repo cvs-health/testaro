@@ -459,7 +459,10 @@ const visit = async (act, page, isStrict) => {
           // Give up.
           console.log(`ERROR: Visits to ${requestedURL} failed`);
           act.result = `ERROR: Visit to ${requestedURL} failed`;
-          await page.goto('about:blank');
+          await page.goto('about:blank')
+          .catch(error => {
+            console.log(`ERROR: Navigation to blank page failed (${error.message})`);
+          });
           return null;
         }
       }

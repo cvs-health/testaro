@@ -127,7 +127,7 @@ exports.scorer = acts => {
       }
       else if (which === 'ibm') {
         facts = test.result;
-        if (facts && (test.result.content.totals || test.result.url.totals)) {
+        if (facts && facts.content && facts.url && (facts.content.totals || facts.url.totals)) {
           rules.ibm = 'multiply violations by 4, recommendatons by 2; sum; subtract discounts';
           const scores = {
             content: null,
