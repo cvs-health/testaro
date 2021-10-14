@@ -3,7 +3,10 @@
   Converts scoreAgg output from JSON to an HTML bar-graph table.
   Arguments:
     0. Subdirectory of report directory.
-    1. Whether to include an axe column.
+    1. What columns to include:
+      'aut': Autotest.
+      'aa': Autotest and axe.
+      'p3': Axe, IBM, and WAVE.
 */
 // ########## IMPORTS
 // Module to access files.
@@ -11,7 +14,7 @@ const fs = require('fs');
 // Module to keep secrets local.
 require('dotenv').config();
 // ########## OPERATION
-const withAxe = process.argv[3];
+const colSpec = process.argv[3];
 // Directory.
 const dir = `${process.env.REPORTDIR}/${process.argv[2]}`;
 // Get the data.
@@ -19,43 +22,64 @@ const dataJSON = fs.readFileSync(`${dir}/deficit.json`, 'utf8');
 const data = JSON.parse(dataJSON);
 const result = data.result;
 // Identify the containing HTML code.
-const axeHead0 = withAxe ? '<th colspan="2">Axe as a</th>' : '';
-const axeHead1 = withAxe ? '<th>Number</th><th>Bar</th>' : '';
+const options = ['aut', 'aa', 'p3'];
+const optionColNames = [['Autotest'], ['Autotest', 'Axe'], ['Axe', 'IBM', 'WAVE']];
+const optionPropNames = [['total'], ['total', 'axe'], ['axe', 'ibm', 'wave']];
+const colNames = optionColNames[options.indexOf(colSpec)];
+const head0 = colNames.map(pair => `<th colspan="2">${pair}</th>`).join('');
+const head1 = '<th>Number</th><th>Bar</th>'.repeat(colNames.length);
+const tableClasses = ['secondCellRight'];
+if (colSpec !== 'aut') {
+  tableClasses.push(' fourthCellRight');
+  if (colSpec === 'p3') {
+    tableClasses.push(' sixthCellRight');
+  }
+}
 const tableStartLines = [
   '<table class="allBorder">',
   '  <caption>Accessibility deficits of web pages</caption>',
   '  <thead>',
-  `    <tr><th rowspan="2">Page</th><th colspan="2">Deficit as a</th>${axeHead0}</tr>`,
-  `    <tr><th>Number</th><th>Bar</th>${axeHead1}`,
+  `    <tr><th rowspan="2">Page</th>${head0}</tr>`,
+  `    <tr>${head1}</tr>`,
   '  </thead>',
-  `  <tbody class="secondCellRight${withAxe ? ' fourthCellRight' : ''}">`
+  `  <tbody class="${tableClasses}">`
 ];
 const tableEndLines = [
   '  </tbody>',
   '</table>'
 ];
 // Calibrate the bar widths.
-const maxDeficit = result.reduce((max, thisItem) => Math.max(max, thisItem.deficit.total), 0);
-const maxAxeDeficit = withAxe
-  ? result.reduce((max, thisItem) => Math.max(max, thisItem.deficit.axe), 0)
-  : 0;
+const maxDeficits = {};
+optionPropNames.forEach(propName => {
+  maxDeficits[propName] = result.reduce(
+    (max, thisItem) => Math.max(max, thisItem.deficit[propName]), 0
+  );
+});
 // Compile the HTML code representing the data.
 const tableMidLines = result.map(item => {
   const pageCell = `<th><a href="${item.url}">${item.org}</a></th>`;
-  const numCell = `<td><a href="data/${item.fileName}">${item.deficit.total}</a></td>`;
-  const barWidth = maxDeficit ? 100 * item.deficit.total / maxDeficit : 0;
-  const bar = `<rect height="100%" width="${barWidth}%" fill="red"></rect>`;
-  const barCell = `<td><svg width="100%" height="1rem">${bar}</svg></td>`;
-  let axeNumCell = '';
-  let axeBarCell = '';
-  const axeDeficit = item.deficit.axe;
-  if (withAxe && typeof axeDeficit === 'number') {
-    axeNumCell = `<td>${axeDeficit}</td>`;
-    const axeBarWidth = maxAxeDeficit ? 100 * axeDeficit / maxAxeDeficit : 0;
-    const axeBar = `<rect height="100%" width="${axeBarWidth}%" fill="red"></rect>`;
-    axeBarCell = `<td><svg width="100%" height="1rem">${axeBar}</svg></td>`;
+  const numCells = [];
+  if (optionPropNames.includes('total')) {
+    numCells.push(`<td><a href="data/${item.fileName}">${item.deficit.total}</a></td>`);
   }
-  const row = `    <tr>${pageCell}${numCell}${barCell}${axeNumCell}${axeBarCell}</tr>`;
+  optionPropNames.filter(name => name !== 'total').forEach(name => {
+    const itemScore = item.deficit[name];
+    numCells.push(`<td>${itemScore !== null ? itemScore : '?'}</td>`);
+  });
+  const barCells = [];
+  optionPropNames.forEach(name => {
+    const itemScore = item.deficit[name];
+    if (itemScore === null) {
+      barCells.push('<td>?</td>');
+    }
+    else {
+      const barWidth = maxDeficits[name] ? 100 * item.deficit[name] / maxDeficits[name] : 0;
+      const bar = `<rect height="100%" width="${barWidth}%" fill="red"></rect>`;
+      barCells.push(`<td><svg width="100%" height="1rem">${bar}</svg></td>`);
+    }
+  });
+  const numBarCells = numCells.map((cell, index) => `${cell}${barCells[index]}`);
+  const row = `    <tr>${pageCell}${numBarCells.join('')}</tr>`;
   return row;
 });
 // Combine the containing and contained lines of HTML code.
