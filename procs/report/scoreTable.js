@@ -21,6 +21,10 @@ const dir = `${process.env.REPORTDIR}/${process.argv[2]}`;
 const dataJSON = fs.readFileSync(`${dir}/deficit.json`, 'utf8');
 const data = JSON.parse(dataJSON);
 const result = data.result;
+// If the column option is p3, sort the data by Axe score.
+if (colSpec === 'p3') {
+  result.sort((a, b) => a.deficit.axe - b.deficit.axe);
+}
 // Identify the containing HTML code.
 const options = ['aut', 'aa', 'p3'];
 const optionColNames = [['Autotest'], ['Autotest', 'Axe'], ['Axe', 'IBM', 'WAVE']];
