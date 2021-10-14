@@ -1,8 +1,8 @@
 # Dependency directories
 node_modules/
 
-# dotenv environment variables file
-.env
+# dotenv environment variables files
+.env*
 
 # Temporary files
 temp/
