@@ -26,6 +26,7 @@ const options = ['aut', 'aa', 'p3'];
 const optionColNames = [['Autotest'], ['Autotest', 'Axe'], ['Axe', 'IBM', 'WAVE']];
 const optionPropNames = [['total'], ['total', 'axe'], ['axe', 'ibm', 'wave']];
 const colNames = optionColNames[options.indexOf(colSpec)];
+const propNames = optionPropNames[options.indexOf(colSpec)];
 const head0 = colNames.map(pair => `<th colspan="2">${pair}</th>`).join('');
 const head1 = '<th>Number</th><th>Bar</th>'.repeat(colNames.length);
 const tableClasses = ['secondCellRight'];
@@ -50,7 +51,7 @@ const tableEndLines = [
 ];
 // Calibrate the bar widths.
 const maxDeficits = {};
-optionPropNames.forEach(propName => {
+propNames.forEach(propName => {
   maxDeficits[propName] = result.reduce(
     (max, thisItem) => Math.max(max, thisItem.deficit[propName]), 0
   );
@@ -59,15 +60,15 @@ optionPropNames.forEach(propName => {
 const tableMidLines = result.map(item => {
   const pageCell = `<th><a href="${item.url}">${item.org}</a></th>`;
   const numCells = [];
-  if (optionPropNames.includes('total')) {
+  if (propNames.includes('total')) {
     numCells.push(`<td><a href="data/${item.fileName}">${item.deficit.total}</a></td>`);
   }
-  optionPropNames.filter(name => name !== 'total').forEach(name => {
+  propNames.filter(name => name !== 'total').forEach(name => {
     const itemScore = item.deficit[name];
     numCells.push(`<td>${itemScore !== null ? itemScore : '?'}</td>`);
   });
   const barCells = [];
-  optionPropNames.forEach(name => {
+  propNames.forEach(name => {
     const itemScore = item.deficit[name];
     if (itemScore === null) {
       barCells.push('<td>?</td>');
