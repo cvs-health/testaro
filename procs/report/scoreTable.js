@@ -30,9 +30,9 @@ const head0 = colNames.map(pair => `<th colspan="2">${pair}</th>`).join('');
 const head1 = '<th>Number</th><th>Bar</th>'.repeat(colNames.length);
 const tableClasses = ['secondCellRight'];
 if (colSpec !== 'aut') {
-  tableClasses.push(' fourthCellRight');
+  tableClasses.push('fourthCellRight');
   if (colSpec === 'p3') {
-    tableClasses.push(' sixthCellRight');
+    tableClasses.push('sixthCellRight');
   }
 }
 const tableStartLines = [
@@ -42,7 +42,7 @@ const tableStartLines = [
   `    <tr><th rowspan="2">Page</th>${head0}</tr>`,
   `    <tr>${head1}</tr>`,
   '  </thead>',
-  `  <tbody class="${tableClasses}">`
+  `  <tbody class="${tableClasses.join(' ')}">`
 ];
 const tableEndLines = [
   '  </tbody>',
