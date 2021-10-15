@@ -20,13 +20,6 @@ exports.commands = {
         revealAll: [true, 'boolean']
       }
     ],
-    focOl: [
-      'Perform a focOl test (revealAll: whether to make all elements visible)',
-      {
-        withItems: [true, 'boolean'],
-        revealAll: [true, 'boolean']
-      }
-    ],
     focOp: [
       'Perform a focOp test (revealAll: whether to make all elements visible)',
       {
