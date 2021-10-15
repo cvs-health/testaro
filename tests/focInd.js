@@ -15,7 +15,11 @@ exports.reporter = async (page, withItems, revealAll) => {
             total: 0,
             tagNames: {}
           },
-          indicatorPresent: {
+          nonOutlinePresent: {
+            total: 0,
+            tagNames: {}
+          },
+          outlinePresent: {
             total: 0,
             tagNames: {}
           }
@@ -28,38 +32,49 @@ exports.reporter = async (page, withItems, revealAll) => {
         indicatorPresent: []
       };
     }
+    const addElementFacts = (element, status) => {
+      const type = data.totals.types[status];
+      type.total++;
+      const tagName = element.tagName;
+      if (type.tagNames[tagName]) {
+        type.tagNames[tagName]++;
+      }
+      else {
+        type.tagNames[tagName] = 1;
+      }
+      if (withItems) {
+        data.items[status].push({
+          tagName,
+          text: element.textContent.trim().replace(/\s{2,}/g, ' ').slice(0, 100)
+        });
+      }
+    };
     elements.forEach(element => {
       if (element.tabIndex === 0) {
         data.totals.total++;
         const styleBlurred = Object.assign({}, window.getComputedStyle(element));
         element.focus({preventScroll: true});
         const styleFocused = window.getComputedStyle(element);
-        const diff = prop => styleFocused[prop] !== styleBlurred[prop];
-        const hasInd
-          = diff('borderStyle')
-          || (styleFocused.borderStyle !== 'none' && diff('borderWidth'))
-          || diff('outlineStyle')
-          || (styleFocused.outlineStyle !== 'none' && diff('outlineWidth'))
-          || diff('fontSize')
-          || diff('fontStyle')
-          || diff('textDecorationLine')
-          || diff('textDecorationStyle')
-          || diff('textDecorationThickness');
-        const status = hasInd ? 'indicatorPresent' : 'indicatorMissing';
-        const type = data.totals.types[status];
-        type.total++;
-        const tagName = element.tagName;
-        if (type.tagNames[tagName]) {
-          type.tagNames[tagName]++;
+        const hasOutline
+          = styleBlurred.outlineWidth === '0px'
+          && styleFocused.outlineWidth !== '0px';
+        if (hasOutline) {
+          addElementFacts(element, 'outlinePresent');
         }
         else {
-          type.tagNames[tagName] = 1;
-        }
-        if (withItems) {
-          data.items[status].push({
-            tagName,
-            text: element.textContent.trim().replace(/\s{2,}/g, ' ').slice(0, 100)
-          });
+          const diff = prop => styleFocused[prop] !== styleBlurred[prop];
+          const hasIndicator
+            = diff('borderStyle')
+            || (styleFocused.borderStyle !== 'none' && diff('borderWidth'))
+            || diff('outlineStyle')
+            || (styleFocused.outlineStyle !== 'none' && diff('outlineWidth'))
+            || diff('fontSize')
+            || diff('fontStyle')
+            || diff('textDecorationLine')
+            || diff('textDecorationStyle')
+            || diff('textDecorationThickness');
+          const status = hasIndicator ? 'nonOutlinePresent' : 'indicatorMissing';
+          addElementFacts(element, status);
         }
       }
     });
