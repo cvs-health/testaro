@@ -5,18 +5,7 @@ exports.reporter = async (page, withItems, revealAll) => {
   // If all elements are to be revealed:
   if (revealAll) {
     // Make them all visible.
-    await page.evaluate(() => {
-      const elements = Array.from(document.body.querySelectorAll('*'));
-      elements.forEach(element => {
-        const styleDec = window.getComputedStyle(element);
-        if (styleDec.display === 'none') {
-          element.style.display = 'unset';
-        }
-        if (styleDec.visibility === 'hidden') {
-          element.style.visibility = 'unset';
-        }
-      });
-    });
+    await require('../procs/test/allVis').allVis(page);
   }
   // Mark any focusable elements.
   await require('../procs/test/focusables').focusables(page, 'focusMark');

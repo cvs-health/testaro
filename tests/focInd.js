@@ -1,46 +1,37 @@
-// Recursively adds the tag names and texts or counts of elements to an array.
-const {tallyTags} = require('../procs/test/tallyTags');
 // Returns counts, and texts if required, of focusable elements with and without indicators.
 exports.reporter = async (page, withItems, revealAll) => {
   // If required, make all elements visible.
   if (revealAll) {
     await require('../procs/test/allVis').allVis(page);
   }
-  // Mark the focusable elements as indicated or not indicated.
-  await require('../procs/test/focusables').focusables(page, 'focIndMark');
-  // Get an array of the focusable elements that are not indicated.
-  const focOutN = await page.$$('body [data-autotest-focused="N"]');
-  // Get an array of the focusable elements that are indicated.
-  const focOutY = await page.$$('body [data-autotest-focused="Y"]');
-  // Initialize the data.
-  const data = {
-    totals: {
-      total: 0,
-      types: {
-        indicatorMissing: {
-          total: 0,
-          tagNames: {}
-        },
-        indicatorPresent: {
-          total: 0,
-          tagNames: {}
+  // Get data on the focusable visible elements with and without indicators.
+  return {result: await page.$$eval('body *:visible', elements => {
+    // Initialize the data.
+    const data = [];
+    elements.forEach(element => {
+      if (element.tabIndex === 0) {
+        const styleBlurred = Object.assign({}, window.getComputedStyle(element));
+        element.focus({preventScroll: true});
+        const styleFocused = window.getComputedStyle(element);
+        const diff = prop => styleFocused[prop] !== styleBlurred[prop];
+        const datum = {
+          indicator: diff('borderStyle')
+            || (styleFocused.borderStyle !== 'none' && diff('borderWidth'))
+            || diff('outlineStyle')
+            || (styleFocused.outlineStyle !== 'none' && diff('outlineWidth'))
+            || diff('fontSize')
+            || diff('fontStyle')
+            || diff('textDecorationLine')
+            || diff('textDecorationStyle')
+            || diff('textDecorationThickness'),
+          tagName: element.tagName
+        };
+        if (withItems) {
+          datum.text = element.textContent.trim().slice(0, 100);
         }
+        data.push(datum);
       }
-    }
-  };
-  if (withItems) {
-    data.items = {
-      indicatorMissing: [],
-      indicatorPresent: []
-    };
-  }
-  // Populate them.
-  const bad = data.totals.types.indicatorMissing;
-  const good = data.totals.types.indicatorPresent;
-  const items = data.items;
-  await tallyTags(page, focOutN, bad, items, 'indicatorMissing', withItems);
-  await tallyTags(page, focOutY, good, items, 'indicatorPresent', withItems);
-  data.totals.total = bad.total + good.total;
-  // Return the data.
-  return {result: data};
+    });
+    return data;
+  })};
 };
