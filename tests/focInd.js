@@ -29,7 +29,8 @@ exports.reporter = async (page, withItems, revealAll) => {
     if (withItems) {
       data.items = {
         indicatorMissing: [],
-        indicatorPresent: []
+        nonOutlinePresent: [],
+        outlinePresent: []
       };
     }
     const addElementFacts = (element, status) => {
