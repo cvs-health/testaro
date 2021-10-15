@@ -5,7 +5,7 @@ exports.reporter = async (page, withItems, revealAll) => {
     await require('../procs/test/allVis').allVis(page);
   }
   // Get data on the focusable visible elements with and without indicators.
-  return {result: await page.$$eval('body *:visible', (elements, withItems) => {
+  const data = await page.$$eval('body *:visible', (elements, withItems) => {
     // Initialize the data.
     const data = {
       totals: {
@@ -45,7 +45,8 @@ exports.reporter = async (page, withItems, revealAll) => {
           || diff('textDecorationLine')
           || diff('textDecorationStyle')
           || diff('textDecorationThickness');
-        const type = data.totals.types[hasInd ? 'indicatorPresent' : 'indicatorMissing'];
+        const status = hasInd ? 'indicatorPresent' : 'indicatorMissing';
+        const type = data.totals.types[status];
         type.total++;
         const tagName = element.tagName;
         if (type.tagNames[tagName]) {
@@ -55,7 +56,7 @@ exports.reporter = async (page, withItems, revealAll) => {
           type.tagNames[tagName] = 1;
         }
         if (withItems) {
-          data.items[type].push({
+          data.items[status].push({
             tagName,
             text: element.textContent.trim().replace(/\s{2,}/g, ' ').slice(0, 100)
           });
@@ -63,5 +64,6 @@ exports.reporter = async (page, withItems, revealAll) => {
       }
     });
     return data;
-  }, withItems)};
+  }, withItems);
+  return {result: data};
 };
