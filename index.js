@@ -396,6 +396,8 @@ const isValid = command => {
     return false;
   }
 };
+// Returns a string with any final slash removed.
+const deSlash = string => string.endsWith('/') ? string.slice(0, -1) : string;
 // Tries to visit a URL.
 const goto = async (page, url, timeout, awaitIdle, isStrict) => {
   const waitUntil = awaitIdle ? 'networkidle' : 'domcontentloaded';
@@ -411,7 +413,7 @@ const goto = async (page, url, timeout, awaitIdle, isStrict) => {
     const httpStatus = response.status();
     if ([200, 304].includes(httpStatus)) {
       const actualURL = page.url();
-      if (isStrict && actualURL !== url) {
+      if (isStrict && deSlash(actualURL) !== deSlash(url)) {
         console.log(`ERROR: Visit to ${url} redirected to ${actualURL}`);
         return null;
       }
@@ -550,23 +552,13 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
         else if (page.url() && page.url() !== 'about:blank') {
           const url = page.url();
           // If redirection is permitted or did not occur:
-          if (! report.strict || url === requestedURL) {
+          if (! report.strict || deSlash(url) === deSlash(requestedURL)) {
             // Add the URL to the act.
             act.url = url;
             // If the act is a revelation:
             if (act.type === 'reveal') {
               // Make all elements in the page visible.
-              await page.$$eval('body *', elements => {
-                elements.forEach(el => {
-                  const elStyleDec = window.getComputedStyle(el);
-                  if (elStyleDec.display === 'none') {
-                    el.style.display = 'initial';
-                  }
-                  if (['hidden', 'collapse'].includes(elStyleDec.visibility)) {
-                    el.style.visibility = 'inherit';
-                  }
-                });
-              });
+              await require('./procs/test/allVis').allVis(page);
               act.result = 'All elements visible.';
             }
             // Otherwise, if the act is a test:

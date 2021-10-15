@@ -1,14 +1,13 @@
 // Makes all elements in a page visible.
 exports.allVis = async page => {
-  await page.evaluate(() => {
-    const elements = Array.from(document.body.querySelectorAll('*'));
+  await page.$$eval('body *', elements => {
     elements.forEach(element => {
       const styleDec = window.getComputedStyle(element);
       if (styleDec.display === 'none') {
-        element.style.display = 'unset';
+        element.style.display = 'initial';
       }
-      if (styleDec.visibility === 'hidden') {
-        element.style.visibility = 'unset';
+      if (['hidden', 'collapse'].includes(styleDec.visibility)) {
+        element.style.visibility = 'inherit';
       }
     });
   })
