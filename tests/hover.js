@@ -19,7 +19,8 @@ exports.reporter = async (page, withItems) => {
     totals: {
       triggers: 0,
       visibilityTargets: 0,
-      opacityTargets: 0
+      opacityTargets: 0,
+      unhoverables: 0
     }
   };
   if (withItems) {
@@ -117,6 +118,7 @@ exports.reporter = async (page, withItems) => {
             if (withItems) {
               // Report them.
               const triggerDataJSHandle = await page.evaluateHandle(args => {
+                // Returns the text of an element.
                 const textOf = (element, limit) => {
                   let text = element.textContent.trim();
                   if (text) {
@@ -139,7 +141,7 @@ exports.reporter = async (page, withItems) => {
                 }));
                 return {
                   tagName: trigger.tagName,
-                  id: trigger.id || 'NONE',
+                  id: trigger.id || '',
                   text: textOf(trigger, 50),
                   newVisibles,
                   opacityChangers
@@ -152,6 +154,20 @@ exports.reporter = async (page, withItems) => {
         }
         catch (error) {
           console.log('ERROR hovering');
+          // Returns the text of an element.
+          const textOf = (element, limit) => {
+            let text = element.textContent.trim();
+            if (text) {
+              text = text.replace(/\n.*/s, '');
+            }
+            return (text ? text : element.outerHTML).slice(0, limit);
+          };
+          data.totals.unhoverables++;
+          data.items.push({
+            tagName: firstTriggerTag,
+            id: firstTrigger.id || '',
+            text: textOf(firstTrigger, 50)
+          });
         }
         triggerTag = firstTriggerTag;
       }
