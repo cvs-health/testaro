@@ -67,7 +67,6 @@ const tests = {
   bulk: 'report the count of visible elements',
   embAc: 'tabulate and list active elements contained by links or buttons',
   focInd: 'tabulate and list focusable elements with and without focus indicators',
-  focOl: 'tabulate and list focusable elements with and without focus outlines',
   focOp: 'tabulate and list visible focusable and operable elements',
   hover: 'tabulate and list hover-caused context additions',
   ibm: 'conduct and report an IBM test',
@@ -86,10 +85,11 @@ const tests = {
   state: 'show an element with and without its focus and hover states in 3 browsers',
   styleDiff: 'tabulate and list style inconsistencies',
   tblAc: 'tabulate and list active elements contained by tables',
-  wave: 'conduct and report a WAVE test'
+  wave: 'conduct and report a WAVE test',
+  zIndex: 'tabulate and list z indexes other than auto'
 };
 const domChangers = new Set([
-  'axe', 'focInd', 'focOl', 'focOp', 'hover', 'ibm', 'state', 'wave'
+  'axe', 'focInd', 'focOp', 'hover', 'ibm', 'state', 'wave'
 ]);
 // Browser types available in PlayWright.
 const browserTypeNames = {

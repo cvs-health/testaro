@@ -83,6 +83,12 @@ exports.commands = {
       {
         reportType: [true, 'number']
       }
+    ],
+    zIndex: [
+      'Perform a zIndex test',
+      {
+        withItems: [true, 'boolean']
+      }
     ]
   },
   etc: {
