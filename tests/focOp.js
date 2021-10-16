@@ -1,85 +1,153 @@
-// Returns counts, and texts if required, of elements by focusability and operability.
+// Returns counts, and texts if required, of (un)focusable and (in)operable elements.
 exports.reporter = async (page, withItems, revealAll) => {
-  // If required, make all elements visible.
+  // Import a module to get the texts of an element.
+  const allText = withItems ? require('../procs/test/allText').allText : '';
+  // If all elements are to be revealed:
   if (revealAll) {
+    // Make them all visible.
     await require('../procs/test/allVis').allVis(page);
   }
-  // Get data on the elements.
-  const data = await page.$$eval('body *:visible', (elements, withItems) => {
-    // Initialize the data.
-    const data = {
-      totals: {
-        total: 0,
-        types: {
-          onlyFocusable: {
-            total: 0,
-            tagNames: {}
-          },
-          onlyOperable: {
-            total: 0,
-            tagNames: {}
-          },
-          focusableAndOperable: {
-            total: 0,
-            tagNames: {}
+  // Mark any focusable elements.
+  await require('../procs/test/focusables').focusables(page, 'focusMark');
+  // Mark the operable elements that are visible or focused-marked.
+  const opMarked = await require('../procs/test/markOperable').markOperable(page);
+  const data = {};
+  if (opMarked) {
+    // Get an array of the elements that are focusable but not operable.
+    const fNotO = await page.$$('body [data-autotest-focused]:not([data-autotest-operable])');
+    // Get an array of the elements that are operable but not focusable.
+    const oNotF = await page.$$('body [data-autotest-operable]:not([data-autotest-focused])');
+    // Get an array of the elements that are focusable and operable.
+    const fAndO = await page.$$('body [data-autotest-focused][data-autotest-operable]');
+    // FUNCTION DEFINITION START
+    // Recursively adds the tag names and texts or counts of elements to an array.
+    const compile = async (elements, totals, items, attribute, isF, isO) => {
+      // If any elements remain to be processed:
+      if (elements.length) {
+        // Identify the first element.
+        const firstElement = elements[0];
+        // Get its tag name, lower-cased.
+        const tagNameJSHandle = await firstElement.getProperty('tagName');
+        let tagName = await tagNameJSHandle.jsonValue();
+        tagName = tagName.toLowerCase();
+        // If it is “input”, add its type.
+        if (tagName === 'input') {
+          const type = await firstElement.getAttribute('type');
+          if (type) {
+            tagName += `[type=${type}]`;
           }
+        }
+        // Add it to the grand total for its type.
+        totals[attribute].total++;
+        // Add it to the total for its type and tag name.
+        const tagNameTotals = totals[attribute].tagName;
+        if (tagNameTotals[tagName]) {
+          tagNameTotals[tagName]++;
+        }
+        else {
+          tagNameTotals[tagName] = 1;
+        }
+        let how = '';
+        let why = '';
+        // If it is focusable:
+        if (isF) {
+          // Add it to the total for its type and focus method:
+          const howTotals = totals[attribute].focusableHow;
+          how = await firstElement.getAttribute('data-autotest-focused');
+          if (howTotals[how]) {
+            howTotals[how]++;
+          }
+          else {
+            howTotals[how] = 1;
+          }
+        }
+        // If it is operable:
+        if (isO) {
+          // Add it to the total for its type and operability evidence:
+          const whyTotals = totals[attribute].operableWhy;
+          why = await firstElement.getAttribute('data-autotest-operable');
+          if (whyTotals[why]) {
+            whyTotals[why]++;
+          }
+          else {
+            whyTotals[why] = 1;
+          }
+        }
+        // If itemization is required:
+        if (withItems) {
+          // Add the item to the itemization.
+          const item = {tagName};
+          if (isF) {
+            item.focusableHow = how;
+          }
+          if (isO) {
+            item.operableWhy = why;
+          }
+          const text = await allText(page, firstElement);
+          item.text = text;
+          items[attribute].push(item);
+        }
+        // Process the remaining elements.
+        return await compile(elements.slice(1), totals, items, attribute, isF, isO);
+      }
+      else {
+        return Promise.resolve('');
+      }
+    };
+    // FUNCTION DEFINITION END
+    // Initialize the data.
+    data.totals = {
+      focusableNotOperable: {
+        total: 0,
+        tagName: {},
+        focusableHow: {
+          Tab: 0,
+          ArrowRight: 0,
+          ArrowDown: 0
+        }
+      },
+      operableNotFocusable: {
+        total: 0,
+        tagName: {},
+        operableWhy: {
+          tag: 0,
+          cursor: 0,
+          onclick: 0
+        }
+      },
+      focusableAndOperable: {
+        total: 0,
+        tagName: {},
+        focusableHow: {
+          Tab: 0,
+          ArrowRight: 0,
+          ArrowDown: 0
+        },
+        operableWhy: {
+          tag: 0,
+          cursor: 0,
+          onclick: 0
         }
       }
     };
     if (withItems) {
       data.items = {
-        indicatorMissing: [],
-        nonOutlinePresent: [],
-        outlinePresent: []
+        focusableNotOperable: [],
+        operableNotFocusable: [],
+        focusableAndOperable: []
       };
     }
-    const addElementFacts = (element, status) => {
-      const type = data.totals.types[status];
-      type.total++;
-      const tagName = element.tagName;
-      if (type.tagNames[tagName]) {
-        type.tagNames[tagName]++;
-      }
-      else {
-        type.tagNames[tagName] = 1;
-      }
-      if (withItems) {
-        data.items[status].push({
-          tagName,
-          text: element.textContent.trim().replace(/\s{2,}/g, ' ').slice(0, 100)
-        });
-      }
-    };
-    elements.forEach(element => {
-      if (element.tabIndex === 0) {
-        data.totals.total++;
-        const styleBlurred = Object.assign({}, window.getComputedStyle(element));
-        element.focus({preventScroll: true});
-        const styleFocused = window.getComputedStyle(element);
-        const hasOutline
-          = styleBlurred.outlineWidth === '0px'
-          && styleFocused.outlineWidth !== '0px';
-        if (hasOutline) {
-          addElementFacts(element, 'outlinePresent');
-        }
-        else {
-          const diff = prop => styleFocused[prop] !== styleBlurred[prop];
-          const hasIndicator
-            = diff('borderStyle')
-            || (styleFocused.borderStyle !== 'none' && diff('borderWidth'))
-            || diff('outlineStyle')
-            || (styleFocused.outlineStyle !== 'none' && diff('outlineWidth'))
-            || diff('fontSize')
-            || diff('fontStyle')
-            || diff('textDecorationLine')
-            || diff('textDecorationStyle')
-            || diff('textDecorationThickness');
-          const status = hasIndicator ? 'nonOutlinePresent' : 'indicatorMissing';
-          addElementFacts(element, status);
-        }
-      }
-    });
-    return data;
-  }, withItems);
-  return {result: data};
+    // Populate them.
+    const totals = data.totals;
+    const items = data.items;
+    await compile(fNotO, totals, items, 'focusableNotOperable', true, false);
+    await compile(oNotF, totals, items, 'operableNotFocusable', false, true);
+    await compile(fAndO, totals, items, 'focusableAndOperable', true, true);
+    // Return it.
+    return {result: data};
+  }
+  else {
+    data.error = 'ERROR: operable marking failed';
+    return {result: data};
+  }
 };
