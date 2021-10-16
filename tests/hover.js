@@ -24,7 +24,10 @@ exports.reporter = async (page, withItems) => {
     }
   };
   if (withItems) {
-    data.items = [];
+    data.items = {
+      triggers: [],
+      unhoverables: []
+    };
   }
   let triggerTag = '';
   // FUNCTION DEFINITION START
@@ -34,7 +37,6 @@ exports.reporter = async (page, withItems) => {
     if (triggers.length) {
       // Identify the first of them.
       const firstTrigger = triggers[0];
-      const firstTriggerTag = firstTrigger.tagName;
       const tagNameJSHandle = await firstTrigger.getProperty('tagName')
       .catch(error => {
         console.log(`ERROR getting trigger tag name (${error.message})`);
@@ -76,7 +78,7 @@ exports.reporter = async (page, withItems) => {
           );
           // Wait for any delayed and/or slowed hover reaction if likely.
           await page.waitForTimeout(
-            elementsChecked++ < 10 || firstTriggerTag !== triggerTag || isController ? 1200 : 200
+            elementsChecked++ < 10 || tagName !== triggerTag || isController ? 1200 : 200
           );
           await root.waitForElementState('stable');
           // Identify the visible active descendants.
@@ -86,12 +88,12 @@ exports.reporter = async (page, withItems) => {
             elements => elements.map(el => window.getComputedStyle(el).opacity), descendants
           );
           // Identify the elements with opacity changes.
-          const opacityChangers = descendants
+          const opacityTargets = descendants
           .filter((descendant, index) => postOpacities[index] !== preOpacities[index]);
-          const opacityTargetCount = opacityChangers.length
+          const opacityTargetCount = opacityTargets.length
             ? await page.evaluate(elements => elements.reduce(
               (total, current) => total + 1 + current.querySelectorAll('*').length, 0
-            ), opacityChangers)
+            ), opacityTargets)
             : 0;
           // If hovering disclosed any element or changed any opacity:
           if (postVisibles.length > preVisibles.length || opacityTargetCount) {
@@ -129,11 +131,11 @@ exports.reporter = async (page, withItems) => {
                 const trigger = args[0];
                 const preVisibles = args[1];
                 const postVisibles = args[2];
-                const opacityChangers = args[3].map(el => ({
+                const opacityTriggered = args[3].map(el => ({
                   tagName: el.tagName,
                   text: textOf(el, 50)
                 }));
-                const newVisibles = postVisibles
+                const visibilityTriggered = postVisibles
                 .filter(el => ! preVisibles.includes(el))
                 .map(el => ({
                   tagName: el.tagName,
@@ -143,33 +145,37 @@ exports.reporter = async (page, withItems) => {
                   tagName: trigger.tagName,
                   id: trigger.id || '',
                   text: textOf(trigger, 50),
-                  newVisibles,
-                  opacityChangers
+                  visibilityTriggered,
+                  opacityTriggered
                 };
-              }, [firstTrigger, preVisibles, postVisibles, opacityChangers]);
+              }, [firstTrigger, preVisibles, postVisibles, opacityTargets]);
               const triggerData = await triggerDataJSHandle.jsonValue();
-              data.items.push(triggerData);
+              data.items.triggers.push(triggerData);
             }
           }
         }
         catch (error) {
           console.log('ERROR hovering');
           // Returns the text of an element.
-          const textOf = (element, limit) => {
-            let text = element.textContent.trim();
+          const textOf = async (element, limit) => {
+            const allText = await element.textContent();
+            let text = allText.trim();
             if (text) {
               text = text.replace(/\n.*/s, '');
             }
-            return (text ? text : element.outerHTML).slice(0, limit);
+            else {
+              text = await element.innerHTML();
+            }
+            return text.slice(0, limit);
           };
           data.totals.unhoverables++;
-          data.items.push({
-            tagName: firstTriggerTag,
+          data.items.unhoverables.push({
+            tagName: tagName,
             id: firstTrigger.id || '',
-            text: textOf(firstTrigger, 50)
+            text: await textOf(firstTrigger, 50)
           });
         }
-        triggerTag = firstTriggerTag;
+        triggerTag = tagName;
       }
       // Process the remaining potential triggers.
       await find(triggers.slice(1));
