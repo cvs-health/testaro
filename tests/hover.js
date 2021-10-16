@@ -18,8 +18,9 @@ exports.reporter = async (page, withItems) => {
   const data = {
     totals: {
       triggers: 0,
-      visibilityTargets: 0,
-      opacityTargets: 0,
+      madeVisible: 0,
+      opacityChanged: 0,
+      opacityAffected: 0,
       unhoverables: 0
     }
   };
@@ -61,11 +62,11 @@ exports.reporter = async (page, withItems) => {
           );
           root = rootJSHandle.asElement();
         }
-        // Identify the visible active descendants of the root.
+        // Identify the visible active descendants of the root before the hover.
         const preVisibles = await root.$$(targetSelectors);
         // Identify all the descendants of the root.
         const descendants = await root.$$('*');
-        // Identify their opacities.
+        // Identify their opacities before the hover.
         const preOpacities = await page.evaluate(
           elements => elements.map(el => window.getComputedStyle(el).opacity), descendants
         );
@@ -81,22 +82,23 @@ exports.reporter = async (page, withItems) => {
             elementsChecked++ < 10 || tagName !== triggerTag || isController ? 1200 : 200
           );
           await root.waitForElementState('stable');
-          // Identify the visible active descendants.
+          // Identify the visible active descendants of the root during the hover.
           const postVisibles = await root.$$(targetSelectors);
-          // Identify the opacities of the descendants of the root.
+          // Identify the opacities of the descendants of the root during the hover.
           const postOpacities = await page.evaluate(
             elements => elements.map(el => window.getComputedStyle(el).opacity), descendants
           );
           // Identify the elements with opacity changes.
           const opacityTargets = descendants
           .filter((descendant, index) => postOpacities[index] !== preOpacities[index]);
-          const opacityTargetCount = opacityTargets.length
+          // Count them and their descendants.
+          const opacityAffected = opacityTargets.length
             ? await page.evaluate(elements => elements.reduce(
               (total, current) => total + 1 + current.querySelectorAll('*').length, 0
             ), opacityTargets)
             : 0;
           // If hovering disclosed any element or changed any opacity:
-          if (postVisibles.length > preVisibles.length || opacityTargetCount) {
+          if (postVisibles.length > preVisibles.length || opacityAffected) {
             // Preserve the lengthened reaction wait, if any, for the next 5 tries.
             if (elementsChecked < 11) {
               elementsChecked = 5;
@@ -113,9 +115,10 @@ exports.reporter = async (page, withItems) => {
             await root.waitForElementState('stable');
             // Increment the counts of triggers and targets.
             data.totals.triggers++;
-            const visibilityTargetCount = postVisibles.length - preVisibles.length;
-            data.totals.visibilityTargets += visibilityTargetCount;
-            data.totals.opacityTargets += opacityTargetCount;
+            const madeVisible = postVisibles.length - preVisibles.length;
+            data.totals.madeVisible += madeVisible;
+            data.totals.opacityChanged += opacityTargets.length;
+            data.totals.opacityAffected += opacityAffected;
             // If details are to be reported:
             if (withItems) {
               // Report them.
@@ -131,13 +134,13 @@ exports.reporter = async (page, withItems) => {
                 const trigger = args[0];
                 const preVisibles = args[1];
                 const postVisibles = args[2];
-                const opacityTriggered = args[3].map(el => ({
+                const madeVisible = postVisibles
+                .filter(el => ! preVisibles.includes(el))
+                .map(el => ({
                   tagName: el.tagName,
                   text: textOf(el, 50)
                 }));
-                const visibilityTriggered = postVisibles
-                .filter(el => ! preVisibles.includes(el))
-                .map(el => ({
+                const opacityChanged = args[3].map(el => ({
                   tagName: el.tagName,
                   text: textOf(el, 50)
                 }));
@@ -145,8 +148,8 @@ exports.reporter = async (page, withItems) => {
                   tagName: trigger.tagName,
                   id: trigger.id || '',
                   text: textOf(trigger, 50),
-                  visibilityTriggered,
-                  opacityTriggered
+                  madeVisible,
+                  opacityChanged
                 };
               }, [firstTrigger, preVisibles, postVisibles, opacityTargets]);
               const triggerData = await triggerDataJSHandle.jsonValue();
