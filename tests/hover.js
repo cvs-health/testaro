@@ -125,11 +125,8 @@ exports.reporter = async (page, withItems) => {
               const triggerDataJSHandle = await page.evaluateHandle(args => {
                 // Returns the text of an element.
                 const textOf = (element, limit) => {
-                  let text = element.textContent.trim();
-                  if (text) {
-                    text = text.replace(/\n.*/s, '');
-                  }
-                  return (text ? text : element.outerHTML).slice(0, limit);
+                  const text = element.textContent.trim() || element.outerHTML.trim();
+                  return text.replace(/\s{2,}/sg, ' ').slice(0, limit);
                 };
                 const trigger = args[0];
                 const preVisibles = args[1];
@@ -161,15 +158,9 @@ exports.reporter = async (page, withItems) => {
           console.log('ERROR hovering');
           // Returns the text of an element.
           const textOf = async (element, limit) => {
-            const allText = await element.textContent();
-            let text = allText.trim();
-            if (text) {
-              text = text.replace(/\n.*/s, '');
-            }
-            else {
-              text = await element.innerHTML();
-            }
-            return text.slice(0, limit);
+            let text = await element.textContent();
+            text = text.trim() || await element.innerHTML();
+            return text.trim().replace(/\s*/sg, '').slice(0, limit);
           };
           data.totals.unhoverables++;
           data.items.unhoverables.push({
