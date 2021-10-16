@@ -15,9 +15,9 @@ const https = require('https');
 const {commands} = require('./commands');
 // ########## CONSTANTS
 // Set debug to true to add debugging features.
-const debug = true;
+const debug = false;
 // Set waits to a positive number to insert delays (in ms).
-const waits = 1000;
+const waits = 0;
 const protocol = process.env.PROTOCOL || 'https';
 // Files servable without modification.
 const statics = {
@@ -399,8 +399,7 @@ const isValid = command => {
 // Returns a string with any final slash removed.
 const deSlash = string => string.endsWith('/') ? string.slice(0, -1) : string;
 // Tries to visit a URL.
-const goto = async (page, url, timeout, awaitIdle, isStrict) => {
-  const waitUntil = awaitIdle ? 'networkidle' : 'domcontentloaded';
+const goto = async (page, url, timeout, waitUntil, isStrict) => {
   const response = await page.goto(url, {
     timeout,
     waitUntil
@@ -436,11 +435,11 @@ const visit = async (act, page, isStrict) => {
   const resolved = act.which.replace('__dirname', __dirname);
   requestedURL = resolved;
   // Visit it and wait 20 seconds or until the network is idle.
-  let response = await goto(page, requestedURL, 20000, true, isStrict);
+  let response = await goto(page, requestedURL, 20000, 'networkidle', isStrict);
   // If the visit fails:
   if (! response) {
     // Try again, but waiting until the DOM is loaded.
-    response = await goto(page, requestedURL, 15000, false, isStrict);
+    response = await goto(page, requestedURL, 15000, 'domcontentloaded', isStrict);
     // If the visit fails:
     if (! response) {
       // Launch another browser type.
@@ -451,21 +450,26 @@ const visit = async (act, page, isStrict) => {
       // Identify its only page as current.
       page = browserContext.pages()[0];
       // Try again, waiting 15 seconds or until the network is idle.
-      response = await goto(page, requestedURL, 15000, true, isStrict);
+      response = await goto(page, requestedURL, 15000, 'networkidle', isStrict);
       // If the visit fails:
       if (! response) {
         // Try again, but waiting 10 seconds or until the DOM is loaded.
-        response = await goto(page, requestedURL, 10000, false, isStrict);
+        response = await goto(page, requestedURL, 10000, 'domcontentloaded', isStrict);
         // If the visit fails:
         if (! response) {
-          // Give up.
-          console.log(`ERROR: Visits to ${requestedURL} failed`);
-          act.result = `ERROR: Visit to ${requestedURL} failed`;
-          await page.goto('about:blank')
-          .catch(error => {
-            console.log(`ERROR: Navigation to blank page failed (${error.message})`);
-          });
-          return null;
+          // Try again, waiting 10 seconds or until a load.
+          response = await goto(page, requestedURL, 10000, 'load', isStrict);
+          // If the visit fails:
+          if (! response) {
+            // Give up.
+            console.log(`ERROR: Visits to ${requestedURL} failed`);
+            act.result = `ERROR: Visit to ${requestedURL} failed`;
+            await page.goto('about:blank')
+            .catch(error => {
+              console.log(`ERROR: Navigation to blank page failed (${error.message})`);
+            });
+            return null;
+          }
         }
       }
     }

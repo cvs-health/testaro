@@ -24,6 +24,7 @@ exports.reporter = async (page, withItems) => {
       if (withItems) {
         data.items.push({
           tagName,
+          id: element.id || '',
           text: element.textContent.trim().replace(/\s{2,}/g, ' ').slice(0, 100)
         });
       }
