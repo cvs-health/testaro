@@ -476,8 +476,6 @@ const visit = async (act, page, isStrict) => {
   }
   // If one of the visits succeeded:
   if (response) {
-    // Press the Escape key to dismiss any initial modal dialog.
-    await page.keyboard.press('Escape');
     // Add the resulting URL to the act.
     act.result = page.url();
     // Return the page.
