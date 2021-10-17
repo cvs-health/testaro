@@ -27,7 +27,7 @@ if (colSpec === 'p3') {
 }
 // Identify the containing HTML code.
 const options = ['aut', 'aa', 'p3'];
-const optionColNames = [['Autotest'], ['Autotest', 'Axe'], ['Axe', 'IBM', 'WAVE']];
+const optionColNames = [['Deficit'], ['Autotest', 'Axe'], ['Axe', 'IBM', 'WAVE']];
 const optionPropNames = [['total'], ['total', 'axe'], ['axe', 'ibm', 'wave']];
 const colNames = optionColNames[options.indexOf(colSpec)];
 const propNames = optionPropNames[options.indexOf(colSpec)];
