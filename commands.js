@@ -23,8 +23,7 @@ exports.commands = {
     focOp: [
       'Perform a focOp test (revealAll: whether to make all elements visible)',
       {
-        withItems: [true, 'boolean'],
-        revealAll: [true, 'boolean']
+        withItems: [true, 'boolean']
       }
     ],
     hover: [

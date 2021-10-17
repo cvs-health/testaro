@@ -229,7 +229,7 @@ exports.scorer = acts => {
         if (facts) {
           rules.focOp = 'multiply nonfocusable operable elements by 4, nonoperable focusable by 1; sum';
           deficit.focOp
-            = 4 * facts.operableNotFocusable.total + 1 * facts.focusableNotOperable.total;
+            = 4 * facts.types.onlyOperable.total + 1 * facts.types.onlyFocusable.total;
         }
         else {
           inferences.focOp = 150;
