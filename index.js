@@ -85,6 +85,7 @@ const tests = {
   state: 'focus and hover states',
   styleDiff: 'style inconsistencies',
   tblAc: 'active elements contained by tables',
+  test: 'miscellaneous',
   wave: 'WAVE',
   zIndex: 'z indexes'
 };
