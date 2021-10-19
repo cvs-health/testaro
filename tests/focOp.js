@@ -114,6 +114,9 @@ exports.reporter = async (page, withItems) => {
       }
     });
     return data;
-  }, withItems);
+  }, withItems)
+  .catch(error => {
+    console.log(`ERROR getting focOp data (${error.message})`);
+  });
   return {result: data};
 };
