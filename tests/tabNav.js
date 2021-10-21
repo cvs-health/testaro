@@ -78,7 +78,7 @@ exports.reporter = async (page, withItems) => {
     }, tabs);
     // Tests a navigation on a tab element.
     const testKey = async (
-      tabs, tabElement, keyName, keyProp, goodIndex, listIsCorrect, elementIsCorrect, itemData
+      tabs, tabElement, keyName, keyProp, goodIndex, elementIsCorrect, itemData
     ) => {
       // Focus the tab element and then press the specified key.
       await tabElement.press(keyName);
@@ -98,12 +98,12 @@ exports.reporter = async (page, withItems) => {
         // Increment the counts of incorrect navigations and incorrect key navigations.
         data.totals.navigations.all.incorrect++;
         data.totals.navigations.specific[keyProp].incorrect++;
-        // Update the element and list statuses to incorrect.
-        listIsCorrect = false;
+        // Update the element status to incorrect.
         elementIsCorrect = false;
         // Update the element report.
         itemData.navigationErrors.push(keyName);
       }
+      return elementIsCorrect;
     };
     // Return the index to which an arrow key should move the focus.
     const arrowTarget = (startIndex, tabCount, orientation, direction) => {
@@ -150,50 +150,46 @@ exports.reporter = async (page, withItems) => {
           itemData.navigationErrors = [];
         }
         // Test the element with each navigation key.
-        await testKey(tabs, currentTab, 'Tab', 'tab', -1, listIsCorrect, isCorrect, itemData);
-        await testKey(
+        isCorrect = await testKey(tabs, currentTab, 'Tab', 'tab', -1, isCorrect, itemData);
+        isCorrect = await testKey(
           tabs,
           currentTab,
           'ArrowLeft',
           'left',
           arrowTarget(index, tabCount, listOrientation, 'left'),
-          listIsCorrect,
           isCorrect,
           itemData
         );
-        await testKey(
+        isCorrect = await testKey(
           tabs,
           currentTab,
-          'ArrowRightt',
+          'ArrowRight',
           'right',
           arrowTarget(index, tabCount, listOrientation, 'right'),
-          listIsCorrect,
           isCorrect,
           itemData
         );
-        await testKey(
+        isCorrect = await testKey(
           tabs,
           currentTab,
           'ArrowUp',
           'up',
           arrowTarget(index, tabCount, listOrientation, 'up'),
-          listIsCorrect,
           isCorrect,
           itemData
         );
-        await testKey(
+        isCorrect = await testKey(
           tabs,
           currentTab,
           'ArrowDown',
           'down',
           arrowTarget(index, tabCount, listOrientation, 'down'),
-          listIsCorrect,
           isCorrect,
           itemData
         );
-        await testKey(tabs, currentTab, 'Home', 'home', 0, listIsCorrect, isCorrect, itemData);
-        await testKey(
-          tabs, currentTab, 'End', 'end', tabCount - 1, listIsCorrect, isCorrect, itemData
+        isCorrect = await testKey(tabs, currentTab, 'Home', 'home', 0, isCorrect, itemData);
+        isCorrect = await testKey(
+          tabs, currentTab, 'End', 'end', tabCount - 1, isCorrect, itemData
         );
         // Increment the data.
         data.totals.tabElements.total++;
@@ -227,7 +223,7 @@ exports.reporter = async (page, withItems) => {
       }
     };
     // FUNCTION DEFINITIONS END
-    testTabLists(tabLists);
+    await testTabLists(tabLists);
   }
   return {result: data};
 };
