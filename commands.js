@@ -77,6 +77,12 @@ exports.commands = {
         withItems: [true, 'boolean']
       }
     ],
+    tabNav: [
+      'Perform a tabNav test',
+      {
+        withItems: [true, 'boolean']
+      }
+    ],
     wave: [
       'Perform a WAVE test (reportType: 1, 2, 3, or 4, per WAVE API documentation)',
       {

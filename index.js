@@ -84,6 +84,7 @@ const tests = {
   simple: 'nothing',
   state: 'focus and hover states',
   styleDiff: 'style inconsistencies',
+  tabNav: 'keyboard navigation between tab elements',
   tblAc: 'active elements contained by tables',
   test: 'miscellaneous',
   wave: 'WAVE',
