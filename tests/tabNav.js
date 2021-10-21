@@ -68,7 +68,6 @@ exports.reporter = async (page, withItems) => {
   // Identify an array of the tablists.
   const tabLists = await page.$$('[role=tablist]');
   if (tabLists.length) {
-    const tabListsData = [];
     // FUNCTION DEFINITIONS START
     // Returns text associated with an element.
     const {allText} = require('../procs/test/allText');
@@ -105,7 +104,7 @@ exports.reporter = async (page, withItems) => {
         // Update the element report.
         itemData.navigationErrors.push(keyName);
       }
-    }
+    };
     // Return the index to which an arrow key should move the focus.
     const arrowTarget = (startIndex, tabCount, orientation, direction) => {
       if (orientation === 'horizontal') {
@@ -116,7 +115,7 @@ exports.reporter = async (page, withItems) => {
           return startIndex ? startIndex - 1 : tabCount - 1;
         }
         else if (direction === 'right') {
-          return startIndex === tabCount - 1 ? 0 : startIndex + 1
+          return startIndex === tabCount - 1 ? 0 : startIndex + 1;
         }
       }
       else if (orientation === 'vertical') {
@@ -127,10 +126,10 @@ exports.reporter = async (page, withItems) => {
           return startIndex ? startIndex - 1 : tabCount - 1;
         }
         else if (direction === 'down') {
-          return startIndex === tabCount - 1 ? 0 : startIndex + 1
+          return startIndex === tabCount - 1 ? 0 : startIndex + 1;
         }
       }
-    }
+    };
     // Recursively tests all tab elements in a tab list.
     const testTabs = async (tabs, index, listOrientation, listIsCorrect) => {
       const tabCount = tabs.length;
@@ -196,128 +195,39 @@ exports.reporter = async (page, withItems) => {
         await testKey(
           tabs, currentTab, 'End', 'end', tabCount - 1, listIsCorrect, isCorrect, itemData
         );
+        // Increment the data.
+        data.totals.tabElements.total++;
+        data.totals.tabElements[isCorrect ? 'correct' : 'incorrect']++;
+        // Process the next tab element.
+        await testTabs(tabs, index + 1, listOrientation, listIsCorrect);
       }
-      await testTabs(tabs, index + 1, listOrientation, listIsCorrect);
+      // Otherwise, i.e. if all tab elements have been tested:
+      else {
+        // Return whether the tablist is correct.
+        return listIsCorrect;
+      }
     };
     // Recursively tests tablists.
     const testTabLists = async tabLists => {
+      // If any tablists remain to be tested:
       if (tabLists.length) {
         const firstTabList = tabLists[0];
         const orientation = (await firstTabList.getAttribute('aria-orientation')) || 'horizontal';
         const tabs = await firstTabList.$$('[role=tab]');
-        const isCorrect = await testTabs(tabs, 0, orientation, true);
-        await testTabLists(tabLists.slice(1));
-      }
-    };
-    // FUNCTION DEFINITIONS END
-  }
-  tabLists.forEach(async tabList => {
-    const tabs = await tabList.$$('[role=tab]');
-    if (tabs.length > 1) {
-      const listData = {
-        orientation: (,
-        tabs
-      };
-      tabListsData.push(listData);
-    }
-  });
-  // Test the navigation in each tablist.
-  tabListsData.forEach(tabListData => {
-    data.totals.tabLists.total++;
-    tabListData.tabs.forEach(async (tab, index) => {
-      const tabData = {
-
-      };
-      await tab.press('Tab');
-      const focusIndex = focusedTab(tabs);
-      if ()
-    });
-  });
-    if (name) {
-      if (radioData.name) {
-        radioData.name.push(radio);
-      }
-      else {
-        radioData.name = radio;
-      }
-    }
-  });
-  Object.keys(radioData).forEach(name => {
-    if (radioData[name].length > 1) {
-      radioData[name].forEach((radio, index) => {
-        
-      });
-    }
-  });
-  const text = require('../procs/test/allText').allText(page, radio);
-  // If itemization is required:
-  // Get the result data.
-  const dataJSHandle = await page.evaluateHandle(args => {
-    const withItems = args[0];
-    // FUNCTION DEFINITIONS START
-    /*
-      If itemization is required, define the textOf function to get element texts.
-      The function body is read as a string and passed to this method because
-      a string can be passed in but a function cannot.
-    */
-    const textOf = args[1] ? new Function('element', args[1]) : '';
-    // Trim excess spaces from a string.
-    const debloat = text => text.trim().replace(/\s+/g, ' ');
-    // FUNCTION DEFINITIONS END
-    // Initialize a report.
-    const data = {
-      totals: {
-        total: 0,
-        inSet: 0,
-        percent: 0
-      }
-    };
-    if (withItems) {
-      data.items = {
-        inSet: [],
-        notInSet: []
-      };
-    }
-    // Get an array of all fieldset elements.
-    const fieldsets = Array.from(document.body.querySelectorAll('fieldset'));
-    // Get an array of those with valid legends.
-    const legendSets = fieldsets.filter(fieldset => {
-      const firstChild = fieldset.firstElementChild;
-      return firstChild
-      && firstChild.tagName === 'LEGEND'
-      && debloat(firstChild.textContent).length;
-    });
-    // Get an array of the radio buttons in those with homogeneous radio buttons.
-    const setRadios = legendSets.reduce((radios, currentSet) => {
-      const currentRadios = Array.from(currentSet.querySelectorAll('input[type=radio]'));
-      const radioCount = currentRadios.length;
-      if (radioCount == 1) {
-        radios.push(currentRadios[0]);
-      }
-      else if (radioCount > 1) {
-        const radioName = currentRadios[0].name;
-        if (radioName && currentRadios.slice(1).every(radio => radio.name === radioName)) {
-          radios.push(...currentRadios);
+        // If the tablist contains at least 2 tab elements:
+        if (tabs.length > 1) {
+          // Test them.
+          const isCorrect = await testTabs(tabs, 0, orientation, true);
+          // Increment the data.
+          data.totals.tabLists.total++;
+          data.totals.tabLists[isCorrect ? 'correct' : 'incorrect']++;
+          // Process the remaining tablists.
+          await testTabLists(tabLists.slice(1));
         }
       }
-      return radios;
-    }, []);
-    // Get an array of all radio buttons.
-    const allRadios = Array.from(document.body.querySelectorAll('input[type=radio'));
-    // Tabulate the results.
-    const totals = data.totals;
-    totals.total = allRadios.length;
-    totals.inSet = setRadios.length;
-    totals.percent = totals.total ? Math.floor(100 * totals.inSet / totals.total) : 'N.A.';
-    // If itemization is required:
-    if (withItems) {
-      // Add it to the results.
-      const nonSetRadios = allRadios.filter(radio => ! setRadios.includes(radio));
-      const items = data.items;
-      items.inSet = setRadios.map(radio => textOf(radio));
-      items.notInSet = nonSetRadios.map(radio => textOf(radio));
-    }
-    return {result: data};
-  }, args);
-  return await dataJSHandle.jsonValue();
+    };
+    // FUNCTION DEFINITIONS END
+    testTabLists(tabLists);
+  }
+  return {result: data};
 };
