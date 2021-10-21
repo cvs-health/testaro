@@ -100,8 +100,11 @@ exports.reporter = async (page, withItems) => {
         data.totals.navigations.specific[keyProp].incorrect++;
         // Update the element status to incorrect.
         elementIsCorrect = false;
-        // Update the element report.
-        itemData.navigationErrors.push(keyName);
+        // If itemization is required:
+        if (withItems) {
+          // Update the element report.
+          itemData.navigationErrors.push(keyName);
+        }
       }
       return elementIsCorrect;
     };
@@ -130,7 +133,10 @@ exports.reporter = async (page, withItems) => {
         }
       }
     };
-    // Recursively tests all tab elements in a tab list.
+    /*
+      Recursively tests tablist tab elements (per
+      https://www.w3.org/TR/wai-aria-practices-1.1/#tabpanel)
+    */
     const testTabs = async (tabs, index, listOrientation, listIsCorrect) => {
       const tabCount = tabs.length;
       // If any tab elements remain to be tested:
@@ -192,8 +198,10 @@ exports.reporter = async (page, withItems) => {
           tabs, currentTab, 'End', 'end', tabCount - 1, isCorrect, itemData
         );
         // Increment the data.
-        data.totals.tabElements.total++;
         data.totals.tabElements[isCorrect ? 'correct' : 'incorrect']++;
+        if (withItems) {
+          data.tabElements[isCorrect ? 'correct' : 'incorrect'].push(itemData);
+        }
         // Process the next tab element.
         await testTabs(tabs, index + 1, listOrientation, listIsCorrect);
       }
