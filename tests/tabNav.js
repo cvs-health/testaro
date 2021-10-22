@@ -197,13 +197,15 @@ exports.reporter = async (page, withItems) => {
         isCorrect = await testKey(
           tabs, currentTab, 'End', 'end', tabCount - 1, isCorrect, itemData
         );
+        // Update the tablist status (&&= operator from ES 2021 rejected by node 14).
+        listIsCorrect = listIsCorrect && isCorrect;
         // Increment the data.
         data.totals.tabElements[isCorrect ? 'correct' : 'incorrect']++;
         if (withItems) {
           data.tabElements[isCorrect ? 'correct' : 'incorrect'].push(itemData);
         }
         // Process the next tab element.
-        await testTabs(tabs, index + 1, listOrientation, listIsCorrect);
+        return await testTabs(tabs, index + 1, listOrientation, listIsCorrect);
       }
       // Otherwise, i.e. if all tab elements have been tested:
       else {
