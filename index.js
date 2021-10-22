@@ -106,6 +106,8 @@ const waitables = ['url', 'title', 'body'];
 let logCount = 0;
 let logSize = 0;
 let prohibitedCount = 0;
+let visitTimeoutCount = 0;
+let visitRejectionCount = 0;
 // Facts about the current browser.
 let browserContext;
 let browserTypeName;
@@ -413,6 +415,7 @@ const goto = async (page, url, timeout, waitUntil, isStrict) => {
   })
   .catch(error => {
     console.log(`ERROR: Visit to ${url} timed out before ${waitUntil} (${error.message})`);
+    visitTimeoutCount++;
     return null;
   });
   if (response) {
@@ -429,6 +432,7 @@ const goto = async (page, url, timeout, waitUntil, isStrict) => {
     }
     else {
       console.log(`ERROR: Visit to ${url} got status ${httpStatus}`);
+      visitRejectionCount++;
       return null;
     }
   }
@@ -721,6 +725,8 @@ const scriptHandler = async (
   report.logCount = 0;
   report.logSize = 0;
   report.prohibitedCount = 0;
+  report.visitTimeoutCount = 0;
+  report.visitRejectionCount = 0;
   report.acts = acts;
   report.testTimes = [];
   const hostSuffix = hostIndex > -1 ? `-${hostIndex.toString().padStart(3, '0')}` : '';
@@ -733,6 +739,8 @@ const scriptHandler = async (
   report.logCount = logCount;
   report.logSize = logSize;
   report.prohibitedCount = prohibitedCount;
+  report.visitTimoutCount = visitTimeoutCount;
+  report.visitRejectionCount = visitRejectionCount;
   // If logs are to be scored, do so.
   const scoreTables = report.acts.filter(act => act.type === 'score');
   if (scoreTables.length) {
@@ -745,6 +753,8 @@ const scriptHandler = async (
           logWeights.count * logCount
           + logWeights.size * logSize
           + logWeights.prohibited * prohibitedCount
+          + logWeights.visitTimeout * visitTimeoutCount
+          + logWeights.visitRejection * visitRejectionCount
         );
         deficit.total += deficit.log;
       }

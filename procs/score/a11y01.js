@@ -4,7 +4,9 @@ exports.scorer = acts => {
   const logWeights = {
     count: 0.5,
     size: 0.01,
-    prohibited: 20
+    prohibited: 15,
+    visitTimeout: 10,
+    visitRejection: 10
   };
   const rules = {
     axe: '',
