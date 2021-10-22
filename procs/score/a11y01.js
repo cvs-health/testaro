@@ -3,7 +3,8 @@ exports.scorer = acts => {
   // Define the configuration disclosures.
   const logWeights = {
     count: 0.5,
-    size: 0.01
+    size: 0.01,
+    prohibited: 20
   };
   const rules = {
     axe: '',
@@ -15,7 +16,7 @@ exports.scorer = acts => {
     ibm: '',
     labClash: '',
     linkUl: '',
-    log: 'multiply log messages by logWeights.count, sum of characters in log messages by logWeights.size',
+    log: 'multiply log messages by 0.5, sum of characters in log messages by 0.01, 403 errors by 20; sum',
     motion: '',
     radioSet: '',
     role: '',

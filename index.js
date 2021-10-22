@@ -105,6 +105,7 @@ const waitables = ['url', 'title', 'body'];
 // Facts about the current session.
 let logCount = 0;
 let logSize = 0;
+let prohibitedCount = 0;
 // Facts about the current browser.
 let browserContext;
 let browserTypeName;
@@ -149,6 +150,10 @@ const launch = async typeName => {
         console.log(msgText);
         logCount++;
         logSize += msgText.length;
+        const msgLC = msgText.toLowerCase();
+        if (msgText.includes('403') && (msgLC.includes('status') || msgLC.includes('prohibited'))) {
+          prohibitedCount++;
+        }
       });
     });
     // Open the first page of the context.
@@ -715,6 +720,7 @@ const scriptHandler = async (
   report.timeStamp = query.timeStamp;
   report.logCount = 0;
   report.logSize = 0;
+  report.prohibitedCount = 0;
   report.acts = acts;
   report.testTimes = [];
   const hostSuffix = hostIndex > -1 ? `-${hostIndex.toString().padStart(3, '0')}` : '';
@@ -726,6 +732,7 @@ const scriptHandler = async (
   // Add the log statistics to the report.
   report.logCount = logCount;
   report.logSize = logSize;
+  report.prohibitedCount = prohibitedCount;
   // If logs are to be scored, do so.
   const scoreTables = report.acts.filter(act => act.type === 'score');
   if (scoreTables.length) {
@@ -734,7 +741,11 @@ const scriptHandler = async (
     if (result) {
       const {logWeights, deficit} = result;
       if (logWeights && deficit) {
-        deficit.log = Math.floor(logWeights.count * logCount + logWeights.size * logSize);
+        deficit.log = Math.floor(
+          logWeights.count * logCount
+          + logWeights.size * logSize
+          + logWeights.prohibited * prohibitedCount
+        );
         deficit.total += deficit.log;
       }
     }
