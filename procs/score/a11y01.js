@@ -18,7 +18,7 @@ exports.scorer = acts => {
     ibm: '',
     labClash: '',
     linkUl: '',
-    log: 'multiply log messages by 0.5, sum of characters in log messages by 0.01, 403 errors by 20; sum',
+    log: 'multiply log items by respective logWeights; sum',
     motion: '',
     radioSet: '',
     role: '',

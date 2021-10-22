@@ -739,7 +739,7 @@ const scriptHandler = async (
   report.logCount = logCount;
   report.logSize = logSize;
   report.prohibitedCount = prohibitedCount;
-  report.visitTimoutCount = visitTimeoutCount;
+  report.visitTimeoutCount = visitTimeoutCount;
   report.visitRejectionCount = visitRejectionCount;
   // If logs are to be scored, do so.
   const scoreTables = report.acts.filter(act => act.type === 'score');
