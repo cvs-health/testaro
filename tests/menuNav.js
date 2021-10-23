@@ -247,7 +247,6 @@ exports.reporter = async (page, withItems) => {
         if (menuItems.length > 1) {
           // Ensure that the menu is visible.
           await page.evaluate(menu => {
-            menu.setAttribute('aria-expanded', true);
             menu.style.display = 'revert';
             menu.style.visibility = 'visible';
             menu.style.opacity = 1;
