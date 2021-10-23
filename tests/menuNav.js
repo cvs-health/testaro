@@ -214,9 +214,9 @@ exports.reporter = async (page, withItems) => {
         // Update the tablist status (&&= operator from ES 2021 rejected by node 14).
         menuIsCorrect = menuIsCorrect && isCorrect;
         // Increment the data.
-        data.totals.tabElements[isCorrect ? 'correct' : 'incorrect']++;
+        data.totals.menuItems[isCorrect ? 'correct' : 'incorrect']++;
         if (withItems) {
-          data.tabElements[isCorrect ? 'correct' : 'incorrect'].push(itemData);
+          data.menuItems[isCorrect ? 'correct' : 'incorrect'].push(itemData);
         }
         // Process the next tab element.
         return await testMenuItems(menuItems, index + 1, orientation, menuIsCorrect);
