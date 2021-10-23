@@ -80,7 +80,9 @@ exports.reporter = async (page, withItems) => {
     const testKey = async (
       tabs, tabElement, keyName, keyProp, goodIndex, elementIsCorrect, itemData
     ) => {
-      // Focus the tab element and then press the specified key.
+      // Click the tab element, to make the focus on it effective.
+      await tabElement.click();
+      // Refocus the tab element and press the specified key (page.keyboard.press may fail).
       await tabElement.press(keyName);
       // Increment the counts of navigations and key navigations.
       data.totals.navigations.all.total++;

@@ -87,6 +87,7 @@ const tests = {
   tabNav: 'keyboard navigation between tab elements',
   tblAc: 'active elements contained by tables',
   test: 'miscellaneous',
+  visibles: 'visible elements',
   wave: 'WAVE',
   zIndex: 'z indexes'
 };
