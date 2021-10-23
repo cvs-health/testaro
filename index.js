@@ -77,6 +77,7 @@ const tests = {
   inLab: 'input labels',
   labClash: 'labeling inconsistencies',
   linkUl: 'inline-link underlining',
+  menuNav: 'keyboard navigation between focusable menu items',
   motion: 'motion',
   radioSet: 'fieldset grouping of radio buttons',
   roleList: 'role attributes',
@@ -91,8 +92,9 @@ const tests = {
   wave: 'WAVE',
   zIndex: 'z indexes'
 };
+// Tests that may change the DOM.
 const domChangers = new Set([
-  'axe', 'focInd', 'focOp', 'hover', 'ibm', 'state', 'wave'
+  'axe', 'focInd', 'focOp', 'hover', 'ibm', 'menuNav', 'state', 'wave'
 ]);
 // Browser types available in PlayWright.
 const browserTypeNames = {

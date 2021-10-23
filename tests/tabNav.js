@@ -110,7 +110,7 @@ exports.reporter = async (page, withItems) => {
       }
       return elementIsCorrect;
     };
-    // Return the index to which an arrow key should move the focus.
+    // Returns the index to which an arrow key should move the focus.
     const arrowTarget = (startIndex, tabCount, orientation, direction) => {
       if (orientation === 'horizontal') {
         if (['up', 'down'].includes(direction)) {
@@ -143,7 +143,7 @@ exports.reporter = async (page, withItems) => {
       const tabCount = tabs.length;
       // If any tab elements remain to be tested:
       if (index < tabCount) {
-        // Increment the count of tab elements.
+        // Increment the reported count of tab elements.
         data.totals.tabElements.total++;
         // Identify the tab element to be tested.
         const currentTab = tabs[index];
