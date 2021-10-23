@@ -67,7 +67,7 @@ exports.reporter = async (page, withItems) => {
   }
   // Identify an array of the true-focus menus.
   const menus = await page.$$(
-    '[role=menu]:not([aria-activedescendant], [role=menubar]:not([aria-activedescendant])'
+    '[role=menu]:not([aria-activedescendant]), [role=menubar]:not([aria-activedescendant])'
   );
   if (menus.length) {
     // FUNCTION DEFINITIONS START
