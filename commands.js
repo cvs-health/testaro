@@ -51,6 +51,12 @@ exports.commands = {
         withItems: [true, 'boolean']
       }
     ],
+    menuNav: [
+      'Perform a tabNav test',
+      {
+        withItems: [true, 'boolean']
+      }
+    ],
     motion: [
       'Perform a motion test (delay: ms until start; interval: ms between; count: of screenshots)',
       {

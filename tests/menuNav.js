@@ -80,11 +80,22 @@ exports.reporter = async (page, withItems) => {
     }, menuItems);
     // Tests a navigation on a menu item.
     const testKey = async (
-      menuItems, menuItem, keyName, keyProp, goodIndex, itemIsCorrect, itemData
+      menu, menuItems, menuItem, keyName, keyProp, goodIndex, itemIsCorrect, itemData
     ) => {
-      // Click the menu item, to make the focus on it effective.
-      await menuItem.click();
-      // Refocus the menu item and press the specified key (page.keyboard.press may fail).
+      // Make the menu visible and the menu item the active one.
+      await page.evaluate(args => {
+        const menu = args[0];
+        const menuItems = args[1];
+        const menuItem = args[2];
+        menu.style.display = 'revert';
+        menu.style.visibility = 'visible';
+        menu.style.opacity = 1;
+        menuItems.forEach(item => {
+          item.tabIndex = -1;
+        });
+        menuItem.tabIndex = 0;
+      }, [menu, menuItems, menuItem]);
+      // Focus it and press the specified key.
       await menuItem.press(keyName);
       // Increment the counts of navigations and key navigations.
       data.totals.navigations.all.total++;
@@ -117,13 +128,9 @@ exports.reporter = async (page, withItems) => {
       return itemIsCorrect;
     };
     // Returns the index to which an arrow key should move the focus.
-    const arrowTarget = (startIndex, itemCount, orientation, hasSubmenu, direction) => {
+    const arrowTarget = (startIndex, itemCount, orientation, direction) => {
       if (orientation === 'horizontal') {
-        // Up or down will exit the menu if there is a sibling menu or else not move the focus.
-        if (['up', 'down'].includes(direction)) {
-          return hasSubmenu ? -1 : null;
-        }
-        else if (direction === 'left') {
+        if (direction === 'left') {
           return startIndex ? startIndex - 1 : itemCount - 1;
         }
         else if (direction === 'right') {
@@ -131,11 +138,7 @@ exports.reporter = async (page, withItems) => {
         }
       }
       else if (orientation === 'vertical') {
-        // Left or right will exit the menu if there is a sibling menu or else not move the focus.
-        if (['left', 'right'].includes(direction)) {
-          return hasSubmenu ? -1 : null;
-        }
-        else if (direction === 'up') {
+        if (direction === 'up') {
           return startIndex ? startIndex - 1 : itemCount - 1;
         }
         else if (direction === 'down') {
@@ -147,7 +150,7 @@ exports.reporter = async (page, withItems) => {
       Recursively tests menu items of a menu (per
       https://www.w3.org/TR/wai-aria-practices-1.1/#menu)
     */
-    const testMenuItems = async (menuItems, index, orientation, menuIsCorrect) => {
+    const testMenuItems = async (menu, menuItems, index, orientation, menuIsCorrect) => {
       const itemCount = menuItems.length;
       // If any menu items remain to be tested:
       if (index < itemCount) {
@@ -165,53 +168,39 @@ exports.reporter = async (page, withItems) => {
           itemData.text = await allText(page, currentItem);
           itemData.navigationErrors = [];
         }
-        // Identify whether the menu item has a submenu.
-        const hasSubmenu = ['true', 'menu'].includes(
-          await currentItem.getAttribute('aria-haspopup')
-        );
         // Test the element with each navigation key.
-        isCorrect = await testKey(menuItems, currentItem, 'Tab', 'tab', -1, isCorrect, itemData);
         isCorrect = await testKey(
-          menuItems,
-          currentItem,
-          'ArrowLeft',
-          'left',
-          arrowTarget(index, itemCount, orientation, hasSubmenu, 'left'),
-          isCorrect,
-          itemData
+          menu, menuItems, currentItem, 'Tab', 'tab', -1, isCorrect, itemData
+        );
+        // FUNCTION DEFINITION START
+        const testArrow = async (keyName, keyProp) => {
+          isCorrect = await testKey(
+            menu,
+            menuItems,
+            currentItem,
+            keyName,
+            keyProp,
+            arrowTarget(index, itemCount, orientation, keyProp),
+            isCorrect,
+            itemData
+          );
+        };
+        // FUNCTION DEFINITION END
+        if (orientation === 'vertical') {
+          await testArrow('ArrowUp', 'up');
+          await testArrow('ArrowDown', 'down');
+        }
+        else {
+          await testArrow('ArrowRight', 'right');
+          await testArrow('ArrowLeft', 'left');
+        }
+        isCorrect = await testKey(
+          menu, menuItems, currentItem, 'Home', 'home', 0, isCorrect, itemData
         );
         isCorrect = await testKey(
-          menuItems,
-          currentItem,
-          'ArrowRight',
-          'right',
-          arrowTarget(index, itemCount, orientation, hasSubmenu, 'right'),
-          isCorrect,
-          itemData
+          menu, menuItems, currentItem, 'End', 'end', itemCount - 1, isCorrect, itemData
         );
-        isCorrect = await testKey(
-          menuItems,
-          currentItem,
-          'ArrowUp',
-          'up',
-          arrowTarget(index, itemCount, orientation, hasSubmenu, 'up'),
-          isCorrect,
-          itemData
-        );
-        isCorrect = await testKey(
-          menuItems,
-          currentItem,
-          'ArrowDown',
-          'down',
-          arrowTarget(index, itemCount, orientation, hasSubmenu, 'down'),
-          isCorrect,
-          itemData
-        );
-        isCorrect = await testKey(menuItems, currentItem, 'Home', 'home', 0, isCorrect, itemData);
-        isCorrect = await testKey(
-          menuItems, currentItem, 'End', 'end', itemCount - 1, isCorrect, itemData
-        );
-        // Update the tablist status (&&= operator from ES 2021 rejected by node 14).
+        // Update the menu-item status (Node 14 does not support the ES 2021 &&= operator).
         menuIsCorrect = menuIsCorrect && isCorrect;
         // Increment the data.
         data.totals.menuItems[isCorrect ? 'correct' : 'incorrect']++;
@@ -219,15 +208,15 @@ exports.reporter = async (page, withItems) => {
           data.menuItems[isCorrect ? 'correct' : 'incorrect'].push(itemData);
         }
         // Process the next tab element.
-        return await testMenuItems(menuItems, index + 1, orientation, menuIsCorrect);
+        return await testMenuItems(menu, menuItems, index + 1, orientation, menuIsCorrect);
       }
-      // Otherwise, i.e. if all tab elements have been tested:
+      // Otherwise, i.e. if all menu items have been tested:
       else {
-        // Return whether the tablist is correct.
+        // Return whether the menu is correct.
         return menuIsCorrect;
       }
     };
-    // Recursively tests tablists.
+    // Recursively tests menus.
     const testMenus = async menus => {
       // If any menus remain to be tested:
       if (menus.length) {
@@ -241,18 +230,12 @@ exports.reporter = async (page, withItems) => {
         );
         // Identify its direct menu items.
         const menuItems = await firstMenu.$$(
-          '[role=menuitem]:not([role=menuitem] [role=menuitem])'
+          '[role=menuitem]:not([role=menu] [role=menuitem]):not([role=menubar] [role=menuitem])'
         );
         // If the menu contains at least 2 direct menu items:
         if (menuItems.length > 1) {
-          // Ensure that the menu is visible.
-          await page.evaluate(menu => {
-            menu.style.display = 'revert';
-            menu.style.visibility = 'visible';
-            menu.style.opacity = 1;
-          }, firstMenu);
           // Test its menu items.
-          const isCorrect = await testMenuItems(menuItems, 0, orientation, true);
+          const isCorrect = await testMenuItems(firstMenu, menuItems, 0, orientation, true);
           // Increment the data.
           data.totals.menus.total++;
           data.totals.menus[isCorrect ? 'correct' : 'incorrect']++;
