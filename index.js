@@ -448,12 +448,12 @@ const visit = async (act, page, isStrict) => {
   // Identify the URL.
   const resolved = act.which.replace('__dirname', __dirname);
   requestedURL = resolved;
-  // Visit it and wait 20 seconds or until the network is idle.
-  let response = await goto(page, requestedURL, 20000, 'networkidle', isStrict);
+  // Visit it and wait 15 seconds or until the network is idle.
+  let response = await goto(page, requestedURL, 15000, 'networkidle', isStrict);
   // If the visit fails:
   if (response === 'error') {
-    // Try again, but waiting until the DOM is loaded.
-    response = await goto(page, requestedURL, 15000, 'domcontentloaded', isStrict);
+    // Try again, but waiting 10 seconds or until the DOM is loaded.
+    response = await goto(page, requestedURL, 10000, 'domcontentloaded', isStrict);
     // If the visit fails:
     if (response === 'error') {
       // Launch another browser type.
@@ -463,16 +463,16 @@ const visit = async (act, page, isStrict) => {
       await launch(newBrowserName);
       // Identify its only page as current.
       page = browserContext.pages()[0];
-      // Try again, waiting 15 seconds or until the network is idle.
-      response = await goto(page, requestedURL, 15000, 'networkidle', isStrict);
+      // Try again, waiting 10 seconds or until the network is idle.
+      response = await goto(page, requestedURL, 10000, 'networkidle', isStrict);
       // If the visit fails:
       if (response === 'error') {
-        // Try again, but waiting 10 seconds or until the DOM is loaded.
-        response = await goto(page, requestedURL, 10000, 'domcontentloaded', isStrict);
+        // Try again, but waiting 5 seconds or until the DOM is loaded.
+        response = await goto(page, requestedURL, 5000, 'domcontentloaded', isStrict);
         // If the visit fails:
         if (response === 'error') {
-          // Try again, waiting 10 seconds or until a load.
-          response = await goto(page, requestedURL, 10000, 'load', isStrict);
+          // Try again, waiting 5 seconds or until a load.
+          response = await goto(page, requestedURL, 5000, 'load', isStrict);
           // If the visit fails:
           if (response === 'error') {
             // Give up.
