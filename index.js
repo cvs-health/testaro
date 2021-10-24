@@ -421,7 +421,7 @@ const goto = async (page, url, timeout, waitUntil, isStrict) => {
     visitTimeoutCount++;
     return 'error';
   });
-  if (response) {
+  if (typeof response !== 'string') {
     const httpStatus = response.status();
     if ([200, 304].includes(httpStatus)) {
       const actualURL = page.url();
