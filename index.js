@@ -419,7 +419,7 @@ const goto = async (page, url, timeout, waitUntil, isStrict) => {
   .catch(error => {
     console.log(`ERROR: Visit to ${url} timed out before ${waitUntil} (${error.message})`);
     visitTimeoutCount++;
-    return null;
+    return 'error';
   });
   if (response) {
     const httpStatus = response.status();
@@ -427,7 +427,7 @@ const goto = async (page, url, timeout, waitUntil, isStrict) => {
       const actualURL = page.url();
       if (isStrict && deSlash(actualURL) !== deSlash(url)) {
         console.log(`ERROR: Visit to ${url} redirected to ${actualURL}`);
-        return null;
+        return 'redirection';
       }
       else {
         return response;
@@ -436,11 +436,11 @@ const goto = async (page, url, timeout, waitUntil, isStrict) => {
     else {
       console.log(`ERROR: Visit to ${url} got status ${httpStatus}`);
       visitRejectionCount++;
-      return null;
+      return 'error';
     }
   }
   else {
-    return null;
+    return 'error';
   }
 };
 // Visits the URL that is the value of the “which” property of an act.
@@ -451,11 +451,11 @@ const visit = async (act, page, isStrict) => {
   // Visit it and wait 20 seconds or until the network is idle.
   let response = await goto(page, requestedURL, 20000, 'networkidle', isStrict);
   // If the visit fails:
-  if (! response) {
+  if (response === 'error') {
     // Try again, but waiting until the DOM is loaded.
     response = await goto(page, requestedURL, 15000, 'domcontentloaded', isStrict);
     // If the visit fails:
-    if (! response) {
+    if (response === 'error') {
       // Launch another browser type.
       const newBrowserName = Object.keys(browserTypeNames)
       .find(name => name !== browserTypeName);
@@ -466,15 +466,15 @@ const visit = async (act, page, isStrict) => {
       // Try again, waiting 15 seconds or until the network is idle.
       response = await goto(page, requestedURL, 15000, 'networkidle', isStrict);
       // If the visit fails:
-      if (! response) {
+      if (response === 'error') {
         // Try again, but waiting 10 seconds or until the DOM is loaded.
         response = await goto(page, requestedURL, 10000, 'domcontentloaded', isStrict);
         // If the visit fails:
-        if (! response) {
+        if (response === 'error') {
           // Try again, waiting 10 seconds or until a load.
           response = await goto(page, requestedURL, 10000, 'load', isStrict);
           // If the visit fails:
-          if (! response) {
+          if (response === 'error') {
             // Give up.
             console.log(`ERROR: Visits to ${requestedURL} failed`);
             act.result = `ERROR: Visit to ${requestedURL} failed`;
@@ -491,6 +491,9 @@ const visit = async (act, page, isStrict) => {
   // If one of the visits succeeded:
   if (response) {
     // Add the resulting URL to the act.
+    if (isStrict && response === 'redirection') {
+      act.error = 'ERROR: Navigation redirected';
+    }
     act.result = page.url();
     // Return the page.
     return page;
@@ -674,7 +677,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
             // Otherwise, i.e. if the act type is unknown:
             else {
               // Add the error result to the act.
-              act.result = 'INVALID COMMAND TYPE';
+              act.result = 'ERROR: invalid command type';
             }
           }
           // Otherwise, i.e. if redirection is prohibited but occurred:
