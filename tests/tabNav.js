@@ -81,7 +81,11 @@ exports.reporter = async (page, withItems) => {
       tabs, tabElement, keyName, keyProp, goodIndex, elementIsCorrect, itemData
     ) => {
       // Click the tab element, to make the focus on it effective.
-      await tabElement.click();
+      await tabElement.click({timeout: 1500})
+      .catch(error => {
+        console.log(`ERROR: could not click tab element ${itemData.text} (${error.message})`);
+        return false;
+      });
       // Refocus the tab element and press the specified key (page.keyboard.press may fail).
       await tabElement.press(keyName);
       // Increment the counts of navigations and key navigations.

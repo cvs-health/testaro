@@ -654,13 +654,13 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                     : 'OPTION NOT FOUND';
                 }
                 else if (act.type === 'button') {
-                  await whichElement.click();
+                  await whichElement.click({timeout: 3000});
                   act.result = 'clicked';
                 }
                 else if (act.type === 'link') {
                   const href = await whichElement.getAttribute('href');
                   const target = await whichElement.getAttribute('target');
-                  await whichElement.click();
+                  await whichElement.click({timeout: 5000});
                   act.result = {
                     href: href || 'NONE',
                     target: target || 'NONE',
