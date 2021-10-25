@@ -166,8 +166,8 @@ const launch = async typeName => {
     const page = await browserContext.newPage();
     // Wait until it is stable.
     await page.waitForLoadState('domcontentloaded');
-    // Update the name of the current browser type.
-    browserTypeName = typeName;
+    // Update the name of the current browser type and store it in the page.
+    page.browserTypeName = browserTypeName = typeName;
   }
 };
 // Serves a system error message.
