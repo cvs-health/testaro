@@ -68,6 +68,7 @@ const tests = {
   embAc: 'active elements embedded in links or buttons',
   focInd: 'focus indicators',
   focOp: 'focusability and operability',
+  focPop: 'focus-caused addition of focusable elements',
   hover: 'hover-caused content additions',
   ibm: 'IBM Accessibility Checker',
   imgAlt: 'alt attributes of img elements',
