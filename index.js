@@ -66,7 +66,7 @@ const tests = {
   bodyText: 'text content of the page body',
   bulk: 'count of visible elements',
   embAc: 'active elements embedded in links or buttons',
-  focAll: 'focus-caused addition of focusable elements',
+  focAll: 'focusable and Tab-focused elements',
   focInd: 'focus indicators',
   focOp: 'focusability and operability',
   hover: 'hover-caused content additions',
@@ -95,7 +95,7 @@ const tests = {
 };
 // Tests that may change the DOM.
 const domChangers = new Set([
-  'axe', 'focInd', 'focOp', 'hover', 'ibm', 'menuNav', 'state', 'wave'
+  'axe', 'focAll', 'focInd', 'focOp', 'hover', 'ibm', 'menuNav', 'state', 'wave'
 ]);
 // Browser types available in PlayWright.
 const browserTypeNames = {

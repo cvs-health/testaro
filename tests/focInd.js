@@ -1,4 +1,7 @@
-// Returns counts, and texts if required, of focusable elements with and without indicators.
+/*
+  Returns counts, and texts if required, of focusable elements with and without indicators.
+  Fails to recognize outlines when run with firefox.
+*/
 exports.reporter = async (page, withItems, revealAll) => {
   // If required, make all elements visible.
   if (revealAll) {

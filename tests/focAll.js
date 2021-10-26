@@ -32,6 +32,6 @@ exports.reporter = async page => {
   return {result: {
     tabFocusables,
     tabFocused,
-    discrepancy: tabFocusables - tabFocused
+    discrepancy: tabFocused - tabFocusables
   }};
 };
