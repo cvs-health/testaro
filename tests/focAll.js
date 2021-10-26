@@ -23,6 +23,7 @@ exports.reporter = async page => {
         return false;
       }
       else {
+        console.log(`Tab-focused ${focus.outerHTML.trim().replace(/\s{2,}/gs, ' ').slice(0,50)}`);
         focus.dataset.autotestfocused = 'true';
         return true;
       }
