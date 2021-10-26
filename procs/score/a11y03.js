@@ -210,7 +210,7 @@ exports.scorer = acts => {
       }
       else if (which === 'focAll') {
         facts = test.result;
-        if (facts) {
+        if (facts && typeof facts === 'object') {
           rules.focAll= 'multiply discrepancy between focusable and focused element counts by 3';
           deficit.focAll = 3 * Math.abs(facts.discrepancy);
         }
