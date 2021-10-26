@@ -720,8 +720,7 @@ const scriptHandler = async (
   what, strict, acts, query, stage, hostIndex, response
 ) => {
   // Reinitialize the log statistics.
-  logCount = 0;
-  logSize = 0;
+  logCount = logSize = prohibitedCount = visitTimeoutCount = visitRejectionCount= 0;
   // Initialize a script report.
   const report = {};
   report.script = query.scriptName;
