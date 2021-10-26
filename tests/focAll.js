@@ -17,7 +17,7 @@ exports.reporter = async page => {
   while (focusInPage && tabFocused < 5000) {
     tabFocused++;
     await page.keyboard.press(page.browserTypeName === 'webkit' ? 'Alt+Tab' : 'Tab');
-    focusInPage = await page.evaluateHandle(() => {
+    focusInPage = await page.evaluate(() => {
       const focus = document.activeElement;
       if (focus === null || focus.tagName === 'BODY' || focus.dataset.autotestfocused) {
         return false;
