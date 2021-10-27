@@ -1,6 +1,11 @@
 /*
-  Returns counts, and texts if required, of focusable elements with and without indicators.
-  Fails to recognize outlines when run with firefox.
+  focInd
+  This test reports focusable elements without focus indicators, with non-outline focus
+  indicators, and with outline focus indicators. It as based on the assumption that
+  outlines are the standard and thus most familiar focus indicator. Other focus
+  indicators are assumed better than none, but more likely to be misunderstood. For
+  example, underlines may be mistaken for selection indicators.
+  Bug: This test fails to recognize outlines when run with firefox.
 */
 exports.reporter = async (page, withItems, revealAll) => {
   // If required, make all elements visible.
