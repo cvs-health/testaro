@@ -11,23 +11,30 @@ exports.reporter = async page => {
       return focusables.length - radios.length + radioNames.size;
     }
   );
-  // Repeatedly perform a Tab or (in webkit) Opt-Tab keypress until the focus exits the page.
-  let focusInPage = true;
-  let tabFocused = -1;
-  while (focusInPage && tabFocused < 5000) {
-    tabFocused++;
+  /*
+    Repeatedly perform a Tab or (in webkit) Opt-Tab keypress. Stop when 100 elements have been
+    focused twice, so shadow roots hiding the focus do not prevent reaching elements.
+  */
+  let tabFocused = 0;
+  let refocused = 0;
+  while (refocused < 100 && tabFocused < 2000) {
     await page.keyboard.press(page.browserTypeName === 'webkit' ? 'Alt+Tab' : 'Tab');
-    focusInPage = await page.evaluate(() => {
+    const isNewFocus = await page.evaluate(() => {
       const focus = document.activeElement;
       if (focus === null || focus.tagName === 'BODY' || focus.dataset.autotestfocused) {
         return false;
       }
       else {
-        console.log(`Tab-focused ${focus.outerHTML.trim().replace(/\s{2,}/gs, ' ').slice(0,50)}`);
         focus.dataset.autotestfocused = 'true';
         return true;
       }
     });
+    if (isNewFocus) {
+      tabFocused++;
+    }
+    else {
+      refocused++;
+    }
   }
   // Return the result.
   return {result: {
