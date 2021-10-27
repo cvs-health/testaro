@@ -314,7 +314,7 @@ const matchIndex = async (page, selector, text) => await page.$eval(
 // Validates a browser type.
 const isBrowserType = type => ['chromium', 'firefox', 'webkit'].includes(type);
 // Validates a URL.
-const isURL = string => /^(?:https?|file):\/\/[^ ]+$/.test(string);
+const isURL = string => /^(?:https?|file):\/\/[^\s]+$/.test(string);
 // Validates a focusable tag name.
 const isFocusable = string => ['a', 'button', 'input', 'select', 'option'].includes(string);
 // Returns whether all elements of an array are strings.

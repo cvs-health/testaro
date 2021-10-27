@@ -12,8 +12,11 @@ exports.reporter = async page => {
     }
   );
   /*
-    Repeatedly perform a Tab or (in webkit) Opt-Tab keypress. Stop when 100 elements have been
-    focused twice, so shadow roots hiding the focus do not prevent reaching elements.
+    Repeatedly perform a Tab or (in webkit) Opt-Tab keypress and count the focused elements.
+    Asumptions:
+      0. No page has more than 2000 focusable elements.
+      1. No shadow root that reports itself as the active element has more than 100 focusable
+        descendants.
   */
   let tabFocused = 0;
   let refocused = 0;
