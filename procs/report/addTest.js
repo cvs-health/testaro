@@ -35,10 +35,17 @@ reportNames.forEach(rn => {
   if (newReportName) {
     const newReportData = JSON.parse(fs.readFileSync(`${dir}/newTest/${newReportName}`, 'utf8'));
     reportData.acts.splice(-1, 0, newReportData.acts.filter(act => act.type === 'test')[0]);
-    const newScore = newReportData.acts.filter(act => act.type === 'score')[0].result[newTest];
-    const scoreResult = reportData.acts.filter(act => act.type === 'score')[0].result;
-    scoreResult[newTest] = newScore;
-    scoreResult.total += newScore || 0;
+    const newResult = newReportData.acts.filter(act => act.type === 'score')[0].result;
+    const oldResult = reportData.acts.filter(act => act.type === 'score')[0].result;
+    const newInference = newResult.inferences[newTest];
+    const newDeficit = newResult.deficit[newTest];
+    if (newInference !== undefined) {
+      oldResult.inferences[newTest] = newInference;
+    }
+    else {
+      oldResult.deficit[newTest] = newResult.deficit[newTest];
+    }
+    oldResult.deficit.total += newInference || newDeficit;
     fs.writeFileSync(`${dir}/newReports/${rn}`, `${JSON.stringify(reportData, null, 2)}\n`);
   }
   else {
