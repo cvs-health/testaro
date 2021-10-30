@@ -1,4 +1,4 @@
-// Computes and reports a score from 3 packages and 15 custom tests, with discounts.
+// Computes and reports a score from 3 packages and 16 custom tests, with discounts.
 exports.scorer = acts => {
   // Define the configuration disclosures.
   const logWeights = {

@@ -1,4 +1,12 @@
-// Reports focusable elements that are not operable and vice versa.
+/*
+  focOp
+  This test reports discrepancies between keyboard-focusable elements and operable elements.
+
+  It is based on the principles that operable elements must be keyboard-focusable so they can be
+  activated with a keypress, and that an interface is most accessible when only operable elements
+  are keyboard-focusable. Making non-operable elements keyboard-focusable can confuse users into
+  expecting they can operate on those elements.
+*/
 exports.reporter = async (page, withItems) => {
   // Get data on focusability-operability-discrepant elements.
   const data = await page.$$eval('body *', (elements, withItems) => {

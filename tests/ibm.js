@@ -1,3 +1,10 @@
+/*
+  idm
+  This test implements the IBM Equal Access Accessibility Checker.
+
+  The withNewContent argument specifies whether the URL of the current page is to be provided
+  to the test package. If not, then the page content is provided, instead.
+*/
 // Import required modules.
 const fs = require('fs/promises');
 const {getCompliance} = require('accessibility-checker');

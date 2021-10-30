@@ -1,4 +1,12 @@
-// Returns counts, fractions, and texts of inline links, by whether underlined.
+/*
+  linkUl
+  This test reports inline links without accessible styles.
+
+  It assumes that inline links are accessible only if users can identify them visually as links.
+  Links are most commonly marked as such by two style changes: color and text decoration. They
+  are commonly blue (before being visited) or purple (after being visited), and also underlined.
+  The test reports whether they are underlined.
+*/
 exports.reporter = async (page, withItems) => {
   // Identify the links in the page, by type.
   const linkTypes = await require('../procs/test/linksByType').linksByType(page);

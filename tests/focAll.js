@@ -1,6 +1,7 @@
 /*
   focAll
-  This test reports discrepancies between focusable and Tab-focused element counts.
+  This test reports discrepancies between Tab-focusable and Tab-focused element counts.
+
   The test first counts all the visible focusable elements (counting each group of
   radio buttons as only one focusable element). Then it repeatedly presses the Tab
   (or Option-Tab in webkit) key until it has reached all the elements it can and

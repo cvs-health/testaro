@@ -1,4 +1,13 @@
-// Tests tablist navigation.
+/*
+  tabNav
+  This test reports whether tab lists manage keyboard navigation among their tabs in
+  a standard way.
+
+  It applies the standard navigation rules for tab lists set forth by the WAI-ARIA Authoring
+  Guidelines. Under these rules, user navigate among tabs with arrow keys, the Home key,
+  and the End key. Arrow-key navigation wraps, and only the two arrow keys that conform to
+  the vertical or horizontal orientation of the tab list perform navigation within it.
+*/
 exports.reporter = async (page, withItems) => {
   // Initialize a report.
   const data = {

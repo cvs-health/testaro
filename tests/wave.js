@@ -1,3 +1,9 @@
+/*
+  axe
+  This test implements the WAVE test package for accessibility.
+
+  The reportType argument specifies a WAVE report type. Its values may be any integer from 1 to 4.
+*/
 // Import a module to create an HTTPS server and client.
 const https = require('https');
 // Conducts and reports a wave test.

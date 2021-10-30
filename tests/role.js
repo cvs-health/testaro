@@ -1,4 +1,16 @@
-// Returns counts, fractions, and texts of inline links, by whether underlined.
+/*
+  role
+  This set reports nonstandard role attributes.
+
+  It assumes that a role attribute is nonstandard in either of three cases:
+
+    0. It assigns a non-existent role.
+    1. It assigns an abstract role.
+    2. It assigns a role that is implicit in a native HTML element.
+
+  The WAI-ARIA standard forbids the assignment of abstract roles and recommends against the
+  assignment of HTML-implicit roles.
+*/
 exports.reporter = async page => await page.$eval('body', body => {
   // CONSTANTS
   /*

@@ -1,4 +1,11 @@
-// Tabulates and lists style inconsistencies.
+/*
+  styleDiff
+  This test reports style inconsistencies for headings, buttons, and links.
+
+  It assumes that a page is more accessible when its operation and navigation elements have
+  consistent styles. The test reports style differences for each heading level, from h1 to h6,
+  for buttons, for inline links, and for non-inline links.
+*/
 exports.reporter = async (page, withItems) => {
   // Get an object with arrays of block and inline links as properties.
   const linkTypes = await require('../procs/test/linksByType').linksByType(page);

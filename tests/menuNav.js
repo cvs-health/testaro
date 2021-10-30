@@ -1,4 +1,15 @@
-// Tests true-focus menu navigation.
+/*
+  menuNav
+  This test reports whether menus manage keyboard navigation among their menu items in
+  a standard way.
+
+  It applies the standard menu-navigation rules set forth by the WAI-ARIA Authoring Guidelines.
+  Under these rules, user navigate among menu items with arrow keys, the Home key, and the
+  End key. Arrow-key navigation wraps, and only the two arrow keys that conform to to the
+  vertical or horizontal orientation of the menu perform navigation within it. This test
+  applies only to menus that manage true focus among their menu items, not to menus that
+  hold the focus and designate active descendant menu items.
+*/
 exports.reporter = async (page, withItems) => {
   // Initialize a report.
   const data = {

@@ -1,3 +1,26 @@
+/*
+  motion
+  This test reports motion in a page.
+
+  For minimal accessibility, standards require motion to be brief, or else stoppable by the user.
+  But stopping motion can be difficult or impossible, and, by the time a user manages to stop
+  motion, the motion may have caused annoyance or harm. For superior accessibility, this test
+  assumes that there is no motion in a page until and unless the user authorizes it. The delay
+  argument specifies how many milliseconds to wait before capturing the first screen shot. The
+  interval argument specified how many milliseconds to wait between screen shots. The count
+  argument specifies how many screen shots to make. The test compares the screen shots and
+  reports 9 statistics:
+
+    0. bytes: an array of the sizes of the screen shots, in bytes
+    1. localRatios: an array of the ratios of bytes of the larger to the smaller of adjacent pairs of screen shots
+    2. meanLocalRatio: the mean of the ratios in the localRatios array
+    3. maxLocalRatio: the greatest of the ratios in the localRatios array
+    4. globalRatio: the ratio of bytes of the largest to the smallest screen shot
+    5. pixelChanges: an array of counts of differing pixels between adjacent pairs of screen shots
+    6. meanPixelChange: the mean of the counts in the pixelChanges array
+    7. maxPixelChange: the greatest of the counts in the pixelChanges array
+    8. changeFrequency: the fraction of the adjacent pairs of screen shots with pixel differences
+*/
 const pixelmatch = require('pixelmatch');
 const {PNG} = require('pngjs');
 // Reports motion in a page.

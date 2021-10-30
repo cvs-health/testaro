@@ -1,9 +1,11 @@
 /*
   embAc
   This test reports interactive elements (links, buttons, inputs, and select lists)
-  contained by links or buttons. Such embedding may be valid HTML (e.g., embedding
-    a button in a link), but it complicates user interaction and creates risks of
-    error. It becomes non-obvious what a user will activate with a click.
+  contained by links or buttons.
+
+  Such embedding may be valid HTML (e.g., embedding a button in a link), but it complicates
+  user interaction and creates risks of error. It becomes non-obvious what a user will
+  activate with a click.
 */
 exports.reporter = async (page, withItems) => await page.$$eval(
   'a a, a button, a input, a select, button a, button button, button input, button select',

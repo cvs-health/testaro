@@ -1,4 +1,19 @@
-// Finds and reports navigation elements that can be hover-disclosed.
+/*
+  hover
+  This test reports accessibility problems related to hovering.
+
+  It assumes that users expect hovering to identify elements that will be acted on by mouse clicks,
+  but not to change the content of a page, so hover-caused content changes can startle and confuse
+  users and thus impair accessibility. It also assumes that users can get disoriented when they try
+  to hover over an operable element but the element cannot be hovered over, for example because it
+  is covered by another element. The test reports:
+
+    0. the number of elements that, when hovered over, trigger content changes
+    1. the number of elements made visible by hovering
+    2. the number of elements whose opacities are directly changed by hovering
+    3. the number of elements whose opacities are indirectly changed by hovering
+    4. the number of operable elements that cannot be hovered over
+*/
 exports.reporter = async (page, withItems) => {
   // Initialize a counter.
   let elementsChecked = 0;

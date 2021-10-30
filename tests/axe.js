@@ -1,6 +1,7 @@
 /*
   axe
   This test implements the axe-core ruleset for accessibility.
+
   The rules argument defaults to all rules; otherwise, specify an array of rule names.
   Experimental, needs-review, and best-practice rules are ignored.
 */

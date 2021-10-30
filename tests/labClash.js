@@ -1,4 +1,13 @@
-// Tabulates and lists labeling conflicts of labelable form controls.
+/*
+  labClash
+  This test reports labeling conflicts of labelable form controls.
+
+  It examines buttons, non-hidden inputs, select lists, and text areas. It reports
+  such a control as well-labeled if the control has text content or is labeled with a single
+  labeling method. If the control is labeled with more than one labeling method, so that
+  any label is superseded and ignored, the test reports the control as mislabeled. If the
+  control has no text content and no label, it is reported as unlabeled.
+*/
 exports.reporter = async (page, withItems) => {
   return await page.$eval('body', (body, withItems) => {
     // FUNCTION DEFINITION START
