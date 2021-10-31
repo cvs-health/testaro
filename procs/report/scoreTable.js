@@ -33,7 +33,7 @@ const colNames = optionColNames[options.indexOf(colSpec)];
 const propNames = optionPropNames[options.indexOf(colSpec)];
 const head0 = colNames.map(pair => `<th colspan="2">${pair}</th>`).join('');
 const head1 = '<th>Number</th><th>Bar</th>'.repeat(colNames.length);
-const tableClasses = ['secondCellRight'];
+const tableClasses = ['thSmaller', 'secondCellRight'];
 if (colSpec !== 'aut') {
   tableClasses.push('fourthCellRight');
   if (colSpec === 'p3') {
