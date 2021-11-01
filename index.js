@@ -15,7 +15,7 @@ const https = require('https');
 const {commands} = require('./commands');
 // ########## CONSTANTS
 // Set debug to true to add debugging features.
-const debug = true;
+const debug = false;
 // Set waits to a positive number to insert delays (in ms).
 const waits = 0;
 const protocol = process.env.PROTOCOL || 'https';
@@ -88,7 +88,6 @@ const tests = {
   styleDiff: 'style inconsistencies',
   tabNav: 'keyboard navigation between tab elements',
   tblAc: 'active elements contained by tables',
-  test: 'miscellaneous',
   visibles: 'visible elements',
   wave: 'WAVE',
   zIndex: 'z indexes'
@@ -208,7 +207,7 @@ const servePage = (content, newURL, mimeType, response) => {
   }
   response.end(content);
 };
-// Serves or returns part of all of an HTML or plain-text page.
+// Serves or returns part or all of an HTML or plain-text page.
 const render = (path, stage, which, query, response) => {
   if (! response.writableEnded) {
     // If an HTML page is to be rendered:
@@ -424,7 +423,7 @@ const goto = async (page, url, timeout, waitUntil, isStrict) => {
   });
   if (typeof response !== 'string') {
     const httpStatus = response.status();
-    if ([200, 304].includes(httpStatus)) {
+    if ([200, 304].includes(httpStatus) || url.startsWith('file:')) {
       const actualURL = page.url();
       if (isStrict && deSlash(actualURL) !== deSlash(url)) {
         console.log(`ERROR: Visit to ${url} redirected to ${actualURL}`);
@@ -600,6 +599,39 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
               // Conduct, report, and time the test.
               const startTime = Date.now();
               const testReport = await require(`./tests/${act.which}`).reporter(...args);
+              // If the test has expectations:
+              if (act.expect) {
+                // Report whether they were fulfilled.
+                testReport.result.expectations = {};
+                const expectProperties = Object.keys(act.expect);
+                let failureCount = 0;
+                expectProperties.forEach(property => {
+                  const expected = act.expect[property];
+                  const actual = testReport.result[property];
+                  let passed;
+                  if (Array.isArray(expected)) {
+                    if (expected[0] === '>') {
+                      passed = actual > expected[1];
+                    }
+                    else if (expected[0] === '<') {
+                      passed = actual < expected[1];
+                    }
+                  }
+                  else {
+                    passed = actual === expected;
+                  }
+                  testReport.result.expectations[property] = {
+                    expected,
+                    actual,
+                    passed
+                  };
+                  if (! passed) {
+                    failureCount++;
+                  }
+                });
+                testReport.result.failureCount = failureCount;
+                console.log(`> failure count: ${failureCount}`);
+              }
               report.testTimes.push([act.which, Math.round((Date.now() - startTime) / 1000)]);
               report.testTimes.sort((a, b) => b[1] - a[1]);
               // If the test produced exhibits:
