@@ -610,9 +610,14 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                 expectations.forEach(spec => {
                   let passed;
                   const property = spec[0];
+                  const propertyTree = property.split('.');
                   const relation = spec[1];
                   const criterion = spec[2];
-                  const actual = testReport.result[property];
+                  let actual = testReport.result[propertyTree[0]];
+                  while (propertyTree.length > 1) {
+                    propertyTree.shift();
+                    actual = actual[propertyTree[0]];
+                  }
                   if (relation === '=') {
                     passed = actual === criterion;
                   }
