@@ -14,7 +14,7 @@
     },
     {
       "type": "test",
-      "which": "bulk",
+      "which": "embAc",
       "what": "visible element count",
       "expect": [
         ["links", "=", 0],
@@ -30,7 +30,7 @@
     },
     {
       "type": "test",
-      "which": "bulk",
+      "which": "embAc",
       "what": "visible element count",
       "expect": [
         ["links", "=", 1],
