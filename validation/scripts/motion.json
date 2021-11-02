@@ -9,7 +9,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/testTargets/motion/good.html",
+      "which": "file://__dirname/validation/targets/motion/good.html",
       "what": "page without motion"
     },
     {
@@ -30,7 +30,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/testTargets/motion/bad.html",
+      "which": "file://__dirname/validation/targets/motion/bad.html",
       "what": "page with motion"
     },
     {

@@ -911,6 +911,7 @@ const requestHandler = (request, response) => {
         query.validatorNames = validatorNames
         .map(name => `<option value="${name}">${name}</option>`)
         .join('\n              ');
+        query.reportDir = process.env.REPORTDIR || '';
         // Render the page.
         render('', 'all', 'validate', query, response);
       }
@@ -1109,7 +1110,7 @@ const requestHandler = (request, response) => {
         }
       }
       // Otherwise, if the request submitted the validate form:
-      else if (pathName === '/validate' && query.validatorName) {
+      else if (pathName === '/validate' && query.validatorName && query.reportDir) {
         const {validatorName} = query;
         // Get the content of the validator script.
         const scriptJSON = await fs.readFile(`validation/scripts/${validatorName}.json`, 'utf8');

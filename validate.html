@@ -16,16 +16,26 @@
       <h1>Autotest: Choose validator</h1>
       <section class="head">
         <h2 class="headText">Choices</h2>
-        <p>To validate Autotest, choose a validator.</p>
+        <p>To validate Autotest, choose a validator and a report directory.</p>
       </section>
       <section class="etc">
         <form method="POST" action="/autotest/validate">
-          <h2>Validator (required)</h2>
           <select id="validatorName" name="validatorName" size="__validatorSize__">
             __validatorNames__
           </select>
+          <p><label>
+            <span>Where do you want your report?</span>
+            <input
+              name="reportDir"
+              type="text"
+              size="40"
+              maxlength="60"
+              value="__reportDir__"
+              required
+            >
+          </label></p>
           <p><button onclick="(() => {this.style.visibility = 'hidden'})()">
-            Run validator
+            Validate
           </button></p>
         </form>
       </section>
