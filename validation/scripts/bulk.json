@@ -17,8 +17,8 @@
       "which": "bulk",
       "what": "visible element count",
       "expect": [
-        ["visibleElements", ">", 2],
-        ["visibleElements", "<", 10]
+        ["visibleElements", ">", 1],
+        ["visibleElements", "<", 5]
       ]
     },
     {
@@ -32,7 +32,7 @@
       "what": "visible element count",
       "expect": [
         ["visibleElements", ">", 30],
-        ["visibleElements", "<", 50]
+        ["visibleElements", "<", 40]
       ]
     }
   ]
