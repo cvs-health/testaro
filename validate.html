@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Choose validator | Autotest</title>
+    <meta
+      name="description"
+      content="Accessibility test automation"
+    >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="favicon.png">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main>
+      <h1>Autotest: Choose validator</h1>
+      <section class="head">
+        <h2 class="headText">Choices</h2>
+        <p>To validate Autotest, choose a validator.</p>
+      </section>
+      <section class="etc">
+        <form method="POST" action="/autotest/validate">
+          <h2>Validator (required)</h2>
+          <select id="validatorName" name="validatorName" size="__validatorSize__">
+            __validatorNames__
+          </select>
+          <p><button onclick="(() => {this.style.visibility = 'hidden'})()">
+            Run validator
+          </button></p>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

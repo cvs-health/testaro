@@ -21,11 +21,13 @@ const waits = 0;
 const protocol = process.env.PROTOCOL || 'https';
 // Files servable without modification.
 const statics = {
+  '/index.html': 'text/html',
   '/style.css': 'text/css'
 };
 // URLs to be redirected.
 const redirects = {
-  '/': '/autotest/index.html'
+  '/': '/autotest/index.html',
+  '/which.html': '/autotest/run.html'
 };
 // Pages to be served as error notifications.
 const customErrorPageStart = [
@@ -499,7 +501,7 @@ const visit = async (act, page, isStrict) => {
     return page;
   }
 };
-// Updates the report file.
+// Updates a report file.
 const reportFileUpdate = async (reportDir, nameSuffix, report, isJSON) => {
   const fileReport = isJSON ? report : JSON.stringify(report, null, 2);
   await fs.writeFile(`${reportDir}/report-${nameSuffix}.json`, fileReport);
@@ -891,14 +893,26 @@ const requestHandler = (request, response) => {
         response.write(content, 'binary');
         response.end();
       }
-      // Otherwise, if the initial page was requested:
-      else if (pathName === '/' || pathName === '/index.html') {
+      // Otherwise, if the run page was requested:
+      else if (pathName === '/run.html') {
         // Add properties to the query.
         query.scriptDir = process.env.SCRIPTDIR || '';
         query.batchDir = process.env.BATCHDIR || '';
         query.reportDir = process.env.REPORTDIR || '';
         // Render the page.
-        render('', 'all', 'index', query, response);
+        render('', 'all', 'run', query, response);
+      }
+      // Otherwise, if the validate page was requested:
+      else if (pathName === '/validate.html') {
+        // Add properties to the query.
+        const validators = await fs.readdir('validation/scripts');
+        query.validatorSize = validators.length;
+        const validatorNames = validators.map(name => name.slice(0, -5));
+        query.validatorNames = validatorNames
+        .map(name => `<option value="${name}">${name}</option>`)
+        .join('\n              ');
+        // Render the page.
+        render('', 'all', 'validate', query, response);
       }
       // Otherwise, i.e. if the URL is invalid:
       else {
@@ -916,10 +930,10 @@ const requestHandler = (request, response) => {
       });
       // Add a timeStamp for any required report file to the query.
       query.timeStamp = Math.floor((Date.now() - Date.UTC(2021, 4)) / 10000).toString(36);
-      // If the request submitted the directory form:
-      if (pathName === '/where' && query.scriptDir && query.batchDir && query.reportDir) {
+      // If the request submitted the run form:
+      if (pathName === '/run' && query.scriptDir && query.batchDir && query.reportDir) {
         const {scriptDir, batchDir} = query;
-        // Request an array of the names of the files in the script directory.
+        // Get an array of the names of the files in the script directory.
         const scriptFileNames = await fs.readdir(scriptDir);
         // When the array arrives, get an array of script names from it.
         const scriptNames = scriptFileNames
@@ -962,7 +976,7 @@ const requestHandler = (request, response) => {
           serveMessage(`ERROR: No scripts in ${scriptDir}`, response);
         }
       }
-      // Otherwise, if the request submitted the choice form:
+      // Otherwise, if the request submitted the run-which form:
       else if (
         pathName === '/which'
         && query.scriptDir
@@ -1092,6 +1106,44 @@ const requestHandler = (request, response) => {
         else {
           // Serve an error message.
           serveMessage(`ERROR: Script ${scriptName} empty`, response);
+        }
+      }
+      // Otherwise, if the request submitted the validate form:
+      else if (pathName === '/validate' && query.validatorName) {
+        const {validatorName} = query;
+        // Get the content of the validator script.
+        const scriptJSON = await fs.readFile(`validation/scripts/${validatorName}.json`, 'utf8');
+        // When the content arrives, if there is any:
+        if (scriptJSON) {
+          // Get the script data.
+          const script = JSON.parse(scriptJSON);
+          const {what, strict, commands} = script;
+          // If the validator is valid:
+          if (
+            what
+            && strict
+            && commands
+            && typeof what === 'string'
+            && Array.isArray(commands)
+            && commands[0].type === 'launch'
+            && commands.length > 1
+            && commands[1].type === 'url'
+            && isURL(commands[1].which)
+          ) {
+            console.log(`>>>>>>>> ${validatorName}: ${what}`);
+            // Process it, using the commands as the initial acts.
+            scriptHandler(what, strict, commands, query, 'all', -1, response);
+          }
+          // Otherwise, i.e. if the validator is invalid:
+          else {
+            // Serve an error message.
+            serveMessage(`ERROR: Validator script ${validatorName} invalid`, response);
+          }
+        }
+        // Otherwise, i.e. if the validator has no content:
+        else {
+          // Serve an error message.
+          serveMessage(`ERROR: Validator script ${validatorName} empty`, response);
         }
       }
       // Otherwise, i.e. if the request is invalid:
