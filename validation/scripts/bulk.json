@@ -16,9 +16,10 @@
       "type": "test",
       "which": "bulk",
       "what": "visible element count",
-      "expect": {
-        "visibleElements": ["<", 10]
-      }
+      "expect": [
+        ["visibleElements", ">", 2],
+        ["visibleElements", "<", 10]
+      ]
     },
     {
       "type": "url",
@@ -29,9 +30,10 @@
       "type": "test",
       "which": "bulk",
       "what": "visible element count",
-      "expect": {
-        "visibleElements": [">", 20]
-      }
+      "expect": [
+        ["visibleElements", ">", 30],
+        ["visibleElements", "<", 50]
+      ]
     }
   ]
 }

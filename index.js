@@ -601,32 +601,34 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
               // Conduct, report, and time the test.
               const startTime = Date.now();
               const testReport = await require(`./tests/${act.which}`).reporter(...args);
+              const expectations = act.expect;
               // If the test has expectations:
-              if (act.expect) {
+              if (expectations) {
                 // Report whether they were fulfilled.
-                testReport.result.expectations = {};
-                const expectProperties = Object.keys(act.expect);
+                testReport.result.expectations = [];
                 let failureCount = 0;
-                expectProperties.forEach(property => {
-                  const expected = act.expect[property];
-                  const actual = testReport.result[property];
+                expectations.forEach(spec => {
                   let passed;
-                  if (Array.isArray(expected)) {
-                    if (expected[0] === '>') {
-                      passed = actual > expected[1];
-                    }
-                    else if (expected[0] === '<') {
-                      passed = actual < expected[1];
-                    }
+                  const property = spec[0];
+                  const relation = spec[1];
+                  const criterion = spec[2];
+                  const actual = testReport.result[property];
+                  if (relation === '=') {
+                    passed = actual === criterion;
                   }
-                  else {
-                    passed = actual === expected;
+                  else if (relation === '<') {
+                    passed = actual < criterion;
                   }
-                  testReport.result.expectations[property] = {
-                    expected,
+                  else if (relation === '>') {
+                    passed = actual > criterion;
+                  }
+                  testReport.result.expectations.push({
+                    property,
+                    relation,
+                    criterion,
                     actual,
                     passed
-                  };
+                  });
                   if (! passed) {
                     failureCount++;
                   }

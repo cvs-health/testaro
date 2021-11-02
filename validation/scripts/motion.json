@@ -19,14 +19,14 @@
       "delay": 2400,
       "interval": 2600,
       "count": 5,
-      "expect": {
-        "meanLocalRatio": 1,
-        "maxLocalRatio": 1,
-        "globalRatio": 1,
-        "meanPixelChange": 0,
-        "maxPixelChange": 0,
-        "changeFrequency": 0
-      }
+      "expect": [
+        ["meanLocalRatio", "=", 1],
+        ["maxLocalRatio", "=", 1],
+        ["globalRatio", "=", 1],
+        ["meanPixelChange", "=", 0],
+        ["maxPixelChange", "=", 0],
+        ["changeFrequency", "=", 0]
+      ]
     },
     {
       "type": "url",
@@ -40,14 +40,14 @@
       "delay": 2400,
       "interval": 2600,
       "count": 5,
-      "expect": {
-        "meanLocalRatio": [">", 1],
-        "maxLocalRatio": [">", 1],
-        "globalRatio": [">", 1],
-        "meanPixelChange": [">", 0],
-        "maxPixelChange": [">", 0],
-        "changeFrequency": [">", 0]
-      }
+      "expect": [
+        ["meanLocalRatio", ">", 1],
+        ["maxLocalRatio", ">", 1],
+        ["globalRatio", ">", 1],
+        ["meanPixelChange", ">", 0],
+        ["maxPixelChange", ">", 0],
+        ["changeFrequency", ">", 0]
+      ]
     }
   ]
 }
