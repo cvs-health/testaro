@@ -172,11 +172,13 @@ exports.reporter = async (page, withItems) => {
             return text.trim().replace(/\s*/sg, '').slice(0, limit);
           };
           data.totals.unhoverables++;
-          data.items.unhoverables.push({
-            tagName: tagName,
-            id: firstTrigger.id || '',
-            text: await textOf(firstTrigger, 50)
-          });
+          if (withItems) {
+            data.items.unhoverables.push({
+              tagName: tagName,
+              id: firstTrigger.id || '',
+              text: await textOf(firstTrigger, 50)
+            });
+          }
         }
         triggerTag = tagName;
       }
