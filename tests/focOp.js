@@ -1,4 +1,14 @@
-// Reports focusable elements that are not operable and vice versa.
+/*
+  focOp
+  This test reports descrepancies between Tab-focusability and operability. The standard
+  practice is to make focusable elements operable and vice versa. If focusable elements are not
+  operable, users are likely to be surprised that nothing happens when they try to operate such
+  elements. If operable elements are not focusable, users depending on keyboard navigation are
+  prevented from operating those elements. The test considers an element operable if it has a
+  non-inherited pointer cursor and is not a 'LABEL' element, or has an operable tag name ('A',
+  'BUTTON', 'IFRAME', 'INPUT', 'SELECT', 'TEXTAREA'), or has an 'onclick' attribute. The test
+  considers an element Tab-focusable if its tabIndex property has the value 0.
+*/
 exports.reporter = async (page, withItems) => {
   // Get data on focusability-operability-discrepant elements.
   const data = await page.$$eval('body *', (elements, withItems) => {
