@@ -39,14 +39,14 @@
       "withItems": false,
       "expect": [
         ["totals.total", "=", 6],
-        ["totals.onlyFocusable.total", "=", 1],
-        ["totals.onlyFocusable.tagNames.SPAN", "=", 1],
-        ["totals.onlyOperable.total", "=", 3],
-        ["totals.onlyOperable.tagNames.BUTTON", "=", 1],
-        ["totals.onlyOperable.tagNames.SPAN", "=", 2],
-        ["totals.focusableAndOperable.total", "=", 2],
-        ["totals.focusableAndOperable.tagNames.LINK", "=", 1],
-        ["totals.focusableAndOperable.tagNames.INPUT", "=", 1]
+        ["totals.types.onlyFocusable.total", "=", 1],
+        ["totals.types.onlyFocusable.tagNames.SPAN", "=", 1],
+        ["totals.types.onlyOperable.total", "=", 3],
+        ["totals.types.onlyOperable.tagNames.BUTTON", "=", 1],
+        ["totals.types.onlyOperable.tagNames.SPAN", "=", 2],
+        ["totals.types.focusableAndOperable.total", "=", 2],
+        ["totals.types.focusableAndOperable.tagNames.LINK", "=", 1],
+        ["totals.types.focusableAndOperable.tagNames.INPUT", "=", 1]
       ]
     }
   ]
