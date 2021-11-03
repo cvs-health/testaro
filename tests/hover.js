@@ -1,4 +1,13 @@
-// Finds and reports navigation elements that can be hover-disclosed.
+/*
+  hover
+  This test reports unexpected effects of hovering. The effects include elements that are made
+  visible, elements whose opacities are changed, elements with ancestors whose opacities are
+  changed, and elements that cannot be hovered over. Only Playwright-visible elements that have
+  'A', 'BUTTON', and 'LI' tag names or have 'onmouseenter' or 'onmouseover' attributes are
+  considered as hovering targets. The elements considered when the effects of hovering are
+  examined are the descendants of the grandparent of the element hovered over if that element
+  has the tag name 'A' or 'BUTTON' or otherwise the descendants of the element.
+*/
 exports.reporter = async (page, withItems) => {
   // Initialize a counter.
   let elementsChecked = 0;

@@ -45,7 +45,7 @@
         ["totals.types.onlyOperable.tagNames.BUTTON", "=", 1],
         ["totals.types.onlyOperable.tagNames.SPAN", "=", 2],
         ["totals.types.focusableAndOperable.total", "=", 2],
-        ["totals.types.focusableAndOperable.tagNames.LINK", "=", 1],
+        ["totals.types.focusableAndOperable.tagNames.A", "=", 1],
         ["totals.types.focusableAndOperable.tagNames.INPUT", "=", 1]
       ]
     }
