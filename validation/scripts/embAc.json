@@ -26,7 +26,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/bulk/bad.html",
+      "which": "file://__dirname/validation/targets/embAc/bad.html",
       "what": "page with embeddings in links and buttons"
     },
     {
@@ -35,7 +35,7 @@
       "what": "visible element count",
       "withItems": false,
       "expect": [
-        ["totals.links", "=", 1],
+        ["totals.links", "=", 2],
         ["totals.buttons", "=", 2],
         ["totals.inputs", "=", 3],
         ["totals.selects", "=", 1]

@@ -1,16 +1,17 @@
 /*
   focAll
   This test reports discrepancies between focusable and Tab-focused element counts.
-  The test first counts all the visible focusable elements (counting each group of
-  radio buttons as only one focusable element). Then it repeatedly presses the Tab
-  (or Option-Tab in webkit) key until it has reached all the elements it can and
-  counts those elements. If the latter are more than the former, Tab-key navigation
-  made more focusable elements visible. If the latter are fewer than the former, the
-  page manages focus so as to prevent Tab-key navigation from reaching all focusable
-  elements. Either of these can complicate navigation for users. It may disappoint
-  the expectation that the content will remain stable as they move with the Tab key,
-  or the expectation that they can reach every focusable element (or widget, such
-  as one radio button or tab in each group) merely by pressing the Tab key.
+  The test first counts all the visible focusable (i.e. with tabIndex 0) elements
+  (except ounting each group of radio buttons as only one focusable element). Then
+  it repeatedly presses the Tab (or Option-Tab in webkit) key until it has reached
+  all the elements it can and counts those elements. If the latter are more than the
+  former, Tab-key navigation made more focusable elements visible. If the latter are
+  fewer than the former, the page manages focus so as to prevent Tab-key navigation
+  from reaching all focusable elements. Either of these can complicate navigation for
+  users. It may disappoint the expectation that the content will remain stable as they
+  move with the Tab key, or the expectation that they can reach every focusable element
+  (or widget, such as one radio button or tab in each group) merely by pressing the Tab
+  key.
 */
 exports.reporter = async page => {
   // Identify the count of visible focusable elements.
