@@ -19,12 +19,12 @@
       "withItems": false,
       "expect": [
         ["totals.total", "=", 3],
-        ["totals.onlyFocusable.total", "=", 0],
-        ["totals.onlyOperable.total", "=", 0],
-        ["totals.focusableAndOperable.total", "=", 3],
-        ["totals.focusableAndOperable.tagNames.A", "=", 1],
-        ["totals.focusableAndOperable.tagNames.BUTTON", "=", 1],
-        ["totals.focusableAndOperable.tagNames.INPUT", "=", 1]
+        ["totals.types.onlyFocusable.total", "=", 0],
+        ["totals.types.onlyOperable.total", "=", 0],
+        ["totals.types.focusableAndOperable.total", "=", 3],
+        ["totals.types.focusableAndOperable.tagNames.A", "=", 1],
+        ["totals.types.focusableAndOperable.tagNames.BUTTON", "=", 1],
+        ["totals.types.focusableAndOperable.tagNames.INPUT", "=", 1]
       ]
     },
     {
