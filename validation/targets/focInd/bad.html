@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Page with mixed focus indication</title>
+    <meta name="description" content="tester">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      input[type=text]:focus {
+        outline: none;
+      }
+      input[type=checkbox]:focus {
+        outline: 3px blue solid;
+        outline-offset: 2px;
+      }
+      #special:focus {
+        outline: none;
+        text-decoration-line: underline overline;
+        text-decoration-color: orange;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Page with mixed focus indication</h1>
+      <p>This paragraph contains a link to <a href="https://en.wikipedia.org">information</a>, a <button type="button">button</button>, and a <label>text input <input type="text"></label>. The link and button exhibit default focus indicators, but the input has none.</p>
+      <p>This paragraph contains a checkbox with an enhanced focus-indication outline. <label><input type="checkbox"> I am human</label></p>
+      <p>This paragraph contains a button with a non-outline focus indicator. <button id="special" type="button">special button</button></p>
+    </main>
+  </body>
+</html>
