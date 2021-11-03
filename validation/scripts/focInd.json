@@ -23,9 +23,9 @@
         ["totals.types.indicatorMissing.total", "=", 0],
         ["totals.types.nonOutlinePresent.total", "=", 0],
         ["totals.types.outlinePresent.total", "=", 4],
-        ["totals.types.indicatorMissing.tagNames.A", "=", 1],
-        ["totals.types.indicatorMissing.tagNames.BUTTON", "=", 1],
-        ["totals.types.indicatorMissing.tagNames.INPUT", "=", 2]
+        ["totals.types.outlinePresent.tagNames.A", "=", 1],
+        ["totals.types.outlinePresent.tagNames.BUTTON", "=", 1],
+        ["totals.types.outlinePresent.tagNames.INPUT", "=", 2]
       ]
     },
     {
