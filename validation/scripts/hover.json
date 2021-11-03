@@ -37,7 +37,7 @@
       "withItems": false,
       "expect": [
         ["totals.triggers", "=", 2],
-        ["totals.madeVisible", "=", 3],
+        ["totals.madeVisible", "=", 2],
         ["totals.opacityChanged", "=", 1],
         ["totals.opacityAffected", "=", 2],
         ["totals.unhoverables", "=", 1]

@@ -6,7 +6,9 @@
   'A', 'BUTTON', and 'LI' tag names or have 'onmouseenter' or 'onmouseover' attributes are
   considered as hovering targets. The elements considered when the effects of hovering are
   examined are the descendants of the grandparent of the element hovered over if that element
-  has the tag name 'A' or 'BUTTON' or otherwise the descendants of the element.
+  has the tag name 'A' or 'BUTTON' or otherwise the descendants of the element. The only
+  elements counted as being made visible by hovering are those with tag names 'A', 'BUTTON',
+  'INPUT', and 'SPAN', and those with 'role="menuitem"' attributes.
 */
 exports.reporter = async (page, withItems) => {
   // Initialize a counter.
