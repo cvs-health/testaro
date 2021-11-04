@@ -1,4 +1,9 @@
-// Tabulates and lists labeling conflicts of labelable form controls.
+/*
+  labClash
+  This test reports defects in the labeling of buttons, non-hidden inputs, select lists, and
+  text areas. The defects include missing labels and redundant labels. Redundant labels are
+  labels that are superseded by other labels.
+*/
 exports.reporter = async (page, withItems) => {
   return await page.$eval('body', (body, withItems) => {
     // FUNCTION DEFINITION START
