@@ -18,9 +18,9 @@
       "what": "Labeling",
       "withItems": false,
       "expect": [
-        ["mislabeled", "=", 0],
-        ["unlabeled", "=", 0],
-        ["wellLabeled", "=", 5]
+        ["totals.mislabeled", "=", 0],
+        ["totals.unlabeled", "=", 0],
+        ["totals.wellLabeled", "=", 5]
       ]
     },
     {
@@ -34,9 +34,9 @@
       "what": "Tab-focusability",
       "withItems": false,
       "expect": [
-        ["mislabeled", "=", 3],
-        ["unlabeled", "=", 2],
-        ["wellLabeled", "=", 0]
+        ["totals.mislabeled", "=", 3],
+        ["totals.unlabeled", "=", 2],
+        ["totals.wellLabeled", "=", 0]
       ]
     }
   ]
