@@ -32,7 +32,7 @@
       "type": "test",
       "which": "labClash",
       "what": "Labeling",
-      "withItems": true,
+      "withItems": false,
       "expect": [
         ["totals.mislabeled", "=", 3],
         ["totals.unlabeled", "=", 2],
