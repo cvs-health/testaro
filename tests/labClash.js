@@ -2,7 +2,8 @@
   labClash
   This test reports defects in the labeling of buttons, non-hidden inputs, select lists, and
   text areas. The defects include missing labels and redundant labels. Redundant labels are
-  labels that are superseded by other labels.
+  labels that are superseded by other labels. Explicit and implicit (wrapped) labels are
+  additive, not conflicting.
 */
 exports.reporter = async (page, withItems) => {
   return await page.$eval('body', (body, withItems) => {

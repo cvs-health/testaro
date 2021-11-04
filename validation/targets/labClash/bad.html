@@ -9,10 +9,10 @@
   <body>
     <main>
       <h1>Page with deviant labeling</h1>
-      <p>This paragraph contains an empty <button type="button">\t</button> button, with no accessible name.</p>
+      <p>This paragraph contains an empty <button type="button">&Tab;</button> button, with no accessible name.</p>
       <p>This is another <button id="labButton" type="button" aria-labelledby="buttonLabel">button</button> with its text content overridden by both an explicit label and a reference label as a <label id="buttonLabel" for="labButton">special type of button</label>.</p>
-      <p>This <label>implicitly labeled text input <input id="textInput" type="text"></label> also has an explicit label. It is a <label for="textInput">redundantly labeled text input</label>.</p>
-      <p>This is an implicitly and explicitly labeled <label for="cbox">checkbox input <input id="cbox" type="checkbox"></label>.</p>
+      <p>This is an implicitly and attribute-labeled <label>checkbox input <input id="cbox" type="checkbox" aria-label="a checkbox-type input"></label>.</p>
+      <p><span id="textInputLabel">Who is your favorite actor?</span> <input type="text" aria-labelledby="textInputLabel" aria-label="your favorite actor">.</p>
       <p>What do you think? Enter your thoughts into this text area, which is unlabeled.</p>
       <p><textarea></textarea></p>
     </main>

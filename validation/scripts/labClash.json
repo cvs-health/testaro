@@ -20,7 +20,7 @@
       "expect": [
         ["totals.mislabeled", "=", 0],
         ["totals.unlabeled", "=", 0],
-        ["totals.wellLabeled", "=", 5]
+        ["totals.wellLabeled", "=", 6]
       ]
     },
     {
@@ -32,7 +32,7 @@
       "type": "test",
       "which": "labClash",
       "what": "Labeling",
-      "withItems": false,
+      "withItems": true,
       "expect": [
         ["totals.mislabeled", "=", 3],
         ["totals.unlabeled", "=", 2],
