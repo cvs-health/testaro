@@ -9,9 +9,12 @@
   <body>
     <main>
       <h1>Page with deviant labeling</h1>
-      <p>This paragraph contains a <button type="button">button</button> with its text content as accessible name, an implicitly labeled <label>text input <input type="text"></label>, and an explicitly labeled <label for="cbox">checkbox input</label>: <input id="cbox" type="checkbox">.</p>
-      <p id="what">What do you think?</p>
-      <p><textarea aria-labelledby="what"></textarea></p>
+      <p>This paragraph contains an empty <button type="button">\t</button> button, with no accessible name.</p>
+      <p>This is another <button id="labButton" type="button" aria-labelledby="buttonLabel">button</button> with its text content overridden by both an explicit label and a reference label as a <label id="buttonLabel" for="labButton">special type of button</label>.</p>
+      <p>This <label>implicitly labeled text input <input id="textInput" type="text"></label> also has an explicit label. It is a <label for="textInput">redundantly labeled text input</label>.</p>
+      <p>This is an implicitly and explicitly labeled <label for="cbox">checkbox input <input id="cbox" type="checkbox"></label>.</p>
+      <p>What do you think? Enter your thoughts into this text area, which is unlabeled.</p>
+      <p><textarea></textarea></p>
     </main>
   </body>
 </html>

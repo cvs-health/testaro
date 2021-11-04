@@ -1,0 +1,43 @@
+{
+  "what": "validation of labClash test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/labClash/good.html",
+      "what": "Page with standard labeling"
+    },
+    {
+      "type": "test",
+      "which": "labClash",
+      "what": "Labeling",
+      "withItems": false,
+      "expect": [
+        ["mislabeled", "=", 0],
+        ["unlabeled", "=", 0],
+        ["wellLabeled", "=", 5]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/labClash/bad.html",
+      "what": "partly Tab-focusable page"
+    },
+    {
+      "type": "test",
+      "which": "focAll",
+      "what": "Tab-focusability",
+      "withItems": false,
+      "expect": [
+        ["mislabeled", "=", 3],
+        ["unlabeled", "=", 2],
+        ["wellLabeled", "=", 0]
+      ]
+    }
+  ]
+}

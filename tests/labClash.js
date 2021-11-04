@@ -7,7 +7,7 @@
 exports.reporter = async (page, withItems) => {
   return await page.$eval('body', (body, withItems) => {
     // FUNCTION DEFINITION START
-    const debloat = text => text.trim().replace(/\s+/g, ' ');
+    const debloat = text => text.replace(/\s+/g, ' ').trim();
     // FUNCTION DEFINITION END
     // Initialize a report.
     const data = {
