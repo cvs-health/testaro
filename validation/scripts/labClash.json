@@ -10,7 +10,7 @@
     {
       "type": "url",
       "which": "file://__dirname/validation/targets/labClash/good.html",
-      "what": "Page with standard labeling"
+      "what": "page with standard labeling"
     },
     {
       "type": "test",
@@ -26,12 +26,12 @@
     {
       "type": "url",
       "which": "file://__dirname/validation/targets/labClash/bad.html",
-      "what": "partly Tab-focusable page"
+      "what": "page with deviant labeling"
     },
     {
       "type": "test",
-      "which": "focAll",
-      "what": "Tab-focusability",
+      "which": "labClash",
+      "what": "Labeling",
       "withItems": false,
       "expect": [
         ["totals.mislabeled", "=", 3],
