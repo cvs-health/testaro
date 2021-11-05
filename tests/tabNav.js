@@ -80,43 +80,51 @@ exports.reporter = async (page, withItems) => {
     const testKey = async (
       tabs, tabElement, keyName, keyProp, goodIndex, elementIsCorrect, itemData
     ) => {
+      let pressed = true;
       // Click the tab element, to make the focus on it effective.
       await tabElement.click({timeout: 1500})
       .catch(error => {
         console.log(`ERROR: could not click tab element ${itemData.text} (${error.message})`);
-        return false;
+        pressed = false;
       });
-      // Refocus the tab element and press the specified key (page.keyboard.press may fail).
-      await tabElement.press(keyName)
-      .catch(error => {
-        console.log(`ERROR: could not press ${keyName} (${error.message})`);
-        return false;
-      });
-      // Increment the counts of navigations and key navigations.
-      data.totals.navigations.all.total++;
-      data.totals.navigations.specific[keyProp].total++;
-      // Identify which tab element is now focused, if any.
-      const focusIndex = await focusedTab(tabs);
-      // If the focus is correct:
-      if (focusIndex === goodIndex) {
-        // Increment the counts of correct navigations and correct key navigations.
-        data.totals.navigations.all.correct++;
-        data.totals.navigations.specific[keyProp].correct++;
-      }
-      // Otherwise, i.e. if the focus is incorrect:
-      else {
-        // Increment the counts of incorrect navigations and incorrect key navigations.
-        data.totals.navigations.all.incorrect++;
-        data.totals.navigations.specific[keyProp].incorrect++;
-        // Update the element status to incorrect.
-        elementIsCorrect = false;
-        // If itemization is required:
-        if (withItems) {
-          // Update the element report.
-          itemData.navigationErrors.push(keyName);
+      if (pressed) {
+        // Refocus the tab element and press the specified key (page.keyboard.press may fail).
+        await tabElement.press(keyName)
+        .catch(error => {
+          console.log(`ERROR: could not press ${keyName} (${error.message})`);
+          pressed = false;
+        });
+        if (pressed) {
+          // Increment the counts of navigations and key navigations.
+          data.totals.navigations.all.total++;
+          data.totals.navigations.specific[keyProp].total++;
+          // Identify which tab element is now focused, if any.
+          const focusIndex = await focusedTab(tabs);
+          // If the focus is correct:
+          if (focusIndex === goodIndex) {
+            // Increment the counts of correct navigations and correct key navigations.
+            data.totals.navigations.all.correct++;
+            data.totals.navigations.specific[keyProp].correct++;
+          }
+          // Otherwise, i.e. if the focus is incorrect:
+          else {
+            // Increment the counts of incorrect navigations and incorrect key navigations.
+            data.totals.navigations.all.incorrect++;
+            data.totals.navigations.specific[keyProp].incorrect++;
+            // Update the element status to incorrect.
+            elementIsCorrect = false;
+            // If itemization is required:
+            if (withItems) {
+              // Update the element report.
+              itemData.navigationErrors.push(keyName);
+            }
+          }
+          return elementIsCorrect;
+        }
+        else {
+          return false;
         }
       }
-      return elementIsCorrect;
     };
     // Returns the index to which an arrow key should move the focus.
     const arrowTarget = (startIndex, tabCount, orientation, direction) => {
