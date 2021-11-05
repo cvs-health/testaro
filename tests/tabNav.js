@@ -75,7 +75,11 @@ exports.reporter = async (page, withItems) => {
     const focusedTab = async tabs => await page.evaluate(tabs => {
       const focus = document.activeElement;
       return tabs.indexOf(focus);
-    }, tabs);
+    }, tabs)
+    .catch(error => {
+      console.log(`ERROR: could not find focused tab (${error.message})`);
+      return -1;
+    });
     // Tests a navigation on a tab element.
     const testKey = async (
       tabs, tabElement, keyName, keyProp, goodIndex, elementIsCorrect, itemData
