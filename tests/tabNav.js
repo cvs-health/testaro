@@ -248,17 +248,26 @@ exports.reporter = async (page, withItems) => {
       // If any tablists remain to be tested:
       if (tabLists.length) {
         const firstTabList = tabLists[0];
-        const orientation = (await firstTabList.getAttribute('aria-orientation')) || 'horizontal';
-        const tabs = await firstTabList.$$('[role=tab]');
-        // If the tablist contains at least 2 tab elements:
-        if (tabs.length > 1) {
-          // Test them.
-          const isCorrect = await testTabs(tabs, 0, orientation, true);
-          // Increment the data.
-          data.totals.tabLists.total++;
-          data.totals.tabLists[isCorrect ? 'correct' : 'incorrect']++;
-          // Process the remaining tablists.
-          await testTabLists(tabLists.slice(1));
+        let orientation = await firstTabList.getAttribute('aria-orientation')
+        .catch(error=> {
+          console.log(`ERROR: could not get tab-list orientation (${error.message})`);
+          return 'ERROR';
+        });
+        if (! orientation) {
+          orientation = 'horizontal';
+        }
+        if (orientation !== 'ERROR') {
+          const tabs = await firstTabList.$$('[role=tab]');
+          // If the tablist contains at least 2 tab elements:
+          if (tabs.length > 1) {
+            // Test them.
+            const isCorrect = await testTabs(tabs, 0, orientation, true);
+            // Increment the data.
+            data.totals.tabLists.total++;
+            data.totals.tabLists[isCorrect ? 'correct' : 'incorrect']++;
+            // Process the remaining tablists.
+            await testTabLists(tabLists.slice(1));
+          }
         }
       }
     };
