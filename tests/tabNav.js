@@ -87,7 +87,11 @@ exports.reporter = async (page, withItems) => {
         return false;
       });
       // Refocus the tab element and press the specified key (page.keyboard.press may fail).
-      await tabElement.press(keyName);
+      await tabElement.press(keyName)
+      .catch(error => {
+        console.log(`ERROR: could not press ${keyName} (${error.message})`);
+        return false;
+      });
       // Increment the counts of navigations and key navigations.
       data.totals.navigations.all.total++;
       data.totals.navigations.specific[keyProp].total++;
