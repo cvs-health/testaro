@@ -49,6 +49,49 @@
         ["totals.menus.correct", "=", 2],
         ["totals.menus.incorrect", "=", 0]
       ]
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/menuNav/bad.html",
+      "what": "page with deviant menu navigation"
+    },
+    {
+      "type": "test",
+      "which": "menuNav",
+      "what": "menu navigation",
+      "withItems": false,
+      "expect": [
+        ["totals.navigations.all.total", "=", 20],
+        ["totals.navigations.all.correct", "=", 12],
+        ["totals.navigations.all.incorrect", "=", 8],
+        ["totals.navigations.specific.tab.total", "=", 4],
+        ["totals.navigations.specific.tab.correct", "=", 4],
+        ["totals.navigations.specific.tab.incorrect", "=", 0],
+        ["totals.navigations.specific.left.total", "=", 2],
+        ["totals.navigations.specific.left.correct", "=", 1],
+        ["totals.navigations.specific.left.incorrect", "=", 1],
+        ["totals.navigations.specific.right.total", "=", 2],
+        ["totals.navigations.specific.right.correct", "=", 1],
+        ["totals.navigations.specific.right.incorrect", "=", 1],
+        ["totals.navigations.specific.up.total", "=", 2],
+        ["totals.navigations.specific.up.correct", "=", 1],
+        ["totals.navigations.specific.up.incorrect", "=", 1],
+        ["totals.navigations.specific.down.total", "=", 2],
+        ["totals.navigations.specific.down.correct", "=", 1],
+        ["totals.navigations.specific.down.incorrect", "=", 1],
+        ["totals.navigations.specific.home.total", "=", 4],
+        ["totals.navigations.specific.home.correct", "=", 2],
+        ["totals.navigations.specific.home.incorrect", "=", 2],
+        ["totals.navigations.specific.end.total", "=", 4],
+        ["totals.navigations.specific.end.correct", "=", 2],
+        ["totals.navigations.specific.end.incorrect", "=", 2],
+        ["totals.menuItems.total", "=", 4],
+        ["totals.menuItems.correct", "=", 0],
+        ["totals.menuItems.incorrect", "=", 4],
+        ["totals.menus.total", "=", 2],
+        ["totals.menus.correct", "=", 0],
+        ["totals.menus.incorrect", "=", 2]
+      ]
     }
   ]
 }
