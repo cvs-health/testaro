@@ -42,9 +42,9 @@
         ["totals.navigations.specific.end.total", "=", 4],
         ["totals.navigations.specific.end.correct", "=", 4],
         ["totals.navigations.specific.end.incorrect", "=", 0],
-        ["totals.menuitems.total", "=", 4],
-        ["totals.menuitems.correct", "=", 4],
-        ["totals.menuitems.incorrect", "=", 0],
+        ["totals.menuItems.total", "=", 4],
+        ["totals.menuItems.correct", "=", 4],
+        ["totals.menuItems.incorrect", "=", 0],
         ["totals.menus.total", "=", 2],
         ["totals.menus.correct", "=", 2],
         ["totals.menus.incorrect", "=", 0]
