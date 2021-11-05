@@ -1,4 +1,10 @@
-// Tests true-focus menu navigation.
+/*
+  menuNav
+  This test reports nonstandard keyboard navigation among menu items in menus that
+  manage true focus. Menus that use pseudofocus with the 'aria-activedescendant'
+  attribute are not tested. Standards are based on
+  https://www.w3.org/TR/wai-aria-practices-1.1/#menu.
+*/
 exports.reporter = async (page, withItems) => {
   // Initialize a report.
   const data = {
@@ -146,10 +152,7 @@ exports.reporter = async (page, withItems) => {
         }
       }
     };
-    /*
-      Recursively tests menu items of a menu (per
-      https://www.w3.org/TR/wai-aria-practices-1.1/#menu)
-    */
+    // Recursively tests menu items of a menu.
     const testMenuItems = async (menu, menuItems, index, orientation, menuIsCorrect) => {
       const itemCount = menuItems.length;
       // If any menu items remain to be tested:
@@ -173,6 +176,7 @@ exports.reporter = async (page, withItems) => {
           menu, menuItems, currentItem, 'Tab', 'tab', -1, isCorrect, itemData
         );
         // FUNCTION DEFINITION START
+        // Tests arrow-key navigation.
         const testArrow = async (keyName, keyProp) => {
           isCorrect = await testKey(
             menu,

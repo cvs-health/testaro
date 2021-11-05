@@ -1,4 +1,10 @@
-// Returns counts, fractions, and texts of inline links, by whether underlined.
+/*
+  role
+  This test reports role assignment that violate either an applicable standard or
+  an applicable recommendation from WAI-ARIA. Reportable roles include those that are
+  abstract and thus prohibited from direct use, and those that are implicit in HTML
+  elements and thus advised against.
+*/
 exports.reporter = async page => await page.$eval('body', body => {
   // CONSTANTS
   /*

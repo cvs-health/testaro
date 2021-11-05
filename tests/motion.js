@@ -1,3 +1,10 @@
+/*
+  motion
+  This test reports spontaneous motion in a page. It quantifies motion by two kinds of
+  changes in screen shots of the viewport:
+    0. Changes in the sizes in bytes.
+    1. Changes in the pixels.
+*/
 const pixelmatch = require('pixelmatch');
 const {PNG} = require('pngjs');
 // Reports motion in a page.

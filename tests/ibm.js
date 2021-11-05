@@ -1,3 +1,10 @@
+/*
+  ibm
+  This test implements the IBM Equal Access ruleset for accessibility.
+  The 'withNewContent' argument determines whether the test package should be
+  given the URL of the page to be tested (true) or should be given the page content
+  (false).
+*/
 // Import required modules.
 const fs = require('fs/promises');
 const {getCompliance} = require('accessibility-checker');

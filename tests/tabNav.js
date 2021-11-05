@@ -1,3 +1,8 @@
+/*
+  tabNav
+  This test reports nonstandard keyboard navigation among tab elements in tab lists.
+  Standards are based on https://www.w3.org/TR/wai-aria-practices-1.1/#tabpanel.
+*/
 // Tests tablist navigation.
 exports.reporter = async (page, withItems) => {
   // Initialize a report.

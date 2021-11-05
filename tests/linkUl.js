@@ -1,4 +1,12 @@
-// Returns counts, fractions, and texts of inline links, by whether underlined.
+/*
+  linkUl
+  This test reports failures to underline inline links. Underlining is the traditional
+  style property that identifies a link. Collections of links in blocks can be recognized
+  without underlines, but inline links are difficult or impossible to distinguish visually
+  from surrounding text if not underlined. Underlining inline links only on hover provides
+  an indicator valuable only to mouse users, and even they must traverse the text with a
+  mouse merely to discover which passages are links.
+*/
 exports.reporter = async (page, withItems) => {
   // Identify the links in the page, by type.
   const linkTypes = await require('../procs/test/linksByType').linksByType(page);
