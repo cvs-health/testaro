@@ -170,8 +170,8 @@ exports.reporter = async (page, withItems) => {
         // Initialize it as correct.
         let isCorrect = true;
         const itemData = {};
-        // If itemization is required:
-        if (withItems) {
+        // If itemization is required and the page still exists:
+        if (withItems && page) {
           // Initialize a report on the element.
           itemData.tagName = await page.evaluate(element => element.tagName, currentTab);
           itemData.text = await allText(page, currentTab);
