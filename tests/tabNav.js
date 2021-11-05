@@ -170,12 +170,20 @@ exports.reporter = async (page, withItems) => {
         // Initialize it as correct.
         let isCorrect = true;
         const itemData = {};
-        // If itemization is required and the page still exists:
-        if (withItems && page) {
+        // If itemization is required:
+        if (withItems) {
+          let found = true;
           // Initialize a report on the element.
-          itemData.tagName = await page.evaluate(element => element.tagName, currentTab);
-          itemData.text = await allText(page, currentTab);
-          itemData.navigationErrors = [];
+          itemData.tagName = await page.evaluate(element => element.tagName, currentTab)
+          .catch(error => {
+            console.log(`ERROR: could not get tag name (${error.message})`);
+            found = false;
+            return 'ERROR: not found';
+          });
+          if (found) {
+            itemData.text = await allText(page, currentTab);
+            itemData.navigationErrors = [];
+          }
         }
         // Test the element with each navigation key.
         isCorrect = await testKey(tabs, currentTab, 'Tab', 'tab', -1, isCorrect, itemData);
