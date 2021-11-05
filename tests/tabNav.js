@@ -75,44 +75,60 @@ exports.reporter = async (page, withItems) => {
     const focusedTab = async tabs => await page.evaluate(tabs => {
       const focus = document.activeElement;
       return tabs.indexOf(focus);
-    }, tabs);
+    }, tabs)
+    .catch(error => {
+      console.log(`ERROR: could not find focused tab (${error.message})`);
+      return -1;
+    });
     // Tests a navigation on a tab element.
     const testKey = async (
       tabs, tabElement, keyName, keyProp, goodIndex, elementIsCorrect, itemData
     ) => {
+      let pressed = true;
       // Click the tab element, to make the focus on it effective.
       await tabElement.click({timeout: 1500})
       .catch(error => {
         console.log(`ERROR: could not click tab element ${itemData.text} (${error.message})`);
-        return false;
+        pressed = false;
       });
-      // Refocus the tab element and press the specified key (page.keyboard.press may fail).
-      await tabElement.press(keyName);
-      // Increment the counts of navigations and key navigations.
-      data.totals.navigations.all.total++;
-      data.totals.navigations.specific[keyProp].total++;
-      // Identify which tab element is now focused, if any.
-      const focusIndex = await focusedTab(tabs);
-      // If the focus is correct:
-      if (focusIndex === goodIndex) {
-        // Increment the counts of correct navigations and correct key navigations.
-        data.totals.navigations.all.correct++;
-        data.totals.navigations.specific[keyProp].correct++;
-      }
-      // Otherwise, i.e. if the focus is incorrect:
-      else {
-        // Increment the counts of incorrect navigations and incorrect key navigations.
-        data.totals.navigations.all.incorrect++;
-        data.totals.navigations.specific[keyProp].incorrect++;
-        // Update the element status to incorrect.
-        elementIsCorrect = false;
-        // If itemization is required:
-        if (withItems) {
-          // Update the element report.
-          itemData.navigationErrors.push(keyName);
+      if (pressed) {
+        // Refocus the tab element and press the specified key (page.keyboard.press may fail).
+        await tabElement.press(keyName)
+        .catch(error => {
+          console.log(`ERROR: could not press ${keyName} (${error.message})`);
+          pressed = false;
+        });
+        if (pressed) {
+          // Increment the counts of navigations and key navigations.
+          data.totals.navigations.all.total++;
+          data.totals.navigations.specific[keyProp].total++;
+          // Identify which tab element is now focused, if any.
+          const focusIndex = await focusedTab(tabs);
+          // If the focus is correct:
+          if (focusIndex === goodIndex) {
+            // Increment the counts of correct navigations and correct key navigations.
+            data.totals.navigations.all.correct++;
+            data.totals.navigations.specific[keyProp].correct++;
+          }
+          // Otherwise, i.e. if the focus is incorrect:
+          else {
+            // Increment the counts of incorrect navigations and incorrect key navigations.
+            data.totals.navigations.all.incorrect++;
+            data.totals.navigations.specific[keyProp].incorrect++;
+            // Update the element status to incorrect.
+            elementIsCorrect = false;
+            // If itemization is required:
+            if (withItems) {
+              // Update the element report.
+              itemData.navigationErrors.push(keyName);
+            }
+          }
+          return elementIsCorrect;
+        }
+        else {
+          return false;
         }
       }
-      return elementIsCorrect;
     };
     // Returns the index to which an arrow key should move the focus.
     const arrowTarget = (startIndex, tabCount, orientation, direction) => {
@@ -156,10 +172,18 @@ exports.reporter = async (page, withItems) => {
         const itemData = {};
         // If itemization is required:
         if (withItems) {
+          let found = true;
           // Initialize a report on the element.
-          itemData.tagName = await page.evaluate(element => element.tagName, currentTab);
-          itemData.text = await allText(page, currentTab);
-          itemData.navigationErrors = [];
+          itemData.tagName = await page.evaluate(element => element.tagName, currentTab)
+          .catch(error => {
+            console.log(`ERROR: could not get tag name (${error.message})`);
+            found = false;
+            return 'ERROR: not found';
+          });
+          if (found) {
+            itemData.text = await allText(page, currentTab);
+            itemData.navigationErrors = [];
+          }
         }
         // Test the element with each navigation key.
         isCorrect = await testKey(tabs, currentTab, 'Tab', 'tab', -1, isCorrect, itemData);
@@ -224,17 +248,26 @@ exports.reporter = async (page, withItems) => {
       // If any tablists remain to be tested:
       if (tabLists.length) {
         const firstTabList = tabLists[0];
-        const orientation = (await firstTabList.getAttribute('aria-orientation')) || 'horizontal';
-        const tabs = await firstTabList.$$('[role=tab]');
-        // If the tablist contains at least 2 tab elements:
-        if (tabs.length > 1) {
-          // Test them.
-          const isCorrect = await testTabs(tabs, 0, orientation, true);
-          // Increment the data.
-          data.totals.tabLists.total++;
-          data.totals.tabLists[isCorrect ? 'correct' : 'incorrect']++;
-          // Process the remaining tablists.
-          await testTabLists(tabLists.slice(1));
+        let orientation = await firstTabList.getAttribute('aria-orientation')
+        .catch(error=> {
+          console.log(`ERROR: could not get tab-list orientation (${error.message})`);
+          return 'ERROR';
+        });
+        if (! orientation) {
+          orientation = 'horizontal';
+        }
+        if (orientation !== 'ERROR') {
+          const tabs = await firstTabList.$$('[role=tab]');
+          // If the tablist contains at least 2 tab elements:
+          if (tabs.length > 1) {
+            // Test them.
+            const isCorrect = await testTabs(tabs, 0, orientation, true);
+            // Increment the data.
+            data.totals.tabLists.total++;
+            data.totals.tabLists[isCorrect ? 'correct' : 'incorrect']++;
+            // Process the remaining tablists.
+            await testTabLists(tabLists.slice(1));
+          }
         }
       }
     };
