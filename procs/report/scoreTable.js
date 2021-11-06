@@ -80,7 +80,7 @@ const tableMidLines = result.map(item => {
     else {
       const barWidth = maxDeficits[name] ? 100 * item.deficit[name] / maxDeficits[name] : 0;
       const bar = `<rect height="100%" width="${barWidth}%" fill="red"></rect>`;
-      barCells.push(`<td aria-hidden="true"><svg width="100%" height="1em">${bar}</svg></td>`);
+      barCells.push(`<td aria-hidden="true"><svg width="100%" height="0.7em">${bar}</svg></td>`);
     }
   });
   const numBarCells = numCells.map((cell, index) => `${cell}${barCells[index]}`);

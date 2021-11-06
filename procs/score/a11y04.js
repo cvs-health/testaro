@@ -156,7 +156,7 @@ exports.scorer = acts => {
               scores[type] = 4 * totals.violation + 2 * totals.recommendation - totalDiscount;
             }
           });
-          if (scores.content || scores.url) {
+          if (scores.content !== null || scores.url !== null) {
             deficit.ibm = Math.max(scores.content || 0, scores.url || 0);
             deficit.total += deficit.ibm;
           }
