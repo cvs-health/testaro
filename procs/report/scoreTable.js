@@ -32,8 +32,8 @@ const optionPropNames = [['total'], ['total', 'axe'], ['axe', 'ibm', 'wave']];
 const colNames = optionColNames[options.indexOf(colSpec)];
 const propNames = optionPropNames[options.indexOf(colSpec)];
 const head0 = colNames.map(pair => `<th colspan="2">${pair}</th>`).join('');
-const head1 = '<th>Number</th><th>Bar</th>'.repeat(colNames.length);
-const tableClasses = ['secondCellRight'];
+const head1 = '<th>Number</th><th aria-hidden="true">Bar</th>'.repeat(colNames.length);
+const tableClasses = ['thSmaller', 'secondCellRight'];
 if (colSpec !== 'aut') {
   tableClasses.push('fourthCellRight');
   if (colSpec === 'p3') {
@@ -75,12 +75,12 @@ const tableMidLines = result.map(item => {
   propNames.forEach(name => {
     const itemScore = item.deficit[name];
     if (itemScore === null) {
-      barCells.push('<td>?</td>');
+      barCells.push('<td aria-hidden="true">?</td>');
     }
     else {
       const barWidth = maxDeficits[name] ? 100 * item.deficit[name] / maxDeficits[name] : 0;
       const bar = `<rect height="100%" width="${barWidth}%" fill="red"></rect>`;
-      barCells.push(`<td><svg width="100%" height="1rem">${bar}</svg></td>`);
+      barCells.push(`<td aria-hidden="true"><svg width="100%" height="1rem">${bar}</svg></td>`);
     }
   });
   const numBarCells = numCells.map((cell, index) => `${cell}${barCells[index]}`);
