@@ -31,9 +31,9 @@ const optionColNames = [['Deficit'], ['Autotest', 'Axe'], ['Axe', 'IBM', 'WAVE']
 const optionPropNames = [['total'], ['total', 'axe'], ['axe', 'ibm', 'wave']];
 const colNames = optionColNames[options.indexOf(colSpec)];
 const propNames = optionPropNames[options.indexOf(colSpec)];
-const head0 = colNames.map(pair => `<th colspan="2">${pair}</th>`).join('');
-const head1 = '<th>Number</th><th aria-hidden="true">Bar</th>'.repeat(colNames.length);
-const tableClasses = ['thSmaller', 'secondCellRight'];
+const head0 = colNames.map(pair => `<th scope="col" colspan="2">${pair}</th>`).join('');
+const head1 = '<th scope="col">Number</th><th scope="col" aria-hidden="true">Bar</th>'.repeat(colNames.length);
+const tableClasses = ['linkSmaller', 'secondCellRight'];
 if (colSpec !== 'aut') {
   tableClasses.push('fourthCellRight');
   if (colSpec === 'p3') {
@@ -44,7 +44,7 @@ const tableStartLines = [
   '<table class="allBorder">',
   '  <caption>Accessibility deficits of web pages</caption>',
   '  <thead>',
-  `    <tr><th rowspan="2">Page</th>${head0}</tr>`,
+  `    <tr><th scope="col" rowspan="2">Page</th>${head0}</tr>`,
   `    <tr>${head1}</tr>`,
   '  </thead>',
   `  <tbody class="${tableClasses.join(' ')}">`
@@ -62,7 +62,7 @@ propNames.forEach(propName => {
 });
 // Compile the HTML code representing the data.
 const tableMidLines = result.map(item => {
-  const pageCell = `<th><a href="${item.url}">${item.org}</a></th>`;
+  const pageCell = `<th scope="row"><a href="${item.url}">${item.org}</a></th>`;
   const numCells = [];
   if (propNames.includes('total')) {
     numCells.push(`<td><a href="data/${item.fileName}">${item.deficit.total}</a></td>`);
@@ -80,7 +80,7 @@ const tableMidLines = result.map(item => {
     else {
       const barWidth = maxDeficits[name] ? 100 * item.deficit[name] / maxDeficits[name] : 0;
       const bar = `<rect height="100%" width="${barWidth}%" fill="red"></rect>`;
-      barCells.push(`<td aria-hidden="true"><svg width="100%" height="1rem">${bar}</svg></td>`);
+      barCells.push(`<td aria-hidden="true"><svg width="100%" height="1em">${bar}</svg></td>`);
     }
   });
   const numBarCells = numCells.map((cell, index) => `${cell}${barCells[index]}`);
