@@ -18,10 +18,16 @@
       "what": "styleDiff",
       "withItems": false,
       "expect": [
-        ["totals.A.elementCount", "=", 4],
-        ["totals.BUTTON.elementCount", "=", 2],
-        ["totals.H1.elementCount", "=", 1],
-        ["totals.H2.elementCount", "=", 3]
+        ["totals.aInline.total", "=", 2],
+        ["totals.aBlock.total", "=", 2],
+        ["totals.button.total", "=", 2],
+        ["totals.h1.total", "=", 1],
+        ["totals.h2.total", "=", 4],
+        ["totals.aInline.subtotals"],
+        ["totals.aBlock.subtotals"],
+        ["totals.button.subtotals"],
+        ["totals.h1.subtotals"],
+        ["totals.h2.subtotals"]
       ]
     }
   ]

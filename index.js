@@ -627,6 +627,9 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                   else if (relation === '>') {
                     passed = actual > criterion;
                   }
+                  else if (! relation) {
+                    passed = actual === undefined;
+                  }
                   testReport.result.expectations.push({
                     property,
                     relation,
