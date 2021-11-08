@@ -33,8 +33,9 @@
       "expect": [
         ["roleElements", "=", 3],
         ["badRoleElements", "=", 3],
-        ["tagNames.SECTION", "=", 2],
-        ["tagNames.H2", "=", 1]
+        ["tagNames.SECTION.main", "=", 1],
+        ["tagNames.SECTION.section", "=", 1],
+        ["tagNames.H2.heading", "=", 1]
       ]
     }
   ]
