@@ -65,7 +65,6 @@ exports.reporter = async (page, withItems) => {
     ['headings', 'other'].forEach(superClass => {
       // For each class in the superclass:
       Object.keys(elementClasses[superClass]).forEach(tagName => {
-        console.log(tagName);
         const elements = elementClasses[superClass][tagName];
         const elementCount = elements.length;
         // If there are any:
