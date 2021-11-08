@@ -20,6 +20,22 @@
         ["roleElements", "=", 1],
         ["badRoleElements", "=", 0]
       ]
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/role/bad.html",
+      "what": "page with deviant roles"
+    },
+    {
+      "type": "test",
+      "which": "role",
+      "what": "role",
+      "expect": [
+        ["roleElements", "=", 3],
+        ["badRoleElements", "=", 3],
+        ["tagNames.SECTION", "=", 2],
+        ["tagNames.H2", "=", 1]
+      ]
     }
   ]
 }

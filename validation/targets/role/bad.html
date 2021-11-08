@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Page with deviant role elements</title>
+    <meta name="description" content="tester">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <section role="main">
+      <h1>Page with deviant role elements</h1>
+      <section role="section">
+        <h2>Abstraction</h2>
+        <p>This section has an abstract role.</p>
+      </section>
+      <section>
+        <h2 role="heading">Redundancy</h2>
+        <p>This section has a redundant role.</p>
+      </section>
+      <section>
+        <h2>Conflict</h2>
+        <p>The parent section of these sections has an unnecessary explicit role.</p>
+      </section>
+    </section>
+  </body>
+</html>
