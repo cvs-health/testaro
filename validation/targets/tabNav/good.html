@@ -11,40 +11,39 @@
   <body>
     <main>
       <h1>Page with standard tab-list navigation</h1>
-      <p>This is a tab list.</p>
       <div class="tabs">
-        <div role="tablist" aria-label="Entertainment">
-          <button role="tab" aria-selected="true" aria-controls="nils-tab" id="nils">
-            Nils Frahm
+        <p id="tabListLabel">What kind of HTML element do you want to study?</p>
+        <div role="tablist" aria-labelledby="tabListLabel">
+          <button role="tab" aria-selected="true" aria-controls="ulDoc" id="ul">
+            <code>ul</code>
           </button>
           <button
             role="tab"
             aria-selected="false"
-            aria-controls="agnes-tab"
-            id="agnes"
+            aria-controls="sectionDoc"
+            id="section"
             tabindex="-1"
           >
-            Agnes Obel
+            <code>section</code>
           </button>
           <button
             role="tab"
             aria-selected="false"
-            aria-controls="complexcomplex"
-            id="complex"
+            aria-controls="mainDoc"
+            id="main"
             tabindex="-1"
           >
-            Joke
+            <code>main</code>
           </button>
         </div>
-        <div tabindex="0" role="tabpanel" id="nils-tab" aria-labelledby="nils">
-          <p>Nils Frahm is a German musician, composer and record producer based in Berlin. He is known for combining classical and electronic music and for an unconventional approach to the piano in which he mixes a grand piano, upright piano, Roland Juno-60, Rhodes piano, drum machine, and Moog Taurus.</p>
+        <div tabindex="0" role="tabpanel" id="ulDoc" aria-labelledby="ul">
+          <p>A <code>ul</code> element encodes an unordered list.</p>
         </div>
-        <div tabindex="0" role="tabpanel" id="agnes-tab" aria-labelledby="agnes" hidden="">
-          <p>Agnes Caroline Thaarup Obel is a Danish singer/songwriter. Her first album, Philharmonics, was released by PIAS Recordings on 4 October 2010 in Europe. Philharmonics was certified gold in June 2011 by the Belgian Entertainment Association (BEA) for sales of 10,000 Copies.</p>
+        <div tabindex="0" role="tabpanel" id="sectionDoc" aria-labelledby="section" hidden>
+          <p>A <code>section</code> element encodes a generic part of a document.</p>
         </div>
-        <div tabindex="0" role="tabpanel" id="complexcomplex" aria-labelledby="complex" hidden="">
-          <p>Fear of complicated buildings:</p>
-          <p>A complex complex complex.</p>
+        <div tabindex="0" role="tabpanel" id="mainDoc" aria-labelledby="main" hidden>
+          <p>A <code>main</code> element encodes the dominant content of a document.</p>
         </div>
       </div>
     </main>

@@ -1,3 +1,28 @@
+button {
+  min-width: 30%;
+  border-width: 3px;
+  background-color: #eee;
+}
+button:focus {
+  border-bottom: none;
+  background-color: #dfd;
+}
+:focus {
+  outline: 2px #00f solid;
+  outline-offset: 2px;
+}
+[role=tablist] {
+  min-height: 5rem;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-evenly;
+}
+.tabs {
+  max-width: 40rem;
+}
+
+/*
+
 .tabs {
   width: 20em;
   font-family: "lucida grande", sans-serif;
@@ -101,3 +126,5 @@
 [role="tabpanel"] * + p {
   margin-top: 1em;
 }
+
+*/
