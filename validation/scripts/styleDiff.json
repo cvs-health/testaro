@@ -29,6 +29,33 @@
         ["totals.h1.subtotals"],
         ["totals.h2.subtotals"]
       ]
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/styleDiff/bad.html",
+      "what": "page with consistent styles"
+    },
+    {
+      "type": "test",
+      "which": "styleDiff",
+      "what": "styleDiff",
+      "withItems": false,
+      "expect": [
+        ["totals.aInline.total", "=", 2],
+        ["totals.aBlock.total", "=", 2],
+        ["totals.button.total", "=", 2],
+        ["totals.h1.total", "=", 1],
+        ["totals.h2.total", "=", 4],
+        ["totals.aInline.subtotals.0", "=", 1],
+        ["totals.aInline.subtotals.1", "=", 1],
+        ["totals.aBlock.subtotals.0", "=", 1],
+        ["totals.aBlock.subtotals.1", "=", 1],
+        ["totals.button.subtotals.0", "=", 1],
+        ["totals.button.subtotals.1", "=", 1],
+        ["totals.h1.subtotals"],
+        ["totals.h2.subtotals.0", "=", 3],
+        ["totals.h2.subtotals.1", "=", 1]
+      ]
     }
   ]
 }
