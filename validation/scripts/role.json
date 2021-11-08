@@ -1,0 +1,25 @@
+{
+  "what": "validation of role test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/role/good.html",
+      "what": "page with standard roles"
+    },
+    {
+      "type": "test",
+      "which": "role",
+      "what": "role",
+      "expect": [
+        ["roleElements", "=", 1],
+        ["badRoleElements", "=", 0]
+      ]
+    }
+  ]
+}

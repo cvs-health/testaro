@@ -16,6 +16,7 @@ exports.reporter = async page => await page.$eval('body', body => {
   */
   const badRoles = new Set([
     'article',
+    'banner',
     'button',
     'cell',
     'checkbox',
