@@ -36,9 +36,12 @@ exports.reporter = async (page, withItems) => {
       let texts = {};
       // Attribute label.
       if (labelee.hasAttribute('aria-label')) {
-        labelTypes.push('aria-label');
-        if (withItems) {
-          texts.attribute = labelee.getAttribute('aria-label');
+        const trimmedLabel = debloat(labelee.ariaLabel);
+        if (trimmedLabel) {
+          labelTypes.push('aria-label');
+          if (withItems) {
+            texts.attribute = labelee.ariaLabel;
+          }
         }
       }
       // Reference label.
