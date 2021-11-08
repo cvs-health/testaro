@@ -604,9 +604,10 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
               const expectations = act.expect;
               // If the test has expectations:
               if (expectations) {
-                // Report whether they were fulfilled.
+                // Initialize whether they were fulfilled.
                 testReport.result.expectations = [];
                 let failureCount = 0;
+                // For each expectation:
                 expectations.forEach(spec => {
                   let passed;
                   const property = spec[0];
@@ -614,10 +615,12 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                   const relation = spec[1];
                   const criterion = spec[2];
                   let actual = testReport.result[propertyTree[0]];
-                  while (propertyTree.length > 1) {
+                  // Identify the actual value of the specified property.
+                  while (propertyTree.length > 1 && actual !== undefined) {
                     propertyTree.shift();
                     actual = actual[propertyTree[0]];
                   }
+                  // Determine whether the expectation was fuldilled.
                   if (relation === '=') {
                     passed = actual === criterion;
                   }
