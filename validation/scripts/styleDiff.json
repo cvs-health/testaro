@@ -1,0 +1,28 @@
+{
+  "what": "validation of styleDiff test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/styleDiff/good.html",
+      "what": "page with consistent styles"
+    },
+    {
+      "type": "test",
+      "which": "styleDiff",
+      "what": "styleDiff",
+      "withItems": false,
+      "expect": [
+        ["totals.A.elementCount", "=", 4],
+        ["totals.BUTTON.elementCount", "=", 2],
+        ["totals.H1.elementCount", "=", 1],
+        ["totals.H2.elementCount", "=", 3]
+      ]
+    }
+  ]
+}

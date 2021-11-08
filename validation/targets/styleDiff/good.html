@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Page with consistent styles</title>
+    <meta name="description" content="tester">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      button {
+        min-height: 44px;
+        min-width: 44px;
+      }
+      .dotted > li > a {
+        text-decoration-line: underline;
+        text-decoration-style: dotted;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Page with consistent styles</h1>
+      <h2>Inline links</h2>
+      <p>This paragraph contains inline links to <a href="https://en.wikipedia.org">English information</a> and <a href="https://fr.wikipedia.org">French information</a>. They both have a default style.</p>
+      <h2>Block links</h2>
+      <p>The following links are not inline. They have a uniform custom underline.</p>
+      <ul class="dotted">
+        <li><a href="https://sp.wikipedia.org">Spanish information</a></li>
+        <li><a href="https://eo.wikipedia.org">Esperanto information</a></li>
+      </ul>
+      <h2>Buttons</h2>
+      <p>This paragraph contains two buttons with a uniform custom style. <button type="button">Wikipedia</button> <button type="button">Wiktionary</button></p>
+      <h2>Headings</h2>
+      <p>This page contains 3 <code>h2</code> headings. They all have a default style.</p>
+    </main>
+  </body>
+</html>
