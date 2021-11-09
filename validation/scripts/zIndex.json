@@ -16,8 +16,9 @@
       "type": "test",
       "which": "zIndex",
       "what": "zIndex",
+      "withItems": false,
       "expect": [
-        ["total", "=", 0]
+        ["totals.total", "=", 0]
       ]
     },
     {
@@ -29,9 +30,10 @@
       "type": "test",
       "which": "zIndex",
       "what": "zIndex",
+      "withItems": false,
       "expect": [
-        ["total", "=", 2],
-        ["tagNames.button", "=", 2]
+        ["totals.total", "=", 2],
+        ["totals.tagNames.BUTTON", "=", 2]
       ]
     }
   ]
