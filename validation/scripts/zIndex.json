@@ -1,0 +1,38 @@
+{
+  "what": "validation of zIndex test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/zIndex/good.html",
+      "what": "page with no explicit z-index attributes"
+    },
+    {
+      "type": "test",
+      "which": "zIndex",
+      "what": "zIndex",
+      "expect": [
+        ["total", "=", 0]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/zIndex/bad.html",
+      "what": "page with explicit z-index attributes roles"
+    },
+    {
+      "type": "test",
+      "which": "zIndex",
+      "what": "zIndex",
+      "expect": [
+        ["total", "=", 2],
+        ["tagNames.button", "=", 2]
+      ]
+    }
+  ]
+}
