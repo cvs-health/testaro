@@ -4,10 +4,10 @@ button {
   background-color: #eee;
   font-size: x-large;
 }
-button:focus {
+button.active {
   border-bottom: none;
 }
-button:focus, .tabPanels {
+button.active, .tabPanels {
   background-color: #dfd;
 }
 :focus {

@@ -15,10 +15,14 @@ const showPanel = button => {
   });
   controlledPanel(button).removeAttribute('hidden');
 };
-// Makes only the active tab keyboard-focusable.
-const makeFocusable = button => {
-  allTabs(button).tabIndex = -1;
+// Makes a tab active.
+const makeActive = button => {
+  allTabs(button).forEach(tab => {
+    tab.tabIndex = -1;
+    tab.classList.remove('active');
+  });
   button.tabIndex = 0;
+  button.classList.add('active');
 };
 // Returns the destination of a keyboard navigation within a tab list.
 const destinationTab = (fromTab, key) => {
@@ -72,8 +76,8 @@ const documentTabs = Array.from(document.body.querySelectorAll('[role=tab]'));
 documentTabs.forEach(tab => {
   tab.addEventListener('focus', () => {
     showPanel(tab);
-    if (tab.tabIndex !== 0) {
-      makeFocusable(tab);
+    if (tab.tabIndex !== 0 || ! tab.classList.contains('active')) {
+      makeActive(tab);
     }
   });
 });
