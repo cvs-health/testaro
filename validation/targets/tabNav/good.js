@@ -3,17 +3,22 @@
 // Returns whether an element is a tab.
 const isTab = element => element.getAttribute('role') === 'tab';
 // Returns the tab list containing a tab.
-const allTabs = button => button.parentElement.children;
+const allTabs = button => Array.from(button.parentElement.children);
 // Returns the panel controlled by a tab.
 const controlledPanel = button => document.getElementById(button.getAttribute('aria-controls'));
 // Returns the tab panels controlled by the tabs of a tab list.
-const allPanels = button => controlledPanel(button).parentElement.children;
+const allPanels = button => Array.from(controlledPanel(button).parentElement.children);
 // Exposes only the tab panel controlled by a button.
 const showPanel = button => {
   allPanels(button).forEach(panel => {
-    panel.hidden = '';
+    panel.setAttribute('hidden', '');
   });
   controlledPanel(button).removeAttribute('hidden');
+};
+// Makes only the active tab keyboard-focusable.
+const makeFocusable = button => {
+  allTabs(button).tabIndex = -1;
+  button.tabIndex = 0;
 };
 // Returns the destination of a keyboard navigation within a tab list.
 const destinationTab = (fromTab, key) => {
@@ -67,5 +72,8 @@ const documentTabs = Array.from(document.body.querySelectorAll('[role=tab]'));
 documentTabs.forEach(tab => {
   tab.addEventListener('focus', () => {
     showPanel(tab);
+    if (tab.tabIndex !== 0) {
+      makeFocusable(tab);
+    }
   });
 });
