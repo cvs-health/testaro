@@ -2,9 +2,12 @@ button {
   min-width: 30%;
   border-width: 3px;
   background-color: #eee;
+  font-size: x-large;
 }
 button:focus {
   border-bottom: none;
+}
+button:focus, .tabPanels {
   background-color: #dfd;
 }
 :focus {
@@ -12,10 +15,19 @@ button:focus {
   outline-offset: 2px;
 }
 [role=tablist] {
+  margin-bottom: 0;
   min-height: 5rem;
   display: flex;
   align-items: stretch;
   justify-content: space-evenly;
+}
+.tabPanels {
+  margin-top:0;
+  padding: 1rem;
+  border-width: 0 3px 3px 3px;
+}
+.tabPanels p {
+  margin-top: 0;
 }
 .tabs {
   max-width: 40rem;
