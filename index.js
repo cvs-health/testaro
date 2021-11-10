@@ -57,6 +57,7 @@ const moves = {
   checkbox: 'input[type=checkbox]',
   focus: true,
   link: 'a',
+  presses: true,
   radio: 'input[type=radio]',
   select: 'select',
   text: 'input[type=text]'
@@ -265,53 +266,36 @@ const render = (path, stage, which, query, response) => {
     }
   }
 };
-// Returns the index of an element matching a text, among elements of a type.
-const matchIndex = async (page, selector, text) => await page.$eval(
-  'body',
-  (body, args) => {
-    const [selector, text] = args;
-    // Identify the elements of the specified type.
-    const matches = Array.from(body.querySelectorAll(selector));
+// Returns an element case-insensitively matching a text.
+const matchElement = async (page, selector, text) => {
+  const matchJSHandle = await page.evaluateHandle(args => {
+    const selector = args[0];
+    const text = args[1].toLowerCase();
+    // Identify the candidate elements.
+    const candidates = Array.from(document.body.querySelectorAll(selector));
     // If there are any:
-    if (matches.length) {
-      // Return the index of the first one satisfying the text condition, or -1 if none.
-      return matches.findIndex(match =>
-        match.textContent.includes(text)
+    if (candidates.length) {
+      // Return the first one satisfying the text condition, or null if none, as a JSHandle.
+      return candidates.find(candidate =>
+        candidate.textContent.toLowerCase().includes(text)
         || (
-          match.hasAttribute('aria-label')
-          && match.getAttribute('aria-label').includes(text)
-        )
-        || (
-          match.labels
+          candidate.tagName === 'INPUT'
+          && candidate.labels
           && Array
-          .from(match.labels)
+          .from(candidate.labels)
           .map(label => label.textContent)
           .join(' ')
+          .toLowerCase()
           .includes(text)
-        )
-        || (
-          match.hasAttribute('aria-labelledby')
-          && match
-          .getAttribute('aria-labelledby')
-          .split(/\s+/)
-          .map(id => document.getElementById(id).textContent)
-          .join(' ')
-          .includes(text)
-        )
-        || (
-          match.hasAttribute('placeholder')
-          && match.getAttribute('placeholder').includes(text)
         )
       );
     }
-    // Otherwise, i.e. if there are no elements of the specified type:
     else {
-      // Return this.
-      return -1;
+      return null;
     }
-  },
-  [selector, text]
-);
+  }, [selector, text]);
+  return await matchJSHandle.asElement();
+};
 // Validates a browser type.
 const isBrowserType = type => ['chromium', 'firefox', 'webkit'].includes(type);
 // Validates a URL.
@@ -506,6 +490,22 @@ const reportFileUpdate = async (reportDir, nameSuffix, report, isJSON) => {
   const fileReport = isJSON ? report : JSON.stringify(report, null, 2);
   await fs.writeFile(`${reportDir}/report-${nameSuffix}.json`, fileReport);
 };
+// Returns the text of an element.
+const textOf = async (page, element) => {
+  const tagNameJSHandle = await element.getProperty('tagName');
+  const tagName = await tagNameJSHandle.jsonValue();
+  if (tagName === 'INPUT') {
+    return await page.evaluate(() => {
+      const labels = Array.from(element.labels);
+      const labelTexts = labels.map(label => label.textContent);
+      const joinTexts = labelTexts.join(' ').toLowerCase().trim();
+      return joinTexts.replace(/\s/g, ' ').replace(/ {2,}/g, ' ');
+    }, element);
+  }
+  else {
+    return await element.textContent().trim().replace(/\s/g, ' ').replace(/ {2,}/g, ' ');
+  }
+};
 // Recursively performs the commands in a report.
 const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
   // Identify the commands in the report.
@@ -673,13 +673,9 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
             else if (moves[act.type]) {
               const selector = typeof moves[act.type] === 'string' ? moves[act.type] : act.what;
               // Identify the index of the specified element among same-type elements.
-              const whichIndex = await matchIndex(page, selector, act.which);
+              const whichElement = await matchElement(page, selector, act.which);
               // If it exists:
-              if (whichIndex > -1) {
-                // Get its ElementHandle.
-                const whichElement = await page.$(`:nth-match(${selector}, ${whichIndex + 1})`);
-                // Focus it.
-                await whichElement.focus();
+              if (whichElement) {
                 // Perform the act on the element and add a move description to the act.
                 if (act.type === 'button') {
                   await whichElement.click({timeout: 3000});
@@ -690,6 +686,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                   act.result = 'checked';
                 }
                 else if (act.type === 'focus') {
+                  await whichElement.focus();
                   act.result = 'focused';
                 }
                 else if (act.type === 'link') {
@@ -700,6 +697,32 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                     href: href || 'NONE',
                     target: target || 'NONE',
                     move: 'clicked'
+                  };
+                }
+                else if (act.type === 'presses') {
+                  let status = 'more';
+                  let presses = 0;
+                  let amountRead = 0;
+                  while (status === 'more') {
+                    await page.keyboard.press(act.which);
+                    presses++;
+                    const focalJSHandle = await page.evaluateHandle(() => document.activeElement);
+                    const focalElement = focalJSHandle.asElement();
+                    if (focalElement) {
+                      amountRead += textOf(page, focalElement).length;
+                      if (focalElement === matchElement) {
+                        status = 'done';
+                        await page.keyboard.press('Enter');
+                      }
+                    }
+                    else {
+                      status = 'failed';
+                    }
+                  }
+                  act.result = {
+                    status,
+                    presses,
+                    amountRead
                   };
                 }
                 else if (act.type === 'select') {
@@ -724,37 +747,6 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
             }
             // Otherwise, if the act is a keypress:
             else if (act.type === 'press') {
-              // Press the key.
-              await page.keyboard.press(act.which);
-            }
-            // Otherwise, if the act is repeated presses of a key until an element is reached:
-            else if (act.type === 'presses') {
-              // Press it until the element is reached.
-              let reached = false;
-              while (! reached) {
-                await page.keyboard.press(act.which);
-                reached = await page.evaluate(act => {
-                  let here = document.activeElement;
-                  if (
-                    here.hasAttribute('aria-activedescendant')
-                    && here.getAttribute('aria-activedescendant')
-                  ) {
-                    here = document.getElementById(here.getAttribute('aria-activedescendant'));
-                  }
-                  const ownText = here.textContent;
-                  const attributeText = here.ariaLabel;
-                  const refLabels = here.getAttribute('aria-labelledby');
-                  const refText = refLabels
-                    ? refLabels
-                    .split(/\s+/)
-                    .map(id => document.getElementById(id).textContent)
-                    .join(' ')
-                    : '';
-                  const labelsText = here.labels.map(label => label.textContent).join(' ');
-                  const hereText = [ownText, attributeText, refText, labelsText].join(' ');
-                  return here.tagName === act.which && hereText.includes(act.text);
-                }, act);
-              }
               // Press the key.
               await page.keyboard.press(act.which);
             }

@@ -49,7 +49,7 @@ exports.commands = {
       }
     ],
     presses: [
-      'Press a key repeatedly (which: key name; what: tag name; text: substring of element text)',
+      'Press a key repeatedly (which: key name; what: selector; text: substring of element text)',
       {
         which: [true, 'string', 'hasLength'],
         what: [true, 'string', 'hasLength'],
