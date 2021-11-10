@@ -15,7 +15,7 @@ exports.commands = {
       }
     ],
     focus: [
-      'Put the specified element into focus (what: element type; which: substring of its text)',
+      'Put the specified element into focus (what: selector; which: substring of its text)',
       {
         what: [true, 'string', 'isFocusable'],
         which: [true, 'string', 'hasLength']
@@ -49,11 +49,11 @@ exports.commands = {
       }
     ],
     presses: [
-      'Press a key repeatedly (which: key name; what: selector; text: substring of element text)',
+      'Press a key repeatedly (what: selector; which: substring of element text; key: key name)',
       {
         which: [true, 'string', 'hasLength'],
         what: [true, 'string', 'hasLength'],
-        text: [true, 'string', 'hasLength']
+        key: [true, 'string', 'hasLength']
       }
     ],
     radio: [

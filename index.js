@@ -276,19 +276,21 @@ const matchElement = async (page, selector, text) => {
     // If there are any:
     if (candidates.length) {
       // Return the first one satisfying the text condition, or null if none, as a JSHandle.
-      return candidates.find(candidate =>
-        candidate.textContent.toLowerCase().includes(text)
-        || (
-          candidate.tagName === 'INPUT'
-          && candidate.labels
-          && Array
-          .from(candidate.labels)
-          .map(label => label.textContent)
-          .join(' ')
-          .toLowerCase()
-          .includes(text)
-        )
-      );
+      const match = candidates.find(candidate => {
+        if (candidate.tagName === 'INPUT') {
+          return candidate.labels
+            && Array
+            .from(candidate.labels)
+            .map(label => label.textContent)
+            .join(' ')
+            .toLowerCase()
+            .includes(text);
+        }
+        else {
+          return candidate.textContent.toLowerCase().includes(text);
+        }
+      });
+      return match;
     }
     else {
       return null;
@@ -492,18 +494,24 @@ const reportFileUpdate = async (reportDir, nameSuffix, report, isJSON) => {
 };
 // Returns the text of an element.
 const textOf = async (page, element) => {
-  const tagNameJSHandle = await element.getProperty('tagName');
-  const tagName = await tagNameJSHandle.jsonValue();
-  if (tagName === 'INPUT') {
-    return await page.evaluate(() => {
-      const labels = Array.from(element.labels);
-      const labelTexts = labels.map(label => label.textContent);
-      const joinTexts = labelTexts.join(' ').toLowerCase().trim();
-      return joinTexts.replace(/\s/g, ' ').replace(/ {2,}/g, ' ');
-    }, element);
+  if (element) {
+    const tagNameJSHandle = await element.getProperty('tagName');
+    const tagName = await tagNameJSHandle.jsonValue();
+    if (tagName === 'INPUT') {
+      return await page.evaluate(element => {
+        const labels = Array.from(element.labels);
+        const labelTexts = labels.map(label => label.textContent);
+        const joinTexts = labelTexts.join(' ').toLowerCase().trim();
+        return joinTexts.replace(/\s/g, ' ').replace(/ {2,}/g, ' ');
+      }, element);
+    }
+    else {
+      const text = await element.textContent();
+      return text.trim().replace(/\s/g, ' ').replace(/ {2,}/g, ' ');
+    }
   }
   else {
-    return await element.textContent().trim().replace(/\s/g, ' ').replace(/ {2,}/g, ' ');
+    return null;
   }
 };
 // Recursively performs the commands in a report.
@@ -704,15 +712,38 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                   let presses = 0;
                   let amountRead = 0;
                   while (status === 'more') {
-                    await page.keyboard.press(act.which);
+                    await page.keyboard.press(act.key);
                     presses++;
-                    const focalJSHandle = await page.evaluateHandle(() => document.activeElement);
+                    const focalJSHandle = await page.evaluateHandle(() => {
+                      let activeElement = document.activeElement;
+                      if (activeElement && activeElement.tagName !== 'BODY') {
+                        if (activeElement.hasAttribute('aria-activedescendant')) {
+                          activeElement = document.getElementById(
+                            activeElement.getAttribute('aria-activedescendant')
+                          );
+                        }
+                        return activeElement;
+                      }
+                      else {
+                        return null;
+                      }
+                    });
                     const focalElement = focalJSHandle.asElement();
                     if (focalElement) {
-                      amountRead += textOf(page, focalElement).length;
-                      if (focalElement === matchElement) {
-                        status = 'done';
-                        await page.keyboard.press('Enter');
+                      const text = await textOf(page, focalElement);
+                      if (text !== null) {
+                        amountRead += text.length;
+                        const sameElement = await page.evaluate(args => {
+                          const [focalElement, whichElement] = args;
+                          return focalElement === whichElement;
+                        }, [focalElement, whichElement]);
+                        if (sameElement) {
+                          status = 'done';
+                          await page.keyboard.press('Enter');
+                        }
+                      }
+                      else {
+                        status = 'ERROR';
                       }
                     }
                     else {
@@ -749,6 +780,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
             else if (act.type === 'press') {
               // Press the key.
               await page.keyboard.press(act.which);
+              act.result = 'pressed';
             }
             // Otherwise, i.e. if the act type is unknown:
             else {
