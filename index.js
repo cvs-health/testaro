@@ -53,13 +53,13 @@ const customErrorPage = customErrorPageStart.concat(...errorPageEnd);
 const systemErrorPage = systemErrorPageStart.concat(...errorPageEnd);
 // CSS selectors for targets of moves.
 const moves = {
-  text: 'input[type=text]',
-  radio: 'input[type=radio]',
-  checkbox: 'input[type=checkbox]',
-  select: 'select',
   button: 'button',
+  checkbox: 'input[type=checkbox]',
+  focus: true,
   link: 'a',
-  focus: true
+  radio: 'input[type=radio]',
+  select: 'select',
+  text: 'input[type=text]'
 };
 // Names and descriptions of tests.
 const tests = {
@@ -681,29 +681,16 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                 // Focus it.
                 await whichElement.focus();
                 // Perform the act on the element and add a move description to the act.
-                if (act.type === 'focus') {
-                  act.result = 'focused';
+                if (act.type === 'button') {
+                  await whichElement.click({timeout: 3000});
+                  act.result = 'clicked';
                 }
-                else if (act.type === 'text') {
-                  await whichElement.type(act.what);
-                  act.result = 'entered';
-                }
-                else if (['radio', 'checkbox'].includes(act.type)) {
+                else if (['checkbox', 'radio'].includes(act.type)) {
                   await whichElement.check();
                   act.result = 'checked';
                 }
-                else if (act.type === 'select') {
-                  await whichElement.selectOption({what: act.what});
-                  const optionText = await whichElement.$eval(
-                    'option:selected', el => el.textContent
-                  );
-                  act.result = optionText
-                    ? `&ldquo;${optionText}}&rdquo; selected`
-                    : 'OPTION NOT FOUND';
-                }
-                else if (act.type === 'button') {
-                  await whichElement.click({timeout: 3000});
-                  act.result = 'clicked';
+                else if (act.type === 'focus') {
+                  act.result = 'focused';
                 }
                 else if (act.type === 'link') {
                   const href = await whichElement.getAttribute('href');
@@ -715,12 +702,61 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                     move: 'clicked'
                   };
                 }
+                else if (act.type === 'select') {
+                  await whichElement.selectOption({what: act.what});
+                  const optionText = await whichElement.$eval(
+                    'option:selected', el => el.textContent
+                  );
+                  act.result = optionText
+                    ? `&ldquo;${optionText}}&rdquo; selected`
+                    : 'OPTION NOT FOUND';
+                }
+                else if (act.type === 'text') {
+                  await whichElement.type(act.what);
+                  act.result = 'entered';
+                }
                 // Otherwise, i.e. if the specified element was not identified:
                 else {
                   // Return an error result.
                   return 'NOT FOUND';
                 }
               }
+            }
+            // Otherwise, if the act is a keypress:
+            else if (act.type === 'press') {
+              // Press the key.
+              await page.keyboard.press(act.which);
+            }
+            // Otherwise, if the act is repeated presses of a key until an element is reached:
+            else if (act.type === 'presses') {
+              // Press it until the element is reached.
+              let reached = false;
+              while (! reached) {
+                await page.keyboard.press(act.which);
+                reached = await page.evaluate(act => {
+                  let here = document.activeElement;
+                  if (
+                    here.hasAttribute('aria-activedescendant')
+                    && here.getAttribute('aria-activedescendant')
+                  ) {
+                    here = document.getElementById(here.getAttribute('aria-activedescendant'));
+                  }
+                  const ownText = here.textContent;
+                  const attributeText = here.ariaLabel;
+                  const refLabels = here.getAttribute('aria-labelledby');
+                  const refText = refLabels
+                    ? refLabels
+                    .split(/\s+/)
+                    .map(id => document.getElementById(id).textContent)
+                    .join(' ')
+                    : '';
+                  const labelsText = here.labels.map(label => label.textContent).join(' ');
+                  const hereText = [ownText, attributeText, refText, labelsText].join(' ');
+                  return here.tagName === act.which && hereText.includes(act.text);
+                }, act);
+              }
+              // Press the key.
+              await page.keyboard.press(act.which);
             }
             // Otherwise, i.e. if the act type is unknown:
             else {

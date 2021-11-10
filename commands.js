@@ -41,6 +41,21 @@ exports.commands = {
         what: [false, 'string', 'hasLength']
       }
     ],
+    press: [
+      'Press a key (which: key name; what: description)',
+      {
+        which: [true, 'string', 'hasLength'],
+        what: [false, 'string', 'hasLength']
+      }
+    ],
+    presses: [
+      'Press a key repeatedly (which: key name; what: tag name; text: substring of element text)',
+      {
+        which: [true, 'string', 'hasLength'],
+        what: [true, 'string', 'hasLength'],
+        text: [true, 'string', 'hasLength']
+      }
+    ],
     radio: [
       'Check a radio button (which: substring of its text; what: description)',
       {
