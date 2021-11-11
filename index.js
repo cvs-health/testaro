@@ -501,7 +501,20 @@ const textOf = async (page, element) => {
       return await page.evaluate(element => {
         const labels = Array.from(element.labels);
         const labelTexts = labels.map(label => label.textContent);
-        const joinTexts = labelTexts.join(' ').toLowerCase().trim();
+        let legendText = '';
+        const fieldsets = Array.from(document.body.querySelectorAll('fieldset'));
+        const inputFieldsets = fieldsets.filter(
+          fieldset => Array.from(fieldset.querySelectorAll('input')).includes(element)
+        );
+        const inputFieldset = inputFieldsets[0] || null;
+        if (inputFieldset && ! inputFieldset.dataset.gotLegend) {
+          const legend = inputFieldset.querySelector('legend');
+          if (legend) {
+            legendText = legend.textContent;
+            inputFieldset.dataset.gotLegend = 'true';
+          }
+        }
+        const joinTexts = labelTexts.concat(legendText).join(' ').toLowerCase().trim();
         return joinTexts.replace(/\s/g, ' ').replace(/ {2,}/g, ' ');
       }, element);
     }
