@@ -744,7 +744,8 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                     });
                     const focalElement = focalJSHandle.asElement();
                     if (focalElement) {
-                      const tagName = await focalElement.getProperty('tagName');
+                      const tagNameJSHandle = await focalElement.getProperty('tagName');
+                      const tagName = await tagNameJSHandle.jsonValue();
                       const text = await textOf(page, focalElement);
                       if (text !== null) {
                         const textLength = text.length;
