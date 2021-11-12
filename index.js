@@ -726,7 +726,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                   let amountRead = 0;
                   let items = [];
                   while (status === 'more') {
-                    await page.keyboard.press(act.key);
+                    await page.keyboard.press(act.navKey);
                     presses++;
                     const focalJSHandle = await page.evaluateHandle(() => {
                       let activeElement = document.activeElement;
@@ -763,7 +763,12 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                         }, [focalElement, whichElement]);
                         if (sameElement) {
                           status = 'done';
-                          await page.keyboard.press('Enter');
+                          if (act.text) {
+                            await page.keyboard.type(act.text);
+                          }
+                          if (act.action) {
+                            await page.keyboard.press(act.action);
+                          }
                         }
                       }
                       else {

@@ -1,124 +1,126 @@
 exports.commands = {
   etc: {
     button: [
-      'Click a button (which: substring of its text; what: description)',
+      'Click a button',
       {
-        which: [true, 'string', 'hasLength'],
-        what: [false, 'string', 'hasLength']
+        which: [true, 'string', 'hasLength', 'substring of button text'],
+        what: [false, 'string', 'hasLength', 'comment']
       }
     ],
     checkbox: [
-      'Check a checkbox (which: substring of its text; what: description)',
+      'Check a checkbox',
       {
-        which: [true, 'string', 'hasLength'],
-        what: [false, 'string', 'hasLength']
+        which: [true, 'string', 'hasLength', 'substring of checkbox text'],
+        what: [false, 'string', 'hasLength', 'comment']
       }
     ],
     focus: [
-      'Put the specified element into focus (what: selector; which: substring of its text)',
+      'Put the specified element into focus',
       {
-        what: [true, 'string', 'isFocusable'],
-        which: [true, 'string', 'hasLength']
+        what: [true, 'string', 'isFocusable', 'selector of element to be focused'],
+        which: [true, 'string', 'hasLength', 'substring of element text']
       }
     ],
     launch: [
-      'Launch a Playwright browser (which: chromium, firefox, or webkit; what: comment)',
+      'Launch a Playwright browser',
       {
-        which: [true, 'string', 'isBrowserType'],
-        what: [false, 'string', 'hasLength']
+        which: [true, 'string', 'isBrowserType', '“chromium”, “firefox”, or “webkit”'],
+        what: [false, 'string', 'hasLength', 'comment']
       }
     ],
     link: [
-      'Click a link (which: substring of its text; what: description)',
+      'Click a link',
       {
-        which: [true, 'string', 'hasLength'],
-        what: [false, 'string', 'hasLength']
+        which: [true, 'string', 'hasLength', 'substring of link text'],
+        what: [false, 'string', 'hasLength', 'comment']
       }
     ],
     page: [
-      'Switch to the last-opened browser tab (what: description)',
+      'Switch to the last-opened browser tab',
       {
-        what: [false, 'string', 'hasLength']
+        what: [false, 'string', 'hasLength', 'comment']
       }
     ],
     press: [
-      'Press a key (which: key name; what: description)',
+      'Press a key',
       {
-        which: [true, 'string', 'hasLength'],
-        what: [false, 'string', 'hasLength']
+        which: [true, 'string', 'hasLength', 'key name'],
+        what: [false, 'string', 'hasLength', 'comment']
       }
     ],
     presses: [
-      'Press a key repeatedly (what: selector; which: substring of element text; key: key name)',
+      'Repeatedly press a navigation key',
       {
-        which: [true, 'string', 'hasLength'],
-        what: [true, 'string', 'hasLength'],
-        key: [true, 'string', 'hasLength'],
+        which: [true, 'string', 'hasLength', 'substring of destination element text'],
+        what: [true, 'string', 'hasLength', 'selector of destination element'],
+        navKey: [true, 'string', 'hasLength', 'navigation-keyname'],
+        text: [false, 'string', 'hasLength', 'text to enter after reaching destination'],
+        action: [false, 'string', 'hasLength', 'name of key to press, after text entry if any'],
         withItems: [true, 'boolean']
       }
     ],
     radio: [
-      'Check a radio button (which: substring of its text; what: description)',
+      'Check a radio button',
       {
-        which: [true, 'string', 'hasLength'],
-        what: [false, 'string', 'hasLength']
+        which: [true, 'string', 'hasLength', 'substring of radio-button text'],
+        what: [false, 'string', 'hasLength', 'comment']
       }
     ],
     reveal: [
-      'Make all elements visible (what: description)',
+      'Make all elements visible',
       {
-        what: [false, 'string', 'hasLength']
+        what: [false, 'string', 'hasLength', 'comment']
       }
     ],
     score: [
-      'Compute and report a score (which: proc name; what: description)',
+      'Compute and report a score',
       {
-        which: [true, 'string', 'hasLength'],
-        what: [false, 'string', 'hasLength']
+        which: [true, 'string', 'hasLength', 'score-proc name'],
+        what: [false, 'string', 'hasLength', 'comment']
       }
     ],
     select: [
-      'Select a select option (which: substring of list text; what: substring of option text)',
+      'Select a select option',
       {
-        which: [true, 'string', 'hasLength'],
-        what: [true, 'string', 'hasLength']
+        which: [true, 'string', 'hasLength', 'substring of select-list text'],
+        what: [true, 'string', 'hasLength', 'substring of option text']
       }
     ],
     test: [
-      'Perform a test (which: test name; what: description)',
+      'Perform a test',
       {
-        which: [true, 'string', 'isTest'],
-        what: [false, 'string', 'hasLength']
+        which: [true, 'string', 'isTest', 'test name'],
+        what: [false, 'string', 'hasLength', 'comment']
       }
     ],
     text: [
-      'Enter text into a text input (which: substring of its text; what: text to enter)',
+      'Enter text into a text input',
       {
-        which: [true, 'string', 'hasLength'],
-        what: [true, 'string', 'hasLength']
+        which: [true, 'string', 'hasLength', 'substring of input text'],
+        what: [true, 'string', 'hasLength', 'text to enter']
       }
     ],
     url: [
-      'Navigate to a new URL (which: URL; isStrict: reject redirection; what: description)',
+      'Navigate to a new URL',
       {
-        which: [true, 'string', 'isURL'],
-        what: [false, 'string', 'hasLength']
+        which: [true, 'string', 'isURL', 'URL'],
+        what: [false, 'string', 'hasLength', 'comment']
       }
     ],
     wait: [
-      'Wait until something appears (what: type of thing; which: substring of its text)',
+      'Wait until something appears',
       {
-        what: [true, 'string', 'isWaitable'],
-        which: [true, 'string', 'hasLength']
+        what: [true, 'string', 'isWaitable', 'waitable item type'],
+        which: [true, 'string', 'hasLength', 'substring of waitable-item text']
       }
     ]
   },
   tests: {
     axe: [
-      'Perform an Axe test (rules: rule names, or empty if all)',
+      'Perform an Axe test',
       {
         withItems: [true, 'boolean'],
-        rules: [true, 'array', 'areStrings']
+        rules: [true, 'array', 'areStrings', 'rule names, or empty if all']
       }
     ],
     embAc: [
@@ -128,10 +130,10 @@ exports.commands = {
       }
     ],
     focInd: [
-      'Perform a focInd test (revealAll: whether to make all elements visible)',
+      'Perform a focInd test',
       {
         withItems: [true, 'boolean'],
-        revealAll: [true, 'boolean']
+        revealAll: [true, 'boolean', '', 'whether to make all elements visible first']
       }
     ],
     focOp: [
@@ -147,10 +149,12 @@ exports.commands = {
       }
     ],
     ibm: [
-      'Perform an IBM test (withNewContent: true = URL, false = content, omitted = both)',
+      'Perform an IBM Equal Access test',
       {
         withItems: [true, 'boolean'],
-        withNewContent: [false, 'boolean']
+        withNewContent: [
+          false, 'boolean', '', 'true: use a URL; false: use page content; omitted: use both'
+        ]
       }
     ],
     labClash: [
@@ -172,11 +176,11 @@ exports.commands = {
       }
     ],
     motion: [
-      'Perform a motion test (delay: ms until start; interval: ms between; count: of screenshots)',
+      'Perform a motion test',
       {
-        delay: [true, 'number'],
-        interval: [true, 'number'],
-        count: [true, 'number']
+        delay: [true, 'number', '', 'ms to wait before first screen shot'],
+        interval: [true, 'number', '', 'ms between screen shots'],
+        count: [true, 'number', '', 'count of screen shots to make']
       }
     ],
     radioSet: [
@@ -204,9 +208,9 @@ exports.commands = {
       }
     ],
     wave: [
-      'Perform a WAVE test (reportType: 1, 2, 3, or 4, per WAVE API documentation)',
+      'Perform a WebAIM WAVE test',
       {
-        reportType: [true, 'number']
+        reportType: [true, 'number', '', 'WAVE report type']
       }
     ],
     zIndex: [
