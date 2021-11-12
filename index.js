@@ -266,38 +266,67 @@ const render = (path, stage, which, query, response) => {
     }
   }
 };
+// Normalizes spacing characters in a string.
+const debloat = string => string.replace(/\s/g, ' ').trim().replace(/ {2,}/g, ' ');
+// Returns the text of an element, lower-cased.
+const textOf = async (page, element) => {
+  if (element) {
+    const tagNameJSHandle = await element.getProperty('tagName');
+    const tagName = await tagNameJSHandle.jsonValue();
+    let totalText = '';
+    if (tagName === 'INPUT') {
+      totalText = await page.evaluate(element => {
+        const labels = Array.from(element.labels);
+        const labelTexts = labels.map(label => label.textContent);
+        let legendText = '';
+        const fieldsets = Array.from(document.body.querySelectorAll('fieldset'));
+        const inputFieldsets = fieldsets.filter(
+          fieldset => Array.from(fieldset.querySelectorAll('input')).includes(element)
+        );
+        const inputFieldset = inputFieldsets[0] || null;
+        if (inputFieldset && ! inputFieldset.dataset.gotLegend) {
+          const legend = inputFieldset.querySelector('legend');
+          if (legend) {
+            legendText = legend.textContent;
+            inputFieldset.dataset.gotLegend = 'true';
+          }
+        }
+        return labelTexts.concat(legendText).join(' ');
+      }, element);
+    }
+    else {
+      totalText = await element.textContent();
+    }
+    console.log(`Element text is ${debloat(totalText).toLowerCase()}`);
+    return debloat(totalText).toLowerCase();
+  }
+  else {
+    return null;
+  }
+};
 // Returns an element case-insensitively matching a text.
-const matchElement = async (page, selector, text) => {
+const matchElement = async (page, selector, matchText) => {
   if (page) {
-    const matchJSHandle = await page.evaluateHandle(args => {
-      const selector = args[0];
-      const text = args[1].toLowerCase();
-      // Identify the candidate elements.
-      const candidates = Array.from(document.body.querySelectorAll(selector));
-      // If there are any:
-      if (candidates.length) {
-        // Return the first one satisfying the text condition, or null if none, as a JSHandle.
-        const match = candidates.find(candidate => {
-          if (candidate.tagName === 'INPUT') {
-            return candidate.labels
-              && Array
-              .from(candidate.labels)
-              .map(label => label.textContent)
-              .join(' ')
-              .toLowerCase()
-              .includes(text);
-          }
-          else {
-            return candidate.textContent.toLowerCase().includes(text);
-          }
-        });
-        return match;
+    const lcText = matchText.toLowerCase();
+    console.log(`lcText is ${lcText}`);
+    // Identify the selected elements.
+    const selections = await page.$$(`body ${selector}`);
+    // If there are any:
+    if (selections.length) {
+      // Return the first one including the specified text, or null if none.
+      for (const element of selections) {
+        const elementText = await textOf(page, element);
+        if (elementText.includes(lcText)) {
+          return element;
+        }
       }
-      else {
-        return null;
-      }
-    }, [selector, text]);
-    return await matchJSHandle.asElement();
+      return null;
+    }
+    // Otherwise, i.e. if there are no selected elements, return null.
+    else {
+      console.log(`No elements matching ${selector}`);
+      return null;
+    }
   }
   else {
     console.log('ERROR: Page gone');
@@ -498,41 +527,6 @@ const reportFileUpdate = async (reportDir, nameSuffix, report, isJSON) => {
   const fileReport = isJSON ? report : JSON.stringify(report, null, 2);
   await fs.writeFile(`${reportDir}/report-${nameSuffix}.json`, fileReport);
 };
-// Returns the text of an element.
-const textOf = async (page, element) => {
-  if (element) {
-    const tagNameJSHandle = await element.getProperty('tagName');
-    const tagName = await tagNameJSHandle.jsonValue();
-    if (tagName === 'INPUT') {
-      return await page.evaluate(element => {
-        const labels = Array.from(element.labels);
-        const labelTexts = labels.map(label => label.textContent);
-        let legendText = '';
-        const fieldsets = Array.from(document.body.querySelectorAll('fieldset'));
-        const inputFieldsets = fieldsets.filter(
-          fieldset => Array.from(fieldset.querySelectorAll('input')).includes(element)
-        );
-        const inputFieldset = inputFieldsets[0] || null;
-        if (inputFieldset && ! inputFieldset.dataset.gotLegend) {
-          const legend = inputFieldset.querySelector('legend');
-          if (legend) {
-            legendText = legend.textContent;
-            inputFieldset.dataset.gotLegend = 'true';
-          }
-        }
-        const joinTexts = labelTexts.concat(legendText).join(' ').toLowerCase().trim();
-        return joinTexts.replace(/\s/g, ' ').replace(/ {2,}/g, ' ');
-      }, element);
-    }
-    else {
-      const text = await element.textContent();
-      return text.trim().replace(/\s/g, ' ').replace(/ {2,}/g, ' ');
-    }
-  }
-  else {
-    return null;
-  }
-};
 // Recursively performs the commands in a report.
 const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
   // Identify the commands in the report.
@@ -571,6 +565,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
         }
         // Otherwise, if the act is a wait:
         else if (act.type === 'wait') {
+          console.log(`>> for ${act.what} to include “${act.which}”`);
           // Wait for the specified text to appear in the specified place.
           await page.waitForFunction(act => {
             const {URL, title, body} = document;
@@ -580,9 +575,20 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
               body: body && body.textContent && body.textContent.includes(act.which)
             };
             return success[act.what];
-          }, act, {timeout: 20000});
+          }, act, {timeout: 10000})
+          .catch(error => {
+            console.log(`ERROR waiting for ${act.what} (${error.message})`);
+            act.result = `ERROR waiting for ${act.what}`;
+          });
+          await page.waitForLoadState('networkidle', {timeout: 5000})
+          .catch(error => {
+            console.log(`ERROR waiting for stability after ${act.what} (${error.message})`);
+            act.result = `ERROR waiting for stability after ${act.what}`;
+          });
           // Add the resulting URL to the act.
-          act.result = page.url();
+          if (! act.result) {
+            act.result = page.url();
+          }
         }
         // Otherwise, if the act is a page switch:
         else if (act.type === 'page') {
@@ -709,11 +715,35 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                   act.result = 'clicked';
                 }
                 else if (['checkbox', 'radio'].includes(act.type)) {
-                  await whichElement.check();
-                  act.result = 'checked';
+                  await whichElement.waitForElementState('stable', {timeout: 3000})
+                  .catch(error => {
+                    console.log(`ERROR waiting for stable ${act.type} (${error.message})`);
+                    act.result = `ERROR waiting for stable ${act.type}`;
+                  });
+                  if (! act.result) {
+                    const isEnabled = await whichElement.isEnabled();
+                    if (isEnabled) {
+                      await whichElement.check({
+                        force: true,
+                        timeout: 2000
+                      })
+                      .catch(error => {
+                        console.log(`ERROR checking ${act.type} (${error.message})`);
+                        act.result = `ERROR checking ${act.type}`;
+                      });
+                      if (! act.result) {
+                        act.result = 'checked';
+                      }
+                    }
+                    else {
+                      const report = `ERROR: could not check ${act.type} because disabled`;
+                      console.log(report);
+                      act.result = report;
+                    }
+                  }
                 }
                 else if (act.type === 'focus') {
-                  await whichElement.focus();
+                  await whichElement.focus({timeout: 2000});
                   act.result = 'focused';
                 }
                 else if (act.type === 'link') {
@@ -1113,7 +1143,7 @@ const requestHandler = (request, response) => {
           // If the script is valid:
           if (
             what
-            && strict
+            && typeof strict === 'boolean'
             && commands
             && typeof what === 'string'
             && Array.isArray(commands)
