@@ -53,7 +53,8 @@ exports.commands = {
       {
         which: [true, 'string', 'hasLength'],
         what: [true, 'string', 'hasLength'],
-        key: [true, 'string', 'hasLength']
+        key: [true, 'string', 'hasLength'],
+        withItems: [true, 'boolean']
       }
     ],
     radio: [

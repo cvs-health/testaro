@@ -724,6 +724,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                   let status = 'more';
                   let presses = 0;
                   let amountRead = 0;
+                  let items = [];
                   while (status === 'more') {
                     await page.keyboard.press(act.key);
                     presses++;
@@ -743,9 +744,18 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                     });
                     const focalElement = focalJSHandle.asElement();
                     if (focalElement) {
+                      const tagName = await focalElement.getProperty('tagName');
                       const text = await textOf(page, focalElement);
                       if (text !== null) {
-                        amountRead += text.length;
+                        const textLength = text.length;
+                        if (act.withItems) {
+                          items.push({
+                            tagName,
+                            text,
+                            textLength
+                          });
+                        }
+                        amountRead += textLength;
                         const sameElement = await page.evaluate(args => {
                           const [focalElement, whichElement] = args;
                           return focalElement === whichElement;
@@ -765,9 +775,14 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                   }
                   act.result = {
                     status,
-                    presses,
-                    amountRead
+                    totals: {
+                      presses,
+                      amountRead
+                    }
                   };
+                  if (act.withItems) {
+                    act.result.items = items;
+                  }
                 }
                 else if (act.type === 'select') {
                   await whichElement.selectOption({what: act.what});
