@@ -268,35 +268,41 @@ const render = (path, stage, which, query, response) => {
 };
 // Returns an element case-insensitively matching a text.
 const matchElement = async (page, selector, text) => {
-  const matchJSHandle = await page.evaluateHandle(args => {
-    const selector = args[0];
-    const text = args[1].toLowerCase();
-    // Identify the candidate elements.
-    const candidates = Array.from(document.body.querySelectorAll(selector));
-    // If there are any:
-    if (candidates.length) {
-      // Return the first one satisfying the text condition, or null if none, as a JSHandle.
-      const match = candidates.find(candidate => {
-        if (candidate.tagName === 'INPUT') {
-          return candidate.labels
-            && Array
-            .from(candidate.labels)
-            .map(label => label.textContent)
-            .join(' ')
-            .toLowerCase()
-            .includes(text);
-        }
-        else {
-          return candidate.textContent.toLowerCase().includes(text);
-        }
-      });
-      return match;
-    }
-    else {
-      return null;
-    }
-  }, [selector, text]);
-  return await matchJSHandle.asElement();
+  if (page) {
+    const matchJSHandle = await page.evaluateHandle(args => {
+      const selector = args[0];
+      const text = args[1].toLowerCase();
+      // Identify the candidate elements.
+      const candidates = Array.from(document.body.querySelectorAll(selector));
+      // If there are any:
+      if (candidates.length) {
+        // Return the first one satisfying the text condition, or null if none, as a JSHandle.
+        const match = candidates.find(candidate => {
+          if (candidate.tagName === 'INPUT') {
+            return candidate.labels
+              && Array
+              .from(candidate.labels)
+              .map(label => label.textContent)
+              .join(' ')
+              .toLowerCase()
+              .includes(text);
+          }
+          else {
+            return candidate.textContent.toLowerCase().includes(text);
+          }
+        });
+        return match;
+      }
+      else {
+        return null;
+      }
+    }, [selector, text]);
+    return await matchJSHandle.asElement();
+  }
+  else {
+    console.log('ERROR: Page gone');
+    return null;
+  }
 };
 // Validates a browser type.
 const isBrowserType = type => ['chromium', 'firefox', 'webkit'].includes(type);
@@ -808,6 +814,9 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                   // Return an error result.
                   return 'NOT FOUND';
                 }
+              }
+              else {
+                act.result = 'ERROR trying to find matching element';
               }
             }
             // Otherwise, if the act is a keypress:
