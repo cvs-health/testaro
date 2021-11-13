@@ -4,6 +4,7 @@ exports.commands = {
       'Click a button',
       {
         which: [true, 'string', 'hasLength', 'substring of button text'],
+        index: [false, 'number', '', 'index among matches if not 0'],
         what: [false, 'string', 'hasLength', 'comment']
       }
     ],
@@ -11,6 +12,7 @@ exports.commands = {
       'Check a checkbox',
       {
         which: [true, 'string', 'hasLength', 'substring of checkbox text'],
+        index: [false, 'number', '', 'index among matches if not 0'],
         what: [false, 'string', 'hasLength', 'comment']
       }
     ],
@@ -18,6 +20,7 @@ exports.commands = {
       'Put the specified element into focus',
       {
         what: [true, 'string', 'isFocusable', 'selector of element to be focused'],
+        index: [false, 'number', '', 'index among matches if not 0'],
         which: [true, 'string', 'hasLength', 'substring of element text']
       }
     ],
@@ -32,6 +35,7 @@ exports.commands = {
       'Click a link',
       {
         which: [true, 'string', 'hasLength', 'substring of link text'],
+        index: [false, 'number', '', 'index among matches if not 0'],
         what: [false, 'string', 'hasLength', 'comment']
       }
     ],
@@ -52,6 +56,7 @@ exports.commands = {
       'Repeatedly press a navigation key',
       {
         which: [true, 'string', 'hasLength', 'substring of destination element text'],
+        index: [false, 'number', '', 'index among matches if not 0'],
         what: [true, 'string', 'hasLength', 'selector of destination element'],
         navKey: [true, 'string', 'hasLength', 'navigation-keyname'],
         text: [false, 'string', 'hasLength', 'text to enter after reaching destination'],
@@ -63,6 +68,7 @@ exports.commands = {
       'Check a radio button',
       {
         which: [true, 'string', 'hasLength', 'substring of radio-button text'],
+        index: [false, 'number', '', 'index among matches if not 0'],
         what: [false, 'string', 'hasLength', 'comment']
       }
     ],
@@ -83,6 +89,7 @@ exports.commands = {
       'Select a select option',
       {
         which: [true, 'string', 'hasLength', 'substring of select-list text'],
+        index: [false, 'number', '', 'index among matches if not 0'],
         what: [true, 'string', 'hasLength', 'substring of option text']
       }
     ],
@@ -97,6 +104,7 @@ exports.commands = {
       'Enter text into a text input',
       {
         which: [true, 'string', 'hasLength', 'substring of input text'],
+        index: [false, 'number', '', 'index among matches if not 0'],
         what: [true, 'string', 'hasLength', 'text to enter']
       }
     ],

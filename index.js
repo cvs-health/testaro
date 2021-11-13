@@ -304,17 +304,18 @@ const textOf = async (page, element) => {
   }
 };
 // Returns an element case-insensitively matching a text.
-const matchElement = async (page, selector, matchText) => {
+const matchElement = async (page, selector, matchText, index = 0) => {
   if (page) {
     const lcText = matchText.toLowerCase();
     // Identify the selected elements.
     const selections = await page.$$(`body ${selector}`);
     // If there are any:
     if (selections.length) {
-      // Return the first one including the specified text, or null if none.
+      // Return the nth one including the specified text, or null if none.
+      let nth = 0;
       for (const element of selections) {
         const elementText = await textOf(page, element);
-        if (elementText.includes(lcText)) {
+        if (elementText.includes(lcText) && nth++ === index) {
           return element;
         }
       }
@@ -703,7 +704,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
             else if (moves[act.type]) {
               const selector = typeof moves[act.type] === 'string' ? moves[act.type] : act.what;
               // Identify the index of the specified element among same-type elements.
-              const whichElement = await matchElement(page, selector, act.which);
+              const whichElement = await matchElement(page, selector, act.which, act.index);
               // If it exists:
               if (whichElement) {
                 // Perform the act on the element and add a move description to the act.
@@ -790,7 +791,6 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                       const tagName = await tagNameJSHandle.jsonValue();
                       const text = await textOf(page, focalElement);
                       if (text !== null) {
-                        console.log(`Text of currently focal element is ${text}`);
                         const textLength = text.length;
                         if (act.withItems) {
                           items.push({
@@ -804,9 +804,6 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                           const [focalElement, whichElement] = args;
                           return focalElement === whichElement;
                         }, [focalElement, whichElement]);
-                        console.log(
-                          `This element found to be ${sameElement ? 'same' : 'different'}`
-                        );
                         if (sameElement) {
                           status = 'done';
                           if (act.text) {
