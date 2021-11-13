@@ -224,13 +224,18 @@ An example of a move is:
 
 ```json
 {
-  "type": "button",
-  "which": "Close",
-  "what": "close the modal dialog"
+  "type": "radio",
+  "which": "No",
+  "index": 2,
+  "what": "No, I am not a smoker"
 }
 ```
 
-In this case, Autotest clicks the first button whose text content includes the string “Close” (case-insensitively).
+In this case, Autotest checks the third radio button whose text includes the string “No” (case-insensitively).
+
+In identifying the target element for a move, Autotest matches the `which` property with the texts of the elements of the applicable type (such as radio buttons). It defines the text of an `input` element as the concatenated texts of its implicit label or explicit labels, if any, plus, for the first input in a `fieldset` element, the text content of the `legend` element of that `fieldset` element. For any other element, Autotest defines the text as the text content of the element.
+
+When multiple elements of the same type have indistinguishable texts, you can include an `index` property to specify the index of the target element, among all those that will match.
 
 An example of a navigation is the command of type `url` above. Another is:
 
