@@ -280,15 +280,15 @@ const textOf = async (page, element) => {
         const labelTexts = labels.map(label => label.textContent);
         let legendText = '';
         const fieldsets = Array.from(document.body.querySelectorAll('fieldset'));
-        const inputFieldsets = fieldsets.filter(
-          fieldset => Array.from(fieldset.querySelectorAll('input')).includes(element)
-        );
+        const inputFieldsets = fieldsets.filter(fieldset => {
+          const inputs = Array.from(fieldset.querySelectorAll('input'));
+          return inputs.length && inputs[0] === element;
+        });
         const inputFieldset = inputFieldsets[0] || null;
-        if (inputFieldset && ! inputFieldset.dataset.gotLegend) {
+        if (inputFieldset) {
           const legend = inputFieldset.querySelector('legend');
           if (legend) {
             legendText = legend.textContent;
-            inputFieldset.dataset.gotLegend = 'true';
           }
         }
         return labelTexts.concat(legendText).join(' ');
@@ -297,7 +297,6 @@ const textOf = async (page, element) => {
     else {
       totalText = await element.textContent();
     }
-    console.log(`Element text is ${debloat(totalText).toLowerCase()}`);
     return debloat(totalText).toLowerCase();
   }
   else {
@@ -308,7 +307,6 @@ const textOf = async (page, element) => {
 const matchElement = async (page, selector, matchText) => {
   if (page) {
     const lcText = matchText.toLowerCase();
-    console.log(`lcText is ${lcText}`);
     // Identify the selected elements.
     const selections = await page.$$(`body ${selector}`);
     // If there are any:
@@ -324,7 +322,6 @@ const matchElement = async (page, selector, matchText) => {
     }
     // Otherwise, i.e. if there are no selected elements, return null.
     else {
-      console.log(`No elements matching ${selector}`);
       return null;
     }
   }
@@ -772,10 +769,19 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                             activeElement.getAttribute('aria-activedescendant')
                           );
                         }
-                        return activeElement;
+                        else if (activeElement.shadowRoot) {
+                          activeElement = activeElement.shadowRoot.activeElement;
+                        }
+                        if (activeElement.dataset.pressesReached) {
+                          return 'locallyExhausted';
+                        }
+                        else {
+                          activeElement.dataset.pressesReached = 'true';
+                          return activeElement;
+                        }
                       }
                       else {
-                        return null;
+                        return 'globallyExhausted';
                       }
                     });
                     const focalElement = focalJSHandle.asElement();
@@ -784,6 +790,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                       const tagName = await tagNameJSHandle.jsonValue();
                       const text = await textOf(page, focalElement);
                       if (text !== null) {
+                        console.log(`Text of currently focal element is ${text}`);
                         const textLength = text.length;
                         if (act.withItems) {
                           items.push({
@@ -797,6 +804,9 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                           const [focalElement, whichElement] = args;
                           return focalElement === whichElement;
                         }, [focalElement, whichElement]);
+                        console.log(
+                          `This element found to be ${sameElement ? 'same' : 'different'}`
+                        );
                         if (sameElement) {
                           status = 'done';
                           if (act.text) {
@@ -812,7 +822,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                       }
                     }
                     else {
-                      status = 'failed';
+                      status = await focalJSHandle.jsonValue();
                     }
                   }
                   act.result = {
