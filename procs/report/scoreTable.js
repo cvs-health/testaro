@@ -31,8 +31,7 @@ const optionColNames = [['Deficit'], ['Autotest', 'Axe'], ['Axe', 'IBM', 'WAVE']
 const optionPropNames = [['total'], ['total', 'axe'], ['axe', 'ibm', 'wave']];
 const colNames = optionColNames[options.indexOf(colSpec)];
 const propNames = optionPropNames[options.indexOf(colSpec)];
-const head0 = colNames.map(pair => `<th scope="col" colspan="2">${pair}</th>`).join('');
-const head1 = '<th scope="col">Number</th><th scope="col" aria-hidden="true">Bar</th>'.repeat(colNames.length);
+const head = colNames.map(header => `<th scope="col" colspan="2">${header}</th>`).join('');
 const tableClasses = ['linkSmaller', 'secondCellRight'];
 if (colSpec !== 'aut') {
   tableClasses.push('fourthCellRight');
@@ -41,11 +40,10 @@ if (colSpec !== 'aut') {
   }
 }
 const tableStartLines = [
-  '<table class="allBorder">',
+  '<table class="allBorder a11yDeficits">',
   '  <caption>Accessibility deficits of web pages</caption>',
   '  <thead>',
-  `    <tr><th scope="col" rowspan="2">Page</th>${head0}</tr>`,
-  `    <tr>${head1}</tr>`,
+  `    <tr><th scope="col">Page</th>${head}</tr>`,
   '  </thead>',
   `  <tbody class="${tableClasses.join(' ')}">`
 ];
