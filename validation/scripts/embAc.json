@@ -1,0 +1,45 @@
+{
+  "what": "validation of embAc test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/embAc/good.html",
+      "what": "page without embedding in links or buttons"
+    },
+    {
+      "type": "test",
+      "which": "embAc",
+      "what": "visible element count",
+      "withItems": false,
+      "expect": [
+        ["totals.links", "=", 0],
+        ["totals.buttons", "=", 0],
+        ["totals.inputs", "=", 0],
+        ["totals.selects", "=", 0]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/embAc/bad.html",
+      "what": "page with embeddings in links and buttons"
+    },
+    {
+      "type": "test",
+      "which": "embAc",
+      "what": "visible element count",
+      "withItems": false,
+      "expect": [
+        ["totals.links", "=", 2],
+        ["totals.buttons", "=", 2],
+        ["totals.inputs", "=", 3],
+        ["totals.selects", "=", 1]
+      ]
+    }
+  ]
+}

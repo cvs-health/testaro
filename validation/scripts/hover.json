@@ -1,0 +1,47 @@
+{
+  "what": "validation of hover test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/hover/good.html",
+      "what": "page with standard hover behavior"
+    },
+    {
+      "type": "test",
+      "which": "hover",
+      "what": "hover",
+      "withItems": false,
+      "expect": [
+        ["totals.triggers", "=", 0],
+        ["totals.madeVisible", "=", 0],
+        ["totals.opacityChanged", "=", 0],
+        ["totals.opacityAffected", "=", 0],
+        ["totals.unhoverables", "=", 0]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/hover/bad.html",
+      "what": "page with deviant hover behavior"
+    },
+    {
+      "type": "test",
+      "which": "hover",
+      "what": "hover",
+      "withItems": false,
+      "expect": [
+        ["totals.triggers", "=", 2],
+        ["totals.madeVisible", "=", 2],
+        ["totals.opacityChanged", "=", 1],
+        ["totals.opacityAffected", "=", 2],
+        ["totals.unhoverables", "=", 1]
+      ]
+    }
+  ]
+}

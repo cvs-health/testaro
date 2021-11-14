@@ -1,9 +1,9 @@
 /*
-  idm
-  This test implements the IBM Equal Access Accessibility Checker.
-
-  The withNewContent argument specifies whether the URL of the current page is to be provided
-  to the test package. If not, then the page content is provided, instead.
+  ibm
+  This test implements the IBM Equal Access ruleset for accessibility.
+  The 'withNewContent' argument determines whether the test package should be
+  given the URL of the page to be tested (true) or should be given the page content
+  (false).
 */
 // Import required modules.
 const fs = require('fs/promises');

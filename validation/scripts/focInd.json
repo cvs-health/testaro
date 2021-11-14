@@ -1,0 +1,55 @@
+{
+  "what": "validation of focInd test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/focInd/good.html",
+      "what": "page with outline focus indication"
+    },
+    {
+      "type": "test",
+      "which": "focInd",
+      "what": "focus indication",
+      "withItems": false,
+      "revealAll": false,
+      "expect": [
+        ["totals.total", "=", 4],
+        ["totals.types.indicatorMissing.total", "=", 0],
+        ["totals.types.nonOutlinePresent.total", "=", 0],
+        ["totals.types.outlinePresent.total", "=", 4],
+        ["totals.types.outlinePresent.tagNames.A", "=", 1],
+        ["totals.types.outlinePresent.tagNames.BUTTON", "=", 1],
+        ["totals.types.outlinePresent.tagNames.INPUT", "=", 2]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/focInd/bad.html",
+      "what": "page with mixed focus indication"
+    },
+    {
+      "type": "test",
+      "which": "focInd",
+      "what": "focus indication",
+      "withItems": false,
+      "revealAll": false,
+      "expect": [
+        ["totals.total", "=", 5],
+        ["totals.types.indicatorMissing.total", "=", 1],
+        ["totals.types.indicatorMissing.tagNames.INPUT", "=", 1],
+        ["totals.types.nonOutlinePresent.total", "=", 1],
+        ["totals.types.nonOutlinePresent.tagNames.BUTTON", "=", 1],
+        ["totals.types.outlinePresent.total", "=", 3],
+        ["totals.types.outlinePresent.tagNames.A", "=", 1],
+        ["totals.types.outlinePresent.tagNames.BUTTON", "=", 1],
+        ["totals.types.outlinePresent.tagNames.INPUT", "=", 1]
+      ]
+    }
+  ]
+}

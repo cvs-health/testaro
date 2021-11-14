@@ -1,17 +1,14 @@
 /*
   labClash
-  This test reports labeling conflicts of labelable form controls.
-
-  It examines buttons, non-hidden inputs, select lists, and text areas. It reports
-  such a control as well-labeled if the control has text content or is labeled with a single
-  labeling method. If the control is labeled with more than one labeling method, so that
-  any label is superseded and ignored, the test reports the control as mislabeled. If the
-  control has no text content and no label, it is reported as unlabeled.
+  This test reports defects in the labeling of buttons, non-hidden inputs, select lists, and
+  text areas. The defects include missing labels and redundant labels. Redundant labels are
+  labels that are superseded by other labels. Explicit and implicit (wrapped) labels are
+  additive, not conflicting.
 */
 exports.reporter = async (page, withItems) => {
   return await page.$eval('body', (body, withItems) => {
     // FUNCTION DEFINITION START
-    const debloat = text => text.trim().replace(/\s+/g, ' ');
+    const debloat = text => text.replace(/\s+/g, ' ').trim();
     // FUNCTION DEFINITION END
     // Initialize a report.
     const data = {
@@ -39,9 +36,12 @@ exports.reporter = async (page, withItems) => {
       let texts = {};
       // Attribute label.
       if (labelee.hasAttribute('aria-label')) {
-        labelTypes.push('aria-label');
-        if (withItems) {
-          texts.attribute = labelee.getAttribute('aria-label');
+        const trimmedLabel = debloat(labelee.ariaLabel);
+        if (trimmedLabel) {
+          labelTypes.push('aria-label');
+          if (withItems) {
+            texts.attribute = labelee.ariaLabel;
+          }
         }
       }
       // Reference label.

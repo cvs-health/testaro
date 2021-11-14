@@ -1,0 +1,43 @@
+{
+  "what": "validation of labClash test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/labClash/good.html",
+      "what": "page with standard labeling"
+    },
+    {
+      "type": "test",
+      "which": "labClash",
+      "what": "Labeling",
+      "withItems": false,
+      "expect": [
+        ["totals.mislabeled", "=", 0],
+        ["totals.unlabeled", "=", 0],
+        ["totals.wellLabeled", "=", 6]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/labClash/bad.html",
+      "what": "page with deviant labeling"
+    },
+    {
+      "type": "test",
+      "which": "labClash",
+      "what": "Labeling",
+      "withItems": false,
+      "expect": [
+        ["totals.mislabeled", "=", 3],
+        ["totals.unlabeled", "=", 2],
+        ["totals.wellLabeled", "=", 0]
+      ]
+    }
+  ]
+}

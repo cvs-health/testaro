@@ -1,0 +1,15 @@
+@keyframes shrink {
+  from {
+    margin-right: 0%;
+    font-size: 1rem;
+  }
+  to {
+    margin-right: 50%;
+    font-size: 2rem;
+  }
+}
+.moving {
+  animation-duration: 4s;
+  animation-iteration-count: 5;
+  animation-name: shrink;
+}

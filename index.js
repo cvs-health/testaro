@@ -21,11 +21,13 @@ const waits = 0;
 const protocol = process.env.PROTOCOL || 'https';
 // Files servable without modification.
 const statics = {
+  '/index.html': 'text/html',
   '/style.css': 'text/css'
 };
 // URLs to be redirected.
 const redirects = {
-  '/': '/autotest/index.html'
+  '/': '/autotest/index.html',
+  '/which.html': '/autotest/run.html'
 };
 // Pages to be served as error notifications.
 const customErrorPageStart = [
@@ -51,13 +53,14 @@ const customErrorPage = customErrorPageStart.concat(...errorPageEnd);
 const systemErrorPage = systemErrorPageStart.concat(...errorPageEnd);
 // CSS selectors for targets of moves.
 const moves = {
-  text: 'input[type=text]',
-  radio: 'input[type=radio]',
-  checkbox: 'input[type=checkbox]',
-  select: 'select',
   button: 'button',
+  checkbox: 'input[type=checkbox]',
+  focus: true,
   link: 'a',
-  focus: true
+  presses: true,
+  radio: 'input[type=radio]',
+  select: 'select',
+  text: 'input[type=text]'
 };
 // Names and descriptions of tests.
 const tests = {
@@ -88,7 +91,6 @@ const tests = {
   styleDiff: 'style inconsistencies',
   tabNav: 'keyboard navigation between tab elements',
   tblAc: 'active elements contained by tables',
-  test: 'miscellaneous',
   visibles: 'visible elements',
   wave: 'WAVE',
   zIndex: 'z indexes'
@@ -208,7 +210,7 @@ const servePage = (content, newURL, mimeType, response) => {
   }
   response.end(content);
 };
-// Serves or returns part of all of an HTML or plain-text page.
+// Serves or returns part or all of an HTML or plain-text page.
 const render = (path, stage, which, query, response) => {
   if (! response.writableEnded) {
     // If an HTML page is to be rendered:
@@ -264,53 +266,71 @@ const render = (path, stage, which, query, response) => {
     }
   }
 };
-// Returns the index of an element matching a text, among elements of a type.
-const matchIndex = async (page, selector, text) => await page.$eval(
-  'body',
-  (body, args) => {
-    const [selector, text] = args;
-    // Identify the elements of the specified type.
-    const matches = Array.from(body.querySelectorAll(selector));
-    // If there are any:
-    if (matches.length) {
-      // Return the index of the first one satisfying the text condition, or -1 if none.
-      return matches.findIndex(match =>
-        match.textContent.includes(text)
-        || (
-          match.hasAttribute('aria-label')
-          && match.getAttribute('aria-label').includes(text)
-        )
-        || (
-          match.labels
-          && Array
-          .from(match.labels)
-          .map(label => label.textContent)
-          .join(' ')
-          .includes(text)
-        )
-        || (
-          match.hasAttribute('aria-labelledby')
-          && match
-          .getAttribute('aria-labelledby')
-          .split(/\s+/)
-          .map(id => document.getElementById(id).textContent)
-          .join(' ')
-          .includes(text)
-        )
-        || (
-          match.hasAttribute('placeholder')
-          && match.getAttribute('placeholder').includes(text)
-        )
-      );
+// Normalizes spacing characters in a string.
+const debloat = string => string.replace(/\s/g, ' ').trim().replace(/ {2,}/g, ' ');
+// Returns the text of an element, lower-cased.
+const textOf = async (page, element) => {
+  if (element) {
+    const tagNameJSHandle = await element.getProperty('tagName');
+    const tagName = await tagNameJSHandle.jsonValue();
+    let totalText = '';
+    if (tagName === 'INPUT') {
+      totalText = await page.evaluate(element => {
+        const labels = Array.from(element.labels);
+        const labelTexts = labels.map(label => label.textContent);
+        let legendText = '';
+        const fieldsets = Array.from(document.body.querySelectorAll('fieldset'));
+        const inputFieldsets = fieldsets.filter(fieldset => {
+          const inputs = Array.from(fieldset.querySelectorAll('input'));
+          return inputs.length && inputs[0] === element;
+        });
+        const inputFieldset = inputFieldsets[0] || null;
+        if (inputFieldset) {
+          const legend = inputFieldset.querySelector('legend');
+          if (legend) {
+            legendText = legend.textContent;
+          }
+        }
+        return labelTexts.concat(legendText).join(' ');
+      }, element);
     }
-    // Otherwise, i.e. if there are no elements of the specified type:
     else {
-      // Return this.
-      return -1;
+      totalText = await element.textContent();
     }
-  },
-  [selector, text]
-);
+    return debloat(totalText).toLowerCase();
+  }
+  else {
+    return null;
+  }
+};
+// Returns an element case-insensitively matching a text.
+const matchElement = async (page, selector, matchText, index = 0) => {
+  if (page) {
+    const lcText = matchText.toLowerCase();
+    // Identify the selected elements.
+    const selections = await page.$$(`body ${selector}`);
+    // If there are any:
+    if (selections.length) {
+      // Return the nth one including the specified text, or null if none.
+      let nth = 0;
+      for (const element of selections) {
+        const elementText = await textOf(page, element);
+        if (elementText.includes(lcText) && nth++ === index) {
+          return element;
+        }
+      }
+      return null;
+    }
+    // Otherwise, i.e. if there are no selected elements, return null.
+    else {
+      return null;
+    }
+  }
+  else {
+    console.log('ERROR: Page gone');
+    return null;
+  }
+};
 // Validates a browser type.
 const isBrowserType = type => ['chromium', 'firefox', 'webkit'].includes(type);
 // Validates a URL.
@@ -424,7 +444,7 @@ const goto = async (page, url, timeout, waitUntil, isStrict) => {
   });
   if (typeof response !== 'string') {
     const httpStatus = response.status();
-    if ([200, 304].includes(httpStatus)) {
+    if ([200, 304].includes(httpStatus) || url.startsWith('file:')) {
       const actualURL = page.url();
       if (isStrict && deSlash(actualURL) !== deSlash(url)) {
         console.log(`ERROR: Visit to ${url} redirected to ${actualURL}`);
@@ -500,7 +520,7 @@ const visit = async (act, page, isStrict) => {
     return page;
   }
 };
-// Updates the report file.
+// Updates a report file.
 const reportFileUpdate = async (reportDir, nameSuffix, report, isJSON) => {
   const fileReport = isJSON ? report : JSON.stringify(report, null, 2);
   await fs.writeFile(`${reportDir}/report-${nameSuffix}.json`, fileReport);
@@ -543,6 +563,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
         }
         // Otherwise, if the act is a wait:
         else if (act.type === 'wait') {
+          console.log(`>> for ${act.what} to include “${act.which}”`);
           // Wait for the specified text to appear in the specified place.
           await page.waitForFunction(act => {
             const {URL, title, body} = document;
@@ -552,9 +573,20 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
               body: body && body.textContent && body.textContent.includes(act.which)
             };
             return success[act.what];
-          }, act, {timeout: 20000});
+          }, act, {timeout: 10000})
+          .catch(error => {
+            console.log(`ERROR waiting for ${act.what} (${error.message})`);
+            act.result = `ERROR waiting for ${act.what}`;
+          });
+          await page.waitForLoadState('networkidle', {timeout: 5000})
+          .catch(error => {
+            console.log(`ERROR waiting for stability after ${act.what} (${error.message})`);
+            act.result = `ERROR waiting for stability after ${act.what}`;
+          });
           // Add the resulting URL to the act.
-          act.result = page.url();
+          if (! act.result) {
+            act.result = page.url();
+          }
         }
         // Otherwise, if the act is a page switch:
         else if (act.type === 'page') {
@@ -600,6 +632,52 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
               // Conduct, report, and time the test.
               const startTime = Date.now();
               const testReport = await require(`./tests/${act.which}`).reporter(...args);
+              const expectations = act.expect;
+              // If the test has expectations:
+              if (expectations) {
+                // Initialize whether they were fulfilled.
+                testReport.result.expectations = [];
+                let failureCount = 0;
+                // For each expectation:
+                expectations.forEach(spec => {
+                  let passed;
+                  const property = spec[0];
+                  const propertyTree = property.split('.');
+                  const relation = spec[1];
+                  const criterion = spec[2];
+                  let actual = testReport.result[propertyTree[0]];
+                  // Identify the actual value of the specified property.
+                  while (propertyTree.length > 1 && actual !== undefined) {
+                    propertyTree.shift();
+                    actual = actual[propertyTree[0]];
+                  }
+                  // Determine whether the expectation was fuldilled.
+                  if (relation === '=') {
+                    passed = actual === criterion;
+                  }
+                  else if (relation === '<') {
+                    passed = actual < criterion;
+                  }
+                  else if (relation === '>') {
+                    passed = actual > criterion;
+                  }
+                  else if (! relation) {
+                    passed = actual === undefined;
+                  }
+                  testReport.result.expectations.push({
+                    property,
+                    relation,
+                    criterion,
+                    actual,
+                    passed
+                  });
+                  if (! passed) {
+                    failureCount++;
+                  }
+                });
+                testReport.result.failureCount = failureCount;
+                console.log(`> failure count: ${failureCount}`);
+              }
               report.testTimes.push([act.which, Math.round((Date.now() - startTime) / 1000)]);
               report.testTimes.sort((a, b) => b[1] - a[1]);
               // If the test produced exhibits:
@@ -626,37 +704,45 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
             else if (moves[act.type]) {
               const selector = typeof moves[act.type] === 'string' ? moves[act.type] : act.what;
               // Identify the index of the specified element among same-type elements.
-              const whichIndex = await matchIndex(page, selector, act.which);
+              const whichElement = await matchElement(page, selector, act.which, act.index);
               // If it exists:
-              if (whichIndex > -1) {
-                // Get its ElementHandle.
-                const whichElement = await page.$(`:nth-match(${selector}, ${whichIndex + 1})`);
-                // Focus it.
-                await whichElement.focus();
+              if (whichElement) {
                 // Perform the act on the element and add a move description to the act.
-                if (act.type === 'focus') {
-                  act.result = 'focused';
-                }
-                else if (act.type === 'text') {
-                  await whichElement.type(act.what);
-                  act.result = 'entered';
-                }
-                else if (['radio', 'checkbox'].includes(act.type)) {
-                  await whichElement.check();
-                  act.result = 'checked';
-                }
-                else if (act.type === 'select') {
-                  await whichElement.selectOption({what: act.what});
-                  const optionText = await whichElement.$eval(
-                    'option:selected', el => el.textContent
-                  );
-                  act.result = optionText
-                    ? `&ldquo;${optionText}}&rdquo; selected`
-                    : 'OPTION NOT FOUND';
-                }
-                else if (act.type === 'button') {
+                if (act.type === 'button') {
                   await whichElement.click({timeout: 3000});
                   act.result = 'clicked';
+                }
+                else if (['checkbox', 'radio'].includes(act.type)) {
+                  await whichElement.waitForElementState('stable', {timeout: 3000})
+                  .catch(error => {
+                    console.log(`ERROR waiting for stable ${act.type} (${error.message})`);
+                    act.result = `ERROR waiting for stable ${act.type}`;
+                  });
+                  if (! act.result) {
+                    const isEnabled = await whichElement.isEnabled();
+                    if (isEnabled) {
+                      await whichElement.check({
+                        force: true,
+                        timeout: 2000
+                      })
+                      .catch(error => {
+                        console.log(`ERROR checking ${act.type} (${error.message})`);
+                        act.result = `ERROR checking ${act.type}`;
+                      });
+                      if (! act.result) {
+                        act.result = 'checked';
+                      }
+                    }
+                    else {
+                      const report = `ERROR: could not check ${act.type} because disabled`;
+                      console.log(report);
+                      act.result = report;
+                    }
+                  }
+                }
+                else if (act.type === 'focus') {
+                  await whichElement.focus({timeout: 2000});
+                  act.result = 'focused';
                 }
                 else if (act.type === 'link') {
                   const href = await whichElement.getAttribute('href');
@@ -668,12 +754,113 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                     move: 'clicked'
                   };
                 }
+                else if (act.type === 'presses') {
+                  let status = 'more';
+                  let presses = 0;
+                  let amountRead = 0;
+                  let items = [];
+                  while (status === 'more') {
+                    await page.keyboard.press(act.navKey);
+                    presses++;
+                    const focalJSHandle = await page.evaluateHandle(() => {
+                      let activeElement = document.activeElement;
+                      if (activeElement && activeElement.tagName !== 'BODY') {
+                        if (activeElement.hasAttribute('aria-activedescendant')) {
+                          activeElement = document.getElementById(
+                            activeElement.getAttribute('aria-activedescendant')
+                          );
+                        }
+                        else if (activeElement.shadowRoot) {
+                          activeElement = activeElement.shadowRoot.activeElement;
+                        }
+                        if (activeElement.dataset.pressesReached) {
+                          return 'locallyExhausted';
+                        }
+                        else {
+                          activeElement.dataset.pressesReached = 'true';
+                          return activeElement;
+                        }
+                      }
+                      else {
+                        return 'globallyExhausted';
+                      }
+                    });
+                    const focalElement = focalJSHandle.asElement();
+                    if (focalElement) {
+                      const tagNameJSHandle = await focalElement.getProperty('tagName');
+                      const tagName = await tagNameJSHandle.jsonValue();
+                      const text = await textOf(page, focalElement);
+                      if (text !== null) {
+                        const textLength = text.length;
+                        if (act.withItems) {
+                          items.push({
+                            tagName,
+                            text,
+                            textLength
+                          });
+                        }
+                        amountRead += textLength;
+                        const sameElement = await page.evaluate(args => {
+                          const [focalElement, whichElement] = args;
+                          return focalElement === whichElement;
+                        }, [focalElement, whichElement]);
+                        if (sameElement) {
+                          status = 'done';
+                          if (act.text) {
+                            await page.keyboard.type(act.text);
+                          }
+                          if (act.action) {
+                            await page.keyboard.press(act.action);
+                          }
+                        }
+                      }
+                      else {
+                        status = 'ERROR';
+                      }
+                    }
+                    else {
+                      status = await focalJSHandle.jsonValue();
+                    }
+                  }
+                  act.result = {
+                    status,
+                    totals: {
+                      presses,
+                      amountRead
+                    }
+                  };
+                  if (act.withItems) {
+                    act.result.items = items;
+                  }
+                }
+                else if (act.type === 'select') {
+                  await whichElement.selectOption({what: act.what});
+                  const optionText = await whichElement.$eval(
+                    'option:selected', el => el.textContent
+                  );
+                  act.result = optionText
+                    ? `&ldquo;${optionText}}&rdquo; selected`
+                    : 'OPTION NOT FOUND';
+                }
+                else if (act.type === 'text') {
+                  await whichElement.type(act.what);
+                  act.result = 'entered';
+                }
                 // Otherwise, i.e. if the specified element was not identified:
                 else {
                   // Return an error result.
                   return 'NOT FOUND';
                 }
               }
+              else {
+                act.result = 'ERROR trying to find matching element';
+              }
+            }
+            // Otherwise, if the act is a keypress:
+            else if (act.type === 'press') {
+              // Press the key.
+              await page.keyboard.press(act.which);
+              act.result = 'pressed';
             }
             // Otherwise, i.e. if the act type is unknown:
             else {
@@ -859,14 +1046,27 @@ const requestHandler = (request, response) => {
         response.write(content, 'binary');
         response.end();
       }
-      // Otherwise, if the initial page was requested:
-      else if (pathName === '/' || pathName === '/index.html') {
+      // Otherwise, if the run page was requested:
+      else if (pathName === '/run.html') {
         // Add properties to the query.
         query.scriptDir = process.env.SCRIPTDIR || '';
         query.batchDir = process.env.BATCHDIR || '';
         query.reportDir = process.env.REPORTDIR || '';
         // Render the page.
-        render('', 'all', 'index', query, response);
+        render('', 'all', 'run', query, response);
+      }
+      // Otherwise, if the validate page was requested:
+      else if (pathName === '/validate.html') {
+        // Add properties to the query.
+        const validators = await fs.readdir('validation/scripts');
+        query.validatorSize = validators.length;
+        const validatorNames = validators.map(name => name.slice(0, -5));
+        query.validatorNames = validatorNames
+        .map(name => `<option value="${name}">${name}</option>`)
+        .join('\n              ');
+        query.reportDir = process.env.REPORTDIR || '';
+        // Render the page.
+        render('', 'all', 'validate', query, response);
       }
       // Otherwise, i.e. if the URL is invalid:
       else {
@@ -884,10 +1084,10 @@ const requestHandler = (request, response) => {
       });
       // Add a timeStamp for any required report file to the query.
       query.timeStamp = Math.floor((Date.now() - Date.UTC(2021, 4)) / 10000).toString(36);
-      // If the request submitted the directory form:
-      if (pathName === '/where' && query.scriptDir && query.batchDir && query.reportDir) {
+      // If the request submitted the run form:
+      if (pathName === '/run' && query.scriptDir && query.batchDir && query.reportDir) {
         const {scriptDir, batchDir} = query;
-        // Request an array of the names of the files in the script directory.
+        // Get an array of the names of the files in the script directory.
         const scriptFileNames = await fs.readdir(scriptDir);
         // When the array arrives, get an array of script names from it.
         const scriptNames = scriptFileNames
@@ -930,7 +1130,7 @@ const requestHandler = (request, response) => {
           serveMessage(`ERROR: No scripts in ${scriptDir}`, response);
         }
       }
-      // Otherwise, if the request submitted the choice form:
+      // Otherwise, if the request submitted the run-which form:
       else if (
         pathName === '/which'
         && query.scriptDir
@@ -950,7 +1150,7 @@ const requestHandler = (request, response) => {
           // If the script is valid:
           if (
             what
-            && strict
+            && typeof strict === 'boolean'
             && commands
             && typeof what === 'string'
             && Array.isArray(commands)
@@ -1060,6 +1260,44 @@ const requestHandler = (request, response) => {
         else {
           // Serve an error message.
           serveMessage(`ERROR: Script ${scriptName} empty`, response);
+        }
+      }
+      // Otherwise, if the request submitted the validate form:
+      else if (pathName === '/validate' && query.validatorName && query.reportDir) {
+        const {validatorName} = query;
+        // Get the content of the validator script.
+        const scriptJSON = await fs.readFile(`validation/scripts/${validatorName}.json`, 'utf8');
+        // When the content arrives, if there is any:
+        if (scriptJSON) {
+          // Get the script data.
+          const script = JSON.parse(scriptJSON);
+          const {what, strict, commands} = script;
+          // If the validator is valid:
+          if (
+            what
+            && strict
+            && commands
+            && typeof what === 'string'
+            && Array.isArray(commands)
+            && commands[0].type === 'launch'
+            && commands.length > 1
+            && commands[1].type === 'url'
+            && isURL(commands[1].which)
+          ) {
+            console.log(`>>>>>>>> ${validatorName}: ${what}`);
+            // Process it, using the commands as the initial acts.
+            scriptHandler(what, strict, commands, query, 'all', -1, response);
+          }
+          // Otherwise, i.e. if the validator is invalid:
+          else {
+            // Serve an error message.
+            serveMessage(`ERROR: Validator script ${validatorName} invalid`, response);
+          }
+        }
+        // Otherwise, i.e. if the validator has no content:
+        else {
+          // Serve an error message.
+          serveMessage(`ERROR: Validator script ${validatorName} empty`, response);
         }
       }
       // Otherwise, i.e. if the request is invalid:

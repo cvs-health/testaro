@@ -1,11 +1,8 @@
 /*
   radioSet
-  This test reports deviations from the standard grouping of radio buttons.
-
-  It assumes that in the standard grouping each set of 2 or more radio buttons is enclosed in a
-  fieldset element with a legend element naming the group, and that no radio buttons share a
-  fieldset element with radio buttons of a different set. A set of radio buttons is defined by
-  the fact that they all have name attributes with the same value.
+  This test reports nonstandard grouping of radio buttons. It defines standard grouping to require
+  that two or more radio buttons with the same name, and no other radio buttons, be grouped in a
+  'fieldset' element with a valid 'legend' element.
 */
 const fs = require('fs/promises');
 // Tabulates and lists radio buttons in and not in accessible field sets.

@@ -1,12 +1,10 @@
 /*
-  axe
-  This test implements the WAVE test package for accessibility.
-
-  The reportType argument specifies a WAVE report type. Its values may be any integer from 1 to 4.
+  wave
+  This test implements the WebAIM WAVE ruleset for accessibility. The 'reportType' argument
+  specifies a WAVE report type: 1, 2, 3, or 4. The larger the number, the more detailed (and
+  expensive) the report.
 */
-// Import a module to create an HTTPS server and client.
 const https = require('https');
-// Conducts and reports a wave test.
 exports.reporter = async (page, reportType) => {
   const waveKey = process.env.WAVE_KEY;
   // Get the data from a WAVE test.

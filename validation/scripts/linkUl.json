@@ -1,0 +1,62 @@
+{
+  "what": "validation of linkUl test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/linkUl/good.html",
+      "what": "page with underlined inline links"
+    },
+    {
+      "type": "test",
+      "which": "linkUl",
+      "what": "link underlining",
+      "withItems": false,
+      "expect": [
+        ["totals.links", "=", 6],
+        ["totals.inline.total", "=", 2],
+        ["totals.inline.underlined", "=", 2],
+        ["totals.inline.underlinedPercent", "=", 100]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/linkUl/bad.html",
+      "what": "page without underlined inline links"
+    },
+    {
+      "type": "test",
+      "which": "linkUl",
+      "what": "link underlining",
+      "withItems": false,
+      "expect": [
+        ["totals.links", "=", 2],
+        ["totals.inline.total", "=", 2],
+        ["totals.inline.underlined", "=", 0],
+        ["totals.inline.underlinedPercent", "=", 0]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/linkUl/na.html",
+      "what": "page without inline links"
+    },
+    {
+      "type": "test",
+      "which": "linkUl",
+      "what": "link underlining",
+      "withItems": false,
+      "expect": [
+        ["totals.links", "=", 2],
+        ["totals.inline.total", "=", 0],
+        ["totals.inline.underlined", "=", 0],
+        ["totals.inline.underlinedPercent", "=", "N/A"]
+      ]
+    }
+  ]
+}

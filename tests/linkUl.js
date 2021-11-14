@@ -1,11 +1,11 @@
 /*
   linkUl
-  This test reports inline links without accessible styles.
-
-  It assumes that inline links are accessible only if users can identify them visually as links.
-  Links are most commonly marked as such by two style changes: color and text decoration. They
-  are commonly blue (before being visited) or purple (after being visited), and also underlined.
-  The test reports whether they are underlined.
+  This test reports failures to underline inline links. Underlining and color are the
+  traditional style properties that identify links. Collections of links in blocks can be
+  recognized without underlines, but inline links are difficult or impossible to distinguish
+  visually from surrounding text if not underlined. Underlining inline links only on hover
+  provides an indicator valuable only to mouse users, and even they must traverse the text with
+  a mouse merely to discover which passages are links.
 */
 exports.reporter = async (page, withItems) => {
   // Identify the links in the page, by type.

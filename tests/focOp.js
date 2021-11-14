@@ -1,11 +1,13 @@
 /*
   focOp
-  This test reports discrepancies between keyboard-focusable elements and operable elements.
-
-  It is based on the principles that operable elements must be keyboard-focusable so they can be
-  activated with a keypress, and that an interface is most accessible when only operable elements
-  are keyboard-focusable. Making non-operable elements keyboard-focusable can confuse users into
-  expecting they can operate on those elements.
+  This test reports descrepancies between Tab-focusability and operability. The standard
+  practice is to make focusable elements operable and vice versa. If focusable elements are not
+  operable, users are likely to be surprised that nothing happens when they try to operate such
+  elements. If operable elements are not focusable, users depending on keyboard navigation are
+  prevented from operating those elements. The test considers an element operable if it has a
+  non-inherited pointer cursor and is not a 'LABEL' element, or has an operable tag name ('A',
+  'BUTTON', 'IFRAME', 'INPUT', 'SELECT', 'TEXTAREA'), or has an 'onclick' attribute. The test
+  considers an element Tab-focusable if its tabIndex property has the value 0.
 */
 exports.reporter = async (page, withItems) => {
   // Get data on focusability-operability-discrepant elements.

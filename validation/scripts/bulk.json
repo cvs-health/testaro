@@ -1,0 +1,39 @@
+{
+  "what": "validation of bulk test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/bulk/good.html",
+      "what": "small page"
+    },
+    {
+      "type": "test",
+      "which": "bulk",
+      "what": "visible element count",
+      "expect": [
+        ["visibleElements", ">", 1],
+        ["visibleElements", "<", 5]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/bulk/bad.html",
+      "what": "large page"
+    },
+    {
+      "type": "test",
+      "which": "bulk",
+      "what": "visible element count",
+      "expect": [
+        ["visibleElements", ">", 30],
+        ["visibleElements", "<", 40]
+      ]
+    }
+  ]
+}

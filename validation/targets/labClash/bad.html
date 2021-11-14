@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Page with deviant labeling</title>
+    <meta name="description" content="tester">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <main>
+      <h1>Page with deviant labeling</h1>
+      <p>This paragraph contains an empty <button type="button" aria-label></button> button, with no accessible name.</p>
+      <p>This is another <button id="labButton" type="button" aria-labelledby="buttonLabel">button</button> with its text content overridden by both an explicit label and a reference label as a <label id="buttonLabel" for="labButton">special type of button</label>.</p>
+      <p>This is an implicitly and attribute-labeled <label>checkbox input <input id="cbox" type="checkbox" aria-label="a checkbox-type input"></label>.</p>
+      <p><span id="textInputLabel">Who is your favorite actor?</span> <input type="text" aria-labelledby="textInputLabel" aria-label="your favorite actor">.</p>
+      <p>What do you think? Enter your thoughts into this text area, which is unlabeled.</p>
+      <p><textarea aria-label></textarea></p>
+    </main>
+  </body>
+</html>

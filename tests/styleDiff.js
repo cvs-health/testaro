@@ -1,10 +1,9 @@
 /*
   styleDiff
-  This test reports style inconsistencies for headings, buttons, and links.
-
-  It assumes that a page is more accessible when its operation and navigation elements have
-  consistent styles. The test reports style differences for each heading level, from h1 to h6,
-  for buttons, for inline links, and for non-inline links.
+  This test reports style differences among links, buttons, and headings. It assumes
+  that an accessible page employs few or only one style for inline links, and likewise
+  for non-inline links, buttons, and headings at each level. The test considers only
+  particular style properties, listed in the 'mainStyles' and 'headingStyles' arrays.
 */
 exports.reporter = async (page, withItems) => {
   // Get an object with arrays of block and inline links as properties.

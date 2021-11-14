@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Page with deviant menu navigation</title>
+    <meta name="description" content="tester">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+    <script src="bad.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <h1>Page with deviant menu navigation</h1>
+      <p>This page contains a menu bar. In it, the personalities submenu implements pseudofocus management and the technologies menu implements true focus management. <a href="https://www.w3.org/TR/wai-aria-practices-1.1/#menu">These two patterns</a> are recommended by the Accessible Rich Internet Applications Working Group. However, the technologies menu manages focus in a nonstandard manner.</p>
+      <p id="menuBarAbout">Choose a domain to toggle that domain&rsquo;s submenu open or closed. The submenu contains links to definitions (in a new tab).</p>
+      <ul id="menubar" role="menubar" class="menubar blockLink" aria-labelledby="menuBarAbout">
+        <li role="none">
+          <button
+            id="persButton"
+            role="menuitem"
+            type="button"
+            tabindex="0"
+            aria-haspopup="menu"
+            aria-expanded="false"
+            aria-controls="persMenu"
+          >
+            Personalities
+          </button>
+          <ul
+            id="persMenu"
+            role="menu"
+            aria-labelledby="persButton"
+            aria-activedescendant="introvert"
+            class="shut"
+            tabindex="-1"
+          >
+            <li role="none">
+              <a
+                id="introvert"
+                role="menuitem"
+                class="blurred"
+                tabindex="-1"
+                href="https://en.wiktionary.org/wiki/introvert"
+                target="_blank"
+              >
+                introvert
+              </a>
+            </li>
+            <li role="none">
+              <a
+                id="extravert"
+                role="menuitem"
+                class="blurred"
+                tabindex="-1"
+                href="https://en.wiktionary.org/wiki/extravert"
+                target="_blank"
+              >
+                extravert
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li role="none">
+          <button
+            id="techButton"
+            role="menuitem"
+            type="button"
+            tabindex="-1"
+            aria-haspopup="menu"
+            aria-expanded="false"
+            aria-controls="techMenu"
+          >
+            Technologies
+          </button>
+          <ul
+            id="techMenu"
+            role="menu"
+            aria-labelledby="techButton"
+            class="shut"
+          >
+            <li role="none">
+              <a
+                tabindex="-1"
+                role="menuitem"
+                href="https://en.wikipedia.org/wiki/Prestressed_concrete"
+                target="_blank"
+              >
+                prestressed concrete
+              </a>
+            </li>
+            <li role="none">
+              <a
+                tabindex="-1"
+                role="menuitem"
+                href="https://en.wikipedia.org/wiki/Heat_pump"
+                target="_blank"
+              >
+                heat pump
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </main>
+  </body>
+</html>

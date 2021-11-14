@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Page with underlined inline links</title>
+    <meta name="description" content="tester">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      .nude > li > a {
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Page with underlined inline links</h1>
+      <p>This page contains inline links to <a href="https://en.wikipedia.org">English information</a> and <a style="text-decoration: underline wavy 2px" href="https://fr.wikipedia.org">French information</a>. The latter is weird, but still an underline.</p>
+      <p>The following links, however, are not inline, so can be (and are) devoid of underlines.</p>
+      <ul class="nude">
+        <li><a href="https://sp.wikipedia.org">Spanish information</a></li>
+        <li><a href="https://eo.wikipedia.org">Esperanto information</a></li>
+      </ul>
+      <p>The following links are not inline, so can be devoid of underlines, but still have them.</p>
+      <ul>
+        <li><a href="https://eus.wikipedia.org">Basque information</a></li>
+        <li><a href="https://tr.wikipedia.org">Turkish information</a></li>
+      </ul>
+    </main>
+  </body>
+</html>

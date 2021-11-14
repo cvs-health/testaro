@@ -1,18 +1,14 @@
 /*
   hover
-  This test reports accessibility problems related to hovering.
-
-  It assumes that users expect hovering to identify elements that will be acted on by mouse clicks,
-  but not to change the content of a page, so hover-caused content changes can startle and confuse
-  users and thus impair accessibility. It also assumes that users can get disoriented when they try
-  to hover over an operable element but the element cannot be hovered over, for example because it
-  is covered by another element. The test reports:
-
-    0. the number of elements that, when hovered over, trigger content changes
-    1. the number of elements made visible by hovering
-    2. the number of elements whose opacities are directly changed by hovering
-    3. the number of elements whose opacities are indirectly changed by hovering
-    4. the number of operable elements that cannot be hovered over
+  This test reports unexpected effects of hovering. The effects include elements that are made
+  visible, elements whose opacities are changed, elements with ancestors whose opacities are
+  changed, and elements that cannot be hovered over. Only Playwright-visible elements that have
+  'A', 'BUTTON', and 'LI' tag names or have 'onmouseenter' or 'onmouseover' attributes are
+  considered as hovering targets. The elements considered when the effects of hovering are
+  examined are the descendants of the grandparent of the element hovered over if that element
+  has the tag name 'A' or 'BUTTON' or otherwise the descendants of the element. The only
+  elements counted as being made visible by hovering are those with tag names 'A', 'BUTTON',
+  'INPUT', and 'SPAN', and those with 'role="menuitem"' attributes.
 */
 exports.reporter = async (page, withItems) => {
   // Initialize a counter.
@@ -178,11 +174,13 @@ exports.reporter = async (page, withItems) => {
             return text.trim().replace(/\s*/sg, '').slice(0, limit);
           };
           data.totals.unhoverables++;
-          data.items.unhoverables.push({
-            tagName: tagName,
-            id: firstTrigger.id || '',
-            text: await textOf(firstTrigger, 50)
-          });
+          if (withItems) {
+            data.items.unhoverables.push({
+              tagName: tagName,
+              id: firstTrigger.id || '',
+              text: await textOf(firstTrigger, 50)
+            });
+          }
         }
         triggerTag = tagName;
       }

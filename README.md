@@ -34,6 +34,7 @@ Several files of HTML, CSS, JavaScript, and JSON are located in the project dire
 The main subdirectories of the project directory containing code files are:
 - `tests`: the code for individual tests
 - `procs`: shared procedures
+- `validation`: code and artifacts for the validation of tests
 
 Autotest assumes that you also have code in another directory. There you may name the main subdirectories as you wish, such as:
 - `scripts`: instructions for conducting tests
@@ -74,13 +75,17 @@ You are responsible for obtaining keys to use WAVE or Kickfire if you wish to us
 
 ## Specification
 
-Before running Autotest, you must specify what it should do. You do this by creating at least one script, and optionally one or more batches.
+Before using Autotest, you must specify what it should do. You do this by creating at least one script, and optionally one or more batches.
+
+## Validation
+
+In order to validate Autotest tests, you will use a validation script in the `validation/scripts` directory, plus artifacts (HTML documents) in a subdirectory of the `validation/targets` directory. For any validation script named `foo.json`, there must be a subdirectory named `validation/targets/foo`. For several of the tests in Autotest, validation scripts and targets already exist, and you can use them as-is. They are named after the tests that they validate.
 
 ### Scripts
 
 #### Introduction
 
-Autotest performs the **commands** in a **script**. When you run Autotest, it lists your scripts and asks you which one you want it to execute.
+Autotest, whether you test with it or validate its tests, performs the **commands** in a **script**. When you run Autotest, you first tell it which mode you want (running or validating). Then it lists the available scripts for the mode you chose and asks you which script you want it to execute.
 
 A script is a JSON file with the properties:
 
@@ -173,7 +178,19 @@ motion: [
 
 This object says that any `motion` test must, in addition to the required and optional properties of all tests, also have `delay`, `interval`, and `count` properties with number values.
 
-The meanings of the extra properties of test commands are stated in the first element of the array, except for the `withItems` property. The `true` or `false` value of `withItems`, in any test requiring it, specifies whether the report of the results of the test should itemize the successes and failures.
+The meanings of the extra properties of test commands are stated in the first element of the array, except for two properties:
+- `withItems`. The `true` or `false` value of `withItems`, in any test requiring it, specifies whether the report of the results of the test should itemize the successes and failures.
+- `expect`. Any command that will validate a test must contain an `expect` property. The value of that property states an array of expected results. If an `expect` property is present in a `test` command, the report will tabulate and identify the expectations that are fulfilled or are violated by the results. For example, a `test` command might have this `expect` property:
+
+```json
+"expect": [
+  ["total.links", "=", 5],
+  ["total.links.underlined", "=", 2],
+  ["total.links.outlined"]
+]
+```
+
+That would state the expectation that the `result` property of the report will have a `total.links` property with the value 5, a `total.links.underlined` property with the value 2, and **no** `total.links.outlined` property.
 
 ##### Command sequence
 
@@ -207,13 +224,18 @@ An example of a move is:
 
 ```json
 {
-  "type": "button",
-  "which": "Close",
-  "what": "close the modal dialog"
+  "type": "radio",
+  "which": "No",
+  "index": 2,
+  "what": "No, I am not a smoker"
 }
 ```
 
-In this case, Autotest clicks the first button whose text content includes the string “Close” (case-insensitively).
+In this case, Autotest checks the third radio button whose text includes the string “No” (case-insensitively).
+
+In identifying the target element for a move, Autotest matches the `which` property with the texts of the elements of the applicable type (such as radio buttons). It defines the text of an `input` element as the concatenated texts of its implicit label or explicit labels, if any, plus, for the first input in a `fieldset` element, the text content of the `legend` element of that `fieldset` element. For any other element, Autotest defines the text as the text content of the element.
+
+When multiple elements of the same type have indistinguishable texts, you can include an `index` property to specify the index of the target element, among all those that will match.
 
 An example of a navigation is the command of type `url` above. Another is:
 
@@ -262,12 +284,12 @@ An example of a scoring command is:
 ```json
 {
   "type": "score",
-  "which": "a11y03",
+  "which": "a11y05",
   "what": "3 packages and 16 custom tests, with duplication discounts"
 }
 ```
 
-In this case, Autotest executes the procedure specified in the `a11y03` score proc (in the `procs/score` directory) to compute a total score for the script. The proc is a JavaScript module whose `scorer` function returns an object containing a total score and the itemized scores that yield the total.
+In this case, Autotest executes the procedure specified in the `a11y05` score proc (in the `procs/score` directory) to compute a total score for the script. The proc is a JavaScript module whose `scorer` function returns an object containing a total score and the itemized scores that yield the total.
 
 The `scorer` function inspects the script report to find the required data, applies specific weights and formulas to yield the itemized scores, and combines the itemized scores to yield the total score.
 
@@ -286,7 +308,7 @@ However, some tests modify web pages. In those cases, Autotest inserts additiona
 
 ### Batches
 
-There are two ways to use a script to give instructions to Autotest:
+There are two ways to use a script in run mode to give instructions to Autotest:
 - The script can be the complete specification of the job.
 - The script can specify the operations to perform, and a **batch** can specify which pages to perform them on.
 

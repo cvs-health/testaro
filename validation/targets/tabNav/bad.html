@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Page with deviant tab-list navigation</title>
+    <meta name="description" content="tester">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+    <script src="bad.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <h1>Page with deviant tab-list navigation</h1>
+      <div class="tabs">
+        <p id="tabListLabel">What kind of HTML element do you want to study?</p>
+        <div role="tablist" aria-labelledby="tabListLabel">
+          <button role="tab" aria-selected="true" aria-controls="ulDoc" id="ul">
+            <code>ul</code>
+          </button>
+          <button
+            role="tab"
+            aria-selected="false"
+            aria-controls="sectionDoc"
+            id="section"
+          >
+            <code>section</code>
+          </button>
+          <button
+            role="tab"
+            aria-selected="false"
+            aria-controls="mainDoc"
+            id="main"
+          >
+            <code>main</code>
+          </button>
+        </div>
+        <div class="tabPanels">
+          <div tabindex="0" role="tabpanel" id="ulDoc" aria-labelledby="ul" hidden>
+            <p>A <code>ul</code> element encodes an unordered list.</p>
+          </div>
+          <div tabindex="0" role="tabpanel" id="sectionDoc" aria-labelledby="section" hidden>
+            <p>A <code>section</code> element encodes a generic part of a document.</p>
+          </div>
+          <div tabindex="0" role="tabpanel" id="mainDoc" aria-labelledby="main" hidden>
+            <p>A <code>main</code> element encodes the dominant content of a document.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

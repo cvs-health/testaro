@@ -1,0 +1,43 @@
+{
+  "what": "validation of radioSet test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/radioSet/good.html",
+      "what": "page with standard radio-button grouping"
+    },
+    {
+      "type": "test",
+      "which": "radioSet",
+      "what": "radioSet",
+      "withItems": false,
+      "expect": [
+        ["totals.total", "=", 4],
+        ["totals.inSet", "=", 4],
+        ["totals.percent", "=", 100]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/radioSet/bad.html",
+      "what": "page with deviant radio-button grouping"
+    },
+    {
+      "type": "test",
+      "which": "radioSet",
+      "what": "radioSet",
+      "withItems": false,
+      "expect": [
+        ["totals.total", "=", 8],
+        ["totals.inSet", "=", 0],
+        ["totals.percent", "=", 0]
+      ]
+    }
+  ]
+}

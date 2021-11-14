@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Page with deviant hover behavior</title>
+    <meta name="description" content="tester">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <main>
+      <h1>Page with deviant hover behavior</h1>
+      <p>This page contains a link to <a href="https://en.wikipedia.org" onmouseover="document.getElementById('translucent').style.opacity = 1">information</a>, a <button type="button" onmouseover="document.getElementById('hiddenP').style.display = 'block'">button</button>, and a <label>text input <input type="text"></label>. All three elements can be hovered over.</p>
+      <p id="hiddenP" style="display: none">The button, when hovered over, makes this paragraph, and therefore this <a href="https://en.wikipedia.org/wiki/Web_accessibility">link on web accessibility</a> and this <button type="button">new button</button>, visible.</p>
+      <p id="translucent" style="opacity: 0.4">The first link, when hovered over, changes the opacity of this paragraph from 0.4 to 1. That indirectly changes the opacity of this <span>word</span>, too.</p>
+      <p>The small button is mostly covered by a large one below.</p>
+      <p style="position: relative"><button style="position: absolute; left: 10rem">button</button><button style="position: absolute; left: 11rem; top: -0.5rem; font-size: x-large">bigger button</button></p>
+    </main>
+  </body>
+</html>

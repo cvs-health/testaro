@@ -1,0 +1,59 @@
+{
+  "what": "validation of focAll test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/focAll/good.html",
+      "what": "fully Tab-focusable page"
+    },
+    {
+      "type": "test",
+      "which": "focAll",
+      "what": "Tab-focusability",
+      "withItems": false,
+      "expect": [
+        ["tabFocusables", "=", 3],
+        ["tabFocused", "=", 3],
+        ["discrepancy", "=", 0]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/focAll/less.html",
+      "what": "partly Tab-focusable page"
+    },
+    {
+      "type": "test",
+      "which": "focAll",
+      "what": "Tab-focusability",
+      "withItems": false,
+      "expect": [
+        ["tabFocusables", "=", 3],
+        ["tabFocused", "=", 2],
+        ["discrepancy", "=", -1]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "file://__dirname/validation/targets/focAll/more.html",
+      "what": "page with added Tab-focusability"
+    },
+    {
+      "type": "test",
+      "which": "focAll",
+      "what": "Tab-focusability",
+      "withItems": false,
+      "expect": [
+        ["tabFocusables", "=", 3],
+        ["tabFocused", "=", 5],
+        ["discrepancy", "=", 2]
+      ]
+    }
+  ]
+}

@@ -1,27 +1,19 @@
 /*
   role
-  This set reports nonstandard role attributes.
-
-  It assumes that a role attribute is nonstandard in either of three cases:
-
-    0. It assigns a non-existent role.
-    1. It assigns an abstract role.
-    2. It assigns a role that is implicit in a native HTML element.
-
-  The WAI-ARIA standard forbids the assignment of abstract roles and recommends against the
-  assignment of HTML-implicit roles.
+  This test reports role assignment that violate either an applicable standard or an applicable
+  recommendation from WAI-ARIA. Invalid roles include those that are abstract and thus prohibited
+  from direct use, and those that are implicit in HTML elements and thus advised against. The math
+  role has been removed, because of poor adoption and exclusion from HTML5. The img role has
+  accessibility uses, so is not classified as deprecated. See:
+    https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/Role_Img
+    https://www.w3.org/TR/html-aria/
+    https://www.w3.org/TR/wai-aria/#roles_categorization
 */
 exports.reporter = async page => await page.$eval('body', body => {
   // CONSTANTS
-  /*
-    The math role has been removed, because of poor adoption and exclusion from HTML5.
-    The img role has accessibility uses
-    (https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/Role_Img),
-    so is not classified as deprecated.
-    Deprecated roles (from https://www.w3.org/TR/html-aria/).
-  */
   const badRoles = new Set([
     'article',
+    'banner',
     'button',
     'cell',
     'checkbox',
@@ -59,7 +51,7 @@ exports.reporter = async page => await page.$eval('body', body => {
     'term',
     'textbox'
   ]);
-  // All non-abstract roles (from https://www.w3.org/TR/wai-aria/#roles_categorization).
+  // All non-abstract roles
   const goodRoles = new Set([
     'alert',
     'alertdialog',
