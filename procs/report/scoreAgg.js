@@ -15,10 +15,10 @@ const dir = `${process.env.REPORTDIR}/${process.argv[2]}`;
 // Initialize the result.
 const result = [];
 // Populate it.
-const fileNames = fs.readdirSync(`${dir}/reports`);
+const fileNames = fs.readdirSync(`${dir}/jsonReports`);
 let batchData = {};
 fileNames.forEach((fn, index) => {
-  const reportJSON = fs.readFileSync(`${dir}/reports/${fn}`, 'utf8');
+  const reportJSON = fs.readFileSync(`${dir}/jsonReports/${fn}`, 'utf8');
   const report = JSON.parse(reportJSON);
   const orgData = report.acts.filter(act => act.type === 'url')[0];
   const deficitData = report.acts.filter(act => act.type === 'score')[0];

@@ -23,7 +23,7 @@ const template = fs.readFileSync(`../../docTemplates/${docSubdir}/index.html`, '
 fileNames.forEach(fn => {
   // Get its content.
   const fileBase = fn.slice(0, -5);
-  const sourceJSON = fs.readFileSync(`${dir}/reports/${fn}`, 'utf8');
+  const sourceJSON = fs.readFileSync(`${dir}/jsonReports/${fn}`, 'utf8');
   const sourceData = JSON.parse(sourceJSON);
   // Get its data.
   const testActs = sourceData.acts.filter(act => act.type === 'test');
