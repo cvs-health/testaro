@@ -16,12 +16,16 @@
       <header>
         <h1>Accessibility test report</h1>
         <p class="author">Jonathan Robert Pool</p>
-        <p class="summary">Autotest <code>__scoreProc</code>, version __version__, report for __org__</p>
+        <p class="summary">Autotest <code>__scoreProc__</code>, version __version__, report for __org__</p>
       </header>
       <h2>Introduction</h2>
-      <p>This report summarizes findings of a battery of tests of the accessibility of a <a href="__url__">web page belonging to __org__</a>. The tests were performed by version __version__ of the <code>__scoreProc</code> procedure of <a href="https://jpdev.pro/jpdev/blog/entries/0020/index.html">Autotest</a>. This is one among the <a href="../">pages of organizations tested</a>. This summary is based on a <a href="../data/__file__">file containing the results in JSON format</a>.</p>
+      <p>This report summarizes findings of a battery of tests of the accessibility of a <a href="__url__">web page belonging to __org__</a>. The tests were performed by version __version__ of the <code>__scoreProc__</code> procedure of <a href="https://jpdev.pro/jpdev/blog/entries/0020/index.html">Autotest</a>. This is one among a <a href="../">batch of pages tested</a>. This summary is based on a <a href="../jsonReports/__file__">file containing the results in JSON format</a>.</p>
       <h2>Testing failures</h2>
-      <p>Some pages prevent some of the tests in this procedure from being performed. This may occur, for example, when a page tries to block any visitor that is not a real human being. When a page prevents a test, an unusually high deficit score for that test is inferred. The inferred score is used in the calculation of the total deficit score. One motivation for this treatment is the axiom that measuring success is a prerequisite for achieving success. Thus, preventing an accessibility test interferes with achieving accessibility. A second motivation is the fact that users with disabilities often rely on assistive technologies to mediate between them and web applications. The owner of a website cannot know what assistive technologies users will employ. Whatever measures interfere with automated testing are at risk of interfering with some assistive technologies, too.</p>
+      <p>Some pages prevent some of the tests in this procedure from being performed. This may occur, for example, when a page tries to block any visitor that is not a real human being. The procedure assigns deficit scores when pages prevent tests. This treatment indicates that preventing accessibility testing is itself an accessibility deficiency, because:</p>
+      <ul>
+        <li>Measuring success is a prerequisite for achieving success, so interfering with accessibility measurement interferes with accessibility.</li>
+        <li>Users with disabilities often rely on assistive technologies to mediate between them and web applications. The owner of a website cannot know what assistive technologies users will employ. Whatever measures interfere with automated testing are at risk of interfering with some assistive technologies, too.</li>
+      </ul>
       <h2>Test packages</h2>
       <h3>Axe</h3>
       <p><a href="https://github.com/dequelabs/axe-core">Axe</a> is an open-source package sponsored by accessibility consulting firm Deque. The procedure performs all 138 of the default Axe tests. If this page failed any of the Axe tests, the failed tests are listed here:</p>
@@ -29,7 +33,7 @@
         __axeFailures__
       </ul>
       <p>The specific failures of Axe tests can be found in the section of the JSON file that begins with</p>
-      <pre>      "type": "test",
+      <pre>        "type": "test",
         "which": "axe",</pre>
       <p>The deficit score of this page from the Axe tests was __axeScore__.</p>
       <h3>Equal Access</h3>
@@ -38,22 +42,40 @@
         __ibmFailures__
       </ul>
       <p>The specific failures of Equal Access tests can be found in the section of the JSON file that begins with</p>
-      <pre>      "type": "test",
+      <pre>        "type": "test",
         "which": "ibm",</pre>
       <p>The deficit score of this page from the Equal Access tests was __ibmScore__.</p>
       <h3>WAVE</h3>
       <p><a href="https://wave.webaim.org/">WAVE</a> is a proprietary package owned by webAIM, a program of the Institute for Disability Research, Policy, and Practice at Utah State University. All 110 of its default tests were performed. If this page failed any of the WAVE tests, the failed tests are listed here:</p>
       <ul>
-        __waveFailures__
+        <li>
+          <h4>errors</h4>
+          <ul>
+            __waveErrors__
+          </ul>
+        </li>
+        <li>
+          <h4>contrast</h4>
+          <ul>
+            __waveContrasts__
+          </ul>
+        </li>
+        <li>
+          <h4>alerts</h4>
+          <ul>
+            __waveAlerts__
+          </ul>
+        </li>
       </ul>
       <p>The specific failures of WAVE tests can be found in the section of the JSON file that begins with</p>
-      <pre>      "type": "test",
+      <pre>        "type": "test",
         "which": "wave",</pre>
       <p>The deficit score of this page from the WAVE tests was __waveScore__.</p>
       <h2>Custom tests</h2>
       <p>Although these three packages conduct a total of 411 tests, the tests are designed to detect only some, not all, accessibility problems. In general, these packages inspect the code of a web page, but they do not observe changes in a page, navigate within a page, or perform operations on a page. Some accessibility problems arise only over time, or only when a user performs an action (such as pressing a key, hovering, or clicking). I have created more tests and included them in this procedure to detect some problems not detected by the test packages.</p>
       <h3><code>bulk</code></h3>
       <p>The <code>bulk</code> test counts the initially visible elements in a page. The motivation for this test is the frustration that users with visual and motor disabilities (and not only they) often express with content bloat. A complex, busy page usually makes it difficult to know what the page is about, whether it is relevant, and how to find a specific thing there. This procedure begins to assign a deficit when the count exceeds 250. The count for this page was __bulkCount__. Obviously, it requires judgment, and perhaps user research, to determine whether this reflects practical accessibility.</p>
+      <p>The deficit score of this page from the <code>bulk</code> test was __bulkScore__.</p>
       <h3><code>embAc</code></h3>
       <p>The <code>embAc</code> test detects improper embedding of interactive elements (links, buttons, inputs, and select lists) within links or buttons. Such embedding not only violates the HTML standard, but also complicates user interaction and creates risks of error. It becomes non-obvious what a user will activate with a click.</p>
       <p>If this page failed the <code>embAc</code> test, the counts of embedded interactive elements are listed here:</p>
@@ -61,14 +83,16 @@
         __embAcFailures__
       </ul>
       <p>The specific failures of the <code>embAc</code>> test can be found in the section of the JSON file that begins with</p>
-      <pre>      "type": "test",
+      <pre>        "type": "test",
         "which": "embAc",</pre>
+      <p>The deficit score of this page from the <code>embAc</code> test was __embAcScore__.</p>
       <h3><code>focAll</code></h3>
       <p>The <code>focAll</code> test detects discrepancies between focusable and Tab-focused element counts. The test first counts all the visible Tab-focusable (i.e. with tabIndex 0) elements (except counting each group of radio buttons as only one focusable element). In principle, by pressing the Tab key a user should be able to reach (i.e. focus) each of those elements. Then the test repeatedly presses the Tab (or Option-Tab in the webkit browser) key until it has focused all the elements it can and counts those elements. If the latter are more than the former, Tab-key navigation made more focusable elements visible. If the latter are fewer than the former, the page managed focus so as to prevent Tab-key navigation from focusing all the elements it would normally be able to focus. Either of these can complicate navigation for users. It may disappoint the expectation that the content will remain stable as they move with the Tab key, or the expectation that they can reach every focusable element (or widget, such as one radio button or tab in each group) merely by pressing the Tab key. This problem is acute for users who must use only a keyboard (not a mouse) or a keyboard-emulating assistive device to navigate.</p>
       <p>If this page failed the <code>focAll</code> test, the counts of focusable and focused elements are listed here:</p>
       <ul>
         __focAllFailures__
       </ul>
+      <p>The deficit score of this page from the <code>focAll</code> test was __focAllScore__.</p>
       <footer>
         <p>This work is entirely my own and does not represent my employer, CVS Health.</p>
         <p class="date">Produced <time itemprop="datePublished" datetime="__dateISO__">__dateSlash__</time></p>
