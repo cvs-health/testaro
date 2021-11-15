@@ -16,11 +16,16 @@ require('dotenv').config();
 let [reportSubdir, docSubdir, scoreProc, version] = process.argv.slice(2);
 // Directory.
 const dir = `${process.env.REPORTDIR}/${reportSubdir}`;
-// Populate it.
-const fileNames = fs.readdirSync(`${dir}/reports`);
+const fileNames = fs.readdirSync(`${dir}/jsonReports`);
+const {parameters} = require(`../../docTemplates/${docSubdir}/index`);
+const template = fs.readFileSync(`../../docTemplates/${docSubdir}/index.html`, 'utf8');
+// For each JSON report file:
 fileNames.forEach(fn => {
+  // Get its content.
+  const fileBase = fn.slice(0, -5);
   const sourceJSON = fs.readFileSync(`${dir}/reports/${fn}`, 'utf8');
   const sourceData = JSON.parse(sourceJSON);
+  // Get its data.
   const testActs = sourceData.acts.filter(act => act.type === 'test');
   const testData = {};
   testActs.forEach(act => {
@@ -30,9 +35,9 @@ fileNames.forEach(fn => {
   scoreProc || (scoreProc = scoreData.scoreProc);
   version || (version = scoreData.version);
   const orgData = sourceData.acts.find(act => act.type === 'url');
-  const paramData = require(`../../docTemplates/${docSubdir}/index`)
-  .parameters(fn, sourceData, testData, scoreData, scoreProc, version, orgData);
+  // Compute the values to be substituted for HTML template placeholders.
+  const paramData = parameters(fn, sourceData, testData, scoreData, scoreProc, version, orgData);
+  // Replace the placeholders.
+  const htmlReport = template.replace(/__([a-zA-Z]+)__/g, (placeHolder, param) => paramData[param]);
+  fs.writeFileSync(`${dir}/htmlReports/${fileBase}.html`, htmlReport);
 });
-fs.writeFileSync(
-  `${dir}/deficit.json`, `${JSON.stringify(data, null, 2)}\n`
-);
