@@ -28,7 +28,7 @@ fileNames.forEach((fn, index) => {
   }
   if (deficitData.result && deficitData.result.deficit) {
     const summary = {
-      fileName: fn,
+      fileBase: fn.slice(0, -5),
       org: orgData.what,
       url: orgData.which,
       deficit: deficitData.result.deficit

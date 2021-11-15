@@ -63,7 +63,7 @@ const tableMidLines = result.map(item => {
   const pageCell = `<th scope="row"><a href="${item.url}">${item.org}</a></th>`;
   const numCells = [];
   if (propNames.includes('total')) {
-    numCells.push(`<td><a href="data/${item.fileName}">${item.deficit.total}</a></td>`);
+    numCells.push(`<td><a href="reports/${item.fileBase}.html">${item.deficit.total}</a></td>`);
   }
   propNames.filter(name => name !== 'total').forEach(name => {
     const itemScore = item.deficit[name];
