@@ -3,6 +3,10 @@ exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData, test
   .toString()
   .replace(/&/g, '&amp;')
   .replace(/</g, '&lt;');
+  const succeedText = package => `The page passed all ${package} tests.`
+  const failText = (score, package, failures) =>
+    `The page received a deficit score of ${score} on ${package} because of one or more failures on:`;
+  
   const paramData = {};
   const date = new Date();
   paramData.dateISO = date.toISOString().slice(0, 10);
@@ -15,12 +19,21 @@ exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData, test
   paramData.url = orgData.which;
   const joiner = '\n        ';
   const innerJoiner = '\n            ';
+  const {deficit} = scoreData;
+  paramData.totalScore = deficit.total;
   paramData.axeScore = deficit.axe;
-  paramData.axeResult = deficit.axe ? 'failed these Axe tests:' : 'passed all the Axe tests';
+  if (deficit.axe) {
+    const axeFailures = testData.axe.result.items.map(
+      item => `<li>${item.rule}: ${htmlEscape(item.description)}</li>`
+    ).join(joiner);
+    paramData.axeResult = `${failedText('Axe', deficit.axe)}:${joiner}${axeFailures}`;
+  }
+  else {
+    paramData.axeResult = '<strong>passed</strong> all Axe tests.';
+  }
   paramData.axeFailures = testData.axe.result.items.map(
     item => `<li>${item.rule}: ${htmlEscape(item.description)}</li>`
   ).join(joiner);
-  const {deficit} = scoreData;
   paramData.ibmFailures = Array.from(new Set(testData.ibm.result.content.items.map(
     item => `<li>${item.ruleId}: ${htmlEscape(item.message)}</li>`
   )).values()).join(joiner);
