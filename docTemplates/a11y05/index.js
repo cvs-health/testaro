@@ -1,4 +1,4 @@
-exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData) => {
+exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData, testDate) => {
   const htmlEscape = textOrNumber => textOrNumber
   .toString()
   .replace(/&/g, '&amp;')
@@ -8,17 +8,19 @@ exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData) => {
   paramData.dateISO = date.toISOString().slice(0, 10);
   paramData.dateSlash = paramData.dateISO.replace(/-/g, '/');
   paramData.file = fn;
+  paramData.testDate = testDate;
   paramData.scoreProc = scoreProc;
   paramData.version = version;
   paramData.org = orgData.what;
   paramData.url = orgData.which;
   const joiner = '\n        ';
   const innerJoiner = '\n            ';
+  paramData.axeScore = deficit.axe;
+  paramData.axeResult = deficit.axe ? 'failed these Axe tests:' : 'passed all the Axe tests';
   paramData.axeFailures = testData.axe.result.items.map(
     item => `<li>${item.rule}: ${htmlEscape(item.description)}</li>`
   ).join(joiner);
   const {deficit} = scoreData;
-  paramData.axeScore = deficit.axe;
   paramData.ibmFailures = Array.from(new Set(testData.ibm.result.content.items.map(
     item => `<li>${item.ruleId}: ${htmlEscape(item.message)}</li>`
   )).values()).join(joiner);

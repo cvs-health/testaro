@@ -26,6 +26,7 @@ fileNames.forEach(fn => {
   const sourceJSON = fs.readFileSync(`${dir}/jsonReports/${fn}`, 'utf8');
   const sourceData = JSON.parse(sourceJSON);
   // Get its data.
+  const {testDate} = sourceData;
   const testActs = sourceData.acts.filter(act => act.type === 'test');
   const testData = {};
   testActs.forEach(act => {
@@ -36,7 +37,7 @@ fileNames.forEach(fn => {
   version || (version = scoreData.version);
   const orgData = sourceData.acts.find(act => act.type === 'url');
   // Compute the values to be substituted for HTML template placeholders.
-  const paramData = parameters(fn, testData, scoreData, scoreProc, version, orgData);
+  const paramData = parameters(fn, testData, scoreData, scoreProc, version, orgData, testDate);
   // Replace the placeholders.
   const htmlReport = template
   .replace(/__([a-zA-Z]+)__/g, (placeHolder, param) => paramData[param]);

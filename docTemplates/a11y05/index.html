@@ -19,16 +19,12 @@
         <p class="summary">Autotest <code>__scoreProc__</code>, version __version__, report for __org__</p>
       </header>
       <h2>Introduction</h2>
-      <p>This report summarizes findings of a battery of tests of the accessibility of a <a href="__url__">web page belonging to __org__</a>. The tests were performed by version __version__ of the <code>__scoreProc__</code> procedure of <a href="https://jpdev.pro/jpdev/blog/entries/0020/index.html">Autotest</a>. This is one among a <a href="../">batch of pages tested</a>. This summary is based on a <a href="../jsonReports/__file__">file containing the results in JSON format</a>.</p>
-      <h2>Testing failures</h2>
-      <p>Some pages prevent some of the tests in this procedure from being performed. This may occur, for example, when a page tries to block any visitor that is not a real human being. The procedure assigns deficit scores when pages prevent tests. This treatment indicates that preventing accessibility testing is itself an accessibility deficiency, because:</p>
-      <ul>
-        <li>Measuring success is a prerequisite for achieving success, so interfering with accessibility measurement interferes with accessibility.</li>
-        <li>Users with disabilities often rely on assistive technologies to mediate between them and web applications. The owner of a website cannot know what assistive technologies users will employ. Whatever measures interfere with automated testing are at risk of interfering with some assistive technologies, too.</li>
-      </ul>
+      <p>A <a href="__url__">web page belonging to __org__</a> received a <q>deficit score</q> of __totalScore__ on accessibility in a <a href="../">batch of tests</a>. This report explains how that score was computed.</p>
+      <p>The tests were performed by version __version__ of the <code>__scoreProc__</code> procedure of <a href="https://jpdev.pro/jpdev/blog/entries/0020/index.html">Autotest</a> and computed in a <a href="../jsonReports/__file__">JSON-format file</a>. Below is an explanation of the data in that file.</p>
       <h2>Test packages</h2>
+      <p>Most of the tests belonged to accessibility test packages created by other specialists.</p>
       <h3>Axe</h3>
-      <p><a href="https://github.com/dequelabs/axe-core">Axe</a> is an open-source package sponsored by accessibility consulting firm Deque. The procedure performs all 138 of the default Axe tests. If this page failed any of the Axe tests, the failed tests are listed here:</p>
+      <p><a href="https://github.com/dequelabs/axe-core">Axe</a> is an open-source package sponsored by accessibility consulting firm Deque. The procedure performs all 138 of the default Axe tests. The page <strong>__axeResult__</strong></p>
       <ul>
         __axeFailures__
       </ul>
@@ -93,6 +89,12 @@
         __focAllFailures__
       </ul>
       <p>The deficit score of this page from the <code>focAll</code> test was __focAllScore__.</p>
+      <h2>Testing failures</h2>
+      <p>Some pages prevent some of the tests in this procedure from being performed. This may occur, for example, when a page tries to block any visitor that is not a real human being. The procedure assigns deficit scores when pages prevent tests. This treatment indicates that preventing accessibility testing is itself an accessibility deficiency, because:</p>
+      <ul>
+        <li>Measuring success is a prerequisite for achieving success, so interfering with accessibility measurement interferes with accessibility.</li>
+        <li>Users with disabilities often rely on assistive technologies to mediate between them and web applications. The owner of a website cannot know what assistive technologies users will employ. Whatever measures interfere with automated testing are at risk of interfering with some assistive technologies, too.</li>
+      </ul>
       <footer>
         <p>This work is entirely my own and does not represent my employer, CVS Health.</p>
         <p class="date">Produced <time itemprop="datePublished" datetime="__dateISO__">__dateSlash__</time></p>

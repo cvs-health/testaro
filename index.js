@@ -914,6 +914,7 @@ const scriptHandler = async (
   report.batch = query.batchName;
   report.what = what;
   report.strict = strict;
+  report.testDate = new Date().toISOString().slice(0, 10);
   report.timeStamp = query.timeStamp;
   report.logCount = 0;
   report.logSize = 0;
