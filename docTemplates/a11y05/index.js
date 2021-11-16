@@ -3,10 +3,11 @@ exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData, test
   .toString()
   .replace(/&/g, '&amp;')
   .replace(/</g, '&lt;');
-  const succeedText = package => `The page passed all ${package} tests.`
-  const failText = (score, package, failures) =>
-    `The page received a deficit score of ${score} on ${package} because of one or more failures on:`;
-  
+  const joiner = '\n        ';
+  const innerJoiner = '\n            ';
+  const succeedText = package => `<p>The page passed all ${package} tests.</p>`;
+  const failText = (score, package, code, failures) =>
+    `<p>The page received a deficit score of ${score} on ${package}. The details are in the <a href="../jsonReports/${fn}">JSON-format file</a>, in the section starting with <code>"which": "${code}". There was at least one failure of:</p>\n${joiner}<ul>${innerJoiner}${failures}\n${joiner}</ul>`;
   const paramData = {};
   const date = new Date();
   paramData.dateISO = date.toISOString().slice(0, 10);
@@ -17,27 +18,26 @@ exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData, test
   paramData.version = version;
   paramData.org = orgData.what;
   paramData.url = orgData.which;
-  const joiner = '\n        ';
-  const innerJoiner = '\n            ';
   const {deficit} = scoreData;
   paramData.totalScore = deficit.total;
-  paramData.axeScore = deficit.axe;
   if (deficit.axe) {
     const axeFailures = testData.axe.result.items.map(
       item => `<li>${item.rule}: ${htmlEscape(item.description)}</li>`
-    ).join(joiner);
-    paramData.axeResult = `${failedText('Axe', deficit.axe)}:${joiner}${axeFailures}`;
+    ).join(innerJoiner);
+    paramData.axeResult = failText(deficit.axe, 'Axe', 'axe', axeFailures);
   }
   else {
-    paramData.axeResult = '<strong>passed</strong> all Axe tests.';
+    paramData.axeResult = succeedText('Axe');
   }
-  paramData.axeFailures = testData.axe.result.items.map(
-    item => `<li>${item.rule}: ${htmlEscape(item.description)}</li>`
-  ).join(joiner);
+  paramData.ibmScore = deficit.ibm;
+  if (deficit.ibm) {
+    const ibmFailures = Array.from(new Set(testData.ibm.result.content.items.map(
+      item => `<li>${item.ruleId}: ${htmlEscape(item.message)}</li>`
+    )).values()).join(joiner);
+  }
   paramData.ibmFailures = Array.from(new Set(testData.ibm.result.content.items.map(
     item => `<li>${item.ruleId}: ${htmlEscape(item.message)}</li>`
   )).values()).join(joiner);
-  paramData.ibmScore = deficit.ibm;
   const waveResult = testData.wave.result.categories;
   paramData.waveErrors = Object
   .keys(waveResult.error.items)
