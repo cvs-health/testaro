@@ -15,10 +15,12 @@
     <main>
       <header>
         <h1>Accessibility test report</h1>
-        <p class="summary">Autotest <code>__scoreProc__</code>, version __version__, report for __org__</p>
+        <p class="summary">__org__</p>
+        <p class="summary">Autotest <code>__scoreProc__</code>, version __version__</p>
+        <p class="summary">Deficit score: __totalScore__</p>
       </header>
       <h2>Introduction</h2>
-      <p>In a <a href="../">comparison</a> of the <a hrlef="https://www.w3.org/WAI/fundamentals/">accessibility</a> of web pages, a <a href="__url__">page belonging to __org__</a> received a <q>deficit score</q> of __totalScore__. This report explains how that score was computed.</p>
+      <p>In a <a href="../">comparison</a> of the <a hrlef="https://www.w3.org/WAI/fundamentals/">accessibility</a> of web pages, <a href="__url__">__org__</a> received a <q>deficit score</q> of __totalScore__. This report explains how that score was computed.</p>
       <p>The pages were tested with version __version__ of the <code>__scoreProc__</code> procedure of <a href="https://jpdev.pro/jpdev/blog/entries/0020/index.html">Autotest</a>. A total of 427 tests were performed on each page. The resulting data were saved in a <a href="../jsonReports/__file__">JSON-format file</a>.</p>
       <h2>Test packages</h2>
       <p>Most of the tests belonged to accessibility test packages created by other specialists.</p>
@@ -32,7 +34,7 @@
       __waveResult__
       <p><a href="https://wave.webaim.org/">WAVE</a> is a proprietary package owned by webAIM, a program of the Institute for Disability Research, Policy, and Practice at Utah State University. The procedure performs all 110 of its default tests.</p>
       <h2>Custom tests</h2>
-      <p>The tests in the above packages are designed to detect some, not all, accessibility problems. I have created more tests and included them in this procedure to detect some problems not detected by the test packages.</p>
+      <p>The tests in the above packages are designed to detect some, not all, accessibility problems. The procedure includes custom tests that supplement the tests of the packages.</p>
       <h3><code>bulk</code></h3>
       __bulkResult__
       <p>The <code>bulk</code> test counts the initially visible elements in a page. A page with a large count tends to be complex and busy, frustrating some users, especially if they have visual or motor disabilities, as they try to determine what the page is about, whether it is relevant, and how to find a specific thing in it.</p>
@@ -45,19 +47,28 @@
       <p>The <code>focAll</code> test detects discrepancies between focusable and Tab-focused element counts. Navigating with the Tab key normally moves the focus and does nothing else. If it also adds or fails to focus focusable elements, this complicates navigation and may make the page unusable for people who must use only a keyboard (not a mouse) or a keyboard-emulating assistive device to navigate.</p>
       <h3><code>focInd</code></h3>
       __focIndResult__
-      <p>The <code>focInd</code> test detects focusable elements without standard focus indicators. An outline is the standard and most recognizable focus indicator; as you repeatedly press the Tab key, the outline moves through the page. Other focus indicators are more likely to be misunderstood. For example, underlines may be mistaken for selection indicators. An absent focus indicator prevents the user from knowing what a keyboard action will act on.</p>
+      <p>The <code>focInd</code> test detects focusable elements without standard focus indicators. An outline is the standard and most recognizable focus indicator; as you repeatedly press the Tab key, the outline moves through the page. Other focus indicators are more likely to be misunderstood. For example, underlines may be mistaken for selection indicators or links. An absent focus indicator prevents the user from knowing what a keyboard action will act on.</p>
       <h3><code>focOp</code></h3>
       __focOpResult__
-      <p>The <code>focOp</code> test detects descrepancies between Tab-focusability and operability. The standard practice is to make focusable elements operable and vice versa. If focusable elements are not operable, users are likely to be surprised that nothing happens when they try to operate such elements. If operable elements are not focusable, users depending on keyboard navigation are prevented from operating those elements. The test considers an element operable if it has a non-inherited pointer cursor and is not a <code>LABEL</code> element, or has an operable tag name (<code>A</code>, <code>BUTTON</code>, <code>IFRAME</code>, <code>INPUT</code>, <code>SELECT</code>, <code>TEXTAREA</code>, or has an <code>onclick</code> attribute. The test considers an element Tab-focusable if its <code>tabIndex</code> property has the value 0.</p>
+      <p>The <code>focOp</code> test detects descrepancies between Tab-focusability and operability. The standard practice is to make focusable elements operable and vice versa. If focusable elements are not operable, users are likely to be surprised that nothing happens when they try to operate such elements. If operable elements are not focusable, users depending on keyboard navigation are prevented from operating those elements. The test considers an element operable if it has a non-inherited pointer cursor and is not a <code>LABEL</code> element, or has an operable tag name (<code>A</code>, <code>BUTTON</code>, <code>IFRAME</code>, <code>INPUT</code>, <code>SELECT</code>, or <code>TEXTAREA</code>), or has an <code>onclick</code> attribute. The test considers an element Tab-focusable if its <code>tabIndex</code> property has the value 0.</p>
       <h3><code>hover</code></h3>
       __hoverResult__
-      <p>The <code>hover</code> test detects unexpected effects of hovering, beyond merely showing the user which element is currently being hovered over (and would therefore be the target of a mouse click). The unexpected effects include elements that are made visible, elements whose opacities are changed, elements whose opacities may be affected by opacity changes of their ancestors, and elements that cannot be hovered over. Only visible elements that have <code>A</code>, <code>BUTTON</code>, and <code>LI</code> tag names or have <code>onmouseenter</code> or <code>onmouseover</code> attributes are considered as triggers of such effects when hovered over. The elements considered when the effects of hovering are examined are the descendants of the grandparent of the element hovered over if that element has the tag name <code>A</code> or <code>BUTTON</code> or otherwise the descendants of the element. The only elements counted as being made visible by hovering are those with tag names <code>A</code>, <code>BUTTON</code>, <code>INPUT</code>, and <code>SPAN</code>, and those with <code>role="menuitem"</code> attributes.</p>
+      <p>The <code>hover</code> test detects unexpected effects of hovering. The normal purpose of hovering is to show the user which element is currently being actually or effectively hovered over and would therefore be the target of a mouse click. When hovering does more than that, the additional effects can confuse or startle users, especially those without precise mouse control. The test detects whether hovering makes elements visible, changes the opacities of elements, affects the opacities of elements by changing the opacities of their ancestors, and fails to reach elements. Only visible elements that have <code>A</code>, <code>BUTTON</code>, and <code>LI</code> tag names or have <code>onmouseenter</code> or <code>onmouseover</code> attributes are considered as triggers of such effects when hovered over. The effects of hovering are inspected for the descendants of the grandparent of the trigger if the trigger has the tag name <code>A</code> or <code>BUTTON</code>, or otherwise the descendants of the trigger. The only elements counted as being made visible by hovering are those with tag names <code>A</code>, <code>BUTTON</code>, <code>INPUT</code>, and <code>SPAN</code>, and those with <code>role="menuitem"</code> attributes.</p>
       <h3><code>labClash</code></h3>
       __labClashResult__
       <p>The <code>labClash</code> test detects defects in the labeling of buttons, non-hidden inputs, select lists, and text areas. The defects include missing labels and redundant labels. Redundant labels are labels that are superseded by other labels. Explicit and implicit (wrapped) labels are additive, not conflicting.</p>
       <h3><code>linkUl</code></h3>
       __linkUlResult__
       <p>The <code>linkUl</code> test detects failures to underline inline links. Underlining and color are the traditional style properties that identify links. Collections of links in blocks can sometimes be recognized without underlines, but inline links are difficult or impossible to distinguish visually from surrounding text if not underlined. Underlining inline links only on hover provides an indicator valuable only to mouse users, and even they must traverse the text with a mouse merely to discover which passages are links.</p>
+      <h3><code>menuNav</code></h3>
+      __menuNavResult__
+      <p>The <code>menuNav</code> test detects nonstandard keyboard navigation among menu items in menus that manage the focus of their menu items. Menus that use pseudofocus with the <code>aria-activedescendant</code> attribute are not tested. The test is based on <a href="https://www.w3.org/TR/wai-aria-practices-1.1/#menu">WAI-ARIA recommendations</a>.</p>
+      <h3><code>radioSet</code></h3>
+      __radioSetResult__
+      <p>The <code>radioSet</code> test detects nonstandard groupings of radio buttons. It defines the standard to require that two or more radio buttons with the same name, and no other radio buttons, be grouped in a <code>fieldset</code> element with a valid <code>legend</code> element.</p>
+      <h3><code>role</code></h3>
+      __roleResult__
+      <p>The <code>role</code> test detects nonstandard and confusing role assignments. It is inspired by the <a href="https://www.w3.org/TR/wai-aria/#roles_categorization">WAI-ARIA recommendations on roles</a> and their <a href="https://www.w3.org/TR/html-aria/">authoring rules</a>. Abstract roles and roles that are implicit in HTML elements fail the test. The <code>math</code> role has been removed, because of poor adoption and exclusion from HTML5. The <code>img</code> role <a href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/Role_Img">has accessibility uses</a>, so does not fail the test, although implicit in the HTML <code>img</code> element.</p>
       <h2>Testing failures</h2>
       <p>Some pages prevent some of the tests in this procedure from being performed. This may occur, for example, when a page tries to block any visitor that is not a real human being. The procedure assigns deficit scores when pages prevent tests. This treatment indicates that preventing accessibility testing is itself an accessibility deficiency, because:</p>
       <ul>

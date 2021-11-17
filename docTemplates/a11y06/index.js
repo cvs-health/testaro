@@ -75,7 +75,7 @@ exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData, test
     paramData.waveResult = packageSucceedText('WAVE');
   }
   if (deficit.bulk) {
-    paramData.bulkResult = `The count for this page was ${testData.bulk.result.visibleElements}, resulting in a deficit score of ${deficit.bulk} on <code>bulk</code>.`;
+    paramData.bulkResult = `The page <strong>did not pass</strong> the <code>bulk</code> test. The count of visible elements in the page was ${testData.bulk.result.visibleElements}, resulting in a deficit score of ${deficit.bulk} on <code>bulk</code>.`;
   }
   else {
     paramData.bulkResult = customSucceedText('bulk');
@@ -140,6 +140,35 @@ exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData, test
   }
   else {
     paramData.linkUlResult = customSucceedText('linkUl');
+  }
+  if (deficit.menuNav) {
+    const failSource = customFailures(testData.menuNav.result.totals);
+    const failObj = {
+      navigations: failSource.navigations.all,
+      menuItems: failSource.menuItems,
+      menus: failSource.menus
+    };
+    const failures = customFailures(failObj);
+    paramData.menuNavResult = customResult(deficit.menuNav, 'menuNav', failures);
+  }
+  else {
+    paramData.menuNavResult = customSucceedText('menuNav');
+  }
+  if (deficit.radioSet) {
+    const failures = customFailures(testData.ratioSet.result.totals);
+    paramData.radioSetResult = customResult(deficit.radioSet, 'radioSet', failures);
+  }
+  else {
+    paramData.radioSetResult = customSucceedText('radioSet');
+  }
+  if (deficit.role) {
+    const {result} = testData.role;
+    delete result.tagNames;
+    const failures = customFailures(result);
+    paramData.roleResult = customResult(deficit.role, 'role', failures);
+  }
+  else {
+    paramData.roleResult = customSucceedText('role');
   }
   return paramData;
 };
