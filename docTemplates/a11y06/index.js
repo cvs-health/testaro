@@ -12,7 +12,7 @@ exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData, test
   const packageSucceedText = package =>
     `<p>The page <strong>passed</strong> all ${package} tests.</p>`;
   const packageFailText = (score, package, code, failures) =>
-    `<p>The page <strong>did not pass</strong> all ${package} tests and received a deficit score of ${score} on ${package}. The details are in the <a href="../jsonReports/${fn}">JSON-format file</a>, in the section starting with <code>"which": "${code}"</code>. There was at least one <strong>failure</strong> of:</p>${joiner}<ul>${innerJoiner}${failures}${joiner}</ul>`;
+    `<p>The page <strong>did not pass</strong> all ${package} tests and received a deficit score of ${score} on ${package}. The details are in the <a href="../jsonReports/${fn}">JSON-format file</a>, in the section starting with <code>"which": "${code}"</code>. There was at least one failure of:</p>${joiner}<ul>${innerJoiner}${failures}${joiner}</ul>`;
   // Creates messages about results of custom tests.
   const customSucceedText =
     test => `<p>The page <strong>passed</strong> the <code>${test}</code> test.</p>`;
@@ -169,6 +169,41 @@ exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData, test
   }
   else {
     paramData.roleResult = customSucceedText('role');
+  }
+  if (deficit.styleDiff) {
+    const {totals} = testData.styleDiff.result;
+    const styleCounts = {};
+    Object.keys(totals).forEach(key => {
+      const data = totals[key];
+      const count = data.subtotals ? data.subtotals.length : 1;
+      styleCounts[key] = `${count} ${count === 1 ? 'style' : 'different styles'}`;
+    });
+    const failures = customFailures(styleCounts);
+    paramData.styleDiffResult = customResult(deficit.styleDiff, 'styleDiff', failures);
+  }
+  else {
+    paramData.roleResult = customSucceedText('role');
+  }
+  if (deficit.tabNav) {
+    const failSource = customFailures(testData.tabNav.result.totals);
+    const failObj = {
+      navigations: failSource.navigations.all,
+      tabElements: failSource.tabElements,
+      tabLists: failSource.tabLists
+    };
+    const failures = customFailures(failObj);
+    paramData.tabNavResult = customResult(deficit.tabNav, 'tabNav', failures);
+  }
+  else {
+    paramData.tabNavResult = customSucceedText('tabNav');
+  }
+  if (deficit.zIndex) {
+    const {tagNames} = testData.zIndex.result.totals;
+    const failures = customFailures(tagNames);
+    paramData.zIndexResult = customResult(deficit.zIndex, 'zIndex', failures);
+  }
+  else {
+    paramData.zIndexResult = customSucceedText('zIndex');
   }
   return paramData;
 };

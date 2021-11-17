@@ -1,12 +1,11 @@
 /*
   zIndex
-  This test reports elements with non-auto z indexes.
-
-  It assumes that pages are most accessible when they do not require users to perceive a third
-  dimension (depth). Layers, popups, and dialogs that cover other content make it difficult for
-  some or all users to interpret the content and know what parts of the content can be acted on.
-  Layering also complicates accessibility control. Tests for visibility of focus, for example,
-  may fail if incapable of detecting that a focused element is covered by another element.
+  This test reports elements with non-auto z indexes. It assumes that pages are most accessible
+  when they do not require users to perceive a third dimension (depth). Layers, popups, and dialogs
+  that cover other content make it difficult for some or all users to interpret the content and
+  know what parts of the content can be acted on. Layering also complicates accessibility control.
+  Tests for visibility of focus, for example, may fail if incapable of detecting that a focused
+  element is covered by another element.
 */
 exports.reporter = async (page, withItems) => {
   // Get data on the elements with non-auto z indexes.

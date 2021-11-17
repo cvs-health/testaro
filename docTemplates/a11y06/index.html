@@ -23,7 +23,7 @@
       <p>In a <a href="../">comparison</a> of the <a hrlef="https://www.w3.org/WAI/fundamentals/">accessibility</a> of web pages, <a href="__url__">__org__</a> received a <q>deficit score</q> of __totalScore__. This report explains how that score was computed.</p>
       <p>The pages were tested with version __version__ of the <code>__scoreProc__</code> procedure of <a href="https://jpdev.pro/jpdev/blog/entries/0020/index.html">Autotest</a>. A total of 427 tests were performed on each page. The resulting data were saved in a <a href="../jsonReports/__file__">JSON-format file</a>.</p>
       <h2>Test packages</h2>
-      <p>Most of the tests belonged to accessibility test packages created by other specialists.</p>
+      <p>Most of the tests belonged to the following three accessibility test packages created by other specialists.</p>
       <h3>Axe</h3>
       __axeResult__
       <p><a href="https://github.com/dequelabs/axe-core">Axe</a> is an open-source package sponsored by accessibility consulting firm Deque. The procedure performs all 138 of the default Axe tests.</p>
@@ -34,7 +34,7 @@
       __waveResult__
       <p><a href="https://wave.webaim.org/">WAVE</a> is a proprietary package owned by webAIM, a program of the Institute for Disability Research, Policy, and Practice at Utah State University. The procedure performs all 110 of its default tests.</p>
       <h2>Custom tests</h2>
-      <p>The tests in the above packages are designed to detect some, not all, accessibility problems. The procedure includes custom tests that supplement the tests of the packages.</p>
+      <p>The tests in the above packages are designed to detect some, not all, accessibility problems. The procedure includes the following custom tests that supplement the tests of the packages.</p>
       <h3><code>bulk</code></h3>
       __bulkResult__
       <p>The <code>bulk</code> test counts the initially visible elements in a page. A page with a large count tends to be complex and busy, frustrating some users, especially if they have visual or motor disabilities, as they try to determine what the page is about, whether it is relevant, and how to find a specific thing in it.</p>
@@ -69,8 +69,17 @@
       <h3><code>role</code></h3>
       __roleResult__
       <p>The <code>role</code> test detects nonstandard and confusing role assignments. It is inspired by the <a href="https://www.w3.org/TR/wai-aria/#roles_categorization">WAI-ARIA recommendations on roles</a> and their <a href="https://www.w3.org/TR/html-aria/">authoring rules</a>. Abstract roles and roles that are implicit in HTML elements fail the test. The <code>math</code> role has been removed, because of poor adoption and exclusion from HTML5. The <code>img</code> role <a href="https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/Role_Img">has accessibility uses</a>, so does not fail the test, although implicit in the HTML <code>img</code> element.</p>
+      <h3><code>styleDiff</code></h3>
+      __styleDiffResult__
+      <p>The <code>styleDiff</code> test detects style inconsistencies among inline links, block links, buttons, and all 6 levels of headings. The principle of consistent identification requires using styles to help users classify content. For example, level-2 headings look the same, and they look different from level-1 headings. Ideally, then, for each of these element types, there would be exactly 1 style. The test considers the style properties <code>borderStyle</code>, <code>borderWidth</code>, <code>fontStyle</code>, <code>fontWeight</code>, <code>lineHeight</code>, <code>maxHeight</code>, <code>maxWidth</code>, <code>minHeight</code>, <code>minWidth</code>, <code>opacity</code>, <code>outlineOffset</code>, <code>outlineStyle</code>, <code>outlineWidth</code>, <code>textDecorationLine</code>, <code>textDecorationStyle</code>, and <code>textDecorationThickness</code>. For headings, it also considers the <code>fontSize</code> style property.</p>
+      <h3><code>tabNav</code></h3>
+      __tabNavResult__
+      <p>The <code>tabNav</code> test detects <a href="https://www.w3.org/TR/wai-aria-practices-1.1/#tabpanel">nonstandard keyboard navigation</a> among tab elements in tab lists. Tab lists let users choose which of several content blocks to display. The Tab key moves the focus into and out of a tab list, but the arrow, Home, and End keys move the focus from tab to tab.</p>
+      <h3><code>zIndex</code></h3>
+      __zIndexResult__
+      <p>The <code>zIndex</code> test detects elements with non-default z indexes. Pages present difficulty for some users when they require users to perceive a third dimension (depth) in the two-dimensional display. Layers, popups, and dialogs that cover other content make it difficult for some users to interpret the content and know what parts of the content can be acted on. Layering also complicates accessibility testing. Tests for visibility of focus, for example, may fail if a focused element is covered by another element.</p>
       <h2>Testing failures</h2>
-      <p>Some pages prevent some of the tests in this procedure from being performed. This may occur, for example, when a page tries to block any visitor that is not a real human being. The procedure assigns deficit scores when pages prevent tests. This treatment indicates that preventing accessibility testing is itself an accessibility deficiency, because:</p>
+      <p>Some pages prevent some of the tests in this procedure from being performed. This may occur, for example, when a page tries to block any non-human visitor. The procedure assigns deficit scores when pages prevent tests, because preventing accessibility testing is itself an accessibility deficiency. Specifically:</p>
       <ul>
         <li>Measuring success is a prerequisite for achieving success, so interfering with accessibility measurement interferes with accessibility.</li>
         <li>Users with disabilities often rely on assistive technologies to mediate between them and web applications. Measures that interfere with automated testing are at risk of interfering with some assistive technologies, too.</li>
