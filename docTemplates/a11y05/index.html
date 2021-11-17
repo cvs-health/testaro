@@ -35,22 +35,20 @@
       <h2>Custom tests</h2>
       <p>The tests in the above packages are designed to detect some, not all, accessibility problems. I have created more tests and included them in this procedure to detect some problems not detected by the test packages.</p>
       <h3><code>bulk</code></h3>
-      <p>The <code>bulk</code> test counts the initially visible elements in a page. Users with visual and motor disabilities (and not only they) often express frustration with content bloat. A complex, busy page usually makes it difficult to know what the page is about, whether it is relevant, and how to find a specific thing in it. This procedure begins to assign a deficit when the count exceeds 250. The count for this page was __bulkCount__, resulting in a deficit score of __bulkScore__ on <code>bulk</code>.</p>
+      <p>The <code>bulk</code> test counts the initially visible elements in a page. A page with a large count tends to be complex and busy, frustrating some users, especially if they have visual or motor disabilities, as they try to determine what the page is about, whether it is relevant, and how to find a specific thing in it.</p>
+      <p>When the count exceeds 250, the procedure begins to assign a non-zero deficit score.</p>
+      <p>__bulkResult__</p>
       <h3><code>embAc</code></h3>
       <p>The <code>embAc</code> test detects improper embedding of interactive elements (links, buttons, inputs, and select lists) within links or buttons. Such embedding violates the HTML standard, complicates user interaction, and creates risks of error. It becomes non-obvious what a user will activate with a click.</p>
       <p>__embAcResult__</p>
       <h3><code>focAll</code></h3>
-      <p>The <code>focAll</code> test detects discrepancies between focusable and Tab-focused element counts. The test first counts all the visible Tab-focusable (i.e. with tabIndex 0) elements (except counting each group of radio buttons as only one focusable element). In principle, by pressing the Tab key a user should be able to reach (i.e. focus) each of those elements. Then the test repeatedly presses the Tab (or Option-Tab in the webkit browser) key until it has focused all the elements it can and counts those elements. If the latter are more than the former, Tab-key navigation made more focusable elements visible. If the latter are fewer than the former, the page managed focus so as to prevent Tab-key navigation from focusing all the elements it would normally be able to focus. Either of these can complicate navigation for users. It may disappoint the expectation that the content will remain stable as they move with the Tab key, or the expectation that they can reach every focusable element (or widget, such as one radio button or tab in each group) merely by pressing the Tab key. This problem is acute for users who must use only a keyboard (not a mouse) or a keyboard-emulating assistive device to navigate.</p>
-      <p>If this page failed the <code>focAll</code> test, the counts of focusable and focused elements are listed here:</p>
-      <ul>
-        __focAllFailures__
-      </ul>
-      <p>The deficit score of this page from the <code>focAll</code> test was __focAllScore__.</p>
+      <p>The <code>focAll</code> test detects discrepancies between focusable and Tab-focused element counts. Navigating with the Tab key normally moves the focus and does nothing else. If it also adds or fails to focus focusable elements, this complicates navigation and may make the page unusable for people who must use only a keyboard (not a mouse) or a keyboard-emulating assistive device to navigate.</p>
+      <p>__focAllResult__</p>
       <h2>Testing failures</h2>
       <p>Some pages prevent some of the tests in this procedure from being performed. This may occur, for example, when a page tries to block any visitor that is not a real human being. The procedure assigns deficit scores when pages prevent tests. This treatment indicates that preventing accessibility testing is itself an accessibility deficiency, because:</p>
       <ul>
         <li>Measuring success is a prerequisite for achieving success, so interfering with accessibility measurement interferes with accessibility.</li>
-        <li>Users with disabilities often rely on assistive technologies to mediate between them and web applications. The owner of a website cannot know what assistive technologies users will employ. Whatever measures interfere with automated testing are at risk of interfering with some assistive technologies, too.</li>
+        <li>Users with disabilities often rely on assistive technologies to mediate between them and web applications. Measures that interfere with automated testing are at risk of interfering with some assistive technologies, too.</li>
       </ul>
       <footer>
         <p>This work is entirely my own and does not represent my employer, CVS Health.</p>
