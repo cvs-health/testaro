@@ -15,7 +15,6 @@
     <main>
       <header>
         <h1>Accessibility test report</h1>
-        <p class="author">Jonathan Robert Pool</p>
         <p class="summary">Autotest <code>__scoreProc__</code>, version __version__, report for __org__</p>
       </header>
       <h2>Introduction</h2>
@@ -44,6 +43,21 @@
       <h3><code>focAll</code></h3>
       __focAllResult__
       <p>The <code>focAll</code> test detects discrepancies between focusable and Tab-focused element counts. Navigating with the Tab key normally moves the focus and does nothing else. If it also adds or fails to focus focusable elements, this complicates navigation and may make the page unusable for people who must use only a keyboard (not a mouse) or a keyboard-emulating assistive device to navigate.</p>
+      <h3><code>focInd</code></h3>
+      __focIndResult__
+      <p>The <code>focInd</code> test detects focusable elements without standard focus indicators. An outline is the standard and most recognizable focus indicator; as you repeatedly press the Tab key, the outline moves through the page. Other focus indicators are more likely to be misunderstood. For example, underlines may be mistaken for selection indicators. An absent focus indicator prevents the user from knowing what a keyboard action will act on.</p>
+      <h3><code>focOp</code></h3>
+      __focOpResult__
+      <p>The <code>focOp</code> test detects descrepancies between Tab-focusability and operability. The standard practice is to make focusable elements operable and vice versa. If focusable elements are not operable, users are likely to be surprised that nothing happens when they try to operate such elements. If operable elements are not focusable, users depending on keyboard navigation are prevented from operating those elements. The test considers an element operable if it has a non-inherited pointer cursor and is not a <code>LABEL</code> element, or has an operable tag name (<code>A</code>, <code>BUTTON</code>, <code>IFRAME</code>, <code>INPUT</code>, <code>SELECT</code>, <code>TEXTAREA</code>, or has an <code>onclick</code> attribute. The test considers an element Tab-focusable if its <code>tabIndex</code> property has the value 0.</p>
+      <h3><code>hover</code></h3>
+      __hoverResult__
+      <p>The <code>hover</code> test detects unexpected effects of hovering, beyond merely showing the user which element is currently being hovered over (and would therefore be the target of a mouse click). The unexpected effects include elements that are made visible, elements whose opacities are changed, elements whose opacities may be affected by opacity changes of their ancestors, and elements that cannot be hovered over. Only visible elements that have <code>A</code>, <code>BUTTON</code>, and <code>LI</code> tag names or have <code>onmouseenter</code> or <code>onmouseover</code> attributes are considered as triggers of such effects when hovered over. The elements considered when the effects of hovering are examined are the descendants of the grandparent of the element hovered over if that element has the tag name <code>A</code> or <code>BUTTON</code> or otherwise the descendants of the element. The only elements counted as being made visible by hovering are those with tag names <code>A</code>, <code>BUTTON</code>, <code>INPUT</code>, and <code>SPAN</code>, and those with <code>role="menuitem"</code> attributes.</p>
+      <h3><code>labClash</code></h3>
+      __labClashResult__
+      <p>The <code>labClash</code> test detects defects in the labeling of buttons, non-hidden inputs, select lists, and text areas. The defects include missing labels and redundant labels. Redundant labels are labels that are superseded by other labels. Explicit and implicit (wrapped) labels are additive, not conflicting.</p>
+      <h3><code>linkUl</code></h3>
+      __linkUlResult__
+      <p>The <code>linkUl</code> test detects failures to underline inline links. Underlining and color are the traditional style properties that identify links. Collections of links in blocks can sometimes be recognized without underlines, but inline links are difficult or impossible to distinguish visually from surrounding text if not underlined. Underlining inline links only on hover provides an indicator valuable only to mouse users, and even they must traverse the text with a mouse merely to discover which passages are links.</p>
       <h2>Testing failures</h2>
       <p>Some pages prevent some of the tests in this procedure from being performed. This may occur, for example, when a page tries to block any visitor that is not a real human being. The procedure assigns deficit scores when pages prevent tests. This treatment indicates that preventing accessibility testing is itself an accessibility deficiency, because:</p>
       <ul>
@@ -51,7 +65,6 @@
         <li>Users with disabilities often rely on assistive technologies to mediate between them and web applications. Measures that interfere with automated testing are at risk of interfering with some assistive technologies, too.</li>
       </ul>
       <footer>
-        <p>This work is entirely my own and does not represent my employer, CVS Health.</p>
         <p class="date">Produced <time itemprop="datePublished" datetime="__dateISO__">__dateSlash__</time></p>
       </footer>
     </main>

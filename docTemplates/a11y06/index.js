@@ -1,4 +1,4 @@
-// a11y version 5 template placeholder replacements.
+// a11y version 6 template placeholder replacements.
 exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData, testDate) => {
   // Makes strings HTML-safe.
   const htmlEscape = textOrNumber => textOrNumber
@@ -17,7 +17,7 @@ exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData, test
   const customSucceedText =
     test => `<p>The page <strong>passed</strong> the <code>${test}</code> test.</p>`;
   const customFailText = (score, test) =>
-    `<p>The page <strong>did not pass</strong> the ${test} test and received a deficit score of ${score} on <code>${test}</code>. The details are in the <a href="../jsonReports/${fn}">JSON-format file</a>, in the section starting with <code>"which": "${test}".</p>`;
+    `<p>The page <strong>did not pass</strong> the <code>${test}</code> test and received a deficit score of ${score} on <code>${test}</code>. The details are in the <a href="../jsonReports/${fn}">JSON-format file</a>, in the section starting with <code>"which": "${test}"</code>.</p>`;
   const customFailures = failObj => Object
   .entries(failObj)
   .map(entry => `<li>${entry[0]}: ${entry[1]}</li>`)
@@ -93,6 +93,53 @@ exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData, test
   }
   else {
     paramData.focAllResult = customSucceedText('focAll');
+  }
+  if (deficit.focInd) {
+    const failSource = testData.focInd.result.totals.types;
+    const failObj = {
+      indicatorMissing: failSource.indicatorMissing.total,
+      nonOutlinePresent: failSource.nonOutlinePresent.total
+    };
+    const failures = customFailures(failObj);
+    paramData.focIndResult = customResult(deficit.focInd, 'focInd', failures);
+  }
+  else {
+    paramData.focIndResult = customSucceedText('focInd');
+  }
+  if (deficit.focOp) {
+    const failSource = testData.focOp.result.totals.types;
+    const failObj = {
+      onlyFocusable: failSource.onlyFocusable.total,
+      onlyOperable: failSource.onlyOperable.total
+    };
+    const failures = customFailures(failObj);
+    paramData.focOpResult = customResult(deficit.focOp, 'focOp', failures);
+  }
+  else {
+    paramData.focOpResult = customSucceedText('focOp');
+  }
+  if (deficit.hover) {
+    const failures = customFailures(testData.hover.result.totals);
+    paramData.hoverResult = customResult(deficit.hover, 'hover', failures);
+  }
+  else {
+    paramData.hoverResult = customSucceedText('hover');
+  }
+  if (deficit.labClash) {
+    const {totals} = testData.labClash.result;
+    delete totals.wellLabeled;
+    const failures = customFailures(totals);
+    paramData.labClashResult = customResult(deficit.labClash, 'labClash', failures);
+  }
+  else {
+    paramData.labClashResult = customSucceedText('labClash');
+  }
+  if (deficit.linkUl) {
+    const failures = customFailures(testData.linkUl.result.totals.inline);
+    paramData.linkUlResult = customResult(deficit.linkUl, 'linkUl', failures);
+  }
+  else {
+    paramData.linkUlResult = customSucceedText('linkUl');
   }
   return paramData;
 };

@@ -3,9 +3,9 @@
   Creates HTML reports from the JSON reports of a batch.
   Arguments:
     0. Subdirectory of the report directory.
-    2. Subdirectory of the docTemplates directory.
-    1. Score proc, if not in the JSON reports.
-    2. Score-proc version, if not in the JSON reports.
+    1. Subdirectory of the docTemplates directory.
+    2. Score proc, if not in the JSON reports.
+    3. Score-proc version, if not in the JSON reports.
 */
 // ########## IMPORTS
 // Module to access files.
