@@ -37,7 +37,9 @@ fileNames.forEach(fn => {
   version || (version = scoreData.version);
   const orgData = sourceData.acts.find(act => act.type === 'url');
   // Compute the values to be substituted for HTML template placeholders.
-  const paramData = parameters(fn, testData, scoreData, scoreProc, version, orgData, testDate);
+  const paramData = parameters(
+    fn, sourceData, testData, scoreData, scoreProc, version, orgData, testDate
+  );
   // Replace the placeholders.
   const htmlReport = template
   .replace(/__([a-zA-Z]+)__/g, (placeHolder, param) => paramData[param]);

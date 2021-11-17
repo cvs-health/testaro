@@ -1,5 +1,7 @@
 // a11y version 6 template placeholder replacements.
-exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData, testDate) => {
+exports.parameters = (
+  fn, sourceData, testData, scoreData, scoreProc, version, orgData, testDate
+) => {
   // Makes strings HTML-safe.
   const htmlEscape = textOrNumber => textOrNumber
   .toString()
@@ -141,6 +143,15 @@ exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData, test
   else {
     paramData.linkUlResult = customSucceedText('linkUl');
   }
+  if (deficit.log) {
+    const {logCount, logSize, visitRejectionCount, prohibitedCount, visitTimeoutCount} = sourceData;
+    const logData = {logCount, logSize, visitRejectionCount, prohibitedCount, visitTimeoutCount};
+    const failures = customFailures(logData);
+    paramData.logResult = customResult(deficit.log, 'log', failures);
+  }
+  else {
+    paramData.logResult = customSucceedText('log');
+  }
   if (deficit.menuNav) {
     const failSource = customFailures(testData.menuNav.result.totals);
     const failObj = {
@@ -154,8 +165,19 @@ exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData, test
   else {
     paramData.menuNavResult = customSucceedText('menuNav');
   }
+  if (deficit.motion) {
+    const {result} = testData.motion;
+    result.bytes = result.bytes.join(', ');
+    result.localRatios = result.localRatios.join(', ');
+    result.pixelChanges = result.pixelChanges.join(', ');
+    const failures = customFailures(result);
+    paramData.motionResult = customResult(deficit.motion, 'motion', failures);
+  }
+  else {
+    paramData.motionResult = customSucceedText('motion');
+  }
   if (deficit.radioSet) {
-    const failures = customFailures(testData.ratioSet.result.totals);
+    const failures = customFailures(testData.radioSet.result.totals);
     paramData.radioSetResult = customResult(deficit.radioSet, 'radioSet', failures);
   }
   else {
