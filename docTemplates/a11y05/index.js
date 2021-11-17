@@ -6,15 +6,16 @@ exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData, test
   .replace(/&/g, '&amp;')
   .replace(/</g, '&lt;');
   // Newlines with indentations.
-  const joiner = '\n        ';
-  const innerJoiner = '\n            ';
+  const joiner = '\n      ';
+  const innerJoiner = '\n        ';
   // Creates messages about results of packaged tests.
   const packageSucceedText = package =>
     `<p>The page <strong>passed</strong> all ${package} tests.</p>`;
   const packageFailText = (score, package, code, failures) =>
-    `<p>The page received a deficit score of ${score} on ${package}. The details are in the <a href="../jsonReports/${fn}">JSON-format file</a>, in the section starting with <code>"which": "${code}". There was at least one <strong>failure</strong> of:</p>\n${joiner}<ul>${innerJoiner}${failures}\n${joiner}</ul>`;
+    `<p>The page received a deficit score of ${score} on ${package}. The details are in the <a href="../jsonReports/${fn}">JSON-format file</a>, in the section starting with <code>"which": "${code}"</code>. There was at least one <strong>failure</strong> of:</p>${joiner}<ul>${innerJoiner}${failures}${joiner}</ul>`;
   // Creates messages about results of custom tests.
-  const customSucceedText = test => `<p>The page <strong>passed</strong> the ${test} test.</p>`;
+  const customSucceedText =
+    test => `<p>The page <strong>passed</strong> the <code>${test}</code> test.</p>`;
   const customFailText = (score, test) =>
     `<p>The page received a deficit score of ${score} on <code>${test}</code>. The details are in the <a href="../jsonReports/${fn}">JSON-format file</a>, in the section starting with <code>"which": "${test}".</p>`;
   const customFailures = failObj => Object
@@ -22,9 +23,9 @@ exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData, test
   .map(entry => `<li>${entry[0]}: ${entry[1]}</li>`)
   .join(innerJoiner);
   const customFailMore = failures =>
-    `<p>Summary of the details:</p>\n${joiner}<ul>${innerJoiner}${failures}\n${joiner}</ul>`;
+    `<p>Summary of the details:</p>${joiner}<ul>${innerJoiner}${failures}${joiner}</ul>`;
   const customResult = (score, test, failures) =>
-    `${customFailText(score, test)}\n${joiner}${customFailMore(failures)}`;
+    `${customFailText(score, test)}${joiner}${customFailMore(failures)}`;
   // Get general data for scoreDoc.
   const paramData = {};
   const date = new Date();
@@ -51,7 +52,7 @@ exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData, test
   if (deficit.ibm) {
     const ibmFailures = Array.from(new Set(testData.ibm.result.content.items.map(
       item => `<li>${item.ruleId}: ${htmlEscape(item.message)}</li>`
-    )).values()).join(joiner);
+    )).values()).join(innerJoiner);
     paramData.ibmResult = packageFailText(deficit.ibm, 'Equal Access', 'ibm', ibmFailures);
   }
   else {
@@ -67,7 +68,7 @@ exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData, test
         .map(entry => `<li>${category}/${entry[0]}: ${entry[1].description}</li>`)
       );
     });
-    const waveFailures = waveItems.join(joiner);
+    const waveFailures = waveItems.join(innerJoiner);
     paramData.waveResult = packageFailText(deficit.wave, 'WAVE', 'wave', waveFailures);
   }
   else {
@@ -83,7 +84,10 @@ exports.parameters = (fn, testData, scoreData, scoreProc, version, orgData, test
   }
   if (deficit.focAll) {
     const failures = customFailures(testData.focAll.result);
-    paramData.focAllResult= customResult(deficit.focAll, 'focAll', failures);
+    paramData.focAllResult = customResult(deficit.focAll, 'focAll', failures);
+  }
+  else {
+    paramData.focAllResult = customSucceedText('focAll');
   }
   return paramData;
 };

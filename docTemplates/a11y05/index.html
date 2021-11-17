@@ -25,25 +25,25 @@
       <p>Most of the tests belonged to accessibility test packages created by other specialists.</p>
       <h3>Axe</h3>
       <p><a href="https://github.com/dequelabs/axe-core">Axe</a> is an open-source package sponsored by accessibility consulting firm Deque. The procedure performs all 138 of the default Axe tests.</p>
-      <p>__axeResult__</p>
+      __axeResult__
       <h3>Equal Access</h3>
       <p><a href="https://github.com/IBMa/equal-access">Equal Access</a> is an open-source package sponsored by IBM Corporation. The procedure performs all 163 of its default tests.</p>
-      <p>__ibmResult__</p>
+      __ibmResult__
       <h3>WAVE</h3>
       <p><a href="https://wave.webaim.org/">WAVE</a> is a proprietary package owned by webAIM, a program of the Institute for Disability Research, Policy, and Practice at Utah State University. The procedure performs all 110 of its default tests.</p>
-      <p>__waveResult__</p>
+      __waveResult__
       <h2>Custom tests</h2>
       <p>The tests in the above packages are designed to detect some, not all, accessibility problems. I have created more tests and included them in this procedure to detect some problems not detected by the test packages.</p>
       <h3><code>bulk</code></h3>
       <p>The <code>bulk</code> test counts the initially visible elements in a page. A page with a large count tends to be complex and busy, frustrating some users, especially if they have visual or motor disabilities, as they try to determine what the page is about, whether it is relevant, and how to find a specific thing in it.</p>
       <p>When the count exceeds 250, the procedure begins to assign a non-zero deficit score.</p>
-      <p>__bulkResult__</p>
+      __bulkResult__
       <h3><code>embAc</code></h3>
       <p>The <code>embAc</code> test detects improper embedding of interactive elements (links, buttons, inputs, and select lists) within links or buttons. Such embedding violates the HTML standard, complicates user interaction, and creates risks of error. It becomes non-obvious what a user will activate with a click.</p>
-      <p>__embAcResult__</p>
+      __embAcResult__
       <h3><code>focAll</code></h3>
       <p>The <code>focAll</code> test detects discrepancies between focusable and Tab-focused element counts. Navigating with the Tab key normally moves the focus and does nothing else. If it also adds or fails to focus focusable elements, this complicates navigation and may make the page unusable for people who must use only a keyboard (not a mouse) or a keyboard-emulating assistive device to navigate.</p>
-      <p>__focAllResult__</p>
+      __focAllResult__
       <h2>Testing failures</h2>
       <p>Some pages prevent some of the tests in this procedure from being performed. This may occur, for example, when a page tries to block any visitor that is not a real human being. The procedure assigns deficit scores when pages prevent tests. This treatment indicates that preventing accessibility testing is itself an accessibility deficiency, because:</p>
       <ul>
