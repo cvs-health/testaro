@@ -153,7 +153,7 @@ exports.parameters = (
     paramData.logResult = customSucceedText('log');
   }
   if (deficit.menuNav) {
-    const failSource = customFailures(testData.menuNav.result.totals);
+    const failSource = testData.menuNav.result.totals;
     const failObj = {
       navigations: failSource.navigations.all,
       menuItems: failSource.menuItems,
@@ -207,7 +207,7 @@ exports.parameters = (
     paramData.roleResult = customSucceedText('role');
   }
   if (deficit.tabNav) {
-    const failSource = customFailures(testData.tabNav.result.totals);
+    const failSource = testData.tabNav.result.totals;
     const failObj = {
       navigations: failSource.navigations.all,
       tabElements: failSource.tabElements,

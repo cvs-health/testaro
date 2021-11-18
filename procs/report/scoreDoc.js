@@ -17,8 +17,8 @@ let [reportSubdir, docSubdir, scoreProc, version] = process.argv.slice(2);
 // Directory.
 const dir = `${process.env.REPORTDIR}/${reportSubdir}`;
 const fileNames = fs.readdirSync(`${dir}/jsonReports`);
-const {parameters} = require(`../../docTemplates/${docSubdir}/index`);
 const template = fs.readFileSync(`./docTemplates/${docSubdir}/index.html`, 'utf8');
+const {parameters} = require(`../../docTemplates/${docSubdir}/index`);
 // For each JSON report file:
 fileNames.forEach(fn => {
   // Get its content.

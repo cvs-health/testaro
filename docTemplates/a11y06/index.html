@@ -22,8 +22,9 @@
       <h2>Introduction</h2>
       <p>In a <a href="../">comparison</a> of the <a hrlef="https://www.w3.org/WAI/fundamentals/">accessibility</a> of web pages, <a href="__url__">__org__</a> received a <q>deficit score</q> of __totalScore__. This report explains how that score was computed.</p>
       <p>The pages were tested with version __version__ of the <code>__scoreProc__</code> procedure of <a href="https://jpdev.pro/jpdev/blog/entries/0020/index.html">Autotest</a>. A total of 427 tests were performed on each page. The resulting data were saved in a <a href="../jsonReports/__file__">JSON-format file</a>.</p>
+      <p>These tests&mdash;like all tests&mdash; are fallible. The failures described below merit investigation as <strong>potential</strong> accessibility defects.</p>
       <h2>Test packages</h2>
-      <p>Most of the tests belonged to the following three accessibility test packages created by other specialists.</p>
+      <p>Most of the tests belong to the following three accessibility test packages created by other specialists.</p>
       <h3>Axe</h3>
       __axeResult__
       <p><a href="https://github.com/dequelabs/axe-core">Axe</a> is an open-source package sponsored by accessibility consulting firm Deque. The procedure performs all 138 of the default Axe tests.</p>
@@ -60,6 +61,7 @@
       <h3><code>linkUl</code></h3>
       __linkUlResult__
       <p>The <code>linkUl</code> test detects failures to underline inline links. Underlining and color are the traditional style properties that identify links. Collections of links in blocks can sometimes be recognized without underlines, but inline links are difficult or impossible to distinguish visually from surrounding text if not underlined. Underlining inline links only on hover provides an indicator valuable only to mouse users, and even they must traverse the text with a mouse merely to discover which passages are links.</p>
+      <p>Warning: This test classifies links as inline or block. Some links classified as inline may not look like inline links to users.</p>
       <h3><code>log</code></h3>
       __logResult__
       <p>The <code>log</code> test detects problems with the behavior of the page or the server. Indicators of such problems are the number of messages logged by the browser, the aggregate size of those messages in characters, the number of rejections with abnormal HTTP statuses, the number of <q>prohibited</q> HTTP statuses, and the number of times the browser timed out trying to reach the page. Although log messages do not always indicate page defects, they mostly do.</p>
@@ -80,6 +82,7 @@
         <li>maxPixelChange: the greatest of the counts in the pixelChanges array</li>
         <li>changeFrequency: what fraction of the adjacent pairs of screen shots has pixel differences</li>
       </ol>
+      <p>Warning: This test waits 2.4 seconds before making its first screen shot. If a page loads more slowly than that, the test may treat it as exhibiting motion.</p>
       <h3><code>radioSet</code></h3>
       __radioSetResult__
       <p>The <code>radioSet</code> test detects nonstandard groupings of radio buttons. It defines the standard to require that two or more radio buttons with the same name, and no other radio buttons, be grouped in a <code>fieldset</code> element with a valid <code>legend</code> element.</p>
