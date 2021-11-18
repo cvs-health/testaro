@@ -13,8 +13,8 @@ exports.parameters = (
   // Creates messages about results of packaged tests.
   const packageSucceedText = package =>
     `<p>The page <strong>passed</strong> all ${package} tests.</p>`;
-  const packageFailText = (score, package, code, failures) =>
-    `<p>The page <strong>did not pass</strong> all ${package} tests and received a deficit score of ${score} on ${package}. The details are in the <a href="../jsonReports/${fn}">JSON-format file</a>, in the section starting with <code>"which": "${code}"</code>. There was at least one failure of:</p>${joiner}<ul>${innerJoiner}${failures}${joiner}</ul>`;
+  const packageFailText = (score, package, failures) =>
+    `<p>The page <strong>did not pass</strong> all ${package} tests and received a deficit score of ${score} on ${package}. The details are in the <a href="../jsonReports/${fn}">JSON-format file</a>, in the section starting with <code>"which": "${package}"</code>. There was at least one failure of:</p>${joiner}<ul>${innerJoiner}${failures}${joiner}</ul>`;
   // Creates messages about results of custom tests.
   const customSucceedText =
     test => `<p>The page <strong>passed</strong> the <code>${test}</code> test.</p>`;
@@ -53,19 +53,19 @@ exports.parameters = (
     const axeFailures = testData.axe.result.items.map(
       item => `<li>${item.rule}: ${htmlEscape(item.description)}</li>`
     ).join(innerJoiner);
-    paramData.axeResult = packageFailText(deficit.axe, 'Axe', 'axe', axeFailures);
+    paramData.axeResult = packageFailText(deficit.axe, 'axe', axeFailures);
   }
   else {
-    paramData.axeResult = packageSucceedText('Axe');
+    paramData.axeResult = packageSucceedText('axe');
   }
   if (deficit.ibm) {
     const ibmFailures = Array.from(new Set(testData.ibm.result.content.items.map(
       item => `<li>${item.ruleId}: ${htmlEscape(item.message)}</li>`
     )).values()).join(innerJoiner);
-    paramData.ibmResult = packageFailText(deficit.ibm, 'Equal Access', 'ibm', ibmFailures);
+    paramData.ibmResult = packageFailText(deficit.ibm, 'ibm', ibmFailures);
   }
   else {
-    paramData.ibmResult = packageSucceedText('Equal Access');
+    paramData.ibmResult = packageSucceedText('ibm');
   }
   if (deficit.wave) {
     const waveResult = testData.wave.result.categories;
@@ -78,10 +78,10 @@ exports.parameters = (
       );
     });
     const waveFailures = waveItems.join(innerJoiner);
-    paramData.waveResult = packageFailText(deficit.wave, 'WAVE', 'wave', waveFailures);
+    paramData.waveResult = packageFailText(deficit.wave, 'wave', waveFailures);
   }
   else {
-    paramData.waveResult = packageSucceedText('WAVE');
+    paramData.waveResult = packageSucceedText('wave');
   }
   if (deficit.bulk) {
     paramData.bulkResult = `The page <strong>did not pass</strong> the <code>bulk</code> test. The count of visible elements in the page was ${testData.bulk.result.visibleElements}, resulting in a deficit score of ${deficit.bulk} on <code>bulk</code>.`;
