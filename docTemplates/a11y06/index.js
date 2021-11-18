@@ -41,6 +41,13 @@ exports.parameters = (
   paramData.url = orgData.which;
   const {deficit} = scoreData;
   paramData.totalScore = deficit.total;
+  const deficitData = scoreData.deficit;
+  const deficitTypes = Object.keys(deficitData);
+  paramData.deficitRows = deficitTypes
+  .sort((a, b) => deficitData[b] - deficitData[a])
+  .map(type => `<tr><th>${type}</th><td>${deficitData[type]}</td></tr>`)
+  .join(innerJoiner);
+  paramData.scoreTable = JSON.stringify(scoreData.deficit, null, 2).replace(/^\{\n|[}","]/g, '');
   // Get package-test result messages for scoreDoc.
   if (deficit.axe) {
     const axeFailures = testData.axe.result.items.map(
