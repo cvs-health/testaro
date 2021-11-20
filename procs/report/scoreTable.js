@@ -27,7 +27,7 @@ if (colSpec === 'p3') {
 }
 // Identify the containing HTML code.
 const options = ['aut', 'aa', 'p3'];
-const optionColNames = [['Deficit'], ['Autotest', 'Axe'], ['Axe', 'IBM', 'WAVE']];
+const optionColNames = [['Score (lower is better)'], ['Autotest', 'Axe'], ['Axe', 'IBM', 'WAVE']];
 const optionPropNames = [['total'], ['total', 'axe'], ['axe', 'ibm', 'wave']];
 const colNames = optionColNames[options.indexOf(colSpec)];
 const propNames = optionPropNames[options.indexOf(colSpec)];
@@ -41,7 +41,7 @@ if (colSpec !== 'aut') {
 }
 const tableStartLines = [
   '<table class="allBorder a11yDeficits">',
-  '  <caption>Accessibility deficits of web pages</caption>',
+  '  <caption>Accessibility scores of web pages</caption>',
   '  <thead>',
   `    <tr><th scope="col">Page</th>${head}</tr>`,
   '  </thead>',

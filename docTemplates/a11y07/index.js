@@ -14,12 +14,12 @@ exports.parameters = (
   const packageSucceedText = package =>
     `<p>The page <strong>passed</strong> the <code>${package}</code> test.</p>`;
   const packageFailText = (score, package, failures) =>
-    `<p>The page <strong>did not pass</strong> the <code>${package}</code> test and received a deficit score of ${score} on <code>${package}</code>. The details are in the <a href="../jsonReports/${fn}">JSON-format file</a>, in the section starting with <code>"which": "${package}"</code>. There was at least one failure of:</p>${joiner}<ul>${innerJoiner}${failures}${joiner}</ul>`;
+    `<p>The page <strong>did not pass</strong> the <code>${package}</code> test and received a score of ${score} on <code>${package}</code>. The details are in the <a href="../jsonReports/${fn}">JSON-format file</a>, in the section starting with <code>"which": "${package}"</code>. There was at least one failure of:</p>${joiner}<ul>${innerJoiner}${failures}${joiner}</ul>`;
   // Creates messages about results of custom tests.
   const customSucceedText =
     test => `<p>The page <strong>passed</strong> the <code>${test}</code> test.</p>`;
   const customFailText = (score, test) =>
-    `<p>The page <strong>did not pass</strong> the <code>${test}</code> test and received a deficit score of ${score} on <code>${test}</code>. The details are in the <a href="../jsonReports/${fn}">JSON-format file</a>, in the section starting with <code>"which": "${test}"</code>.</p>`;
+    `<p>The page <strong>did not pass</strong> the <code>${test}</code> test and received a score of ${score} on <code>${test}</code>. The details are in the <a href="../jsonReports/${fn}">JSON-format file</a>, in the section starting with <code>"which": "${test}"</code>.</p>`;
   const customFailures = failObj => Object
   .entries(failObj)
   .map(entry => `<li>${entry[0]}: ${entry[1]}</li>`)
@@ -84,7 +84,7 @@ exports.parameters = (
     paramData.waveResult = packageSucceedText('wave');
   }
   if (deficit.bulk) {
-    paramData.bulkResult = `The page <strong>did not pass</strong> the <code>bulk</code> test. The count of visible elements in the page was ${testData.bulk.result.visibleElements}, resulting in a deficit score of ${deficit.bulk} on <code>bulk</code>.`;
+    paramData.bulkResult = `The page <strong>did not pass</strong> the <code>bulk</code> test. The count of visible elements in the page was ${testData.bulk.result.visibleElements}, resulting in a score of ${deficit.bulk} on <code>bulk</code>.`;
   }
   else {
     paramData.bulkResult = customSucceedText('bulk');

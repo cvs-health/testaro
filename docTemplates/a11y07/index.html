@@ -17,14 +17,14 @@
         <h1>Accessibility test report</h1>
         <p class="summary">__org__</p>
         <p class="summary">Autotest <code>__scoreProc__</code>, version __version__</p>
-        <p class="summary">Deficit score: __totalScore__</p>
+        <p class="summary">Score: __totalScore__</p>
       </header>
       <h2>Introduction</h2>
-      <p>In a <a href="../index.html">comparison</a> of the <a hrlef="https://www.w3.org/WAI/fundamentals/">accessibility</a> of web pages, <a href="__url__">__org__</a> received a <q>deficit score</q> of __totalScore__. This report explains how that score was computed.</p>
+      <p>In a <a href="../index.html">comparison</a> of the <a hrlef="https://www.w3.org/WAI/fundamentals/">accessibility</a> of web pages, <a href="__url__">__org__</a> received a score of __totalScore__. This report explains how that score was computed.</p>
       <p>The pages were tested with version __version__ of the <code>__scoreProc__</code> procedure of <a href="https://jpdev.pro/jpdev/blog/entries/0020/index.html">Autotest</a>. A total of 427 tests were performed on each page. The resulting data were saved in a <a href="../jsonReports/__file__">JSON-format file</a>.</p>
       <p>These tests&mdash;like all tests&mdash;are fallible. The failures described below merit investigation as <strong>potential</strong> opportunities for improved accessibility.</p>
       <h2>Summary</h2>
-      <p>The individual tests&rsquo; contributions to the deficit score were:</p>
+      <p>The individual tests&rsquo; contributions to the score were:</p>
       <table class="allBorder secondCellRight"><tbody class="headersLeft">
         __deficitRows__
       </tbody></table>
@@ -44,7 +44,7 @@
       <h3><code>bulk</code></h3>
       __bulkResult__
       <p>The <code>bulk</code> test counts the initially visible elements in a page. A page with a large count tends to be complex and busy, frustrating some users, especially if they have visual or motor disabilities, as they try to determine what the page is about, whether it is relevant, and how to find a specific thing in it.</p>
-      <p>When the count exceeds 250, the procedure begins to assign a non-zero deficit score.</p>
+      <p>When the count exceeds 250, the procedure begins to assign a non-zero score.</p>
       <h3><code>embAc</code></h3>
       __embAcResult__
       <p>The <code>embAc</code> test detects improper embedding of interactive elements (links, buttons, inputs, and select lists) within links or buttons. Such embedding violates the HTML standard, complicates user interaction, and creates risks of error. It becomes non-obvious what a user will activate with a click.</p>
@@ -75,7 +75,7 @@
       <p>The <code>menuNav</code> test detects nonstandard keyboard navigation among menu items in menus that manage the focus of their menu items. Menus that use pseudofocus with the <code>aria-activedescendant</code> attribute are not tested. The test is based on <a href="https://www.w3.org/TR/wai-aria-practices-1.1/#menu">WAI-ARIA recommendations</a>.</p>
       <h3><code>motion</code></h3>
       __motionResult__
-      <p>The <code>motion</code> test detects unrequested motion in a page. Accessibility standards minimally require motion to be brief, or else stoppable by the user. But stopping motion can be difficult or impossible, and, by the time a user manages to stop motion, the motion may have caused annoyance or harm. For superior accessibility, a page contains no motion until and unless the user authorizes it. The test compares five screen shots of the initially visible part of the page and assigns a deficit score based on:</p>
+      <p>The <code>motion</code> test detects unrequested motion in a page. Accessibility standards minimally require motion to be brief, or else stoppable by the user. But stopping motion can be difficult or impossible, and, by the time a user manages to stop motion, the motion may have caused annoyance or harm. For superior accessibility, a page contains no motion until and unless the user authorizes it. The test compares five screen shots of the initially visible part of the page and assigns a score based on:</p>
       <ol>
         <li>bytes: an array of the sizes of the screen shots, in bytes</li>
         <li>localRatios: an array of the ratios of bytes of the larger to the smaller of adjacent pairs of screen shots</li>
@@ -104,7 +104,7 @@
       __zIndexResult__
       <p>The <code>zIndex</code> test detects elements with non-default z indexes. Pages present difficulty for some users when they require users to perceive a third dimension (depth) in the two-dimensional display. Layers, popups, and dialogs that cover other content make it difficult for some users to interpret the content and know what parts of the content can be acted on. Layering also complicates accessibility testing. Tests for visibility of focus, for example, may fail if a focused element is covered by another element.</p>
       <h2>Testing failures</h2>
-      <p>Some pages prevent some of the tests in this procedure from being performed. This may occur, for example, when a page tries to block any non-human visitor. The procedure assigns deficit scores when pages prevent tests, because preventing accessibility testing is itself an accessibility deficiency. Specifically:</p>
+      <p>Some pages prevent some of the tests in this procedure from being performed. This may occur, for example, when a page tries to block any non-human visitor. The procedure estimates high scores when pages prevent tests, because preventing accessibility testing is itself an accessibility deficiency. Specifically:</p>
       <ul>
         <li>Measuring success is a prerequisite for achieving success, so interfering with accessibility measurement interferes with accessibility.</li>
         <li>Users with disabilities often rely on assistive technologies to mediate between them and web applications. Measures that interfere with automated testing are at risk of interfering with some assistive technologies, too.</li>
