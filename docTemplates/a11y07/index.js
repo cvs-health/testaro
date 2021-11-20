@@ -59,7 +59,17 @@ exports.parameters = (
     paramData.axeResult = packageSucceedText('axe');
   }
   if (deficit.ibm) {
-    const ibmFailures = Array.from(new Set(testData.ibm.result.content.items.map(
+    const {result} = testData.ibm;
+    const contentItems = result.content.items;
+    const urlItems = result.url.items;
+    const items = [];
+    if (contentItems) {
+      items.push(...contentItems);
+    }
+    if (urlItems) {
+      items.push(...urlItems);
+    }
+    const ibmFailures = Array.from(new Set(items.map(
       item => `<li>${item.ruleId}: ${htmlEscape(item.message)}</li>`
     )).values()).join(innerJoiner);
     paramData.ibmResult = packageFailText(deficit.ibm, 'ibm', ibmFailures);
