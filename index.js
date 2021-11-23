@@ -311,22 +311,32 @@ const matchElement = async (page, selector, matchText, index = 0) => {
     const selections = await page.$$(`body ${selector}`);
     // If there are any:
     if (selections.length) {
-      // Return the nth one including any specified text, or null if none.
-      let nth = 0;
-      for (const element of selections) {
-        const elementText = await textOf(page, element);
-        if ((! lcText || elementText.includes(lcText)) && nth++ === index) {
-          return element;
+      // If there are enough to make a match possible:
+      if (index < selections.length) {
+        // Return the nth one including any specified text, or the count of candidates if none.
+        let nth = 0;
+        for (const element of selections) {
+          const elementText = await textOf(page, element);
+          if ((! lcText || elementText.includes(lcText)) && nth++ === index) {
+            return element;
+          }
         }
+        return selections.length;
       }
-      return null;
+      // Otherwise, i.e. if there are too few to make a match possible:
+      else {
+        // Return the count of candidates.
+        return selections.length;
+      }
     }
-    // Otherwise, i.e. if there are no selected elements, return null.
+    // Otherwise, i.e. if there are no selected elements, return 0.
     else {
-      return null;
+      return 0;
     }
   }
+  // Otherwise, i.e. if the page no longer exists:
   else {
+    // Return null.
     console.log('ERROR: Page gone');
     return null;
   }
@@ -719,8 +729,16 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
               const selector = typeof moves[act.type] === 'string' ? moves[act.type] : act.what;
               // Identify the element to perform the move on.
               const whichElement = await matchElement(page, selector, act.which, act.index);
-              // If it exists:
-              if (whichElement) {
+              // If it was not found:
+              if (typeof whichElement === 'number') {
+                // Add the failure to the act.
+                act.result = {
+                  candidateCount: whichElement,
+                  error: 'ERROR: no element with matching text found'
+                };
+              }
+              // Otherwise, if it was found:
+              else if (whichElement !== null) {
                 // If the move is a button click, perform it.
                 if (act.type === 'button') {
                   await whichElement.click({timeout: 3000});
@@ -857,6 +875,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                     act.result.items = items;
                   }
                 }
+                // Otherwise, if it is selecting an option in a select list, perform it.
                 else if (act.type === 'select') {
                   await whichElement.selectOption({what: act.what});
                   const optionText = await whichElement.$eval(
@@ -866,18 +885,20 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                     ? `&ldquo;${optionText}}&rdquo; selected`
                     : 'OPTION NOT FOUND';
                 }
+                // Otherwise, if it is entering text on the element, perform it.
                 else if (act.type === 'text') {
                   await whichElement.type(act.what);
                   act.result = 'entered';
                 }
-                // Otherwise, i.e. if the specified element was not identified:
+                // Otherwise, i.e. if the move is unknown, add the failure to the act.
                 else {
                   // Return an error result.
-                  return 'NOT FOUND';
+                  act.result = 'ERROR: move unknown';
                 }
               }
+              // Otherwise, i.e. if the page was gone:
               else {
-                act.result = 'ERROR trying to find matching element';
+                act.result = 'ERROR: page gone, so matching element not found';
               }
             }
             // Otherwise, if the act is a keypress:
