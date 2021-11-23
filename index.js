@@ -311,11 +311,11 @@ const matchElement = async (page, selector, matchText, index = 0) => {
     const selections = await page.$$(`body ${selector}`);
     // If there are any:
     if (selections.length) {
-      // Return the nth one including the specified text, or null if none.
+      // Return the nth one including any specified text, or null if none.
       let nth = 0;
       for (const element of selections) {
         const elementText = await textOf(page, element);
-        if (elementText.includes(lcText) && nth++ === index) {
+        if ((! lcText || elementText.includes(lcText)) && nth++ === index) {
           return element;
         }
       }
@@ -564,28 +564,63 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
         // Otherwise, if the act is a wait:
         else if (act.type === 'wait') {
           console.log(`>> for ${act.what} to include “${act.which}”`);
-          // Wait for the specified text to appear in the specified place.
-          await page.waitForFunction(act => {
-            const {URL, title, body} = document;
-            const success = {
-              url: body && URL && URL.includes(act.which),
-              title: body && title && title.includes(act.which),
-              body: body && body.textContent && body.textContent.includes(act.which)
-            };
-            return success[act.what];
-          }, act, {timeout: 10000})
+          // Wait 5 seconds for the specified text to appear in the specified place.
+          let successJSHandle;
+          if (act.what === 'url') {
+            successJSHandle = await page.waitForFunction(
+              act => document.URL.includes(act.which), act, {timeout: 5000}
+            )
+            .catch(error => {
+              console.log(`ERROR waiting for URL (${error.message})`);
+              act.result = 'ERROR waiting for URL';
+            });
+          }
+          if (act.what === 'title') {
+            successJSHandle = await page.waitForFunction(
+              act => document.title.includes(act.which), act, {timeout: 5000}
+            )
+            .catch(error => {
+              console.log(`ERROR waiting for title (${error.message})`);
+              act.result = 'ERROR waiting for title';
+            });
+          }
+          else if (act.what === 'title') {
+            successJSHandle = await page.waitForFunction(act => document.title.includes(act.which));
+          }
+          else if (act.what === 'body') {
+            successJSHandle = await page.waitForFunction(
+              act => document.body.textContent.includes(act.which)
+            );
+          }
+
+          const successJSHandle = await page.waitForFunction(act => {
+            if (act.what === 'url') {
+              return document.URL.includes(act.which);
+            }
+            else if (act.what === 'title') {
+              return document.title.includes(act.which);
+            }
+            else if (act.what === 'body') {
+              return document.body.textContent.includes(act.which);
+            }
+          }, act, {timeout: 5000})
           .catch(error => {
             console.log(`ERROR waiting for ${act.what} (${error.message})`);
             act.result = `ERROR waiting for ${act.what}`;
+            return false;
           });
-          await page.waitForLoadState('networkidle', {timeout: 5000})
-          .catch(error => {
-            console.log(`ERROR waiting for stability after ${act.what} (${error.message})`);
-            act.result = `ERROR waiting for stability after ${act.what}`;
-          });
-          // Add the resulting URL to the act.
-          if (! act.result) {
-            act.result = page.url();
+          const success = await successJSHandle.jsonValue();
+          console.log(`Wait success was ${success}`);
+          if (success) {
+            act.result = {url: document.URL};
+            if (act.what === 'title') {
+              act.result.title = document.title;
+            }
+            await page.waitForLoadState('networkidle', {timeout: 5000})
+            .catch(error => {
+              console.log(`ERROR waiting for stability after ${act.what} (${error.message})`);
+              act.result = `ERROR waiting for stability after ${act.what}`;
+            });
           }
         }
         // Otherwise, if the act is a page switch:
@@ -703,17 +738,18 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
             // Otherwise, if the act is a move:
             else if (moves[act.type]) {
               const selector = typeof moves[act.type] === 'string' ? moves[act.type] : act.what;
-              // Identify the index of the specified element among same-type elements.
+              // Identify the element to perform the move on.
               const whichElement = await matchElement(page, selector, act.which, act.index);
               // If it exists:
               if (whichElement) {
-                // Perform the act on the element and add a move description to the act.
+                // If the move is a button click, perform it.
                 if (act.type === 'button') {
                   await whichElement.click({timeout: 3000});
                   act.result = 'clicked';
                 }
+                // Otherwise, if it is checking a radio button or checkbox, perform it.
                 else if (['checkbox', 'radio'].includes(act.type)) {
-                  await whichElement.waitForElementState('stable', {timeout: 3000})
+                  await whichElement.waitForElementState('stable', {timeout: 2000})
                   .catch(error => {
                     console.log(`ERROR waiting for stable ${act.type} (${error.message})`);
                     act.result = `ERROR waiting for stable ${act.type}`;
@@ -740,10 +776,12 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                     }
                   }
                 }
+                // Otherwise, if it is focusing the element, perform it.
                 else if (act.type === 'focus') {
                   await whichElement.focus({timeout: 2000});
                   act.result = 'focused';
                 }
+                // Otherwise, if it is clicking a link, perform it.
                 else if (act.type === 'link') {
                   const href = await whichElement.getAttribute('href');
                   const target = await whichElement.getAttribute('target');
@@ -754,14 +792,18 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                     move: 'clicked'
                   };
                 }
+                // Otherwise, if it is navigating until the element is reached:
                 else if (act.type === 'presses') {
                   let status = 'more';
                   let presses = 0;
                   let amountRead = 0;
                   let items = [];
+                  // As long as the element has not been reached:
                   while (status === 'more') {
+                    // Press the specified navigation key.
                     await page.keyboard.press(act.navKey);
                     presses++;
+                    // Identify the newly focused or newly active element.
                     const focalJSHandle = await page.evaluateHandle(() => {
                       let activeElement = document.activeElement;
                       if (activeElement && activeElement.tagName !== 'BODY') {
@@ -786,7 +828,9 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                       }
                     });
                     const focalElement = focalJSHandle.asElement();
+                    // If it exists:
                     if (focalElement) {
+                      // Update the data.
                       const tagNameJSHandle = await focalElement.getProperty('tagName');
                       const tagName = await tagNameJSHandle.jsonValue();
                       const text = await textOf(page, focalElement);
@@ -800,6 +844,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                           });
                         }
                         amountRead += textLength;
+                        // Determine whether the element has been reached.
                         const sameElement = await page.evaluate(args => {
                           const [focalElement, whichElement] = args;
                           return focalElement === whichElement;
