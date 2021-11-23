@@ -566,7 +566,8 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
           console.log(`>> for ${act.what} to include “${act.which}”`);
           const waitError = (error, what) => {
             console.log(`ERROR waiting for ${what} (${error.message})`);
-            act.result = `ERROR waiting for ${what}`;
+            act.result = {url: page.url()};
+            act.result.error = `ERROR waiting for ${what}`;
             return false;
           };
           // Wait 5 seconds for the specified text to appear in the specified place.
@@ -589,9 +590,9 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
             )
             .catch(error => waitError(error, 'body'));
           }
-          const success = await successJSHandle.jsonValue();
-          console.log(`Wait success was ${success}`);
-          if (success) {
+          if (successJSHandle) {
+            console.log('Success');
+            const success = await successJSHandle.jsonValue();
             act.result = {url: page.url()};
             if (act.what === 'title') {
               act.result.title = await page.title();
@@ -601,6 +602,9 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
               console.log(`ERROR waiting for stability after ${act.what} (${error.message})`);
               act.result.error = `ERROR waiting for stability after ${act.what}`;
             });
+          }
+          else {
+            console.log('Failure');
           }
         }
         // Otherwise, if the act is a page switch:
