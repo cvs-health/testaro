@@ -564,44 +564,37 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
         // Otherwise, if the act is a wait:
         else if (act.type === 'wait') {
           console.log(`>> for ${act.what} to include “${act.which}”`);
+          const waitError = (error, what) => {
+            console.log(`ERROR waiting for ${what} (${error.message})`);
+            act.result = `ERROR waiting for ${what}`;
+            return false;
+          };
           // Wait 5 seconds for the specified text to appear in the specified place.
           let successJSHandle;
           if (act.what === 'url') {
             successJSHandle = await page.waitForFunction(
               text => document.URL.includes(text), act.which, {timeout: 5000}
             )
-            .catch(error => {
-              console.log(`ERROR waiting for URL (${error.message})`);
-              act.result = 'ERROR waiting for URL';
-              return false;
-            });
+            .catch(error => waitError(error, 'URL'));
           }
           else if (act.what === 'title') {
             successJSHandle = await page.waitForFunction(
               text => document.title.includes(text), act.which, {timeout: 5000}
             )
-            .catch(error => {
-              console.log(`ERROR waiting for title (${error.message})`);
-              act.result = 'ERROR waiting for title';
-              return false;
-            });
+            .catch(error => waitError(error, 'title'));
           }
           else if (act.what === 'body') {
             successJSHandle = await page.waitForFunction(
               text => document.body.textContent.includes(text), act.which, {timeout: 5000}
             )
-            .catch(error => {
-              console.log(`ERROR waiting for title (${error.message})`);
-              act.result = 'ERROR waiting for title';
-              return false;
-            });
+            .catch(error => waitError(error, 'body'));
           }
           const success = await successJSHandle.jsonValue();
           console.log(`Wait success was ${success}`);
           if (success) {
-            act.result = {url: document.URL};
+            act.result = {url: page.url()};
             if (act.what === 'title') {
-              act.result.title = document.title;
+              act.result.title = await page.title();
             }
             await page.waitForLoadState('networkidle', {timeout: 5000})
             .catch(error => {
