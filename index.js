@@ -568,47 +568,34 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
           let successJSHandle;
           if (act.what === 'url') {
             successJSHandle = await page.waitForFunction(
-              act => document.URL.includes(act.which), act, {timeout: 5000}
+              text => document.URL.includes(text), act.which, {timeout: 5000}
             )
             .catch(error => {
               console.log(`ERROR waiting for URL (${error.message})`);
               act.result = 'ERROR waiting for URL';
+              return false;
             });
           }
-          if (act.what === 'title') {
+          else if (act.what === 'title') {
             successJSHandle = await page.waitForFunction(
-              act => document.title.includes(act.which), act, {timeout: 5000}
+              text => document.title.includes(text), act.which, {timeout: 5000}
             )
             .catch(error => {
               console.log(`ERROR waiting for title (${error.message})`);
               act.result = 'ERROR waiting for title';
+              return false;
             });
-          }
-          else if (act.what === 'title') {
-            successJSHandle = await page.waitForFunction(act => document.title.includes(act.which));
           }
           else if (act.what === 'body') {
             successJSHandle = await page.waitForFunction(
-              act => document.body.textContent.includes(act.which)
-            );
+              text => document.body.textContent.includes(text), act.which, {timeout: 5000}
+            )
+            .catch(error => {
+              console.log(`ERROR waiting for title (${error.message})`);
+              act.result = 'ERROR waiting for title';
+              return false;
+            });
           }
-
-          const successJSHandle = await page.waitForFunction(act => {
-            if (act.what === 'url') {
-              return document.URL.includes(act.which);
-            }
-            else if (act.what === 'title') {
-              return document.title.includes(act.which);
-            }
-            else if (act.what === 'body') {
-              return document.body.textContent.includes(act.which);
-            }
-          }, act, {timeout: 5000})
-          .catch(error => {
-            console.log(`ERROR waiting for ${act.what} (${error.message})`);
-            act.result = `ERROR waiting for ${act.what}`;
-            return false;
-          });
           const success = await successJSHandle.jsonValue();
           console.log(`Wait success was ${success}`);
           if (success) {
@@ -619,7 +606,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
             await page.waitForLoadState('networkidle', {timeout: 5000})
             .catch(error => {
               console.log(`ERROR waiting for stability after ${act.what} (${error.message})`);
-              act.result = `ERROR waiting for stability after ${act.what}`;
+              act.result.error = `ERROR waiting for stability after ${act.what}`;
             });
           }
         }
