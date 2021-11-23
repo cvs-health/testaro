@@ -315,8 +315,13 @@ const matchElement = async (page, selector, matchText, index = 0) => {
       let nth = 0;
       for (const element of selections) {
         const elementText = await textOf(page, element);
+        console.log(`Next selection element has text ${elementText}`);
         if ((! lcText || elementText.includes(lcText)) && nth++ === index) {
+          console.log('This is the one');
           return element;
+        }
+        else {
+          console.log('This is not the one');
         }
       }
       return null;
@@ -778,6 +783,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                 }
                 // Otherwise, if it is navigating until the element is reached:
                 else if (act.type === 'presses') {
+                  console.log(`Text to match: ${act.which}`);
                   let status = 'more';
                   let presses = 0;
                   let amountRead = 0;
