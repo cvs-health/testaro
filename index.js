@@ -314,14 +314,16 @@ const matchElement = async (page, selector, matchText, index = 0) => {
       // If there are enough to make a match possible:
       if (index < selections.length) {
         // Return the nth one including any specified text, or the count of candidates if none.
+        const elementTexts = [];
         let nth = 0;
         for (const element of selections) {
           const elementText = await textOf(page, element);
+          elementTexts.push(elementText);
           if ((! lcText || elementText.includes(lcText)) && nth++ === index) {
             return element;
           }
         }
-        return selections.length;
+        return elementTexts;
       }
       // Otherwise, i.e. if there are too few to make a match possible:
       else {
@@ -729,15 +731,24 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
               const selector = typeof moves[act.type] === 'string' ? moves[act.type] : act.what;
               // Identify the element to perform the move on.
               const whichElement = await matchElement(page, selector, act.which, act.index);
-              // If it was not found:
-              if (typeof whichElement === 'number') {
+              // If there were enough candidates but no text match:
+              if (Array.isArray(whichElement)) {
+                // Add the result to the act.
+                act.result = {
+                  candidateCount: whichElement.length,
+                  error: 'ERROR: no element with matching text found',
+                  candidateTexts: whichElement
+                };
+              }
+              // Otherwise, if there were not enough candidates:
+              else if (typeof whichElement === 'number') {
                 // Add the failure to the act.
                 act.result = {
                   candidateCount: whichElement,
-                  error: 'ERROR: no element with matching text found'
+                  error: 'ERROR: too few such elements to allow a match'
                 };
               }
-              // Otherwise, if it was found:
+              // Otherwise, if a match was found:
               else if (whichElement !== null) {
                 // If the move is a button click, perform it.
                 if (act.type === 'button') {
