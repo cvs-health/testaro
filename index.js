@@ -829,6 +829,8 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                   let items = [];
                   // As long as the element has not been reached:
                   while (status === 'more') {
+                    // Press the Escape key to dismiss any modal dialog.
+                    await page.keyboard.press('Escape');
                     // Press the specified navigation key.
                     await page.keyboard.press(act.navKey);
                     presses++;
