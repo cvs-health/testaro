@@ -323,11 +323,11 @@ const textOf = async (page, element) => {
 const matchElement = async (page, selector, matchText, index = 0) => {
   // If the page still exists:
   if (page) {
-    // Wait 5 seconds until the body contains any text to be matched.
+    // Wait 3 seconds until the body contains any text to be matched.
     const textInBodyJSHandle = await page.waitForFunction(
       matchText => matchText === null || document.body.textContent.includes(matchText),
       matchText,
-      {timeout: 5000}
+      {timeout: 3000}
     )
     .catch(error => {
       console.log(`ERROR: text to match not in body (${error.message})`);
