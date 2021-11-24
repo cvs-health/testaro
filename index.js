@@ -274,8 +274,8 @@ const textOf = async (page, element) => {
     const tagNameJSHandle = await element.getProperty('tagName');
     const tagName = await tagNameJSHandle.jsonValue();
     let totalText = '';
-    // If the element is an input:
-    if (tagName === 'INPUT') {
+    // If the element is an input or select list:
+    if (['INPUT', 'SELECT'].includes(tagName)) {
       // Concatenate its visible labels and, if the first input in a fieldset, its legend.
       totalText = await page.evaluate(element => {
         const labels = Array.from(element.labels);
@@ -325,7 +325,7 @@ const matchElement = async (page, selector, matchText, index = 0) => {
   if (page) {
     // Wait 3 seconds until the body contains any text to be matched.
     const textInBodyJSHandle = await page.waitForFunction(
-      matchText => matchText === null || document.body.textContent.includes(matchText),
+      matchText => ! matchText || document.body.textContent.includes(matchText),
       matchText,
       {timeout: 3000}
     )
