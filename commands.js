@@ -55,7 +55,7 @@ exports.commands = {
     presses: [
       'Repeatedly press a navigation key',
       {
-        which: [true, 'string', 'hasLength', 'substring of destination element text'],
+        which: [false, 'string', 'hasLength', 'substring of destination element text if any'],
         index: [false, 'number', '', 'index among matches if not 0'],
         what: [true, 'string', 'hasLength', 'selector of destination element'],
         navKey: [true, 'string', 'hasLength', 'navigation-keyname'],

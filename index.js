@@ -323,16 +323,18 @@ const textOf = async (page, element) => {
 const matchElement = async (page, selector, matchText, index = 0) => {
   // If the page still exists:
   if (page) {
-    // Wait 5 seconds until the body contains the text to be matched.
+    // Wait 5 seconds until the body contains any text to be matched.
     const textInBodyJSHandle = await page.waitForFunction(
-      matchText => document.body.textContent.includes(matchText), matchText, {timeout: 5000}
+      matchText => matchText === null || document.body.textContent.includes(matchText),
+      matchText,
+      {timeout: 5000}
     )
     .catch(error => {
       console.log(`ERROR: text to match not in body (${error.message})`);
     });
-    // If the body contained it:
+    // If there is no text to be matched or the body contained it:
     if (textInBodyJSHandle) {
-      const lcText = matchText.toLowerCase();
+      const lcText = matchText ? matchText.toLowerCase() : '';
       // Identify the selected elements.
       const selections = await page.$$(`body ${selector}`);
       // If there are any:
@@ -830,7 +832,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                 else if (act.type === 'link') {
                   const href = await whichElement.getAttribute('href');
                   const target = await whichElement.getAttribute('target');
-                  await whichElement.click({timeout: 5000});
+                  await whichElement.click({timeout: 2000});
                   act.result = {
                     href: href || 'NONE',
                     target: target || 'NONE',
