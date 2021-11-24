@@ -878,13 +878,16 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                           const [focalElement, whichElement] = args;
                           return focalElement === whichElement;
                         }, [focalElement, whichElement]);
+                        // If it has:
                         if (sameElement) {
+                          // Perform the action.
                           status = 'done';
                           if (act.text) {
                             await page.keyboard.type(act.text);
                           }
                           if (act.action) {
                             await page.keyboard.press(act.action);
+                            await page.waitForLoadState();
                           }
                         }
                       }
