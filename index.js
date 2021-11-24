@@ -274,10 +274,24 @@ const textOf = async (page, element) => {
     const tagNameJSHandle = await element.getProperty('tagName');
     const tagName = await tagNameJSHandle.jsonValue();
     let totalText = '';
+    // If the element is an input:
     if (tagName === 'INPUT') {
+      // Concatenate its visible labels and, if the first input in a fieldset, its legend.
       totalText = await page.evaluate(element => {
         const labels = Array.from(element.labels);
         const labelTexts = labels.map(label => label.textContent);
+        if (element.hasAttribute('aria-labelledby')) {
+          const labelerIDs = new Set(element.getAttribute('aria-labelledby').split(/\s+/));
+          labelerIDs.forEach(id => {
+            const labeler = document.getElementById(id);
+            if (labeler) {
+              const labelerText = labeler.textContent.replace(/\s+/g, ' ').trim();
+              if (labelerText.length) {
+                labelTexts.push(labelerText);
+              }
+            }
+          });
+        }
         let legendText = '';
         const fieldsets = Array.from(document.body.querySelectorAll('fieldset'));
         const inputFieldsets = fieldsets.filter(fieldset => {
@@ -294,7 +308,9 @@ const textOf = async (page, element) => {
         return labelTexts.concat(legendText).join(' ');
       }, element);
     }
+    // Otherwise, i.e. if it is not an input:
     else {
+      // Get its text content.
       totalText = await element.textContent();
     }
     return debloat(totalText).toLowerCase();
