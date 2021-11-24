@@ -305,35 +305,51 @@ const textOf = async (page, element) => {
 };
 // Returns an element case-insensitively matching a text.
 const matchElement = async (page, selector, matchText, index = 0) => {
+  // If the page still exists:
   if (page) {
-    const lcText = matchText.toLowerCase();
-    // Identify the selected elements.
-    const selections = await page.$$(`body ${selector}`);
-    // If there are any:
-    if (selections.length) {
-      // If there are enough to make a match possible:
-      if (index < selections.length) {
-        // Return the nth one including any specified text, or the count of candidates if none.
-        const elementTexts = [];
-        let nth = 0;
-        for (const element of selections) {
-          const elementText = await textOf(page, element);
-          elementTexts.push(elementText);
-          if ((! lcText || elementText.includes(lcText)) && nth++ === index) {
-            return element;
+    // Wait 5 seconds until the body contains the text to be matched.
+    const textInBodyJSHandle = await page.waitForFunction(
+      matchText => document.body.textContent.includes(matchText), matchText, {timeout: 5000}
+    )
+    .catch(error => {
+      console.log(`ERROR: text to match not in body (${error.message})`);
+    });
+    // If the body contained it:
+    if (textInBodyJSHandle) {
+      const lcText = matchText.toLowerCase();
+      // Identify the selected elements.
+      const selections = await page.$$(`body ${selector}`);
+      // If there are any:
+      if (selections.length) {
+        // If there are enough to make a match possible:
+        if (index < selections.length) {
+          // Return the nth one including any specified text, or the count of candidates if none.
+          const elementTexts = [];
+          let nth = 0;
+          for (const element of selections) {
+            const elementText = await textOf(page, element);
+            elementTexts.push(elementText);
+            if ((! lcText || elementText.includes(lcText)) && nth++ === index) {
+              return element;
+            }
           }
+          return elementTexts;
         }
-        return elementTexts;
+        // Otherwise, i.e. if there are too few to make a match possible:
+        else {
+          // Return the count of candidates.
+          return selections.length;
+        }
       }
-      // Otherwise, i.e. if there are too few to make a match possible:
+      // Otherwise, i.e. if there are no selected elements, return 0.
       else {
-        // Return the count of candidates.
-        return selections.length;
+        return 0;
       }
     }
-    // Otherwise, i.e. if there are no selected elements, return 0.
+    // Otherwise, i.e. if the body did not contain it:
     else {
-      return 0;
+      // Return the failure.
+      return -1;
     }
   }
   // Otherwise, i.e. if the page no longer exists:
@@ -739,6 +755,11 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                   error: 'ERROR: no element with matching text found',
                   candidateTexts: whichElement
                 };
+              }
+              // Otherwise, if the body did not contain the text:
+              else if (whichElement === -1) {
+                // Add the failure to the act.
+                act.result = 'ERROR: body did not contain text to match';
               }
               // Otherwise, if there were not enough candidates:
               else if (typeof whichElement === 'number') {
