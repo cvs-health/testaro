@@ -852,7 +852,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                     // Press the specified navigation key.
                     await page.keyboard.press(act.navKey);
                     presses++;
-                    // Identify the newly focused or newly active element.
+                    // Identify the newly focused or active element or a failure.
                     const focalJSHandle = await page.evaluateHandle(() => {
                       let activeElement = document.activeElement;
                       if (activeElement && activeElement.tagName !== 'BODY') {
@@ -876,8 +876,8 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                         return 'globallyExhausted';
                       }
                     });
+                    // If the element exists:
                     const focalElement = focalJSHandle.asElement();
-                    // If it exists:
                     if (focalElement) {
                       // Update the data.
                       const tagNameJSHandle = await focalElement.getProperty('tagName');
@@ -915,7 +915,9 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                         status = 'ERROR';
                       }
                     }
+                    // Otherwise, i.e. if there was a failure:
                     else {
+                      // Update the status.
                       status = await focalJSHandle.jsonValue();
                     }
                   }
