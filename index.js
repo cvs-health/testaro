@@ -382,7 +382,7 @@ const isBrowserType = type => ['chromium', 'firefox', 'webkit'].includes(type);
 // Validates a URL.
 const isURL = string => /^(?:https?|file):\/\/[^\s]+$/.test(string);
 // Validates a focusable tag name.
-const isFocusable = string => ['a', 'button', 'input', 'select', 'option'].includes(string);
+const isFocusable = string => ['a', 'button', 'input', 'select'].includes(string);
 // Returns whether all elements of an array are strings.
 const areStrings = array => array.every(element => typeof element === 'string');
 // Returns whether a variable has a specified type.
@@ -852,24 +852,27 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                     // Press the specified navigation key.
                     await page.keyboard.press(act.navKey);
                     presses++;
-                    // Identify the newly focused or active element or a failure.
+                    // Identify the newly focused, active, or selected element or a failure.
                     const focalJSHandle = await page.evaluateHandle(() => {
-                      let activeElement = document.activeElement;
-                      if (activeElement && activeElement.tagName !== 'BODY') {
-                        if (activeElement.hasAttribute('aria-activedescendant')) {
-                          activeElement = document.getElementById(
-                            activeElement.getAttribute('aria-activedescendant')
+                      let currentElement = document.currentElement;
+                      if (currentElement && currentElement.tagName !== 'BODY') {
+                        if (currentElement.hasAttribute('aria-activedescendant')) {
+                          currentElement = document.getElementById(
+                            currentElement.getAttribute('aria-activedescendant')
                           );
                         }
-                        else if (activeElement.shadowRoot) {
-                          activeElement = activeElement.shadowRoot.activeElement;
+                        else if (currentElement.tagName === 'SELECT') {
+                          currentElement = currentElement.querySelector('option [selected]');
                         }
-                        if (activeElement.dataset.pressesReached) {
+                        else if (currentElement.shadowRoot) {
+                          currentElement = currentElement.shadowRoot.currentElement;
+                        }
+                        if (currentElement.dataset.pressesReached) {
                           return 'locallyExhausted';
                         }
                         else {
-                          activeElement.dataset.pressesReached = 'true';
-                          return activeElement;
+                          currentElement.dataset.pressesReached = 'true';
+                          return currentElement;
                         }
                       }
                       else {
@@ -940,7 +943,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                   );
                   act.result = optionText
                     ? `&ldquo;${optionText}}&rdquo; selected`
-                    : 'OPTION NOT FOUND';
+                    : 'ERROR: option not found';
                 }
                 // Otherwise, if it is entering text on the element, perform it.
                 else if (act.type === 'text') {
