@@ -854,7 +854,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                     presses++;
                     // Identify the newly focused, active, or selected element or a failure.
                     const focalJSHandle = await page.evaluateHandle(() => {
-                      let currentElement = document.currentElement;
+                      let currentElement = document.activeElement;
                       if (currentElement && currentElement.tagName !== 'BODY') {
                         if (currentElement.hasAttribute('aria-activedescendant')) {
                           currentElement = document.getElementById(
@@ -862,17 +862,24 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                           );
                         }
                         else if (currentElement.tagName === 'SELECT') {
-                          currentElement = currentElement.querySelector('option [selected]');
+                          const currentIndex = Math.max(0, currentElement.selectedIndex);
+                          const options = currentElement.querySelectorAll('option');
+                          currentElement = options[currentIndex];
                         }
                         else if (currentElement.shadowRoot) {
-                          currentElement = currentElement.shadowRoot.currentElement;
+                          currentElement = currentElement.shadowRoot.activeElement;
                         }
-                        if (currentElement.dataset.pressesReached) {
-                          return 'locallyExhausted';
+                        if (currentElement) {
+                          if (currentElement.dataset.pressesReached) {
+                            return 'locallyExhausted';
+                          }
+                          else {
+                            currentElement.dataset.pressesReached = 'true';
+                            return currentElement;
+                          }
                         }
                         else {
-                          currentElement.dataset.pressesReached = 'true';
-                          return currentElement;
+                          return 'noActiveElement';
                         }
                       }
                       else {
