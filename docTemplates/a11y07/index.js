@@ -1,4 +1,4 @@
-// a11y version 6 template placeholder replacements.
+// a11y version 7 template placeholder replacements.
 exports.parameters = (
   fn, sourceData, testData, scoreData, scoreProc, version, orgData, testDate
 ) => {
@@ -20,6 +20,7 @@ exports.parameters = (
     test => `<p>The page <strong>passed</strong> the <code>${test}</code> test.</p>`;
   const customFailText = (score, test) =>
     `<p>The page <strong>did not pass</strong> the <code>${test}</code> test and received a score of ${score} on <code>${test}</code>. The details are in the <a href="../jsonReports/${fn}">JSON-format file</a>, in the section starting with <code>"which": "${test}"</code>.</p>`;
+  const testCrashText = (score, test) => `<p>The <code>${test}</code> test could not be performed. The page received an inferred score of ${score} on <code>${test}</code>.</p>`;
   const customFailures = failObj => Object
   .entries(failObj)
   .map(entry => `<li>${entry[0]}: ${entry[1]}</li>`)
@@ -41,7 +42,8 @@ exports.parameters = (
   paramData.url = orgData.which;
   const {deficit} = scoreData;
   paramData.totalScore = deficit.total;
-  const deficitData = scoreData.deficit;
+  // Get summary-table data for scoreDoc.
+  const deficitData = Object.assign({}, deficit, scoreData.inferences);
   const deficitTypes = Object.keys(deficitData);
   paramData.deficitRows = deficitTypes
   .sort((a, b) => deficitData[b] - deficitData[a])
@@ -54,6 +56,9 @@ exports.parameters = (
       item => `<li>${item.rule}: ${htmlEscape(item.description)}</li>`
     ).join(innerJoiner);
     paramData.axeResult = packageFailText(deficit.axe, 'axe', axeFailures);
+  }
+  else if (scoreData.inferences.axe) {
+    paramData.axeResult = testCrashText(deficitData.axe, 'axe');
   }
   else {
     paramData.axeResult = packageSucceedText('axe');
@@ -74,6 +79,9 @@ exports.parameters = (
     )).values()).join(innerJoiner);
     paramData.ibmResult = packageFailText(deficit.ibm, 'ibm', ibmFailures);
   }
+  else if (scoreData.inferences.ibm) {
+    paramData.ibmResult = testCrashText(deficitData.ibm, 'ibm');
+  }
   else {
     paramData.ibmResult = packageSucceedText('ibm');
   }
@@ -90,11 +98,18 @@ exports.parameters = (
     const waveFailures = waveItems.join(innerJoiner);
     paramData.waveResult = packageFailText(deficit.wave, 'wave', waveFailures);
   }
+  else if (scoreData.inferences.wave) {
+    paramData.waveResult = testCrashText(deficitData.wave, 'wave');
+  }
   else {
     paramData.waveResult = packageSucceedText('wave');
   }
+  // Get custom-test result messages for scoreDoc.
   if (deficit.bulk) {
     paramData.bulkResult = `The page <strong>did not pass</strong> the <code>bulk</code> test. The count of visible elements in the page was ${testData.bulk.result.visibleElements}, resulting in a score of ${deficit.bulk} on <code>bulk</code>.`;
+  }
+  else if (scoreData.inferences.bulk) {
+    paramData.bulkResult = testCrashText(deficitData.bulk, 'bulk');
   }
   else {
     paramData.bulkResult = customSucceedText('bulk');
@@ -103,12 +118,18 @@ exports.parameters = (
     const failures = customFailures(testData.embAc.result.totals);
     paramData.embAcResult = customResult(deficit.embAc, 'embAc', failures);
   }
+  else if (scoreData.inferences.embAc) {
+    paramData.embAcResult = testCrashText(deficitData.ebmAc, 'ebmAc');
+  }
   else {
     paramData.embAcResult = customSucceedText('embAc');
   }
   if (deficit.focAll) {
     const failures = customFailures(testData.focAll.result);
     paramData.focAllResult = customResult(deficit.focAll, 'focAll', failures);
+  }
+  else if (scoreData.inferences.focAll) {
+    paramData.focAllResult = testCrashText(deficitData.focAll, 'focAll');
   }
   else {
     paramData.focAllResult = customSucceedText('focAll');
@@ -122,6 +143,9 @@ exports.parameters = (
     const failures = customFailures(failObj);
     paramData.focIndResult = customResult(deficit.focInd, 'focInd', failures);
   }
+  else if (scoreData.inferences.focInd) {
+    paramData.focIndResult = testCrashText(deficitData.focInd, 'focInd');
+  }
   else {
     paramData.focIndResult = customSucceedText('focInd');
   }
@@ -134,12 +158,18 @@ exports.parameters = (
     const failures = customFailures(failObj);
     paramData.focOpResult = customResult(deficit.focOp, 'focOp', failures);
   }
+  else if (scoreData.inferences.focOp) {
+    paramData.focOpResult = testCrashText(deficitData.focOp, 'focOp');
+  }
   else {
     paramData.focOpResult = customSucceedText('focOp');
   }
   if (deficit.hover) {
     const failures = customFailures(testData.hover.result.totals);
     paramData.hoverResult = customResult(deficit.hover, 'hover', failures);
+  }
+  else if (scoreData.inferences.hover) {
+    paramData.hoverResult = testCrashText(deficitData.hover, 'hover');
   }
   else {
     paramData.hoverResult = customSucceedText('hover');
@@ -150,12 +180,18 @@ exports.parameters = (
     const failures = customFailures(totals);
     paramData.labClashResult = customResult(deficit.labClash, 'labClash', failures);
   }
+  else if (scoreData.inferences.labClash) {
+    paramData.labClashResult = testCrashText(deficitData.labClash, 'labClash');
+  }
   else {
     paramData.labClashResult = customSucceedText('labClash');
   }
   if (deficit.linkUl) {
     const failures = customFailures(testData.linkUl.result.totals.inline);
     paramData.linkUlResult = customResult(deficit.linkUl, 'linkUl', failures);
+  }
+  else if (scoreData.inferences.linkUl) {
+    paramData.linkUlResult = testCrashText(deficitData.linkUl, 'linkUl');
   }
   else {
     paramData.linkUlResult = customSucceedText('linkUl');
@@ -165,6 +201,9 @@ exports.parameters = (
     const logData = {logCount, logSize, visitRejectionCount, prohibitedCount, visitTimeoutCount};
     const failures = customFailures(logData);
     paramData.logResult = customResult(deficit.log, 'log', failures);
+  }
+  else if (scoreData.inferences.log) {
+    paramData.logResult = testCrashText(deficitData.log, 'log');
   }
   else {
     paramData.logResult = customSucceedText('log');
@@ -179,6 +218,9 @@ exports.parameters = (
     const failures = customFailures(failObj);
     paramData.menuNavResult = customResult(deficit.menuNav, 'menuNav', failures);
   }
+  else if (scoreData.inferences.menuNav) {
+    paramData.menuNavResult = testCrashText(deficitData.menuNav, 'menuNav');
+  }
   else {
     paramData.menuNavResult = customSucceedText('menuNav');
   }
@@ -190,12 +232,18 @@ exports.parameters = (
     const failures = customFailures(result);
     paramData.motionResult = customResult(deficit.motion, 'motion', failures);
   }
+  else if (scoreData.inferences.motion) {
+    paramData.motionResult = testCrashText(deficitData.motion, 'motion');
+  }
   else {
     paramData.motionResult = customSucceedText('motion');
   }
   if (deficit.radioSet) {
     const failures = customFailures(testData.radioSet.result.totals);
     paramData.radioSetResult = customResult(deficit.radioSet, 'radioSet', failures);
+  }
+  else if (scoreData.inferences.radioSet) {
+    paramData.radioSetResult = testCrashText(deficitData.radioSet, 'radioSet');
   }
   else {
     paramData.radioSetResult = customSucceedText('radioSet');
@@ -205,6 +253,9 @@ exports.parameters = (
     delete result.tagNames;
     const failures = customFailures(result);
     paramData.roleResult = customResult(deficit.role, 'role', failures);
+  }
+  else if (scoreData.inferences.role) {
+    paramData.roleResult = testCrashText(deficitData.role, 'role');
   }
   else {
     paramData.roleResult = customSucceedText('role');
@@ -220,6 +271,9 @@ exports.parameters = (
     const failures = customFailures(styleCounts);
     paramData.styleDiffResult = customResult(deficit.styleDiff, 'styleDiff', failures);
   }
+  else if (scoreData.inferences.styleDiff) {
+    paramData.styleDiffResult = testCrashText(deficitData.styleDiff, 'styleDiff');
+  }
   else {
     paramData.roleResult = customSucceedText('role');
   }
@@ -233,6 +287,9 @@ exports.parameters = (
     const failures = customFailures(failObj);
     paramData.tabNavResult = customResult(deficit.tabNav, 'tabNav', failures);
   }
+  else if (scoreData.inferences.tabNav) {
+    paramData.tabNavResult = testCrashText(deficitData.tabNav, 'tabNav');
+  }
   else {
     paramData.tabNavResult = customSucceedText('tabNav');
   }
@@ -240,6 +297,9 @@ exports.parameters = (
     const {tagNames} = testData.zIndex.result.totals;
     const failures = customFailures(tagNames);
     paramData.zIndexResult = customResult(deficit.zIndex, 'zIndex', failures);
+  }
+  else if (scoreData.inferences.zIndex) {
+    paramData.zIndexResult = testCrashText(deficitData.zIndex, 'zIndex');
   }
   else {
     paramData.zIndexResult = customSucceedText('zIndex');
