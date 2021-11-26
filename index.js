@@ -107,6 +107,8 @@ const browserTypeNames = {
 };
 // Items that may be waited for.
 const waitables = ['url', 'title', 'body'];
+// Index of quasi-page.
+let quasiPage = 0;
 // ########## VARIABLES
 // Facts about the current session.
 let logCount = 0;
@@ -308,7 +310,14 @@ const textOf = async (page, element) => {
         return labelTexts.concat(legendText).join(' ');
       }, element);
     }
-    // Otherwise, i.e. if it is not an input:
+    // Otherwise, if it is an option:
+    else if (tagName === 'OPTION') {
+      const ownText = await element.textContent();
+      const indexJSHandle = await element.getProperty('index');
+      const index = await indexJSHandle.jsonValue();
+      totalText = index === 0 ? `${ownText} ${textOf(element.parentElement)}` : ownText;
+    }
+    // Otherwise, i.e. if it is not an input, select, or option:
     else {
       // Get its text content.
       totalText = await element.textContent();
@@ -841,6 +850,8 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                 }
                 // Otherwise, if it is navigating until the element is reached:
                 else if (act.type === 'presses') {
+                  // Increment the quasi-page index.
+                  quasiPage++;
                   let status = 'more';
                   let presses = 0;
                   let amountRead = 0;
@@ -853,7 +864,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                     await page.keyboard.press(act.navKey);
                     presses++;
                     // Identify the newly focused, active, or selected element or a failure.
-                    const focalJSHandle = await page.evaluateHandle(() => {
+                    const focalJSHandle = await page.evaluateHandle(quasiPage => {
                       let currentElement = document.activeElement;
                       if (currentElement && currentElement.tagName !== 'BODY') {
                         if (currentElement.hasAttribute('aria-activedescendant')) {
@@ -870,22 +881,27 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                           currentElement = currentElement.shadowRoot.activeElement;
                         }
                         if (currentElement) {
-                          if (currentElement.dataset.pressesReached) {
-                            return 'locallyExhausted';
+                          if (currentElement.dataset.pressesReached === quasiPage.toString(10)) {
+                            console.log(`Element ${currentElement.tagName} reached again`);
+                            status = 'ERROR';
+                            return 'ERROR: locallyExhausted';
                           }
                           else {
-                            currentElement.dataset.pressesReached = 'true';
+                            console.log(`Element ${currentElement.tagName} reached first time`);
+                            currentElement.dataset.pressesReached = quasiPage;
                             return currentElement;
                           }
                         }
                         else {
+                          status = 'ERROR';
                           return 'noActiveElement';
                         }
                       }
                       else {
-                        return 'globallyExhausted';
+                        status = 'ERROR';
+                        return 'ERROR: globallyExhausted';
                       }
-                    });
+                    }, quasiPage);
                     // If the element exists:
                     const focalElement = focalJSHandle.asElement();
                     if (focalElement) {
