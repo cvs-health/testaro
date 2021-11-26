@@ -318,6 +318,7 @@ const textOf = async (page, element) => {
       const indexJSHandle = await element.getProperty('index');
       const index = await indexJSHandle.jsonValue();
       console.log(`The option index is ${index}`);
+      console.log(`The option text is ${ownText}`);
       if (index) {
         console.log('Index is not zero');
         totalText = ownText;
@@ -1007,9 +1008,15 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
             }
             // Otherwise, if the act is a keypress:
             else if (act.type === 'press') {
+              // Identify the number of times to press the key.
+              let times = 1 + (act.again || 0);
+              const key = act.which;
               // Press the key.
-              await page.keyboard.press(act.which);
-              act.result = 'pressed';
+              while (times--) {
+                await page.keyboard.press(key);
+              }
+              const qualifier = act.again ? `${1 + act.again} times` : 'once';
+              act.result = `pressed ${qualifier}`;
             }
             // Otherwise, i.e. if the act type is unknown:
             else {

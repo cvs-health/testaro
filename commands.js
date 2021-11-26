@@ -49,7 +49,8 @@ exports.commands = {
       'Press a key',
       {
         which: [true, 'string', 'hasLength', 'key name'],
-        what: [false, 'string', 'hasLength', 'comment']
+        what: [false, 'string', 'hasLength', 'comment'],
+        again: [false, 'number', '', 'number of additional times to press the key']
       }
     ],
     presses: [
