@@ -211,9 +211,9 @@ exports.parameters = (
   if (deficit.menuNav) {
     const failSource = testData.menuNav.result.totals;
     const failObj = {
-      navigations: failSource.navigations.all,
-      menuItems: failSource.menuItems,
-      menus: failSource.menus
+      navigations: failSource.navigations.all.incorrect,
+      menuItems: failSource.menuItems.incorrect,
+      menus: failSource.menus.incorrect
     };
     const failures = customFailures(failObj);
     paramData.menuNavResult = customResult(deficit.menuNav, 'menuNav', failures);
@@ -280,9 +280,9 @@ exports.parameters = (
   if (deficit.tabNav) {
     const failSource = testData.tabNav.result.totals;
     const failObj = {
-      navigations: failSource.navigations.all,
-      tabElements: failSource.tabElements,
-      tabLists: failSource.tabLists
+      navigations: failSource.navigations.all.incorrect,
+      tabElements: failSource.tabElements.incorrect,
+      tabLists: failSource.tabLists.incorrect
     };
     const failures = customFailures(failObj);
     paramData.tabNavResult = customResult(deficit.tabNav, 'tabNav', failures);
