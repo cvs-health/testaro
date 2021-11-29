@@ -631,16 +631,17 @@ const isTrue = (object, specs) => {
   return [actual, satisfied];
 };
 // Recursively performs the commands in a report.
-const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
-  // Identify the commands in the report.
-  const {acts} = report;
+const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => {
   // If any commands remain unperformed:
   if (actIndex < acts.length) {
     // Identify the command to be performed.
-    const act = acts[actIndex];
+    const scriptAct = acts[actIndex];
+    // Copy it into the report.
+    const act = JSON.parse(JSON.stringify(scriptAct));
     // If it is valid:
-    if (isValid(act)) {
-      console.log(`>>>> ${act.type}`);
+    if (isValid(scriptAct)) {
+      console.log(`>>>> ${scriptAct.type}`);
+      report.acts.push(act);
       // If the command is an index changer:
       if (act.type === 'next') {
         const condition = act.if;
@@ -654,8 +655,8 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
             value: truth[0],
             jumpRequired: truth[1]
           };
-          // Jump by the specified amount and perform the remaining acts.
-          await doActs(report, actIndex + act.jump, page, reportSuffix, reportDir);
+          // Jump by the specified amount and perform the remaining commands.
+          await doActs(acts, report, actIndex + act.jump, page, reportSuffix, reportDir);
         }
       }
       // Otherwise, if the command is a launch:
@@ -1098,12 +1099,12 @@ const scriptHandler = async (
   report.prohibitedCount = 0;
   report.visitTimeoutCount = 0;
   report.visitRejectionCount = 0;
-  report.acts = acts;
+  report.acts = [];
   report.testTimes = [];
   const hostSuffix = hostIndex > -1 ? `-${hostIndex.toString().padStart(3, '0')}` : '';
   const reportSuffix = `${query.timeStamp}${hostSuffix}`;
   // Perform the specified acts and add the results and exhibits to the report.
-  await doActs(report, 0, null, reportSuffix, query.reportDir);
+  await doActs(acts, report, 0, null, reportSuffix, query.reportDir);
   // Close the browser.
   await closeBrowser();
   // Add the log statistics to the report.
