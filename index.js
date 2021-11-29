@@ -644,9 +644,10 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
       report.acts.push(act);
       // If the command is an index changer:
       if (act.type === 'next') {
+        // Determine whether its jump condition is true.
         const condition = act.if;
-        const truth = isTrue(acts[actIndex - 1].result, condition);
-        // If the jump condition is true:
+        const truth = isTrue(report.acts[report.acts.length - 2].result, condition);
+        // If so:
         if (truth[1]) {
           act.result = {
             property: condition[0],
