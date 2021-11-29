@@ -358,7 +358,7 @@ const matchElement = async (page, selector, matchText, index = 0) => {
         return ! matchText || bodyText.includes(matchText);
       },
       [slimText, slimBody],
-      {timeout: 3000}
+      {timeout: 2000}
     )
     .catch(async error => {
       console.log(`ERROR: text to match not in body (${error.message})`);
