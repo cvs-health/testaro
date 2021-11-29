@@ -602,6 +602,34 @@ const reportFileUpdate = async (reportDir, nameSuffix, report, isJSON) => {
   const fileReport = isJSON ? report : JSON.stringify(report, null, 2);
   await fs.writeFile(`${reportDir}/report-${nameSuffix}.json`, fileReport);
 };
+// Returns a property value and whether it satisfies a condition.
+const isTrue = (object, specs) => {
+  let satisfied;
+  const property = specs[0];
+  const propertyTree = property.split('.');
+  const relation = specs[1];
+  const criterion = specs[2];
+  let actual = object[propertyTree[0]];
+  // Identify the actual value of the specified property.
+  while (propertyTree.length > 1 && actual !== undefined) {
+    propertyTree.shift();
+    actual = actual[propertyTree[0]];
+  }
+  // Determine whether the expectation was fulfilled.
+  if (relation === '=') {
+    satisfied = actual === criterion;
+  }
+  else if (relation === '<') {
+    satisfied = actual < criterion;
+  }
+  else if (relation === '>') {
+    satisfied = actual > criterion;
+  }
+  else if (! relation) {
+    satisfied = actual === undefined;
+  }
+  return [actual, satisfied];
+};
 // Recursively performs the commands in a report.
 const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
   // Identify the commands in the report.
@@ -613,8 +641,25 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
     // If it is valid:
     if (isValid(act)) {
       console.log(`>>>> ${act.type}`);
-      // If the command is a launch:
-      if (act.type === 'launch') {
+      // If the command is an index changer:
+      if (act.type === 'next') {
+        const condition = act.if;
+        const truth = isTrue(act[actIndex - 1].result, condition);
+        // If the jump condition is true:
+        if (truth[1]) {
+          act.result = {
+            property: condition[0],
+            relation: condition[1],
+            criterion: condition[2],
+            value: truth[0],
+            jumpRequired: truth[1]
+          };
+          // Jump by the specified amount and perform the remaining acts.
+          await doActs(report, actIndex + act.jump, page, reportSuffix, reportDir);
+        }
+      }
+      // Otherwise, if the command is a launch:
+      else if (act.type === 'launch') {
         // Launch the specified browser, creating a browser context and a page in it.
         await launch(act.which);
         // Identify its only page as current.
@@ -731,38 +776,15 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                 let failureCount = 0;
                 // For each expectation:
                 expectations.forEach(spec => {
-                  let passed;
-                  const property = spec[0];
-                  const propertyTree = property.split('.');
-                  const relation = spec[1];
-                  const criterion = spec[2];
-                  let actual = testReport.result[propertyTree[0]];
-                  // Identify the actual value of the specified property.
-                  while (propertyTree.length > 1 && actual !== undefined) {
-                    propertyTree.shift();
-                    actual = actual[propertyTree[0]];
-                  }
-                  // Determine whether the expectation was fuldilled.
-                  if (relation === '=') {
-                    passed = actual === criterion;
-                  }
-                  else if (relation === '<') {
-                    passed = actual < criterion;
-                  }
-                  else if (relation === '>') {
-                    passed = actual > criterion;
-                  }
-                  else if (! relation) {
-                    passed = actual === undefined;
-                  }
+                  const truth = isTrue(testReport.result, spec);
                   testReport.result.expectations.push({
-                    property,
-                    relation,
-                    criterion,
-                    actual,
-                    passed
+                    property: spec[0],
+                    relation: spec[1],
+                    criterion: spec[2],
+                    actual: truth[0],
+                    passed: truth[1]
                   });
-                  if (! passed) {
+                  if (! truth[1]) {
                     failureCount++;
                   }
                 });

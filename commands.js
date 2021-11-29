@@ -39,6 +39,16 @@ exports.commands = {
         what: [false, 'string', 'hasLength', 'comment']
       }
     ],
+    next: [
+      'Jump to a different next command if the last result requires',
+      {
+        if: [
+          true, 'array', 'areStrings', 'act result property tree in a.b.c format; if to exist, also one of “<=>” and criterion'
+        ],
+        jump: [true, 'number', '', 'offset of next command from this one'],
+        what: [false, 'string', 'hasLength', 'comment']
+      }
+    ],
     page: [
       'Switch to the last-opened browser tab',
       {
