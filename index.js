@@ -268,8 +268,8 @@ const render = (path, stage, which, query, response) => {
     }
   }
 };
-// Normalizes spacing characters in a string.
-const debloat = string => string.replace(/\s/g, ' ').trim().replace(/ {2,}/g, ' ');
+// Normalizes spacing characters and cases in a string.
+const debloat = string => string.replace(/\s/g, ' ').trim().replace(/ {2,}/g, ' ').toLowerCase();
 // Returns the text of an element, lower-cased.
 const textOf = async (page, element) => {
   if (element) {
@@ -337,7 +337,7 @@ const textOf = async (page, element) => {
       // Get its text content.
       totalText = await element.textContent();
     }
-    return debloat(totalText).toLowerCase();
+    return debloat(totalText);
   }
   else {
     return null;
