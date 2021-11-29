@@ -10,3 +10,9 @@ screenShots/
 
 # System files
 .DS_Store
+
+# Development configurations
+.vscode/
+
+# Temporary files
+temp/
