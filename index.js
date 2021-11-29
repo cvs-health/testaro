@@ -1072,7 +1072,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
     // Update the report file.
     await reportFileUpdate(reportDir, reportSuffix, report, false);
     // Perform the remaining acts.
-    await doActs(report, actIndex + 1, page, reportSuffix, reportDir);
+    await doActs(acts, report, actIndex + 1, page, reportSuffix, reportDir);
   }
   // Otherwise, i.e. if all acts have been performed:
   else {
