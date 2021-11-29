@@ -278,7 +278,6 @@ const textOf = async (page, element) => {
     let totalText = '';
     // If the element is an input or select list:
     if (['INPUT', 'SELECT'].includes(tagName)) {
-      console.log(`Getting text of ${tagName}`);
       // Concatenate its visible labels and, if the first input in a fieldset, its legend.
       totalText = await page.evaluate(element => {
         const labels = Array.from(element.labels);
@@ -310,17 +309,13 @@ const textOf = async (page, element) => {
         }
         return labelTexts.concat(legendText).join(' ');
       }, element);
-      console.log(`Got ${totalText}`);
     }
     // Otherwise, if it is an option:
     else if (tagName === 'OPTION') {
       const ownText = await element.textContent();
       const indexJSHandle = await element.getProperty('index');
       const index = await indexJSHandle.jsonValue();
-      console.log(`The option index is ${index}`);
-      console.log(`The option text is ${ownText}`);
       if (index) {
-        console.log('Index is not zero');
         totalText = ownText;
       }
       else {
@@ -330,11 +325,9 @@ const textOf = async (page, element) => {
         const select = await selectJSHandle.asElement();
         if (select) {
           const selectText = await textOf(page, select);
-          console.log(`Select text is ${selectText}`);
           totalText = [ownText, selectText].join(' ');
         }
         else {
-          console.log('Select not found');
           totalText = ownText;
         }
       }
@@ -926,12 +919,11 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                         }
                         if (currentElement) {
                           if (currentElement.dataset.pressesReached === quasiPage.toString(10)) {
-                            console.log(`Element ${currentElement.tagName} reached again`);
+                            console.log(`ERROR: ${currentElement.tagName} element reached again`);
                             status = 'ERROR';
                             return 'ERROR: locallyExhausted';
                           }
                           else {
-                            console.log(`Element ${currentElement.tagName} reached first time`);
                             currentElement.dataset.pressesReached = quasiPage;
                             return currentElement;
                           }
