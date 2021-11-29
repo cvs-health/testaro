@@ -107,7 +107,7 @@ const browserTypeNames = {
 };
 // Items that may be waited for.
 const waitables = ['url', 'title', 'body'];
-// Index of quasi-page.
+// Index of quasi-page for defining exhaustion in presses act.
 let quasiPage = 0;
 // ########## VARIABLES
 // Facts about the current session.
@@ -348,12 +348,19 @@ const matchElement = async (page, selector, matchText, index = 0) => {
   // If the page still exists:
   if (page) {
     // Wait 3 seconds until the body contains any text to be matched.
+    const slimText = debloat(matchText);
+    const bodyText = await page.textContent('body');
+    const slimBody = debloat(bodyText);
     const textInBodyJSHandle = await page.waitForFunction(
-      matchText => ! matchText || document.body.textContent.includes(matchText),
-      matchText,
+      args => {
+        const matchText = args[0];
+        const bodyText = args[1];
+        return ! matchText || bodyText.includes(matchText);
+      },
+      [slimText, slimBody],
       {timeout: 3000}
     )
-    .catch(error => {
+    .catch(async error => {
       console.log(`ERROR: text to match not in body (${error.message})`);
     });
     // If there is no text to be matched or the body contained it:
@@ -810,7 +817,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
             else if (moves[act.type]) {
               const selector = typeof moves[act.type] === 'string' ? moves[act.type] : act.what;
               // Identify the element to perform the move on.
-              const whichElement = await matchElement(page, selector, act.which, act.index);
+              const whichElement = await matchElement(page, selector, act.which || '', act.index);
               // If there were enough candidates but no text match:
               if (Array.isArray(whichElement)) {
                 // Add the result to the act.
@@ -887,7 +894,7 @@ const doActs = async (report, actIndex, page, reportSuffix, reportDir) => {
                 }
                 // Otherwise, if it is navigating until the element is reached:
                 else if (act.type === 'presses') {
-                  // Increment the quasi-page index.
+                  // Increment the quasi-page index to make exhaustion act-specific.
                   quasiPage++;
                   let status = 'more';
                   let presses = 0;
