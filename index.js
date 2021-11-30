@@ -15,9 +15,9 @@ const https = require('https');
 const {commands} = require('./commands');
 // ########## CONSTANTS
 // Set debug to true to add debugging features.
-const debug = false;
+const debug = true;
 // Set waits to a positive number to insert delays (in ms).
-const waits = 0;
+const waits = 100;
 const protocol = process.env.PROTOCOL || 'https';
 // Files servable without modification.
 const statics = {
@@ -410,6 +410,8 @@ const matchElement = async (page, selector, matchText, index = 0) => {
 };
 // Validates a browser type.
 const isBrowserType = type => ['chromium', 'firefox', 'webkit'].includes(type);
+// Validates a load state.
+const isState = string => ['loaded', 'idle'].includes(string);
 // Validates a URL.
 const isURL = string => /^(?:https?|file):\/\/[^\s]+$/.test(string);
 // Validates a focusable tag name.
@@ -457,6 +459,9 @@ const hasSubtype = (variable, subtype) => {
     }
     else if (subtype === 'areStrings') {
       return areStrings(variable);
+    }
+    else if (subtype === 'isState') {
+      return isState(variable);
     }
     else {
       return false;
@@ -685,7 +690,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
           // Visit it and wait until it is stable.
           page = await visit(act, page, report.strict);
         }
-        // Otherwise, if the act is a wait:
+        // Otherwise, if the act is a wait for text:
         else if (act.type === 'wait') {
           console.log(`>> for ${act.what} to include “${act.which}”`);
           const waitError = (error, what) => {
@@ -724,6 +729,23 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
               console.log(`ERROR waiting for stability after ${act.what} (${error.message})`);
               act.result.error = `ERROR waiting for stability after ${act.what}`;
             });
+          }
+        }
+        // Otherwise, if the act is a wait for a state:
+        else if (act.type === 'state') {
+          // If the state is valid:
+          const stateIndex = ['loaded', 'idle'].indexOf(act.which);
+          if (stateIndex !== -1) {
+            // Wait for it.
+            await page.waitForLoadState(['domcontentloaded', 'idle'][stateIndex], {timeout: 5000})
+            .catch(error => {
+              console.log(`ERROR waiting for page to be ${act.which} (${error.message})`);
+              act.result = `ERROR waiting for page to be ${act.which}`;
+            });
+          }
+          else {
+            console.log('ERROR: invalid state');
+            act.result = 'ERROR: invalid state';
           }
         }
         // Otherwise, if the act is a page switch:

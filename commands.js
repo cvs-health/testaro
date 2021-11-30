@@ -66,10 +66,10 @@ exports.commands = {
     presses: [
       'Repeatedly press a navigation key',
       {
+        navKey: [true, 'string', 'hasLength', 'navigation-keyname'],
+        what: [true, 'string', 'hasLength', 'selector of destination element'],
         which: [false, 'string', 'hasLength', 'substring of destination element text if any'],
         index: [false, 'number', '', 'index among matches if not 0'],
-        what: [true, 'string', 'hasLength', 'selector of destination element'],
-        navKey: [true, 'string', 'hasLength', 'navigation-keyname'],
         text: [false, 'string', 'hasLength', 'text to enter after reaching destination'],
         action: [false, 'string', 'hasLength', 'name of key to press, after text entry if any'],
         withItems: [true, 'boolean']
@@ -104,11 +104,18 @@ exports.commands = {
         what: [true, 'string', 'hasLength', 'substring of option text']
       }
     ],
+    state: [
+      'Wait until the page reaches a load state',
+      {
+        which: [true, 'string', 'hasLength', '“loaded” or “idle”'],
+        what: [false, 'string', 'hasLength', 'comment']
+      }
+    ],
     test: [
       'Perform a test',
       {
         which: [true, 'string', 'isTest', 'test name'],
-        what: [false, 'string', 'hasLength', 'comment']
+        what: [false, 'string', 'isState', 'comment']
       }
     ],
     text: [
