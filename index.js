@@ -669,8 +669,13 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
           };
           // Initialize the commands as completed.
           let newIndex = -1;
-          // If there is a numerical jump:
-          if (act.jump) {
+          // If the performance of commands is to stop:
+          if (act.jump === 0) {
+            // Set the new index accordingly.
+            newIndex = -1;
+          }
+          // Otherwise, if there is a numerical jump:
+          else if (act.jump) {
             // Set the new index accordingly.
             newIndex = actIndex + act.jump;
           }
