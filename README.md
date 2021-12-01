@@ -220,6 +220,7 @@ There are no constraints on the command types after the first two.
 The subsequent commands can tell Autotest to perform any of:
 - moves (clicks, text inputs, hovers, etc.)
 - navigations (browser launches, visits to URLs, waits for page conditions, etc.)
+- alterations (changes to the page)
 - tests (whether in dependency packages or defined by Autotest)
 - scoring (aggregating test results into total scores)
 - branching (continuing from a command other than the next one)
@@ -252,6 +253,17 @@ An example of a navigation is the command of type `url` above. Another is:
 ```
 
 In this case, Autotest waits until the page title contains the string “travel” (case-insensitively).
+
+An example of an alteration is:
+
+```json
+{
+  "type": "reveal",
+  "what": "make everything visible"
+}
+```
+
+This command causes Autotest to alter the `display` and `visibility` style properties of all elements, where necessary, so those properties do not make any element invisible.
 
 An example of a packaged test is:
 

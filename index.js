@@ -57,7 +57,6 @@ const moves = {
   checkbox: 'input[type=checkbox]',
   focus: true,
   link: 'a',
-  presses: true,
   radio: 'input[type=radio]',
   select: 'select',
   text: 'input[type=text]'
@@ -107,8 +106,6 @@ const browserTypeNames = {
 };
 // Items that may be waited for.
 const waitables = ['url', 'title', 'body'];
-// Index of quasi-page for defining exhaustion in presses act.
-let quasiPage = 0;
 // ########## VARIABLES
 // Facts about the current session.
 let logCount = 0;
@@ -293,6 +290,13 @@ const textOf = async (page, element) => {
               }
             }
           });
+        }
+        if (element.hasAttribute('aria-describedby')) {
+          const describer = document.getElementById(element.getAttribute('aria-describedby'));
+          if (describer) {
+            const description = describer.textContent;
+            labelTexts.push(description);
+          }
         }
         let legendText = '';
         const fieldsets = Array.from(document.body.querySelectorAll('fieldset'));
@@ -796,6 +800,137 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
               await require('./procs/test/allVis').allVis(page);
               act.result = 'All elements visible.';
             }
+            // Otherwise, if it is a repetitive keyboard navigation:
+            else if (act.type === 'presses') {
+              // Initialize the loop variables.
+              let status = 'more';
+              let presses = 0;
+              let amountRead = 0;
+              let items = [];
+              // As long as a matching element has not been reached:
+              while (status === 'more') {
+                // Press the Escape key to dismiss any modal dialog.
+                await page.keyboard.press('Escape');
+                // Press the specified navigation key.
+                await page.keyboard.press(act.navKey);
+                presses++;
+                // Identify the newly current element or a failure.
+                const currentJSHandle = await page.evaluateHandle(actIndex => {
+                  // Initialize it as the focused element.
+                  let currentElement = document.activeElement;
+                  // If it exists in the page:
+                  if (currentElement && currentElement.tagName !== 'BODY') {
+                    // Change it, if necessary, to its active descendant.
+                    if (currentElement.hasAttribute('aria-activedescendant')) {
+                      currentElement = document.getElementById(
+                        currentElement.getAttribute('aria-activedescendant')
+                      );
+                    }
+                    // Or change it, if necessary, to its selected option.
+                    else if (currentElement.tagName === 'SELECT') {
+                      const currentIndex = Math.max(0, currentElement.selectedIndex);
+                      const options = currentElement.querySelectorAll('option');
+                      currentElement = options[currentIndex];
+                    }
+                    // Or change it, if necessary, to its active shadow-DOM element.
+                    else if (currentElement.shadowRoot) {
+                      currentElement = currentElement.shadowRoot.activeElement;
+                    }
+                    // If there is a current element:
+                    if (currentElement) {
+                      // If it was already reached within this act:
+                      if (currentElement.dataset.pressesReached === actIndex.toString(10)) {
+                        // Report the error.
+                        console.log(`ERROR: ${currentElement.tagName} element reached again`);
+                        status = 'ERROR';
+                        return 'ERROR: locallyExhausted';
+                      }
+                      // Otherwise, i.e. if it is newly reached within this act:
+                      else {
+                        // Mark and return it.
+                        currentElement.dataset.pressesReached = actIndex;
+                        return currentElement;
+                      }
+                    }
+                    // Otherwise, i.e. if there is no current element:
+                    else {
+                      // Report the error.
+                      status = 'ERROR';
+                      return 'noActiveElement';
+                    }
+                  }
+                  // Otherwise, i.e. if there is no focus in the page:
+                  else {
+                    // Report the error.
+                    status = 'ERROR';
+                    return 'ERROR: globallyExhausted';
+                  }
+                }, actIndex);
+                // If the current element exists:
+                const currentElement = currentJSHandle.asElement();
+                if (currentElement) {
+                  // Update the data.
+                  const tagNameJSHandle = await currentElement.getProperty('tagName');
+                  const tagName = await tagNameJSHandle.jsonValue();
+                  const text = await textOf(page, currentElement);
+                  // If the text of the current element was found:
+                  if (text !== null) {
+                    // Update more of the data.
+                    const textLength = text.length;
+                    if (act.withItems) {
+                      items.push({
+                        tagName,
+                        text,
+                        textLength
+                      });
+                    }
+                    amountRead += textLength;
+                    // If there is no text-match failure:
+                    if (! act.text || text && text.includes(act.text)) {
+                      // Determine whether the selector selects the current element.
+                      const isSelected = await page.evaluate(args => {
+                        const [currentElement, selector] = args;
+                        return Array
+                        .from(document.body.querySelectorAll(selector))
+                        .includes(currentElement);
+                      }, [currentElement, act.what]);
+                      // If it does:
+                      if (isSelected) {
+                        // Change the status.
+                        status = 'done';
+                        // Perform the action.
+                        if (act.text) {
+                          await page.keyboard.type(act.text);
+                        }
+                        if (act.action) {
+                          await page.keyboard.press(act.action);
+                          await page.waitForLoadState();
+                        }
+                      }
+                    }
+                  }
+                  else {
+                    status = 'ERROR';
+                  }
+                }
+                // Otherwise, i.e. if there was a failure:
+                else {
+                  // Update the status.
+                  status = await currentJSHandle.jsonValue();
+                }
+              }
+              // Add the result to the act.
+              act.result = {
+                status,
+                totals: {
+                  presses,
+                  amountRead
+                }
+              };
+              if (act.withItems) {
+                act.result.items = items;
+              }
+            }
             // Otherwise, if the act is a test:
             else if (act.type === 'test') {
               console.log(`>> ${act.which}`);
@@ -938,115 +1073,6 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
                     target: target || 'NONE',
                     move: 'clicked'
                   };
-                }
-                // Otherwise, if it is navigating until the element is reached:
-                else if (act.type === 'presses') {
-                  // Increment the quasi-page index to make exhaustion act-specific.
-                  quasiPage++;
-                  let status = 'more';
-                  let presses = 0;
-                  let amountRead = 0;
-                  let items = [];
-                  // As long as the element has not been reached:
-                  while (status === 'more') {
-                    // Press the Escape key to dismiss any modal dialog.
-                    await page.keyboard.press('Escape');
-                    // Press the specified navigation key.
-                    await page.keyboard.press(act.navKey);
-                    presses++;
-                    // Identify the newly focused, active, or selected element or a failure.
-                    const focalJSHandle = await page.evaluateHandle(quasiPage => {
-                      let currentElement = document.activeElement;
-                      if (currentElement && currentElement.tagName !== 'BODY') {
-                        if (currentElement.hasAttribute('aria-activedescendant')) {
-                          currentElement = document.getElementById(
-                            currentElement.getAttribute('aria-activedescendant')
-                          );
-                        }
-                        else if (currentElement.tagName === 'SELECT') {
-                          const currentIndex = Math.max(0, currentElement.selectedIndex);
-                          const options = currentElement.querySelectorAll('option');
-                          currentElement = options[currentIndex];
-                        }
-                        else if (currentElement.shadowRoot) {
-                          currentElement = currentElement.shadowRoot.activeElement;
-                        }
-                        if (currentElement) {
-                          if (currentElement.dataset.pressesReached === quasiPage.toString(10)) {
-                            console.log(`ERROR: ${currentElement.tagName} element reached again`);
-                            status = 'ERROR';
-                            return 'ERROR: locallyExhausted';
-                          }
-                          else {
-                            currentElement.dataset.pressesReached = quasiPage;
-                            return currentElement;
-                          }
-                        }
-                        else {
-                          status = 'ERROR';
-                          return 'noActiveElement';
-                        }
-                      }
-                      else {
-                        status = 'ERROR';
-                        return 'ERROR: globallyExhausted';
-                      }
-                    }, quasiPage);
-                    // If the element exists:
-                    const focalElement = focalJSHandle.asElement();
-                    if (focalElement) {
-                      // Update the data.
-                      const tagNameJSHandle = await focalElement.getProperty('tagName');
-                      const tagName = await tagNameJSHandle.jsonValue();
-                      const text = await textOf(page, focalElement);
-                      if (text !== null) {
-                        const textLength = text.length;
-                        if (act.withItems) {
-                          items.push({
-                            tagName,
-                            text,
-                            textLength
-                          });
-                        }
-                        amountRead += textLength;
-                        // Determine whether the element has been reached.
-                        const sameElement = await page.evaluate(args => {
-                          const [focalElement, whichElement] = args;
-                          return focalElement === whichElement;
-                        }, [focalElement, whichElement]);
-                        // If it has:
-                        if (sameElement) {
-                          // Perform the action.
-                          status = 'done';
-                          if (act.text) {
-                            await page.keyboard.type(act.text);
-                          }
-                          if (act.action) {
-                            await page.keyboard.press(act.action);
-                            await page.waitForLoadState();
-                          }
-                        }
-                      }
-                      else {
-                        status = 'ERROR';
-                      }
-                    }
-                    // Otherwise, i.e. if there was a failure:
-                    else {
-                      // Update the status.
-                      status = await focalJSHandle.jsonValue();
-                    }
-                  }
-                  act.result = {
-                    status,
-                    totals: {
-                      presses,
-                      amountRead
-                    }
-                  };
-                  if (act.withItems) {
-                    act.result.items = items;
-                  }
                 }
                 // Otherwise, if it is selecting an option in a select list, perform it.
                 else if (act.type === 'select') {
