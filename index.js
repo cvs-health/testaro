@@ -499,10 +499,15 @@ const isValid = command => {
     }
     // Return whether the command is valid.
     return Object.keys(validator).every(property => {
-      const vP = validator[property];
-      const cP = command[property];
-      // If it is optional and omitted or present and valid:
-      return ! vP[0] && ! cP || cP !== undefined && hasType(cP, vP[1]) && hasSubtype(cP, vP[2]);
+      if (property === 'name') {
+        return true;
+      }
+      else {
+        const vP = validator[property];
+        const cP = command[property];
+        // If it is optional and omitted or present and valid:
+        return ! vP[0] && ! cP || cP !== undefined && hasType(cP, vP[1]) && hasSubtype(cP, vP[2]);
+      }
     });
   }
   // Otherwise, i.e. if the command has an unknown or no type:
@@ -637,8 +642,8 @@ const isTrue = (object, specs) => {
 };
 // Recursively performs the commands in a report.
 const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => {
-  // If any commands remain unperformed:
-  if (actIndex < acts.length) {
+  // If any more commands are to be performed:
+  if (actIndex > -1 && actIndex < acts.length) {
     // Identify the command to be performed.
     const scriptAct = acts[actIndex];
     // Copy it into the report.
@@ -654,6 +659,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
         const truth = isTrue(report.acts[report.acts.length - 2].result, condition);
         // If so:
         if (truth[1]) {
+          // Add the result to the act.
           act.result = {
             property: condition[0],
             relation: condition[1],
@@ -661,8 +667,20 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
             value: truth[0],
             jumpRequired: truth[1]
           };
-          // Jump by the specified amount and perform the remaining commands.
-          await doActs(acts, report, actIndex + act.jump, page, reportSuffix, reportDir);
+          // Initialize the commands as completed.
+          let newIndex = -1;
+          // If there is a numerical jump:
+          if (act.jump) {
+            // Set the new index accordingly.
+            newIndex = actIndex + act.jump;
+          }
+          // Otherwise, if there is a named next command:
+          else if (act.next) {
+            // Set the new index accordingly, or stop if it does not exist.
+            newIndex = acts.map(act => act.name).indexOf(act.next);
+          }
+          // Perform the remaining commands, if any, starting with the specified one.
+          await doActs(acts, report, newIndex, page, reportSuffix, reportDir);
         }
       }
       // Otherwise, if the command is a launch:
@@ -1097,7 +1115,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
     // Perform the remaining acts.
     await doActs(acts, report, actIndex + 1, page, reportSuffix, reportDir);
   }
-  // Otherwise, i.e. if all acts have been performed:
+  // Otherwise, i.e. if no more acts are to be performed:
   else {
     // Return a Promise.
     return Promise.resolve('');

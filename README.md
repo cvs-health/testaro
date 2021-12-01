@@ -107,7 +107,7 @@ If the `strict` property is `true`, Autotest will accept redirections that add o
 
 The `commands` property’s value is an array of commands, each being an object.
 
-Each command has a `type` property and other properties specifying the command.
+Each command has a `type` property, optionally has a `name` property, and has other properties specifying the command.
 
 You can look up the command types and their required and optional properties in the `commands.js` file. That file defines two objects, named `etc` and `tests`.
 
@@ -145,6 +145,7 @@ That other validity criterion may be any of these:
 - `'isURL`': is a string starting with `http`, `https`, or `file`, then `://`, then ending with 1 or more non-whitespace characters
 - `'isBrowserType'`: is `'chromium'`, `'firefox'`, or `'webkit'`
 - `'isFocusable'`: is `'a'`, `'button'`, `'input'`, `'select'`, or `'option'`
+- `'isState'`: is `'loaded'` or `'idle'`
 - `'isTest'`: is the name of a test
 - `'isWaitable'`: is `'url'`, `'title'`, or `'body'`
 - `'areStrings'`: is an array of strings
@@ -212,6 +213,8 @@ The first two commands have the types `launch` and `url`, respectively. They lau
 }
 ```
 
+There are no constraints on the command types after the first two.
+
 ##### Command types
 
 The subsequent commands can tell Autotest to perform any of:
@@ -219,6 +222,7 @@ The subsequent commands can tell Autotest to perform any of:
 - navigations (browser launches, visits to URLs, waits for page conditions, etc.)
 - tests (whether in dependency packages or defined by Autotest)
 - scoring (aggregating test results into total scores)
+- branching (continuing from a command other than the next one)
 
 An example of a move is:
 
@@ -300,17 +304,30 @@ The data for scores can include not only test results, but also log statistics. 
 - `visitTimeoutCount`: how many times an attempt to visit a URL timed out
 - `visitRejectionCount`: how many times a URL visit got an HTTP status other than 200 or 304
 
+An example of a branching command is:
+
+```json
+{
+  "type": "next",
+  "if": ["totals.invalid", ">", 0],
+  "jump": -4,
+  "what": "redo search if any invalid elements"
+}
+```
+
+This command checks the result of the previous act to determine whether its `result.totals.invalid` property has a positive value. If so, it changes the next command to be performed, specifying the command 4 commands before this one.
+
 ##### URL commands
 
 Once you have included a `url` command in a script, you do not need to add more `url` commands unless you want the browser to visit a different URL.
 
-However, some tests modify web pages. In those cases, Autotest inserts additional `url` commands into your script, to ensure that changes made by one test do not affect subsequent acts.
+However, some tests modify web pages. In those cases, Autotest performs additional `url` commands after those tests, to ensure that changes made by one test do not affect subsequent acts. Those additional `url` acts appear in the report, but their commands are not inserted into your script.
 
 ### Batches
 
 There are two ways to use a script in run mode to give instructions to Autotest:
 - The script can be the complete specification of the job.
-- The script can specify the operations to perform, and a **batch** can specify which pages to perform them on.
+- The script can specify the operations to perform, and a _batch_ can specify which pages to perform them on.
 
 A batch is a JSON file with this format:
 
@@ -330,7 +347,7 @@ A batch is a JSON file with this format:
 }
 ```
 
-When you combine a script with a batch, Autotest performs the script, replacing the `which` and `what` properties of all `url` commands with the values in the first object in the `hosts` array, then again with the values in the second object, and so on.
+When you combine a script with a batch, Autotest performs the script, replacing the `which` and `what` properties of all `url` commands with the values in the first object in the `hosts` array, then again with the values in the second object, and so on. Those replacements also occur in the extra `url` commands mentioned above.
 
 A batch offers an efficient way to perform a uniform set of commands on every host in a set of hosts. In this way you can run the same set of tests on multiple web pages. Autotest writes a separate report file for each host.
 
