@@ -278,6 +278,7 @@ const textOf = async (page, element) => {
       // Return its visible labels, descriptions, and legend if the first input in a fieldset.
       totalText = await page.evaluate(element => {
         const {tagName} = element;
+        const ownText = ['A', 'BUTTON'].includes(tagName) ? element.textContent : '';
         // HTML link elements have no labels property.
         const labels = tagName !== 'A' ? Array.from(element.labels) : [];
         const labelTexts = labels.map(label => label.textContent);
@@ -311,7 +312,7 @@ const textOf = async (page, element) => {
             }
           }
         }
-        return labelTexts.concat(legendText).join(' ');
+        return [legendText].concat(labelTexts, ownText).join(' ');
       }, element);
     }
     // Otherwise, if it is an option:
