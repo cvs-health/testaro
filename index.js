@@ -273,8 +273,8 @@ const textOf = async (page, element) => {
     const tagNameJSHandle = await element.getProperty('tagName');
     const tagName = await tagNameJSHandle.jsonValue();
     let totalText = '';
-    // If the element is an input or select list:
-    if (['INPUT', 'SELECT'].includes(tagName)) {
+    // If the element is a link, button, input, or select list:
+    if (['A', 'BUTTON', 'INPUT', 'SELECT'].includes(tagName)) {
       // Concatenate its visible labels and, if the first input in a fieldset, its legend.
       totalText = await page.evaluate(element => {
         const labels = Array.from(element.labels);
