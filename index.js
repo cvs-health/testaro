@@ -785,7 +785,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
           if (stateIndex !== -1) {
             // Wait for it.
             await page.waitForLoadState(
-              ['domcontentloaded', 'idle'][stateIndex], {timeout: stateIndex ? 10000 : 5000}
+              ['domcontentloaded', 'networkidle'][stateIndex], {timeout: [10000, 5000][stateIndex]}
             )
             .catch(error => {
               console.log(`ERROR waiting for page to be ${act.which} (${error.message})`);
