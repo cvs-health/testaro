@@ -153,6 +153,10 @@ const launch = async typeName => {
       viewPort: {
         width: 1280,
         height: 1120
+      },
+      screen: {
+        width: 1280,
+        height: 1120
       }
     } : {};
     browserContext = await browser.newContext(viewport);
@@ -765,7 +769,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
             if (act.what === 'title') {
               act.result.title = await page.title();
             }
-            await page.waitForLoadState('networkidle', {timeout: 5000})
+            await page.waitForLoadState('networkidle', {timeout: 10000})
             .catch(error => {
               console.log(`ERROR waiting for stability after ${act.what} (${error.message})`);
               act.result.error = `ERROR waiting for stability after ${act.what}`;
@@ -778,7 +782,9 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
           const stateIndex = ['loaded', 'idle'].indexOf(act.which);
           if (stateIndex !== -1) {
             // Wait for it.
-            await page.waitForLoadState(['domcontentloaded', 'idle'][stateIndex], {timeout: 5000})
+            await page.waitForLoadState(
+              ['domcontentloaded', 'idle'][stateIndex], {timeout: stateIndex ? 10000 : 5000}
+            )
             .catch(error => {
               console.log(`ERROR waiting for page to be ${act.which} (${error.message})`);
               act.result = `ERROR waiting for page to be ${act.which}`;
