@@ -623,7 +623,7 @@ const isTrue = (object, specs) => {
   const propertyTree = property.split('.');
   const relation = specs[1];
   const criterion = specs[2];
-  let actual = object[propertyTree[0]];
+  let actual = property.length ? object[propertyTree[0]] : object;
   // Identify the actual value of the specified property.
   while (propertyTree.length > 1 && actual !== undefined) {
     propertyTree.shift();
