@@ -802,6 +802,8 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
             }
             // Otherwise, if it is a repetitive keyboard navigation:
             else if (act.type === 'presses') {
+              const {navKey, what, which, withItems} = act;
+              const matchText = debloat(which);
               // Initialize the loop variables.
               let status = 'more';
               let presses = 0;
@@ -812,7 +814,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
                 // Press the Escape key to dismiss any modal dialog.
                 await page.keyboard.press('Escape');
                 // Press the specified navigation key.
-                await page.keyboard.press(act.navKey);
+                await page.keyboard.press(navKey);
                 presses++;
                 // Identify the newly current element or a failure.
                 const currentJSHandle = await page.evaluateHandle(actIndex => {
@@ -877,7 +879,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
                   if (text !== null) {
                     // Update more of the data.
                     const textLength = text.length;
-                    if (act.withItems) {
+                    if (withItems) {
                       items.push({
                         tagName,
                         text,
@@ -886,14 +888,14 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
                     }
                     amountRead += textLength;
                     // If there is no text-match failure:
-                    if (! act.which || text && text.includes(act.which)) {
+                    if (! which || text && text.includes(matchText)) {
                       // Determine whether the selector selects the current element.
                       const isSelected = await page.evaluate(args => {
                         const [currentElement, selector] = args;
                         return Array
                         .from(document.body.querySelectorAll(selector))
                         .includes(currentElement);
-                      }, [currentElement, act.what]);
+                      }, [currentElement, what]);
                       // If it does:
                       if (isSelected) {
                         // Change the status.

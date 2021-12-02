@@ -70,7 +70,6 @@ exports.commands = {
         navKey: [true, 'string', 'hasLength', 'navigation-keyname'],
         what: [true, 'string', 'hasLength', 'selector of destination element'],
         which: [false, 'string', 'hasLength', 'substring of destination element text if any'],
-        index: [false, 'number', '', 'index among matches if not 0'],
         text: [false, 'string', 'hasLength', 'text to enter after reaching destination'],
         action: [false, 'string', 'hasLength', 'name of key to press, after text entry if any'],
         withItems: [true, 'boolean']
