@@ -277,7 +277,9 @@ const textOf = async (page, element) => {
     if (['A', 'BUTTON', 'INPUT', 'SELECT'].includes(tagName)) {
       // Return its visible labels, descriptions, and legend if the first input in a fieldset.
       totalText = await page.evaluate(element => {
-        const labels = Array.from(element.labels);
+        const {tagName} = element;
+        // HTML link elements have no labels property.
+        const labels = tagName !== 'A' ? Array.from(element.labels) : [];
         const labelTexts = labels.map(label => label.textContent);
         const refIDs = new Set([
           element.getAttribute('aria-labelledby') || '',
@@ -294,8 +296,9 @@ const textOf = async (page, element) => {
             }
           });
         }
+        console.log('Middle');
         let legendText = '';
-        if (element.tagName === 'INPUT') {
+        if (tagName === 'INPUT') {
           const fieldsets = Array.from(document.body.querySelectorAll('fieldset'));
           const inputFieldsets = fieldsets.filter(fieldset => {
             const inputs = Array.from(fieldset.querySelectorAll('input'));
