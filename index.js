@@ -671,13 +671,16 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
     // Copy it into the report.
     const act = JSON.parse(JSON.stringify(scriptAct));
     // If it is valid:
-    if (isValid(scriptAct)) {
-      console.log(`>>>> ${scriptAct.type}`);
+    if (isValid(act)) {
+      const whichSuffix = act.which ? ` (${act.which})` : '';
+      console.log(`>>>> ${act.type}${whichSuffix}`);
       report.acts.push(act);
       // Increment the count of commands performed.
       actCount++;
       // If the command is an index changer:
       if (act.type === 'next') {
+        const logSuffix = act.length === 3 ? ` ${act.if[1]} ${act.if[2]}` : '';
+        console.log(`>> ${act.if[0]}${logSuffix}`);
         // Determine whether its jump condition is true.
         const condition = act.if;
         const truth = isTrue(report.acts[report.acts.length - 2].result, condition);
