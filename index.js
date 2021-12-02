@@ -296,7 +296,6 @@ const textOf = async (page, element) => {
             }
           });
         }
-        console.log('Middle');
         let legendText = '';
         if (tagName === 'INPUT') {
           const fieldsets = Array.from(document.body.querySelectorAll('fieldset'));
