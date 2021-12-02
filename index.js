@@ -275,7 +275,7 @@ const textOf = async (page, element) => {
     let totalText = '';
     // If the element is a link, button, input, or select list:
     if (['A', 'BUTTON', 'INPUT', 'SELECT'].includes(tagName)) {
-      // Concatenate its visible labels and, if the first input in a fieldset, its legend.
+      // Return its visible labels, description, and legend if the first input in a fieldset.
       totalText = await page.evaluate(element => {
         const labels = Array.from(element.labels);
         const labelTexts = labels.map(label => label.textContent);
@@ -299,16 +299,18 @@ const textOf = async (page, element) => {
           }
         }
         let legendText = '';
-        const fieldsets = Array.from(document.body.querySelectorAll('fieldset'));
-        const inputFieldsets = fieldsets.filter(fieldset => {
-          const inputs = Array.from(fieldset.querySelectorAll('input'));
-          return inputs.length && inputs[0] === element;
-        });
-        const inputFieldset = inputFieldsets[0] || null;
-        if (inputFieldset) {
-          const legend = inputFieldset.querySelector('legend');
-          if (legend) {
-            legendText = legend.textContent;
+        if (element.tagName === 'INPUT') {
+          const fieldsets = Array.from(document.body.querySelectorAll('fieldset'));
+          const inputFieldsets = fieldsets.filter(fieldset => {
+            const inputs = Array.from(fieldset.querySelectorAll('input'));
+            return inputs.length && inputs[0] === element;
+          });
+          const inputFieldset = inputFieldsets[0] || null;
+          if (inputFieldset) {
+            const legend = inputFieldset.querySelector('legend');
+            if (legend) {
+              legendText = legend.textContent;
+            }
           }
         }
         return labelTexts.concat(legendText).join(' ');
@@ -316,6 +318,7 @@ const textOf = async (page, element) => {
     }
     // Otherwise, if it is an option:
     else if (tagName === 'OPTION') {
+      // Return its text content, prefixed with the text of its select parent if the first option.
       const ownText = await element.textContent();
       const indexJSHandle = await element.getProperty('index');
       const index = await indexJSHandle.jsonValue();
