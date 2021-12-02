@@ -15,9 +15,9 @@ const https = require('https');
 const {commands} = require('./commands');
 // ########## CONSTANTS
 // Set debug to true to add debugging features.
-const debug = false;
+const debug = true;
 // Set waits to a positive number to insert delays (in ms).
-const waits = 0;
+const waits = 50;
 const protocol = process.env.PROTOCOL || 'https';
 // Files servable without modification.
 const statics = {
@@ -148,8 +148,14 @@ const launch = async typeName => {
       browserOptions.slowMo = waits;
     }
     const browser = await browserType.launch(browserOptions);
-    // Create a new context (window) in it.
-    browserContext = await browser.newContext();
+    // Create a new context (window) in it, taller if debugging is on.
+    const viewport = debug ? {
+      viewPort: {
+        width: 1280,
+        height: 1120
+      }
+    } : {};
+    browserContext = await browser.newContext(viewport);
     // When a page is added to the browser context:
     browserContext.on('page', page => {
       // Make its console messages appear in the Playwright console.
