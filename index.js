@@ -113,6 +113,7 @@ let logSize = 0;
 let prohibitedCount = 0;
 let visitTimeoutCount = 0;
 let visitRejectionCount = 0;
+let actCount = 0;
 // Facts about the current browser.
 let browserContext;
 let browserTypeName;
@@ -661,6 +662,8 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
     if (isValid(scriptAct)) {
       console.log(`>>>> ${scriptAct.type}`);
       report.acts.push(act);
+      // Increment the count of commands performed.
+      actCount++;
       // If the command is an index changer:
       if (act.type === 'next') {
         // Determine whether its jump condition is true.
@@ -822,7 +825,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
                 await page.keyboard.press(navKey);
                 presses++;
                 // Identify the newly current element or a failure.
-                const currentJSHandle = await page.evaluateHandle(actIndex => {
+                const currentJSHandle = await page.evaluateHandle(actCount => {
                   // Initialize it as the focused element.
                   let currentElement = document.activeElement;
                   // If it exists in the page:
@@ -845,8 +848,8 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
                     }
                     // If there is a current element:
                     if (currentElement) {
-                      // If it was already reached within this act:
-                      if (currentElement.dataset.pressesReached === actIndex.toString(10)) {
+                      // If it was already reached within this command performance:
+                      if (currentElement.dataset.pressesReached === actCount.toString(10)) {
                         // Report the error.
                         console.log(`ERROR: ${currentElement.tagName} element reached again`);
                         status = 'ERROR';
@@ -855,7 +858,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
                       // Otherwise, i.e. if it is newly reached within this act:
                       else {
                         // Mark and return it.
-                        currentElement.dataset.pressesReached = actIndex;
+                        currentElement.dataset.pressesReached = actCount;
                         return currentElement;
                       }
                     }
@@ -872,7 +875,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
                     status = 'ERROR';
                     return 'ERROR: globallyExhausted';
                   }
-                }, actIndex);
+                }, actCount);
                 // If the current element exists:
                 const currentElement = currentJSHandle.asElement();
                 if (currentElement) {
