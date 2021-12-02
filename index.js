@@ -803,7 +803,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
             // Otherwise, if it is a repetitive keyboard navigation:
             else if (act.type === 'presses') {
               const {navKey, what, which, withItems} = act;
-              const matchText = debloat(which);
+              const matchText = which ? debloat(which) : '';
               // Initialize the loop variables.
               let status = 'more';
               let presses = 0;
@@ -888,7 +888,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
                     }
                     amountRead += textLength;
                     // If there is no text-match failure:
-                    if (! which || text && text.includes(matchText)) {
+                    if (! matchText || text && text.includes(matchText)) {
                       // Determine whether the selector selects the current element.
                       const isSelected = await page.evaluate(args => {
                         const [currentElement, selector] = args;
