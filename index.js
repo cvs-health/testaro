@@ -886,7 +886,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
                     }
                     amountRead += textLength;
                     // If there is no text-match failure:
-                    if (! act.text || text && text.includes(act.text)) {
+                    if (! act.which || text && text.includes(act.which)) {
                       // Determine whether the selector selects the current element.
                       const isSelected = await page.evaluate(args => {
                         const [currentElement, selector] = args;
