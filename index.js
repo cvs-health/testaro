@@ -666,16 +666,16 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
         // Determine whether its jump condition is true.
         const condition = act.if;
         const truth = isTrue(report.acts[report.acts.length - 2].result, condition);
-        // If so:
+        // Add the result to the act.
+        act.result = {
+          property: condition[0],
+          relation: condition[1],
+          criterion: condition[2],
+          value: truth[0],
+          jumpRequired: truth[1]
+        };
+        // If the condition is true:
         if (truth[1]) {
-          // Add the result to the act.
-          act.result = {
-            property: condition[0],
-            relation: condition[1],
-            criterion: condition[2],
-            value: truth[0],
-            jumpRequired: truth[1]
-          };
           // Initialize the commands as completed.
           let newIndex = -1;
           // If the performance of commands is to stop:
