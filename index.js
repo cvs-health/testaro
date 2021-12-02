@@ -275,28 +275,24 @@ const textOf = async (page, element) => {
     let totalText = '';
     // If the element is a link, button, input, or select list:
     if (['A', 'BUTTON', 'INPUT', 'SELECT'].includes(tagName)) {
-      // Return its visible labels, description, and legend if the first input in a fieldset.
+      // Return its visible labels, descriptions, and legend if the first input in a fieldset.
       totalText = await page.evaluate(element => {
         const labels = Array.from(element.labels);
         const labelTexts = labels.map(label => label.textContent);
-        if (element.hasAttribute('aria-labelledby')) {
-          const labelerIDs = new Set(element.getAttribute('aria-labelledby').split(/\s+/));
-          labelerIDs.forEach(id => {
+        const refIDs = new Set([
+          element.getAttribute('aria-labelledby') || '',
+          element.getAttribute('aria-describedby') || ''
+        ].join(' ').split(/\s+/));
+        if (refIDs.size) {
+          refIDs.forEach(id => {
             const labeler = document.getElementById(id);
             if (labeler) {
-              const labelerText = labeler.textContent.replace(/\s+/g, ' ').trim();
+              const labelerText = labeler.textContent.trim();
               if (labelerText.length) {
                 labelTexts.push(labelerText);
               }
             }
           });
-        }
-        if (element.hasAttribute('aria-describedby')) {
-          const describer = document.getElementById(element.getAttribute('aria-describedby'));
-          if (describer) {
-            const description = describer.textContent;
-            labelTexts.push(description);
-          }
         }
         let legendText = '';
         if (element.tagName === 'INPUT') {
