@@ -17,7 +17,7 @@ const {commands} = require('./commands');
 // Set debug to true to add debugging features.
 const debug = true;
 // Set waits to a positive number to insert delays (in ms).
-const waits = 50;
+const waits = 250;
 const protocol = process.env.PROTOCOL || 'https';
 // Files servable without modification.
 const statics = {
@@ -153,10 +153,6 @@ const launch = async typeName => {
       viewPort: {
         width: 1280,
         height: 1120
-      },
-      screen: {
-        width: 1280,
-        height: 1120
       }
     } : {};
     browserContext = await browser.newContext(viewport);
@@ -176,6 +172,12 @@ const launch = async typeName => {
     });
     // Open the first page of the context.
     const page = await browserContext.newPage();
+    if (debug) {
+      page.setViewportSize({
+        width: 1280,
+        height: 1120
+      });
+    }
     // Wait until it is stable.
     await page.waitForLoadState('domcontentloaded');
     // Update the name of the current browser type and store it in the page.
