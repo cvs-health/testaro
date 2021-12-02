@@ -43,7 +43,7 @@ exports.commands = {
       'Specify the next command if the last result requires',
       {
         if: [
-          true, 'array', 'areStrings', 'act result property tree in a.b.c format; if to exist, also one of “<=>!” and criterion'
+          true, 'array', '', 'act result property tree in a.b.c format; if to exist, also one of “<=>!” and criterion'
         ],
         jump: [false, 'number', '', 'offset of next command from this one, or 0 to stop'],
         next: [false, 'string', 'hasLength', 'name of next command'],
