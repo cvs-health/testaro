@@ -664,6 +664,7 @@ const isTrue = (object, specs) => {
 };
 // Recursively performs the commands in a report.
 const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => {
+  console.log(`Command index is ${actIndex}`);
   // If any more commands are to be performed:
   if (actIndex > -1 && actIndex < acts.length) {
     // Identify the command to be performed.
@@ -696,25 +697,21 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
         };
         // If the condition is true:
         if (truth[1]) {
-          // Initialize the commands as completed.
-          let newIndex = -1;
           // If the performance of commands is to stop:
           if (act.jump === 0) {
-            // Set the new index accordingly.
-            newIndex = -1;
+            // Set the command index to cause a stop.
+            actIndex = -2;
           }
           // Otherwise, if there is a numerical jump:
           else if (act.jump) {
-            // Set the new index accordingly.
-            newIndex = actIndex + act.jump;
+            // Set the command index accordingly.
+            actIndex += act.jump - 1;
           }
           // Otherwise, if there is a named next command:
           else if (act.next) {
             // Set the new index accordingly, or stop if it does not exist.
-            newIndex = acts.map(act => act.name).indexOf(act.next);
+            actIndex = acts.map(act => act.name).indexOf(act.next) - 1;
           }
-          // Perform the remaining commands, if any, starting with the specified one.
-          await doActs(acts, report, newIndex, page, reportSuffix, reportDir);
         }
       }
       // Otherwise, if the command is a launch:
