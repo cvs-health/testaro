@@ -834,6 +834,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
               let presses = 0;
               let amountRead = 0;
               let items = [];
+              let matchedText;
               // As long as a matching element has not been reached:
               while (status === 'more') {
                 // Press the Escape key to dismiss any modal dialog.
@@ -904,7 +905,6 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
                   if (text !== null) {
                     const textLength = text.length;
                     // If it is non-empty and there are texts to match:
-                    let matchedText;
                     if (matchTexts.length && textLength) {
                       // Identify the matching text.
                       matchedText = matchTexts.find(matchText => text.includes(matchText));
@@ -957,6 +957,9 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
                   amountRead
                 }
               };
+              if (status === 'done' && matchedText) {
+                act.result.matchedText = matchedText;
+              }
               if (withItems) {
                 act.result.items = items;
               }
