@@ -17,7 +17,7 @@ const {commands} = require('./commands');
 // Set debug to true to add debugging features.
 const debug = true;
 // Set waits to a positive number to insert delays (in ms).
-const waits = 250;
+const waits = 300;
 const protocol = process.env.PROTOCOL || 'https';
 // Files servable without modification.
 const statics = {
@@ -828,7 +828,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
             // Otherwise, if it is a repetitive keyboard navigation:
             else if (act.type === 'presses') {
               const {navKey, what, which, withItems} = act;
-              const matchTexts = which.map(text => debloat(text));
+              const matchTexts = which ? which.map(text => debloat(text)) : [];
               // Initialize the loop variables.
               let status = 'more';
               let presses = 0;
