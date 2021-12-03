@@ -1146,7 +1146,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
             else if (act.type === 'press') {
               // Identify the number of times to press the key.
               let times = 1 + (act.again || 0);
-              report.press += times;
+              report.presses += times;
               const key = act.which;
               // Press the key.
               while (times--) {
