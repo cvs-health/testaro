@@ -767,7 +767,15 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
           }
           else if (act.what === 'body') {
             successJSHandle = await page.waitForFunction(
-              text => document.body.innerText.includes(text), act.which, {timeout: 5000}
+              text => {
+                const innerText = document.body.innerText;
+                if (text === 'ZIP') {
+                  console.log('STARTING INNER TEXT');
+                  console.log(innerText);
+                  console.log('ENDING INNER TEXT');
+                }
+                return document.body.innerText.includes(text);
+              }, act.which, {timeout: 5000}
             )
             .catch(error => waitError(error, 'body'));
           }
