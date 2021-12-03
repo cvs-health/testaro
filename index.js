@@ -767,7 +767,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
           }
           else if (act.what === 'body') {
             successJSHandle = await page.waitForFunction(
-              text => document.body.textContent.includes(text), act.which, {timeout: 5000}
+              text => document.body.innerText.includes(text), act.which, {timeout: 5000}
             )
             .catch(error => waitError(error, 'body'));
           }
