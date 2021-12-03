@@ -744,7 +744,8 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
         }
         // Otherwise, if the act is a wait for text:
         else if (act.type === 'wait') {
-          console.log(`>> for ${act.what} to include “${act.which}”`);
+          const {what, which} = act;
+          console.log(`>> for ${what} to include “${which}”`);
           const waitError = (error, what) => {
             console.log(`ERROR waiting for ${what} (${error.message})`);
             act.result = {url: page.url()};
@@ -766,16 +767,16 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
             .catch(error => waitError(error, 'title'));
           }
           else if (act.what === 'body') {
+            if (which === 'This service is temporarily unavailable') {
+              console.log('STARTING INNER TEXT');
+              console.log(await page.innerText('body'));
+              console.log('ENDING INNER TEXT');
+            }
             successJSHandle = await page.waitForFunction(
-              text => {
+              matchText => {
                 const innerText = document.body.innerText;
-                if (text === 'ZIP') {
-                  console.log('STARTING INNER TEXT');
-                  console.log(innerText);
-                  console.log('ENDING INNER TEXT');
-                }
-                return document.body.innerText.includes(text);
-              }, act.which, {timeout: 5000}
+                return innerText.includes(matchText);
+              }, which, {timeout: 5000}
             )
             .catch(error => waitError(error, 'body'));
           }
