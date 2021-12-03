@@ -664,7 +664,6 @@ const isTrue = (object, specs) => {
 };
 // Recursively performs the commands in a report.
 const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => {
-  console.log(`Command index is ${actIndex}`);
   // If any more commands are to be performed:
   if (actIndex > -1 && actIndex < acts.length) {
     // Identify the command to be performed.
@@ -764,11 +763,6 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
             .catch(error => waitError(error, 'title'));
           }
           else if (act.what === 'body') {
-            if (which === 'unavailable') {
-              console.log('STARTING INNER TEXT');
-              console.log(await page.innerText('body'));
-              console.log('ENDING INNER TEXT');
-            }
             successJSHandle = await page.waitForFunction(
               matchText => {
                 const innerText = document.body.innerText;
@@ -937,10 +931,13 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
                         // Change the status.
                         status = 'done';
                         // Perform the action.
-                        if (act.text) {
-                          await page.keyboard.type(act.text);
+                        const inputText = act.text;
+                        if (inputText) {
+                          await page.keyboard.type(inputText);
+                          presses += inputText.length;
                         }
                         if (act.action) {
+                          presses++;
                           await page.keyboard.press(act.action);
                           await page.waitForLoadState();
                         }
@@ -971,6 +968,9 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
               if (withItems) {
                 act.result.items = items;
               }
+              // Add the totals to the report.
+              report.presses += presses;
+              report.amountRead += amountRead;
             }
             // Otherwise, if the act is a test:
             else if (act.type === 'test') {
@@ -1128,6 +1128,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
                 // Otherwise, if it is entering text on the element, perform it.
                 else if (act.type === 'text') {
                   await whichElement.type(act.what);
+                  report.presses += act.what.length;
                   act.result = 'entered';
                 }
                 // Otherwise, i.e. if the move is unknown, add the failure to the act.
@@ -1145,6 +1146,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
             else if (act.type === 'press') {
               // Identify the number of times to press the key.
               let times = 1 + (act.again || 0);
+              report.press += times;
               const key = act.which;
               // Press the key.
               while (times--) {
@@ -1212,6 +1214,8 @@ const scriptHandler = async (
   report.prohibitedCount = 0;
   report.visitTimeoutCount = 0;
   report.visitRejectionCount = 0;
+  report.presses = 0;
+  report.amountRead = 0;
   report.acts = [];
   report.testTimes = [];
   const hostSuffix = hostIndex > -1 ? `-${hostIndex.toString().padStart(3, '0')}` : '';
