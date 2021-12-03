@@ -681,9 +681,11 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
       if (act.type === 'next') {
         const logSuffix = act.length === 3 ? ` ${act.if[1]} ${act.if[2]}` : '';
         console.log(`>> ${act.if[0]}${logSuffix}`);
+        // Identify the act to be checked.
+        const ifActIndex = report.acts.map(act => act.type !== 'next').lastIndexOf(true);
         // Determine whether its jump condition is true.
         const condition = act.if;
-        const truth = isTrue(report.acts[report.acts.length - 2].result, condition);
+        const truth = isTrue(report.acts[report.acts[ifActIndex]].result, condition);
         // Add the result to the act.
         act.result = {
           property: condition[0],
