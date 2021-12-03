@@ -767,7 +767,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
             .catch(error => waitError(error, 'title'));
           }
           else if (act.what === 'body') {
-            if (which === 'This service is temporarily unavailable') {
+            if (which === 'unavailable') {
               console.log('STARTING INNER TEXT');
               console.log(await page.innerText('body'));
               console.log('ENDING INNER TEXT');
