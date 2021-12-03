@@ -828,7 +828,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
             // Otherwise, if it is a repetitive keyboard navigation:
             else if (act.type === 'presses') {
               const {navKey, what, which, withItems} = act;
-              const matchText = which ? debloat(which) : '';
+              const matchTexts = which.map(text => debloat(text));
               // Initialize the loop variables.
               let status = 'more';
               let presses = 0;
@@ -902,27 +902,30 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
                   const text = await textOf(page, currentElement);
                   // If the text of the current element was found:
                   if (text !== null) {
-                    // Update more of the data.
                     const textLength = text.length;
+                    // If it is non-empty and there are texts to match:
+                    let matchedText;
+                    if (matchTexts.length && textLength) {
+                      // Identify the matching text.
+                      matchedText = matchTexts.find(matchText => text.includes(matchText));
+                    }
+                    // Update the item data if required.
                     if (withItems) {
-                      items.push({
+                      const itemData = {
                         tagName,
                         text,
                         textLength
-                      });
+                      };
+                      if (matchedText) {
+                        itemData.matchedText = matchedText;
+                      }
+                      items.push(itemData);
                     }
                     amountRead += textLength;
                     // If there is no text-match failure:
-                    if (! matchText || text && text.includes(matchText)) {
-                      // Determine whether the selector selects the current element.
-                      const isSelected = await page.evaluate(args => {
-                        const [currentElement, selector] = args;
-                        return Array
-                        .from(document.body.querySelectorAll(selector))
-                        .includes(currentElement);
-                      }, [currentElement, what]);
-                      // If it does:
-                      if (isSelected) {
+                    if (matchedText || ! matchTexts.length) {
+                      // If the element has any specified tag name:
+                      if (! what || tagName === what) {
                         // Change the status.
                         status = 'done';
                         // Perform the action.
@@ -954,7 +957,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
                   amountRead
                 }
               };
-              if (act.withItems) {
+              if (withItems) {
                 act.result.items = items;
               }
             }

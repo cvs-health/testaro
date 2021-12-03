@@ -68,9 +68,9 @@ exports.commands = {
       'Repeatedly press a navigation key',
       {
         navKey: [true, 'string', 'hasLength', 'navigation-keyname'],
-        what: [true, 'string', 'hasLength', 'selector of destination element'],
-        which: [false, 'string', 'hasLength', 'substring of destination element text if any'],
-        text: [false, 'string', 'hasLength', 'text to enter after reaching destination'],
+        what: [false, 'string', 'hasLength', 'tag name of element'],
+        which: [false, 'array', 'areStrings', 'substrings any of which matches element text'],
+        text: [false, 'string', 'hasLength', 'text to enter after reaching element'],
         action: [false, 'string', 'hasLength', 'name of key to press, after text entry if any'],
         withItems: [true, 'boolean']
       }
