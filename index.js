@@ -679,12 +679,12 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
       actCount++;
       // If the command is an index changer:
       if (act.type === 'next') {
-        const logSuffix = act.length === 3 ? ` ${act.if[1]} ${act.if[2]}` : '';
-        console.log(`>> ${act.if[0]}${logSuffix}`);
+        const condition = act.if;
+        const logSuffix = condition.length === 3 ? ` ${condition[1]} ${condition[2]}` : '';
+        console.log(`>> ${condition[0]}${logSuffix}`);
         // Identify the act to be checked.
         const ifActIndex = report.acts.map(act => act.type !== 'next').lastIndexOf(true);
         // Determine whether its jump condition is true.
-        const condition = act.if;
         const truth = isTrue(report.acts[ifActIndex].result, condition);
         // Add the result to the act.
         act.result = {
