@@ -17,7 +17,7 @@ const {commands} = require('./commands');
 // Set debug to true to add debugging features.
 const debug = true;
 // Set waits to a positive number to insert delays (in ms).
-const waits = 300;
+const waits = 200;
 const protocol = process.env.PROTOCOL || 'https';
 // Files servable without modification.
 const statics = {
@@ -685,7 +685,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
         const ifActIndex = report.acts.map(act => act.type !== 'next').lastIndexOf(true);
         // Determine whether its jump condition is true.
         const condition = act.if;
-        const truth = isTrue(report.acts[report.acts[ifActIndex]].result, condition);
+        const truth = isTrue(report.acts[ifActIndex].result, condition);
         // Add the result to the act.
         act.result = {
           property: condition[0],
