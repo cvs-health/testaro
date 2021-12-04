@@ -108,14 +108,14 @@ exports.commands = {
       'Wait until the page reaches a load state',
       {
         which: [true, 'string', 'hasLength', '“loaded” or “idle”'],
-        what: [false, 'string', 'hasLength', 'comment']
+        what: [false, 'string', 'isState', 'comment']
       }
     ],
     test: [
       'Perform a test',
       {
         which: [true, 'string', 'isTest', 'test name'],
-        what: [false, 'string', 'isState', 'comment']
+        what: [false, 'string', 'hasLength', 'comment']
       }
     ],
     text: [

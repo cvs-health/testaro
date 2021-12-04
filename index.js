@@ -525,7 +525,9 @@ const isValid = command => {
         const vP = validator[property];
         const cP = command[property];
         // If it is optional and omitted or present and valid:
-        return ! vP[0] && ! cP || cP !== undefined && hasType(cP, vP[1]) && hasSubtype(cP, vP[2]);
+        const optAndNone = ! vP[0] && ! cP;
+        const isValid = cP !== undefined && hasType(cP, vP[1]) && hasSubtype(cP, vP[2]);
+        return optAndNone || isValid;
       }
     });
   }
@@ -668,12 +670,12 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
   if (actIndex > -1 && actIndex < acts.length) {
     // Identify the command to be performed.
     const scriptAct = acts[actIndex];
-    // Copy it into the report.
     const act = JSON.parse(JSON.stringify(scriptAct));
     // If it is valid:
     if (isValid(act)) {
       const whichSuffix = act.which ? ` (${act.which})` : '';
       console.log(`>>>> ${act.type}${whichSuffix}`);
+      // Copy it into the report.
       report.acts.push(act);
       // Increment the count of commands performed.
       actCount++;
