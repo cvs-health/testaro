@@ -15,9 +15,9 @@ const https = require('https');
 const {commands} = require('./commands');
 // ########## CONSTANTS
 // Set debug to true to add debugging features.
-const debug = true;
+const debug = false;
 // Set waits to a positive number to insert delays (in ms).
-const waits = 200;
+const waits = 0;
 const protocol = process.env.PROTOCOL || 'https';
 // Files servable without modification.
 const statics = {
