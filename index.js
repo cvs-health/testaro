@@ -727,7 +727,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
         // Compute and report the score.
         try {
           const {scorer} = require(`./procs/score/${act.which}`);
-          act.result = scorer(acts);
+          act.result = scorer(report.acts);
         }
         catch (error) {
           act.error = `ERROR: ${error.message}\n${error.stack}`;
