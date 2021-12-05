@@ -7,12 +7,10 @@ node_modules/
 # Temporary files
 temp/
 screenShots/
+ibmtemp/
 
 # System files
 .DS_Store
 
 # Development configurations
 .vscode/
-
-# Temporary files
-temp/
