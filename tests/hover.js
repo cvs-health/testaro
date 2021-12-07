@@ -126,7 +126,7 @@ exports.reporter = async (page, withItems) => {
             await root.waitForElementState('stable');
             // Increment the counts of triggers and targets.
             data.totals.triggers++;
-            const madeVisible = postVisibles.length - preVisibles.length;
+            const madeVisible = Math.max(0, postVisibles.length - preVisibles.length);
             data.totals.madeVisible += madeVisible;
             data.totals.opacityChanged += opacityTargets.length;
             data.totals.opacityAffected += opacityAffected;
