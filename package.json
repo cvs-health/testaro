@@ -23,6 +23,9 @@
   },
   "homepage": "https://github.com/jrpool/autotest#readme",
   "dependencies": {
+    "@siteimprove/alfa-act": "*",
+    "@siteimprove/alfa-rules": "*",
+    "@siteimprove/alfa-scraper": "*",
     "accessibility-checker": "*",
     "axe-playwright": "*",
     "dotenv": "*",
