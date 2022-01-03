@@ -63,6 +63,7 @@ const moves = {
 };
 // Names and descriptions of tests.
 const tests = {
+  alfa: 'alfa',
   autocom: 'autocomplete attributes of inputs',
   axe: 'Axe',
   bodyText: 'text content of the page body',
