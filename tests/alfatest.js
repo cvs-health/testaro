@@ -11,10 +11,12 @@ exports.reporter = async () => {
   // Get the data on the elements violating the default alfa rules.
   Scraper.with(async scraper => {
     console.log('Starting for loop');
-    for (const input of await scraper.scrape('https://tenon.io/')) {
-      console.log(await Audit.of(input, Rules).evaluate());
+    for (const input of await scraper.scrape('https://example.com/')) {
+      const auditResult = Audit.of(input, Rules);
+      console.log(`Audit result is ${JSON.stringify(auditResult, null, 2)}`);
+      const evaluation = await auditResult.evaluate();
+      console.log(`Evaluation is ${JSON.stringify(evaluation, null, 2)}`);
     }
   });
 };
 exports.reporter();
-
