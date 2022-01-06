@@ -1,8 +1,9 @@
 # Dependency directories
 node_modules/
 
-# dotenv environment variables files
+# Secret environment variables
 .env*
+.npmrc
 
 # Temporary files
 temp/
