@@ -1,4 +1,8 @@
-// Computes and reports a score from 4 packages and 16 custom tests, with discounts.
+/*
+  asp08
+  Autotest score proc 8
+  Computes and reports a score from 4 packages and 16 custom tests, with discounts.
+*/
 exports.scorer = acts => {
   // CONSTANTS
   // Define the configuration disclosures.
@@ -129,21 +133,19 @@ exports.scorer = acts => {
           facts = test.result;
           if (facts) {
             rules.aatt = 'multiply warning by 2, error by 4; sum; subtract discounts';
-            const axeRules = test.result.items || [];
+            const issues = facts.filter(fact => fact.type);
             let totalDiscount = 0;
-            axeRules.forEach(rule => {
-              const ruleDiscount = ruleDiscounts.axe[rule.rule];
-              if (ruleDiscount) {
-                totalDiscount += ruleDiscount * rule.elements.length;
+            issues.forEach(issue => {
+              const issueDiscount = ruleDiscounts.aatt[issue.id];
+              if (issueDiscount) {
+                totalDiscount += issueDiscount;
               }
             });
-            deficit.axe
-              = 2 * facts.minor
-              + 3 * facts.moderate
-              + 4 * facts.serious
-              + 5 * facts.critical
+            deficit.aatt
+              = 2 * issues.filter(issue => issue.type === 'warning').length
+              + 4 * issues.filter(issue => issue.type === 'error').length
               - totalDiscount;
-            deficit.total += deficit.axe;
+            deficit.total += deficit.aatt;
           }
         }
         else if (which === 'axe') {
@@ -452,7 +454,7 @@ exports.scorer = acts => {
           }
         });
       };
-      estimate(['axe', 'ibm', 'wave'], 100);
+      estimate(['aatt', 'axe', 'ibm', 'wave'], 100);
     }
   }
   // Return the score facts, except for the log test.

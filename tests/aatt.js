@@ -22,6 +22,18 @@ exports.reporter = async page => {
   // Convert the JSON string to an array.
   const issueArray = JSON.parse(reportJSON);
   // Remove the notices from the array.
-  const majorIssues = issueArray.filter(issue => issue.type !== 'notice');
-  return {result: majorIssues};
+  const nonNotices = issueArray.filter(issue => issue.type !== 'notice');
+  // Convert the technique property from a string to an array of strings.
+  nonNotices.forEach(issue => {
+    if (issue.type) {
+      const longTech = issue.techniques;
+      issue.techniques = longTech.replace(/a><a/g, 'a>%<a').split('%');
+      issue.id = issue
+      .techniques
+      .map(technique => technique.replace(/^.+?>|<\/a>$/g, ''))
+      .sort()
+      .join('+');
+    }
+  });
+  return {result: nonNotices};
 };
