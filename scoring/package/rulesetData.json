@@ -1,0 +1,15 @@
+{
+  "aatt": {
+    "public": true,
+    "url": ""
+  },
+  "axe": {
+    "public": true
+  },
+  "ibm": {
+    "public": true
+  },
+  "wave": {
+    "public": false
+  }
+}
