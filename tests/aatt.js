@@ -28,7 +28,8 @@ exports.reporter = async page => {
   // If it arrived within the time limit:
   if (resultIfFast) {
     // Remove the non-JSON prefix and (if any) suffix from the string.
-    const reportJSON = resultIfFast.replace(/^.+?\n|\s+done$/g, '');
+    const reportJSON = resultIfFast.replace(/^.+?\n|\s+done\s*$/g, '');
+    console.log(reportJSON.slice(-50));
     try {
       // Convert the JSON string to an array.
       const issueArray = JSON.parse(reportJSON);
