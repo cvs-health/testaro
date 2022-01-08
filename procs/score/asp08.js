@@ -88,11 +88,19 @@ exports.scorer = acts => {
     if (tests.length) {
       // CONSTANTS
       // Discounts from deficit scores based on multi-test reporting of the same faults.
-      ruleDiscounts.aatt = {};
+      ruleDiscounts.aatt = {
+        'e:F77': 2,
+        'e:G18': 2,
+        'e:H91': 2,
+        'w:F24': 1,
+        'w:G18': 1,
+        'w:H67': 2
+      };
       ruleDiscounts.axe = {
         'aria-allowed-role': 1,
         'aria-roles': 2,
         'color-contrast': 2,
+        'duplicate-id': 1,
         'image-redundant-alt': 1,
         'label': 3,
         'link-name': 2,
