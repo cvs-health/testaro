@@ -28,8 +28,7 @@ exports.reporter = async page => {
   // If it arrived within the time limit:
   if (resultIfFast) {
     // Remove the non-JSON prefix and (if any) suffix from the string.
-    const reportJSON = resultIfFast.replace(/^.+?\n|\s+done\s*$/g, '');
-    console.log(reportJSON.slice(-50));
+    const reportJSON = resultIfFast.replace(/^.+?Object]\s+|\s+done\s*$/g, '');
     try {
       // Convert the JSON string to an array.
       const issueArray = JSON.parse(reportJSON);
@@ -50,7 +49,8 @@ exports.reporter = async page => {
       return {result: nonNotices};
     }
     catch (error) {
-      console.log(`ERROR processing AATT report (${error.message})`);
+      console.log(`ERROR processing AATT report (${error.message}):`);
+      console.log(resultIfFast);
       return {result: 'ERROR processing AATT report'};
     }
   }
