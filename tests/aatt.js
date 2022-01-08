@@ -49,8 +49,7 @@ exports.reporter = async page => {
       return {result: nonNotices};
     }
     catch (error) {
-      console.log(`ERROR processing AATT report (${error.message}):`);
-      console.log(resultIfFast);
+      console.log(`ERROR processing AATT report (${error.message})`);
       return {result: 'ERROR processing AATT report'};
     }
   }
