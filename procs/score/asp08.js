@@ -467,8 +467,8 @@ exports.scorer = acts => {
   }
   // Return the score facts, except for the log test.
   return {
-    scoreProc: 'a11y',
-    version: '7',
+    scoreProc: 'asp',
+    version: '8',
     ruleDiscounts,
     rules,
     diffStyles,

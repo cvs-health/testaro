@@ -22,6 +22,7 @@ Autotest uses the [Playwright](https://playwright.dev/) package to launch browse
 
 Autotest uses:
 - [pixelmatch](https://www.npmjs.com/package/pixelmatch) to measure motion
+- [aatt](https://github.com/paypal/AATT) to test with the HTML CodeSniffer ruleset
 - [axe-playwright](https://www.npmjs.com/package/axe-playwright) to test with the `axe-core` ruleset
 - [accessibility-checker](https://www.npmjs.com/package/accessibility-checker) to test with the IBM Equal Access Accessibility Checker
 - [WAVE API](https://wave.webaim.org/api/) to test with WAVE
@@ -385,7 +386,8 @@ You can define additional Autotest commands and functionality. Contributions are
 
 ## Accessibility principles
 
-Autotest seeks to contribute some tests of web-application quality, particularly with respect to accessibility. Web accessibility is variously understood. The Axe, IBM, and WAVE test packages used by Autotest check compliance with their own rules. As of October 2021, the rule counts were:
+Autotest seeks to contribute some tests of web-application quality, particularly with respect to accessibility. Web accessibility is variously understood. The AATT, Axe, IBM, and WAVE test packages used by Autotest check compliance with their own rules (HTML CodeSniffer rules in the case of AATT). As of January 2022, the rule counts (discovered by inspection of various files) were:
+- AATT: 98
 - Axe: 138
 - IBM 163
 - WAVE: 110
