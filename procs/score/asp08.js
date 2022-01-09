@@ -144,7 +144,7 @@ exports.scorer = acts => {
             const issues = facts.filter(fact => fact.type);
             let totalDiscount = 0;
             issues.forEach(issue => {
-              const issueDiscount = ruleDiscounts.aatt[issue.id];
+              const issueDiscount = ruleDiscounts.aatt[`${issue.type.slice(0, 1)}:${issue.id}`];
               if (issueDiscount) {
                 totalDiscount += issueDiscount;
               }
