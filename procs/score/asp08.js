@@ -139,7 +139,7 @@ exports.scorer = acts => {
         // Compute its score.
         if (which === 'aatt') {
           facts = test.result;
-          if (facts) {
+          if (facts && Array.isArray(facts)) {
             rules.aatt = 'multiply warning by 2, error by 4; sum; subtract discounts';
             const issues = facts.filter(fact => fact.type);
             let totalDiscount = 0;
