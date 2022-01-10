@@ -4,13 +4,14 @@
 */
 // 'use strict';
 // Object.defineProperty(exports, '__esModule', {value: true});
-const alfa_act_1 = require('@siteimprove/alfa-act');
-const alfa_scraper_1 = require('@siteimprove/alfa-scraper');
-const alfa_rules_1 = require('@siteimprove/alfa-rules');
+const {Audit} = require('@siteimprove/alfa-act');
+const {Scraper} = require('@siteimprove/alfa-scraper');
+const alfaRules = require('@siteimprove/alfa-rules');
+console.log(`default type is ${typeof alfaRules.default}`);
 
-alfa_scraper_1.Scraper.with(async (scraper) => {
+Scraper.with(async (scraper) => {
   for (const input of await scraper.scrape('https://www.barclaydamon.com/')) {
-    const outcomes = await alfa_act_1.Audit.of(input, alfa_rules_1.default).evaluate();
+    const outcomes = await Audit.of(input, alfaRules.default).evaluate();
     console.log(JSON.stringify(`outcomes has type ${typeof outcomes}`));
     console.log(JSON.stringify(`outcomes is ${JSON.stringify(outcomes, null, 2)}`));
   }
