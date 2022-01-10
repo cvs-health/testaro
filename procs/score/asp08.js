@@ -113,6 +113,7 @@ exports.scorer = acts => {
         'Rpt_Aria_OrphanedContent_Native_Host_Sematics': 2,
         'Rpt_Aria_ValidIdRef': 2,
         'Rpt_Aria_ValidRole': 2,
+        'RPT_Elem_UniqueId': 2,
         'WCAG20_A_HasText': 2,
         'WCAG20_Fieldset_HasLegend': 3,
         'WCAG20_Input_ExplicitLabel': 2,
