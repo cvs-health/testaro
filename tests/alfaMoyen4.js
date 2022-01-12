@@ -10,7 +10,20 @@ Scraper.with(async scraper => {
     const audit = Audit.of(input, alfaRules.default);
     const outcomes = Array.from(await audit.evaluate());
     outcomes.forEach(outcome => {
-      console.log(outcome.toJSON());
+      const outcomeJSON = outcome.toJSON();
+      const verdict = outcomeJSON.outcome;
+      if (verdict === 'failed') {
+        console.log(`outcome.toString() is ${outcome.toString.toString()}`);
+        console.log(`outcome.toJSON() is ${outcome.toJSON.toString()}`);
+        console.log(outcome.toJSON());
+        const target = outcome._target;
+        if (target._name === 'html') {
+          console.log('html element');
+        }
+        else {
+          console.log(JSON.stringify(target, null, 2));
+        }
+      }
     });
   }
 });
