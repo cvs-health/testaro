@@ -31,10 +31,30 @@ Scraper.with(async scraper => {
               console.log(`  It is an array of length ${value[key].length}`);
             }
             else if (typeof value[key] === 'object') {
-              console.log(`  It is an object with properties ${Object.getOwnPropertyNames(value[key])}`);
+              console.log(
+                `  It is an object with properties ${Object.getOwnPropertyNames(value[key])}`
+              );
             }
           });
         });
+        ['target', 'expectations', 'equals'].forEach(protoKey => {
+          console.log(
+            `Outcome ${index} has prototype property ${protoKey} with type ${typeof outcome[protoKey]}`
+          );
+        });
+        const {target} = outcome;
+        console.log(
+          `Outcome target object has properties ${Object.getOwnPropertyNames(target)}`
+        );
+        const targetProto = Object.getPrototypeOf(target);
+        console.log(`Target prototype has properties ${Object.getOwnPropertyNames(targetProto)}`);
+        console.log(`Target toJSON method has code ${target.toJSON.toString()}`);
+        const targetJO = target.toJSON();
+        console.log(`Result of that method has type ${typeof targetJO}`);
+        console.log(`Result has properties ${Object.getOwnPropertyNames(targetJO)}`);
+        const targetJOProto = Object.getPrototypeOf(targetJO);
+        console.log(`Its prototype has properties ${Object.getOwnPropertyNames(targetJOProto)}`);
+        console.log(`Target toString() result is:\n${target.toString()}`);
       }
     });
   }
