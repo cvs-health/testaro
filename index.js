@@ -64,6 +64,7 @@ const moves = {
 // Names and descriptions of tests.
 const tests = {
   aatt: 'AATT with HTML CodeSniffer WCAG 2.1 AA ruleset',
+  alfa: 'alfa',
   autocom: 'autocomplete attributes of inputs',
   axe: 'Axe',
   bodyText: 'text content of the page body',
@@ -977,7 +978,6 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
             }
             // Otherwise, if the act is a test:
             else if (act.type === 'test') {
-              console.log(`>> ${act.which}`);
               // Add a description of the test to the act.
               act.what = tests[act.which];
               // Initialize the arguments.

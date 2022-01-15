@@ -24,11 +24,15 @@
   "homepage": "https://github.com/jrpool/autotest#readme",
   "dependencies": {
     "aatt": "*",
+    "@siteimprove/alfa-act": "*",
+    "@siteimprove/alfa-playwright": "*",
+    "@siteimprove/alfa-rules": "*",
+    "@siteimprove/alfa-scraper": "*",
     "accessibility-checker": "*",
     "axe-playwright": "*",
     "dotenv": "*",
     "pixelmatch": "*",
-    "playwright": "^1.14.0"
+    "playwright": "*"
   },
   "devDependencies": {
     "eslint": "^7.24.0"
