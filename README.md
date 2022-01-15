@@ -21,11 +21,21 @@ Autotest uses `Node.js` to run:
 Autotest uses the [Playwright](https://playwright.dev/) package to launch browsers, perform user actions in them, and perform tests.
 
 Autotest uses:
-- [pixelmatch](https://www.npmjs.com/package/pixelmatch) to measure motion
-- [axe-playwright](https://www.npmjs.com/package/axe-playwright) to test with the `axe-core` ruleset
-- [accessibility-checker](https://www.npmjs.com/package/accessibility-checker) to test with the IBM Equal Access Accessibility Checker
-- [WAVE API](https://wave.webaim.org/api/) to test with WAVE
+- [accessibility-checker](https://www.npmjs.com/package/accessibility-checker) to perform the `ibm` test, using the IBM Equal Access Accessibility Checker
+- [alfa](https://alfa.siteimprove.com/) to perform the `alfa` test, using Siteimprove alfa
+- [Automated Accessibility Testing Tool](https://www.npmjs.com/package/aatt) to perform the `aatt` test, using HTML CodeSniffer
+- [axe-playwright](https://www.npmjs.com/package/axe-playwright) to perform the `axe` test, using `axe-core`
 - [KickFire Company Name to Website Endpoint](https://www.kickfire.com/developers/docs-page.php#item-3-6) to convert organization names to URLs
+- [pixelmatch](https://www.npmjs.com/package/pixelmatch) to measure motion
+- [WAVE API](https://wave.webaim.org/api/) to perform the `wave' test, using WAVE
+
+Autotest enables federated accessibility testing by combining several test packages and supplementing them with additional tests. As of January 2022, the counts of tests in the packages referenced above were:
+- `aatt`: 98
+- `alfa`: 103
+- `axe`: 138
+- `ibm` 163
+- `wave`: 110
+- total: 612
 
 ## Code organization
 
@@ -221,7 +231,7 @@ The subsequent commands can tell Autotest to perform any of:
 - moves (clicks, text inputs, hovers, etc.)
 - navigations (browser launches, visits to URLs, waits for page conditions, etc.)
 - alterations (changes to the page)
-- tests (whether in dependency packages or defined by Autotest)
+- tests (whether in dependency packages or defined within Autotest)
 - scoring (aggregating test results into total scores)
 - branching (continuing from a command other than the next one)
 
@@ -300,8 +310,8 @@ An example of a scoring command is:
 ```json
 {
   "type": "score",
-  "which": "a11y05",
-  "what": "3 packages and 16 custom tests, with duplication discounts"
+  "which": "asp09",
+  "what": "5 packages and 16 custom tests, with duplication discounts"
 }
 ```
 
@@ -385,14 +395,9 @@ You can define additional Autotest commands and functionality. Contributions are
 
 ## Accessibility principles
 
-Autotest seeks to contribute some tests of web-application quality, particularly with respect to accessibility. Web accessibility is variously understood. The Axe, IBM, and WAVE test packages used by Autotest check compliance with their own rules. As of October 2021, the rule counts were:
-- Axe: 138
-- IBM 163
-- WAVE: 110
+Autotest allows other tests to be defined, which can detect accessibility properties not discovered by any of the packages.
 
-Autotest defines other tests, mainly for accessibility properties not tested by these three packages. These additional properties in some cases conform to prevailing industry standards (WCAG 2.1 and WAI-ARIA 1.1) and in other cases yield experiences that may benefit users in general and especially users with some disabilities.
-
-The rationales motivating various Autotest-defined tests can be found in comments within the files of those tests, in the `tests` directory.
+The rationales motivating tests can be found in comments within the files of those tests, in the `tests` directory.
 
 ### Future work
 
@@ -405,9 +410,7 @@ Further development is contemplated, is taking place, or is welcomed, on:
 - modal dialogs
 - autocomplete attributes
 
-Additional test packages that may be integratable into Autotest in the future include:
-- [`html codesniffer`](https://github.com/squizlabs/HTML_CodeSniffer)
-- [`bbc-a11y`](https://github.com/bbc/bbc-a11y) (but not updated since 2018, and has vulnerable dependencies)
+Additional test packages may be integratable into Autotest. The [`bbc-a11y`](https://github.com/bbc/bbc-a11y) package has been considered, but it has not been updated since 2018 and has vulnerable dependencies.
 
 ## Testing challenges
 
