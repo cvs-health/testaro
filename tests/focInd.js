@@ -76,8 +76,12 @@ exports.reporter = async (page, withItems, revealAll) => {
           const diff = prop => styleFocused[prop] !== styleBlurred[prop];
           const hasIndicator
             = diff('borderStyle')
+            && styleBlurred.borderWidth !== '0px'
+            && styleFocused.borderWidth !== '0px'
             || (styleFocused.borderStyle !== 'none' && diff('borderWidth'))
             || diff('outlineStyle')
+            && styleBlurred.outlineWidth !== '0px'
+            && styleFocused.outlineWidth !== '0px'
             || (styleFocused.outlineStyle !== 'none' && diff('outlineWidth'))
             || diff('fontSize')
             || diff('fontStyle')
