@@ -107,6 +107,36 @@ A script is a JSON file with the properties:
 }
 ```
 
+#### Example
+
+Here is an example of a script:
+
+```json
+{
+  "what": "Test example.com with alfa",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "Chromium browser"
+    },
+    {
+      "type": "url",
+      "which": "https://example.com/",
+      "what": "page with a few accessibility defects"
+    },
+    {
+      "type": "test",
+      "which": "alfa",
+      "what": "Siteimprove alfa package"
+    }
+  ]
+}
+```
+
+This script tells Autotest to open a page in the Chromium browser, navigate to `example.com`, and perform the tests in the `alfa` package on that URL. Autotest will output a report in your browser window and save a copy of the report as a file.
+
 #### Strictness
 
 If the `strict` property is `true`, Autotest will accept redirections that add or subtract a final slash, but otherwise will treat redirections as failures.
@@ -117,7 +147,7 @@ If the `strict` property is `true`, Autotest will accept redirections that add o
 
 The `commands` property’s value is an array of commands, each being an object.
 
-Each command has a `type` property, optionally has a `name` property, and has other properties specifying the command.
+Each command has a `type` property and optionally has a `name` property. It must or may have other properties, depending on the value of `type`.
 
 You can look up the command types and their required and optional properties in the `commands.js` file. That file defines two objects, named `etc` and `tests`.
 
@@ -131,7 +161,7 @@ The properties of the `etc` object specify what is required for commands to be v
 }
 ```
 
-And here is the applicable object in the `etc` array of `commands.js`:
+And here is the applicable property of the `etc` object:
 
 ```js
 link: [
@@ -143,12 +173,12 @@ link: [
 ]
 ```
 
-Thus, the applicable `etc` object has the command’s `type` value (`"link"`) as its key. The object’s value is an array with two elements: a string describing the command and an object containing property requirements.
+As this example illustrates, to find the requirements for a `link`-type command, you look up the `link` property of the `etc` object. Its value is an array with two elements: a string describing the command and an object containing requirements.
 
-A property requirement, such as `which: [true, 'string', 'hasLength']`, has a property key as its key and an array of requirement elements as its value. The requirement elements are:
-- 0. Is the property required (`true` or `false`)?
+A requirement, such as `which: [true, 'string', 'hasLength']`, has a property key as its key. In this case, it specifies what is required for the `which` property of a `link`-type command. The requirement takes the form of an array:
+- 0. Is the property (here `which`) required (`true` or `false`)?
 - 1. What format must the property value have (`'string'`, `'array'`, `'boolean'`, or `'number'`)?
-- 2. What other validity criterion applies (if any)?
+- 2. What other validity criterion applies (if any)? (Omitted if none.)
 
 That other validity criterion may be any of these:
 - `'hasLength'`: is not a blank string
@@ -187,7 +217,7 @@ motion: [
 ]
 ```
 
-This object says that any `motion` test must, in addition to the required and optional properties of all tests, also have `delay`, `interval`, and `count` properties with number values.
+This property says that any `motion` test must, in addition to the required and optional properties of all tests, also have `delay`, `interval`, and `count` properties with number values.
 
 The meanings of the extra properties of test commands are stated in the first element of the array, except for two properties:
 - `withItems`. The `true` or `false` value of `withItems`, in any test requiring it, specifies whether the report of the results of the test should itemize the successes and failures.
@@ -205,13 +235,13 @@ That would state the expectation that the `result` property of the report will h
 
 ##### Command sequence
 
-The first two commands have the types `launch` and `url`, respectively. They launch a browser and then use it to visit a URL. For example:
+The first two commands have the types `launch` and `url`, respectively, as shown in the example above. They launch a browser and then use it to visit a URL. For example:
 
 ```json
 {
   "type": "launch",
   "which": "chromium",
-  "what": "Launch a chromium browser"
+  "what": "Open a page in a Chromium browser"
 }
 ```
 
@@ -223,8 +253,6 @@ The first two commands have the types `launch` and `url`, respectively. They lau
 }
 ```
 
-There are no constraints on the command types after the first two.
-
 ##### Command types
 
 The subsequent commands can tell Autotest to perform any of:
@@ -235,7 +263,7 @@ The subsequent commands can tell Autotest to perform any of:
 - scoring (aggregating test results into total scores)
 - branching (continuing from a command other than the next one)
 
-An example of a move is:
+An example of a **move** is:
 
 ```json
 {
@@ -252,7 +280,7 @@ In identifying the target element for a move, Autotest matches the `which` prope
 
 When multiple elements of the same type have indistinguishable texts, you can include an `index` property to specify the index of the target element, among all those that will match.
 
-An example of a navigation is the command of type `url` above. Another is:
+An example of a **navigation** is the command of type `url` above. Another is:
 
 ```json
 {
@@ -264,7 +292,7 @@ An example of a navigation is the command of type `url` above. Another is:
 
 In this case, Autotest waits until the page title contains the string “travel” (case-insensitively).
 
-An example of an alteration is:
+An example of an **alteration** is:
 
 ```json
 {
@@ -275,7 +303,7 @@ An example of an alteration is:
 
 This command causes Autotest to alter the `display` and `visibility` style properties of all elements, where necessary, so those properties do not make any element invisible.
 
-An example of a packaged test is:
+An example of a **packaged test** is:
 
 ```json
 {
@@ -288,7 +316,7 @@ An example of a packaged test is:
 
 In this case, Autosest runs the WAVE test with report type 1.
 
-An example of an Autotest-defined test is:
+An example of an **Autotest-defined** test is:
 
 ```json
 {
@@ -305,7 +333,7 @@ In this case, Autotest runs the `motion` test with the specified parameters.
 
 Near the top of the `index.js` file is an object named `tests`. It describes all available tests.
 
-An example of a scoring command is:
+An example of a **scoring** command is:
 
 ```json
 {
@@ -326,7 +354,7 @@ The data for scores can include not only test results, but also log statistics. 
 - `visitTimeoutCount`: how many times an attempt to visit a URL timed out
 - `visitRejectionCount`: how many times a URL visit got an HTTP status other than 200 or 304
 
-An example of a branching command is:
+An example of a **branching** command is:
 
 ```json
 {
@@ -338,6 +366,8 @@ An example of a branching command is:
 ```
 
 This command checks the result of the previous act to determine whether its `result.totals.invalid` property has a positive value. If so, it changes the next command to be performed, specifying the command 4 commands before this one.
+
+A `next`-type command can use a `next` property instead of a `jump` property. The value of the `next` property is a command name. It tells Autotest to continue performing commands starting with the command having that value as the value of its `name` property.
 
 ##### URL commands
 
