@@ -63,6 +63,7 @@ const moves = {
 };
 // Names and descriptions of tests.
 const tests = {
+  aatt: 'AATT with HTML CodeSniffer WCAG 2.1 AA ruleset',
   alfa: 'alfa',
   autocom: 'autocomplete attributes of inputs',
   axe: 'Axe',
