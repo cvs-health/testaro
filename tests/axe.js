@@ -5,7 +5,9 @@
   The rules argument defaults to all rules; otherwise, specify an array of rule names.
   Experimental, needs-review, and best-practice rules are ignored.
 */
+// IMPORTS
 const {injectAxe, getViolations} = require('axe-playwright');
+// FUNCTIONS
 // Conducts and reports an Axe test.
 exports.reporter = async (page, withItems, rules = []) => {
   // Initialize the report.
