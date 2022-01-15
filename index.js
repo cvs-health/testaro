@@ -978,7 +978,6 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
             }
             // Otherwise, if the act is a test:
             else if (act.type === 'test') {
-              console.log(`>> ${act.which}`);
               // Add a description of the test to the act.
               act.what = tests[act.which];
               // Initialize the arguments.

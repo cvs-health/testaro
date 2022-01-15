@@ -41,8 +41,9 @@ exports.reporter = async page => {
     });
     await rulePage.close();
   }
-  Scraper.with(async scraper => {
-    for (const input of await scraper.scrape('https://tenon.io/')) {
+  const data = [];
+  await Scraper.with(async scraper => {
+    for (const input of await scraper.scrape(page.url())) {
       const audit = Audit.of(input, alfaRules.default);
       const outcomes = Array.from(await audit.evaluate());
       outcomes.forEach((outcome, index) => {
@@ -63,7 +64,7 @@ exports.reporter = async page => {
             else if (codeLines[0].startsWith('<html')) {
               codeLines.splice(1, codeLines.length - 2, '...');
             }
-            const data = {
+            const outcomeData = {
               index,
               verdict,
               rule: {
@@ -83,19 +84,20 @@ exports.reporter = async page => {
             const etcTags = [];
             tags.forEach(tag => {
               if (tag.type === 'scope') {
-                data.rule.scope = tag.scope;
+                outcomeData.rule.scope = tag.scope;
               }
               else {
                 etcTags.push(tag);
               }
             });
             if (etcTags.length) {
-              data.etcTags = etcTags;
+              outcomeData.etcTags = etcTags;
             }
-            console.log(JSON.stringify(data, null, 2));
+            data.push(outcomeData);
           }
         }
       });
     }
   });
+  return {result: data};
 };
