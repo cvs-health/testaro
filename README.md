@@ -29,7 +29,7 @@ Autotest uses:
 - [pixelmatch](https://www.npmjs.com/package/pixelmatch) to measure motion
 - [WAVE API](https://wave.webaim.org/api/) to perform the `wave' test, using WAVE
 
-Autotest enables federated accessibility testing by combining several test packages and supplementing them with additional tests. As of January 2022, the counts of tests in the packages referenced above were:
+Autotest enables federated accessibility testing by combining test packages and supplementing them with additional tests. As of January 2022, the counts of tests in the packages referenced above were:
 - `aatt`: 98
 - `alfa`: 103
 - `axe`: 138
@@ -39,16 +39,16 @@ Autotest enables federated accessibility testing by combining several test packa
 
 ## Code organization
 
-Several files of HTML, CSS, JavaScript, and JSON are located in the project directory.
+Some of the files of code are located at the root of the project directory.
 
-The main subdirectories of the project directory containing code files are:
-- `tests`: the code for individual tests
+The main subdirectories of the project directory containing other code files are:
+- `tests`: files containing the code defining particular tests
 - `procs`: shared procedures
 - `validation`: code and artifacts for the validation of tests
 
 Autotest assumes that you also have code in another directory. There you may name the main subdirectories as you wish, such as:
 - `scripts`: instructions for conducting tests
-- `batches`: collections of data on pages to be tested
+- `batches`: collections of URLs to be tested by a single script
 - `reports`: reports of the results of tests
 - `data`: data for use by procedures
 
@@ -145,7 +145,7 @@ If the `strict` property is `true`, Autotest will accept redirections that add o
 
 ##### Commands in general
 
-The `commands` property’s value is an array of commands, each being an object.
+The `commands` property’s value is an array of commands, each formatted as an object.
 
 Each command has a `type` property and optionally has a `name` property. It must or may have other properties, depending on the value of `type`.
 
@@ -204,7 +204,9 @@ test: [
 ]
 ```
 
-The `commands.js` file also has a `tests` object. Its properties provide additional validity requirements for those tests that have any. For example, one property of `tests` is:
+Thus, each `test`-type command must have a `which` property and may have a `what` property. (As stated above, it may also have a `name` property.)
+
+The `commands.js` file also has a `tests` object. Its properties provide additional validity requirements for some tests. For example, one property of `tests` is:
 
 ```js
 motion: [
@@ -217,9 +219,9 @@ motion: [
 ]
 ```
 
-This property says that any `motion` test must, in addition to the required and optional properties of all tests, also have `delay`, `interval`, and `count` properties with number values.
+This property says that any `motion`-type test must, in addition to the required and optional properties of all tests, also have `delay`, `interval`, and `count` properties with number values.
 
-The meanings of the extra properties of test commands are stated in the first element of the array, except for two properties:
+The meanings of the extra properties of test commands are stated, in parentheses, in the first element of the array, except for two properties:
 - `withItems`. The `true` or `false` value of `withItems`, in any test requiring it, specifies whether the report of the results of the test should itemize the successes and failures.
 - `expect`. Any command that will validate a test must contain an `expect` property. The value of that property states an array of expected results. If an `expect` property is present in a `test` command, the report will tabulate and identify the expectations that are fulfilled or are violated by the results. For example, a `test` command might have this `expect` property:
 
@@ -235,7 +237,7 @@ That would state the expectation that the `result` property of the report will h
 
 ##### Command sequence
 
-The first two commands have the types `launch` and `url`, respectively, as shown in the example above. They launch a browser and then use it to visit a URL. For example:
+The first two commands in any script have the types `launch` and `url`, respectively, as shown in the example above. They launch a browser and then use it to visit a URL. For example:
 
 ```json
 {
@@ -399,7 +401,7 @@ A batch is a JSON file with this format:
 }
 ```
 
-When you combine a script with a batch, Autotest performs the script, replacing the `which` and `what` properties of all `url` commands with the values in the first object in the `hosts` array, then again with the values in the second object, and so on. Those replacements also occur in the extra `url` commands mentioned above.
+When you combine a script with a batch, Autotest performs the script, replacing the `which` and `what` properties of all `url` commands with the values in the first object in the `hosts` array, then again with the values in the second object, and so on. Those replacements also occur in the inserted extra `url` commands mentioned above.
 
 A batch offers an efficient way to perform a uniform set of commands on every host in a set of hosts. In this way you can run the same set of tests on multiple web pages. Autotest writes a separate report file for each host.
 
