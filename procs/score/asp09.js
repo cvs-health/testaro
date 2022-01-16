@@ -162,17 +162,16 @@ exports.scorer = acts => {
           facts = test.result;
           if (facts && Array.isArray(facts)) {
             rules.alfa = 'multiply cantTell by 2, failed by 4; sum; subtract discounts';
-            const issues = facts.filter(fact => fact.type);
             let totalDiscount = 0;
-            issues.forEach(issue => {
-              if (ruleDiscounts.alfa.includes(issue.ruleID)) {
-                const issueDiscount = issue.verdict === 'failed' ? 2 : 1;
-                totalDiscount += issueDiscount;
+            facts.forEach(fact => {
+              if (ruleDiscounts.alfa.includes(fact.rule.ruleID)) {
+                const factDiscount = fact.verdict === 'failed' ? 2 : 1;
+                totalDiscount += factDiscount;
               }
             });
             deficit.alfa
-              = 2 * issues.filter(issue => issue.verdict === 'cantTell').length
-              + 4 * issues.filter(issue => issue.verdict === 'failed').length
+              = 2 * facts.filter(fact => fact.verdict === 'cantTell').length
+              + 4 * facts.filter(fact => fact.verdict === 'failed').length
               - totalDiscount;
             deficit.total += deficit.alfa;
           }
