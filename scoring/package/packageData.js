@@ -63,27 +63,30 @@ const compilers = {
   },
   ibm: act => {
     const {result} = act;
-    const contentViolations = result.content.totals.violation;
-    const urlViolations = result.url.totals.violation;
-    let items;
-    if (contentViolations && urlViolations) {
-      items = contentViolations > urlViolations ? result.content.items : result.url.items;
-    }
-    else {
-      items = contentViolations || urlViolations;
-    }
+    const {content, url} = result;
+    const contentViolations = content && content.totals && content.totals.violation;
+    const urlViolations = url && url.totals && url.totals.violation;
     const data = {};
-    if (items) {
-      items.forEach(item => {
-        const {ruleID, level} = item;
-        const issueID = `${level[0]}:${ruleID}`;
-        if (data[issueID]) {
-          data[issueID]++;
-        }
-        else {
-          data[issueID] = 1;
-        }
-      });
+    if (contentViolations || urlViolations) {
+      let items;
+      if (contentViolations && urlViolations) {
+        items = contentViolations > urlViolations ? content.items : url.items;
+      }
+      else {
+        items = content.items || url.items;
+      }
+      if (items) {
+        items.forEach(item => {
+          const {ruleID, level} = item;
+          const issueID = `${level[0]}:${ruleID}`;
+          if (data[issueID]) {
+            data[issueID]++;
+          }
+          else {
+            data[issueID] = 1;
+          }
+        });
+      }
     }
     return data;
   },
