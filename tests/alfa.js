@@ -18,7 +18,11 @@ exports.reporter = async page => {
     const msgText = msg.text();
     console.log(msgText);
   });
-  const response = await rulePage.goto('https://alfa.siteimprove.com/rules');
+  const response = await rulePage.goto('https://alfa.siteimprove.com/rules', {timeout: 10000})
+  .catch(error => {
+    console.log(`ERROR: navigation to URL timed out (${error})`);
+    return {result: {error: 'ERROR: navigation to URL timed out'}};
+  });
   let ruleData = {};
   if (response.status() === 200) {
     // Compile data on the rule IDs and summaries.
