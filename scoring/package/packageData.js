@@ -8,8 +8,9 @@ const fs = require('fs');
 const compilers = {
   aatt: act => {
     const {result} = act;
-    const data = {};
+    let data = null;
     if (Array.isArray(result)) {
+      data = {};
       result.forEach(issue => {
         const {type, id} = issue;
         if (type && id) {
@@ -27,8 +28,9 @@ const compilers = {
   },
   alfa: act => {
     const {result} = act;
-    const data = {};
+    let data = null;
     if (Array.isArray(result)) {
+      data = {};
       result.forEach(issue => {
         const {rule} = issue;
         if (rule) {
@@ -47,8 +49,9 @@ const compilers = {
   axe: act => {
     const {result} = act;
     const {items} = result;
-    const data = {};
+    let data = null;
     if (items) {
+      data = {};
       items.forEach(item => {
         const {rule, elements} = item;
         if (data[rule]) {
@@ -66,7 +69,7 @@ const compilers = {
     const {content, url} = result;
     const contentViolations = content && content.totals && content.totals.violation;
     const urlViolations = url && url.totals && url.totals.violation;
-    const data = {};
+    let data = null;
     if (contentViolations || urlViolations) {
       let items;
       if (contentViolations && urlViolations) {
@@ -76,9 +79,10 @@ const compilers = {
         items = content.items || url.items;
       }
       if (items) {
+        data = {};
         items.forEach(item => {
-          const {ruleID, level} = item;
-          const issueID = `${level[0]}:${ruleID}`;
+          const {ruleId, level} = item;
+          const issueID = `${level[0]}:${ruleId}`;
           if (data[issueID]) {
             data[issueID]++;
           }
@@ -93,8 +97,9 @@ const compilers = {
   wave: act => {
     const {result} = act;
     const {categories} = result;
-    const data = {};
+    let data = null;
     if (categories) {
+      data = {};
       const {error, contrast, alert} = categories;
       [error, contrast, alert].forEach((category, index) => {
         const {items} = category;
