@@ -51,6 +51,9 @@ const compile = () => {
         const correlation
           = (abSum / n - aSum * bSum / n ^ 2)
           / (Math.sqrt(aSqSum / n - (aSum / n) ^ 2) * Math.sqrt(bSqSum / n - (bSum / n) ^ 2));
+        if (correlation > 0.7) {
+          data[packagePair][`${issueA} @ ${issueB}`] = correlation;
+        }
       });
     });
   });
