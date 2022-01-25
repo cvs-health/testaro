@@ -93,19 +93,29 @@ exports.scorer = acts => {
       ruleDiscounts.aatt = {
         'e:F77': 2,
         'e:G18': 2,
+        'e:H36': 2,
+        'e:H37': 2,
+        'e:H57': 3,
+        'e:H58': 2,
         'e:H91': 2,
         'w:F24': 1,
         'w:G18': 1,
-        'w:H67': 2
+        'w:G141': 1,
+        'w:H67': 2,
+        'w:H98': 2
       };
       ruleDiscounts.alfa = [
         'r2',
         'r3',
         'r4',
         'r5',
+        'r7',
+        'r10',
         'r11',
         'r12',
+        'r28',
         'r52',
+        'r53',
         'r56',
         'r57',
         'r58',
@@ -118,14 +128,17 @@ exports.scorer = acts => {
         'aria-roles': 2,
         'color-contrast': 2,
         'duplicate-id': 1,
-        'httml-has-lang': 2,
+        'heading-order': 2,
+        'html-has-lang': 3,
         'html-lang-valid': 2,
         'image-alt': 2,
         'image-redundant-alt': 1,
+        'input-image-alt': 2,
         'label': 3,
         'link-name': 2,
         'nested-interactive': 2,
-        'region': 1
+        'region': 1,
+        'valid-lang': 2
       };
       ruleDiscounts.ibm = {
         'aria_semantics_role': 2,
@@ -140,6 +153,7 @@ exports.scorer = acts => {
         'WCAG20_Input_RadioChkInFieldSet': 3
       };
       ruleDiscounts.wave = {
+        'alt_missing': 2,
         'alt_redundant': 1,
         'aria_reference_broken': 2,
         'contrast': 1,
