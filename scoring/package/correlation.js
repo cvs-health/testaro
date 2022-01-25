@@ -25,6 +25,7 @@ const compile = () => {
   // For each pair of packages:
   const packagePairs = Object.keys(data);
   packagePairs.forEach(packagePair => {
+    console.log(`Starting package pair ${packagePair}`);
     const packages = packagePair.split('_');
     // For each pair of issues:
     issues[packages[0]].forEach(issueA => {
@@ -45,33 +46,26 @@ const compile = () => {
         const aSum = scorePairs.reduce((sum, current) => sum + current[0], 0);
         const bSum = scorePairs.reduce((sum, current) => sum + current[1], 0);
         const abSum = scorePairs.reduce((sum, current) => sum + current[0] * current[1], 0);
-        const aSqSum = scorePairs.reduce((sum, current) => sum + current[0] ^ 2, 0);
-        const bSqSum = scorePairs.reduce((sum, current) => sum + current[1] ^ 2, 0);
+        const aSqSum = scorePairs.reduce((sum, current) => sum + current[0] ** 2, 0);
+        const bSqSum = scorePairs.reduce((sum, current) => sum + current[1] ** 2, 0);
         const n = scorePairs.length;
         const correlation
-          = (abSum / n - aSum * bSum / n ^ 2)
-          / (Math.sqrt(aSqSum / n - (aSum / n) ^ 2) * Math.sqrt(bSqSum / n - (bSum / n) ^ 2));
+          = (abSum - aSum * bSum / n) / n
+          / (Math.sqrt(aSqSum / n - (aSum / n) ** 2) * Math.sqrt(bSqSum / n - (bSum / n) ** 2));
+        // If the correlation is large enough:
         if (correlation > 0.7) {
+          // Record it.
+          if (data[packagePair][issueA]) {
+            data[packagePair][issueA][issueB] = correlation;
+          }
+          else {
+            data[packagePair][issueA] = {issueB: correlation};
+          }
           data[packagePair][`${issueA} @ ${issueB}`] = correlation;
         }
       });
     });
   });
-  reports.forEach(entry => {
-    Object.keys(entry).forEach(key => {
-      if (entry[key] !== null) {
-        Object.keys(entry[key]).forEach(issueName => {
-          data[key].add(issueName);
-        });
-      }
-    });
-  });
-  return {
-    aatt: Array.from(data.aatt).sort(),
-    alfa: Array.from(data.alfa).sort(),
-    axe: Array.from(data.axe).sort(),
-    ibm: Array.from(data.ibm).sort(),
-    wave: Array.from(data.wave).sort()
-  };
+  return data;
 };
-fs.writeFileSync('scoring/package/issues.json', JSON.stringify(compile(), null, 2));
+fs.writeFileSync('scoring/package/correlations.json', JSON.stringify(compile(), null, 2));
