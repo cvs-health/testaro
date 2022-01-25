@@ -53,12 +53,16 @@ const compile = () => {
         // If the correlation is large enough:
         if (correlation > 0.7) {
           const roundedCorr = correlation.toFixed(2);
-          // Record it.
+          // Record it and the count of non-zero scores.
+          const nonZero = scorePairs.reduce(
+            (count, current) => count + current.filter(score => score).length, 0
+          );
+          const corrPlusNZ = `${roundedCorr} (${nonZero})`;
           if (data[packagePair][issueA]) {
-            data[packagePair][issueA][issueB] = roundedCorr;
+            data[packagePair][issueA][issueB] = corrPlusNZ;
           }
           else {
-            data[packagePair][issueA] = {[issueB]: roundedCorr};
+            data[packagePair][issueA] = {[issueB]: corrPlusNZ};
           }
         }
       });
