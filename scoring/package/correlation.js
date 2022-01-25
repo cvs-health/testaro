@@ -52,12 +52,13 @@ const compile = () => {
           / (Math.sqrt(aSqSum / n - (aSum / n) ** 2) * Math.sqrt(bSqSum / n - (bSum / n) ** 2));
         // If the correlation is large enough:
         if (correlation > 0.7) {
+          const roundedCorr = correlation.toFixed(2);
           // Record it.
           if (data[packagePair][issueA]) {
-            data[packagePair][issueA][issueB] = correlation;
+            data[packagePair][issueA][issueB] = roundedCorr;
           }
           else {
-            data[packagePair][issueA] = {issueB: correlation};
+            data[packagePair][issueA] = {[issueB]: roundedCorr};
           }
         }
       });

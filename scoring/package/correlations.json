@@ -1,12 +1,327 @@
 {
-  "aatt_alfa": {},
-  "aatt_axe": {},
-  "aatt_ibm": {},
-  "aatt_wave": {},
-  "alfa_axe": {},
-  "alfa_ibm": {},
-  "alfa_wave": {},
-  "axe_ibm": {},
-  "axe_wave": {},
-  "ibm_wave": {}
+  "aatt_alfa": {
+    "e:F77": {
+      "r3": 0.8929917624009232
+    },
+    "e:H36": {
+      "r28": 0.9781172905782096
+    },
+    "e:H37": {
+      "r2": 0.7249485051964011
+    },
+    "e:H57": {
+      "r4": 0.8118620997729802
+    },
+    "e:H58": {
+      "r7": 0.8156420578459626
+    },
+    "w:G141": {
+      "r53": 0.8888984139618898
+    },
+    "w:H98": {
+      "r10": 0.9486174246387834
+    }
+  },
+  "aatt_axe": {
+    "e:H36": {
+      "input-image-alt": 0.9781308452947071
+    },
+    "e:H57": {
+      "html-has-lang": 0.7298721678196682
+    },
+    "e:H58": {
+      "valid-lang": 0.8157430075498924
+    },
+    "w:G141": {
+      "heading-order": 0.7891156471677426
+    }
+  },
+  "aatt_ibm": {
+    "e:ARIA4+F92": {
+      "v:Rpt_Aria_ValidRole": 0.9596979364715443
+    },
+    "e:ARIA6+H53": {
+      "v:WCAG20_Object_HasText": 0.9999999999999999
+    },
+    "e:H24": {
+      "v:WCAG20_Area_HasAlt": 0.7886505676153145
+    },
+    "e:H36": {
+      "v:WCAG20_Input_ExplicitLabelImage": 0.9846453617997853
+    },
+    "w:F10": {
+      "v:WCAG20_Object_HasText": 0.9999999999999999
+    },
+    "w:H65": {
+      "v:Rpt_Aria_ValidRole": 0.9168339493951649
+    }
+  },
+  "aatt_wave": {
+    "e:G1+G123+G124": {
+      "a:link_internal_broken": 0.9407944841706025
+    },
+    "e:H24": {
+      "e:alt_area_missing": 0.729350149626317
+    },
+    "e:H36": {
+      "e:alt_input_missing": 0.9127760490175396
+    },
+    "e:H37": {
+      "e:alt_missing": 0.7500794171864614
+    },
+    "e:H57": {
+      "e:language_missing": 0.7204247993994605
+    },
+    "w:G141": {
+      "a:heading_skipped": 0.852991085140007
+    },
+    "w:G90": {
+      "a:event_handler": 0.7638574544862085
+    },
+    "w:H44": {
+      "a:label_orphaned": 0.7077364854491321
+    },
+    "w:H49": {
+      "a:image_title": 0.7043155661780534,
+      "e:alt_spacer_missing": 0.7819485774915909,
+      "e:th_empty": 0.9308522464376819
+    }
+  },
+  "alfa_axe": {
+    "r11": {
+      "link-name": 0.7075373507506578
+    },
+    "r12": {
+      "aria-command-name": 0.9264525937264922,
+      "dlitem": 0.9276419364779741
+    },
+    "r2": {
+      "image-alt": 0.7033265306813151
+    },
+    "r20": {
+      "aria-command-name": 0.9284327019506692,
+      "dlitem": 0.9299210114420559
+    },
+    "r28": {
+      "input-image-alt": 1
+    },
+    "r3": {
+      "duplicate-id": 0.7459279058931425
+    },
+    "r4": {
+      "html-has-lang": 0.7953984899140228
+    },
+    "r40": {
+      "aria-command-name": 0.8929353156892336,
+      "dlitem": 0.8942410076083345
+    },
+    "r42": {
+      "aria-required-children": 0.9067369684450018,
+      "aria-required-parent": 0.9630476228570706,
+      "listitem": 0.7303933198429152
+    },
+    "r43": {
+      "svg-img-alt": 0.9802134138755956
+    },
+    "r47": {
+      "meta-viewport": 0.8117418819723201
+    },
+    "r5": {
+      "html-lang-valid": 1
+    },
+    "r53": {
+      "heading-order": 0.9210871549197315
+    },
+    "r68": {
+      "aria-required-children": 0.7281370093255192,
+      "aria-required-parent": 0.783051955989857
+    },
+    "r7": {
+      "valid-lang": 1
+    },
+    "r83": {
+      "definition-list": 0.8850872576412535,
+      "landmark-main-is-top-level": 0.781364972740489
+    },
+    "r93": {
+      "avoid-inline-spacing": 0.8102540207392972
+    }
+  },
+  "alfa_ibm": {
+    "r12": {
+      "v:Rpt_Aria_RequiredParent_Native_Host_Sematics": 0.8384569944715411
+    },
+    "r13": {
+      "v:WCAG20_Frame_HasTitle": 0.7030337639328517
+    },
+    "r20": {
+      "v:Rpt_Aria_RequiredParent_Native_Host_Sematics": 0.8429116903389134
+    },
+    "r28": {
+      "v:WCAG20_Input_ExplicitLabelImage": 0.9267448886079089
+    },
+    "r40": {
+      "v:Rpt_Aria_RequiredParent_Native_Host_Sematics": 0.8083326101311924
+    },
+    "r5": {
+      "v:WCAG20_Elem_Lang_Valid": 0.705557804997266
+    }
+  },
+  "alfa_wave": {
+    "r28": {
+      "a:select_missing_label": 0.7289854416391057,
+      "e:alt_input_missing": 0.9245173402684443
+    },
+    "r4": {
+      "e:language_missing": 0.7090114731948641
+    },
+    "r53": {
+      "a:heading_skipped": 0.8964373936063278
+    },
+    "r83": {
+      "a:youtube_video": 0.8762185102128959
+    }
+  },
+  "axe_ibm": {
+    "area-alt": {
+      "v:HAAC_Img_UsemapAlt": 0.8942543217857751
+    },
+    "aria-allowed-role": {
+      "v:aria_semantics_role": 0.7421179736498433
+    },
+    "aria-command-name": {
+      "v:Rpt_Aria_RequiredParent_Native_Host_Sematics": 0.7792401881230796
+    },
+    "aria-required-attr": {
+      "v:Rpt_Aria_RequiredProperties": 0.8157050183752604
+    },
+    "aria-valid-attr": {
+      "v:Rpt_Aria_ValidProperty": 0.9379695292920074
+    },
+    "autocomplete-valid": {
+      "v:WCAG21_Input_Autocomplete": 0.744659599073641
+    },
+    "color-contrast": {
+      "v:IBMA_Color_Contrast_WCAG2AA": 0.7609174300414853
+    },
+    "dlitem": {
+      "v:Rpt_Aria_RequiredParent_Native_Host_Sematics": 0.7806084436505872
+    },
+    "duplicate-id-aria": {
+      "v:WCAG21_Label_Accessible": 0.7303224977701807
+    },
+    "empty-heading": {
+      "v:RPT_Header_HasContent": 0.863781123236227
+    },
+    "frame-title": {
+      "v:WCAG20_Frame_HasTitle": 0.7299366725905706
+    },
+    "html-lang-valid": {
+      "v:WCAG20_Elem_Lang_Valid": 0.7730911349334056
+    },
+    "image-alt": {
+      "v:WCAG20_Img_HasAlt": 0.8356178776051484
+    },
+    "image-redundant-alt": {
+      "v:WCAG20_Img_LinkTextNotRedundant": 0.8205701634525474
+    },
+    "input-image-alt": {
+      "v:WCAG20_Input_ExplicitLabelImage": 0.9267938642490173
+    },
+    "landmark-complementary-is-top-level": {
+      "v:Rpt_Aria_ComplementaryRequiredLabel_Implicit": 0.8223162448557954,
+      "v:Rpt_Aria_MultipleComplementaryLandmarks_Implicit": 0.8303970730072464
+    },
+    "landmark-contentinfo-is-top-level": {
+      "v:Rpt_Aria_MultipleContentinfoInSiblingSet_Implicit": 0.7296276884167224,
+      "v:Rpt_Aria_MultipleContentinfoLandmarks_Implicit": 0.862666500352446
+    },
+    "landmark-main-is-top-level": {
+      "r:Rpt_Aria_MultipleMainsVisibleLabel_Implicit": 0.7096163105719637,
+      "v:Rpt_Aria_MultipleMainsRequireLabel_Implicit_2": 0.7264341468746461
+    },
+    "landmark-no-duplicate-banner": {
+      "v:Rpt_Aria_MultipleBannerLandmarks_Implicit": 0.7267911055740311
+    },
+    "landmark-no-duplicate-main": {
+      "r:Rpt_Aria_MultipleMainsVisibleLabel_Implicit": 0.9999999999999998,
+      "v:Rpt_Aria_MultipleMainsRequireLabel_Implicit_2": 0.9501292060816068
+    },
+    "link-name": {
+      "v:WCAG20_A_HasText": 0.7509113648805906
+    }
+  },
+  "axe_wave": {
+    "area-alt": {
+      "e:alt_area_missing": 0.7737342492272781
+    },
+    "definition-list": {
+      "a:youtube_video": 0.979930043660114
+    },
+    "document-title": {
+      "e:title_invalid": 0.7064517492894146
+    },
+    "empty-heading": {
+      "e:heading_empty": 0.7371971174160494
+    },
+    "heading-order": {
+      "a:heading_skipped": 0.9004769206993171
+    },
+    "html-has-lang": {
+      "e:language_missing": 0.8732362525851582
+    },
+    "input-image-alt": {
+      "e:alt_input_missing": 0.9245633875909721
+    },
+    "landmark-main-is-top-level": {
+      "a:youtube_video": 0.8660401882338696
+    },
+    "object-alt": {
+      "a:plugin": 0.9999999999999999
+    },
+    "page-has-heading-one": {
+      "a:h1_missing": 0.7899823232893118
+    },
+    "select-name": {
+      "a:select_missing_label": 0.7855751772790192
+    }
+  },
+  "ibm_wave": {
+    "v:HAAC_Aria_ImgAlt": {
+      "a:tabindex": 0.8442181647509672
+    },
+    "v:IBMA_Color_Contrast_WCAG2AA": {
+      "c:contrast": 0.7300516593125107
+    },
+    "v:RPT_Header_HasContent": {
+      "e:heading_empty": 0.8430972154751263
+    },
+    "v:RPT_Table_DataHeadingsAria": {
+      "a:table_layout": 0.7318251984971932
+    },
+    "v:Rpt_Aria_MultipleToolbarUniqueLabel": {
+      "a:tabindex": 0.8904187480345691
+    },
+    "v:Rpt_Aria_ValidIdRef": {
+      "e:aria_reference_broken": 0.8084655355665253
+    },
+    "v:WCAG20_Area_HasAlt": {
+      "e:alt_area_missing": 0.7998049645498749
+    },
+    "v:WCAG20_Elem_UniqueAccessKey": {
+      "a:accesskey": 0.7788796697276408
+    },
+    "v:WCAG20_Img_HasAlt": {
+      "e:alt_missing": 0.8650489662577145
+    },
+    "v:WCAG20_Img_PresentationImgHasNonNullAlt": {
+      "a:alt_redundant": 0.7460551846004677
+    },
+    "v:WCAG20_Input_ExplicitLabelImage": {
+      "e:alt_input_missing": 0.8720843423802348
+    },
+    "v:WCAG20_Input_RadioChkInFieldSet": {
+      "a:fieldset_missing": 0.7081227738008363
+    }
+  }
 }
