@@ -25,22 +25,20 @@ const compile = () => {
   // For each pair of packages:
   const packagePairs = Object.keys(data);
   packagePairs.forEach(packagePair => {
-    console.log(`Starting package pair ${packagePair}`);
+    console.log(`=== Starting package pair ${packagePair}`);
     const packages = packagePair.split('_');
+    // Identify the reports containing results from both packages.
+    const pairReports = reports.filter(report => report[packages[0]] && report[packages[1]]);
     // For each pair of issues:
     issues[packages[0]].forEach(issueA => {
       issues[packages[1]].forEach(issueB => {
-        // Initialize an array of report score pairs.
+        // Initialize an array of score pairs.
         const scorePairs = [];
-        // For each report:
-        reports.forEach(report => {
-          // If it contains results from both packages:
-          if (report[packages[0] && report[packages[1]]]) {
-            // Add them to the array of report score pairs.
-            const scorePair = [];
-            scorePair.push(packages[0][issueA] || 0, packages[1][issueB] || 0);
-            scorePairs.push(scorePair);
-          }
+        // For each applicable report:
+        pairReports.forEach(report => {
+          // Add the scores for the issues to the array of score pairs.
+          const scorePair = [report[packages[0]][issueA] || 0, report[packages[1]][issueB] || 0];
+          scorePairs.push(scorePair);
         });
         // Get the correlation between the issues.
         const aSum = scorePairs.reduce((sum, current) => sum + current[0], 0);
@@ -61,7 +59,6 @@ const compile = () => {
           else {
             data[packagePair][issueA] = {issueB: correlation};
           }
-          data[packagePair][`${issueA} @ ${issueB}`] = correlation;
         }
       });
     });
