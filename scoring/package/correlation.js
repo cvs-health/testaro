@@ -1,6 +1,7 @@
 /*
   correlation
-  Compiles a list of the correlations between distinct-package issue types.
+  Compiles a list of the correlations between distinct-package issue types and creates a file,
+  correlations.json, containing the list.
 */
 const fs = require('fs');
 const compile = () => {
