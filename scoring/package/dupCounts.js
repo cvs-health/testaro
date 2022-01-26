@@ -22,7 +22,7 @@ const compile = () => {
   packagePairs.forEach(packagePair => {
     const packages = packagePair.split('_');
     // For each issue in the first package:
-    dups[packagePair].forEach(issueA => {
+    Object.keys(dups[packagePair]).forEach(issueA => {
       // Add its duplicate count to the object.
       const count = data[packages[0]][issueA] || 0;
       const issueDups = Object.keys(dups[packagePair][issueA]);

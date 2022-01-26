@@ -89,85 +89,125 @@ exports.scorer = acts => {
     const tests = acts.filter(act => act.type === 'test');
     if (tests.length) {
       // CONSTANTS
-      // Discounts from deficit scores based on multi-test reporting of the same faults.
-      ruleDiscounts.aatt = {
-        'e:F77': 2,
-        'e:G18': 2,
-        'e:H36': 2,
-        'e:H37': 2,
-        'e:H57': 3,
-        'e:H58': 2,
-        'e:H91': 2,
-        'w:F24': 1,
-        'w:G18': 1,
-        'w:G141': 1,
-        'w:H67': 2,
-        'w:H98': 2
-      };
-      ruleDiscounts.alfa = [
-        'r2',
-        'r3',
-        'r4',
-        'r5',
-        'r7',
-        'r10',
-        'r11',
-        'r12',
-        'r28',
-        'r52',
-        'r53',
-        'r56',
-        'r57',
-        'r58',
-        'r68',
-        'r69',
-        'r88'
-      ];
-      ruleDiscounts.axe = {
-        'aria-allowed-role': 1,
-        'aria-roles': 2,
-        'color-contrast': 2,
-        'duplicate-id': 1,
-        'heading-order': 2,
-        'html-has-lang': 3,
-        'html-lang-valid': 2,
-        'image-alt': 2,
-        'image-redundant-alt': 1,
-        'input-image-alt': 2,
-        'label': 3,
-        'link-name': 2,
-        'nested-interactive': 2,
-        'region': 1,
-        'valid-lang': 2
-      };
-      ruleDiscounts.ibm = {
-        'aria_semantics_role': 2,
-        'IBMA_Color_Contrast_WCAG2AA': 2,
-        'Rpt_Aria_OrphanedContent_Native_Host_Sematics': 2,
-        'Rpt_Aria_ValidIdRef': 2,
-        'Rpt_Aria_ValidRole': 2,
-        'RPT_Elem_UniqueId': 2,
-        'WCAG20_A_HasText': 2,
-        'WCAG20_Fieldset_HasLegend': 3,
-        'WCAG20_Input_ExplicitLabel': 2,
-        'WCAG20_Input_RadioChkInFieldSet': 3
-      };
-      ruleDiscounts.wave = {
-        'alt_missing': 2,
-        'alt_redundant': 1,
-        'aria_reference_broken': 2,
-        'contrast': 1,
-        'fieldset_missing': 1,
-        'label_orphaned': 1,
-        'legend_missing': 1,
-        'link_empty': 2,
-        'select_missing_label': 1
+      // Empirically derived counts of duplications of package rules.
+      const duplications = {
+        'aatt': {
+          'e:F77': 1,
+          'e:H36': 4,
+          'e:H37': 2,
+          'e:H57': 3,
+          'e:H58': 2,
+          'w:G141': 3,
+          'w:H98': 1,
+          'e:ARIA6+H53': 1,
+          'e:H24': 2,
+          'e:G1+G123+G124': 1,
+          'w:G90': 1,
+          'w:H44': 1
+        },
+        'alfa': {
+          'r3': 2,
+          'r28': 4,
+          'r2': 2,
+          'r4': 3,
+          'r7': 2,
+          'r53': 3,
+          'r10': 1,
+          'r11': 1,
+          'r12': 2,
+          'r20': 1,
+          'r42': 1,
+          'r43': 1,
+          'r47': 1,
+          'r5': 2,
+          'r68': 1,
+          'r93': 1,
+          'r13': 1
+        },
+        'axe': {
+          'input-image-alt': 4,
+          'html-has-lang': 3,
+          'valid-lang': 2,
+          'heading-order': 3,
+          'link-name': 2,
+          'aria-command-name': 2,
+          'dlitem': 1,
+          'image-alt': 2,
+          'duplicate-id': 1,
+          'aria-required-parent': 1,
+          'svg-img-alt': 1,
+          'meta-viewport': 1,
+          'html-lang-valid': 2,
+          'aria-required-children': 1,
+          'avoid-inline-spacing': 1,
+          'area-alt': 2,
+          'aria-allowed-role': 1,
+          'aria-required-attr': 1,
+          'aria-valid-attr': 1,
+          'autocomplete-valid': 1,
+          'color-contrast': 1,
+          'empty-heading': 2,
+          'frame-title': 1,
+          'image-redundant-alt': 1,
+          'landmark-complementary-is-top-level': 2,
+          'landmark-no-duplicate-banner': 1,
+          'landmark-no-duplicate-main': 2,
+          'document-title': 1,
+          'object-alt': 1,
+          'page-has-heading-one': 1,
+          'select-name': 1
+        },
+        'ibm': {
+          'v:WCAG20_Object_HasText': 1,
+          'v:WCAG20_Area_HasAlt': 2,
+          'v:WCAG20_Input_ExplicitLabelImage': 4,
+          'v:WCAG20_Frame_HasTitle': 2,
+          'v:WCAG20_Elem_Lang_Valid': 2,
+          'v:HAAC_Img_UsemapAlt': 1,
+          'v:aria_semantics_role': 1,
+          'v:Rpt_Aria_RequiredProperties': 1,
+          'v:Rpt_Aria_ValidProperty': 1,
+          'v:WCAG21_Input_Autocomplete': 1,
+          'v:IBMA_Color_Contrast_WCAG2AA': 2,
+          'v:RPT_Header_HasContent': 2,
+          'v:WCAG20_Img_HasAlt': 2,
+          'v:WCAG20_Img_LinkTextNotRedundant': 1,
+          'v:Rpt_Aria_ComplementaryRequiredLabel_Implicit': 1,
+          'v:Rpt_Aria_MultipleComplementaryLandmarks_Implicit': 1,
+          'v:Rpt_Aria_MultipleBannerLandmarks_Implicit': 1,
+          'r:Rpt_Aria_MultipleMainsVisibleLabel_Implicit': 1,
+          'v:Rpt_Aria_MultipleMainsRequireLabel_Implicit_2': 1,
+          'v:WCAG20_A_HasText': 1,
+          'v:Rpt_Aria_ValidIdRef': 1,
+          'v:WCAG20_Elem_UniqueAccessKey': 1,
+          'v:WCAG20_Input_RadioChkInFieldSet': 1
+        },
+        'wave': {
+          'a:link_internal_broken': 1,
+          'e:alt_area_missing': 3,
+          'e:alt_input_missing': 4,
+          'e:alt_missing': 2,
+          'e:language_missing': 3,
+          'a:heading_skipped': 3,
+          'a:event_handler': 1,
+          'a:label_orphaned': 1,
+          'e:title_invalid': 1,
+          'e:heading_empty': 2,
+          'a:plugin': 1,
+          'a:h1_missing': 1,
+          'a:select_missing_label': 1,
+          'c:contrast': 1,
+          'e:aria_reference_broken': 1,
+          'a:accesskey': 1,
+          'a:fieldset_missing': 1
+        }
       };
       // FUNCTIONS
       // Adds the actual or inferred score of a test to the total score.
       const increment = test => {
         deficit.total += typeof deficit[test] === 'number' ? deficit[test] : inferences[test];
       };
+      // OPERATION
       // For each test:
       tests.forEach(test => {
         const {which} = test;
@@ -175,65 +215,46 @@ exports.scorer = acts => {
         if (which === 'alfa') {
           facts = test.result;
           if (facts && Array.isArray(facts)) {
-            rules.alfa = 'multiply cantTell by 2, failed by 4; sum; subtract discounts';
-            let totalDiscount = 0;
-            facts.forEach(fact => {
-              if (ruleDiscounts.alfa.includes(fact.rule.ruleID)) {
-                const factDiscount = fact.verdict === 'failed' ? 2 : 1;
-                totalDiscount += factDiscount;
-              }
-            });
-            deficit.alfa
-              = 2 * facts.filter(fact => fact.verdict === 'cantTell').length
-              + 4 * facts.filter(fact => fact.verdict === 'failed').length
-              - totalDiscount;
+            rules.alfa = 'multiply cantTell by 2*, failed by 4* (*discounted); sum';
+            deficit.alfa = Math.round(facts.reduce((total, issue) => {
+              const rawScore = [4, 2][['failed', 'cantTell'].indexOf(issue.verdict)] || 0;
+              const divisor = duplications.alfa[issue.rule.ruleID] + 1 || 1;
+              return total + rawScore / divisor;
+            }, 0));
             deficit.total += deficit.alfa;
           }
         }
         else if (which === 'aatt') {
           facts = test.result;
           if (facts && Array.isArray(facts)) {
-            rules.aatt = 'multiply warning by 2, error by 4; sum; subtract discounts';
+            rules.aatt = 'multiply warning by 2*, error by 4* (*discounted); sum';
             const issues = facts.filter(fact => fact.type);
-            let totalDiscount = 0;
-            issues.forEach(issue => {
-              const issueDiscount = ruleDiscounts.aatt[`${issue.type.slice(0, 1)}:${issue.id}`];
-              if (issueDiscount) {
-                totalDiscount += issueDiscount;
-              }
-            });
-            deficit.aatt
-              = 2 * issues.filter(issue => issue.type === 'warning').length
-              + 4 * issues.filter(issue => issue.type === 'error').length
-              - totalDiscount;
+            deficit.aatt = Math.round(issues.reduce((total, issue) => {
+              const rawScore = [4, 2][['error', 'warning'].indexOf(issue.type)] || 0;
+              const divisor = duplications.aatt[`${issue.type.slice(0, 1)}:${issue.id}`] + 1 || 1;
+              return total + rawScore / divisor;
+            }, 0));
             deficit.total += deficit.aatt;
           }
         }
         else if (which === 'axe') {
-          facts = test.result && test.result.violations;
+          facts = test.result && test.result.items;
           if (facts) {
-            rules.axe = 'multiply minor by 2, moderate by 3, serious by 4, critical by 5; sum; subtract discounts';
-            const axeRules = test.result.items || [];
-            let totalDiscount = 0;
-            axeRules.forEach(rule => {
-              const ruleDiscount = ruleDiscounts.axe[rule.rule];
-              if (ruleDiscount) {
-                totalDiscount += ruleDiscount * rule.elements.length;
-              }
-            });
-            deficit.axe
-              = 2 * facts.minor
-              + 3 * facts.moderate
-              + 4 * facts.serious
-              + 5 * facts.critical
-              - totalDiscount;
+            rules.axe = 'multiply minor by 2*, moderate by 3*, serious by 4*, critical by 5* (*discounted); sum';
+            deficit.axe = Math.round(facts.reduce((total, item) => {
+              const rawScore = item.elements.length * (
+                [5, 4, 3, 2][['critical', 'serious', 'moderate', 'minor'].indexOf(item.impact)] || 0
+              );
+              const divisor = duplications.axe[item.rule] + 1 || 1;
+              return total + rawScore / divisor;
+            }, 0));
             deficit.total += deficit.axe;
           }
         }
         else if (which === 'ibm') {
           facts = test.result;
           if (facts && facts.content && facts.url && (facts.content.totals || facts.url.totals)) {
-            rules.ibm = 'multiply violations by 4, recommendatons by 2; sum; subtract discounts';
+            rules.ibm = 'multiply violations by 4*, recommendatons by 2* (*discounted); sum';
             const scores = {
               content: null,
               url: null
@@ -241,15 +262,13 @@ exports.scorer = acts => {
             ['content', 'url'].forEach(type => {
               const totals = facts[type].totals;
               if (totals) {
-                const ibmRules = test.result[type].items || [];
-                let totalDiscount = 0;
-                ibmRules.forEach(rule => {
-                  const ruleDiscount = ruleDiscounts.ibm[rule.ruleId];
-                  if (ruleDiscount) {
-                    totalDiscount += ruleDiscount;
-                  }
-                });
-                scores[type] = 4 * totals.violation + 2 * totals.recommendation - totalDiscount;
+                const items = facts[type].items || [];
+                scores[type] = Math.round(items.reduce((total, item) => {
+                  const {ruleId, level} = item;
+                  const rawScore = [4, 2][['violation', 'recommendation'].indexOf(level)] || 0;
+                  const divisor = duplications.ibm[`${level.slice(0, 1)}:${ruleId}`] + 1 || 1;
+                  return total + rawScore / divisor;
+                }, 0));
               }
             });
             if (scores.content !== null || scores.url !== null) {
@@ -261,23 +280,27 @@ exports.scorer = acts => {
         else if (which === 'wave') {
           facts = test.result && test.result.categories;
           if (facts) {
-            rules.wave = 'multiply alerts by 2, contrast errors by 3, errors by 4; sum; subtract discounts';
-            let totalDiscount = 0;
+            rules.wave
+              = 'multiply alerts by 2*, contrast errors by 3*, errors by 4* (*discounted); sum';
+            const weights = {
+              error: 4,
+              contrast: 3,
+              alert: 2
+            };
+            const scores = {
+              error: 0,
+              contrast: 0,
+              alert: 0
+            };
             ['error', 'contrast', 'alert'].forEach(level => {
-              const items = facts[level].items;
-              const waveRules = Object.keys(items);
-              waveRules.forEach(rule => {
-                const ruleDiscount = ruleDiscounts.wave[rule] * items[rule].count;
-                if (ruleDiscount) {
-                  totalDiscount += ruleDiscount;
-                }
-              });
+              const {items} = facts[level];
+              scores[level] = Math.round(Object.keys(items).reduce((total, ruleID) => {
+                const rawScore = items[ruleID].count * weights[level];
+                const divisor = duplications.wave[`${level.slice(0, 1)}:${ruleID}`] + 1 || 1;
+                return total + rawScore / divisor;
+              }, 0));
             });
-            deficit.wave
-              = 2 * facts.alert.count
-              + 3 * facts.contrast.count
-              + 4 * facts.error.count
-              - totalDiscount;
+            deficit.wave = scores.reduce((total, level) => total + level);
             deficit.total += deficit.wave;
           }
         }
