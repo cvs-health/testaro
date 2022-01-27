@@ -23,11 +23,11 @@
   },
   "homepage": "https://github.com/jrpool/autotest#readme",
   "dependencies": {
-    "aatt": "*",
     "@siteimprove/alfa-act": "*",
     "@siteimprove/alfa-playwright": "*",
     "@siteimprove/alfa-rules": "*",
     "@siteimprove/alfa-scraper": "*",
+    "aatt": "*",
     "accessibility-checker": "*",
     "axe-playwright": "*",
     "dotenv": "*",
