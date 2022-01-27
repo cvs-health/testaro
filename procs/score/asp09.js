@@ -36,7 +36,7 @@ exports.scorer = acts => {
     wave: '',
     zIndex: ''
   };
-  const ruleDiscounts = {};
+  let duplications = {};
   const diffStyles = [
     'borderStyle',
     'borderWidth',
@@ -90,7 +90,7 @@ exports.scorer = acts => {
     if (tests.length) {
       // CONSTANTS
       // Empirically derived counts of duplications of package rules.
-      const duplications = {
+      duplications = {
         'aatt': {
           'e:F77': 1,
           'e:H36': 4,
@@ -254,7 +254,7 @@ exports.scorer = acts => {
         else if (which === 'ibm') {
           facts = test.result;
           if (facts && facts.content && facts.url && (facts.content.totals || facts.url.totals)) {
-            rules.ibm = 'multiply violations by 4*, recommendatons by 2* (*discounted); sum';
+            rules.ibm = 'multiply violations by 4*, recommendations by 2* (*discounted); sum';
             const scores = {
               content: null,
               url: null
@@ -300,7 +300,7 @@ exports.scorer = acts => {
                 return total + rawScore / divisor;
               }, 0));
             });
-            deficit.wave = scores.reduce((total, level) => total + level);
+            deficit.wave = scores.error + scores.contrast + scores.alert;
             deficit.total += deficit.wave;
           }
         }
@@ -544,8 +544,8 @@ exports.scorer = acts => {
   // Return the score facts, except for the log test.
   return {
     scoreProc: 'asp',
-    version: '8',
-    ruleDiscounts,
+    version: '9',
+    duplications,
     rules,
     diffStyles,
     logWeights,
