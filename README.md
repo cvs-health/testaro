@@ -1,10 +1,12 @@
-# autotest
+# testaro
 
 Accessibility test automation
 
 ## Summary
 
-Autotest is a prototype application investigating methods of web-application test automation, with an emphasis on tests for accessibility. Autotest performs automated tests on web documents.
+Testaro (Esperanto for “collection of tests”) is a collection of web accessibility tests.
+
+Testaro is derived from [Autotest](https://github.com/jrpool/autotest).
 
 ## System requirements
 
@@ -12,29 +14,22 @@ Version 14 or later of [Node.js](https://nodejs.org/en/).
 
 ## Technologies
 
-Autotest uses the [dotenv](https://www.npmjs.com/package/dotenv) package to keep secrets and personalize form completion.
+Testaro uses the [Playwright](https://playwright.dev/) package to launch browsers, perform user actions in them, and perform tests.
 
-Autotest uses `Node.js` to run:
-- an `HTTP(S)` server to interact with you
-- an `HTTP(S)` client to interact with websites
-
-Autotest uses the [Playwright](https://playwright.dev/) package to launch browsers, perform user actions in them, and perform tests.
-
-Autotest uses:
-- [accessibility-checker](https://www.npmjs.com/package/accessibility-checker) to perform the `ibm` test, using the IBM Equal Access Accessibility Checker
-- [alfa](https://alfa.siteimprove.com/) to perform the `alfa` test, using Siteimprove alfa
-- [Automated Accessibility Testing Tool](https://www.npmjs.com/package/aatt) to perform the `aatt` test, using HTML CodeSniffer
-- [axe-playwright](https://www.npmjs.com/package/axe-playwright) to perform the `axe` test, using `axe-core`
-- [KickFire Company Name to Website Endpoint](https://www.kickfire.com/developers/docs-page.php#item-3-6) to convert organization names to URLs
+Testaro combines its own collection of tests with tests made available in other packages and APIs:
+- [accessibility-checker](https://www.npmjs.com/package/accessibility-checker) (the IBM Equal Access Accessibility Checker)
+- [alfa](https://alfa.siteimprove.com/) (Siteimprove alfa)
+- [Automated Accessibility Testing Tool](https://www.npmjs.com/package/aatt) (Paypal AATT, running HTML CodeSniffer)
+- [axe-playwright](https://www.npmjs.com/package/axe-playwright) (Deque Axe-core)
 - [pixelmatch](https://www.npmjs.com/package/pixelmatch) to measure motion
-- [WAVE API](https://wave.webaim.org/api/) to perform the `wave' test, using WAVE
+- [WAVE API](https://wave.webaim.org/api/) (WebAIM WAVE)
 
-Autotest enables federated accessibility testing by combining test packages and supplementing them with additional tests. As of January 2022, the counts of tests in the packages referenced above were:
-- `aatt`: 98
-- `alfa`: 103
-- `axe`: 138
-- `ibm` 163
-- `wave`: 110
+As of January 2022, the counts of tests in the packages referenced above were:
+- AATT: 98
+- Alfa: 103
+- Axe-core: 138
+- Equal Access: 163
+- WAVE: 110
 - total: 612
 
 ## Code organization
@@ -46,12 +41,6 @@ The main subdirectories of the project directory containing other code files are
 - `procs`: shared procedures
 - `validation`: code and artifacts for the validation of tests
 
-Autotest assumes that you also have code in another directory. There you may name the main subdirectories as you wish, such as:
-- `scripts`: instructions for conducting tests
-- `batches`: collections of URLs to be tested by a single script
-- `reports`: reports of the results of tests
-- `data`: data for use by procedures
-
 ## Installation
 
 ```bash
@@ -62,40 +51,21 @@ npm install
 
 ## Configuration
 
-Create a file named `.env` in the project directory, with this content:
-
-```bash
-HOST=localhost:3000
-PROTOCOL=http
-WAVE_KEY=[1]
-KICKFIRE_KEY=[2]
-SCRIPTDIR=[3]
-BATCHDIR=[4]
-REPORTDIR=[5]
-DATADIR=[6]
-```
-
-Replace the bracketed numbers above with the applicable values, such as:
-
-```bash
-SCRIPTDIR=../my-autotest/scripts
-```
-
-You are responsible for obtaining keys to use WAVE or Kickfire if you wish to use them within Autotest. (See the links above under “Technologies”.)
+Use of WAVE requires you to have a WAVE API key (see the link above under “Technologies”).
 
 ## Specification
 
-Before using Autotest, you must specify what it should do. You do this by creating at least one script, and optionally one or more batches.
+To use Testaro, you must specify what it should do. You do this by creating at least one script, and optionally one or more batches.
 
 ## Validation
 
-In order to validate Autotest tests, you will use a validation script in the `validation/scripts` directory, plus artifacts (HTML documents) in a subdirectory of the `validation/targets` directory. For any validation script named `foo.json`, there must be a subdirectory named `validation/targets/foo`. For several of the tests in Autotest, validation scripts and targets already exist, and you can use them as-is. They are named after the tests that they validate.
+In order to validate Testaro tests, you will use a validation script in the `validation/scripts` directory, plus artifacts (HTML documents) in a subdirectory of the `validation/targets` directory. For any validation script named `foo.json`, there must be a subdirectory named `validation/targets/foo`. For several of the tests in Autotest, validation scripts and targets already exist, and you can use them as-is. They are named after the tests that they validate.
 
 ### Scripts
 
 #### Introduction
 
-Autotest, whether you test with it or validate its tests, performs the **commands** in a **script**. When you run Autotest, you first tell it which mode you want (running or validating). Then it lists the available scripts for the mode you chose and asks you which script you want it to execute.
+Testaro, whether you test with it or validate its tests, performs the **commands** in a **script**. When you run Testaro, you specify running mode or validation mode and provide a script.
 
 A script is a JSON file with the properties:
 

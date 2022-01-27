@@ -1,6 +1,6 @@
 /*
   index.js
-  autotest main script.
+  testaro main script.
 */
 // ########## IMPORTS
 // Module to access files.
