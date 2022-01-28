@@ -5,52 +5,16 @@
 // ########## IMPORTS
 // Module to access files.
 const fs = require('fs/promises');
-// Module to keep secrets local.
-require('dotenv').config();
-// Module to create an HTTP server and client.
-const http = require('http');
 // Module to create an HTTPS server and client.
 const https = require('https');
 // Requirements for commands.
 const {commands} = require('./commands');
 // ########## CONSTANTS
-// Set debug to true to add debugging features.
-const debug = false;
-// Set waits to a positive number to insert delays (in ms).
-const waits = 0;
-const protocol = process.env.PROTOCOL || 'https';
-// Files servable without modification.
-const statics = {
-  '/index.html': 'text/html',
-  '/style.css': 'text/css'
-};
-// URLs to be redirected.
-const redirects = {
-  '/': '/autotest/index.html',
-  '/which.html': '/autotest/run.html'
-};
-// Pages to be served as error notifications.
-const customErrorPageStart = [
-  '<html lang="en-US">',
-  '  <head>',
-  '    <meta charset="utf-8">',
-  '    <title>ERROR</title>',
-  '  </head>',
-  '  <body><main>',
-  '    <h1>ERROR</h1>',
-  '    <p>__msg__</p>'
-];
-const systemErrorPageStart = customErrorPageStart.concat(...[
-  '    <p>Location:</p>',
-  '    <pre>__stack__</pre>'
-]);
-const errorPageEnd = [
-  '  </main></body>',
-  '</html>',
-  ''
-];
-const customErrorPage = customErrorPageStart.concat(...errorPageEnd);
-const systemErrorPage = systemErrorPageStart.concat(...errorPageEnd);
+// Set DEBUG environment variable to 'true' to add debugging features.
+const debug = process.env.DEBUG === 'true';
+// Set WAITS environment variable to a positive number to insert delays (in ms).
+const waits = Number.parseInt(process.env.WAITS) || 0;
+const protocol = 'https';
 // CSS selectors for targets of moves.
 const moves = {
   button: 'button',
@@ -121,12 +85,6 @@ let browserContext;
 let browserTypeName;
 let requestedURL = '';
 // ########## FUNCTIONS
-// Serves a redirection.
-const redirect = (url, response) => {
-  response.statusCode = 303;
-  response.setHeader('Location', url);
-  response.end();
-};
 // Closes any existing browser.
 const closeBrowser = async () => {
   const browser = browserContext && browserContext.browser();
@@ -187,98 +145,13 @@ const launch = async typeName => {
   }
 };
 // Serves a system error message.
-const serveError = (error, response) => {
-  if (response.writableEnded) {
-    console.log(error.message);
-    console.log(error.stack);
-  }
-  else {
-    response.statusCode = 400;
-    response.write(
-      systemErrorPage
-      .join('\n')
-      .replace('__msg__', error.message)
-      .replace('__stack__', error.stack)
-    );
-    response.end();
-  }
-  return '';
+const serveError = error => {
+  console.log(error.message);
+  console.log(error.stack);
 };
 // Serves a custom error message.
-const serveMessage = (msg, response) => {
-  if (response.writableEnded) {
-    console.log(msg);
-  }
-  else {
-    response.statusCode = 400;
-    response.write(customErrorPage.join('\n').replace('__msg__', msg));
-    response.end();
-  }
-  return '';
-};
-// Serves a page.
-const servePage = (content, newURL, mimeType, response) => {
-  response.setHeader('Content-Type', `${mimeType}; charset=UTF-8`);
-  if (newURL) {
-    response.setHeader('Content-Location', newURL);
-  }
-  response.end(content);
-};
-// Serves or returns part or all of an HTML or plain-text page.
-const render = (path, stage, which, query, response) => {
-  if (! response.writableEnded) {
-    // If an HTML page is to be rendered:
-    if (['all', 'raw'].includes(stage)) {
-      // Get the page.
-      return fs.readFile(`./${path}/${which}.html`, 'utf8')
-      .then(
-        // When it arrives:
-        page => {
-          // Replace its placeholders with eponymous query parameters.
-          const renderedPage = page.replace(/__([a-zA-Z]+)__/g, (ph, qp) => query[qp]);
-          // If the page is ready to serve in its entirety:
-          if (stage === 'all') {
-            // Serve it.
-            servePage(renderedPage, `/${path}-out.html`, 'text/html', response);
-            return '';
-          }
-          // Otherwise, i.e. if the page needs modification before it is served:
-          else {
-            return renderedPage;
-          }
-        },
-        error => serveError(new Error(error), response)
-      );
-    }
-    // Otherwise, if a plain-text page is ready to start:
-    else if (stage === 'start') {
-      // Serve its start.
-      response.setHeader('Content-Type', 'text/plain; charset=UTF-8');
-      // Set headers to tell the browser to render content chunks as they arrive.
-      response.setHeader('Transfer-Encoding', 'chunked');
-      response.setHeader('X-Content-Type-Options', 'nosniff');
-      if (path) {
-        response.setHeader('Content-Location', `/${path}-out.txt`);
-      }
-      response.write(`Report timestamp: ${query.timeStamp}\n\nProcessed URL 0\n`);
-      return '';
-    }
-    // Otherwise, if a plain-text page is ready to continue:
-    else if (stage === 'more') {
-      // Serve its continuation.
-      response.write(`Processed URL ${query.hostIndex}\n`);
-      return '';
-    }
-    // Otherwise, if a plain-text page is ready to end:
-    else if (stage === 'end') {
-      // Serve its end.
-      response.end(`Processed URL ${query.hostIndex}\n`);
-      return '';
-    }
-    else {
-      serveError('ERROR: Invalid stage', response);
-    }
-  }
+const serveMessage = msg => {
+  console.log(msg);
 };
 // Normalizes spacing characters and cases in a string.
 const debloat = string => string.replace(/\s/g, ' ').trim().replace(/ {2,}/g, ' ').toLowerCase();
@@ -429,6 +302,7 @@ const matchElement = async (page, selector, matchText, index = 0) => {
     return null;
   }
 };
+// ########## VALIDATORS
 // Validates a browser type.
 const isBrowserType = type => ['chromium', 'firefox', 'webkit'].includes(type);
 // Validates a load state.
@@ -493,7 +367,7 @@ const hasSubtype = (variable, subtype) => {
   }
 };
 // Validates a command.
-const isValid = command => {
+const isValidCommand = command => {
   // Identify the type of the command.
   const type = command.type;
   // If the type exists and is known:
@@ -528,8 +402,8 @@ const isValid = command => {
         const cP = command[property];
         // If it is optional and omitted or present and valid:
         const optAndNone = ! vP[0] && ! cP;
-        const isValid = cP !== undefined && hasType(cP, vP[1]) && hasSubtype(cP, vP[2]);
-        return optAndNone || isValid;
+        const isValidCommand = cP !== undefined && hasType(cP, vP[1]) && hasSubtype(cP, vP[2]);
+        return optAndNone || isValidCommand;
       }
     });
   }
@@ -538,6 +412,51 @@ const isValid = command => {
     // Return invalidity.
     return false;
   }
+};
+// Validates a script.
+const isValidScript = scriptJSON => {
+  // Get the script data.
+  const script = JSON.parse(scriptJSON);
+  const {what, strict, commands} = script;
+  // Return whether the script is valid:
+  return what
+    && typeof strict === 'boolean'
+    && commands
+    && typeof what === 'string'
+    && Array.isArray(commands)
+    && commands[0].type === 'launch'
+    && commands.length > 1
+    && commands[1].type === 'url'
+    && isURL(commands[1].which);
+};
+// Validates a validator script.
+const isValidValidator = scriptJSON => {
+  // Get the script data.
+  const script = JSON.parse(scriptJSON);
+  const {what, strict, commands} = script;
+  // Return whether the validator is valid:
+  return what
+    && strict
+    && commands
+    && typeof what === 'string'
+    && Array.isArray(commands)
+    && commands[0].type === 'launch'
+    && commands.length > 1
+    && commands[1].type === 'url'
+    && isURL(commands[1].which);
+};
+// Validates a batch.
+const isValidBatch = batchJSON => {
+  // Get the batch data.
+  const batch = JSON.parse(batchJSON);
+  const batchWhat = batch.what;
+  const {hosts} = batch;
+  // Return whether the batch is valid:
+  return batchWhat
+    && hosts
+    && typeof batchWhat === 'string'
+    && Array.isArray(hosts)
+    && hosts.every(host => host.which && host.what && isURL(host.which));
 };
 // Returns a string with any final slash removed.
 const deSlash = string => string.endsWith('/') ? string.slice(0, -1) : string;
@@ -674,7 +593,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
     const scriptAct = acts[actIndex];
     const act = JSON.parse(JSON.stringify(scriptAct));
     // If it is valid:
-    if (isValid(act)) {
+    if (isValidCommand(act)) {
       const whichSuffix = act.which ? ` (${act.which})` : '';
       console.log(`>>>> ${act.type}${whichSuffix}`);
       // Copy it into the report.
@@ -1199,9 +1118,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
   }
 };
 // Handles a script request.
-const scriptHandler = async (
-  what, strict, acts, query, stage, hostIndex, response
-) => {
+const scriptHandler = async (what, strict, acts, query, hostIndex) => {
   // Reinitialize the log statistics.
   logCount = logSize = prohibitedCount = visitTimeoutCount = visitRejectionCount= 0;
   // Initialize a script report.
@@ -1268,8 +1185,8 @@ const scriptHandler = async (
   query.report = reportJSON.replace(/</g, '&lt;');
   // Update the report file.
   await reportFileUpdate(query.reportDir, reportSuffix, reportJSON, true);
-  // Render and serve the output.
-  render('', stage, 'out', query, response);
+  // Write the output.
+  console.log(query);
 };
 // Recursively gets an array of file-name base/property-value arrays from JSON object files.
 const getWhats = async (path, baseNames, result) => {
@@ -1282,6 +1199,28 @@ const getWhats = async (path, baseNames, result) => {
   }
   else {
     return Promise.resolve(result);
+  }
+};
+// Injects url commands into a report where necessary to undo DOM changes.
+const injectURLCommands = commands => {
+  let injectMore = true;
+  while (injectMore) {
+    const injectIndex = commands.findIndex((command, index) =>
+      index < commands.length - 1
+      && command.type === 'test'
+      && commands[index + 1].type === 'test'
+      && domChangers.has(command.which)
+    );
+    if (injectIndex === -1) {
+      injectMore = false;
+    }
+    else {
+      commands.splice(injectIndex + 1, 0, {
+        type: 'url',
+        which: 'https://*',
+        what: 'URL'
+      });
+    }
   }
 };
 // Handles a request.
@@ -1462,7 +1401,7 @@ const requestHandler = (request, response) => {
             // If there is no batch:
             if (batchName === 'None') {
               // Process the script, using the commands as the initial acts.
-              scriptHandler(what, strict, commands, query, 'all', -1, response);
+              scriptHandler(what, strict, commands, query, -1);
             }
             // Otherwise, i.e. if there is a batch:
             else {
@@ -1483,25 +1422,7 @@ const requestHandler = (request, response) => {
                   && hosts.every(host => host.which && host.what && isURL(host.which))
                 ) {
                   // Inject url commands where necessary to undo DOM changes.
-                  let injectMore = true;
-                  while (injectMore) {
-                    const injectIndex = commands.findIndex((command, index) =>
-                      index < commands.length - 1
-                      && command.type === 'test'
-                      && commands[index + 1].type === 'test'
-                      && domChangers.has(command.which)
-                    );
-                    if (injectIndex === -1) {
-                      injectMore = false;
-                    }
-                    else {
-                      commands.splice(injectIndex + 1, 0, {
-                        type: 'url',
-                        which: 'https://*',
-                        what: 'URL'
-                      });
-                    }
-                  }
+                  injectURLCommands(commands);
                   // FUNCTION DEFINITION START
                   // Recursively process commands on the hosts of a batch.
                   const doBatch = async (hosts, isFirst, hostIndex) => {
@@ -1527,7 +1448,7 @@ const requestHandler = (request, response) => {
                       // Initialize an array of the acts as a copy of the commands.
                       const acts = JSON.parse(JSON.stringify(commands));
                       // Process the commands on the host.
-                      await scriptHandler(what, strict, acts, query, stage, hostIndex, response);
+                      await scriptHandler(what, strict, acts, query, hostIndex);
                       // Process the remaining hosts.
                       await doBatch(hosts.slice(1), false, hostIndex + 1);
                     }
