@@ -426,7 +426,8 @@ const isValidScript = script => {
     && commands[0].type === 'launch'
     && commands.length > 1
     && commands[1].type === 'url'
-    && isURL(commands[1].which);
+    && isURL(commands[1].which)
+    && commands.every(command => isValidCommand(command));
 };
 // Validates a batch.
 const isValidBatch = batchJSON => {
@@ -603,11 +604,6 @@ const visit = async (act, page, isStrict) => {
     return page;
   }
 };
-// Updates a report file.
-const reportFileUpdate = async (reportDir, nameSuffix, report, isJSON) => {
-  const fileReport = isJSON ? report : JSON.stringify(report, null, 2);
-  await fs.writeFile(`${reportDir}/report-${nameSuffix}.json`, fileReport);
-};
 // Returns a property value and whether it satisfies a condition.
 const isTrue = (object, specs) => {
   let satisfied;
@@ -640,12 +636,12 @@ const isTrue = (object, specs) => {
   return [actual, satisfied];
 };
 // Recursively performs the commands in a report.
-const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => {
+const doActs = async (report, actIndex, page) => {
+  const {options, acts} = report;
   // If any more commands are to be performed:
   if (actIndex > -1 && actIndex < acts.length) {
     // Identify the command to be performed.
-    const scriptAct = acts[actIndex];
-    const act = JSON.parse(JSON.stringify(scriptAct));
+    const act = acts[actIndex];
     // If it is valid:
     if (isValidCommand(act)) {
       const whichSuffix = act.which ? ` (${act.which})` : '';
@@ -1160,8 +1156,6 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
       // Add an error result to the act.
       act.result = `ERROR: Invalid command of type ${act.type}`;
     }
-    // Update the report file.
-    await reportFileUpdate(reportDir, reportSuffix, report, false);
     // Perform the remaining acts.
     await doActs(acts, report, actIndex + 1, page, reportSuffix, reportDir);
   }
@@ -1171,18 +1165,11 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
     return Promise.resolve('');
   }
 };
-// Handles a script request.
-const scriptHandler = async (what, strict, options, hostIndex) => {
+// Performs the commands in a script and returns a report.
+const doScript = async (report, hostIndex) => {
   // Reinitialize the log statistics.
   logCount = logSize = prohibitedCount = visitTimeoutCount = visitRejectionCount= 0;
-  // Initialize a script report.
-  const report = {};
-  report.script = query.scriptName;
-  report.batch = query.batchName;
-  report.what = what;
-  report.strict = strict;
-  report.testDate = new Date().toISOString().slice(0, 10);
-  report.timeStamp = query.timeStamp;
+  // Add initialized properties to the report.
   report.logCount = 0;
   report.logSize = 0;
   report.prohibitedCount = 0;
@@ -1190,12 +1177,11 @@ const scriptHandler = async (what, strict, options, hostIndex) => {
   report.visitRejectionCount = 0;
   report.presses = 0;
   report.amountRead = 0;
-  report.acts = [];
   report.testTimes = [];
   const hostSuffix = hostIndex > -1 ? `-${hostIndex.toString().padStart(3, '0')}` : '';
-  const reportSuffix = `${query.timeStamp}${hostSuffix}`;
+  report.reportSuffix = `${report.timeStamp}${hostSuffix}`;
   // Perform the specified acts and add the results and exhibits to the report.
-  await doActs(acts, report, 0, null, reportSuffix, query.reportDir);
+  await doActs(report, 0, null);
   // Close the browser.
   await closeBrowser();
   // Add the log statistics to the report.
@@ -1223,20 +1209,14 @@ const scriptHandler = async (what, strict, options, hostIndex) => {
       }
     }
   }
-  // If any exhibits have been added to the report, move them to the query.
-  if (report.exhibits) {
-    query.exhibits = report.exhibits;
-    delete report.exhibits;
-  }
-  // Otherwise, i.e. if no exhibits have been added to the report:
-  else {
-    // Add properties to the query.
-    query.exhibits = '<p><strong>None</strong></p>';
-    query.hostIndex = hostIndex;
-  }
-  // Convert the report to JSON and add it to the query.
-  const reportJSON = JSON.stringify(report, null, 2);
-  query.report = reportJSON.replace(/</g, '&lt;');
+  // Return the report.
+  return report;
+};
+  // Write a report file.
+  const reportFileUpdate = async (reportDir, nameSuffix, report, isJSON) => {
+    const fileReport = isJSON ? report : JSON.stringify(report, null, 2);
+    await fs.writeFile(`${reportDir}/report-${nameSuffix}.json`, fileReport);
+  };
   // Update the report file.
   await reportFileUpdate(query.reportDir, reportSuffix, reportJSON, true);
   // Write the output.
@@ -1277,16 +1257,45 @@ const injectURLCommands = commands => {
     }
   }
 };
+// Write a JSON report.
+const writeReport = async report => {
+  const {options} = report;
+  const {reportFile, withBatch} = options;
+  let reportDir = '';
+  let stdOut = false;
+  if (reportFile) {
+    reportDir = reportFile.directory;
+    if (reportFile.alsoStdOut) {
+      stdOut = true;
+    }
+  }
+  else if (withBatch) {
+    reportDir = withBatch.directory;
+  }
+  else {
+    stdOut = true;
+  }
+  // If the report is to be written as a file:
+  if (reportDir) {
+    // Write it.
+    fs.writeFileSync(reportDir, JSON.stringify(report, null, 2));
+  }
+  // If the report is to be sent to the standard output:
+  if (stdOut) {
+    // Send it.
+    console.log(JSON.stringify(report, null, 2));
+  }
+};
 // Recursively performs commands on the hosts of a batch.
 const doBatch = async (report, hostIndex) => {
-  const {withBatch} = hostReport.options;
+  const {withBatch} = report.options;
   const {batch} = withBatch;
   const {hosts} = batch;
   const host = hosts[hostIndex];
   // If the specified host exists:
   if (host) {
-  // Copy the report for it.
-  const hostReport = JSON.parse(JSON.stringify(report));
+    // Copy the report for it.
+    const hostReport = JSON.parse(JSON.stringify(report));
     // Copy the properties of the specified host to all hosts in the acts.
     hostReport.acts.forEach(act => {
       if (act.type === 'url') {
@@ -1298,13 +1307,13 @@ const doBatch = async (report, hostIndex) => {
     batch.size = hosts.length;
     delete batch.hosts;
     // Perform the commands on the host.
-    await doScript(hostReport);
+    await writeReport(await doScript(hostReport));
     // Process the remaining hosts.
     await doBatch(hostReport, hostIndex + 1);
   }
 };
 // Handles a request.
-const handleRequest = options => {
+const handleRequest = async options => {
   // If the options object is valid:
   if (isValidOptions(options)) {
     // Initialize a JSON report.
@@ -1315,131 +1324,18 @@ const handleRequest = options => {
     // Copy the commands into an array of acts.
     report.acts = JSON.parse(JSON.stringify(commands));
     // Inject url acts where necessary to undo DOM changes.
-    injectURLCommands(acts);
+    injectURLCommands(report.acts);
     // If there is a batch:
     if (options.withBatch) {
-      const {hosts} = options.withBatch.batch;
       // Perform the script on all the hosts in the batch.
-      doBatch(report, 0);
+      await doBatch(report, 0);
     }
     // Otherwise, i.e. if there is no batch:
     else {
       // Perform the script.
-      doScript(options, -1);
-    }
-    // If there is no batch:
-    if (batchName === 'None') {
+      await writeReport(await doScript(report, -1));
     }
   }
-
-            // Otherwise, i.e. if there is a batch:
-            else {
-              // Get its content.
-              const batchJSON = await fs.readFile(`${batchDir}/${batchName}.json`, 'utf8');
-              // When the content arrives, if there is any:
-              if (batchJSON) {
-                // Get the batch data.
-                const batch = JSON.parse(batchJSON);
-                const batchWhat = batch.what;
-                const {hosts} = batch;
-                // If the batch is valid:
-                if (isValidBatch) {
-                  // Inject url commands where necessary to undo DOM changes.
-                  injectURLCommands(commands);
-                  // FUNCTION DEFINITION START
-                  // Recursively process commands on the hosts of a batch.
-                  const doBatch = async (hosts, isFirst, hostIndex) => {
-                    if (hosts.length) {
-                      // Identify the first host.
-                      const firstHost = hosts[0];
-                      console.log(`>>>>>> ${firstHost.what}`);
-                      // Replace all hosts in the script with it.
-                      commands.forEach(command => {
-                        if (command.type === 'url') {
-                          command.which = firstHost.which;
-                          command.what = firstHost.what;
-                        }
-                      });
-                      // Identify the stage of the host.
-                      let stage = 'more';
-                      if (isFirst) {
-                        stage = hosts.length > 1 ? 'start' : 'all';
-                      }
-                      else {
-                        stage = hosts.length > 1 ? 'more' : 'end';
-                      }
-                      // Initialize an array of the acts as a copy of the commands.
-                      const acts = JSON.parse(JSON.stringify(commands));
-                      // Process the commands on the host.
-                      await scriptHandler(what, strict, acts, options, hostIndex);
-                      // Process the remaining hosts.
-                      await doBatch(hosts.slice(1), false, hostIndex + 1);
-                    }
-                  };
-                  // FUNCTION DEFINITION END
-                  // Process the script on the batch.
-                  doBatch(hosts, true, 0);
-                }
-                // Otherwise, i.e. if the batch is invalid:
-                else {
-                  // Serve an error message.
-                  serveMessage(`ERROR: Batch ${batchName} invalid`, response);
-                }
-              }
-              // Otherwise, i.e. if the batch has no content:
-              else {
-                // Serve an error message.
-                serveMessage(`ERROR: Batch ${batchName} empty`, response);
-              }
-            }
-          }
-          // Otherwise, i.e. if the script is invalid:
-          else {
-            // Serve an error message.
-            serveMessage(`ERROR: Script ${scriptName} invalid`, response);
-          }
-        }
-        // Otherwise, i.e. if the script has no content:
-        else {
-          // Serve an error message.
-          serveMessage(`ERROR: Script ${scriptName} empty`, response);
-        }
-      }
-      // Otherwise, if the request submitted the validate form:
-      else if (pathName === '/validate' && options.validatorName && options.reportDir) {
-        const {validatorName} = options;
-        // Get the content of the validator script.
-        const scriptJSON = await fs.readFile(`validation/scripts/${validatorName}.json`, 'utf8');
-        // When the content arrives, if there is any:
-        if (scriptJSON) {
-          // Get the script data.
-          const script = JSON.parse(scriptJSON);
-          const {what, strict, commands} = script;
-          // If the validator is valid:
-          if (isValidScript(scriptJSON, true) {
-            console.log(`>>>>>>>> ${validatorName}: ${what}`);
-            // Process it, using the commands as the initial acts.
-            scriptHandler(what, strict, commands, options, 'all', -1, response);
-          }
-          // Otherwise, i.e. if the validator is invalid:
-          else {
-            // Serve an error message.
-            serveMessage(`ERROR: Validator script ${validatorName} invalid`, response);
-          }
-        }
-        // Otherwise, i.e. if the validator has no content:
-        else {
-          // Serve an error message.
-          serveMessage(`ERROR: Validator script ${validatorName} empty`, response);
-        }
-      }
-      // Otherwise, i.e. if the request is invalid:
-      else {
-        // Serve an error message.
-        serveMessage('ERROR: Form submission invalid', response);
-      }
-    }
-  });
 };
 // ########## SERVER
 const serve = (protocolModule, options) => {
