@@ -414,29 +414,14 @@ const isValidCommand = command => {
   }
 };
 // Validates a script.
-const isValidScript = scriptJSON => {
+const isValidScript = (scriptJSON, isValidator) => {
   // Get the script data.
   const script = JSON.parse(scriptJSON);
   const {what, strict, commands} = script;
   // Return whether the script is valid:
   return what
     && typeof strict === 'boolean'
-    && commands
-    && typeof what === 'string'
-    && Array.isArray(commands)
-    && commands[0].type === 'launch'
-    && commands.length > 1
-    && commands[1].type === 'url'
-    && isURL(commands[1].which);
-};
-// Validates a validator script.
-const isValidValidator = scriptJSON => {
-  // Get the script data.
-  const script = JSON.parse(scriptJSON);
-  const {what, strict, commands} = script;
-  // Return whether the validator is valid:
-  return what
-    && strict
+    && isValidator ? strict : true
     && commands
     && typeof what === 'string'
     && Array.isArray(commands)
@@ -1118,7 +1103,7 @@ const doActs = async (acts, report, actIndex, page, reportSuffix, reportDir) => 
   }
 };
 // Handles a script request.
-const scriptHandler = async (what, strict, acts, query, hostIndex) => {
+const scriptHandler = async (what, strict, options, hostIndex) => {
   // Reinitialize the log statistics.
   logCount = logSize = prohibitedCount = visitTimeoutCount = visitRejectionCount= 0;
   // Initialize a script report.
@@ -1223,186 +1208,53 @@ const injectURLCommands = commands => {
     }
   }
 };
+// Recursively performs commands on the hosts of a batch.
+const doBatch = async (commands, hosts, hostIndex) => {
+  if (hosts.length) {
+    // Identify the first host.
+    const firstHost = hosts[0];
+    // Copy the commands for the first host.
+    const acts = JSON.parse(JSON.stringify(commands));
+    // Replace all hosts in the acts with the first host.
+    acts.forEach(act => {
+      if (act.type === 'url') {
+        act.which = firstHost.which;
+        act.what = firstHost.what;
+      }
+    });
+    // Perform the commands on the host.
+    await scriptHandler(what, strict, options, hostIndex);
+    // Process the remaining hosts.
+    await doBatch(commands, hosts.slice(1), hostIndex + 1);
+  }
+};
 // Handles a request.
-const requestHandler = (request, response) => {
-  const {method} = request;
-  const bodyParts = [];
-  request.on('error', err => {
-    console.error(err);
-  })
-  .on('data', chunk => {
-    bodyParts.push(chunk);
-  })
-  // When the request has arrived:
-  .on('end', async () => {
-    // Identify its WHATWG URL instance.
-    let url = new URL(request.url, `${protocol}://${request.headers.host}`);
-    // Identify the pathname, with any initial 'autotest/' segment deleted.
-    let pathName = url.pathname;
-    if (pathName.startsWith('/autotest/')) {
-      pathName = pathName.slice(9);
+const requestHandler = options => {
+  // If the options object is valid:
+  if (isValidOptions) {
+    // Initialize the JSON report.
+    const report = {options};
+    // Add a timeStamp.
+    report.timeStamp = Math.floor((Date.now() - Date.UTC(2021, 4)) / 10000).toString(36);
+    const {commands} = options.script;
+    // Inject url commands where necessary to undo DOM changes.
+    injectURLCommands(commands);
+    // If there is a batch:
+    if (options.withBatch) {
+      const {hosts} = options.withBatch.batch;
+      // Perform the script on all the hosts in the batch.
+      doBatch(options, 0);
     }
-    else if (pathName === '/autotest') {
-      pathName = '/';
+    // Otherwise, i.e. if there is no batch:
+    else {
+      // Perform the script.
+      doScript(options, -1);
     }
-    const query = {};
-    // If the request method is GET:
-    if (method === 'GET') {
-      // Identify a query object, presupposing no query name occurs twice.
-      const searchParams = url.searchParams;
-      searchParams.forEach((value, name) => {
-        query[name] = value;
-      });
-      let type = statics[pathName];
-      let encoding;
-      if (type) {
-        encoding = 'utf8';
-      }
-      else if (pathName.endsWith('.png')) {
-        type = 'image/png';
-        encoding = null;
-      }
-      const target = redirects[pathName];
-      // If a requestable static file is requested:
-      if (type) {
-        // Get the file content.
-        const content = await fs.readFile(pathName.slice(1), encoding);
-        // When it has arrived, serve it.
-        servePage(content, pathName, type, response);
-      }
-      // Otherwise, if the request must be redirected:
-      else if (target) {
-        // Redirect it.
-        redirect(target, response);
-      }
-      // Otherwise, if the site icon was requested:
-      else if (pathName === '/favicon.ico') {
-        // Get the file content.
-        const content = await fs.readFile('favicon.png');
-        // When it has arrived, serve it.
-        response.setHeader('Content-Type', 'image/png');
-        response.write(content, 'binary');
-        response.end();
-      }
-      // Otherwise, if the run page was requested:
-      else if (pathName === '/run.html') {
-        // Add properties to the query.
-        query.scriptDir = process.env.SCRIPTDIR || '';
-        query.batchDir = process.env.BATCHDIR || '';
-        query.reportDir = process.env.REPORTDIR || '';
-        // Render the page.
-        render('', 'all', 'run', query, response);
-      }
-      // Otherwise, if the validate page was requested:
-      else if (pathName === '/validate.html') {
-        // Add properties to the query.
-        const validators = await fs.readdir('validation/scripts');
-        query.validatorSize = validators.length;
-        const validatorNames = validators.map(name => name.slice(0, -5));
-        query.validatorNames = validatorNames
-        .map(name => `<option value="${name}">${name}</option>`)
-        .join('\n              ');
-        query.reportDir = process.env.REPORTDIR || '';
-        // Render the page.
-        render('', 'all', 'validate', query, response);
-      }
-      // Otherwise, i.e. if the URL is invalid:
-      else {
-        serveMessage('ERROR: Invalid URL', response);
-      }
+    // If there is no batch:
+    if (batchName === 'None') {
     }
-    // Otherwise, if the request method is POST:
-    else if (method === 'POST') {
-      // Get a query string from the request body.
-      const queryString = Buffer.concat(bodyParts).toString();
-      // Create a query object.
-      const searchParams = new URLSearchParams(queryString);
-      searchParams.forEach((value, name) => {
-        query[name] = value;
-      });
-      // Add a timeStamp for any required report file to the query.
-      query.timeStamp = Math.floor((Date.now() - Date.UTC(2021, 4)) / 10000).toString(36);
-      // If the request submitted the run form:
-      if (pathName === '/run' && query.scriptDir && query.batchDir && query.reportDir) {
-        const {scriptDir, batchDir} = query;
-        // Get an array of the names of the files in the script directory.
-        const scriptFileNames = await fs.readdir(scriptDir);
-        // When the array arrives, get an array of script names from it.
-        const scriptNames = scriptFileNames
-        .filter(name => name.endsWith('.json'))
-        .map(name => name.slice(0, -5));
-        // If any exist:
-        if (scriptNames.length) {
-          // Add their count to the query.
-          query.scriptSize = scriptNames.length;
-          // Get their descriptions.
-          const scriptWhats = await getWhats(scriptDir, scriptNames, []);
-          // When the descriptions arrive, add them as options to the query.
-          query.scriptNames = scriptWhats.map((pair, index) => {
-            const state = index === 0 ? 'selected ' : '';
-            return `<option ${state}value="${pair[0]}">${pair[0]}: ${pair[1]}</option>`;
-          }).join('\n              ');
-          // Request an array of the names of the files in the batch directory.
-          const batchFileNames = await fs.readdir(batchDir);
-          // When the array arrives, get an array of batch names from it.
-          const batchNames = batchFileNames
-          .filter(name => name.endsWith('.json'))
-          .map(name => name.slice(0, -5));
-          // Get their descriptions.
-          const batchWhats = await getWhats(batchDir, batchNames, []);
-          // Prepend a no-batch option to the name/description array.
-          batchWhats.unshift(['None', 'Perform the script without a batch']);
-          // Add the count of batches to the query.
-          query.batchSize = batchWhats.length;
-          // Add the batch names and descriptions as options to the query.
-          query.batchNames = batchWhats.map((pair, index) => {
-            const state = index === 0 ? 'selected ' : '';
-            return `<option ${state}value="${pair[0]}">${pair[0]}: ${pair[1]}</option>`;
-          }).join('\n              ');
-          // Render the choice page.
-          render('', 'all', 'which', query, response);
-        }
-        // Otherwise, i.e. if no scripts exist in the script directory:
-        else {
-          // Serve an error message.
-          serveMessage(`ERROR: No scripts in ${scriptDir}`, response);
-        }
-      }
-      // Otherwise, if the request submitted the run-which form:
-      else if (
-        pathName === '/which'
-        && query.scriptDir
-        && query.batchDir
-        && query.reportDir
-        && query.scriptName
-        && query.batchName
-      ) {
-        const {scriptDir, batchDir, scriptName, batchName} = query;
-        // Get the content of the script.
-        const scriptJSON = await fs.readFile(`${scriptDir}/${scriptName}.json`, 'utf8');
-        // When the content arrives, if there is any:
-        if (scriptJSON) {
-          // Get the script data.
-          const script = JSON.parse(scriptJSON);
-          const {what, strict, commands} = script;
-          // If the script is valid:
-          if (
-            what
-            && typeof strict === 'boolean'
-            && commands
-            && typeof what === 'string'
-            && Array.isArray(commands)
-            && commands[0].type === 'launch'
-            && commands.length > 1
-            && commands[1].type === 'url'
-            && isURL(commands[1].which)
-          ) {
-            console.log(`>>>>>>>> ${scriptName}: ${what}`);
-            // If there is no batch:
-            if (batchName === 'None') {
-              // Process the script, using the commands as the initial acts.
-              scriptHandler(what, strict, commands, query, -1);
-            }
+  }
+
             // Otherwise, i.e. if there is a batch:
             else {
               // Get its content.
@@ -1414,13 +1266,7 @@ const requestHandler = (request, response) => {
                 const batchWhat = batch.what;
                 const {hosts} = batch;
                 // If the batch is valid:
-                if (
-                  batchWhat
-                  && hosts
-                  && typeof batchWhat === 'string'
-                  && Array.isArray(hosts)
-                  && hosts.every(host => host.which && host.what && isURL(host.which))
-                ) {
+                if (isValidBatch) {
                   // Inject url commands where necessary to undo DOM changes.
                   injectURLCommands(commands);
                   // FUNCTION DEFINITION START
@@ -1448,7 +1294,7 @@ const requestHandler = (request, response) => {
                       // Initialize an array of the acts as a copy of the commands.
                       const acts = JSON.parse(JSON.stringify(commands));
                       // Process the commands on the host.
-                      await scriptHandler(what, strict, acts, query, hostIndex);
+                      await scriptHandler(what, strict, acts, options, hostIndex);
                       // Process the remaining hosts.
                       await doBatch(hosts.slice(1), false, hostIndex + 1);
                     }
@@ -1483,8 +1329,8 @@ const requestHandler = (request, response) => {
         }
       }
       // Otherwise, if the request submitted the validate form:
-      else if (pathName === '/validate' && query.validatorName && query.reportDir) {
-        const {validatorName} = query;
+      else if (pathName === '/validate' && options.validatorName && options.reportDir) {
+        const {validatorName} = options;
         // Get the content of the validator script.
         const scriptJSON = await fs.readFile(`validation/scripts/${validatorName}.json`, 'utf8');
         // When the content arrives, if there is any:
@@ -1493,20 +1339,10 @@ const requestHandler = (request, response) => {
           const script = JSON.parse(scriptJSON);
           const {what, strict, commands} = script;
           // If the validator is valid:
-          if (
-            what
-            && strict
-            && commands
-            && typeof what === 'string'
-            && Array.isArray(commands)
-            && commands[0].type === 'launch'
-            && commands.length > 1
-            && commands[1].type === 'url'
-            && isURL(commands[1].which)
-          ) {
+          if (isValidScript(scriptJSON, true) {
             console.log(`>>>>>>>> ${validatorName}: ${what}`);
             // Process it, using the commands as the initial acts.
-            scriptHandler(what, strict, commands, query, 'all', -1, response);
+            scriptHandler(what, strict, commands, options, 'all', -1, response);
           }
           // Otherwise, i.e. if the validator is invalid:
           else {

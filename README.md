@@ -346,7 +346,7 @@ A `next`-type command can use a `next` property instead of a `jump` property. Th
 
 Once you have included a `url` command in a script, you do not need to add more `url` commands unless you want the browser to visit a different URL.
 
-However, some tests modify web pages. In those cases, Testaro performs additional `url` commands after those tests, to ensure that changes made by one test do not affect subsequent acts. Those additional `url` acts appear in the report, but their commands are not inserted into your script.
+However, some tests modify web pages. In those cases, Testaro inserts additional `url` commands into the `script` property of the `options` object, after those tests, to ensure that changes made by one test do not affect subsequent acts.
 
 ## Batches
 
@@ -411,7 +411,7 @@ In this statement, `options` is an options object with at least these properties
 {
   script: 'the script to be performed',
   etcDir: 'the path of an existing directory to be used for any non-report file output',
-  reportType: 'json or hj (for HTML plus JSON)'
+  reportType: 'json or htmlAndJSON'
 }
 ```
 
