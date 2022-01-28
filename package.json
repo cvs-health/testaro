@@ -1,5 +1,5 @@
 {
-  "name": "autotest",
+  "name": "testaro",
   "version": "1.0.0",
   "description": "Automation of accessibility testing",
   "main": "index.html",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jrpool/autotest.git"
+    "url": "git+https://github.com/jrpool/testaro.git"
   },
   "keywords": [
     "accessibility",
@@ -19,9 +19,9 @@
   "author": "Jonathan Pool",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jrpool/autotest/issues"
+    "url": "https://github.com/jrpool/testaro/issues"
   },
-  "homepage": "https://github.com/jrpool/autotest#readme",
+  "homepage": "https://github.com/jrpool/testaro#readme",
   "dependencies": {
     "@siteimprove/alfa-act": "*",
     "@siteimprove/alfa-playwright": "*",
@@ -30,7 +30,6 @@
     "aatt": "*",
     "accessibility-checker": "*",
     "axe-playwright": "*",
-    "dotenv": "*",
     "pixelmatch": "*",
     "playwright": "*"
   },
