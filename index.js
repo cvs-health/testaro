@@ -414,14 +414,12 @@ const isValidCommand = command => {
   }
 };
 // Validates a script.
-const isValidScript = (scriptJSON, isValidator) => {
+const isValidScript = script => {
   // Get the script data.
-  const script = JSON.parse(scriptJSON);
   const {what, strict, commands} = script;
   // Return whether the script is valid:
   return what
     && typeof strict === 'boolean'
-    && isValidator ? strict : true
     && commands
     && typeof what === 'string'
     && Array.isArray(commands)
@@ -442,6 +440,77 @@ const isValidBatch = batchJSON => {
     && typeof batchWhat === 'string'
     && Array.isArray(hosts)
     && hosts.every(host => host.which && host.what && isURL(host.which));
+};
+// Validates an options object.
+const isValidOptions = options => {
+  const {script, etcDir, reportType, reportFile, withBatch} = options;
+  if (script && isValidScript(script)) {
+    if (etcDir && fs.statSync(etcDir).isDirectory()) {
+      if (reportType && ['json', 'htmlAndJSON'].includes(reportType)) {
+        if (reportFile && ! withBatch) {
+          const {directory, alsoStdOut} = reportFile;
+          if (directory && fs.statSync(directory).isDirectory()) {
+            if (alsoStdOut && typeof alsoStdOut === 'boolean') {
+              return {isValid: true};
+            }
+            else {
+              return {
+                isValid: false,
+                error: 'reportFile.alsoStdOut missing or non-Boolean'
+              }
+            }
+          }
+          else {
+            return {
+              isValid: false,
+              error: 'reportFile.directory missing or not a directory'
+            }
+          }
+        }
+        else if (withBatch && ! reportFile) {
+          const {batch, directory} = withBatch;
+          if (batch && isValidBatch(batch)) {
+            if (directory && fs.statSync(directory).isDirectory()) {
+              return {isValid: true};
+            }
+            else {
+              return {
+                isValid: false,
+                error: 'withBatch.directory missing or not a directory'
+              }
+            }
+          }
+          else {
+            return {
+              isValid: false,
+              error: 'withBatch.batch missing or invalid'
+            }
+          }
+        }
+        else if (! reportFile && ! withBatch) {
+          return {isValid: true};
+        }
+      }
+      else {
+        return {
+          isValid: false,
+          error: 'options.reportType missing or invalid'
+        }
+      }
+    }
+    else {
+      return {
+        isValid: false,
+        error: 'options.etcDir missing or invalid'
+      }
+    }
+  }
+  else {
+    return {
+      isValid: false,
+      error: 'options.script missing or invalid'
+    }
+  }
 };
 // Returns a string with any final slash removed.
 const deSlash = string => string.endsWith('/') ? string.slice(0, -1) : string;
@@ -1209,41 +1278,49 @@ const injectURLCommands = commands => {
   }
 };
 // Recursively performs commands on the hosts of a batch.
-const doBatch = async (commands, hosts, hostIndex) => {
-  if (hosts.length) {
-    // Identify the first host.
-    const firstHost = hosts[0];
-    // Copy the commands for the first host.
-    const acts = JSON.parse(JSON.stringify(commands));
-    // Replace all hosts in the acts with the first host.
-    acts.forEach(act => {
+const doBatch = async (report, hostIndex) => {
+  const {withBatch} = hostReport.options;
+  const {batch} = withBatch;
+  const {hosts} = batch;
+  const host = hosts[hostIndex];
+  // If the specified host exists:
+  if (host) {
+  // Copy the report for it.
+  const hostReport = JSON.parse(JSON.stringify(report));
+    // Copy the properties of the specified host to all hosts in the acts.
+    hostReport.acts.forEach(act => {
       if (act.type === 'url') {
-        act.which = firstHost.which;
-        act.what = firstHost.what;
+        act.which = host.which;
+        act.what = host.what;
       }
     });
+    // Replace the batch with its size in the report.
+    batch.size = hosts.length;
+    delete batch.hosts;
     // Perform the commands on the host.
-    await scriptHandler(what, strict, options, hostIndex);
+    await doScript(hostReport);
     // Process the remaining hosts.
-    await doBatch(commands, hosts.slice(1), hostIndex + 1);
+    await doBatch(hostReport, hostIndex + 1);
   }
 };
 // Handles a request.
-const requestHandler = options => {
+const handleRequest = options => {
   // If the options object is valid:
-  if (isValidOptions) {
-    // Initialize the JSON report.
+  if (isValidOptions(options)) {
+    // Initialize a JSON report.
     const report = {options};
     // Add a timeStamp.
     report.timeStamp = Math.floor((Date.now() - Date.UTC(2021, 4)) / 10000).toString(36);
     const {commands} = options.script;
-    // Inject url commands where necessary to undo DOM changes.
-    injectURLCommands(commands);
+    // Copy the commands into an array of acts.
+    report.acts = JSON.parse(JSON.stringify(commands));
+    // Inject url acts where necessary to undo DOM changes.
+    injectURLCommands(acts);
     // If there is a batch:
     if (options.withBatch) {
       const {hosts} = options.withBatch.batch;
       // Perform the script on all the hosts in the batch.
-      doBatch(options, 0);
+      doBatch(report, 0);
     }
     // Otherwise, i.e. if there is no batch:
     else {
