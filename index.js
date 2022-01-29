@@ -225,24 +225,23 @@ const isValidBatch = batchJSON => {
 };
 // Validates an options object.
 const isValidOptions = options => {
-  const {script, withBatch} = options;
-  if (script && isValidScript(script)) {
-    const {batch} = withBatch;
-    if (batch && isValidBatch(batch)) {
-      return true;
+  if (options) {
+    const {script, withBatch} = options;
+    if (script && isValidScript(script)) {
+      const {batch} = withBatch;
+      if (batch && isValidBatch(batch)) {
+        return true;
+      }
+      else {
+        return false;
+      }
     }
     else {
-      return {
-        isValid: false,
-        error: 'options.batch missing or invalid'
-      };
+      return false;
     }
   }
   else {
-    return {
-      isValid: false,
-      error: 'options.script missing or invalid'
-    };
+    return false;
   }
 };
 // ########## OTHER FUNCTIONS
@@ -1203,10 +1202,26 @@ const doBatch = async (report, hostIndex) => {
     await doBatch(hostReport, hostIndex + 1);
   }
 };
+// Performs a script.
+const doScriptOrBatch = async report => {
+  // If the report has an options property:
+  if (report.options) {
+    // If there is a batch:
+    if (report.options.withBatch) {
+      // Perform the script on all the hosts in the batch.
+      await doBatch(report, 0);
+    }
+    // Otherwise, i.e. if there is no batch:
+    else {
+      // Perform the script and send the report to the console.
+      console.log(await doScript(report, -1));
+    }
+  }
+};
 // Handles a request.
-exports.handleRequest = async options => {
+exports.handleRequest = options => {
   // If the options object is valid:
-  if (isValidOptions(options)) {
+  if(isValidOptions(options)) {
     // Initialize a JSON report.
     const report = {options};
     // Add a timeStamp.
@@ -1216,15 +1231,10 @@ exports.handleRequest = async options => {
     report.acts = JSON.parse(JSON.stringify(commands));
     // Inject url acts where necessary to undo DOM changes.
     injectURLCommands(report.acts);
-    // If there is a batch:
-    if (options.withBatch) {
-      // Perform the script on all the hosts in the batch.
-      await doBatch(report, 0);
-    }
-    // Otherwise, i.e. if there is no batch:
-    else {
-      // Perform the script and send the report to the console.
-      console.log(await doScript(report, -1));
-    }
+    // Perform the script, with or without a batch.
+    doScriptOrBatch(report);
+  }
+  else {
+    console.log('ERROR: options missing or invalid');
   }
 };
