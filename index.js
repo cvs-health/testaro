@@ -228,12 +228,17 @@ const isValidOptions = options => {
   if (options) {
     const {script, withBatch} = options;
     if (script && isValidScript(script)) {
-      const {batch} = withBatch;
-      if (batch && isValidBatch(batch)) {
-        return true;
+      if (withBatch) {
+        const {batch} = withBatch;
+        if (batch && isValidBatch(batch)) {
+          return true;
+        }
+        else {
+          return false;
+        }
       }
       else {
-        return false;
+        return true;
       }
     }
     else {
