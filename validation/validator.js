@@ -4,10 +4,13 @@
 */
 const scriptName = process.argv[2];
 const fs = require('fs');
-const validator = scriptName => {
+const validator = async scriptName => {
   const {handleRequest} = require('../index');
   const scriptJSON = fs.readFileSync(`validation/scripts/${scriptName}.json`);
   const script = JSON.parse(scriptJSON);
-  handleRequest({script});
+  await handleRequest({script});
 };
-validator(scriptName);
+validator(scriptName)
+.then(result => {
+  console.log(JSON.stringify(result, null, 2));
+});

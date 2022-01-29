@@ -591,8 +591,6 @@ const doActs = async (report, actIndex, page) => {
     if (isValidCommand(act)) {
       const whichSuffix = act.which ? ` (${act.which})` : '';
       console.log(`>>>> ${act.type}${whichSuffix}`);
-      // Copy it into the report.
-      report.acts.push(act);
       // Increment the count of commands performed.
       actCount++;
       // If the command is an index changer:
@@ -929,7 +927,6 @@ const doActs = async (report, actIndex, page) => {
                   }
                 });
                 testReport.result.failureCount = failureCount;
-                console.log(`> failure count: ${failureCount}`);
               }
               report.testTimes.push([act.which, Math.round((Date.now() - startTime) / 1000)]);
               report.testTimes.sort((a, b) => b[1] - a[1]);
@@ -1111,7 +1108,7 @@ const doActs = async (report, actIndex, page) => {
   }
 };
 // Performs the commands in a script and returns a report.
-const doScript = async (report, hostIndex) => {
+const doScript = async report => {
   // Reinitialize the log statistics.
   logCount = logSize = prohibitedCount = visitTimeoutCount = visitRejectionCount= 0;
   // Add initialized properties to the report.
@@ -1123,8 +1120,6 @@ const doScript = async (report, hostIndex) => {
   report.presses = 0;
   report.amountRead = 0;
   report.testTimes = [];
-  const hostSuffix = hostIndex > -1 ? `-${hostIndex.toString().padStart(3, '0')}` : '';
-  report.reportSuffix = `${report.timeStamp}${hostSuffix}`;
   // Perform the specified acts and add the results and exhibits to the report.
   await doActs(report, 0, null);
   // Close the browser.
@@ -1180,7 +1175,7 @@ const injectURLCommands = commands => {
   }
 };
 // Recursively performs commands on the hosts of a batch.
-const doBatch = async (report, hostIndex) => {
+const doBatch = async (report, hostIndex, reportList) => {
   const {withBatch} = report.options;
   const {batch} = withBatch;
   const {hosts} = batch;
@@ -1201,10 +1196,21 @@ const doBatch = async (report, hostIndex) => {
     delete batch.hosts;
     // Perform the commands on the host and produce a report.
     const report = await doScript(hostReport);
+    const hostSuffix = hostIndex > -1 ? `-${hostIndex.toString().padStart(3, '0')}` : '';
+    const reportName = `report-${report.timeStamp}${hostSuffix}.json`;
+    report.reportName = reportName;
+    const reportPath = `${reportDir}/${reportName}`;
     // Save the report.
-    fs.writeFileSync(`${reportDir}/${report.reportSuffix}`);
+    fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
+    // Send the report name to the console.
+    reportList.push(reportName);
     // Process the remaining hosts.
     await doBatch(hostReport, hostIndex + 1);
+  }
+  // Otherwise, i.e. if the hosts have been exhausted:
+  else {
+    // Return the list of reports.
+    return reportList;
   }
 };
 // Performs a script.
@@ -1213,18 +1219,18 @@ const doScriptOrBatch = async report => {
   if (report.options) {
     // If there is a batch:
     if (report.options.withBatch) {
-      // Perform the script on all the hosts in the batch.
-      await doBatch(report, 0);
+      // Perform the script on all the hosts in the batch and return a list of the reports.
+      return await doBatch(report, 0, []);
     }
     // Otherwise, i.e. if there is no batch:
     else {
-      // Perform the script and send the report to the console.
-      console.log(await doScript(report, -1));
+      // Perform the script and return the report.
+      return await doScript(report);
     }
   }
 };
 // Handles a request.
-exports.handleRequest = options => {
+exports.handleRequest = async options => {
   // If the options object is valid:
   if(isValidOptions(options)) {
     // Initialize a JSON report.
@@ -1236,10 +1242,11 @@ exports.handleRequest = options => {
     report.acts = JSON.parse(JSON.stringify(commands));
     // Inject url acts where necessary to undo DOM changes.
     injectURLCommands(report.acts);
-    // Perform the script, with or without a batch.
-    doScriptOrBatch(report);
+    // Perform the script, with or without a batch, and return the report or list of reports.
+    return await doScriptOrBatch(report);
   }
   else {
     console.log('ERROR: options missing or invalid');
+    return '';
   }
 };
