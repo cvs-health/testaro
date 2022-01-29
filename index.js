@@ -5,8 +5,6 @@
 // ########## IMPORTS
 // Module to access files.
 const fs = require('fs/promises');
-// Module to create an HTTPS server and client.
-const https = require('https');
 // Requirements for commands.
 const {commands} = require('./commands');
 // ########## CONSTANTS
@@ -14,7 +12,6 @@ const {commands} = require('./commands');
 const debug = process.env.DEBUG === 'true';
 // Set WAITS environment variable to a positive number to insert delays (in ms).
 const waits = Number.parseInt(process.env.WAITS) || 0;
-const protocol = 'https';
 // CSS selectors for targets of moves.
 const moves = {
   button: 'button',
@@ -72,6 +69,8 @@ const browserTypeNames = {
 };
 // Items that may be waited for.
 const waitables = ['url', 'title', 'body'];
+// Directory for storage of report files.
+const reportDir = 'reports';
 // ########## VARIABLES
 // Facts about the current session.
 let logCount = 0;
@@ -84,224 +83,6 @@ let actCount = 0;
 let browserContext;
 let browserTypeName;
 let requestedURL = '';
-// ########## FUNCTIONS
-// Closes any existing browser.
-const closeBrowser = async () => {
-  const browser = browserContext && browserContext.browser();
-  if (browser) {
-    await browser.close();
-  }
-};
-// Launches a browser.
-const launch = async typeName => {
-  const browserType = require('playwright')[typeName];
-  // If the specified browser type exists:
-  if (browserType) {
-    // Close any existing browser.
-    await closeBrowser();
-    // Launch a browser of the specified type.
-    const browserOptions = {};
-    if (debug) {
-      browserOptions.headless = false;
-    }
-    if (waits) {
-      browserOptions.slowMo = waits;
-    }
-    const browser = await browserType.launch(browserOptions);
-    // Create a new context (window) in it, taller if debugging is on.
-    const viewport = debug ? {
-      viewPort: {
-        width: 1280,
-        height: 1120
-      }
-    } : {};
-    browserContext = await browser.newContext(viewport);
-    // When a page is added to the browser context:
-    browserContext.on('page', page => {
-      // Make its console messages appear in the Playwright console.
-      page.on('console', msg => {
-        const msgText = msg.text();
-        console.log(msgText);
-        logCount++;
-        logSize += msgText.length;
-        const msgLC = msgText.toLowerCase();
-        if (msgText.includes('403') && (msgLC.includes('status') || msgLC.includes('prohibited'))) {
-          prohibitedCount++;
-        }
-      });
-    });
-    // Open the first page of the context.
-    const page = await browserContext.newPage();
-    if (debug) {
-      page.setViewportSize({
-        width: 1280,
-        height: 1120
-      });
-    }
-    // Wait until it is stable.
-    await page.waitForLoadState('domcontentloaded');
-    // Update the name of the current browser type and store it in the page.
-    page.browserTypeName = browserTypeName = typeName;
-  }
-};
-// Serves a system error message.
-const serveError = error => {
-  console.log(error.message);
-  console.log(error.stack);
-};
-// Serves a custom error message.
-const serveMessage = msg => {
-  console.log(msg);
-};
-// Normalizes spacing characters and cases in a string.
-const debloat = string => string.replace(/\s/g, ' ').trim().replace(/ {2,}/g, ' ').toLowerCase();
-// Returns the text of an element, lower-cased.
-const textOf = async (page, element) => {
-  if (element) {
-    const tagNameJSHandle = await element.getProperty('tagName');
-    const tagName = await tagNameJSHandle.jsonValue();
-    let totalText = '';
-    // If the element is a link, button, input, or select list:
-    if (['A', 'BUTTON', 'INPUT', 'SELECT'].includes(tagName)) {
-      // Return its visible labels, descriptions, and legend if the first input in a fieldset.
-      totalText = await page.evaluate(element => {
-        const {tagName} = element;
-        const ownText = ['A', 'BUTTON'].includes(tagName) ? element.textContent : '';
-        // HTML link elements have no labels property.
-        const labels = tagName !== 'A' ? Array.from(element.labels) : [];
-        const labelTexts = labels.map(label => label.textContent);
-        const refIDs = new Set([
-          element.getAttribute('aria-labelledby') || '',
-          element.getAttribute('aria-describedby') || ''
-        ].join(' ').split(/\s+/));
-        if (refIDs.size) {
-          refIDs.forEach(id => {
-            const labeler = document.getElementById(id);
-            if (labeler) {
-              const labelerText = labeler.textContent.trim();
-              if (labelerText.length) {
-                labelTexts.push(labelerText);
-              }
-            }
-          });
-        }
-        let legendText = '';
-        if (tagName === 'INPUT') {
-          const fieldsets = Array.from(document.body.querySelectorAll('fieldset'));
-          const inputFieldsets = fieldsets.filter(fieldset => {
-            const inputs = Array.from(fieldset.querySelectorAll('input'));
-            return inputs.length && inputs[0] === element;
-          });
-          const inputFieldset = inputFieldsets[0] || null;
-          if (inputFieldset) {
-            const legend = inputFieldset.querySelector('legend');
-            if (legend) {
-              legendText = legend.textContent;
-            }
-          }
-        }
-        return [legendText].concat(labelTexts, ownText).join(' ');
-      }, element);
-    }
-    // Otherwise, if it is an option:
-    else if (tagName === 'OPTION') {
-      // Return its text content, prefixed with the text of its select parent if the first option.
-      const ownText = await element.textContent();
-      const indexJSHandle = await element.getProperty('index');
-      const index = await indexJSHandle.jsonValue();
-      if (index) {
-        totalText = ownText;
-      }
-      else {
-        const selectJSHandle = await page.evaluateHandle(
-          element => element.parentElement, element
-        );
-        const select = await selectJSHandle.asElement();
-        if (select) {
-          const selectText = await textOf(page, select);
-          totalText = [ownText, selectText].join(' ');
-        }
-        else {
-          totalText = ownText;
-        }
-      }
-    }
-    // Otherwise, i.e. if it is not an input, select, or option:
-    else {
-      // Get its text content.
-      totalText = await element.textContent();
-    }
-    return debloat(totalText);
-  }
-  else {
-    return null;
-  }
-};
-// Returns an element case-insensitively matching a text.
-const matchElement = async (page, selector, matchText, index = 0) => {
-  // If the page still exists:
-  if (page) {
-    // Wait 3 seconds until the body contains any text to be matched.
-    const slimText = debloat(matchText);
-    const bodyText = await page.textContent('body');
-    const slimBody = debloat(bodyText);
-    const textInBodyJSHandle = await page.waitForFunction(
-      args => {
-        const matchText = args[0];
-        const bodyText = args[1];
-        return ! matchText || bodyText.includes(matchText);
-      },
-      [slimText, slimBody],
-      {timeout: 2000}
-    )
-    .catch(async error => {
-      console.log(`ERROR: text to match not in body (${error.message})`);
-    });
-    // If there is no text to be matched or the body contained it:
-    if (textInBodyJSHandle) {
-      const lcText = matchText ? matchText.toLowerCase() : '';
-      // Identify the selected elements.
-      const selections = await page.$$(`body ${selector}`);
-      // If there are any:
-      if (selections.length) {
-        // If there are enough to make a match possible:
-        if (index < selections.length) {
-          // Return the nth one including any specified text, or the count of candidates if none.
-          const elementTexts = [];
-          let nth = 0;
-          for (const element of selections) {
-            const elementText = await textOf(page, element);
-            elementTexts.push(elementText);
-            if ((! lcText || elementText.includes(lcText)) && nth++ === index) {
-              return element;
-            }
-          }
-          return elementTexts;
-        }
-        // Otherwise, i.e. if there are too few to make a match possible:
-        else {
-          // Return the count of candidates.
-          return selections.length;
-        }
-      }
-      // Otherwise, i.e. if there are no selected elements, return 0.
-      else {
-        return 0;
-      }
-    }
-    // Otherwise, i.e. if the body did not contain it:
-    else {
-      // Return the failure.
-      return -1;
-    }
-  }
-  // Otherwise, i.e. if the page no longer exists:
-  else {
-    // Return null.
-    console.log('ERROR: Page gone');
-    return null;
-  }
-};
 // ########## VALIDATORS
 // Validates a browser type.
 const isBrowserType = type => ['chromium', 'firefox', 'webkit'].includes(type);
@@ -458,14 +239,14 @@ const isValidOptions = options => {
               return {
                 isValid: false,
                 error: 'reportFile.alsoStdOut missing or non-Boolean'
-              }
+              };
             }
           }
           else {
             return {
               isValid: false,
               error: 'reportFile.directory missing or not a directory'
-            }
+            };
           }
         }
         else if (withBatch && ! reportFile) {
@@ -478,14 +259,14 @@ const isValidOptions = options => {
               return {
                 isValid: false,
                 error: 'withBatch.directory missing or not a directory'
-              }
+              };
             }
           }
           else {
             return {
               isValid: false,
               error: 'withBatch.batch missing or invalid'
-            }
+            };
           }
         }
         else if (! reportFile && ! withBatch) {
@@ -496,21 +277,230 @@ const isValidOptions = options => {
         return {
           isValid: false,
           error: 'options.reportType missing or invalid'
-        }
+        };
       }
     }
     else {
       return {
         isValid: false,
         error: 'options.etcDir missing or invalid'
-      }
+      };
     }
   }
   else {
     return {
       isValid: false,
       error: 'options.script missing or invalid'
+    };
+  }
+};
+// ########## OTHER FUNCTIONS
+// Closes any existing browser.
+const closeBrowser = async () => {
+  const browser = browserContext && browserContext.browser();
+  if (browser) {
+    await browser.close();
+  }
+};
+// Launches a browser.
+const launch = async typeName => {
+  const browserType = require('playwright')[typeName];
+  // If the specified browser type exists:
+  if (browserType) {
+    // Close any existing browser.
+    await closeBrowser();
+    // Launch a browser of the specified type.
+    const browserOptions = {};
+    if (debug) {
+      browserOptions.headless = false;
     }
+    if (waits) {
+      browserOptions.slowMo = waits;
+    }
+    const browser = await browserType.launch(browserOptions);
+    // Create a new context (window) in it, taller if debugging is on.
+    const viewport = debug ? {
+      viewPort: {
+        width: 1280,
+        height: 1120
+      }
+    } : {};
+    browserContext = await browser.newContext(viewport);
+    // When a page is added to the browser context:
+    browserContext.on('page', page => {
+      // Make its console messages appear in the Playwright console.
+      page.on('console', msg => {
+        const msgText = msg.text();
+        console.log(msgText);
+        logCount++;
+        logSize += msgText.length;
+        const msgLC = msgText.toLowerCase();
+        if (msgText.includes('403') && (msgLC.includes('status') || msgLC.includes('prohibited'))) {
+          prohibitedCount++;
+        }
+      });
+    });
+    // Open the first page of the context.
+    const page = await browserContext.newPage();
+    if (debug) {
+      page.setViewportSize({
+        width: 1280,
+        height: 1120
+      });
+    }
+    // Wait until it is stable.
+    await page.waitForLoadState('domcontentloaded');
+    // Update the name of the current browser type and store it in the page.
+    page.browserTypeName = browserTypeName = typeName;
+  }
+};
+// Normalizes spacing characters and cases in a string.
+const debloat = string => string.replace(/\s/g, ' ').trim().replace(/ {2,}/g, ' ').toLowerCase();
+// Returns the text of an element, lower-cased.
+const textOf = async (page, element) => {
+  if (element) {
+    const tagNameJSHandle = await element.getProperty('tagName');
+    const tagName = await tagNameJSHandle.jsonValue();
+    let totalText = '';
+    // If the element is a link, button, input, or select list:
+    if (['A', 'BUTTON', 'INPUT', 'SELECT'].includes(tagName)) {
+      // Return its visible labels, descriptions, and legend if the first input in a fieldset.
+      totalText = await page.evaluate(element => {
+        const {tagName} = element;
+        const ownText = ['A', 'BUTTON'].includes(tagName) ? element.textContent : '';
+        // HTML link elements have no labels property.
+        const labels = tagName !== 'A' ? Array.from(element.labels) : [];
+        const labelTexts = labels.map(label => label.textContent);
+        const refIDs = new Set([
+          element.getAttribute('aria-labelledby') || '',
+          element.getAttribute('aria-describedby') || ''
+        ].join(' ').split(/\s+/));
+        if (refIDs.size) {
+          refIDs.forEach(id => {
+            const labeler = document.getElementById(id);
+            if (labeler) {
+              const labelerText = labeler.textContent.trim();
+              if (labelerText.length) {
+                labelTexts.push(labelerText);
+              }
+            }
+          });
+        }
+        let legendText = '';
+        if (tagName === 'INPUT') {
+          const fieldsets = Array.from(document.body.querySelectorAll('fieldset'));
+          const inputFieldsets = fieldsets.filter(fieldset => {
+            const inputs = Array.from(fieldset.querySelectorAll('input'));
+            return inputs.length && inputs[0] === element;
+          });
+          const inputFieldset = inputFieldsets[0] || null;
+          if (inputFieldset) {
+            const legend = inputFieldset.querySelector('legend');
+            if (legend) {
+              legendText = legend.textContent;
+            }
+          }
+        }
+        return [legendText].concat(labelTexts, ownText).join(' ');
+      }, element);
+    }
+    // Otherwise, if it is an option:
+    else if (tagName === 'OPTION') {
+      // Return its text content, prefixed with the text of its select parent if the first option.
+      const ownText = await element.textContent();
+      const indexJSHandle = await element.getProperty('index');
+      const index = await indexJSHandle.jsonValue();
+      if (index) {
+        totalText = ownText;
+      }
+      else {
+        const selectJSHandle = await page.evaluateHandle(
+          element => element.parentElement, element
+        );
+        const select = await selectJSHandle.asElement();
+        if (select) {
+          const selectText = await textOf(page, select);
+          totalText = [ownText, selectText].join(' ');
+        }
+        else {
+          totalText = ownText;
+        }
+      }
+    }
+    // Otherwise, i.e. if it is not an input, select, or option:
+    else {
+      // Get its text content.
+      totalText = await element.textContent();
+    }
+    return debloat(totalText);
+  }
+  else {
+    return null;
+  }
+};
+// Returns an element case-insensitively matching a text.
+const matchElement = async (page, selector, matchText, index = 0) => {
+  // If the page still exists:
+  if (page) {
+    // Wait 3 seconds until the body contains any text to be matched.
+    const slimText = debloat(matchText);
+    const bodyText = await page.textContent('body');
+    const slimBody = debloat(bodyText);
+    const textInBodyJSHandle = await page.waitForFunction(
+      args => {
+        const matchText = args[0];
+        const bodyText = args[1];
+        return ! matchText || bodyText.includes(matchText);
+      },
+      [slimText, slimBody],
+      {timeout: 2000}
+    )
+    .catch(async error => {
+      console.log(`ERROR: text to match not in body (${error.message})`);
+    });
+    // If there is no text to be matched or the body contained it:
+    if (textInBodyJSHandle) {
+      const lcText = matchText ? matchText.toLowerCase() : '';
+      // Identify the selected elements.
+      const selections = await page.$$(`body ${selector}`);
+      // If there are any:
+      if (selections.length) {
+        // If there are enough to make a match possible:
+        if (index < selections.length) {
+          // Return the nth one including any specified text, or the count of candidates if none.
+          const elementTexts = [];
+          let nth = 0;
+          for (const element of selections) {
+            const elementText = await textOf(page, element);
+            elementTexts.push(elementText);
+            if ((! lcText || elementText.includes(lcText)) && nth++ === index) {
+              return element;
+            }
+          }
+          return elementTexts;
+        }
+        // Otherwise, i.e. if there are too few to make a match possible:
+        else {
+          // Return the count of candidates.
+          return selections.length;
+        }
+      }
+      // Otherwise, i.e. if there are no selected elements, return 0.
+      else {
+        return 0;
+      }
+    }
+    // Otherwise, i.e. if the body did not contain it:
+    else {
+      // Return the failure.
+      return -1;
+    }
+  }
+  // Otherwise, i.e. if the page no longer exists:
+  else {
+    // Return null.
+    console.log('ERROR: Page gone');
+    return null;
   }
 };
 // Returns a string with any final slash removed.
@@ -604,7 +594,7 @@ const visit = async (act, page, isStrict) => {
     return page;
   }
 };
-// Returns a property value and whether it satisfies a condition.
+// Returns a property value and whether it satisfies an expectation.
 const isTrue = (object, specs) => {
   let satisfied;
   const property = specs[0];
@@ -637,7 +627,7 @@ const isTrue = (object, specs) => {
 };
 // Recursively performs the commands in a report.
 const doActs = async (report, actIndex, page) => {
-  const {options, acts} = report;
+  const {acts} = report;
   // If any more commands are to be performed:
   if (actIndex > -1 && actIndex < acts.length) {
     // Identify the command to be performed.
@@ -1157,7 +1147,7 @@ const doActs = async (report, actIndex, page) => {
       act.result = `ERROR: Invalid command of type ${act.type}`;
     }
     // Perform the remaining acts.
-    await doActs(acts, report, actIndex + 1, page, reportSuffix, reportDir);
+    await doActs(report, actIndex + 1, page);
   }
   // Otherwise, i.e. if no more acts are to be performed:
   else {
@@ -1212,29 +1202,6 @@ const doScript = async (report, hostIndex) => {
   // Return the report.
   return report;
 };
-  // Write a report file.
-  const reportFileUpdate = async (reportDir, nameSuffix, report, isJSON) => {
-    const fileReport = isJSON ? report : JSON.stringify(report, null, 2);
-    await fs.writeFile(`${reportDir}/report-${nameSuffix}.json`, fileReport);
-  };
-  // Update the report file.
-  await reportFileUpdate(query.reportDir, reportSuffix, reportJSON, true);
-  // Write the output.
-  console.log(query);
-};
-// Recursively gets an array of file-name base/property-value arrays from JSON object files.
-const getWhats = async (path, baseNames, result) => {
-  if (baseNames.length) {
-    const firstName = baseNames[0];
-    const content = await fs.readFile(`${path}/${firstName}.json`, 'utf8');
-    const addition = [firstName, JSON.parse(content).what];
-    result.push(addition);
-    return await getWhats(path, baseNames.slice(1), result);
-  }
-  else {
-    return Promise.resolve(result);
-  }
-};
 // Injects url commands into a report where necessary to undo DOM changes.
 const injectURLCommands = commands => {
   let injectMore = true;
@@ -1257,35 +1224,6 @@ const injectURLCommands = commands => {
     }
   }
 };
-// Write a JSON report.
-const writeReport = async report => {
-  const {options} = report;
-  const {reportFile, withBatch} = options;
-  let reportDir = '';
-  let stdOut = false;
-  if (reportFile) {
-    reportDir = reportFile.directory;
-    if (reportFile.alsoStdOut) {
-      stdOut = true;
-    }
-  }
-  else if (withBatch) {
-    reportDir = withBatch.directory;
-  }
-  else {
-    stdOut = true;
-  }
-  // If the report is to be written as a file:
-  if (reportDir) {
-    // Write it.
-    fs.writeFileSync(reportDir, JSON.stringify(report, null, 2));
-  }
-  // If the report is to be sent to the standard output:
-  if (stdOut) {
-    // Send it.
-    console.log(JSON.stringify(report, null, 2));
-  }
-};
 // Recursively performs commands on the hosts of a batch.
 const doBatch = async (report, hostIndex) => {
   const {withBatch} = report.options;
@@ -1296,7 +1234,7 @@ const doBatch = async (report, hostIndex) => {
   if (host) {
     // Copy the report for it.
     const hostReport = JSON.parse(JSON.stringify(report));
-    // Copy the properties of the specified host to all hosts in the acts.
+    // Copy the properties of the specified host to all url acts.
     hostReport.acts.forEach(act => {
       if (act.type === 'url') {
         act.which = host.which;
@@ -1306,14 +1244,16 @@ const doBatch = async (report, hostIndex) => {
     // Replace the batch with its size in the report.
     batch.size = hosts.length;
     delete batch.hosts;
-    // Perform the commands on the host.
-    await writeReport(await doScript(hostReport));
+    // Perform the commands on the host and produce a report.
+    const report = await doScript(hostReport);
+    // Save the report.
+    fs.writeFileSync(`${reportDir}/${report.reportSuffix}`);
     // Process the remaining hosts.
     await doBatch(hostReport, hostIndex + 1);
   }
 };
 // Handles a request.
-const handleRequest = async options => {
+exports.handleRequest = async options => {
   // If the options object is valid:
   if (isValidOptions(options)) {
     // Initialize a JSON report.
@@ -1332,36 +1272,8 @@ const handleRequest = async options => {
     }
     // Otherwise, i.e. if there is no batch:
     else {
-      // Perform the script.
-      await writeReport(await doScript(report, -1));
+      // Perform the script and send the report to the console.
+      console.log(await doScript(report, -1));
     }
   }
 };
-// ########## SERVER
-const serve = (protocolModule, options) => {
-  const server = protocolModule.createServer(options, requestHandler);
-  const host = process.env.HOST || 'localhost';
-  // Choose the port specified by the argument or the .env file.
-  const port = process.argv[2] || process.env.PORT || '3000';
-  server.listen(port, () => {
-    console.log(`Server listening at ${protocol}://${host}:${port}.`);
-  });
-};
-if (protocol === 'http') {
-  serve(http, {});
-}
-else if (protocol === 'https') {
-  fs.readFile(process.env.KEY)
-  .then(
-    key => {
-      fs.readFile(process.env.CERT)
-      .then(
-        cert => {
-          serve(https, {key, cert});
-        },
-        error => console.log(error.message)
-      );
-    },
-    error => console.log(error.message)
-  );
-}
