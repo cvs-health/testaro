@@ -225,65 +225,16 @@ const isValidBatch = batchJSON => {
 };
 // Validates an options object.
 const isValidOptions = options => {
-  const {script, etcDir, reportType, reportFile, withBatch} = options;
+  const {script, withBatch} = options;
   if (script && isValidScript(script)) {
-    if (etcDir && fs.statSync(etcDir).isDirectory()) {
-      if (reportType && ['json', 'htmlAndJSON'].includes(reportType)) {
-        if (reportFile && ! withBatch) {
-          const {directory, alsoStdOut} = reportFile;
-          if (directory && fs.statSync(directory).isDirectory()) {
-            if (alsoStdOut && typeof alsoStdOut === 'boolean') {
-              return {isValid: true};
-            }
-            else {
-              return {
-                isValid: false,
-                error: 'reportFile.alsoStdOut missing or non-Boolean'
-              };
-            }
-          }
-          else {
-            return {
-              isValid: false,
-              error: 'reportFile.directory missing or not a directory'
-            };
-          }
-        }
-        else if (withBatch && ! reportFile) {
-          const {batch, directory} = withBatch;
-          if (batch && isValidBatch(batch)) {
-            if (directory && fs.statSync(directory).isDirectory()) {
-              return {isValid: true};
-            }
-            else {
-              return {
-                isValid: false,
-                error: 'withBatch.directory missing or not a directory'
-              };
-            }
-          }
-          else {
-            return {
-              isValid: false,
-              error: 'withBatch.batch missing or invalid'
-            };
-          }
-        }
-        else if (! reportFile && ! withBatch) {
-          return {isValid: true};
-        }
-      }
-      else {
-        return {
-          isValid: false,
-          error: 'options.reportType missing or invalid'
-        };
-      }
+    const {batch} = withBatch;
+    if (batch && isValidBatch(batch)) {
+      return true;
     }
     else {
       return {
         isValid: false,
-        error: 'options.etcDir missing or invalid'
+        error: 'options.batch missing or invalid'
       };
     }
   }
