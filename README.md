@@ -6,7 +6,7 @@ Accessibility test automation
 
 Testaro (Esperanto for “collection of tests”) is a collection of web accessibility tests.
 
-Testaro is derived from [Autotest](https://github.com/jrpool/autotest).
+Testaro is derived from [Autotest](https://github.com/jrpool/autotest). Autotest contains additional tests not included in Testaro. Those additional tests are inspection-oriented: They output results intended to be inspected by the user. The tests in Testaro are automation-oriented: They output results intended to be further processed programmatically.
 
 ## System requirements
 
@@ -55,10 +55,6 @@ Use of WAVE requires you to have a WAVE API key (see the link above under “Tec
 ## Specification
 
 To use Testaro, you must specify what it should do. You do this by creating at least one script, and optionally one or more batches.
-
-## Validation
-
-In order to validate Testaro tests, you will use a validation script in the `validation/scripts` directory, plus artifacts (HTML documents) in a subdirectory of the `validation/targets` directory. For any validation script named `foo.json`, there must be a subdirectory named `validation/targets/foo`. For several of the tests in Testaro, validation scripts and targets already exist, and you can use them as-is. They are named after the tests that they validate.
 
 ## Scripts
 
@@ -205,6 +201,18 @@ There are two exceptions:
 ```
 
 That would state the expectation that the `result` property of the report will have a `total.links` property with the value 5, a `total.links.underlined` property with a value less than 6, **no** `total.links.outlined` property, and a `docLang` property with a value different from `es-ES`.
+
+The second item in each array, if there are 3 items in the array, is an operator, drawn from:
+- `<`: less than
+- `=`: equal to
+- `>`: greater than
+- `!`: unequal to
+
+#### Provided validators
+
+For each of the non-package tests defined in Testaro, a validating script and some files tested by it already exist. They are in the `validation` directory. A module that you can use to execute those scripts is also there, named `validator.js`.
+
+For example, to execute the `focOp.json` validation script, you can enter `node validation/validator focOp`. As its commands are performed, their names are sent to the console. When the execution ends, the report is sent to the console.
 
 #### Command sequence
 
@@ -386,12 +394,6 @@ When you run Testaro with a no-batch script, Testaro returns the report.
 
 If you use a batch, Testaro writes one report per host into the `reports` directory. Testaro also returns a list of the names of the files containing the reports.
 
-## Files
-
-Under some conditions Testaro writes temporary files into the `temp` directory:
-- image files from screenshots made in the `motion` test
-- temporary files required by some tests
-
 ## Execution
 
 Testaro is executed with a statement in this format:
@@ -441,7 +443,7 @@ Test packages sometimes do redundant testing, in that two or more packages test 
 
 ## Repository exclusions
 
-The files in the `temp` directory are presumed ephemeral and are not tracked by `git`.
+The files in the `temp` directory are presumed ephemeral and are not tracked by `git`. When tests require temporary files to be written, Testaro writes them there.
 
 ## More information
 

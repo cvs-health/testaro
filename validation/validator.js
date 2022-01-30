@@ -1,5 +1,5 @@
 /*
-  validator0
+  validator
   Script that executes the application with a validation script and no batch.
 */
 const scriptName = process.argv[2];
