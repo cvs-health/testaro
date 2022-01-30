@@ -28,7 +28,6 @@ const tests = {
   alfa: 'alfa',
   autocom: 'autocomplete attributes of inputs',
   axe: 'Axe',
-  bodyText: 'text content of the page body',
   bulk: 'count of visible elements',
   embAc: 'active elements embedded in links or buttons',
   focAll: 'focusable and Tab-focused elements',
@@ -36,30 +35,20 @@ const tests = {
   focOp: 'focusability and operability',
   hover: 'hover-caused content additions',
   ibm: 'IBM Accessibility Checker',
-  imgAlt: 'alt attributes of img elements',
-  imgBg: 'background images and their texts',
-  imgDec: 'decorative images and their texts',
-  imgInf: 'informative images and their texts',
-  inLab: 'input labels',
   labClash: 'labeling inconsistencies',
   linkUl: 'inline-link underlining',
   menuNav: 'keyboard navigation between focusable menu items',
   motion: 'motion',
   radioSet: 'fieldset grouping of radio buttons',
-  roleList: 'role attributes',
   role: 'roles',
-  simple: 'nothing',
-  state: 'focus and hover states',
   styleDiff: 'style inconsistencies',
   tabNav: 'keyboard navigation between tab elements',
-  tblAc: 'active elements contained by tables',
-  visibles: 'visible elements',
   wave: 'WAVE',
   zIndex: 'z indexes'
 };
 // Tests that may change the DOM.
 const domChangers = new Set([
-  'axe', 'focAll', 'focInd', 'focOp', 'hover', 'ibm', 'menuNav', 'state', 'wave'
+  'axe', 'focAll', 'focInd', 'focOp', 'hover', 'ibm', 'menuNav', 'wave'
 ]);
 // Browser types available in PlayWright.
 const browserTypeNames = {

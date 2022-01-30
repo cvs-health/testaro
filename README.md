@@ -380,24 +380,17 @@ A no-batch script offers a way to carry out a complex operation, which can inclu
 
 ## Reports
 
-Testaro can produce reports of two types:
-- JSON
-- HTML
+Testaro produces reports in JSON format. It contains detailed results in a program-tractable format.
 
-A JSON report contains detailed results in a program-tractable format. An HTML report contains a human-readable summary, with references to the JSON report.
+When you run Testaro with a no-batch script, Testaro returns the report.
 
-When you run Testaro with a no-batch script, you specify what reports it should produce: either JSON or HTML plus JSON. You also specify where Testaro should put the report(s): the standard output, a file-system directory, or both. HTML and JSON reports are stored as separate files, but, when HTML plus JSON is written to the standard output, the JSON report is embedded into a `pre` element at the end of the HTML output.
-
-If you use a batch, there is no option to write the reports to the standard output, so you must specify a file-system directory. 
+If you use a batch, Testaro writes one report per host into the `reports` directory. Testaro also returns a list of the names of the files containing the reports.
 
 ## Files
 
-Under some conditions Testaro must write files:
-- image files if necessary for exhibits in reports (i.e. if the images cannot be linked to)
+Under some conditions Testaro writes temporary files into the `temp` directory:
 - image files from screenshots made in the `motion` test
 - temporary files required by some tests
-
-To cover these cases, Testaro requires a file-system directory to write such files into.
 
 ## Execution
 
@@ -405,43 +398,9 @@ Testaro is executed with a statement in this format:
 
 `node index options`
 
-In this statement, `options` is an options object with at least these properties:
+In this statement, `options` is an options object with a `script` property, whose value is the script object, and optionally a `withBatch` property, whose value is an object with a`what` property (a string describing the batch) and a `batch` property (the batch object).
 
-```javascript
-{
-  script: 'the script to be performed',
-  etcDir: 'the path of an existing directory to be used for any non-report file output',
-  reportType: 'json or htmlAndJSON'
-}
-```
-
-If that is the entire options object, then Testaro will perform the script without any batch and send the report to the standard output.
-
-Optionally, the options object can also have this property:
-
-```javascript
-{
-  reportFile: {
-    directory: 'the path of an existing directory to be used for report-file output',
-    alsoStdOut: 'true or false'
-  }
-}
-```
-
-With the `reportFile` property, you can specify that report files will be written, where to write them, and whether to send a report to the standard output in addition to writing files.
-
-Instead of a `reportFile` property, the options object can have this optional property:
-
-```javascript
-{
-  withBatch: {
-    batch: 'the batch to be used',
-    directory: 'the path of an existing directory to be used for report-file output'
-  }
-}
-```
-
-The values of the `script` and `batch` properties are a script and a batch, not a reference to them.
+The values of the required `script` and the optional `batch` properties are a script and a batch, respectively, not references to them.
 
 If the script includes execution of the `wave` test, a WAVE API key must exist as the value of the environment variable `WAVE_KEY`.
 
@@ -478,9 +437,7 @@ The Playwright “Receives Events” actionability check does **not** check whet
 
 ### Test-package duplication
 
-Test packages sometimes do redundant testing, in that two or more packages test for the same issues. But the testing and reporting are not necessarily identical.
-
-To compensate for test-package duplication, scoring procs can adjust the weights they apply to particular findings of test packages.
+Test packages sometimes do redundant testing, in that two or more packages test for the same issues. But the testing and reporting are not necessarily identical. Therefore, the scoring procs currently made available by Testaro do not select a single package to test for a single issue. Instead, they allow all packages to test for all the issues they can test for, but decrease the weights placed on issues that multiple packages test for. The more packages test for an issue, the smaller the weight placed on each package’s finding of that issue.
 
 ## Repository exclusions
 
