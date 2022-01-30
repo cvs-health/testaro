@@ -20,48 +20,45 @@
 */
 const pixelmatch = require('pixelmatch');
 const {PNG} = require('pngjs');
-// Reports motion in a page.
-exports.reporter = async (page, delay, interval, count) => {
-  // FUNCTION DEFINITIONS START
-  // Creates and returns a screenshot.
-  const shoot = async (page, fileName) => {
-    // Make a screenshot as a buffer.
-    return await page.screenshot({
-      fullPage: false,
-      omitBackground: true,
-      timeout: 3000,
-      path: `${process.env.REPORTDIR}/motion/${fileName}.png`
-    })
-    .catch(error => {
-      console.log(`ERROR: Screenshot for ${fileName} failed(${error.message})`);
-      return '';
-    });
-  };
-  // Recursively creates and returns screenshots.
-  const shootAll = async (page, delay, interval, count, toDo, buffers) => {
-    // Wait.
-    await page.waitForTimeout(toDo === count ? delay : interval);
-    // Make a screenshot.
-    const buffer = await shoot(
-      page, `${page.url().replace(/^.+\/\/|\/$/g, '').replace(/\//g, '+')}-${count - toDo}`
-    );
-    // Get its dimensions.
-    if (buffer.length) {
-      buffers.push(buffer);
-      if (toDo > 1) {
-        return shootAll(page, delay, interval, count, toDo - 1, buffers);
-      }
-      else {
-        return buffers;
-      }
+// Creates and returns a screenshot.
+const shoot = async page => {
+  // Make a screenshot as a buffer.
+  return await page.screenshot({
+    fullPage: false,
+    omitBackground: true,
+    timeout: 3000
+  })
+  .catch(error => {
+    console.log(`ERROR: Screenshot failed(${error.message})`);
+    return '';
+  });
+};
+// Recursively creates and returns screenshots.
+const shootAll = async (page, delay, interval, count, toDo, buffers) => {
+  // Wait.
+  await page.waitForTimeout(toDo === count ? delay : interval);
+  // Make a screenshot.
+  const buffer = await shoot(
+    page, `${page.url().replace(/^.+\/\/|\/$/g, '').replace(/\//g, '+')}-${count - toDo}`
+  );
+  // Get its dimensions.
+  if (buffer.length) {
+    buffers.push(buffer);
+    if (toDo > 1) {
+      return shootAll(page, delay, interval, count, toDo - 1, buffers);
     }
     else {
-      return '';
+      return buffers;
     }
-  };
-  // Returns a number rounded to 2 decimal digits.
-  const round = (num, precision) => Number.parseFloat(num.toPrecision(precision));
-  // FUNCTION DEFINITIONS END
+  }
+  else {
+    return '';
+  }
+};
+// Returns a number rounded to 2 decimal digits.
+const round = (num, precision) => Number.parseFloat(num.toPrecision(precision));
+// Reports motion in a page.
+exports.reporter = async (page, delay, interval, count) => {
   // Make screenshots and get their image buffers.
   const shots = await shootAll(page, delay, interval, count, count, []);
   // If the shooting succeeded:
