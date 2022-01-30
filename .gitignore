@@ -1,18 +1,14 @@
 # Dependency directories
 node_modules/
 
-# Secret environment variables
-.env*
-.npmrc
-
 # Temporary files
 temp/
-screenShots/
-ibmtemp/
+
+# Secrets
+.env
 
 # System files
 .DS_Store
 
 # Development configurations
 .vscode/
-.npmrc

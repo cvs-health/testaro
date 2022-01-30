@@ -6,7 +6,22 @@ Accessibility test automation
 
 Testaro (Esperanto for “collection of tests”) is a collection of web accessibility tests.
 
-Testaro is derived from [Autotest](https://github.com/jrpool/autotest). Autotest contains additional tests not included in Testaro. Those additional tests are inspection-oriented: They output results intended to be inspected by the user. The tests in Testaro are automation-oriented: They output results intended to be further processed programmatically.
+The purpose of Testaro is to provide programmatic access to over 600 accessibility tests defined in several test packages and in Testaro itself.
+
+Calling Testaro requires telling it which operations (including tests) to perform and which URLs to perform them on. Testaro outputs progress and error messages to the console and, if it is not interrupted by an error, returns a JavaScript object containing a report, which can be further processed programmatically.
+
+## Origin
+
+Testaro is derived from [Autotest](https://github.com/jrpool/autotest). Autotest contains additional tests, procedures, and data not included in Testaro.
+
+The additional tests in Autotest are inspection-oriented: They output results intended to be inspected by the user. The tests in Testaro are automation-oriented, intended for the programmatic derivation of scores and other processing.
+
+The additional procedures in Autotest perform:
+- previous versions of scoring
+- operations that processed data for scoring discounts
+- file operations for score aggregation, report revision, and HTML reporting
+
+The additional data in Autotest are tabulations of duplications between test packages (two test packages finding the same issues).
 
 ## System requirements
 
@@ -14,14 +29,13 @@ Version 14 or later of [Node.js](https://nodejs.org/en/).
 
 ## Technologies
 
-Testaro uses the [Playwright](https://playwright.dev/) package to launch browsers, perform user actions in them, and perform tests.
+Testaro uses the [Playwright](https://playwright.dev/) package to launch browsers, perform user actions in them, and perform tests, and uses [pixelmatch](https://www.npmjs.com/package/pixelmatch) to measure motion.
 
 Testaro combines its own collection of tests with tests made available in other packages and APIs:
 - [accessibility-checker](https://www.npmjs.com/package/accessibility-checker) (the IBM Equal Access Accessibility Checker)
 - [alfa](https://alfa.siteimprove.com/) (Siteimprove alfa)
 - [Automated Accessibility Testing Tool](https://www.npmjs.com/package/aatt) (Paypal AATT, running HTML CodeSniffer)
 - [axe-playwright](https://www.npmjs.com/package/axe-playwright) (Deque Axe-core)
-- [pixelmatch](https://www.npmjs.com/package/pixelmatch) to measure motion
 - [WAVE API](https://wave.webaim.org/api/) (WebAIM WAVE)
 
 As of January 2022, the counts of tests in the packages referenced above were:
@@ -30,7 +44,9 @@ As of January 2022, the counts of tests in the packages referenced above were:
 - Axe-core: 138
 - Equal Access: 163
 - WAVE: 110
-- total: 612
+- subtotal: 612
+- Testaro tests: 15
+- grand total: 627
 
 ## Code organization
 
@@ -40,7 +56,6 @@ The main subdirectories of the package directory containing other code files are
 - `tests`: files containing the code defining particular tests
 - `procs`: shared procedures
 - `validation`: code and artifacts for the validation of tests
-- `docTemplates`: code for the production of HTML reports
 
 ## Installation
 
@@ -49,6 +64,8 @@ npm install testaro
 ```
 
 ## Configuration
+
+Successful installation depends on the scoped registry declaration for `@siteimprove` in the `.npmrc` file.
 
 Use of WAVE requires you to have a WAVE API key (see the link above under “Technologies”).
 
@@ -156,64 +173,6 @@ That other validity criterion may be any of these:
 - `'isWaitable'`: is `'url'`, `'title'`, or `'body'`
 - `'areStrings'`: is an array of strings
 
-#### Test commands
-
-Commands of type `test` may have additional validity requirements. They must always conform to the `test` object in `etc`, namely:
-
-```js
-test: [
-  'Perform a test (which: test name; what: description)',
-  {
-    which: [true, 'string', 'isTest', 'test name'],
-    what: [false, 'string', 'hasLength', 'comment']
-  }
-]
-```
-
-Thus, each `test`-type command must have a `which` property and may have a `what` property. (As stated above, it may also have a `name` property.)
-
-The `commands.js` file also has a `tests` object. Its properties provide additional validity requirements for some tests. For example, one property of `tests` is:
-
-```js
-motion: [
-  'Perform a motion test',
-  {
-    delay: [true, 'number', '', 'ms to wait before first screen shot'],
-    interval: [true, 'number', '', 'ms between screen shots'],
-    count: [true, 'number', '', 'count of screen shots to make']
-  }
-]
-```
-
-This property says that any `motion`-type test must, in addition to the required and optional properties of all tests, also have `delay`, `interval`, and `count` properties with number values.
-
-There are two exceptions:
-- `withItems`. For this property, the requirements array is always `[true, 'boolean']`. It means that the command must include a `withItems` property specifying whether item details should be included in the report.
-- `expect`. Any command that will validate a test must contain an `expect` property. The value of that property states an array of expected results. If an `expect` property is present in a `test` command, the report will tabulate and identify the expectations that are fulfilled or are violated by the results. For example, a `test` command might have this `expect` property:
-
-```json
-"expect": [
-  ["total.links", "=", 5],
-  ["total.links.underlined", "<", 6],
-  ["total.links.outlined"],
-  ["docLang", "!", "es-ES]
-]
-```
-
-That would state the expectation that the `result` property of the report will have a `total.links` property with the value 5, a `total.links.underlined` property with a value less than 6, **no** `total.links.outlined` property, and a `docLang` property with a value different from `es-ES`.
-
-The second item in each array, if there are 3 items in the array, is an operator, drawn from:
-- `<`: less than
-- `=`: equal to
-- `>`: greater than
-- `!`: unequal to
-
-#### Provided validators
-
-For each of the non-package tests defined in Testaro, a validating script and some files tested by it already exist. They are in the `validation` directory. A module that you can use to execute those scripts is also there, named `validator.js`.
-
-For example, to execute the `focOp.json` validation script, you can enter `node validation/validator focOp`. As its commands are performed, their names are sent to the console. When the execution ends, the report is sent to the console.
-
 #### Command sequence
 
 The first two commands in any script have the types `launch` and `url`, respectively, as shown in the example above. They launch a browser and then use it to visit a URL. For example:
@@ -244,6 +203,8 @@ The subsequent commands can tell Testaro to perform any of:
 - scoring (aggregating test results into total scores)
 - branching (continuing from a command other than the next one)
 
+##### Moves
+
 An example of a **move** is:
 
 ```json
@@ -261,7 +222,15 @@ In identifying the target element for a move, Testaro matches the `which` proper
 
 When multiple elements of the same type have indistinguishable texts, you can include an `index` property to specify the index of the target element, among all those that will match.
 
-An example of a **navigation** is the command of type `url` above. Another is:
+##### Navigations
+
+An example of a **navigation** is the command of type `url` above.
+
+Once you have included a `url` command in a script, you do not need to add more `url` commands unless you want the browser to visit a different URL.
+
+However, some tests modify web pages. In those cases, Testaro inserts additional `url` commands into the `script` property of the `options` object, after those tests, to ensure that changes made by one test do not affect subsequent acts.
+
+Another navigation example is:
 
 ```json
 {
@@ -273,6 +242,8 @@ An example of a **navigation** is the command of type `url` above. Another is:
 
 In this case, Testaro waits until the page title contains the string “travel” (case-insensitively).
 
+##### Alterations
+
 An example of an **alteration** is:
 
 ```json
@@ -283,6 +254,10 @@ An example of an **alteration** is:
 ```
 
 This command causes Testaro to alter the `display` and `visibility` style properties of all elements, where necessary, so those properties do not make any element invisible.
+
+##### Tests
+
+###### Examples
 
 An example of a **packaged test** is:
 
@@ -314,6 +289,64 @@ In this case, Testaro runs the `motion` test with the specified parameters.
 
 Near the top of the `index.js` file is an object named `tests`. It describes all available tests.
 
+###### Validation
+
+Commands of type `test` may have additional validity requirements. They must always conform to the `test` object in `etc`, namely:
+
+```js
+test: [
+  'Perform a test (which: test name; what: description)',
+  {
+    which: [true, 'string', 'isTest', 'test name'],
+    what: [false, 'string', 'hasLength', 'comment']
+  }
+]
+```
+
+Thus, each `test`-type command must have a `which` property and may have a `what` property. (As stated above, it may also have a `name` property.)
+
+The `commands.js` file also has a `tests` object. Its properties provide additional validity requirements for some tests. For example, one property of `tests` is:
+
+```js
+motion: [
+  'Perform a motion test',
+  {
+    delay: [true, 'number', '', 'ms to wait before first screen shot'],
+    interval: [true, 'number', '', 'ms between screen shots'],
+    count: [true, 'number', '', 'count of screen shots to make']
+  }
+]
+```
+
+This property says that any `motion`-type test must, in addition to the required and optional properties of all tests, also have `delay`, `interval`, and `count` properties with number values.
+
+There are two exceptions:
+- `withItems`. For this property, the requirements array is always `[true, 'boolean']`. This means that the command must include a `withItems` property specifying whether or not item details should be included in the report.
+- `expect`. Any `test` command that will validate the test must contain an `expect` property. The value of that property states an array of expected results. If an `expect` property is present in a `test` command, the report will tabulate and identify the expectations that are fulfilled or are violated by the results. For example, a `test` command might have this `expect` property:
+
+```json
+"expect": [
+  ["total.links", "=", 5],
+  ["total.links.underlined", "<", 6],
+  ["total.links.outlined"],
+  ["docLang", "!", "es-ES]
+]
+```
+
+That would state the expectation that the `result` property of the report will have a `total.links` property with the value 5, a `total.links.underlined` property with a value less than 6, **no** `total.links.outlined` property, and a `docLang` property with a value different from `es-ES`.
+
+The second item in each array, if there are 3 items in the array, is an operator, drawn from:
+- `<`: less than
+- `=`: equal to
+- `>`: greater than
+- `!`: unequal to
+
+For each of the non-package tests defined in Testaro, a validating script and some files tested by it are also provided. They are in the `validation` directory. A module that you can use to execute those scripts is also there, named `validator.js`.
+
+For example, to execute the `focOp.json` validation script, you can enter `node validation/validator focOp`. The `validator.js` module outputs the report to the console.
+
+##### Scoring
+
 An example of a **scoring** command is:
 
 ```json
@@ -324,7 +357,7 @@ An example of a **scoring** command is:
 }
 ```
 
-In this case, Testaro executes the procedure specified in the `asp09` score proc (in the `procs/score` directory) to compute a total score for the script. The proc is a JavaScript module whose `scorer` function returns an object containing a total score and the itemized scores that yield the total.
+In this case, Testaro executes the procedure specified in the `asp09` score proc (in the `procs/score` directory) to compute a total score for the script or (if there is a batch) the host. The proc is a JavaScript module whose `scorer` function returns an object containing a total score and the itemized scores that yield the total.
 
 The `scorer` function inspects the script report to find the required data, applies specific weights and formulas to yield the itemized scores, and combines the itemized scores to yield the total score.
 
@@ -334,6 +367,8 @@ The data for scores can include not only test results, but also log statistics. 
 - `prohibitedCount`: how many log items contain (case-insensitively) `403` and `status`, or `prohibited`
 - `visitTimeoutCount`: how many times an attempt to visit a URL timed out
 - `visitRejectionCount`: how many times a URL visit got an HTTP status other than 200 or 304
+
+##### Branching
 
 An example of a **branching** command is:
 
@@ -350,15 +385,9 @@ This command checks the result of the previous act to determine whether its `res
 
 A `next`-type command can use a `next` property instead of a `jump` property. The value of the `next` property is a command name. It tells Testaro to continue performing commands starting with the command having that value as the value of its `name` property.
 
-#### URL commands
-
-Once you have included a `url` command in a script, you do not need to add more `url` commands unless you want the browser to visit a different URL.
-
-However, some tests modify web pages. In those cases, Testaro inserts additional `url` commands into the `script` property of the `options` object, after those tests, to ensure that changes made by one test do not affect subsequent acts.
-
 ## Batches
 
-There are two ways to use a script in run mode to give instructions to Testaro:
+There are two ways to use a script to give instructions to Testaro:
 - The script can be the complete specification of the job.
 - The script can specify the operations to perform, and a _batch_ can specify which pages to perform them on.
 
@@ -384,15 +413,15 @@ When you combine a script with a batch, Testaro performs the script, replacing t
 
 A batch offers an efficient way to perform a uniform set of commands on every host in a set of hosts. In this way you can run the same set of tests on multiple web pages.
 
-A no-batch script offers a way to carry out a complex operation, which can include navigating from one host to another, which is not possible with a batch. Any `url` commands are performed as-is, without changing their URLs.
+A no-batch script offers a way to carry out a complex operation, which can include navigating from one host to another, which is not possible with a batch. Any `url` commands are performed as-is, without changes to their URLs.
 
 ## Reports
 
-Testaro produces reports in JSON format. It contains detailed results in a program-tractable format.
+Testaro produces reports as JavaScript objects. They contain detailed results.
 
 When you run Testaro with a no-batch script, Testaro returns the report.
 
-If you use a batch, Testaro writes one report per host into the `reports` directory. Testaro also returns a list of the names of the files containing the reports.
+When you use a batch, Testaro writes one report per host into the `reports` directory in JSON format. Testaro also returns a list of the names of the files containing the reports.
 
 ## Execution
 

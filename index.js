@@ -26,7 +26,6 @@ const moves = {
 const tests = {
   aatt: 'AATT with HTML CodeSniffer WCAG 2.1 AA ruleset',
   alfa: 'alfa',
-  autocom: 'autocomplete attributes of inputs',
   axe: 'Axe',
   bulk: 'count of visible elements',
   embAc: 'active elements embedded in links or buttons',
