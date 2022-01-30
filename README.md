@@ -425,13 +425,20 @@ When you use a batch, Testaro writes one report per host into the `reports` dire
 
 ## Execution
 
-Testaro is executed with a statement in this format:
+A Testaro script can be executed with statements in these formats:
 
-`node index options`
+```javascript
+const options = {
+  script: { ... },
+  batch: { ... }
+};
+const {handleRequest} = require('./index');
+handleRequest(options).then(report => console.log(JSON.stringify(report, null, 2)));
+```
 
-In this statement, `options` is an options object with a `script` property, whose value is the script object, and optionally a `withBatch` property, whose value is an object with a`what` property (a string describing the batch) and a `batch` property (the batch object).
+The `...` ellipses above must be the contents of (not references to) a script and a batch, respectively, such as the examples shown above.
 
-The values of the required `script` and the optional `batch` properties are a script and a batch, respectively, not references to them.
+However, the `batch` property is optional. If there is no batch, it is omitted.
 
 If the script includes execution of the `wave` test, a WAVE API key must exist as the value of the environment variable `WAVE_KEY`.
 
@@ -441,9 +448,7 @@ You can define additional Testaro commands and functionality. Contributions are 
 
 ## Accessibility principles
 
-Testaro allows other tests to be defined, which can detect accessibility properties not discovered by any of the packages.
-
-The rationales motivating tests can be found in comments within the files of those tests, in the `tests` directory.
+The rationales motivating the Testaro-defined tests and scoring procs can be found in comments within the files of those tests and procs, in the `tests` and `procs/score` directories. Unavoidably, each test is opinionated. Testaro itself, however, can accommodate other tests representing different opinions. Testaro is intended to be neutral with respect to questions such as the criteria for accessibility, the severities of accessibility issues, whether accessibility should be understcood as binary or graded, and the distinction between usability and accessibility.
 
 ### Future work
 

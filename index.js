@@ -213,11 +213,10 @@ const isValidBatch = batch => {
 // Validates an options object.
 const isValidOptions = options => {
   if (options) {
-    const {script, withBatch} = options;
+    const {script, batch} = options;
     if (script && isValidScript(script)) {
-      if (withBatch) {
-        const {batch} = withBatch;
-        if (batch && isValidBatch(batch)) {
+      if (batch) {
+        if (isValidBatch(batch)) {
           return true;
         }
         else {
@@ -1163,8 +1162,7 @@ const injectURLCommands = commands => {
 };
 // Recursively performs commands on the hosts of a batch.
 const doBatch = async (report, hostIndex, reportList) => {
-  const {withBatch} = report.options;
-  const {batch} = withBatch;
+  const {batch} = report.options;
   const {hosts} = batch;
   const host = hosts[hostIndex];
   // If the specified host exists:
@@ -1205,7 +1203,7 @@ const doScriptOrBatch = async report => {
   // If the report has an options property:
   if (report.options) {
     // If there is a batch:
-    if (report.options.withBatch) {
+    if (report.options.batch) {
       // Perform the script on all the hosts in the batch and return a list of the reports.
       const reportList = await doBatch(report, 0, []);
       return reportList;

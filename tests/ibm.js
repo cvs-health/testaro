@@ -2,8 +2,8 @@
   ibm
   This test implements the IBM Equal Access ruleset for accessibility.
   The 'withNewContent' argument determines whether the test package should be
-  given the URL of the page to be tested (true) or should be given the page content
-  (false).
+  given the URL of the page to be tested (true), should be given the page content
+  (false), or should test in both ways (omitted).
 */
 // Import required modules.
 const fs = require('fs/promises');
@@ -61,9 +61,6 @@ exports.reporter = async (page, withItems, withNewContent) => {
     const result = await run(content);
     all.url = report(result, withItems);
   }
-  // Delete the report files.
-  fs.rm('ibmtemp', {recursive: true})
-  .catch(error => console.log(`ERROR deleting temporary ibm files (${error.message})`));
   // Return the result.
   return {result: all};
 };
