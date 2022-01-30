@@ -211,9 +211,8 @@ const isValidScript = script => {
     && commands.every(command => isValidCommand(command));
 };
 // Validates a batch.
-const isValidBatch = batchJSON => {
+const isValidBatch = batch => {
   // Get the batch data.
-  const batch = JSON.parse(batchJSON);
   const batchWhat = batch.what;
   const {hosts} = batch;
   // Return whether the batch is valid:
@@ -1195,17 +1194,17 @@ const doBatch = async (report, hostIndex, reportList) => {
     batch.size = hosts.length;
     delete batch.hosts;
     // Perform the commands on the host and produce a report.
-    const report = await doScript(hostReport);
+    const finalReport = await doScript(hostReport);
     const hostSuffix = hostIndex > -1 ? `-${hostIndex.toString().padStart(3, '0')}` : '';
-    const reportName = `report-${report.timeStamp}${hostSuffix}.json`;
-    report.reportName = reportName;
-    const reportPath = `${reportDir}/${reportName}`;
+    const reportName = `report-${finalReport.timeStamp}${hostSuffix}.json`;
+    finalReport.reportName = reportName;
+    const reportPath = `${__dirname}/${reportDir}/${reportName}`;
     // Save the report.
-    fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
+    await fs.writeFile(reportPath, JSON.stringify(finalReport, null, 2));
     // Send the report name to the console.
     reportList.push(reportName);
     // Process the remaining hosts.
-    await doBatch(hostReport, hostIndex + 1);
+    return await doBatch(hostReport, hostIndex + 1, reportList);
   }
   // Otherwise, i.e. if the hosts have been exhausted:
   else {
@@ -1220,7 +1219,8 @@ const doScriptOrBatch = async report => {
     // If there is a batch:
     if (report.options.withBatch) {
       // Perform the script on all the hosts in the batch and return a list of the reports.
-      return await doBatch(report, 0, []);
+      const reportList = await doBatch(report, 0, []);
+      return reportList;
     }
     // Otherwise, i.e. if there is no batch:
     else {
@@ -1243,7 +1243,8 @@ exports.handleRequest = async options => {
     // Inject url acts where necessary to undo DOM changes.
     injectURLCommands(report.acts);
     // Perform the script, with or without a batch, and return the report or list of reports.
-    return await doScriptOrBatch(report);
+    const finalReport = await doScriptOrBatch(report);
+    return finalReport;
   }
   else {
     console.log('ERROR: options missing or invalid');
