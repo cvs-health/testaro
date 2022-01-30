@@ -24,7 +24,7 @@ exports.reporter = async (page, reportType) => {
         response.on('end', () => {
           try {
             const result = JSON.parse(report);
-            const categories = result.categories;
+            const {categories} = result;
             delete categories.feature;
             delete categories.structure;
             delete categories.aria;

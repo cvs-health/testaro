@@ -61,6 +61,11 @@ exports.reporter = async (page, withItems, withNewContent) => {
     const result = await run(content);
     all.url = report(result, withItems);
   }
+  // Delete the report files.
+  fs.rm('temp/ibm', {recursive: true})
+  .catch(error => {
+    console.log(`ERROR deleting temporary ibm files (${error.message})`);
+  });
   // Return the result.
   return {result: all};
 };

@@ -442,6 +442,19 @@ However, the `batch` property is optional. If there is no batch, it is omitted.
 
 If the script includes execution of the `wave` test, a WAVE API key must exist as the value of the environment variable `WAVE_KEY`.
 
+A module is provided to simplify execution in simple cases. It is `validation/tester.js`. You can edit it to specify which test to perform. If you want to use a batch, you can change `noBatch` to `batch` and edit the URLs of the batch. You can then call it with:
+
+```javascript
+node validation/tester
+```
+If you choose to run the `wave` test, you can use this call instead:
+
+```javascript
+env WAVE_KEY=XYZ123 node validation/tester
+```
+
+Replace `XYZ123` with your WAVE API key.
+
 ## Contribution
 
 You can define additional Testaro commands and functionality. Contributions are welcome.

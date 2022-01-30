@@ -916,22 +916,6 @@ const doActs = async (report, actIndex, page) => {
               }
               report.testTimes.push([act.which, Math.round((Date.now() - startTime) / 1000)]);
               report.testTimes.sort((a, b) => b[1] - a[1]);
-              // If the test produced exhibits:
-              if (testReport.exhibits) {
-                // Add that fact to the act.
-                act.exhibits = 'appended';
-                // Replace any browser-type placeholder in the exhibits.
-                const newExhibits = testReport.exhibits.replace(
-                  /__browserTypeName__/g, browserTypeNames[browserTypeName]
-                );
-                // Append the exhibits to any existing ones.
-                if (report.exhibits) {
-                  report.exhibits += `\n${newExhibits}`;
-                }
-                else {
-                  report.exhibits = newExhibits;
-                }
-              }
               // Add the result object (possibly an array) to the act.
               const resultCount = Object.keys(testReport.result).length;
               act.result = resultCount ? testReport.result : 'NONE';
