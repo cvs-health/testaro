@@ -12,3 +12,5 @@ temp/
 
 # Development configurations
 .vscode/
+.eslintrc.json
+.npmrc

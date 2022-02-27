@@ -8,24 +8,23 @@ Testaro (Esperanto for “collection of tests”) is a collection of web accessi
 
 The purpose of Testaro is to provide programmatic access to over 600 accessibility tests defined in several test packages and in Testaro itself.
 
-Calling Testaro requires telling it which operations (including tests) to perform and which URLs to perform them on. Testaro outputs progress and error messages to the console and, if it is not interrupted by an error, returns a JavaScript object containing a report, which can be further processed programmatically.
+Calling Testaro requires telling it which operations (including tests) to perform and which URLs to perform them on. Testaro outputs progress messages and a final report (in JSON format) to the standard output.
 
 ## Origin
 
-Testaro is derived from [Autotest](https://github.com/jrpool/autotest). Autotest contains additional tests, procedures, and data not included in Testaro.
+Testaro is derived from [Autotest](https://github.com/jrpool/autotest).
 
-The additional tests in Autotest are inspection-oriented: They output results intended to be inspected by the user. The tests in Testaro are automation-oriented, intended for the programmatic derivation of scores and other processing.
-
-The additional procedures in Autotest perform:
-- previous versions of scoring
-- operations that processed data for scoring discounts
-- file operations for score aggregation, report revision, and HTML reporting
-
-The additional data in Autotest are tabulations of duplications between test packages (two test packages finding the same issues).
+Testaro omits some functionalities of Autotest, such as:
+- tests producing results intended to be human-inspected
+- previous versions of scoring algorithms
+- file operations for score aggregation, report revision, and HTML reports
+- a web user interface
 
 ## System requirements
 
 Version 14 or later of [Node.js](https://nodejs.org/en/).
+
+A file system with a directory that Testaro has permission to read and write in.
 
 ## Technologies
 
@@ -38,7 +37,7 @@ Testaro combines its own collection of tests with tests made available in other 
 - [axe-playwright](https://www.npmjs.com/package/axe-playwright) (Deque Axe-core)
 - [WAVE API](https://wave.webaim.org/api/) (WebAIM WAVE)
 
-As of January 2022, the counts of tests in the packages referenced above were:
+As of March 2022, the counts of tests in the packages referenced above were:
 - AATT: 98
 - Alfa: 103
 - Axe-core: 138
@@ -50,9 +49,8 @@ As of January 2022, the counts of tests in the packages referenced above were:
 
 ## Code organization
 
-Some of the files of code are located at the root of the package directory.
-
-The main subdirectories of the package directory containing other code files are:
+The main directories containing code files are:
+- package root: main code files
 - `tests`: files containing the code defining particular tests
 - `procs`: shared procedures
 - `validation`: code and artifacts for the validation of tests
@@ -130,48 +128,6 @@ If the `strict` property is `true`, Testaro will accept redirections that add or
 The `commands` property’s value is an array of commands, each formatted as an object.
 
 Each command has a `type` property and optionally has a `name` property (used in branching, described below). It must or may have other properties, depending on the value of `type`.
-
-You can look up the command types and their required and optional properties in the `commands.js` file. That file defines two objects, named `etc` and `tests`.
-
-The properties of the `etc` object specify what is required for commands to be valid. Consider this command:
-
-```json
-{
-  "type": "link",
-  "which": "warming",
-  "what": "article on climate change"
-}
-```
-
-Here is the applicable property of the `etc` object in `commmands.js`:
-
-```js
-link: [
-  'Click a link',
-  {
-    which: [true, 'string', 'hasLength', 'substring of the link text'],
-    what: [false, 'string', 'hasLength', 'comment']
-  }
-]
-```
-
-As this example illustrates, to find the requirements for a `link`-type command, you look up the `link` property of the `etc` object. Its value is an array with two elements: a string describing the command and an object containing requirements for any command of that type.
-
-A requirement, such as `which: [true, 'string', 'hasLength', 'substringc of the link text']`, has a property key as its key. In this case, it specifies what is required for the `which` property of a `link`-type command. The requirement takes the form of an array:
-- 0. Is the property (here `which`) required (`true` or `false`)?
-- 1. What format must the property value have (`'string'`, `'array'`, `'boolean'`, or `'number'`)?
-- 2. What other validity criterion applies (if any)? (Empty string if none.)
-- 3. Description.
-
-That other validity criterion may be any of these:
-- `'hasLength'`: is not a blank string
-- `'isURL`': is a string starting with `http`, `https`, or `file`, then `://`, then ending with 1 or more non-whitespace characters
-- `'isBrowserType'`: is `'chromium'`, `'firefox'`, or `'webkit'`
-- `'isFocusable'`: is `'a'`, `'button'`, `'input'`, `'select'`, or `'option'`
-- `'isState'`: is `'loaded'` or `'idle'`
-- `'isTest'`: is the name of a test
-- `'isWaitable'`: is `'url'`, `'title'`, or `'body'`
-- `'areStrings'`: is an array of strings
 
 #### Command sequence
 
@@ -257,6 +213,10 @@ This command causes Testaro to alter the `display` and `visibility` style proper
 
 ##### Tests
 
+###### Introduction
+
+The possible commands of type `test` are enumerated in the `tests` object defined in the `index.js` file.
+
 ###### Examples
 
 An example of a **packaged test** is:
@@ -270,7 +230,7 @@ An example of a **packaged test** is:
 }
 ```
 
-In this case, Autosest runs the WAVE test with report type 1.
+In this case, Testaro runs the WAVE test with report type 1.
 
 An example of a **Testaro-defined** test is:
 
@@ -287,59 +247,7 @@ An example of a **Testaro-defined** test is:
 
 In this case, Testaro runs the `motion` test with the specified parameters.
 
-Near the top of the `index.js` file is an object named `tests`. It describes all available tests.
-
 ###### Validation
-
-Commands of type `test` may have additional validity requirements. They must always conform to the `test` object in `etc`, namely:
-
-```js
-test: [
-  'Perform a test (which: test name; what: description)',
-  {
-    which: [true, 'string', 'isTest', 'test name'],
-    what: [false, 'string', 'hasLength', 'comment']
-  }
-]
-```
-
-Thus, each `test`-type command must have a `which` property and may have a `what` property. (As stated above, it may also have a `name` property.)
-
-The `commands.js` file also has a `tests` object. Its properties provide additional validity requirements for some tests. For example, one property of `tests` is:
-
-```js
-motion: [
-  'Perform a motion test',
-  {
-    delay: [true, 'number', '', 'ms to wait before first screen shot'],
-    interval: [true, 'number', '', 'ms between screen shots'],
-    count: [true, 'number', '', 'count of screen shots to make']
-  }
-]
-```
-
-This property says that any `motion`-type test must, in addition to the required and optional properties of all tests, also have `delay`, `interval`, and `count` properties with number values.
-
-There are two exceptions:
-- `withItems`. For this property, the requirements array is always `[true, 'boolean']`. This means that the command must include a `withItems` property specifying whether or not item details should be included in the report.
-- `expect`. Any `test` command that will validate the test must contain an `expect` property. The value of that property states an array of expected results. If an `expect` property is present in a `test` command, the report will tabulate and identify the expectations that are fulfilled or are violated by the results. For example, a `test` command might have this `expect` property:
-
-```json
-"expect": [
-  ["total.links", "=", 5],
-  ["total.links.underlined", "<", 6],
-  ["total.links.outlined"],
-  ["docLang", "!", "es-ES]
-]
-```
-
-That would state the expectation that the `result` property of the report will have a `total.links` property with the value 5, a `total.links.underlined` property with a value less than 6, **no** `total.links.outlined` property, and a `docLang` property with a value different from `es-ES`.
-
-The second item in each array, if there are 3 items in the array, is an operator, drawn from:
-- `<`: less than
-- `=`: equal to
-- `>`: greater than
-- `!`: unequal to
 
 For each of the non-package tests defined in Testaro, a validating script and some files tested by it are also provided. They are in the `validation` directory. A module that you can use to execute those scripts is also there, named `validator.js`.
 
@@ -368,6 +276,12 @@ The data for scores can include not only test results, but also log statistics. 
 - `visitTimeoutCount`: how many times an attempt to visit a URL timed out
 - `visitRejectionCount`: how many times a URL visit got an HTTP status other than 200 or 304
 
+A good score proc takes account of duplications between test packages: two or more packages that discover the same accessibility defects. Score procs can apply discounts to reflect duplications between test packages, so that, if two or more packages discover the same defect, the defect will not be overweighted.
+
+The procedures in the `scoring` directory have produced data there that score procs can use for the calibration of discounts.
+
+Some documents are implemented in such a way that some tests are prevented from being conducted on them. When that occurs, the score proc can **infer** a score for that test.
+
 ##### Branching
 
 An example of a **branching** command is:
@@ -384,6 +298,81 @@ An example of a **branching** command is:
 This command checks the result of the previous act to determine whether its `result.totals.invalid` property has a positive value. If so, it changes the next command to be performed, specifying the command 4 commands before this one.
 
 A `next`-type command can use a `next` property instead of a `jump` property. The value of the `next` property is a command name. It tells Testaro to continue performing commands starting with the command having that value as the value of its `name` property.
+
+#### Commands file
+
+##### Introduction
+
+The `commands.js` file contains rules governing commands. The rules determine whether a command is valid.
+
+##### Rule format
+
+The rules in `commands.js` are organized into two objects, `etc` and `tests`. The `etc` object contains rules for commands of all types. The `tests` object contains additional rules that apply to some commands of type `test`, depending on the values of their `which` properties, namely which tests they perform.
+
+Here is an example of a command:
+
+```json
+{
+  "type": "link",
+  "which": "warming",
+  "what": "article on climate change"
+}
+```
+
+And here is the applicable property of the `etc` object in `commmands.js`:
+
+```js
+link: [
+  'Click a link',
+  {
+    which: [true, 'string', 'hasLength', 'substring of the link text'],
+    what: [false, 'string', 'hasLength', 'comment']
+  }
+]
+```
+
+The rule is an array with two elements: a string ('Click a link') describing the command and an object containing requirements for any command of type `link`.
+
+The requirement `which: [true, 'string', 'hasLength', 'substring of the link text']` specifies what is required for the `which` property of a `link`-type command. The requirement is an array.
+
+In most cases, the array has length 4:
+- 0. Is the property (here `which`) required (`true` or `false`)? The value `true` here means that every `link`-type command **must** contain a `which` property.
+- 1. What format must the property value have (`'string'`, `'array'`, `'boolean'`, or `'number'`)?
+- 2. What other validity criterion applies (if any)? (Empty string if none.) The `hasLength` criterion means that the string must be at least 1 character long.
+- 3. Description of the property. Here, the value of `which` is some substring of the text content of the link that is to be clicked. Thus, a `link` command tells Testaro to find the first link whose text content has this substring and click it.
+
+The validity criterion named in item 2 may be any of these:
+- `'hasLength'`: is not a blank string
+- `'isURL`': is a string starting with `http`, `https`, or `file`, then `://`, then ending with 1 or more non-whitespace characters
+- `'isBrowserType'`: is `'chromium'`, `'firefox'`, or `'webkit'`
+- `'isFocusable'`: is `'a'`, `'button'`, `'input'`, `'select'`, or `'option'`
+- `'isState'`: is `'loaded'` or `'idle'`
+- `'isTest'`: is the name of a test
+- `'isWaitable'`: is `'url'`, `'title'`, or `'body'`
+- `'areStrings'`: is an array of strings
+
+When `commands.js` specifies a `withItems` requirement for a `test`-type command, that requirement is an array of length 2, and is always `[true, 'boolean']`. That means that this `test`-type command must have a `withItems` property, whose value must be `true` or `false`. That property tells Testaro whether to itemize the results of that test.
+
+Any `test` command can also (in addition to the requirements in `commands.js`) contain an `expect` requirement. If it does, that requirement has a different format: an array of any non-0 length. The items in that array specify expectations about the results of the test.
+
+For example, a `test` command might have this `expect` property:
+
+```json
+"expect": [
+  ["total.links", "=", 5],
+  ["total.links.underlined", "<", 6],
+  ["total.links.outlined"],
+  ["docLang", "!", "es-ES]
+]
+```
+
+That would state the expectation that the `result` property of the `acts` item for that test in the report will have a `total.links` property with the value 5, a `total.links.underlined` property with a value less than 6, **no** `total.links.outlined` property, and a `docLang` property with a value different from `es-ES`.
+
+The second item in each array, if there are 3 items in the array, is an operator, drawn from:
+- `<`: less than
+- `=`: equal to
+- `>`: greater than
+- `!`: unequal to
 
 ## Batches
 
@@ -417,11 +406,9 @@ A no-batch script offers a way to carry out a complex operation, which can inclu
 
 ## Reports
 
-Testaro produces reports as JavaScript objects. They contain detailed results.
+Testaro writes reports as files in JSON format. They contain detailed results.
 
-When you run Testaro with a no-batch script, Testaro returns the report.
-
-When you use a batch, Testaro writes one report per host into the `reports` directory in JSON format. Testaro also returns a list of the names of the files containing the reports.
+Testaro also writes to standard output a list of the names of the files containing the reports.
 
 ## Execution
 
@@ -429,31 +416,17 @@ A Testaro script can be executed with statements in these formats:
 
 ```javascript
 const options = {
-  script: { ... },
-  batch: { ... }
+  script: '/path/to/script/file.json',
+  batch: '/path/to/batch/file.json',
+  waveKey: 'XYZ123'
 };
 const {handleRequest} = require('./index');
-handleRequest(options).then(report => console.log(JSON.stringify(report, null, 2)));
+handleRequest(options);
 ```
 
-The `...` ellipses above must be the contents of (not references to) a script and a batch, respectively, such as the examples shown above.
+The `batch` option is optional. If there is no batch, it is omitted.
 
-However, the `batch` property is optional. If there is no batch, it is omitted.
-
-If the script includes execution of the `wave` test, a WAVE API key must exist as the value of the environment variable `WAVE_KEY`.
-
-A module is provided to simplify execution in simple cases. It is `validation/tester.js`. You can edit it to specify which test to perform. If you want to use a batch, you can change `noBatch` to `batch` and edit the URLs of the batch. You can then call it with:
-
-```javascript
-node validation/tester
-```
-If you choose to run the `wave` test, you can use this call instead:
-
-```javascript
-env WAVE_KEY=XYZ123 node validation/tester
-```
-
-Replace `XYZ123` with your WAVE API key.
+The `waveKey` option is required only if a `wave` test is included in the script. In this case, replace `XYZ123` with your WAVE API key.
 
 ## Contribution
 
@@ -486,12 +459,8 @@ The Playwright “Receives Events” actionability check does **not** check whet
 
 ### Test-package duplication
 
-Test packages sometimes do redundant testing, in that two or more packages test for the same issues. But the testing and reporting are not necessarily identical. Therefore, the scoring procs currently made available by Testaro do not select a single package to test for a single issue. Instead, they allow all packages to test for all the issues they can test for, but decrease the weights placed on issues that multiple packages test for. The more packages test for an issue, the smaller the weight placed on each package’s finding of that issue.
+Test packages sometimes do redundant testing, in that two or more packages test for the same issues. But such duplications are not necessarily perfect. Therefore, the scoring procs currently made available by Testaro do not select a single package to test for a single issue. Instead, they allow all packages to test for all the issues they can test for, but decrease the weights placed on issues that multiple packages test for. The more packages test for an issue, the smaller the weight placed on each package’s finding of that issue.
 
 ## Repository exclusions
 
 The files in the `temp` directory are presumed ephemeral and are not tracked by `git`. When tests require temporary files to be written, Testaro writes them there.
-
-## More information
-
-The `doc` directory may contain additional information.
