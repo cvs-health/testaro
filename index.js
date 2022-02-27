@@ -1145,9 +1145,17 @@ const injectURLCommands = commands => {
       injectMore = false;
     }
     else {
+      const lastURL = commands.reduce((url, command, index) => {
+        if (command.type === 'url' && index < injectIndex) {
+          return command.which;
+        }
+        else {
+          return url;
+        }
+      }, '');
       commands.splice(injectIndex + 1, 0, {
         type: 'url',
-        which: 'https://*',
+        which: lastURL,
         what: 'URL'
       });
     }
@@ -1213,7 +1221,6 @@ const doScriptOrBatch = async report => {
     await fs.writeFile(reportPath, JSON.stringify(finalReport, null, 2));
     // Send the report name to the console.
     console.log(reportName);
-    await doScript(report);
   }
 };
 // Handles a request.
