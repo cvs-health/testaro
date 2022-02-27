@@ -208,21 +208,37 @@ const isValidBatch = batch => {
     && Array.isArray(hosts)
     && hosts.every(host => host.which && host.what && isURL(host.which));
 };
+// Validates a reports directory.
+const isValidReports = reports => typeof reports === 'string' && reports.length;
 // Validates an options object.
-const isValidOptions = options => {
+const isValidOptions = async options => {
   if (options) {
-    const {script, batch} = options;
-    if (script && isValidScript(script)) {
-      if (batch) {
-        if (isValidBatch(batch)) {
-          return true;
+    const {script, batch, reports} = options;
+    if (script) {
+      const scriptJSON = await fs.readFile(script, 'utf8');
+      const scriptObj = JSON.parse(scriptJSON);
+      if (isValidScript(scriptObj)) {
+        if (reports && isValidReports(reports)) {
+          if (batch) {
+            const batchJSON = await fs.readFile(batch, 'utf8');
+            const batchObj = JSON.parse(batchJSON);
+            if (isValidBatch(batchObj)) {
+              return true;
+            }
+            else {
+              return false;
+            }
+          }
+          else {
+            return true;
+          }
         }
         else {
           return false;
         }
       }
       else {
-        return true;
+        return false;
       }
     }
     else {
