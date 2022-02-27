@@ -57,8 +57,6 @@ const browserTypeNames = {
 };
 // Items that may be waited for.
 const waitables = ['url', 'title', 'body'];
-// Directory for storage of report files.
-const reportDir = 'reports';
 // ########## VARIABLES
 // Facts about the current session.
 let logCount = 0;
@@ -1082,11 +1080,6 @@ const doScript = async report => {
   // Reinitialize the log statistics.
   logCount = logSize = prohibitedCount = visitTimeoutCount = visitRejectionCount= 0;
   // Add initialized properties to the report.
-  report.logCount = 0;
-  report.logSize = 0;
-  report.prohibitedCount = 0;
-  report.visitTimeoutCount = 0;
-  report.visitRejectionCount = 0;
   report.presses = 0;
   report.amountRead = 0;
   report.testTimes = [];
@@ -1145,8 +1138,7 @@ const injectURLCommands = commands => {
   }
 };
 // Recursively performs commands on the hosts of a batch.
-const doBatch = async (report, hostIndex, reportList) => {
-  const {batch} = report.options;
+const doBatch = async (report, batch, hostIndex, reportList) => {
   const {hosts} = batch;
   const host = hosts[hostIndex];
   // If the specified host exists:
@@ -1160,7 +1152,7 @@ const doBatch = async (report, hostIndex, reportList) => {
         act.what = host.what;
       }
     });
-    // Replace the batch with its size in the report.
+    // Record the batch size in the report.
     batch.size = hosts.length;
     delete batch.hosts;
     // Perform the commands on the host and produce a report.
@@ -1168,7 +1160,7 @@ const doBatch = async (report, hostIndex, reportList) => {
     const hostSuffix = hostIndex > -1 ? `-${hostIndex.toString().padStart(3, '0')}` : '';
     const reportName = `report-${finalReport.timeStamp}${hostSuffix}.json`;
     finalReport.reportName = reportName;
-    const reportPath = `${__dirname}/${reportDir}/${reportName}`;
+    const reportPath = `${report.options.reports}/${reportName}`;
     // Save the report.
     await fs.writeFile(reportPath, JSON.stringify(finalReport, null, 2));
     // Send the report name to the console.
@@ -1185,18 +1177,27 @@ const doBatch = async (report, hostIndex, reportList) => {
 // Performs a script.
 const doScriptOrBatch = async report => {
   // If the report has an options property:
-  if (report.options) {
-    // If there is a batch:
-    if (report.options.batch) {
-      // Perform the script on all the hosts in the batch and return a list of the reports.
-      const reportList = await doBatch(report, 0, []);
-      return reportList;
-    }
-    // Otherwise, i.e. if there is no batch:
-    else {
-      // Perform the script and return the report.
-      return await doScript(report);
-    }
+  const {options} = report;
+  // If there is a batch:
+  if (options.batch) {
+    // Perform the script on all the hosts in the batch and return a list of the reports.
+    const batchJSON = await fs.readFile(options.batch, 'utf8');
+    const batch = JSON.parse(batchJSON);
+    const reportList = await doBatch(report, batch, 0, []);
+    console.log(reportList);
+  }
+  // Otherwise, i.e. if there is no batch:
+  else {
+    // Perform the script and save the report.
+    const finalReport = await doScript(report);
+    const reportName = `report-${finalReport.timeStamp}.json`;
+    finalReport.reportName = reportName;
+    const reportPath = `${report.options.reports}/${reportName}`;
+    // Save the report.
+    await fs.writeFile(reportPath, JSON.stringify(finalReport, null, 2));
+    // Send the report name to the console.
+    console.log(reportName);
+    await doScript(report);
   }
 };
 // Handles a request.
@@ -1207,14 +1208,13 @@ exports.handleRequest = async options => {
     const report = {options};
     // Add a timeStamp.
     report.timeStamp = Math.floor((Date.now() - Date.UTC(2021, 4)) / 10000).toString(36);
-    const {commands} = options.script;
     // Copy the commands into an array of acts.
-    report.acts = JSON.parse(JSON.stringify(commands));
+    const script = await fs.readFile(options.script);
+    report.acts = JSON.parse(script).commands;
     // Inject url acts where necessary to undo DOM changes.
     injectURLCommands(report.acts);
     // Perform the script, with or without a batch, and return the report or list of reports.
-    const finalReport = await doScriptOrBatch(report);
-    return finalReport;
+    await doScriptOrBatch(report);
   }
   else {
     console.log('ERROR: options missing or invalid');

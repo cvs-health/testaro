@@ -35,6 +35,6 @@
   },
   "devDependencies": {
     "dotenv": "*",
-    "eslint": "^7.24.0"
+    "eslint": "*"
   }
 }

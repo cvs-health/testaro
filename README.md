@@ -412,13 +412,15 @@ Testaro also writes to standard output a list of the names of the files containi
 
 ## Execution
 
+### Invocation
+
 A Testaro script can be executed with statements in these formats:
 
 ```javascript
 const options = {
+  reports: '/path/to/reports/directory',
   script: '/path/to/script/file.json',
-  batch: '/path/to/batch/file.json',
-  waveKey: 'XYZ123'
+  batch: '/path/to/batch/file.json'
 };
 const {handleRequest} = require('./index');
 handleRequest(options);
@@ -426,7 +428,11 @@ handleRequest(options);
 
 The `batch` option is optional. If there is no batch, it is omitted.
 
-The `waveKey` option is required only if a `wave` test is included in the script. In this case, replace `XYZ123` with your WAVE API key.
+### Environment variables
+
+If a `wave` test is included in the script, an environment variable named `WAVE_KEY` must exist, with your WAVE API key as its value.
+
+Before executing a Testaro script, you can also set the environment variables `DEBUG` and/or `WAITS`. The effects of these variables are described in the `index.js` file.
 
 ## Contribution
 
