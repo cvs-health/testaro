@@ -1,0 +1,21 @@
+{
+  "what": "Sample Testaro executor with 1 test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "Chromium browser"
+    },
+    {
+      "type": "url",
+      "which": "https://example.com/",
+      "what": "simple page, replaced if there is a batch"
+    },
+    {
+      "type": "test",
+      "which": "bulk",
+      "what": "bulk"
+    }
+  ]
+}

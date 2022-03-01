@@ -4,7 +4,7 @@ Accessibility test automation
 
 ## Summary
 
-Testaro (Esperanto for “collection of tests”) is a collection of web accessibility tests.
+Testaro is a collection of web accessibility tests.
 
 The purpose of Testaro is to provide programmatic access to over 600 accessibility tests defined in several test packages and in Testaro itself.
 
@@ -414,19 +414,23 @@ Testaro also writes to standard output a list of the names of the files containi
 
 ### Invocation
 
-A Testaro script can be executed with statements in these formats:
+To run Testaro, create a Node.js file like this:
 
 ```javascript
 const options = {
-  reports: '/path/to/reports/directory',
-  script: '/path/to/script/file.json',
-  batch: '/path/to/batch/file.json'
+  reports: 'path/to/reports/directory',
+  script: 'path/to/script/file.json',
+  batch: 'path/to/batch/file.json'
 };
-const {handleRequest} = require('./index');
+const {handleRequest} = require('path/to/index.js');
 handleRequest(options);
 ```
 
 The `batch` option is optional. If there is no batch, it is omitted.
+
+The paths can be absolute or relative. If they are relative, they are relative to the file.
+
+If the file name is `runTestaro.js`, execute it with the statement `node runTestaro`.
 
 ### Environment variables
 
@@ -470,3 +474,7 @@ Test packages sometimes do redundant testing, in that two or more packages test 
 ## Repository exclusions
 
 The files in the `temp` directory are presumed ephemeral and are not tracked by `git`. When tests require temporary files to be written, Testaro writes them there.
+
+## Etymology
+
+“Testaro” means “collection of tests” in Esperanto.
