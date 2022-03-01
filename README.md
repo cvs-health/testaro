@@ -57,9 +57,31 @@ The main directories containing code files are:
 
 ## Installation
 
-```bash
-npm install testaro
-```
+To install Testaro, enter `git clone https://github.com/jrpool/testaro.git`.
+
+Then make its directory your working directory (`cd testaro`).
+
+Before installing its dependencies, authorize yourself to install them. You presumably are already authorized to install dependencies from `https://npmjs.org`. But some of the Testaro dependencies are not there, but rather at `https://npm.pkg.github.com`. If you are not already authorized to install packages from that registry, authorize yourself as follows:
+- Log in at [Github](https://github.com).
+- From your avatar in the upper-right corner, choose “Settings”.
+- In the left sidebar, choose “Developer settings”.
+- In the left sidebar, choose “Personal access tokens”.
+- Activate the button “Generate new token”.
+- Give the new token a descriptive note.
+- Select an expiration date.
+- Check the checkbox `read:packages`.
+- Activate the button “Generate token”.
+- Copy the generated token (you can use the copy icon next to it).
+- In your working directory (the root directory of the Testaro project), create a file named `.npmrc`.
+- Populate the `.npmrc` file with the following statements, replacing `abc` with your Github username and `xyz` with the token that you copied:
+
+    ```bash
+    @siteimprove:registry=https://npm.pkg.github.com
+    //npm.pkg.github.com/:username=abc
+    //npm.pkg.github.com/:_authToken=xyz
+    ```
+
+- Install the dependencies (`npm install` or `npm install --verbose`).
 
 ## Configuration
 
