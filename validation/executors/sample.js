@@ -3,7 +3,8 @@
 
 const options = {
   reports: '../reports',
-  batches: '../batches/sample.json',
+  // To use the sample batch, uncomment the following line.
+  // batches: '../batches/sample.json',
   script: '../scripts/app/sample.json'
 };
 const {handleRequest} = require('../../index');
