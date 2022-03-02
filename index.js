@@ -1088,6 +1088,7 @@ const doActs = async (report, actIndex, page) => {
   // Otherwise, i.e. if no more acts are to be performed:
   else {
     // Return a Promise.
+    console.log('All commands performed');
     return Promise.resolve('');
   }
 };
@@ -1129,6 +1130,7 @@ const doScript = async report => {
     }
   }
   // Return the report.
+  console.log('Script finished');
   return report;
 };
 // Injects url commands into a report where necessary to undo DOM changes.
@@ -1220,7 +1222,7 @@ const doScriptOrBatch = async report => {
     // Save the report.
     await fs.writeFile(reportPath, JSON.stringify(finalReport, null, 2));
     // Send the report name to the console.
-    console.log(reportName);
+    console.log(`Report ${reportName} saved`);
   }
 };
 // Handles a request.
@@ -1238,9 +1240,9 @@ exports.handleRequest = async options => {
     injectURLCommands(report.acts);
     // Perform the script, with or without a batch, and return the report or list of reports.
     await doScriptOrBatch(report);
+    console.log('Request handled');
   }
   else {
     console.log('ERROR: options missing or invalid');
-    return '';
   }
 };

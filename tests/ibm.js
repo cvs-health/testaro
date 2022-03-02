@@ -4,6 +4,19 @@
   The 'withNewContent' argument determines whether the test package should be
   given the URL of the page to be tested (true), should be given the page content
   (false), or should test in both ways (omitted).
+
+  Before using this test, you must:
+    0. Create a file named aceconfig.js.
+    1. Locate that file in the directory in which you call Testaro.
+    2. Populate that file with this content:
+
+      module.exports = {
+        reportLevels: [
+          'violation',
+          'recommendation'
+        ],
+        outputFolder: 'temp/ibm'
+      };
 */
 // Import required modules.
 const fs = require('fs/promises');
@@ -11,15 +24,20 @@ const {getCompliance} = require('accessibility-checker');
 // Runs the IBM test.
 const run = async content => {
   const nowLabel = (new Date()).toISOString().slice(0, 19);
-  // Return the result of a test, or blank if 20 seconds elapse.
-  return await Promise.race([
-    getCompliance(content, nowLabel),
-    new Promise(resolve => setTimeout(() => resolve(''), 20000))
-  ])
-  .catch(error => {
-    console.log(`ERROR running ibm test (${error.message})`);
-    return null;
+  // Return the result of a test.
+  const report = await getCompliance(content, nowLabel);
+  /*
+  let timeoutID;
+  const deadline = new Promise(resolve => {
+    timeoutID = setTimeout(() => {
+      resolve('');
+    }, 20000);
   });
+  const result = Promise.race([report, deadline]);
+  clearTimeout(timeoutID);
+  return result;
+  */
+  return report;
 };
 // Reports the result of an IBM test.
 const report = (result, withItems) => {
