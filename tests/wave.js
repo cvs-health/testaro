@@ -6,7 +6,7 @@
 */
 const https = require('https');
 exports.reporter = async (page, reportType) => {
-  const waveKey = process.env.WAVE_KEY;
+  const waveKey = process.env.TESTARO_WAVE_KEY;
   // Get the data from a WAVE test.
   const data = await new Promise(resolve => {
     https.get(

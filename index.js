@@ -9,9 +9,9 @@ const fs = require('fs/promises');
 const {commands} = require('./commands');
 // ########## CONSTANTS
 // Set DEBUG environment variable to 'true' to add debugging features.
-const debug = process.env.DEBUG === 'true';
+const debug = process.env.TESTARO_DEBUG === 'true';
 // Set WAITS environment variable to a positive number to insert delays (in ms).
-const waits = Number.parseInt(process.env.WAITS) || 0;
+const waits = Number.parseInt(process.env.TESTARO_WAITS) || 0;
 // CSS selectors for targets of moves.
 const moves = {
   button: 'button',

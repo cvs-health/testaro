@@ -8,36 +8,30 @@ Testaro is a collection of web accessibility tests.
 
 The purpose of Testaro is to provide programmatic access to over 600 accessibility tests defined in several test packages and in Testaro itself.
 
-Calling Testaro requires telling it which operations (including tests) to perform and which URLs to perform them on. Testaro outputs progress messages and a final report (in JSON format) to the standard output.
+Calling Testaro requires telling it which operations (including tests) to perform, which URLs to perform them on, and where to write its reports.
 
-## Origin
-
-Testaro is derived from [Autotest](https://github.com/jrpool/autotest).
-
-Testaro omits some functionalities of Autotest, such as:
-- tests producing results intended to be human-inspected
-- previous versions of scoring algorithms
-- file operations for score aggregation, report revision, and HTML reports
-- a web user interface
+Testaro outputs progress messages and a list of reports to the standard output. It writes the reports in JSON format.
 
 ## System requirements
 
 Version 14 or later of [Node.js](https://nodejs.org/en/).
 
-A file system with a directory that Testaro has permission to read and write in.
+A file system with a directory that the Testaro user has permission to read and write in.
 
-## Technologies
+## Dependencies
 
-Testaro uses the [Playwright](https://playwright.dev/) package to launch browsers, perform user actions in them, and perform tests, and uses [pixelmatch](https://www.npmjs.com/package/pixelmatch) to measure motion.
+Testaro uses:
+- [Playwright](https://playwright.dev/) to launch browsers, perform user actions in them, and perform tests
+- [pixelmatch](https://www.npmjs.com/package/pixelmatch) to measure motion
 
-Testaro combines its own collection of tests with tests made available in other packages and APIs:
+Testaro includes some of its own accessibility tests. In addition, it performs the tests in:
 - [accessibility-checker](https://www.npmjs.com/package/accessibility-checker) (the IBM Equal Access Accessibility Checker)
 - [alfa](https://alfa.siteimprove.com/) (Siteimprove alfa)
 - [Automated Accessibility Testing Tool](https://www.npmjs.com/package/aatt) (Paypal AATT, running HTML CodeSniffer)
 - [axe-playwright](https://www.npmjs.com/package/axe-playwright) (Deque Axe-core)
 - [WAVE API](https://wave.webaim.org/api/) (WebAIM WAVE)
 
-As of March 2022, the counts of tests in the packages referenced above were:
+As of this version, the counts of tests in the packages referenced above were:
 - AATT: 98
 - Alfa: 103
 - Axe-core: 138
@@ -57,11 +51,7 @@ The main directories containing code files are:
 
 ## Installation
 
-To install Testaro, enter `git clone https://github.com/jrpool/testaro.git`.
-
-Then make its directory your working directory (`cd testaro`).
-
-Before installing its dependencies, authorize yourself to install them. You presumably are already authorized to install dependencies from `https://npmjs.org`. But some of the Testaro dependencies are not there, but rather at `https://npm.pkg.github.com`. If you are not already authorized to install packages from that registry, authorize yourself as follows:
+Some of the dependencies of Testaro are published as Github packages. Installing Testaro therefore requires you to be authorized to read Github packages. If you do not yet have that authorization, you can give it to yourself as follows:
 - Log in at [Github](https://github.com).
 - From your avatar in the upper-right corner, choose “Settings”.
 - In the left sidebar, choose “Developer settings”.
@@ -72,7 +62,7 @@ Before installing its dependencies, authorize yourself to install them. You pres
 - Check the checkbox `read:packages`.
 - Activate the button “Generate token”.
 - Copy the generated token (you can use the copy icon next to it).
-- In your working directory (the root directory of the Testaro project), create a file named `.npmrc`.
+- In the local directory of the project into which you will install Testaro, create a file named `.npmrc`, unless it already exists.
 - Populate the `.npmrc` file with the following statements, replacing `abc` with your Github username and `xyz` with the token that you copied:
 
     ```bash
@@ -80,18 +70,15 @@ Before installing its dependencies, authorize yourself to install them. You pres
     //npm.pkg.github.com/:username=abc
     //npm.pkg.github.com/:_authToken=xyz
     ```
+Once you have done that, you can install Testaro as you would install any `npm` package.
 
-- Install the dependencies (`npm install` or `npm install --verbose`).
+## Payment
 
-## Configuration
-
-Successful installation depends on the scoped registry declaration for `@siteimprove` in the `.npmrc` file.
-
-Use of WAVE requires you to have a WAVE API key (see the link above under “Technologies”).
+All of the tests that Testaro can perform are free of cost, except those in the WAVE package. WebAIM requires an API key for those tests. If you wish to have Testaro perform the WAVE tests, you will need to have a WAVE API key. Visit the URL above in order to obtain your key. It costs 1 to 3 credits to perform the WAVE tests on one URL. WebAIM gives you 100 credits without cost, before you need to begin paying.
 
 ## Specification
 
-To use Testaro, you must specify what it should do. You do this by creating at least one script, and optionally one or more batches.
+To use Testaro, you must specify what it should do. You do this with a script and optionally a batch.
 
 ## Scripts
 
@@ -145,9 +132,9 @@ If the `strict` property is `true`, Testaro will accept redirections that add or
 
 ### Commands
 
-#### Commands in general
+#### Introduction
 
-The `commands` property’s value is an array of commands, each formatted as an object.
+The `commands` property’s value is an array of command objects.
 
 Each command has a `type` property and optionally has a `name` property (used in branching, described below). It must or may have other properties, depending on the value of `type`.
 
@@ -399,8 +386,8 @@ The second item in each array, if there are 3 items in the array, is an operator
 ## Batches
 
 There are two ways to use a script to give instructions to Testaro:
-- The script can be the complete specification of the job.
-- The script can specify the operations to perform, and a _batch_ can specify which pages to perform them on.
+- The script can be the complete specification of the operations to perform and the URLs to perform them on.
+- The script can specify the operations to perform, and a _batch_ can specify which URLs to perform them on.
 
 A batch is a JSON file with this format:
 
@@ -420,9 +407,9 @@ A batch is a JSON file with this format:
 }
 ```
 
-When you combine a script with a batch, Testaro performs the script, replacing the `which` and `what` properties of all `url` commands with the values in the first object in the `hosts` array, then again with the values in the second object, and so on. Those replacements also occur in the inserted extra `url` commands mentioned above.
+When you combine a script with a batch, Testaro performs the script, replacing the `which` and `what` properties of all `url` commands with the values in the first object in the `hosts` array of the batch, then again with the values in the second `host` object, and so on. Those replacements also occur in the inserted extra `url` commands mentioned above.
 
-A batch offers an efficient way to perform a uniform set of commands on every host in a set of hosts. In this way you can run the same set of tests on multiple web pages.
+A batch offers an efficient way to perform a uniform set of operations on every host in a set of hosts. In this way you can run the same set of tests on multiple web pages.
 
 A no-batch script offers a way to carry out a complex operation, which can include navigating from one host to another, which is not possible with a batch. Any `url` commands are performed as-is, without changes to their URLs.
 
@@ -436,29 +423,29 @@ Testaro also writes to standard output a list of the names of the files containi
 
 ### Invocation
 
-To run Testaro, create a Node.js file like this:
+To run Testaro, create an _invocation_ file like this:
 
 ```javascript
 const options = {
-  reports: 'path/to/reports/directory',
-  script: 'path/to/script/file.json',
-  batch: 'path/to/batch/file.json'
+  reports: `${__readdir}/path/to/reports/directory`,
+  batch: `${__readdir}/path/to/batch/file.json`,
+  script: `${__readdir}/path/to/script/file.json`
 };
-const {handleRequest} = require('path/to/index.js');
+const {handleRequest} = require('testaro');
 handleRequest(options);
 ```
 
-The `batch` option is optional. If there is no batch, it is omitted.
+The `batch` option is optional. If there is no batch, omit it.
 
-The paths can be absolute or relative. If they are relative, they are relative to the file.
+The paths are relative to the directory containing the file. So, if the script file is `script.json` and is in the same directory as the invocation file, the path would be `${__readdir}/script.json`.
 
-If the file name is `runTestaro.js`, execute it with the statement `node runTestaro`.
+If the invocation file is named `runTestaro.js`, execute it with the statement `node runTestaro`.
 
 ### Environment variables
 
-If a `wave` test is included in the script, an environment variable named `WAVE_KEY` must exist, with your WAVE API key as its value.
+If a `wave` test is included in the script, an environment variable named `TESTARO_WAVE_KEY` must exist, with your WAVE API key as its value.
 
-Before executing a Testaro script, you can also set the environment variables `DEBUG` and/or `WAITS`. The effects of these variables are described in the `index.js` file.
+Before executing a Testaro script, you can optionally also set the environment variables `TESTARO_DEBUG` (to `'true'` or anything else) and/or `TESTARO_WAITS` (to a non-negative integer). The effects of these variables are described in the `index.js` file.
 
 ## Contribution
 
@@ -466,7 +453,7 @@ You can define additional Testaro commands and functionality. Contributions are 
 
 ## Accessibility principles
 
-The rationales motivating the Testaro-defined tests and scoring procs can be found in comments within the files of those tests and procs, in the `tests` and `procs/score` directories. Unavoidably, each test is opinionated. Testaro itself, however, can accommodate other tests representing different opinions. Testaro is intended to be neutral with respect to questions such as the criteria for accessibility, the severities of accessibility issues, whether accessibility should be understcood as binary or graded, and the distinction between usability and accessibility.
+The rationales motivating the Testaro-defined tests and scoring procs can be found in comments within the files of those tests and procs, in the `tests` and `procs/score` directories. Unavoidably, each test is opinionated. Testaro itself, however, can accommodate other tests representing different opinions. Testaro is intended to be neutral with respect to questions such as the criteria for accessibility, the severities of accessibility issues, whether accessibility is binary or graded, and the distinction between usability and accessibility.
 
 ### Future work
 
@@ -491,11 +478,21 @@ The Playwright “Receives Events” actionability check does **not** check whet
 
 ### Test-package duplication
 
-Test packages sometimes do redundant testing, in that two or more packages test for the same issues. But such duplications are not necessarily perfect. Therefore, the scoring procs currently made available by Testaro do not select a single package to test for a single issue. Instead, they allow all packages to test for all the issues they can test for, but decrease the weights placed on issues that multiple packages test for. The more packages test for an issue, the smaller the weight placed on each package’s finding of that issue.
+Test packages sometimes do redundant testing, in that two or more packages test for the same issues. But such duplications are not necessarily perfect. Therefore, the scoring procs currently defined by Testaro do not select a single package to test for a single issue. Instead, they allow all packages to test for all the issues they can test for, but decrease the weights placed on issues that multiple packages test for. The more packages test for an issue, the smaller the weight placed on each package’s finding of that issue.
 
 ## Repository exclusions
 
 The files in the `temp` directory are presumed ephemeral and are not tracked by `git`. When tests require temporary files to be written, Testaro writes them there.
+
+## Origin
+
+Testaro is derived from [Autotest](https://github.com/jrpool/autotest), which in turn is derived from accessibility test investigations beginning in 2018.
+
+Testaro omits some functionalities of Autotest, such as:
+- tests producing results intended to be human-inspected
+- previous versions of scoring algorithms
+- file operations for score aggregation, report revision, and HTML reports
+- a web user interface
 
 ## Etymology
 
