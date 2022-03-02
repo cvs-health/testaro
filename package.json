@@ -16,7 +16,7 @@
     "testing",
     "automation"
   ],
-  "author": "Jonathan Pool",
+  "author": "Jonathan Pool <pool@jpdev.pro>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/jrpool/testaro/issues"
@@ -34,7 +34,6 @@
     "playwright": "*"
   },
   "devDependencies": {
-    "dotenv": "*",
     "eslint": "*"
   }
 }
