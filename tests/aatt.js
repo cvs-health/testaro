@@ -19,14 +19,16 @@ exports.reporter = async page => {
     level: 'WCAG2AA'
   });
   // Wait for it until the time limit expires.
+  let timeoutID;
   const wait = new Promise(resolve => {
-    setTimeout(() => {
+    timeoutID = setTimeout(() => {
       resolve('');
     }, 1000 * timeLimit);
   });
   const resultIfFast = await Promise.race([report, wait]);
   // If it arrived within the time limit:
   if (resultIfFast) {
+    clearTimeout(timeoutID);
     // Remove the non-JSON prefix and (if any) suffix from the string.
     const reportJSON = resultIfFast.replace(/^.+?Object]\s+|\s+done\s*$/sg, '');
     try {
