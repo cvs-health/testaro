@@ -3,8 +3,6 @@
   testaro main script.
 */
 // ########## IMPORTS
-// Module to access files.
-const fs = require('fs/promises');
 // Requirements for commands.
 const {commands} = require('./commands');
 // ########## CONSTANTS
@@ -563,6 +561,13 @@ const isTrue = (object, specs) => {
   }
   return [actual, satisfied];
 };
+// Adds an error result to an act.
+const waitError = (page, act, error, what) => {
+  console.log(`ERROR waiting for ${what} (${error.message})`);
+  act.result = {url: page.url()};
+  act.result.error = `ERROR waiting for ${what}`;
+  return false;
+};
 // Recursively performs the commands in a report.
 const doActs = async (report, actIndex, page) => {
   const {acts} = report;
@@ -641,25 +646,19 @@ const doActs = async (report, actIndex, page) => {
         else if (act.type === 'wait') {
           const {what, which} = act;
           console.log(`>> for ${what} to include “${which}”`);
-          const waitError = (error, what) => {
-            console.log(`ERROR waiting for ${what} (${error.message})`);
-            act.result = {url: page.url()};
-            act.result.error = `ERROR waiting for ${what}`;
-            return false;
-          };
           // Wait 5 seconds for the specified text to appear in the specified place.
           let successJSHandle;
           if (act.what === 'url') {
             successJSHandle = await page.waitForFunction(
               text => document.URL.includes(text), act.which, {timeout: 5000}
             )
-            .catch(error => waitError(error, 'URL'));
+            .catch(error => waitError(page, act, error, 'URL'));
           }
           else if (act.what === 'title') {
             successJSHandle = await page.waitForFunction(
               text => document.title.includes(text), act.which, {timeout: 5000}
             )
-            .catch(error => waitError(error, 'title'));
+            .catch(error => waitError(page, act, error, 'title'));
           }
           else if (act.what === 'body') {
             successJSHandle = await page.waitForFunction(
@@ -668,7 +667,7 @@ const doActs = async (report, actIndex, page) => {
                 return innerText.includes(matchText);
               }, which, {timeout: 5000}
             )
-            .catch(error => waitError(error, 'body'));
+            .catch(error => waitError(page, act, error, 'body'));
           }
           if (successJSHandle) {
             act.result = {url: page.url()};
@@ -1014,7 +1013,7 @@ const doActs = async (report, actIndex, page) => {
                 }
                 // Otherwise, i.e. if the move is unknown, add the failure to the act.
                 else {
-                  // Return an error result.
+                  // Report the error.
                   act.result = 'ERROR: move unknown';
                 }
               }
@@ -1068,22 +1067,16 @@ const doActs = async (report, actIndex, page) => {
     // Perform the remaining acts.
     await doActs(report, actIndex + 1, page);
   }
-  // Otherwise, i.e. if no more acts are to be performed:
-  else {
-    // Return a Promise.
-    console.log('All commands performed');
-    return Promise.resolve('');
-  }
 };
 // Performs the commands in a script and returns a report.
-const doScript = async (options, report) => {
+const doScript = async report => {
   // Reinitialize the log statistics.
   logCount = logSize = prohibitedCount = visitTimeoutCount = visitRejectionCount= 0;
   // Add initialized properties to the report.
   report.presses = 0;
   report.amountRead = 0;
   report.testTimes = [];
-  // Perform the specified acts and add the results to the report.
+  // Perform the specified acts.
   await doActs(report, 0, null);
   // Close the browser.
   await closeBrowser();
@@ -1112,9 +1105,6 @@ const doScript = async (options, report) => {
       }
     }
   }
-  // Return the report.
-  console.log('Script finished');
-  return report;
 };
 // Recursively performs commands on the hosts of a batch.
 const doBatch = async (options, reportTemplate, hostIndex = 0) => {
@@ -1132,7 +1122,7 @@ const doBatch = async (options, reportTemplate, hostIndex = 0) => {
       }
     });
     // Perform the commands on the host.
-    await doScript(options, hostReport);
+    await doScript(hostReport);
     // Process the remaining hosts.
     await doBatch(options, reportTemplate, hostIndex + 1);
   }
@@ -1147,7 +1137,7 @@ const doScriptOrBatch = async (options, reportTemplate) => {
   // Otherwise, i.e. if there is no batch:
   else {
     // Perform the script.
-    await doScript(options, reportTemplate);
+    await doScript(reportTemplate);
   }
   // Add an end time to the log.
   options.log.push({
