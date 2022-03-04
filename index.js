@@ -1072,6 +1072,9 @@ const doActs = async (report, actIndex, page) => {
 const doScript = async (options, report) => {
   // Reinitialize the log statistics.
   logCount = logSize = prohibitedCount = visitTimeoutCount = visitRejectionCount= 0;
+  // Add the start time to the report.
+  const startTime = new Date();
+  report.startTime = startTime.toISOString().slice(0, 19);
   // Add initialized properties to the report.
   report.presses = 0;
   report.amountRead = 0;
@@ -1105,6 +1108,10 @@ const doScript = async (options, report) => {
       }
     }
   }
+  // Add the end time and duration to the report.
+  const endTime = new Date();
+  report.endTime = endTime.toISOString().slice(0, 19);
+  report.elapsedSeconds =  Math.floor((endTime - startTime) / 1000);
   // Add the report to the reports array.
   options.reports.push(report);
 };
@@ -1191,7 +1198,7 @@ exports.handleRequest = async options => {
       },
       {
         event: 'timeStamp',
-        value: Math.floor((Date.now() - Date.UTC(2022, 3)) / 10000).toString(36)
+        value: Math.floor((Date.now() - Date.UTC(2022, 1)) / 10000).toString(36)
       }
     );
     // Add the batch size to the log if there is a batch.
