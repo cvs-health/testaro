@@ -1132,11 +1132,13 @@ const doScriptOrBatch = async (options, reportTemplate) => {
   // If there is a batch:
   if (options.batch) {
     // Perform the script on all the hosts in the batch.
+    console.log('Starting batch');
     await doBatch(options, reportTemplate);
   }
   // Otherwise, i.e. if there is no batch:
   else {
     // Perform the script.
+    console.log('Starting no-batch script');
     await doScript(reportTemplate);
   }
   // Add an end time to the log.
