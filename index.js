@@ -1069,7 +1069,7 @@ const doActs = async (report, actIndex, page) => {
   }
 };
 // Performs the commands in a script and returns a report.
-const doScript = async report => {
+const doScript = async (options, report) => {
   // Reinitialize the log statistics.
   logCount = logSize = prohibitedCount = visitTimeoutCount = visitRejectionCount= 0;
   // Add initialized properties to the report.
@@ -1105,6 +1105,8 @@ const doScript = async report => {
       }
     }
   }
+  // Add the report to the reports array.
+  options.reports.push(report);
 };
 // Recursively performs commands on the hosts of a batch.
 const doBatch = async (options, reportTemplate, hostIndex = 0) => {
@@ -1122,7 +1124,7 @@ const doBatch = async (options, reportTemplate, hostIndex = 0) => {
       }
     });
     // Perform the commands on the host.
-    await doScript(hostReport);
+    await doScript(options, hostReport);
     // Process the remaining hosts.
     await doBatch(options, reportTemplate, hostIndex + 1);
   }
@@ -1139,7 +1141,7 @@ const doScriptOrBatch = async (options, reportTemplate) => {
   else {
     // Perform the script.
     console.log('Starting no-batch script');
-    await doScript(reportTemplate);
+    await doScript(options, reportTemplate);
   }
   // Add an end time to the log.
   options.log.push({
