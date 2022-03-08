@@ -413,33 +413,28 @@ A batch offers an efficient way to perform a uniform set of operations on every 
 
 A no-batch script offers a way to carry out a complex operation, which can include navigating from one host to another, which is not possible with a batch. Any `url` commands are performed as-is, without changes to their URLs.
 
-## Reports
-
-Testaro writes reports as files in JSON format. They contain detailed results.
-
-Testaro also writes to standard output a list of the names of the files containing the reports.
-
 ## Execution
 
 ### Invocation
 
-To run Testaro, create an _invocation_ file like this:
+To run Testaro, create an options object like this:
 
 ```javascript
-const options = {
-  reports: `${__readdir}/path/to/reports/directory`,
-  batch: `${__readdir}/path/to/batch/file.json`,
-  script: `${__readdir}/path/to/script/file.json`
-};
-const {handleRequest} = require('testaro');
-handleRequest(options);
+{
+  log: [],
+  reports: [],
+  script: {abc},
+  batch: {def}
+}
 ```
 
-The `batch` option is optional. If there is no batch, omit it.
+Replace `{abc}` with a script object, like the example script shown above.
 
-The paths are relative to the directory containing the file. So, if the script file is `script.json` and is in the same directory as the invocation file, the path would be `${__readdir}/script.json`.
+Replace `{def}` with a batch object, like the example batch shown above, or omit the `batch` property if there is no batch.
 
-If the invocation file is named `runTestaro.js`, execute it with the statement `node runTestaro`.
+Then execute the statement `require('testaro').handleRequest(ghi)`, where `ghi` is replaced with the name of the options object. That statement will run Testaro.
+
+While it runs, Testaro will populate the `log` and `reports` arrays of the options object. When Testaro finishes, the `log` and `reports` arrays will contain its results.
 
 ### Environment variables
 

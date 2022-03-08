@@ -1068,7 +1068,7 @@ const doActs = async (report, actIndex, page) => {
     await doActs(report, actIndex + 1, page);
   }
 };
-// Performs the commands in a script and returns a report.
+// Performs the commands in a script.
 const doScript = async (options, report) => {
   // Reinitialize the log statistics.
   logCount = logSize = prohibitedCount = visitTimeoutCount = visitRejectionCount= 0;
