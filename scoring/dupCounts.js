@@ -7,7 +7,7 @@
 */
 const fs = require('fs');
 const compile = () => {
-  const dupsJSON = fs.readFileSync(`${__dirname}/scoring/package/duplications.json`, 'utf8');
+  const dupsJSON = fs.readFileSync(`${__dirname}/package/duplications.json`, 'utf8');
   const dups = JSON.parse(dupsJSON);
   // Initialize the object.
   const data = {
@@ -36,4 +36,4 @@ const compile = () => {
   });
   return data;
 };
-fs.writeFileSync(`${__dirname}/scoring/package/dupCounts.json`, JSON.stringify(compile(), null, 2));
+fs.writeFileSync(`${__dirname}/package/dupCounts.json`, JSON.stringify(compile(), null, 2));

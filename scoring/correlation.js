@@ -5,9 +5,9 @@
 */
 const fs = require('fs');
 const compile = () => {
-  const issuesJSON = fs.readFileSync(`${__dirname}/scoring/package/issues.json`, 'utf8');
+  const issuesJSON = fs.readFileSync(`${__dirname}/package/issues.json`, 'utf8');
   const issues = JSON.parse(issuesJSON);
-  const dataJSON = fs.readFileSync(`${__dirname}/scoring/package/data.json`, 'utf8');
+  const dataJSON = fs.readFileSync(`${__dirname}/package/data.json`, 'utf8');
   const reportData = JSON.parse(dataJSON);
   const reports = Object.values(reportData);
   // Initialize the list.
@@ -72,5 +72,5 @@ const compile = () => {
   return data;
 };
 fs.writeFileSync(
-  `${__dirname}/scoring/package/correlations.json`, JSON.stringify(compile(), null, 2)
+  `${__dirname}/package/correlations.json`, JSON.stringify(compile(), null, 2)
 );

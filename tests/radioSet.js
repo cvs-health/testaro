@@ -12,7 +12,7 @@ exports.reporter = async (page, withItems) => {
   // If itemization is required:
   if (withItems) {
     // Add the body of the textOf function as a string to the array.
-    const textOfBody = await fs.readFile(`${__dirname}/procs/test/textOf.txt`, 'utf8');
+    const textOfBody = await fs.readFile(`${__dirname}../procs/test/textOf.txt`, 'utf8');
     args.push(textOfBody);
   }
   // Get the result data.
