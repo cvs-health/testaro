@@ -120,7 +120,7 @@ const compilers = {
 };
 const repo = process.argv[2];
 const compile = repo => {
-  const dirPath = `__dirname/../${repo}/reports/script`;
+  const dirPath = `${__dirname}/../${repo}/reports/script`;
   const batchDirNames = fs
   .readdirSync(dirPath, {withFileTypes: true})
   .filter(dirEnt => dirEnt.isDirectory())
@@ -168,4 +168,4 @@ const compile = repo => {
   });
   return data;
 };
-fs.writeFileSync('scoring/package/data.json', JSON.stringify(compile(repo), null, 2));
+fs.writeFileSync(`${__dirname}/scoring/package/data.json`, JSON.stringify(compile(repo), null, 2));

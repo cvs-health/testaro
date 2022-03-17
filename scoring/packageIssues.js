@@ -4,7 +4,7 @@
 */
 const fs = require('fs');
 const compile = () => {
-  const dataJSON = fs.readFileSync('__dirname/scoring/package/data.json', 'utf8');
+  const dataJSON = fs.readFileSync(`${__dirname}/scoring/package/data.json`, 'utf8');
   const reportData = JSON.parse(dataJSON);
   const reports = Object.values(reportData);
   const data = {
@@ -31,4 +31,4 @@ const compile = () => {
     wave: Array.from(data.wave).sort()
   };
 };
-fs.writeFileSync('scoring/package/issues.json', JSON.stringify(compile(), null, 2));
+fs.writeFileSync(`${__dirname}/scoring/package/issues.json`, JSON.stringify(compile(), null, 2));
