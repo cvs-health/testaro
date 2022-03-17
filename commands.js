@@ -215,12 +215,6 @@ exports.commands = {
         withItems: [true, 'boolean']
       }
     ],
-    roleList: [
-      'Perform a roleList test',
-      {
-        withItems: [true, 'boolean']
-      }
-    ],
     styleDiff: [
       'Perform a styleDiff test',
       {

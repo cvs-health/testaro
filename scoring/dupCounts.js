@@ -7,7 +7,7 @@
 */
 const fs = require('fs');
 const compile = () => {
-  const dupsJSON = fs.readFileSync('scoring/package/duplications.json', 'utf8');
+  const dupsJSON = fs.readFileSync('__dirname/scoring/package/duplications.json', 'utf8');
   const dups = JSON.parse(dupsJSON);
   // Initialize the object.
   const data = {

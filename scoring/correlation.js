@@ -5,9 +5,9 @@
 */
 const fs = require('fs');
 const compile = () => {
-  const issuesJSON = fs.readFileSync('scoring/package/issues.json', 'utf8');
+  const issuesJSON = fs.readFileSync('__dirname/scoring/package/issues.json', 'utf8');
   const issues = JSON.parse(issuesJSON);
-  const dataJSON = fs.readFileSync('scoring/package/data.json', 'utf8');
+  const dataJSON = fs.readFileSync('__dirname/scoring/package/data.json', 'utf8');
   const reportData = JSON.parse(dataJSON);
   const reports = Object.values(reportData);
   // Initialize the list.

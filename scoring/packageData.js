@@ -120,7 +120,7 @@ const compilers = {
 };
 const repo = process.argv[2];
 const compile = repo => {
-  const dirPath = `../${repo}/reports/script`;
+  const dirPath = `__dirname/../${repo}/reports/script`;
   const batchDirNames = fs
   .readdirSync(dirPath, {withFileTypes: true})
   .filter(dirEnt => dirEnt.isDirectory())
