@@ -377,6 +377,8 @@ The second item in each array, if there are 3 items in the array, is an operator
 - `>`: greater than
 - `!`: unequal to
 
+A typical use for an `expect` property is checking the correctness of a Testaro test. Thus, the validation scripts in the `validation/tests/scripts` directory all contain `test` commands with `expect` properties. See the “Validation” section below.
+
 ## Batches
 
 There are two ways to use a script to give instructions to Testaro:
@@ -446,6 +448,8 @@ The executors are:
 - `tests.js`: Runs Testaro with each custom test and reports whether the results are correct.
 
 To execute any executor `xyz.js`, call it with the statement `node validation/executors/xyz`. The results will appear in the standard output.
+
+The `tests.js` executor makes use of the scripts in the `validation/tests/scripts` directory, and they, in turn, run tests on HTML files in the `validation/tests/targets` directory.
 
 ## Contribution
 
