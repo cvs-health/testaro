@@ -9,7 +9,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/styleDiff/good.html",
+      "which": "__targets__/styleDiff/good.html",
       "what": "page with consistent styles"
     },
     {
@@ -32,7 +32,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/styleDiff/bad.html",
+      "which": "__targets__/styleDiff/bad.html",
       "what": "page with consistent styles"
     },
     {

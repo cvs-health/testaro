@@ -9,7 +9,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/zIndex/good.html",
+      "which": "__targets__/zIndex/good.html",
       "what": "page with no explicit z-index attributes"
     },
     {
@@ -23,7 +23,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/zIndex/bad.html",
+      "which": "__targets__/zIndex/bad.html",
       "what": "page with explicit z-index attributes roles"
     },
     {

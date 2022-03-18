@@ -9,7 +9,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/embAc/good.html",
+      "which": "__targets__/embAc/good.html",
       "what": "page without embedding in links or buttons"
     },
     {
@@ -26,7 +26,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/embAc/bad.html",
+      "which": "__targets__/embAc/bad.html",
       "what": "page with embeddings in links and buttons"
     },
     {

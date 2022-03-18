@@ -9,7 +9,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/radioSet/good.html",
+      "which": "__targets__/radioSet/good.html",
       "what": "page with standard radio-button grouping"
     },
     {
@@ -25,7 +25,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/radioSet/bad.html",
+      "which": "__targets__/radioSet/bad.html",
       "what": "page with deviant radio-button grouping"
     },
     {

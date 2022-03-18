@@ -9,7 +9,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/focInd/good.html",
+      "which": "__targets__/focInd/good.html",
       "what": "page with outline focus indication"
     },
     {
@@ -30,7 +30,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/focInd/bad.html",
+      "which": "__targets__/focInd/bad.html",
       "what": "page with mixed focus indication"
     },
     {

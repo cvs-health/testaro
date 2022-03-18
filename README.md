@@ -8,9 +8,9 @@ Testaro is a collection of web accessibility tests.
 
 The purpose of Testaro is to provide programmatic access to over 600 accessibility tests defined in several test packages and in Testaro itself.
 
-Calling Testaro requires telling it which operations (including tests) to perform, which URLs to perform them on, and where to write its reports.
+Running Testaro requires telling it which operations (including tests) to perform and which URLs to perform them on, and giving Testaro an object to put its output into.
 
-Testaro outputs progress messages and a list of reports to the standard output. It writes the reports in JSON format.
+Testaro outputs progress messages to the standard output. It populates the object with log information and test reports.
 
 ## System requirements
 
@@ -47,7 +47,7 @@ The main directories containing code files are:
 - package root: main code files
 - `tests`: files containing the code defining particular tests
 - `procs`: shared procedures
-- `validation`: code and artifacts for the validation of tests
+- `validation`: code and artifacts for the validation of Testaro
 
 ## Installation
 
@@ -256,12 +256,6 @@ An example of a **Testaro-defined** test is:
 
 In this case, Testaro runs the `motion` test with the specified parameters.
 
-###### Validation
-
-For each of the non-package tests defined in Testaro, a validating script and some files tested by it are also provided. They are in the `validation` directory. A module that you can use to execute those scripts is also there, named `validator.js`.
-
-For example, to execute the `focOp.json` validation script, you can enter `node validation/validator focOp`. The `validator.js` module outputs the report to the console.
-
 ##### Scoring
 
 An example of a **scoring** command is:
@@ -441,6 +435,17 @@ While it runs, Testaro will populate the `log` and `reports` arrays of the optio
 If a `wave` test is included in the script, an environment variable named `TESTARO_WAVE_KEY` must exist, with your WAVE API key as its value.
 
 Before executing a Testaro script, you can optionally also set the environment variables `TESTARO_DEBUG` (to `'true'` or anything else) and/or `TESTARO_WAITS` (to a non-negative integer). The effects of these variables are described in the `index.js` file.
+
+## Validation
+
+Three _executors_ for Testaro validation are located in the `validation` directory. An executor is a commonJS JavaScript module that runs Testaro and reports whether the results are correct.
+
+The executors are:
+- `appNoBatch.js`: Reports whether Testaro runs correctly with a no-batch script.
+- `appBatch.js`: Reports whether Testaro runs correctly with a script and a batch.
+- `tests.js`: Runs Testaro with each custom test and reports whether the results are correct.
+
+To execute any executor `xyz.js`, call it with the statement `node validation/executors/xyz`. The results will appear in the standard output.
 
 ## Contribution
 

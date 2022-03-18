@@ -9,7 +9,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/hover/good.html",
+      "which": "__targets__/hover/good.html",
       "what": "page with standard hover behavior"
     },
     {
@@ -27,7 +27,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/hover/bad.html",
+      "which": "__targets__/hover/bad.html",
       "what": "page with deviant hover behavior"
     },
     {

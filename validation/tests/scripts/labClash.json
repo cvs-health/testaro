@@ -9,7 +9,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/labClash/good.html",
+      "which": "__targets__/labClash/good.html",
       "what": "page with standard labeling"
     },
     {
@@ -25,7 +25,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/labClash/bad.html",
+      "which": "__targets__/labClash/bad.html",
       "what": "page with deviant labeling"
     },
     {

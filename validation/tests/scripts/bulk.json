@@ -9,7 +9,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/bulk/good.html",
+      "which": "__targets__/bulk/good.html",
       "what": "small page"
     },
     {
@@ -23,7 +23,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/bulk/bad.html",
+      "which": "__targets__/bulk/bad.html",
       "what": "large page"
     },
     {

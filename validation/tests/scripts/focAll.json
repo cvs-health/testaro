@@ -9,7 +9,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/focAll/good.html",
+      "which": "__targets__/focAll/good.html",
       "what": "fully Tab-focusable page"
     },
     {
@@ -25,7 +25,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/focAll/less.html",
+      "which": "__targets__/focAll/less.html",
       "what": "partly Tab-focusable page"
     },
     {
@@ -41,7 +41,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/focAll/more.html",
+      "which": "__targets__/focAll/more.html",
       "what": "page with added Tab-focusability"
     },
     {

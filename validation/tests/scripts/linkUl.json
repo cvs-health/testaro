@@ -9,7 +9,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/linkUl/good.html",
+      "which": "__targets__/linkUl/good.html",
       "what": "page with underlined inline links"
     },
     {
@@ -26,7 +26,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/linkUl/bad.html",
+      "which": "__targets__/linkUl/bad.html",
       "what": "page without underlined inline links"
     },
     {
@@ -43,7 +43,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/linkUl/na.html",
+      "which": "__targets__/linkUl/na.html",
       "what": "page without inline links"
     },
     {

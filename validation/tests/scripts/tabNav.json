@@ -9,7 +9,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/tabNav/good.html",
+      "which": "__targets__/tabNav/good.html",
       "what": "page with standard menu navigation"
     },
     {
@@ -52,7 +52,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/tabNav/bad.html",
+      "which": "__targets__/tabNav/bad.html",
       "what": "page with deviant menu navigation"
     },
     {

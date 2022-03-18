@@ -9,7 +9,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/focOp/good.html",
+      "which": "__targets__/focOp/good.html",
       "what": "page with standard focusability and operability"
     },
     {
@@ -29,7 +29,7 @@
     },
     {
       "type": "url",
-      "which": "file://__dirname/validation/targets/focOp/bad.html",
+      "which": "__targets__/focOp/bad.html",
       "what": "page with deviant focusability and operability"
     },
     {
