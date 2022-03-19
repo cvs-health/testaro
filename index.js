@@ -1132,6 +1132,8 @@ const doBatch = async (options, reportTemplate, hostIndex = 0) => {
     });
     // Perform the commands on the host.
     await doScript(options, hostReport);
+    // Add the host’s ID to the report.
+    hostReport.id = host.id;
     // Process the remaining hosts.
     await doBatch(options, reportTemplate, hostIndex + 1);
   }
@@ -1210,6 +1212,7 @@ exports.handleRequest = async options => {
     }
     // Create a report template, containing a copy of the commands as its acts.
     const reportTemplate = {
+      host: '',
       acts: JSON.parse(JSON.stringify(options.script.commands))
     };
     // Inject url acts where necessary to undo DOM changes.
