@@ -1121,7 +1121,7 @@ const doBatch = async (options, reportTemplate, hostIndex = 0) => {
   const host = hosts[hostIndex];
   // If the specified host exists:
   if (host) {
-    // Copy the report for it.
+    // Create a report for it.
     const hostReport = JSON.parse(JSON.stringify(reportTemplate));
     // Copy the properties of the specified host to all url acts.
     hostReport.acts.forEach(act => {
@@ -1132,8 +1132,18 @@ const doBatch = async (options, reportTemplate, hostIndex = 0) => {
     });
     // Perform the commands on the host.
     await doScript(options, hostReport);
-    // Add the host’s ID to the report.
-    hostReport.id = host.id;
+    // Add the host’s ID to the host report.
+    hostReport.hostName = host.id;
+    // Add data from the template to the host report.
+    hostReport.orderName = reportTemplate.id;
+    hostReport.id = `${hostReport.orderName}-${host.id}`;
+    hostReport.orderUserName = reportTemplate.userName;
+    hostReport.orderTime = reportTemplate.orderTime;
+    hostReport.scriptName = reportTemplate.scriptName;
+    hostReport.batchName = reportTemplate.batchName;
+    hostReport.scriptIsValid = reportTemplate.scriptIsValid;
+    hostReport.batchIsValid = reportTemplate.batchIsValid;
+    hostReport.host = host;
     // Process the remaining hosts.
     await doBatch(options, reportTemplate, hostIndex + 1);
   }
