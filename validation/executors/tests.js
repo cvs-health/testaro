@@ -4,6 +4,10 @@
 const fs = require('fs').promises;
 const {handleRequest} = require(`${__dirname}/../../index`);
 const validateTests = async () => {
+  const totals = {
+    attempts: 0,
+    successes: 0
+  };
   const scriptFileNames = await fs.readdir(`${__dirname}/../tests/scripts`);
   for (const scriptFileName of scriptFileNames) {
     const rawScriptJSON = await fs
@@ -33,21 +37,28 @@ const validateTests = async () => {
           : true
       )
     ) {
+      totals.attempts++;
+      totals.successes++;
       console.log('Success: Reports have been correctly populated');
       if (reports[0].acts.every(
         act => act.type === 'test' ? act.result.failureCount === 0 : true
       )) {
+        totals.attempts++;
+        totals.successes++;
         console.log('Success: No failures');
       }
       else {
+        totals.attempts++;
         console.log('Failure: At least one test has at least one failure');
         console.log(JSON.stringify(reports, null, 2));
       }
     }
     else {
+      totals.attempts++;
       console.log('Failure: Reports empty or invalid');
       console.log(JSON.stringify(reports, null, 2));
     }
   }
+  console.log(`Grand totals: attempts ${totals.attempts}, successes ${totals.successes}`);
 };
 validateTests();
