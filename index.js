@@ -1210,7 +1210,7 @@ exports.handleRequest = async options => {
       },
       {
         event: 'timeStamp',
-        value: Math.floor((Date.now() - Date.UTC(2022, 1)) / 10000).toString(36)
+        value: Math.floor((Date.now() - Date.UTC(2022, 1)) / 500).toString(36)
       }
     );
     // Add the batch size to the log if there is a batch.
