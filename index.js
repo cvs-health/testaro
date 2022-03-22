@@ -1131,8 +1131,6 @@ const doBatch = async (options, reportTemplate, hostIndex = 0) => {
         act.what = host.what;
       }
     });
-    // Perform the commands on the host.
-    await doScript(options, hostReport);
     // Add the host’s ID to the host report.
     hostReport.hostName = host.id;
     // Add data from the template to the host report.
@@ -1145,6 +1143,8 @@ const doBatch = async (options, reportTemplate, hostIndex = 0) => {
     hostReport.scriptIsValid = reportTemplate.scriptIsValid;
     hostReport.batchIsValid = reportTemplate.batchIsValid;
     hostReport.host = host;
+    // Perform the commands on the host and add a report to the options object.
+    await doScript(options, hostReport);
     // Process the remaining hosts.
     await doBatch(options, reportTemplate, hostIndex + 1);
   }
