@@ -220,8 +220,9 @@ const isValidLog = log => Array.isArray(log) && ! log.length;
 // Validates an options object.
 const isValidOptions = async options => {
   if (options) {
-    const {script, batch, log, reports} = options;
-    return isValidScript(script)
+    const {id, script, batch, log, reports} = options;
+    return id
+    && isValidScript(script)
     && isValidBatch(batch)
     && isValidLog(log)
     && isValidReports(reports);
@@ -1136,7 +1137,7 @@ const doBatch = async (options, reportTemplate, hostIndex = 0) => {
     hostReport.hostName = host.id;
     // Add data from the template to the host report.
     hostReport.orderName = reportTemplate.id;
-    hostReport.id = `${hostReport.orderName}-${host.id}`;
+    hostReport.id = `${options.id}-${host.id}`;
     hostReport.orderUserName = reportTemplate.userName;
     hostReport.orderTime = reportTemplate.orderTime;
     hostReport.scriptName = reportTemplate.scriptName;
