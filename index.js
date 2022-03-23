@@ -1138,6 +1138,9 @@ const doBatch = async (options, reportTemplate, hostIndex = 0) => {
     hostReport.id = `${options.id}-${host.id}`;
     hostReport.orderUserName = options.userName;
     hostReport.orderTime = options.orderTime;
+    hostReport.assignedBy = options.assignedBy;
+    hostReport.assignedTime = options.assignedTime;
+    hostReport.tester = options.tester;
     hostReport.scriptName = options.scriptName;
     hostReport.batchName = options.batchName;
     hostReport.scriptIsValid = options.scriptIsValid;
