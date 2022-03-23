@@ -57,7 +57,7 @@ exports.scorer = acts => {
   ];
   // Initialize the score.
   const inferences = {};
-  let deficit = {
+  let scores = {
     total: 0,
     aatt: null,
     alfa: null,
@@ -205,7 +205,7 @@ exports.scorer = acts => {
       // FUNCTIONS
       // Adds the actual or inferred score of a test to the total score.
       const increment = test => {
-        deficit.total += typeof deficit[test] === 'number' ? deficit[test] : inferences[test];
+        scores.total += typeof scores[test] === 'number' ? scores[test] : inferences[test];
       };
       // OPERATION
       // For each test:
@@ -216,12 +216,12 @@ exports.scorer = acts => {
           facts = test.result;
           if (facts && Array.isArray(facts)) {
             rules.alfa = 'multiply cantTell by 2*, failed by 4* (*discounted); sum';
-            deficit.alfa = Math.round(facts.reduce((total, issue) => {
+            scores.alfa = Math.round(facts.reduce((total, issue) => {
               const rawScore = [4, 2][['failed', 'cantTell'].indexOf(issue.verdict)] || 0;
               const divisor = duplications.alfa[issue.rule.ruleID] + 1 || 1;
               return total + rawScore / divisor;
             }, 0));
-            deficit.total += deficit.alfa;
+            scores.total += scores.alfa;
           }
         }
         else if (which === 'aatt') {
@@ -229,26 +229,26 @@ exports.scorer = acts => {
           if (facts && Array.isArray(facts)) {
             rules.aatt = 'multiply warning by 2*, error by 4* (*discounted); sum';
             const issues = facts.filter(fact => fact.type);
-            deficit.aatt = Math.round(issues.reduce((total, issue) => {
+            scores.aatt = Math.round(issues.reduce((total, issue) => {
               const rawScore = [4, 2][['error', 'warning'].indexOf(issue.type)] || 0;
               const divisor = duplications.aatt[`${issue.type.slice(0, 1)}:${issue.id}`] + 1 || 1;
               return total + rawScore / divisor;
             }, 0));
-            deficit.total += deficit.aatt;
+            scores.total += scores.aatt;
           }
         }
         else if (which === 'axe') {
           facts = test.result && test.result.items;
           if (facts) {
             rules.axe = 'multiply minor by 2*, moderate by 3*, serious by 4*, critical by 5* (*discounted); sum';
-            deficit.axe = Math.round(facts.reduce((total, item) => {
+            scores.axe = Math.round(facts.reduce((total, item) => {
               const rawScore = item.elements.length * (
                 [5, 4, 3, 2][['critical', 'serious', 'moderate', 'minor'].indexOf(item.impact)] || 0
               );
               const divisor = duplications.axe[item.rule] + 1 || 1;
               return total + rawScore / divisor;
             }, 0));
-            deficit.total += deficit.axe;
+            scores.total += scores.axe;
           }
         }
         else if (which === 'ibm') {
@@ -272,8 +272,8 @@ exports.scorer = acts => {
               }
             });
             if (scores.content !== null || scores.url !== null) {
-              deficit.ibm = Math.max(scores.content || 0, scores.url || 0);
-              deficit.total += deficit.ibm;
+              scores.ibm = Math.max(scores.content || 0, scores.url || 0);
+              scores.total += scores.ibm;
             }
           }
         }
@@ -300,8 +300,8 @@ exports.scorer = acts => {
                 return total + rawScore / divisor;
               }, 0));
             });
-            deficit.wave = scores.error + scores.contrast + scores.alert;
-            deficit.total += deficit.wave;
+            scores.wave = scores.error + scores.contrast + scores.alert;
+            scores.total += scores.wave;
           }
         }
         else if (which === 'bulk') {
@@ -309,7 +309,7 @@ exports.scorer = acts => {
           if (typeof facts === 'number') {
             rules.bulk = 'subtract 250 from visible elements; make 0 if negative; raise to 0.9th power; multiply by 0.15';
             // Deficit: 15% of the excess, to the 0.9th power, of the element count over 250.
-            deficit.bulk = Math.floor(0.15 * Math.pow(Math.max(0, facts - 250), 0.9));
+            scores.bulk = Math.floor(0.15 * Math.pow(Math.max(0, facts - 250), 0.9));
           }
           else {
             inferences.bulk = 100;
@@ -320,7 +320,7 @@ exports.scorer = acts => {
           facts = test.result && test.result.totals;
           if (facts) {
             rules.embAc = 'multiply link- or button-contained links, buttons, inputs, and selects by 3 (discounted)';
-            deficit.embAc = 3 * (facts.links + facts.buttons + facts.inputs + facts.selects);
+            scores.embAc = 3 * (facts.links + facts.buttons + facts.inputs + facts.selects);
           }
           else {
             inferences.embAc = 150;
@@ -331,7 +331,7 @@ exports.scorer = acts => {
           facts = test.result;
           if (facts && typeof facts === 'object') {
             rules.focAll= 'multiply discrepancy between focusable and focused element counts by 3';
-            deficit.focAll = 3 * Math.abs(facts.discrepancy);
+            scores.focAll = 3 * Math.abs(facts.discrepancy);
           }
           else {
             inferences.focAll = 150;
@@ -343,7 +343,7 @@ exports.scorer = acts => {
           facts = facts ? facts.types : null;
           if (facts) {
             rules.focInd = 'multiply indicatorless-when-focused elements by 5';
-            deficit.focInd = 5 * facts.indicatorMissing.total + 3 * facts.nonOutlinePresent.total;
+            scores.focInd = 5 * facts.indicatorMissing.total + 3 * facts.nonOutlinePresent.total;
           }
           else {
             inferences.focInd = 150;
@@ -356,7 +356,7 @@ exports.scorer = acts => {
           facts = facts ? facts.outlineMissing : null;
           if (facts) {
             rules.focOl = 'multiply non-outline focus indicators by 3, missing focus indicators by 5; sum';
-            deficit.focOl = 3 * facts.total;
+            scores.focOl = 3 * facts.total;
           }
           else {
             inferences.focOl = 100;
@@ -367,7 +367,7 @@ exports.scorer = acts => {
           facts = test.result && test.result.totals;
           if (facts) {
             rules.focOp = 'multiply nonfocusable operable elements by 4, nonoperable focusable by 1; sum';
-            deficit.focOp
+            scores.focOp
               = 4 * facts.types.onlyOperable.total + 1 * facts.types.onlyFocusable.total;
           }
           else {
@@ -379,7 +379,7 @@ exports.scorer = acts => {
           facts = test.result && test.result.totals;
           if (facts) {
             rules.hover = 'multiply elements changing page on hover by 4, made visible by 2, with directly changed opacity by 0.1, with indirectly changed opacity by 0.2, unhoverable by 2; sum';
-            deficit.hover
+            scores.hover
               = 4 * facts.triggers
               + 2 * facts.madeVisible
               + Math.floor(0.1 * facts.opacityChanged)
@@ -396,7 +396,7 @@ exports.scorer = acts => {
           if (facts) {
             rules.labClash = 'multiply conflictually labeled elements by 2, unlabeled elements by 2; sum';
             // Unlabeled elements discounted.
-            deficit.labClash = 2 * facts.mislabeled + 2 * facts.unlabeled;
+            scores.labClash = 2 * facts.mislabeled + 2 * facts.unlabeled;
           }
           else {
             inferences.labClash = 100;
@@ -408,7 +408,7 @@ exports.scorer = acts => {
           facts = facts ? facts.inline : null;
           if (facts) {
             rules.linkUl = 'multiply nonunderlined inline links by 3';
-            deficit.linkUl = 3 * (facts.total - facts.underlined);
+            scores.linkUl = 3 * (facts.total - facts.underlined);
           }
           else {
             inferences.linkUl = 150;
@@ -419,7 +419,7 @@ exports.scorer = acts => {
           facts = test.result && test.result.totals && test.result.totals.navigations;
           if (facts) {
             rules.menuNav = 'multiply Home and End errors by 1 and other key-navigation errors by 3; sum';
-            deficit.menuNav
+            scores.menuNav
               = 3 * facts.all.incorrect
               - 2 * (facts.specific.home.incorrect + facts.specific.end.incorrect);
           }
@@ -432,7 +432,7 @@ exports.scorer = acts => {
           facts = test.result;
           if (facts && facts.bytes) {
             rules.motion = 'get PNG screenshot sizes (sss); get differing-pixel counts between adjacent PNG screenshots (pd); “sssd” = sss difference ÷ smaller sss - 1; multiply mean adjacent sssd by 5, maximum adjacent sssd by 2, maximum over-all ssd by 1; divide mean pd by 10,000, maximum pd by 25,000; multiply count of non-0 pd by 30; sum';
-            deficit.motion = Math.floor(
+            scores.motion = Math.floor(
               5 * (facts.meanLocalRatio - 1)
               + 2 * (facts.maxLocalRatio - 1)
               + facts.globalRatio - 1
@@ -451,7 +451,7 @@ exports.scorer = acts => {
           if (facts) {
             rules.radioSet = 'multiply radio buttons not in fieldsets with legends and no other-name radio buttons by 2';
             // Defects discounted.
-            deficit.radioSet = 2 * (facts.total - facts.inSet);
+            scores.radioSet = 2 * (facts.total - facts.inSet);
           }
           else {
             inferences.radioSet = 100;
@@ -463,7 +463,7 @@ exports.scorer = acts => {
           if (typeof facts === 'number') {
             rules.role = 'multiple role attributes with invalid or native-HTML-equivalent values by 2';
             // Defects discounted.
-            deficit.role = 2 * facts;
+            scores.role = 2 * facts;
           }
           else {
             inferences.role = 100;
@@ -484,7 +484,7 @@ exports.scorer = acts => {
               }
             );
             // Deficit: 2 per excess style + 0.2 per nonplurality element.
-            deficit.styleDiff = Math.floor(deficits.reduce(
+            scores.styleDiff = Math.floor(deficits.reduce(
               (total, currentPair) => total + 2 * currentPair[0] + 0.2 * currentPair[1], 0
             ));
           }
@@ -497,7 +497,7 @@ exports.scorer = acts => {
           facts = test.result && test.result.totals && test.result.totals.navigations;
           if (facts) {
             rules.tabNav = 'multiply Home and End errors by 1 and other key-navigation errors by 3; sum';
-            deficit.tabNav
+            scores.tabNav
               = 3 * facts.all.incorrect
               - 2 * (facts.specific.home.incorrect + facts.specific.end.incorrect);
           }
@@ -510,7 +510,7 @@ exports.scorer = acts => {
           facts = test.result && test.result.totals;
           if (facts) {
             rules.zIndex = 'multiply non-auto z indexes by 3';
-            deficit.zIndex = 3 * facts.total;
+            scores.zIndex = 3 * facts.total;
           }
           else {
             inferences.zIndex = 100;
@@ -520,7 +520,7 @@ exports.scorer = acts => {
       });
       // Compute the inferred scores of package tests that failed and adjust the total score.
       const estimate = (tests, penalty) => {
-        const packageScores = tests.map(test => deficit[test]).filter(score => score !== null);
+        const packageScores = tests.map(test => scores[test]).filter(score => score !== null);
         const scoreCount = packageScores.length;
         let meanScore;
         if (scoreCount) {
@@ -532,9 +532,9 @@ exports.scorer = acts => {
           meanScore = 100;
         }
         tests.forEach(test => {
-          if (deficit[test] === null) {
+          if (scores[test] === null) {
             inferences[test] = meanScore + penalty;
-            deficit.total += inferences[test];
+            scores.total += inferences[test];
           }
         });
       };
@@ -550,6 +550,6 @@ exports.scorer = acts => {
     diffStyles,
     logWeights,
     inferences,
-    deficit
+    scores
   };
 };
