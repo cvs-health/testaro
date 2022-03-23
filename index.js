@@ -1134,14 +1134,14 @@ const doBatch = async (options, reportTemplate, hostIndex = 0) => {
     // Add the host’s ID to the host report.
     hostReport.hostName = host.id;
     // Add data from the template to the host report.
-    hostReport.orderName = reportTemplate.id;
+    hostReport.orderName = options.id;
     hostReport.id = `${options.id}-${host.id}`;
-    hostReport.orderUserName = reportTemplate.userName;
-    hostReport.orderTime = reportTemplate.orderTime;
-    hostReport.scriptName = reportTemplate.scriptName;
-    hostReport.batchName = reportTemplate.batchName;
-    hostReport.scriptIsValid = reportTemplate.scriptIsValid;
-    hostReport.batchIsValid = reportTemplate.batchIsValid;
+    hostReport.orderUserName = options.userName;
+    hostReport.orderTime = options.orderTime;
+    hostReport.scriptName = options.scriptName;
+    hostReport.batchName = options.batchName;
+    hostReport.scriptIsValid = options.scriptIsValid;
+    hostReport.batchIsValid = options.batchIsValid;
     hostReport.host = host;
     // Perform the commands on the host and add a report to the options object.
     await doScript(options, hostReport);
