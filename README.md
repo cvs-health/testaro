@@ -38,8 +38,8 @@ As of this version, the counts of tests in the packages referenced above were:
 - Equal Access: 163
 - WAVE: 110
 - subtotal: 612
-- Testaro tests: 15
-- grand total: 627
+- Testaro tests: 16
+- grand total: 628
 
 ## Code organization
 
@@ -278,6 +278,8 @@ The data for scores can include not only test results, but also log statistics. 
 - `prohibitedCount`: how many log items contain (case-insensitively) `403` and `status`, or `prohibited`
 - `visitTimeoutCount`: how many times an attempt to visit a URL timed out
 - `visitRejectionCount`: how many times a URL visit got an HTTP status other than 200 or 304
+
+Those log statistics can provide data for a log-based test defined in a score proc.
 
 A good score proc takes account of duplications between test packages: two or more packages that discover the same accessibility defects. Score procs can apply discounts to reflect duplications between test packages, so that, if two or more packages discover the same defect, the defect will not be overweighted.
 
