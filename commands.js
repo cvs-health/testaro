@@ -119,11 +119,11 @@ exports.commands = {
       }
     ],
     text: [
-      'Enter text into a text input',
+      'Enter text into a text input, optionally with 1 placeholder for an all-caps literal environment variable',
       {
         which: [true, 'string', 'hasLength', 'substring of input text'],
         index: [false, 'number', '', 'index among matches if not 0'],
-        what: [true, 'string', 'hasLength', 'text to enter']
+        what: [true, 'string', 'hasLength', 'text to enter, with optional __PLACEHOLDER__']
       }
     ],
     url: [

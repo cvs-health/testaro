@@ -1006,8 +1006,17 @@ const doActs = async (report, actIndex, page) => {
                     ? `&ldquo;${optionText}}&rdquo; selected`
                     : 'ERROR: option not found';
                 }
-                // Otherwise, if it is entering text on the element, perform it.
+                // Otherwise, if it is entering text on the element:
                 else if (act.type === 'text') {
+                  // If the text contains a placeholder for an environment variable:
+                  let {what} = act; 
+                  if (/__[A-Z]+__/.test(what)) {
+                    // Replace it.
+                    const envKey = /__([A-Z]+)__/.exec(what)[1];
+                    const envValue = process.env[envKey];
+                    what = what.replace(/__[A-Z]+__/, envValue);
+                  }
+                  // Enter the text.
                   await whichElement.type(act.what);
                   report.presses += act.what.length;
                   act.result = 'entered';
