@@ -7,8 +7,9 @@
 const {evaluate} = require('aatt');
 
 // FUNCTIONS
-exports.reporter = async page => {
-  const timeLimit = 30;
+exports.reporter = async (page, waitLong) => {
+  // Set the limit in seconds on the wait for the result.
+  const timeLimit = waitLong ? 20 : 10;
   // Get the HTML of the document body.
   const source = await page.content();
   // Return the result of a test with the HTML CodeSniffer WCAG 2.1 AA ruleset as a string.
