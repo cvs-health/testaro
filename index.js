@@ -454,7 +454,7 @@ const goto = async (page, url, timeout, waitUntil, isStrict) => {
     return 'error';
   });
   if (typeof response !== 'string') {
-    const httpStatus = response.status();
+    const httpStatus = response.statusCode;
     if ([200, 304].includes(httpStatus) || url.startsWith('file:')) {
       const actualURL = page.url();
       if (isStrict && deSlash(actualURL) !== deSlash(url)) {

@@ -24,7 +24,7 @@ exports.reporter = async page => {
     return {result: {error: 'ERROR: navigation to URL timed out'}};
   });
   let ruleData = {};
-  if (response.status() === 200) {
+  if (response.statusCode === 200) {
     // Compile data on the rule IDs and summaries.
     ruleData = await rulePage.evaluate(() => {
       const rulePs = Array.from(document.querySelectorAll('p.h5'));

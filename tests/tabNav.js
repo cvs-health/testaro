@@ -231,7 +231,7 @@ exports.reporter = async (page, withItems) => {
         isCorrect = await testKey(
           tabs, currentTab, 'End', 'end', tabCount - 1, isCorrect, itemData
         );
-        // Update the tablist status (&&= operator from ES 2021 rejected by node 14).
+        // Update the tablist status (Node 14 does not support the ES 2021 &&= operator).
         listIsCorrect = listIsCorrect && isCorrect;
         // Increment the data.
         data.totals.tabElements[isCorrect ? 'correct' : 'incorrect']++;
