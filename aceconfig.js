@@ -3,5 +3,4 @@ module.exports = {
     'violation',
     'recommendation'
   ],
-  outputFolder: 'temp/ibm'
 };

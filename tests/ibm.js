@@ -14,8 +14,7 @@
         reportLevels: [
           'violation',
           'recommendation'
-        ],
-        outputFolder: 'temp/ibm'
+        ]
       };
 */
 // Import required modules.
@@ -26,17 +25,6 @@ const run = async content => {
   const nowLabel = (new Date()).toISOString().slice(0, 19);
   // Return the result of a test.
   const report = await getCompliance(content, nowLabel);
-  /*
-  let timeoutID;
-  const deadline = new Promise(resolve => {
-    timeoutID = setTimeout(() => {
-      resolve('');
-    }, 20000);
-  });
-  const result = Promise.race([report, deadline]);
-  clearTimeout(timeoutID);
-  return result;
-  */
   return report;
 };
 // Reports the result of an IBM test.
@@ -80,10 +68,10 @@ exports.reporter = async (page, withItems, withNewContent) => {
     all.url = report(result, withItems);
   }
   // Delete the report files.
-  fs.rm('temp/ibm', {recursive: true})
-  .catch(error => {
-    console.log(`ERROR deleting temporary ibm files (${error.message})`);
-  });
+  const reportNames = await fs.readdir('results');
+  for (const reportName of reportNames) {
+    await fs.rm(`results/${reportName}`);
+  }
   // Return the result.
   return {result: all};
 };
