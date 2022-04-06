@@ -287,20 +287,20 @@ exports.scorer = acts => {
               contrast: 3,
               alert: 2
             };
-            const scores = {
+            const waveScores = {
               error: 0,
               contrast: 0,
               alert: 0
             };
             ['error', 'contrast', 'alert'].forEach(level => {
               const {items} = facts[level];
-              scores[level] = Math.round(Object.keys(items).reduce((total, ruleID) => {
+              waveScores[level] = Math.round(Object.keys(items).reduce((total, ruleID) => {
                 const rawScore = items[ruleID].count * weights[level];
                 const divisor = duplications.wave[`${level.slice(0, 1)}:${ruleID}`] + 1 || 1;
                 return total + rawScore / divisor;
               }, 0));
             });
-            scores.wave = scores.error + scores.contrast + scores.alert;
+            scores.wave = waveScores.error + waveScores.contrast + waveScores.alert;
             scores.total += scores.wave;
           }
         }
