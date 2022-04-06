@@ -4,7 +4,7 @@
   that two or more radio buttons with the same name, and no other radio buttons, be grouped in a
   'fieldset' element with a valid 'legend' element.
 */
-const fs = require('fs/promises');
+const fs = require('fs').promises;
 // Tabulates and lists radio buttons in and not in accessible field sets.
 exports.reporter = async (page, withItems) => {
   // Initialize the argument array to be passed to the page function.

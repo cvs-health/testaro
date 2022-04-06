@@ -18,7 +18,7 @@
       };
 */
 // Import required modules.
-const fs = require('fs/promises');
+const fs = require('fs').promises;
 const {getCompliance} = require('accessibility-checker');
 // Runs the IBM test.
 const run = async content => {
