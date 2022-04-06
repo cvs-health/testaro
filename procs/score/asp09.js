@@ -538,7 +538,7 @@ exports.scorer = acts => {
           }
         });
       };
-      estimate(['aatt', 'axe', 'ibm', 'wave'], 100);
+      estimate(['alfa', 'aatt', 'axe', 'ibm', 'wave'], 100);
     }
   }
   // Return the score facts, except for the log test.

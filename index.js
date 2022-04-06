@@ -1105,16 +1105,16 @@ const doScript = async (options, report) => {
     const scoreTable = scoreTables[0];
     const {result} = scoreTable;
     if (result) {
-      const {logWeights, deficit} = result;
-      if (logWeights && deficit) {
-        deficit.log = Math.floor(
+      const {logWeights, scores} = result;
+      if (logWeights && scores) {
+        scores.log = Math.floor(
           logWeights.count * logCount
           + logWeights.size * logSize
           + logWeights.prohibited * prohibitedCount
           + logWeights.visitTimeout * visitTimeoutCount
           + logWeights.visitRejection * visitRejectionCount
         );
-        deficit.total += deficit.log;
+        scores.total += scores.log;
       }
     }
   }
