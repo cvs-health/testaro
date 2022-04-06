@@ -255,7 +255,7 @@ exports.scorer = acts => {
           facts = test.result;
           if (facts && facts.content && facts.url && (facts.content.totals || facts.url.totals)) {
             rules.ibm = 'multiply violations by 4*, recommendations by 2* (*discounted); sum';
-            const scores = {
+            const ibmScores = {
               content: null,
               url: null
             };
@@ -263,7 +263,7 @@ exports.scorer = acts => {
               const totals = facts[type].totals;
               if (totals) {
                 const items = facts[type].items || [];
-                scores[type] = Math.round(items.reduce((total, item) => {
+                ibmScores[type] = Math.round(items.reduce((total, item) => {
                   const {ruleId, level} = item;
                   const rawScore = [4, 2][['violation', 'recommendation'].indexOf(level)] || 0;
                   const divisor = duplications.ibm[`${level.slice(0, 1)}:${ruleId}`] + 1 || 1;
@@ -271,8 +271,8 @@ exports.scorer = acts => {
                 }, 0));
               }
             });
-            if (scores.content !== null || scores.url !== null) {
-              scores.ibm = Math.max(scores.content || 0, scores.url || 0);
+            if (ibmScores.content !== null || ibmScores.url !== null) {
+              scores.ibm = Math.max(ibmScores.content || 0, ibmScores.url || 0);
               scores.total += scores.ibm;
             }
           }
