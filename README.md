@@ -1,10 +1,10 @@
 # testaro
 
-Accessibility test automation
+Federated accessibility test automation
 
 ## Summary
 
-Testaro is a collection of web accessibility tests.
+Testaro is a collection of collections of web accessibility tests.
 
 The purpose of Testaro is to provide programmatic access to over 600 accessibility tests defined in several test packages and in Testaro itself.
 
@@ -464,6 +464,7 @@ The rationales motivating the Testaro-defined tests and scoring procs can be fou
 ### Future work
 
 Further development is contemplated, is taking place, or is welcomed, on:
+- addition of Tenon to the set of packages
 - links with href="#"
 - links and buttons styled non-distinguishably
 - first focused element not first focusable element in DOM
@@ -471,8 +472,6 @@ Further development is contemplated, is taking place, or is welcomed, on:
 - buttons with no text content
 - modal dialogs
 - autocomplete attributes
-
-Additional test packages may be integratable into Testaro. The [`bbc-a11y`](https://github.com/bbc/bbc-a11y) package has been considered, but it has not been updated since 2018 and has vulnerable dependencies.
 
 ## Testing challenges
 
