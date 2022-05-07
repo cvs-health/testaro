@@ -1,7 +1,7 @@
 // app.js
 // Validator for Testaro application with a no-batch script.
 
-const options = {
+const report = {
   script: {
     what: 'Sample Testaro executor with 1 test',
     strict: true,
@@ -29,14 +29,14 @@ const options = {
     ]
   },
   log: [],
-  reports: []
+  acts: []
 };
 const {handleRequest} = require(`${__dirname}/../../index`);
-handleRequest(options)
+handleRequest(report)
 .then(
   () => {
-    const {log, reports} = options;
-    if (log.length === 3 && log[1].event === 'timeStamp' && /^[a-z0-9]+$/.test(log[1].value)) {
+    const {log, acts} = report;
+    if (log.length === 2 && log[1].event === 'endTime' && /^\d{4}-.+$/.test(log[1].value)) {
       console.log('Success: Log has been correctly populated');
     }
     else {
@@ -44,21 +44,19 @@ handleRequest(options)
       console.log(JSON.stringify(log, null, 2));
     }
     if (
-      reports.length === 1
-      && reports[0].acts
-      && reports[0].acts.length === 4
-      && reports[0].acts[2].result
-      && reports[0].acts[2].result.visibleElements
-      && typeof reports[0].acts[2].result.visibleElements === 'number'
-      && reports[0].acts[3].result
-      && typeof reports[0].acts[3].result === 'string'
-      && reports[0].acts[3].result.startsWith('ERROR')
+      acts.length === 4
+      && acts[2].result
+      && acts[2].result.visibleElements
+      && typeof acts[2].result.visibleElements === 'number'
+      && acts[3].result
+      && typeof acts[3].result === 'string'
+      && acts[3].result.startsWith('ERROR')
     ) {
-      console.log('Success: Reports have been correctly populated');
+      console.log('Success: Acts have been correctly populated');
     }
     else {
-      console.log('Failure: Reports empty or invalid');
-      console.log(JSON.stringify(reports, null, 2));
+      console.log('Failure: Acts empty or invalid');
+      console.log(JSON.stringify(acts, null, 2));
     }
   },
   rejection => {

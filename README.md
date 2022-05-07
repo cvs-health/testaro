@@ -428,11 +428,14 @@ Before executing a Testaro script, you can optionally also set the environment v
 
 ## Validation
 
-Three _executors_ for Testaro validation are located in the `validation` directory. An executor is a commonJS JavaScript module that runs Testaro and reports whether the results are correct.
+_Executors_ for Testaro validation are located in the `validation` directory.
 
-The executors are:
-- `appNoBatch.js`: Reports whether Testaro runs correctly with a no-batch script.
-- `appBatch.js`: Reports whether Testaro runs correctly with a script and a batch.
+A basic executor is the `test.js` file. It runs Testaro with a simple sample script and outputs the log and the acts.
+
+The other executors are commonJS JavaScript modules that run Testaro and report whether the results are correct.
+
+The other executors are:
+- `app.js`: Reports whether Testaro runs correctly with a script.
 - `tests.js`: Runs Testaro with each custom test and reports whether the results are correct.
 
 To execute any executor `xyz.js`, call it with the statement `node validation/executors/xyz`. The results will appear in the standard output.

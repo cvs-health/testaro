@@ -11,6 +11,8 @@ const report = {
   log: [],
   acts: []
 };
-handleRequest(report);
-console.log(`Report log:\n${JSON.stringify(report.log, null, 2)}\n`);
-console.log(`Report acts:\n${JSON.stringify(report.acts, null, 2)}`);
+(async () => {
+  await handleRequest(report);
+  console.log(`Report log:\n${JSON.stringify(report.log, null, 2)}\n`);
+  console.log(`Report acts:\n${JSON.stringify(report.acts, null, 2)}`);
+})();
