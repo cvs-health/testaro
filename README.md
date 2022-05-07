@@ -10,7 +10,15 @@ The purpose of Testaro is to provide programmatic access to over 600 accessibili
 
 Running Testaro requires telling it which operations (including tests) to perform and which URLs to perform them on, and giving Testaro an object to put its output into.
 
-Testaro outputs progress messages to the standard output. It populates the object with log information and test reports.
+## Origin
+
+Work on the custom tests in this package began in 2017, and work on the multi-package federation that Testaro implements began in early 2018. These two aspects were combined into the [Autotest](https://github.com/jrpool/autotest) package in early 2021 and into this more limited-purpose package, Testaro, in January 2022.
+
+Testaro omits some functionalities of Autotest, such as:
+- tests producing results intended to be human-inspected
+- previous versions of scoring algorithms
+- file operations for score aggregation, report revision, and HTML reports
+- a web user interface
 
 ## System requirements
 
