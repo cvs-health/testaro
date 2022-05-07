@@ -49,6 +49,10 @@ As of this version, the counts of tests in the packages referenced above were:
 - Testaro tests: 16
 - grand total: 628
 
+## Related packages
+
+[Testilo](https://github.com/jrpool/testilo) is an application that facilitates the use of Testaro.
+
 ## Code organization
 
 The main directories containing code files are:
@@ -391,56 +395,32 @@ A typical use for an `expect` property is checking the correctness of a Testaro 
 
 ## Batches
 
-There are two ways to use a script to give instructions to Testaro:
-- The script can be the complete specification of the operations to perform and the URLs to perform them on.
-- The script can specify the operations to perform, and a _batch_ can specify which URLs to perform them on.
+In some cases you may wish to repeatedly run Testaro with the same script, changing only its `url` commands. The purpose would be to perform the same set of tests on multiple web pages. Such a use would apply only to scripts whose `url` commands are all identical, not to a script that moves from one host to another.
 
-A batch is a JSON file with this format:
-
-```json
-{
-  "what": "Accessibility standards",
-  "hosts": [
-    {
-      "which": "https://www.w3.org/TR/WCAG21/",
-      "what": "WCAG 2.1"
-    },
-    {
-      "which": "https://www.w3.org/WAI/standards-guidelines/aria/",
-      "what": "W3C WAI-ARIA"
-    }
-  ]
-}
-```
-
-When you combine a script with a batch, Testaro performs the script, replacing the `which` and `what` properties of all `url` commands with the values in the first object in the `hosts` array of the batch, then again with the values in the second `host` object, and so on. Those replacements also occur in the inserted extra `url` commands mentioned above.
-
-A batch offers an efficient way to perform a uniform set of operations on every host in a set of hosts. In this way you can run the same set of tests on multiple web pages.
-
-A no-batch script offers a way to carry out a complex operation, which can include navigating from one host to another, which is not possible with a batch. Any `url` commands are performed as-is, without changes to their URLs.
+Testaro does not support such batch processing, but Testilo does. See its `README.md` file for instructions.
 
 ## Execution
 
 ### Invocation
 
-To run Testaro, create an options object like this:
+To run Testaro, create a report object like this:
 
 ```javascript
-{
-  log: [],
-  reports: [],
+const report = {
+  id: '',
   script: {abc},
-  batch: {def}
-}
+  log: [],
+  acts: []
+};
 ```
 
 Replace `{abc}` with a script object, like the example script shown above.
 
-Replace `{def}` with a batch object, like the example batch shown above, or omit the `batch` property if there is no batch.
+Then execute the statement `require('testaro').handleRequest(report)`. That statement will run Testaro.
 
-Then execute the statement `require('testaro').handleRequest(ghi)`, where `ghi` is replaced with the name of the options object. That statement will run Testaro.
+While it runs, Testaro will populate the `log` and `acts` arrays of the report object. When Testaro finishes, the `log` and `acts` properties will contain its results.
 
-While it runs, Testaro will populate the `log` and `reports` arrays of the options object. When Testaro finishes, the `log` and `reports` arrays will contain its results.
+Another way to run Testaro is to use Testilo, which can handle batches and saves results to files. Testilo prepopulates the report object with an `id` property consisting of a timestamp and, if a batch is used, the host ID. If Testaro finds a non-empty `id` property in the `report` object, Testaro leaves it unchanged; if not, Testaro creates an `id` property with a timestamp value.
 
 ### Environment variables
 

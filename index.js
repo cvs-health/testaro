@@ -194,38 +194,18 @@ const isValidScript = script => {
     && isURL(commands[1].which)
     && commands.every(command => isValidCommand(command));
 };
-// Validates a batch.
-const isValidBatch = batch => {
-  // If the batch exists:
-  if (batch) {
-    // Get its data.
-    const {what, hosts} = batch;
-    // Return whether the batch is valid:
-    return what
-      && hosts
-      && typeof what === 'string'
-      && Array.isArray(hosts)
-      && hosts.every(host => host.which && host.what && isURL(host.which));
-  }
-  // Otherwise, i.e. if the batch does not exist:
-  else {
-    // Return that it is valid, because it is optional.
-    return true;
-  }
-};
 // Validates an initialized reports array.
-const isValidReports = reports => Array.isArray(reports) && ! reports.length;
+const isValidActs = acts => Array.isArray(acts) && ! acts.length;
 // Validates an initialized log array.
 const isValidLog = log => Array.isArray(log) && ! log.length;
-// Validates an options object.
-const isValidOptions = async options => {
-  if (options) {
-    const {id, script, batch, log, reports} = options;
+// Validates a report object.
+const isValidReport = async report => {
+  if (report) {
+    const {id, script, log, acts} = report;
     return id
     && isValidScript(script)
-    && isValidBatch(batch)
     && isValidLog(log)
-    && isValidReports(reports);
+    && isValidActs(acts);
   }
   else {
     return false;
@@ -569,7 +549,7 @@ const waitError = (page, act, error, what) => {
   act.result.error = `ERROR waiting for ${what}`;
   return false;
 };
-// Recursively performs the commands in a report.
+// Recursively performs the acts in a report.
 const doActs = async (report, actIndex, page) => {
   const {acts} = report;
   // If any more commands are to be performed:
@@ -1009,7 +989,7 @@ const doActs = async (report, actIndex, page) => {
                 // Otherwise, if it is entering text on the element:
                 else if (act.type === 'text') {
                   // If the text contains a placeholder for an environment variable:
-                  let {what} = act; 
+                  let {what} = act;
                   if (/__[A-Z]+__/.test(what)) {
                     // Replace it.
                     const envKey = /__([A-Z]+)__/.exec(what)[1];
@@ -1079,7 +1059,7 @@ const doActs = async (report, actIndex, page) => {
   }
 };
 // Performs the commands in a script.
-const doScript = async (options, report) => {
+const doScript = async (report) => {
   // Reinitialize the log statistics.
   logCount = logSize = prohibitedCount = visitTimeoutCount = visitRejectionCount= 0;
   // Add the start time to the report.
@@ -1122,88 +1102,35 @@ const doScript = async (options, report) => {
   const endTime = new Date();
   report.endTime = endTime.toISOString().slice(0, 19);
   report.elapsedSeconds =  Math.floor((endTime - startTime) / 1000);
-  // Add the report to the reports array.
-  options.reports.push(report);
-};
-// Recursively performs commands on the hosts of a batch.
-const doBatch = async (options, reportTemplate, hostIndex = 0) => {
-  const {hosts} = options.batch;
-  const host = hosts[hostIndex];
-  // If the specified host exists:
-  if (host) {
-    // Create a report for it.
-    const hostReport = JSON.parse(JSON.stringify(reportTemplate));
-    // Copy the properties of the specified host to all url acts.
-    hostReport.acts.forEach(act => {
-      if (act.type === 'url') {
-        act.which = host.which;
-        act.what = host.what;
-      }
-    });
-    // Add the host’s ID to the host report.
-    hostReport.hostName = host.id;
-    // Add data from the template to the host report.
-    hostReport.orderName = options.id;
-    hostReport.id = `${options.id}-${host.id}`;
-    hostReport.orderUserName = options.userName;
-    hostReport.orderTime = options.orderTime;
-    hostReport.assignedBy = options.assignedBy;
-    hostReport.assignedTime = options.assignedTime;
-    hostReport.tester = options.tester;
-    hostReport.scriptName = options.scriptName;
-    hostReport.batchName = options.batchName;
-    hostReport.scriptIsValid = options.scriptIsValid;
-    hostReport.batchIsValid = options.batchIsValid;
-    hostReport.host = host;
-    // Perform the commands on the host and add a report to the options object.
-    await doScript(options, hostReport);
-    // Process the remaining hosts.
-    await doBatch(options, reportTemplate, hostIndex + 1);
-  }
-};
-// Performs a script, with or without a batch.
-const doScriptOrBatch = async (options, reportTemplate) => {
-  // If there is a batch:
-  if (options.batch) {
-    // Perform the script on all the hosts in the batch.
-    console.log('Starting batch');
-    await doBatch(options, reportTemplate);
-  }
-  // Otherwise, i.e. if there is no batch:
-  else {
-    // Perform the script.
-    console.log('Starting no-batch script');
-    await doScript(options, reportTemplate);
-  }
   // Add an end time to the log.
-  options.log.push({
+  report.log.push({
     event: 'endTime',
     value: ((new Date()).toISOString().slice(0, 19))
   });
 };
-// Injects url commands into a report where necessary to undo DOM changes.
-const injectURLCommands = commands => {
+// Injects url acts into a report where necessary to undo DOM changes.
+const injectURLActs = acts => {
   let injectMore = true;
   while (injectMore) {
-    const injectIndex = commands.findIndex((command, index) =>
-      index < commands.length - 1
-      && command.type === 'test'
-      && commands[index + 1].type === 'test'
-      && domChangers.has(command.which)
+    const injectIndex = acts.findIndex((act, index) =>
+      index < acts.length - 1
+      && act.type === 'test'
+      && acts[index + 1].type === 'test'
+      && domChangers.has(act.which)
     );
     if (injectIndex === -1) {
       injectMore = false;
     }
     else {
-      const lastURL = commands.reduce((url, command, index) => {
-        if (command.type === 'url' && index < injectIndex) {
-          return command.which;
+      const lastURL = acts.reduce((url, act, index) => {
+        if (act.type === 'url' && index < injectIndex) {
+          return act.which;
         }
         else {
           return url;
         }
       }, '');
-      commands.splice(injectIndex + 1, 0, {
+      acts.splice(injectIndex + 1, 0, {
         type: 'url',
         which: lastURL,
         what: 'URL'
@@ -1212,36 +1139,26 @@ const injectURLCommands = commands => {
   }
 };
 // Handles a request.
-exports.handleRequest = async options => {
-  // If the options object is valid:
-  if(isValidOptions(options)) {
-    // Add a start time and a timeStamp to the log.
-    options.log.push(
+exports.handleRequest = async report => {
+  // If the report object is valid:
+  if(isValidReport(report)) {
+    // Add a start time to the log.
+    report.log.push(
       {
         event: 'startTime',
         value: ((new Date()).toISOString().slice(0, 19))
-      },
-      {
-        event: 'timeStamp',
-        value: Math.floor((Date.now() - Date.UTC(2022, 1)) / 500).toString(36)
       }
     );
-    // Add the batch size to the log if there is a batch.
-    if (options.batch) {
-      options.log.push({
-        event: 'batchSize',
-        value: options.batch.hosts.length
-      });
+    // Add an ID to the report if none exists yet.
+    if (! report.id) {
+      report.id = Math.floor((Date.now() - Date.UTC(2022, 1)) / 2000).toString(36);
     }
-    // Create a report template, containing a copy of the commands as its acts.
-    const reportTemplate = {
-      host: '',
-      acts: JSON.parse(JSON.stringify(options.script.commands))
-    };
+    // Add the script commands to the report as its initial acts.
+    report.acts = JSON.parse(JSON.stringify(report.script.commands));
     // Inject url acts where necessary to undo DOM changes.
-    injectURLCommands(reportTemplate.acts);
-    // Perform the script, with or without a batch, asynchronously adding to the log and reports.
-    await doScriptOrBatch(options, reportTemplate);
+    injectURLActs(report.acts);
+    // Perform the script, asynchronously adding to the log and report.
+    await doScript(report);
   }
   else {
     console.log('ERROR: options missing or invalid');
