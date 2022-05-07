@@ -24,8 +24,6 @@ Testaro omits some functionalities of Autotest, such as:
 
 Version 14 or later of [Node.js](https://nodejs.org/en/).
 
-A file system with a directory that the Testaro user has permission to read and write in.
-
 ## Dependencies
 
 Testaro uses:
