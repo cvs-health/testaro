@@ -112,25 +112,25 @@ A script is a JSON file with the properties:
 
 Here is an example of a script:
 
-```json
+```javascript
 {
-  "what": "Test example.com with alfa",
-  "strict": true,
-  "commands": [
+  what: 'Test example.com with alfa',
+  strict: true,
+  commands: [
     {
-      "type": "launch",
-      "which": "chromium",
-      "what": "Chromium browser"
+      type: 'launch',
+      which: 'chromium',
+      what: 'Chromium browser'
     },
     {
-      "type": "url",
-      "which": "https://example.com/",
-      "what": "page with a few accessibility defects"
+      type: 'url',
+      which: 'https://example.com/',
+      what: 'page with a few accessibility defects'
     },
     {
-      "type": "test",
-      "which": "alfa",
-      "what": "Siteimprove alfa package"
+      type: 'test',
+      which: 'alfa',
+      what: 'Siteimprove alfa package'
     }
   ]
 }
@@ -408,13 +408,13 @@ To run Testaro, create a report object like this:
 ```javascript
 const report = {
   id: '',
-  script: {abc},
+  script: {…},
   log: [],
   acts: []
 };
 ```
 
-Replace `{abc}` with a script object, like the example script shown above.
+Replace `{…}` with a script object, like the example script shown above.
 
 Then execute the statement `require('testaro').handleRequest(report)`. That statement will run Testaro.
 
