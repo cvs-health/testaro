@@ -49,7 +49,7 @@ As of this version, the counts of tests in the packages referenced above were:
 
 ## Related packages
 
-[Testilo](https://github.com/jrpool/testilo) is an application that facilitates the use of Testaro.
+[Testilo](https://www.npmjs.com/package/testilo) is an application that facilitates the use of Testaro.
 
 ## Code organization
 
@@ -461,6 +461,9 @@ Further development is contemplated, is taking place, or is welcomed, on:
 - buttons with no text content
 - modal dialogs
 - autocomplete attributes
+- inclusion of other test packages, such as:
+   - FAE (https://github.com/opena11y/evaluation-library)
+   - Tenon
 
 ## Testing challenges
 
