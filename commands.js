@@ -185,7 +185,7 @@ exports.commands = {
       {
         withItems: [true, 'boolean'],
         withNewContent: [
-          false, 'boolean', '', 'true: use a URL; false: use page content; omitted: use both'
+          false, 'boolean', '', 'true: use a URL; false: use page content; omitted: both'
         ]
       }
     ],

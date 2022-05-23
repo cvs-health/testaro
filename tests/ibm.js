@@ -50,21 +50,8 @@ const report = (result, withItems) => {
   }
   return data;
 };
-const all = {};
-// Returns results of an IBM test.
-exports.reporter = async (page, withItems, withNewContent) => {
-  const timeLimit = withNewContent ? 20 : 15;
-  // Identify the page content.
-  let content = '';
-  let allType = '';
-  if (! withNewContent) {
-    content = await page.content();
-    allType = 'content';
-  }
-  else {
-    content = page.url();
-    allType = 'url';
-  }
+// Performs an IBM test.
+const doTest = async (content, withItems, timeLimit) => {
   // Conduct and report the test.
   const result = await run(content);
   // Wait for the report until the time limit expires.
@@ -83,11 +70,28 @@ exports.reporter = async (page, withItems, withNewContent) => {
   // Return the result.
   if (resultIfFast) {
     clearTimeout(timeoutID);
-    all[allType] = report(result, withItems);
-    return {result: all};
+    const typeResult = report(result, withItems);
+    return typeResult;
   }
   else {
     console.log('ERROR: getting report took too long');
-    return {result: 'ERROR: getting IBM Equal Access report took too long'};
+    return 'ERROR: getting IBM Equal Access report took too long';
   }
+};
+// Returns results of one or two IBM tests.
+exports.reporter = async (page, withItems, withNewContent) => {
+  // If a test with existing content is to be performed:
+  const result = {};
+  if (! withNewContent) {
+    const timeLimit = 15;
+    const typeContent = await page.content();
+    result.content = await doTest(typeContent, withItems, timeLimit);
+  }
+  // If a test with new content is to be performed:
+  if ([true, undefined].includes(withNewContent)) {
+    const timeLimit = 20;
+    const typeContent = page.url();
+    result.url = await doTest(typeContent, withItems, timeLimit);
+  }
+  return {result};
 };

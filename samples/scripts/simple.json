@@ -1,5 +1,5 @@
 {
-  "what": "Test example.com with alfa",
+  "what": "Test example.com with bulk",
   "strict": true,
   "commands": [
     {
@@ -14,8 +14,7 @@
     },
     {
       "type": "test",
-      "which": "alfa",
-      "what": "Siteimprove alfa package"
+      "which": "bulk"
     }
   ]
 }
