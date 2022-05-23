@@ -52,20 +52,26 @@ const report = (result, withItems) => {
 };
 // Performs an IBM test.
 const doTest = async (content, withItems, timeLimit) => {
-  // Conduct and report the test.
-  const result = await run(content);
-  // Wait for the report until the time limit expires.
+  // Start a timeout clock.
   let timeoutID;
   const wait = new Promise(resolve => {
     timeoutID = setTimeout(() => {
       resolve('');
     }, 1000 * timeLimit);
   });
+  // Conduct and report the test.
+  const result = run(content);
+  // Wait for the report until the time limit expires.
   const resultIfFast = await Promise.race([result, wait]);
   // Delete the report files.
-  const reportNames = await fs.readdir('results');
-  for (const reportName of reportNames) {
-    await fs.rm(`results/${reportName}`);
+  try {
+    const reportNames = await fs.readdir('results');
+    for (const reportName of reportNames) {
+      await fs.rm(`results/${reportName}`);
+    }
+  }
+  catch(error) {
+    console.log('ibm test created no result files.');
   }
   // Return the result.
   if (resultIfFast) {
@@ -74,8 +80,8 @@ const doTest = async (content, withItems, timeLimit) => {
     return typeResult;
   }
   else {
-    console.log('ERROR: getting report took too long');
-    return 'ERROR: getting IBM Equal Access report took too long';
+    console.log('ERROR: getting ibm test report took too long');
+    return 'ERROR: getting ibm test report took too long';
   }
 };
 // Returns results of one or two IBM tests.

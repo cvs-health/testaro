@@ -9,13 +9,12 @@
     },
     {
       "type": "url",
-      "which": "https://www.accessibilityassociation.org/s/",
+      "which": "https://example.com/",
       "what": "page with a few accessibility defects"
     },
     {
       "type": "test",
-      "which": "ibm",
-      "withItems": true
+      "which": "bulk"
     }
   ]
 }
