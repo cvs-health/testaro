@@ -53,25 +53,41 @@ const report = (result, withItems) => {
 const all = {};
 // Returns results of an IBM test.
 exports.reporter = async (page, withItems, withNewContent) => {
-  // If the test is to be conducted with existing content:
+  const timeLimit = withNewContent ? 20 : 15;
+  // Identify the page content.
+  let content = '';
+  let allType = '';
   if (! withNewContent) {
-    // Conduct and report it.
-    const content = await page.content();
-    const result = await run(content);
-    all.content = report(result, withItems);
+    content = await page.content();
+    allType = 'content';
   }
-  // If the test is to be conducted with a URL:
-  if ([true, undefined].includes(withNewContent)) {
-    // Conduct and report it.
-    const content = page.url();
-    const result = await run(content);
-    all.url = report(result, withItems);
+  else {
+    content = page.url();
+    allType = 'url';
   }
+  // Conduct and report the test.
+  const result = await run(content);
+  // Wait for the report until the time limit expires.
+  let timeoutID;
+  const wait = new Promise(resolve => {
+    timeoutID = setTimeout(() => {
+      resolve('');
+    }, 1000 * timeLimit);
+  });
+  const resultIfFast = await Promise.race([result, wait]);
   // Delete the report files.
   const reportNames = await fs.readdir('results');
   for (const reportName of reportNames) {
     await fs.rm(`results/${reportName}`);
   }
   // Return the result.
-  return {result: all};
+  if (resultIfFast) {
+    clearTimeout(timeoutID);
+    all[allType] = report(result, withItems);
+    return {result: all};
+  }
+  else {
+    console.log('ERROR: getting report took too long');
+    return {result: 'ERROR: getting IBM Equal Access report took too long'};
+  }
 };
