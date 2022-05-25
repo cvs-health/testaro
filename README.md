@@ -450,21 +450,6 @@ You can define additional Testaro commands and functionality. Contributions are 
 
 The rationales motivating the Testaro-defined tests and scoring procs can be found in comments within the files of those tests and procs, in the `tests` and `procs/score` directories. Unavoidably, each test is opinionated. Testaro itself, however, can accommodate other tests representing different opinions. Testaro is intended to be neutral with respect to questions such as the criteria for accessibility, the severities of accessibility issues, whether accessibility is binary or graded, and the distinction between usability and accessibility.
 
-### Future work
-
-Further development is contemplated, is taking place, or is welcomed, on:
-- addition of Tenon to the set of packages
-- links with href="#"
-- links and buttons styled non-distinguishably
-- first focused element not first focusable element in DOM
-- never-visible skip links
-- buttons with no text content
-- modal dialogs
-- autocomplete attributes
-- inclusion of other test packages, such as:
-   - FAE (https://github.com/opena11y/evaluation-library)
-   - Tenon
-
 ## Testing challenges
 
 ### Activation
@@ -494,3 +479,37 @@ Testaro omits some functionalities of Autotest, such as:
 ## Etymology
 
 “Testaro” means “collection of tests” in Esperanto.
+
+## Future work
+
+### Improvements
+
+Further development is contemplated, is taking place, or is welcomed, on:
+- addition of Tenon to the set of packages
+- links with href="#"
+- links and buttons styled non-distinguishably
+- first focused element not first focusable element in DOM
+- never-visible skip links
+- buttons with no text content
+- modal dialogs
+- autocomplete attributes
+- inclusion of other test packages, such as:
+   - FAE (https://github.com/opena11y/evaluation-library)
+   - Tenon
+
+## Corrections
+
+Issues found or reported with the current version that need diagnosis and correction include:
+
+### hover
+
+There seem to be a couple of problems with the hover test:
+- The score for unhoverability is documented as 2 times the count of unhoverables, but is reported as 1 time that count.
+- The list of unhoverables in the report is empty.
+Observed after inquiry by Tobias Christian Jensen of Siteimprove on 2022-05-09.
+
+### axe
+
+Configuration to include best practices and experimental tests.
+
+Investigation of tags, including wcag2a, wcag2aa, wcag21a, wcag21aa, best-practice, wcag***, ACT, cat.*.
