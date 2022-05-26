@@ -770,11 +770,15 @@ const doActs = async (report, actIndex, page) => {
               if (tenonData.accessToken) {
                 // Request a Tenon test of the page and get a response ID.
                 const option = {};
+                // If Tenon is to be given the URL and not the content of the page:
                 if (withNewContent) {
-                  option.src = await page.content();
-                }
-                else {
+                  // Specify this.
                   option.url = page.url();
+                }
+                // Otherwise, i.e. if Tenon is to be given the page content:
+                else {
+                  // Specify this.
+                  option.src = await page.content();
                 }
                 const responseID = await new Promise(resolve => {
                   const request = https.request(
@@ -823,7 +827,7 @@ const doActs = async (report, actIndex, page) => {
               // Add a description of the test to the act.
               act.what = tests[act.which];
               // Initialize the arguments.
-              const args = [page];
+              const args = [act.which === 'tenon' ? tenonData : page];
               // Identify the additional validator of the test.
               const testValidator = commands.tests[act.which];
               // If it exists:
