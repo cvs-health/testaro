@@ -121,7 +121,7 @@ exports.commands = {
     tenonRequest: [
       'Request a Tenon test',
       {
-        which: [true, 'string', 'hasLength', 'ID for this test instance'],
+        id: [true, 'string', 'hasLength', 'ID for this test instance'],
         withNewContent: [true, 'boolean', '', 'true: use a URL; false: use page content'],
         what: [false, 'string', 'hasLength', 'comment']
       }
@@ -244,7 +244,7 @@ exports.commands = {
     tenon: [
       'Perform a Tenon test',
       {
-        which: [true, 'string', 'hasLength', 'ID of the requested test instance']
+        id: [true, 'string', 'hasLength', 'ID of the requested test instance']
       }
     ],
     wave: [

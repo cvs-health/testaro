@@ -3,113 +3,90 @@
   This test processes a previously requested test by the Tenon API.
 */
 const https = require('https');
-exports.reporter = async (tenonData, which) => {
-  // Identify the status-request options.
-  const statusOptions = {
+exports.reporter = async (tenonData, id) => {
+  // Universal request options.
+  const requestOptions = {
     host: 'tenon.io',
-    path: `/api/v2/${tenonData.responseIDs[which]}`,
+    path: `/api/v2/${tenonData.responseIDs[id]}`,
     port: 443,
     protocol: 'https:',
-    method: 'HEAD',
     headers: {
       Authorization: tenonData.access_token,
       'Cache-Control': 'no-cache'
     }
   };
-  // Identify the result-request options.
-  const resultOptions = {
-    host: 'tenon.io',
-    path: `/api/v2/${tenonData.responseIDs[which]}`,
-    port: 443,
-    protocol: 'https:',
-    method: 'GET',
-    headers: {
-      Authorization: tenonData.access_token,
-      'Cache-Control': 'no-cache'
-    }
-  };
-  let result = {};
-  // Request the test status.
-  https.request(statusOptions, response => {
-    const {statusCode} = response;
-    if (statusCode ===  '200') {
-      const resultRequest = https.request(resultOptions, response => {
-        result = response.response;
+  // Gets the test status.
+  const getStatus = async () => {
+    const testStatus = await new Promise((resolve, reject) => {
+      requestOptions.method = 'HEAD';
+      const statusRequest = https.request(requestOptions, statusResponse => {
+        const {statusCode} = statusResponse;
+        resolve(statusCode);
       });
-    }
-    else {
-      result = {
-        error: 'ERROR: tenon test not yet completed'
-      };
-    }
-  });
-  const testStatus = async (tenonData, which) => {
-    const statusResponse = statusRequest.end();
-    const status = await new Promise(resolve => {
-      const request = https.request(
-        {
-          host: 'tenon.io',
-          path: `/api/v2/${tenonData.responseIDs[which]}`,
-          port: 80,
-          protocol: 'https:',
-          method: 'HEAD',
-          headers: {
-            'Cache-Control': 'no-cache'
-          }
-        },
-        response => {
-          response.on('end', () => {
-            const statusCode = response.statusCode;
-            return resolve(statusCode);
-          });
-        }
-      );
-      request.end();
+      statusRequest.on('error', error => {
+        console.log(`ERROR getting Tenon test status (${error.message})`);
+        reject(`ERROR getting Tenon test status (${error.message})`);
+      });
+      statusRequest.end();
     });
-    return status;
+    return testStatus;
   };
-  if (authData.access_token) {
-    // Get a response ID for a Tenon test.
-    const responseID = await new Promise(resolve => {
-      const request = https.request(
-        {
-          host: 'tenon.io',
-          path: '/api/',
-          port: 443,
-          protocol: 'https:',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-cache',
-            Authorization: `Bearer ${authData.access_token}`
-          }
-        },
-        response => {
-          let report = '';
-          response.on('data', chunk => {
-            report += chunk;
+  // Get the test status.
+  let testStatus = getStatus();
+  // If the test is still in the Tenon queue:
+  if (testStatus === '202') {
+    // Wait 20 seconds and get the status again.
+    setTimeout(() => {
+      testStatus = getStatus();
+    }, 20000);
+  }
+  // If the test has been completed:
+  if (testStatus ===  '200') {
+    // Get the test result.
+    const testResult = await new Promise((resolve, reject) => {
+      requestOptions.method = 'GET';
+      const resultRequest = https.request(requestOptions, resultResponse => {
+        const {statusCode} = resultResponse;
+        if (statusCode === '200') {
+          let resultJSON = '';
+          resultResponse.on('data', chunk => {
+            resultJSON += chunk;
           });
-          // When the data arrive, return them as an object.
-          response.on('end', () => {
+          resultResponse.on('end', () => {
             try {
-              const result = JSON.parse(report);
-              return resolve(result);
+              const result = JSON.parse(resultJSON);
+              resolve(result.response);
             }
-            catch (error) {
-              return resolve({
-                error: 'Tenon did not return JSON.',
-                report
+            catch(error) {
+              console.log(`ERROR getting Tenon test result (${resultJSON.slice(0, 80)})`);
+              resolve({
+                error: 'ERROR getting Tenon test result',
+                resultStart: resultJSON.slice(0, 80)
               });
             }
           });
         }
-      );
-      const postData = JSON.stringify({
-        url: page.url()
+        else {
+          resolve({
+            error: 'ERROR: Tenon test not yet completed'
+          });
+        }
       });
-      request.write(postData);
-      request.end();
+      resultRequest.on('error', error => {
+        console.log(`ERROR getting Tenon test result (${error.message})`);
+        reject({
+          error: `ERROR getting Tenon test result (${error.message})`
+        });
+      });
+      resultRequest.end();
     });
-    return {result: responseID};
+    return {result: testResult};
+  }
+  // Otherwise, i.e. if the test has not been completed:
+  else {
+    // Report the test status.
+    return {result: {
+      error: testStatus
+    }};
   }
 };

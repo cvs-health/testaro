@@ -1,5 +1,5 @@
 {
-  "what": "Test example.com with bulk",
+  "what": "Test example.com with tenon",
   "strict": true,
   "commands": [
     {
@@ -13,8 +13,16 @@
       "what": "page with a few accessibility defects"
     },
     {
+      "type": "tenonRequest",
+      "withNewContent": true,
+      "id": "a",
+      "what": "tenon request"
+    },
+    {
       "type": "test",
-      "which": "tenon"
+      "which": "tenon",
+      "id": "a",
+      "what": "result of prior tenon request"
     }
   ]
 }
