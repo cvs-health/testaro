@@ -118,6 +118,14 @@ exports.commands = {
         what: [false, 'string', 'hasLength', 'comment']
       }
     ],
+    tenonRequest: [
+      'Request a Tenon test',
+      {
+        which: [true, 'string', 'hasLength', 'ID for this test instance'],
+        withNewContent: [true, 'boolean', '', 'true: use a URL; false: use page content'],
+        what: [false, 'string', 'hasLength', 'comment']
+      }
+    ],
     text: [
       'Enter text into a text input, optionally with 1 placeholder for an all-caps literal environment variable',
       {
@@ -231,6 +239,12 @@ exports.commands = {
       'Perform a tabNav test',
       {
         withItems: [true, 'boolean']
+      }
+    ],
+    tenon: [
+      'Perform a Tenon test',
+      {
+        which: [true, 'string', 'hasLength', 'ID of the requested test instance']
       }
     ],
     wave: [

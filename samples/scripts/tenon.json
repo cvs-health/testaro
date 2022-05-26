@@ -1,0 +1,20 @@
+{
+  "what": "Test example.com with bulk",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "Chromium browser"
+    },
+    {
+      "type": "url",
+      "which": "https://example.com/",
+      "what": "page with a few accessibility defects"
+    },
+    {
+      "type": "test",
+      "which": "tenon"
+    }
+  ]
+}

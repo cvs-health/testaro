@@ -40,6 +40,7 @@ const tests = {
   role: 'roles',
   styleDiff: 'style inconsistencies',
   tabNav: 'keyboard navigation between tab elements',
+  tenon: 'Tenon',
   wave: 'WAVE',
   zIndex: 'z indexes'
 };
@@ -55,6 +56,11 @@ const browserTypeNames = {
 };
 // Items that may be waited for.
 const waitables = ['url', 'title', 'body'];
+// Tenon data.
+const tenonData = {
+  accessToken: '',
+  requestIDs: {}
+};
 // ########## VARIABLES
 // Facts about the current session.
 let logCount = 0;
@@ -706,150 +712,111 @@ const doActs = async (report, actIndex, page) => {
               await require('./procs/test/allVis').allVis(page);
               act.result = 'All elements visible.';
             }
-            // Otherwise, if it is a repetitive keyboard navigation:
-            else if (act.type === 'presses') {
-              const {navKey, what, which, withItems} = act;
-              const matchTexts = which ? which.map(text => debloat(text)) : [];
-              // Initialize the loop variables.
-              let status = 'more';
-              let presses = 0;
-              let amountRead = 0;
-              let items = [];
-              let matchedText;
-              // As long as a matching element has not been reached:
-              while (status === 'more') {
-                // Press the Escape key to dismiss any modal dialog.
-                await page.keyboard.press('Escape');
-                // Press the specified navigation key.
-                await page.keyboard.press(navKey);
-                presses++;
-                // Identify the newly current element or a failure.
-                const currentJSHandle = await page.evaluateHandle(actCount => {
-                  // Initialize it as the focused element.
-                  let currentElement = document.activeElement;
-                  // If it exists in the page:
-                  if (currentElement && currentElement.tagName !== 'BODY') {
-                    // Change it, if necessary, to its active descendant.
-                    if (currentElement.hasAttribute('aria-activedescendant')) {
-                      currentElement = document.getElementById(
-                        currentElement.getAttribute('aria-activedescendant')
-                      );
-                    }
-                    // Or change it, if necessary, to its selected option.
-                    else if (currentElement.tagName === 'SELECT') {
-                      const currentIndex = Math.max(0, currentElement.selectedIndex);
-                      const options = currentElement.querySelectorAll('option');
-                      currentElement = options[currentIndex];
-                    }
-                    // Or change it, if necessary, to its active shadow-DOM element.
-                    else if (currentElement.shadowRoot) {
-                      currentElement = currentElement.shadowRoot.activeElement;
-                    }
-                    // If there is a current element:
-                    if (currentElement) {
-                      // If it was already reached within this command performance:
-                      if (currentElement.dataset.pressesReached === actCount.toString(10)) {
-                        // Report the error.
-                        console.log(`ERROR: ${currentElement.tagName} element reached again`);
-                        status = 'ERROR';
-                        return 'ERROR: locallyExhausted';
+            // Otherwise, if the act is a tenon request:
+            else if (act.type === 'tenonrequest') {
+              const {which, withNewContent} = act;
+              const https = require('https');
+              // If a Tenon access token has not yet been obtained:
+              if (! tenonData.accessToken) {
+                // Authenticate with the Tenon API.
+                const authData = await new Promise(resolve => {
+                  const request = https.request(
+                    {
+                      host: 'tenon.io',
+                      path: '/api/v2/auth',
+                      port: 443,
+                      protocol: 'https:',
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache'
                       }
-                      // Otherwise, i.e. if it is newly reached within this act:
-                      else {
-                        // Mark and return it.
-                        currentElement.dataset.pressesReached = actCount;
-                        return currentElement;
-                      }
-                    }
-                    // Otherwise, i.e. if there is no current element:
-                    else {
-                      // Report the error.
-                      status = 'ERROR';
-                      return 'noActiveElement';
-                    }
-                  }
-                  // Otherwise, i.e. if there is no focus in the page:
-                  else {
-                    // Report the error.
-                    status = 'ERROR';
-                    return 'ERROR: globallyExhausted';
-                  }
-                }, actCount);
-                // If the current element exists:
-                const currentElement = currentJSHandle.asElement();
-                if (currentElement) {
-                  // Update the data.
-                  const tagNameJSHandle = await currentElement.getProperty('tagName');
-                  const tagName = await tagNameJSHandle.jsonValue();
-                  const text = await textOf(page, currentElement);
-                  // If the text of the current element was found:
-                  if (text !== null) {
-                    const textLength = text.length;
-                    // If it is non-empty and there are texts to match:
-                    if (matchTexts.length && textLength) {
-                      // Identify the matching text.
-                      matchedText = matchTexts.find(matchText => text.includes(matchText));
-                    }
-                    // Update the item data if required.
-                    if (withItems) {
-                      const itemData = {
-                        tagName,
-                        text,
-                        textLength
-                      };
-                      if (matchedText) {
-                        itemData.matchedText = matchedText;
-                      }
-                      items.push(itemData);
-                    }
-                    amountRead += textLength;
-                    // If there is no text-match failure:
-                    if (matchedText || ! matchTexts.length) {
-                      // If the element has any specified tag name:
-                      if (! what || tagName === what) {
-                        // Change the status.
-                        status = 'done';
-                        // Perform the action.
-                        const inputText = act.text;
-                        if (inputText) {
-                          await page.keyboard.type(inputText);
-                          presses += inputText.length;
+                    },
+                    response => {
+                      let responseData = '';
+                      response.on('data', chunk => {
+                        responseData += chunk;
+                      });
+                      response.on('end', () => {
+                        try {
+                          const responseJSON = JSON.parse(responseData);
+                          return resolve(responseJSON);
                         }
-                        if (act.action) {
-                          presses++;
-                          await page.keyboard.press(act.action);
-                          await page.waitForLoadState();
+                        catch(error) {
+                          return resolve({
+                            error: 'Tenon did not return JSON authentication data.',
+                            responseData
+                          });
                         }
-                      }
+                      });
                     }
-                  }
-                  else {
-                    status = 'ERROR';
-                  }
+                  );
+                  const tenonUser = process.env.TESTARO_TENON_USER;
+                  const tenonPassword = process.env.TESTARO_TENON_PASSWORD;
+                  const postData = JSON.stringify({
+                    username: tenonUser,
+                    password: tenonPassword
+                  });
+                  request.write(postData);
+                  request.end();
+                });
+                // If the authentication succeeded:
+                if (authData.access_token) {
+                  // Record the access token.
+                  tenonData.accessToken = authData.access_token;
                 }
-                // Otherwise, i.e. if there was a failure:
+              }
+              // If a Tenon access token exists:
+              if (tenonData.accessToken) {
+                // Request a Tenon test of the page and get a response ID.
+                const option = {};
+                if (withNewContent) {
+                  option.src = await page.content();
+                }
                 else {
-                  // Update the status.
-                  status = await currentJSHandle.jsonValue();
+                  option.url = page.url();
                 }
+                const responseID = await new Promise(resolve => {
+                  const request = https.request(
+                    {
+                      host: 'tenon.io',
+                      path: '/api/',
+                      port: 443,
+                      protocol: 'https:',
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache',
+                        Authorization: `Bearer ${tenonData.accessToken}`
+                      }
+                    },
+                    response => {
+                      let report = '';
+                      response.on('data', chunk => {
+                        report += chunk;
+                      });
+                      // When the data arrive, return them as an object.
+                      response.on('end', () => {
+                        try {
+                          const result = JSON.parse(report);
+                          return resolve(result);
+                        }
+                        catch (error) {
+                          return resolve({
+                            error: 'Tenon did not return JSON.',
+                            report
+                          });
+                        }
+                      });
+                    }
+                  );
+                  const postData = JSON.stringify(option);
+                  request.write(postData);
+                  request.end();
+                });
+                // Record the response ID.
+                tenonData.requestIDs[which] = responseID || '';
               }
-              // Add the result to the act.
-              act.result = {
-                status,
-                totals: {
-                  presses,
-                  amountRead
-                }
-              };
-              if (status === 'done' && matchedText) {
-                act.result.matchedText = matchedText;
-              }
-              if (withItems) {
-                act.result.items = items;
-              }
-              // Add the totals to the report.
-              report.presses += presses;
-              report.amountRead += amountRead;
             }
             // Otherwise, if the act is a test:
             else if (act.type === 'test') {
@@ -1024,6 +991,151 @@ const doActs = async (report, actIndex, page) => {
               }
               const qualifier = act.again ? `${1 + act.again} times` : 'once';
               act.result = `pressed ${qualifier}`;
+            }
+            // Otherwise, if it is a repetitive keyboard navigation:
+            else if (act.type === 'presses') {
+              const {navKey, what, which, withItems} = act;
+              const matchTexts = which ? which.map(text => debloat(text)) : [];
+              // Initialize the loop variables.
+              let status = 'more';
+              let presses = 0;
+              let amountRead = 0;
+              let items = [];
+              let matchedText;
+              // As long as a matching element has not been reached:
+              while (status === 'more') {
+                // Press the Escape key to dismiss any modal dialog.
+                await page.keyboard.press('Escape');
+                // Press the specified navigation key.
+                await page.keyboard.press(navKey);
+                presses++;
+                // Identify the newly current element or a failure.
+                const currentJSHandle = await page.evaluateHandle(actCount => {
+                  // Initialize it as the focused element.
+                  let currentElement = document.activeElement;
+                  // If it exists in the page:
+                  if (currentElement && currentElement.tagName !== 'BODY') {
+                    // Change it, if necessary, to its active descendant.
+                    if (currentElement.hasAttribute('aria-activedescendant')) {
+                      currentElement = document.getElementById(
+                        currentElement.getAttribute('aria-activedescendant')
+                      );
+                    }
+                    // Or change it, if necessary, to its selected option.
+                    else if (currentElement.tagName === 'SELECT') {
+                      const currentIndex = Math.max(0, currentElement.selectedIndex);
+                      const options = currentElement.querySelectorAll('option');
+                      currentElement = options[currentIndex];
+                    }
+                    // Or change it, if necessary, to its active shadow-DOM element.
+                    else if (currentElement.shadowRoot) {
+                      currentElement = currentElement.shadowRoot.activeElement;
+                    }
+                    // If there is a current element:
+                    if (currentElement) {
+                      // If it was already reached within this command performance:
+                      if (currentElement.dataset.pressesReached === actCount.toString(10)) {
+                        // Report the error.
+                        console.log(`ERROR: ${currentElement.tagName} element reached again`);
+                        status = 'ERROR';
+                        return 'ERROR: locallyExhausted';
+                      }
+                      // Otherwise, i.e. if it is newly reached within this act:
+                      else {
+                        // Mark and return it.
+                        currentElement.dataset.pressesReached = actCount;
+                        return currentElement;
+                      }
+                    }
+                    // Otherwise, i.e. if there is no current element:
+                    else {
+                      // Report the error.
+                      status = 'ERROR';
+                      return 'noActiveElement';
+                    }
+                  }
+                  // Otherwise, i.e. if there is no focus in the page:
+                  else {
+                    // Report the error.
+                    status = 'ERROR';
+                    return 'ERROR: globallyExhausted';
+                  }
+                }, actCount);
+                // If the current element exists:
+                const currentElement = currentJSHandle.asElement();
+                if (currentElement) {
+                  // Update the data.
+                  const tagNameJSHandle = await currentElement.getProperty('tagName');
+                  const tagName = await tagNameJSHandle.jsonValue();
+                  const text = await textOf(page, currentElement);
+                  // If the text of the current element was found:
+                  if (text !== null) {
+                    const textLength = text.length;
+                    // If it is non-empty and there are texts to match:
+                    if (matchTexts.length && textLength) {
+                      // Identify the matching text.
+                      matchedText = matchTexts.find(matchText => text.includes(matchText));
+                    }
+                    // Update the item data if required.
+                    if (withItems) {
+                      const itemData = {
+                        tagName,
+                        text,
+                        textLength
+                      };
+                      if (matchedText) {
+                        itemData.matchedText = matchedText;
+                      }
+                      items.push(itemData);
+                    }
+                    amountRead += textLength;
+                    // If there is no text-match failure:
+                    if (matchedText || ! matchTexts.length) {
+                      // If the element has any specified tag name:
+                      if (! what || tagName === what) {
+                        // Change the status.
+                        status = 'done';
+                        // Perform the action.
+                        const inputText = act.text;
+                        if (inputText) {
+                          await page.keyboard.type(inputText);
+                          presses += inputText.length;
+                        }
+                        if (act.action) {
+                          presses++;
+                          await page.keyboard.press(act.action);
+                          await page.waitForLoadState();
+                        }
+                      }
+                    }
+                  }
+                  else {
+                    status = 'ERROR';
+                  }
+                }
+                // Otherwise, i.e. if there was a failure:
+                else {
+                  // Update the status.
+                  status = await currentJSHandle.jsonValue();
+                }
+              }
+              // Add the result to the act.
+              act.result = {
+                status,
+                totals: {
+                  presses,
+                  amountRead
+                }
+              };
+              if (status === 'done' && matchedText) {
+                act.result.matchedText = matchedText;
+              }
+              if (withItems) {
+                act.result.items = items;
+              }
+              // Add the totals to the report.
+              report.presses += presses;
+              report.amountRead += amountRead;
             }
             // Otherwise, i.e. if the act type is unknown:
             else {
