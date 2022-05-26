@@ -1,5 +1,5 @@
 // tenon.js
-// Test executor.
+// Test executor for tenon sample script.
 
 const fs = require('fs');
 const {handleRequest} = require('../../index');

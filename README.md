@@ -434,6 +434,8 @@ Another way to run Testaro is to use Testilo, which can handle batches and saves
 
 If a `wave` test is included in the script, an environment variable named `TESTARO_WAVE_KEY` must exist, with your WAVE API key as its value.
 
+If a `tenon` test is included in the script, an environment variable named `TESTARO_TENON_KEY` must exist, with your Tenon API key as its value.
+
 Before executing a Testaro script, you can optionally also set the environment variables `TESTARO_DEBUG` (to `'true'` or anything else) and/or `TESTARO_WAITS` (to a non-negative integer). The effects of these variables are described in the `index.js` file.
 
 ## Validation
