@@ -436,7 +436,11 @@ If a `wave` test is included in the script, an environment variable named `TESTA
 
 If a `tenon` test is included in the script, an environment variable named `TESTARO_TENON_KEY` must exist, with your Tenon API key as its value.
 
+The `text` command can interpolate the value of an environment variable into text that it enters on a page, as documented in the `commands.js` file.
+
 Before executing a Testaro script, you can optionally also set the environment variables `TESTARO_DEBUG` (to `'true'` or anything else) and/or `TESTARO_WAITS` (to a non-negative integer). The effects of these variables are described in the `index.js` file.
+
+You may store these environment variables in an untracked `.env` file if you wish, and Testaro will recognize them.
 
 ## Validation
 

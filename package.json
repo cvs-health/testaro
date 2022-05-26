@@ -30,6 +30,7 @@
     "aatt": "*",
     "accessibility-checker": "*",
     "axe-playwright": "*",
+    "dotenv": "*",
     "pixelmatch": "*",
     "playwright": "*"
   },

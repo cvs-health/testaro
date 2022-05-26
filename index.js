@@ -3,6 +3,8 @@
   testaro main script.
 */
 // ########## IMPORTS
+// Module to keep secrets.
+require('dotenv').config();
 // Requirements for commands.
 const {commands} = require('./commands');
 // ########## CONSTANTS
@@ -713,12 +715,13 @@ const doActs = async (report, actIndex, page) => {
               act.result = 'All elements visible.';
             }
             // Otherwise, if the act is a tenon request:
-            else if (act.type === 'tenonrequest') {
+            else if (act.type === 'tenonRequest') {
               const {which, withNewContent} = act;
               const https = require('https');
               // If a Tenon access token has not yet been obtained:
               if (! tenonData.accessToken) {
                 // Authenticate with the Tenon API.
+                console.log('About to authenticate');
                 const authData = await new Promise(resolve => {
                   const request = https.request(
                     {
@@ -738,6 +741,7 @@ const doActs = async (report, actIndex, page) => {
                         responseData += chunk;
                       });
                       response.on('end', () => {
+                        console.log(`Response data:\n${responseData}`);
                         try {
                           const responseJSON = JSON.parse(responseData);
                           return resolve(responseJSON);
@@ -839,6 +843,7 @@ const doActs = async (report, actIndex, page) => {
               }
               // Conduct, report, and time the test.
               const startTime = Date.now();
+              console.log(JSON.stringify(args));
               const testReport = await require(`./tests/${act.which}`).reporter(...args);
               const expectations = act.expect;
               // If the test has expectations:
