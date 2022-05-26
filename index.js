@@ -716,12 +716,11 @@ const doActs = async (report, actIndex, page) => {
             }
             // Otherwise, if the act is a tenon request:
             else if (act.type === 'tenonRequest') {
-              const {which, withNewContent} = act;
+              const {id, withNewContent} = act;
               const https = require('https');
               // If a Tenon access token has not yet been obtained:
               if (! tenonData.accessToken) {
                 // Authenticate with the Tenon API.
-                console.log('About to authenticate');
                 const authData = await new Promise(resolve => {
                   const request = https.request(
                     {
@@ -741,7 +740,6 @@ const doActs = async (report, actIndex, page) => {
                         responseData += chunk;
                       });
                       response.on('end', () => {
-                        console.log(`Response data:\n${responseData}`);
                         try {
                           const responseJSON = JSON.parse(responseData);
                           return resolve(responseJSON);
@@ -784,11 +782,12 @@ const doActs = async (report, actIndex, page) => {
                   // Specify this.
                   option.src = await page.content();
                 }
+                // Request a Tenon test and get a response ID.
                 const responseID = await new Promise(resolve => {
                   const request = https.request(
                     {
                       host: 'tenon.io',
-                      path: '/api/',
+                      path: '/api/v2/',
                       port: 443,
                       protocol: 'https:',
                       method: 'POST',
@@ -799,21 +798,19 @@ const doActs = async (report, actIndex, page) => {
                       }
                     },
                     response => {
-                      let report = '';
+                      let resultJSON = '';
                       response.on('data', chunk => {
-                        report += chunk;
+                        resultJSON += chunk;
                       });
                       // When the data arrive, return them as an object.
                       response.on('end', () => {
                         try {
-                          const result = JSON.parse(report);
-                          return resolve(result);
+                          const result = JSON.parse(resultJSON);
+                          resolve(result.responseID);
                         }
                         catch (error) {
-                          return resolve({
-                            error: 'Tenon did not return JSON.',
-                            report
-                          });
+                          console.log('ERROR: Tenon did not return JSON.');
+                          resolve('');
                         }
                       });
                     }
@@ -823,7 +820,7 @@ const doActs = async (report, actIndex, page) => {
                   request.end();
                 });
                 // Record the response ID.
-                tenonData.requestIDs[which] = responseID || '';
+                tenonData.requestIDs[id] = responseID || '';
               }
             }
             // Otherwise, if the act is a test:
@@ -843,7 +840,6 @@ const doActs = async (report, actIndex, page) => {
               }
               // Conduct, report, and time the test.
               const startTime = Date.now();
-              console.log(JSON.stringify(args));
               const testReport = await require(`./tests/${act.which}`).reporter(...args);
               const expectations = act.expect;
               // If the test has expectations:

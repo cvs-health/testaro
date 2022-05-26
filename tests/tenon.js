@@ -7,11 +7,11 @@ exports.reporter = async (tenonData, id) => {
   // Universal request options.
   const requestOptions = {
     host: 'tenon.io',
-    path: `/api/v2/${tenonData.responseIDs[id]}`,
+    path: `/api/v2/${tenonData.requestIDs[id]}`,
     port: 443,
     protocol: 'https:',
     headers: {
-      Authorization: tenonData.access_token,
+      Authorization: tenonData.accessToken,
       'Cache-Control': 'no-cache'
     }
   };
