@@ -1,5 +1,5 @@
 {
-  "what": "Test example.com with tenon",
+  "what": "Test Wikipedia with tenon",
   "strict": true,
   "commands": [
     {
@@ -9,8 +9,8 @@
     },
     {
       "type": "url",
-      "which": "https://example.com/",
-      "what": "page with a few accessibility defects"
+      "which": "https://en.wikipedia.org/wiki/Main_Page",
+      "what": "Wikipedia English home page"
     },
     {
       "type": "tenonRequest",

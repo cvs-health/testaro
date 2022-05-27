@@ -33,11 +33,11 @@ As of this version, the counts of tests in the packages referenced above were:
 - Alfa: 103
 - Axe-core: 138
 - Equal Access: 163
-- Tenon: 433
+- Tenon: 180
 - WAVE: 110
 - subtotal: 612
 - Testaro tests: 16
-- grand total: 1061
+- grand total: 808
 
 ## Code organization
 
