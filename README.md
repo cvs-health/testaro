@@ -39,10 +39,6 @@ As of this version, the counts of tests in the packages referenced above were:
 - Testaro tests: 16
 - grand total: 1061
 
-## Related packages
-
-[Testilo](https://www.npmjs.com/package/testilo) is an application that facilitates the use of Testaro.
-
 ## Code organization
 
 The main directories containing code files are:
@@ -264,13 +260,13 @@ The `tenon` test requires two commands:
 - A command of type `tenonRequest`.
 - A command of type `test` with `tenon` as the value of `which`.
 
-The reason for this is that the Tenon API operates asynchronously. You ask it to perform a test, and it puts your request into a queue. To learn whether Tenon has completed your test, you make a status request. You can continue making status requests until Tenon replies that your test has been completed. Then you submit a request for the test result, and Tenon replies with the result.
+The reason for this is that the Tenon API operates asynchronously. You ask it to perform a test, and it puts your request into a queue. To learn whether Tenon has completed your test, you make a status request. You can continue making status requests until Tenon replies that your test has been completed. Then you submit a request for the test result, and Tenon replies with the result. (As of May 2022, status requests were observed to misreport still-running tests as completed. The `tenon` test works around that.)
 
-Tenon says that tests are typically completed in 3 to 6 seconds, but the latency can be longer, depending on demand.
+Tenon says that tests are typically completed in 3 to 6 seconds but that the latency can be longer, depending on demand.
 
-Therefore, you can include a `tenonRequest` command early in your script, and a `tenon` test late in your script. Tenon will move your request through its queue while Testaro is processing your script. When Testaro reaches your `tenon` test command, Tenon will most likely have completed your test. If not, the `tenon` test will wait and then make a second status request before giving up.
+Therefore, you can include a `tenonRequest` command early in your script, and a `tenon` test late in your script. Tenon will move your request through its queue while Testaro is processing your script. When Testaro reaches your `tenon` test command, Tenon will most likely have completed your test. If not, the `tenon` test will wait and then make a second request before giving up.
 
-Thus, a `tenon` test actually does not perform any test; it merely collects the result. The page that was loaded when the `tenonRequest` command was performed is the one that Tenon tests.
+Thus, a `tenon` test actually does not perform any test; it merely collects the result. The page that was active when the `tenonRequest` command was performed is the one that Tenon tests.
 
 In case you want to perform more than one `tenon` test, you can do so. Just give each pair of commands a distinct `id` property, so each `tenon` test command will request the correct result.
 
@@ -434,7 +430,7 @@ Another way to run Testaro is to use Testilo, which can handle batches and saves
 
 If a `wave` test is included in the script, an environment variable named `TESTARO_WAVE_KEY` must exist, with your WAVE API key as its value.
 
-If a `tenon` test is included in the script, an environment variable named `TESTARO_TENON_KEY` must exist, with your Tenon API key as its value.
+If a `tenon` test is included in the script, environment variables named `TESTARO_TENON_USER` and `TESTARO_TENON_PASSWORD` must exist, with your Tenon username and password, respectively, as their values.
 
 The `text` command can interpolate the value of an environment variable into text that it enters on a page, as documented in the `commands.js` file.
 
@@ -482,25 +478,21 @@ Test packages sometimes do redundant testing, in that two or more packages test 
 
 The files in the `temp` directory are presumed ephemeral and are not tracked by `git`. When tests require temporary files to be written, Testaro writes them there.
 
-## Origin
+## Related packages
 
-Testaro is derived from [Autotest](https://github.com/jrpool/autotest), which in turn is derived from accessibility test investigations beginning in 2018.
+[Testilo](https://www.npmjs.com/package/testilo) is an application that facilitates the use of Testaro.
 
-Testaro omits some functionalities of Autotest, such as:
-- tests producing results intended to be human-inspected
-- previous versions of scoring algorithms
-- file operations for score aggregation, report revision, and HTML reports
-- a web user interface
-
-## Origin
-
-Work on the custom tests in this package began in 2017, and work on the multi-package federation that Testaro implements began in early 2018. These two aspects were combined into the [Autotest](https://github.com/jrpool/autotest) package in early 2021 and into this more limited-purpose package, Testaro, in January 2022.
+Testaro is derived from [Autotest](https://github.com/jrpool/autotest).
 
 Testaro omits some functionalities of Autotest, such as:
 - tests producing results intended to be human-inspected
 - previous versions of scoring algorithms
 - file operations for score aggregation, report revision, and HTML reports
 - a web user interface
+
+## Origin
+
+Work on the custom tests in this package began in 2017, and work on the multi-package federation that Testaro implements began in early 2018. These two aspects were combined into the [Autotest](https://github.com/jrpool/autotest) package in early 2021 and into this more single-purpose package, Testaro, in January 2022.
 
 ## Etymology
 
