@@ -367,7 +367,7 @@ const textOf = async (page, element) => {
 const matchElement = async (page, selector, matchText, index = 0) => {
   // If the page still exists:
   if (page) {
-    // Wait 3 seconds until the body contains any text to be matched.
+    // Wait 2 seconds until the body contains any text to be matched.
     const slimText = debloat(matchText);
     const bodyText = await page.textContent('body');
     const slimBody = debloat(bodyText);
@@ -767,6 +767,10 @@ const doActs = async (report, actIndex, page) => {
                   // Record the access token.
                   tenonData.accessToken = authData.access_token;
                 }
+                // Otherwise, i.e. if the authentication failed:
+                else {
+                  console.log('ERROR: tenon authentication failed');
+                }
               }
               // If a Tenon access token exists:
               if (tenonData.accessToken) {
@@ -806,7 +810,7 @@ const doActs = async (report, actIndex, page) => {
                       response.on('end', () => {
                         try {
                           const result = JSON.parse(resultJSON);
-                          resolve(result.responseID);
+                          resolve(result.data.responseID || '');
                         }
                         catch (error) {
                           console.log('ERROR: Tenon did not return JSON.');
