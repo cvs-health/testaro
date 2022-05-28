@@ -6,7 +6,7 @@ Federated accessibility test automation
 
 Testaro is a collection of collections of web accessibility tests.
 
-The purpose of Testaro is to provide programmatic access to over 600 accessibility tests defined in several test packages and in Testaro itself.
+The purpose of Testaro is to provide programmatic access to over 800 accessibility tests defined in several test packages and in Testaro itself.
 
 Running Testaro requires telling it which operations (including tests) to perform and which URLs to perform them on, and giving Testaro an object to put its output into.
 
@@ -72,7 +72,7 @@ Once you have done that, you can install Testaro as you would install any `npm` 
 
 ## Payment
 
-All of the tests that Testaro can perform are free of cost, except those in the WAVE package. WebAIM requires an API key for those tests. If you wish to have Testaro perform the WAVE tests, you will need to have a WAVE API key. Visit the URL above in order to obtain your key. It costs 1 to 3 credits to perform the WAVE tests on one URL. WebAIM gives you 100 credits without cost, before you need to begin paying.
+All of the tests that Testaro can perform are free of cost, except those in the Tenon and WAVE packages. The owner of each of those packages gives new registrants a free allowance of credits before it becomes necessary to pay for use of their APIs. The required environment variables for authentication and payment are described below under “Environment variables”.
 
 ## Specification
 
@@ -163,7 +163,6 @@ The subsequent commands can tell Testaro to perform any of:
 - navigations (browser launches, visits to URLs, waits for page conditions, etc.)
 - alterations (changes to the page)
 - tests (whether in dependency packages or defined within Testaro)
-- scoring (aggregating test results into total scores)
 - branching (continuing from a command other than the next one)
 
 ##### Moves
@@ -271,37 +270,6 @@ Thus, a `tenon` test actually does not perform any test; it merely collects the 
 In case you want to perform more than one `tenon` test, you can do so. Just give each pair of commands a distinct `id` property, so each `tenon` test command will request the correct result.
 
 Tenon recommends giving it a public URL rather than giving it the content of a page, if possible. So, it is best to give the `withNewContent` property of the `tenonRequest` command the value `true`, unless the page is not public.
-
-##### Scoring
-
-An example of a **scoring** command is:
-
-```json
-{
-  "type": "score",
-  "which": "asp09",
-  "what": "5 packages and 16 custom tests, with duplication discounts"
-}
-```
-
-In this case, Testaro executes the procedure specified in the `asp09` score proc (in the `procs/score` directory) to compute a total score for the script or (if there is a batch) the host. The proc is a JavaScript module whose `scorer` function returns an object containing a total score and the itemized scores that yield the total.
-
-The `scorer` function inspects the script report to find the required data, applies specific weights and formulas to yield the itemized scores, and combines the itemized scores to yield the total score.
-
-The data for scores can include not only test results, but also log statistics. Testaro includes in each report the properties:
-- `logCount`: how many log items the browser generated
-- `logSize`: how large the log items were in the aggregate, in characters
-- `prohibitedCount`: how many log items contain (case-insensitively) `403` and `status`, or `prohibited`
-- `visitTimeoutCount`: how many times an attempt to visit a URL timed out
-- `visitRejectionCount`: how many times a URL visit got an HTTP status other than 200 or 304
-
-Those log statistics can provide data for a log-based test defined in a score proc.
-
-A good score proc takes account of duplications between test packages: two or more packages that discover the same accessibility defects. Score procs can apply discounts to reflect duplications between test packages, so that, if two or more packages discover the same defect, the defect will not be overweighted.
-
-The procedures in the `scoring` directory have produced data there that score procs can use for the calibration of discounts.
-
-Some documents are implemented in such a way that some tests are prevented from being conducted on them. When that occurs, the score proc can **infer** a score for that test.
 
 ##### Branching
 
@@ -428,9 +396,9 @@ Another way to run Testaro is to use Testilo, which can handle batches and saves
 
 ### Environment variables
 
-If a `wave` test is included in the script, an environment variable named `TESTARO_WAVE_KEY` must exist, with your WAVE API key as its value.
-
 If a `tenon` test is included in the script, environment variables named `TESTARO_TENON_USER` and `TESTARO_TENON_PASSWORD` must exist, with your Tenon username and password, respectively, as their values.
+
+If a `wave` test is included in the script, an environment variable named `TESTARO_WAVE_KEY` must exist, with your WAVE API key as its value.
 
 The `text` command can interpolate the value of an environment variable into text that it enters on a page, as documented in the `commands.js` file.
 
@@ -460,7 +428,7 @@ You can define additional Testaro commands and functionality. Contributions are 
 
 ## Accessibility principles
 
-The rationales motivating the Testaro-defined tests and scoring procs can be found in comments within the files of those tests and procs, in the `tests` and `procs/score` directories. Unavoidably, each test is opinionated. Testaro itself, however, can accommodate other tests representing different opinions. Testaro is intended to be neutral with respect to questions such as the criteria for accessibility, the severities of accessibility issues, whether accessibility is binary or graded, and the distinction between usability and accessibility.
+The rationales motivating the Testaro-defined tests can be found in comments within the files of those tests, in the `tests` directory. Unavoidably, each test is opinionated. Testaro itself, however, can accommodate other tests representing different opinions. Testaro is intended to be neutral with respect to questions such as the criteria for accessibility, the severities of accessibility issues, whether accessibility is binary or graded, and the distinction between usability and accessibility.
 
 ## Testing challenges
 
@@ -472,11 +440,23 @@ The Playwright “Receives Events” actionability check does **not** check whet
 
 ### Test-package duplication
 
-Test packages sometimes do redundant testing, in that two or more packages test for the same issues. But such duplications are not necessarily perfect. Therefore, the scoring procs currently defined by Testaro do not select a single package to test for a single issue. Instead, they allow all packages to test for all the issues they can test for, but decrease the weights placed on issues that multiple packages test for. The more packages test for an issue, the smaller the weight placed on each package’s finding of that issue.
+Test packages sometimes do redundant testing, in that two or more packages test for the same issues, although such duplications are not necessarily perfect. This fact creates three problems:
+- One cannot be confident in excluding some tests of some packages on the assumption that they perfectly duplicate tests of other packages.
+- The Testaro report from a script documents each package’s results separately, so a single difect may be documented in multiple locations within the report, making the consumption of the report inefficient.
+- An effort to aggregate the results into a single score may distort the scores by inflating the weights of defects that happen to be discovered by multiple packages.
+
+The tests provided with Testaro do not exclude any apparently duplicative tests from packages.
+
+To deal with the above problems, you can:
+- revise package `test` commands to exclude tests that you consider duplicative
+- create derivative reports that organize results by defect types rather than by package
+- take duplication into account when defining scoring rules
+
+Some measures of these kinds are included in the scoring and reporting features of the Testilo package.
 
 ## Repository exclusions
 
-The files in the `temp` directory are presumed ephemeral and are not tracked by `git`. When tests require temporary files to be written, Testaro writes them there.
+The files in the `temp` directory are presumed ephemeral and are not tracked by `git`.
 
 ## Related packages
 

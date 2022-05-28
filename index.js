@@ -613,17 +613,6 @@ const doActs = async (report, actIndex, page) => {
         // Identify its only page as current.
         page = browserContext.pages()[0];
       }
-      // Otherwise, if it is a score:
-      else if (act.type === 'score') {
-        // Compute and report the score.
-        try {
-          const {scorer} = require(`./procs/score/${act.which}`);
-          act.result = scorer(report.acts);
-        }
-        catch (error) {
-          act.error = `ERROR: ${error.message}\n${error.stack}`;
-        }
-      }
       // Otherwise, if a current page exists:
       else if (page) {
         // If the command is a url:
@@ -1200,25 +1189,6 @@ const doScript = async (report) => {
   report.prohibitedCount = prohibitedCount;
   report.visitTimeoutCount = visitTimeoutCount;
   report.visitRejectionCount = visitRejectionCount;
-  // If logs are to be scored, do so.
-  const scoreTables = report.acts.filter(act => act.type === 'score');
-  if (scoreTables.length) {
-    const scoreTable = scoreTables[0];
-    const {result} = scoreTable;
-    if (result) {
-      const {logWeights, scores} = result;
-      if (logWeights && scores) {
-        scores.log = Math.floor(
-          logWeights.count * logCount
-          + logWeights.size * logSize
-          + logWeights.prohibited * prohibitedCount
-          + logWeights.visitTimeout * visitTimeoutCount
-          + logWeights.visitRejection * visitRejectionCount
-        );
-        scores.total += scores.log;
-      }
-    }
-  }
   // Add the end time and duration to the report.
   const endTime = new Date();
   report.endTime = endTime.toISOString().slice(0, 19);

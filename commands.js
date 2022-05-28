@@ -89,13 +89,6 @@ exports.commands = {
         what: [false, 'string', 'hasLength', 'comment']
       }
     ],
-    score: [
-      'Compute and report a score',
-      {
-        which: [true, 'string', 'hasLength', 'score-proc name'],
-        what: [false, 'string', 'hasLength', 'comment']
-      }
-    ],
     select: [
       'Select a select option',
       {
