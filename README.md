@@ -406,22 +406,35 @@ const report = {
 
 Replace `{…}` with a script object, like the example script shown above. The low-level method does not allow the use of batches.
 
-Then execute the statement `node run report`. That statement will make Testaro run the script and populate the `log` and `acts` arrays of the `report` object. When Testaro finishes, the `log` and `acts` properties will contain the results.
+Then execute the `run` module with the `report` object as an argument.
+- Another Node.js package that has Testaro as a dependency can execute `require('testaro').run(report)`.
+- In a command environment with the Testaro project directory as the current directory, you can execute `node run report`.
+
+Either statement will make Testaro run the script and populate the `log` and `acts` arrays of the `report` object. When Testaro finishes, the `log` and `acts` properties will contain the results.
+
+You or a dependent package can then save or further process the `report` object as desired.
 
 #### High-level
 
-Make sure that you have defined these environment variables:
+Make sure that you have defined these environment variables, with absolute or relative paths to directories as their values:
 - `SCRIPTDIR`
 - `BATCHDIR`
 - `REPORTDIR`
 
-Also ensure that Testaro can read those directories and write to `REPORTDIR`.
+Relative paths must be relative to the Testaro project directory. For example, if the script directory is `scripts` in a `testing` directory that is a sibling of the Testaro directory, then `SCRIPTDIR` must have the value `../testing/scripts`.
+
+Also ensure that Testaro can read all those directories and write to `REPORTDIR`.
 
 Place a script into `SCRIPTDIR` and, optionally, a batch into `BATCHDIR`. Each should be named `idValue.json`, where `idValue` is replaced with the value of its `id` property. That value must consist of only lower-case ASCII letters and digits.
 
 Then execute the statement `node job scriptID` or `node job scriptID batchID`, replacing `scriptID` and `batchID` with the `id` values of the script and the batch, respectively.
 
-The `job` module will call the `run` module on the script, or, if there is a batch, will create multiple scripts, one per host, and sequentially call the `run` module on each script. The results will be saved in report files in the `REPORTDIR` directory. If there is no batch, the report file will be named with a unique timestamp. If there is a batch, then the base of each file’s name will be the same timestamp, suffixed with `-hostID`, where `hostID` is the value of the `id` property of the `host` object in the batch file.
+The `job` module will call the `run` module on the script, or, if there is a batch, will create multiple scripts, one per host, and sequentially call the `run` module on each script. The results will be saved in report files in the `REPORTDIR` directory.
+
+If there is no batch, the report file will be named with a unique timestamp, suffixed with a `.json` extension. If there is a batch, then the base of each file’s name will be the same timestamp, suffixed with `-hostID`, where `hostID` is the value of the `id` property of the `host` object in the batch file. For example, if you execute `node job script01 wikis`, you might get these report files deposited into `REPORTDIR`:
+- `enp46j-wikipedia.json`
+- `enp45j-wiktionary.json`
+- `enp45j-wikidata.json`
 
 ### Environment variables
 
@@ -497,7 +510,7 @@ Testaro is derived from [Autotest](https://github.com/jrpool/autotest).
 
 Testaro omits some functionalities of Autotest, such as:
 - tests producing results intended to be human-inspected
-- previous versions of scoring algorithms
+- scoring
 - file operations for score aggregation, report revision, and HTML reports
 - a web user interface
 
