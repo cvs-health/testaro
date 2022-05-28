@@ -452,15 +452,23 @@ You may store these environment variables in an untracked `.env` file if you wis
 
 ## Validation
 
+### Samples
+
+The `samples` directory contains scripts and a batch that you can use to test Testaro with with the high-level, by giving `SCRIPTDIR` the value `'samples/scripts'` and `BATCHDIR` the value `'samples/batches'`. Do to this, you must also define `REPORTDIR`.
+
+### Validators
+
 _Executors_ for Testaro validation are located in the `validation` directory.
 
-A basic executor is the `test.js` file. It runs Testaro with a simple sample script and outputs the log and the acts.
+A basic executor is the `test.js` file. It uses the low-level method to run Testaro with the `simple.js` sample script and outputs the log and the acts to the standard output.
 
 The other executors are commonJS JavaScript modules that run Testaro and report whether the results are correct.
 
 The other executors are:
 - `app.js`: Reports whether Testaro runs correctly with a script.
 - `tests.js`: Runs Testaro with each custom test and reports whether the results are correct.
+
+There are no executors for validating the test packages.
 
 To execute any executor `xyz.js`, call it with the statement `node validation/executors/xyz`. The results will appear in the standard output.
 
