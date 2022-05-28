@@ -8,8 +8,6 @@ Testaro is a collection of collections of web accessibility tests.
 
 The purpose of Testaro is to provide programmatic access to over 800 accessibility tests defined in several test packages and in Testaro itself.
 
-Running Testaro requires telling it which operations (including tests) to perform and which URLs to perform them on, and giving Testaro an object to put its output into.
-
 ## System requirements
 
 Version 14 or later of [Node.js](https://nodejs.org/en/).
@@ -72,7 +70,7 @@ Once you have done that, you can install Testaro as you would install any `npm` 
 
 ## Payment
 
-All of the tests that Testaro can perform are free of cost, except those in the Tenon and WAVE packages. The owner of each of those packages gives new registrants a free allowance of credits before it becomes necessary to pay for use of their APIs. The required environment variables for authentication and payment are described below under “Environment variables”.
+All of the tests that Testaro can perform are free of cost, except those in the Tenon and WAVE packages. The owner of each of those packages gives new registrants a free allowance of credits before it becomes necessary to pay for use of the API of the package. The required environment variables for authentication and payment are described below under “Environment variables”.
 
 ## Specification
 
@@ -82,7 +80,7 @@ To use Testaro, you must specify what it should do. You do this with a script an
 
 ### Introduction
 
-When you run Testaro, you provide a **script** to it. The script contains **commands**. Testaro performs those commands.
+To use Testaro, you provide a **script** to it. The script contains **commands**. Testaro __runs__ the script, i.e. performs the commands in it and writes a report of the results.
 
 A script is a JSON file with the properties:
 
@@ -367,15 +365,35 @@ A typical use for an `expect` property is checking the correctness of a Testaro 
 
 ## Batches
 
-In some cases you may wish to repeatedly run Testaro with the same script, changing only its `url` commands. The purpose would be to perform the same set of tests on multiple web pages. Such a use would apply only to scripts whose `url` commands are all identical, not to a script that moves from one host to another.
+You may wish to have Testaro perform the same sequence of tests on multiple web pages. In that case, you can create a _batch_, with the following structure:
 
-Testaro does not support such batch processing, but Testilo does. See its `README.md` file for instructions.
+```javascript
+{
+  what: 'Web leaders',
+  hosts: {
+    id: 'w3c',
+    which: 'https://www.w3.org/',
+    what: 'W3C'
+  },
+  {
+    id: 'wikimedia',
+    which: 'https://www.wikimedia.org/',
+    what: 'Wikimedia'
+  }
+}
+```
+
+With a batch, you can execute a single statement to run a script multiple times, one per host. On each call, Testaro takes one of the hosts in the batch and substitutes it for each host specified in a `url` command of the script. Testaro thereby creates and sequentially runs multiple scripts.
 
 ## Execution
 
 ### Invocation
 
-To run Testaro, create a report object like this:
+There are two methods for using Testaro.
+
+#### Low-level
+
+Create a report object like this:
 
 ```javascript
 const report = {
@@ -386,15 +404,28 @@ const report = {
 };
 ```
 
-Replace `{…}` with a script object, like the example script shown above.
+Replace `{…}` with a script object, like the example script shown above. The low-level method does not allow the use of batches.
 
-Then execute the statement `require('testaro').handleRequest(report)`. That statement will run Testaro.
+Then execute the statement `node run report`. That statement will make Testaro run the script and populate the `log` and `acts` arrays of the `report` object. When Testaro finishes, the `log` and `acts` properties will contain the results.
 
-While it runs, Testaro will populate the `log` and `acts` arrays of the report object. When Testaro finishes, the `log` and `acts` properties will contain its results.
+#### High-level
 
-Another way to run Testaro is to use Testilo, which can handle batches and saves results to files. Testilo prepopulates the report object with an `id` property consisting of a timestamp and, if a batch is used, the host ID. If Testaro finds a non-empty `id` property in the `report` object, Testaro leaves it unchanged; if not, Testaro creates an `id` property with a timestamp value.
+Make sure that you have defined these environment variables:
+- `SCRIPTDIR`
+- `BATCHDIR`
+- `REPORTDIR`
+
+Also ensure that Testaro can read those directories and write to `REPORTDIR`.
+
+Place a script into `SCRIPTDIR` and, optionally, a batch into `BATCHDIR`. Each should be named `idValue.json`, where `idValue` is replaced with the value of its `id` property. That value must consist of only lower-case ASCII letters and digits.
+
+Then execute the statement `node job scriptID` or `node job scriptID batchID`, replacing `scriptID` and `batchID` with the `id` values of the script and the batch, respectively.
+
+The `job` module will call the `run` module on the script, or, if there is a batch, will create multiple scripts, one per host, and sequentially call the `run` module on each script. The results will be saved in report files in the `REPORTDIR` directory. If there is no batch, the report file will be named with a unique timestamp. If there is a batch, then the base of each file’s name will be the same timestamp, suffixed with `-hostID`, where `hostID` is the value of the `id` property of the `host` object in the batch file.
 
 ### Environment variables
+
+As mentioned above, using the high-level method to run Testaro jobs requires `SCRIPTDIR`, `BATCHDIR`, and `REPORTDIR` environment variables.
 
 If a `tenon` test is included in the script, environment variables named `TESTARO_TENON_USER` and `TESTARO_TENON_PASSWORD` must exist, with your Tenon username and password, respectively, as their values.
 
