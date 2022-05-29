@@ -3,6 +3,7 @@
 
 const report = {
   script: {
+    id: 'script0',
     what: 'Sample Testaro executor with 1 test',
     strict: true,
     commands: [

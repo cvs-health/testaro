@@ -9,7 +9,7 @@
 require('dotenv').config();
 // Module to read and write files.
 const fs = require('fs/promises');
-const { handleRequest } = require('./run');
+const {handleRequest} = require('./run');
 
 // ########## CONSTANTS
 const scriptDir = process.env.SCRIPTDIR;
@@ -45,12 +45,12 @@ const runHost = async (id, script) => {
     script,
     acts: []
   };
-  await require('./run').handleRequest(report);
+  await handleRequest(report);
   const reportJSON = JSON.stringify(report, null, 2);
   await fs.writeFile(`${reportDir}/${id}.json`, reportJSON);
 };
 // Runs a job.
-exports.handleRequest = async (scriptID, batchID) => {
+exports.job = async (scriptID, batchID) => {
   if (scriptID) {
     try {
       const scriptJSON = await fs.readFile(`${scriptDir}/${scriptID}.json`, 'utf8');
@@ -89,4 +89,4 @@ exports.handleRequest = async (scriptID, batchID) => {
 
 // ########## OPERATION
 
-handleRequest(process.argv[2], process.argv[3]);
+exports.job(process.argv[2], process.argv[3]);

@@ -7,7 +7,6 @@
 require('dotenv').config();
 // Requirements for commands.
 const {commands} = require('./commands');
-const { handleRequest } = require('./job');
 // ########## CONSTANTS
 // Set DEBUG environment variable to 'true' to add debugging features.
 const debug = process.env.TESTARO_DEBUG === 'true';
@@ -1256,7 +1255,3 @@ exports.handleRequest = async report => {
     console.log('ERROR: options missing or invalid');
   }
 };
-
-// ########## OPERATION
-
-handleRequest(process.argv[2]);

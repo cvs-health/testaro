@@ -462,8 +462,8 @@ Testaro can be validated with the _executors_ located in the `validation/executo
 
 The executors are:
 
-- `test`: runs the `simple` sample script
 - `app`: reports whether Testaro runs correctly with a script
+- `test`: runs the `simple` sample script
 - `tests`: makes Testaro perform each custom test and reports whether the results are correct
 
 There are no executors for validating the test packages.
