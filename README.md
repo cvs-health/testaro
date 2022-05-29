@@ -440,13 +440,48 @@ If there is no batch, the report file will be named with a unique timestamp, suf
 
 In watch mode, Testaro periodically checks for a job to be run by it, containing a script and, optionally, a batch. When such a job exists, Testaro runs the script, or creates a set of host scripts and sequentially runs them. After running the script or each host script, Testaro converts the report to JSON and disposes of it as specified.
 
+Testaro checks periodically. The interval between checks, in seconds, is specified by an `INTERVAL` environment variable.
+
 There are two ways for Testaro to watch for jobs.
 
 ##### Directory watch
 
-With directory watch, Testaro checks whether a particular directory in its host’s filesystem contains a job file. If it does,
+With directory watch, Testaro checks whether a particular directory in its host’s filesystem contains a job file. A job file is a JSON-format file named `abc.json` representing an object like this:
+
+```json
+{
+  "jobID": "abc",
+  "script": {…},
+  "batch": {…}
+}
+```
+
+The `batch` property is optional. The object may also include other properties. The value `abc` may be replaced with any string of lower-case ASCII letters and digits, which must be identical in the file name and the `jobID` value.
+
+When Testaro finds job files in the directory, Testaro runs the first job, writes the report(s) into the report directory, and moves the job file into the ex-jobs directory.
+
+Since Testaro runs the first job (i.e. the job whose name is first in ASCII order), whoever populates the directory with job files has control over the order in which Testaro runs them.
+
+In order to make directory watching possible, you must define these environment variables:
+- `REPORTDIR`
+- `JOBDIR`
+- `EXJOBDIR`
 
 ##### Network watch
+
+With network watch, Testaro asks a particular API whether it has any jobs for the current instance of Testaro, identified by an authorization code. If the response is a JSON representation of an object satisfying the same requirements as given above under “Directory watch”, Testaro runs the job and sends the report(s) to the API.
+
+Thus, if there are multiple jobs queued for the Testaro instance, the API is responsible for choosing one of them to send in response.
+
+When the API receives the reports, it can dispose of them as desired. Each report is a JSON representation of an object, which has these identification properties:
+- `jobID`
+- `timeStamp`
+- `id`
+The `jobID` property can be used for an association between each report and the job that it arose from. The `timeStamp` property can be used for an association of all the reports in a batched job. And the `id` property (which begins with the time stamp) is unique to each report.
+
+In order to make network watching possible, you must define these environment variables:
+- `JOB_URL`
+- `REPORT_URL`
 
 ### Environment variables
 

@@ -56,7 +56,8 @@ const checkDirJob = async () => {
 // Checks for a network job.
 const checkNetJob = async () => {
   const job = await new Promise(resolve => {
-    const request = client.request(jobURL, response => {
+    const wholeURL = `${jobURL}?authCode=${authCode}`;
+    const request = client.request(wholeURL, response => {
       const chunks = [];
       response.on('data', chunk => {
         chunks.push(chunk);
@@ -199,10 +200,10 @@ const runJob = async job => {
 };
 // Repeatedly checks for jobs, runs them, and submits reports.
 exports.cycle = async () => {
-  const interval = Number.parseInt(interval);
+  const intervalMS = Number.parseInt(interval);
   let statusOK = true;
   while (statusOK) {
-    await wait(1000 * interval);
+    await wait(1000 * intervalMS);
     const job = watchType === 'dir' ? await checkDirJob() : await checkNetJob();
     const report = await runJob(job);
     if (watchType === 'dir') {
