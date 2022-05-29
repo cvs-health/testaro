@@ -83,7 +83,14 @@ const writeDirReport = async report => {
   const {id, jobID} = report;
   if (id && jobID) {
     const reportJSON = JSON.stringify(report, null, 2);
-    await fs.writeFile(`${reportDir}/${report.id}.json`, reportJSON);
+    try {
+      await fs.writeFile(`${reportDir}/${report.id}.json`, reportJSON);
+      return true;
+    }
+    catch(error) {
+      console.log(`ERROR: Failed to write report ${id} for job ${jobID}`);
+      return false;
+    }
   }
 };
 // Submits a network report.
@@ -125,9 +132,10 @@ const wait = ms => {
   });
 };
 // Runs one script and writes or sends a report.
-const runHost = async (jobID, id, script) => {
+const runHost = async (jobID, timeStamp, id, script) => {
   const report = {
     jobID,
+    timeStamp,
     id,
     log: [],
     script,
@@ -159,13 +167,13 @@ const runJob = async job => {
             const spec = specs.shift();
             const {id} = spec;
             const hostScript = spec.script;
-            return await runHost(jobID, id, hostScript);
+            return await runHost(jobID, timeStamp, id, hostScript);
           }
         }
         // Otherwise, i.e. if there is no batch:
         else {
           // Run the script and submit a report with a timestamp ID.
-          return await runHost(jobID, timeStamp, script);
+          return await runHost(jobID, timeStamp, timeStamp, script);
         }
       }
       catch(error) {
@@ -190,25 +198,25 @@ const runJob = async job => {
   }
 };
 // Repeatedly checks for jobs, runs them, and submits reports.
-const cycle = async () => {
+exports.cycle = async () => {
   const interval = Number.parseInt(interval);
-  while (true) {
+  let statusOK = true;
+  while (statusOK) {
     await wait(1000 * interval);
     const job = watchType === 'dir' ? await checkDirJob() : await checkNetJob();
-    await runJob(job);
-    await exifyJob(job.jobID, job.timeStamp);
-  };
+    const report = await runJob(job);
+    if (watchType === 'dir') {
+      const writeSuccess = await writeDirReport(report);
+      statusOK = writeSuccess;
+    }
+    else {
+      const ack = await writeNetReport(report);
+      if (ack.error) {
+        statusOK = false;
+      }
+    }
+    if (statusOK) {
+      await exifyJob(job.jobID, job.timeStamp);
+    }
+  }
 };
-
-// ########## OPERATION
-
-try {
-  cycle();
-}
-catch(error) {
-  console.log(`ERROR: ${error.message}`);
-  const interval = Number.parseInt(INTERVAL);
-  setTimeout(() => {
-    cycle();
-  }, interval)
-}
