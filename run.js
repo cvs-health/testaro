@@ -9,9 +9,9 @@ require('dotenv').config();
 const {commands} = require('./commands');
 // ########## CONSTANTS
 // Set DEBUG environment variable to 'true' to add debugging features.
-const debug = process.env.TESTARO_DEBUG === 'true';
+const debug = process.env.DEBUG === 'true';
 // Set WAITS environment variable to a positive number to insert delays (in ms).
-const waits = Number.parseInt(process.env.TESTARO_WAITS) || 0;
+const waits = Number.parseInt(process.env.WAITS) || 0;
 // CSS selectors for targets of moves.
 const moves = {
   button: 'button',
@@ -742,8 +742,8 @@ const doActs = async (report, actIndex, page) => {
                       });
                     }
                   );
-                  const tenonUser = process.env.TESTARO_TENON_USER;
-                  const tenonPassword = process.env.TESTARO_TENON_PASSWORD;
+                  const tenonUser = process.env.TENON_USER;
+                  const tenonPassword = process.env.TENON_PASSWORD;
                   const postData = JSON.stringify({
                     username: tenonUser,
                     password: tenonPassword

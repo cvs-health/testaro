@@ -383,13 +383,13 @@ You may wish to have Testaro perform the same sequence of tests on multiple web 
 }
 ```
 
-With a batch, you can execute a single statement to run a script multiple times, one per host. On each call, Testaro takes one of the hosts in the batch and substitutes it for each host specified in a `url` command of the script. Testaro thereby creates and sequentially runs multiple scripts.
+With a batch, you can execute a single statement to run a script multiple times, one per host. On each call, Testaro takes one of the hosts in the batch and substitutes it for each host specified in a `url` command of the script. The result is a _host script_. Testaro sequentially runs all of those host scripts.
 
 ## Execution
 
 ### Invocation
 
-There are two methods for using Testaro.
+There are three methods for using Testaro.
 
 #### Low-level
 
@@ -412,7 +412,7 @@ Then execute the `run` module with the `report` object as an argument.
 
 Either statement will make Testaro run the script and populate the `log` and `acts` arrays of the `report` object. When Testaro finishes, the `log` and `acts` properties will contain the results.
 
-You or a dependent package can then save or further process the `report` object as desired.
+You or a dependent package can then further process the `report` object as desired.
 
 #### High-level
 
@@ -421,32 +421,44 @@ Make sure that you have defined these environment variables, with absolute or re
 - `BATCHDIR`
 - `REPORTDIR`
 
-Relative paths must be relative to the Testaro project directory. For example, if the script directory is `scripts` in a `testing` directory that is a sibling of the Testaro directory, then `SCRIPTDIR` must have the value `../testing/scripts`.
+Relative paths must be relative to the Testaro project directory. For example, if the script directory is `scripts` in a `testing` directory that is a sibling of the Testaro directory, then a relative-path `SCRIPTDIR` must have the value `../testing/scripts`.
 
 Also ensure that Testaro can read all those directories and write to `REPORTDIR`.
 
 Place a script into `SCRIPTDIR` and, optionally, a batch into `BATCHDIR`. Each should be named `idValue.json`, where `idValue` is replaced with the value of its `id` property. That value must consist of only lower-case ASCII letters and digits.
 
-Then execute the statement `node job scriptID` or `node job scriptID batchID`, replacing `scriptID` and `batchID` with the `id` values of the script and the batch, respectively.
+Then execute the statement `node create scriptID` or `node create scriptID batchID`, replacing `scriptID` and `batchID` with the `id` values of the script and the batch, respectively.
 
-The `job` module will call the `run` module on the script, or, if there is a batch, will create multiple scripts, one per host, and sequentially call the `run` module on each script. The results will be saved in report files in the `REPORTDIR` directory.
+The `create` module will call the `run` module on the script, or, if there is a batch, will create host scripts and sequentially call the `run` module on each script. The results will be saved in report files in the `REPORTDIR` directory.
 
-If there is no batch, the report file will be named with a unique timestamp, suffixed with a `.json` extension. If there is a batch, then the base of each file’s name will be the same timestamp, suffixed with `-hostID`, where `hostID` is the value of the `id` property of the `host` object in the batch file. For example, if you execute `node job script01 wikis`, you might get these report files deposited into `REPORTDIR`:
+If there is no batch, the report file will be named with a unique timestamp, suffixed with a `.json` extension. If there is a batch, then the base of each report file’s name will be the same timestamp, suffixed with `-hostID`, where `hostID` is the value of the `id` property of the `host` object in the batch file. For example, if you execute `node create script01 wikis`, you might get these report files deposited into `REPORTDIR`:
 - `enp46j-wikipedia.json`
 - `enp45j-wiktionary.json`
 - `enp45j-wikidata.json`
+
+#### Watch
+
+In watch mode, Testaro periodically checks for a job to be run by it, containing a script and, optionally, a batch. When such a job exists, Testaro runs the script, or creates a set of host scripts and sequentially runs them. After running the script or each host script, Testaro converts the report to JSON and disposes of it as specified.
+
+There are two ways for Testaro to watch for jobs.
+
+##### Directory watch
+
+With directory watch, Testaro checks whether a particular directory in its host’s filesystem contains a `.json` file.
+
+##### Network watch
 
 ### Environment variables
 
 As mentioned above, using the high-level method to run Testaro jobs requires `SCRIPTDIR`, `BATCHDIR`, and `REPORTDIR` environment variables.
 
-If a `tenon` test is included in the script, environment variables named `TESTARO_TENON_USER` and `TESTARO_TENON_PASSWORD` must exist, with your Tenon username and password, respectively, as their values.
+If a `tenon` test is included in the script, environment variables named `TENON_USER` and `TENON_PASSWORD` must exist, with your Tenon username and password, respectively, as their values.
 
-If a `wave` test is included in the script, an environment variable named `TESTARO_WAVE_KEY` must exist, with your WAVE API key as its value.
+If a `wave` test is included in the script, an environment variable named `WAVE_KEY` must exist, with your WAVE API key as its value.
 
 The `text` command can interpolate the value of an environment variable into text that it enters on a page, as documented in the `commands.js` file.
 
-Before executing a Testaro script, you can optionally also set the environment variables `TESTARO_DEBUG` (to `'true'` or anything else) and/or `TESTARO_WAITS` (to a non-negative integer). The effects of these variables are described in the `index.js` file.
+Before executing a Testaro script, you can optionally also set the environment variables `DEBUG` (to `'true'` or anything else) and/or `WAITS` (to a non-negative integer). The effects of these variables are described in the `index.js` file.
 
 You may store these environment variables in an untracked `.env` file if you wish, and Testaro will recognize them.
 

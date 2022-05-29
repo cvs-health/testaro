@@ -1,6 +1,6 @@
 /*
-  job.js
-  Manages jobs.
+  create.js
+  Creates and runs a file-based job and writes a report file.
 */
 
 // ########## IMPORTS
@@ -10,6 +10,8 @@ require('dotenv').config();
 // Module to read and write files.
 const fs = require('fs/promises');
 const {handleRequest} = require('./run');
+// Module to convert a script and a batch to a batch-based array of scripts.
+const {batchify} = require('./batchify');
 
 // ########## CONSTANTS
 const scriptDir = process.env.SCRIPTDIR;
@@ -18,26 +20,7 @@ const reportDir = process.env.REPORTDIR;
 
 // ########## FUNCTIONS
 
-// Converts a script to a batch-based array of scripts.
-const batchify = (script, batch, timeStamp) => {
-  const {hosts} = batch;
-  const specs = hosts.map(host => {
-    const newScript = JSON.parse(JSON.stringify(script));
-    newScript.commands.forEach(command => {
-      if (command.type === 'url') {
-        command.which = host.which;
-        command.what = host.what;
-      }
-    });
-    const spec = {
-      id: `${timeStamp}-${host.id}`,
-      script: newScript
-    };
-    return spec;
-  });
-  return specs;
-};
-// Runs a no-batch script.
+// Runs one script and writes a report file.
 const runHost = async (id, script) => {
   const report = {
     id,
@@ -49,8 +32,8 @@ const runHost = async (id, script) => {
   const reportJSON = JSON.stringify(report, null, 2);
   await fs.writeFile(`${reportDir}/${id}.json`, reportJSON);
 };
-// Runs a job.
-exports.job = async (scriptID, batchID) => {
+// Runs a file-based job and writes a report file for the script or each host.
+exports.runJob = async (scriptID, batchID) => {
   if (scriptID) {
     try {
       const scriptJSON = await fs.readFile(`${scriptDir}/${scriptID}.json`, 'utf8');
@@ -89,4 +72,4 @@ exports.job = async (scriptID, batchID) => {
 
 // ########## OPERATION
 
-exports.job(process.argv[2], process.argv[3]);
+exports.runJob(process.argv[2], process.argv[3]);
