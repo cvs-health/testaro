@@ -1,4 +1,5 @@
 {
+  "id": "simple",
   "what": "Test example.com with bulk",
   "strict": true,
   "commands": [

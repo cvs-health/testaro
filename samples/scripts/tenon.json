@@ -1,4 +1,5 @@
 {
+  "id": "tenon",
   "what": "Test Wikipedia with tenon",
   "strict": true,
   "commands": [
