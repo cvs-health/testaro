@@ -454,25 +454,23 @@ You may store these environment variables in an untracked `.env` file if you wis
 
 ### Samples
 
-The `samples` directory contains scripts and a batch that you can use to test Testaro with with the high-level, by giving `SCRIPTDIR` the value `'samples/scripts'` and `BATCHDIR` the value `'samples/batches'`. Do to this, you must also define `REPORTDIR`.
+The `samples` directory contains scripts and a batch that you can use to test Testaro with with the high-level method, by giving `SCRIPTDIR` the value `'samples/scripts'` and `BATCHDIR` the value `'samples/batches'`. Do to this, you must also define `REPORTDIR`. Then execute `node job simple` or `node job simple weborgs` to run the `simple` script alone or with the `weborgs` batch.
 
 ### Validators
 
-_Executors_ for Testaro validation are located in the `validation` directory.
+Testaro can be validated with the _executors_ located in the `validation/executors` directory. Executors are modules that run Testaro with the low-level method and write the results to the standard output.
 
-A basic executor is the `test.js` file. It uses the low-level method to run Testaro with the `simple.js` sample script and outputs the log and the acts to the standard output.
+The executors are:
 
-The other executors are commonJS JavaScript modules that run Testaro and report whether the results are correct.
-
-The other executors are:
-- `app.js`: Reports whether Testaro runs correctly with a script.
-- `tests.js`: Runs Testaro with each custom test and reports whether the results are correct.
+- `test`: runs the `simple` sample script
+- `app`: reports whether Testaro runs correctly with a script
+- `tests`: makes Testaro perform each custom test and reports whether the results are correct
 
 There are no executors for validating the test packages.
 
-To execute any executor `xyz.js`, call it with the statement `node validation/executors/xyz`. The results will appear in the standard output.
+To execute any executor `xyz`, call it with the statement `node validation/executors/xyz`.
 
-The `tests.js` executor makes use of the scripts in the `validation/tests/scripts` directory, and they, in turn, run tests on HTML files in the `validation/tests/targets` directory.
+The `tests` executor makes use of the scripts in the `validation/tests/scripts` directory, and they, in turn, run tests on HTML files in the `validation/tests/targets` directory.
 
 ## Contribution
 

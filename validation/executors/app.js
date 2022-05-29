@@ -31,7 +31,7 @@ const report = {
   log: [],
   acts: []
 };
-const {handleRequest} = require(`${__dirname}/../../index`);
+const {handleRequest} = require(`${__dirname}/../../run`);
 handleRequest(report)
 .then(
   () => {

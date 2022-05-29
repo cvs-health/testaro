@@ -2,7 +2,7 @@
 // Test executor.
 
 const fs = require('fs');
-const {handleRequest} = require('../../index');
+const {handleRequest} = require('../../run');
 const scriptJSON = fs.readFileSync('samples/scripts/simple.json', 'utf8');
 const script = JSON.parse(scriptJSON);
 const report = {

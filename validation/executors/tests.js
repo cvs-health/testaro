@@ -2,7 +2,7 @@
 // Validator for Testaro tests.
 
 const fs = require('fs').promises;
-const {handleRequest} = require(`${__dirname}/../../index`);
+const {handleRequest} = require(`${__dirname}/../../run`);
 const validateTests = async () => {
   const totals = {
     attempts: 0,
