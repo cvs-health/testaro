@@ -473,6 +473,8 @@ Since Testaro runs the first job (i.e. the job whose name is first in ASCII orde
 
 In order to make directory watching possible, you must define these environment variables:
 - `WATCH_TYPE=dir`
+- `INTERVAL`
+- `WATCH_FOREVER` (`=true` or `=false`)
 - `REPORTDIR`
 - `JOBDIR`
 - `EXJOBDIR`
@@ -491,6 +493,8 @@ The `jobID` property can be used for an association between each report and the 
 
 In order to make network watching possible, you must define these environment variables:
 - `WATCH_TYPE=net`
+- `INTERVAL`
+- `WATCH_FOREVER` (`=true` or `=false`)
 - `PROTOCOL` (`=http` or `=https`)
 - `JOB_URL` (not including the authorization code)
 - `REPORT_URL` (not including the authorization code)
