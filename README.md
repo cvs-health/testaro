@@ -385,6 +385,10 @@ You may wish to have Testaro perform the same sequence of tests on multiple web 
 
 With a batch, you can execute a single statement to run a script multiple times, one per host. On each call, Testaro takes one of the hosts in the batch and substitutes it for each host specified in a `url` command of the script. The result is a _host script_. Testaro sequentially runs all of those host scripts.
 
+## Samples
+
+The `samples` directory contains examples of scripts and batches. If you wish to use them in their current locations, you can give `SCRIPTDIR` the value `'samples/scripts'` and `BATCHDIR` the value `'samples/batches'`. Then execute `node create sss` or `node create sss bbb` to run the `sss` script alone or with the `bbb` batch (e.g., `node create simple weborgs`). The `create` module will create a job, run the script or host scripts, and save the report(s) in the directory that you have specified with the `REPORTDIR` environment variable.
+
 ## Execution
 
 ### Invocation
@@ -397,19 +401,22 @@ A module in this package can invoke Testaro with this pattern:
 
 ```javascript
 const report = {
-  id: 'abc',
   script: {…},
   log: [],
   acts: []
 };
-require('./run').handleRequest(report).then(() => …);
+const {handleRequest} = require('./run');
+handleRequest(report)
+.then(() => …);
 ```
 
 Replace `{…}` with a script object, like the example script shown above. The low-level method does not allow the use of batches.
 
+The argument of `require` is a path relative to the directory of the module in which this code appears. If the module is in a subdirectory, `./run` will need to be revised. In an executor within `validation/executors`, it must be revised to `../../run`.
+
 Another Node.js package that has Testaro as a dependency can execute the same statements, except changing `'./run'` to `'testaro/run'`.
 
-Testaro will run the script and populate the `log` and `acts` arrays of the `report` object. When Testaro finishes, the `log` and `acts` properties will contain the results. Your final statement can further process the `report` object as desired in the `then` callback.
+Testaro will run the script and populate the `log` and `acts` arrays of the `report` object. When Testaro finishes, the `log` and `acts` properties will contain the results. The final statement can further process the `report` object as desired in the `then` callback.
 
 #### High-level
 
@@ -499,21 +506,16 @@ You may store these environment variables in an untracked `.env` file if you wis
 
 ## Validation
 
-### Samples
-
-The `samples` directory contains scripts and a batch that you can use to test Testaro with with the high-level method, by giving `SCRIPTDIR` the value `'samples/scripts'` and `BATCHDIR` the value `'samples/batches'`. Do to this, you must also define `REPORTDIR`. Then execute `node job simple` or `node job simple weborgs` to run the `simple` script alone or with the `weborgs` batch.
-
 ### Validators
 
 Testaro can be validated with the _executors_ located in the `validation/executors` directory. Executors are modules that run Testaro with the low-level method and write the results to the standard output.
 
 The executors are:
 
+- `low`: validates low-level invocation
 - `app`: reports whether Testaro runs correctly with a script
 - `test`: runs the `simple` sample script
-- `tests`: makes Testaro perform each custom test and reports whether the results are correct
-
-There are no executors for validating the test packages.
+- `tests`: validates the custom tests (not the test packages)
 
 To execute any executor `xyz`, call it with the statement `node validation/executors/xyz`.
 

@@ -209,9 +209,8 @@ const isValidLog = log => Array.isArray(log) && ! log.length;
 // Validates a report object.
 const isValidReport = async report => {
   if (report) {
-    const {id, script, log, acts} = report;
-    return id
-    && isValidScript(script)
+    const {script, log, acts} = report;
+    return isValidScript(script)
     && isValidLog(log)
     && isValidActs(acts);
   }
@@ -1248,7 +1247,7 @@ exports.handleRequest = async report => {
     report.acts = JSON.parse(JSON.stringify(report.script.commands));
     // Inject url acts where necessary to undo DOM changes.
     injectURLActs(report.acts);
-    // Perform the script, asynchronously adding to the log and report.
+    // Perform the acts, asynchronously adding to the log and report.
     await doScript(report);
   }
   else {
