@@ -2,11 +2,11 @@
 // Validator for high-level invocation of Testaro without a batch.
 
 const fs = require('fs/promises');
-const create = require('../../create');
 process.env.SCRIPTDIR = 'samples/scripts';
 process.env.REPORTDIR = 'temp';
+const {runJob} = require('../../create');
 const validate = async (scriptID) => {
-  const timeStamp = await create(scriptID);
+  const timeStamp = await runJob(scriptID);
   try {
     const reportJSON = await fs.readFile(`${__dirname}/../../temp/${timeStamp}.json`);
     const report = JSON.parse(reportJSON);

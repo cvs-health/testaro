@@ -33,7 +33,7 @@ const runHost = async (id, script) => {
   await fs.writeFile(`${reportDir}/${id}.json`, reportJSON);
 };
 // Runs a file-based job and writes a report file for the script or each host.
-const runJob = async (scriptID, batchID) => {
+exports.runJob = async (scriptID, batchID) => {
   if (scriptID) {
     try {
       const scriptJSON = await fs.readFile(`${scriptDir}/${scriptID}.json`, 'utf8');
@@ -72,7 +72,3 @@ const runJob = async (scriptID, batchID) => {
     return null;
   }
 };
-
-// ########## OPERATION
-
-runJob(process.argv[2], process.argv[3]);
