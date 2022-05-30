@@ -393,26 +393,23 @@ There are three methods for using Testaro.
 
 #### Low-level
 
-Create a report object like this:
+A module in this package can invoke Testaro with this pattern:
 
 ```javascript
 const report = {
-  id: '',
+  id: 'abc',
   script: {…},
   log: [],
   acts: []
 };
+require('./run').handleRequest(report).then(() => …);
 ```
 
 Replace `{…}` with a script object, like the example script shown above. The low-level method does not allow the use of batches.
 
-Then execute the `run` module with the `report` object as an argument.
-- Another Node.js package that has Testaro as a dependency can execute `require('testaro').run(report)`.
-- In a command environment with the Testaro project directory as the current directory, you can execute `node run report`.
+Another Node.js package that has Testaro as a dependency can execute the same statements, except changing `'./run'` to `'testaro/run'`.
 
-Either statement will make Testaro run the script and populate the `log` and `acts` arrays of the `report` object. When Testaro finishes, the `log` and `acts` properties will contain the results.
-
-You or a dependent package can then further process the `report` object as desired.
+Testaro will run the script and populate the `log` and `acts` arrays of the `report` object. When Testaro finishes, the `log` and `acts` properties will contain the results. Your final statement can further process the `report` object as desired in the `then` callback.
 
 #### High-level
 
