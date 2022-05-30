@@ -15,7 +15,6 @@ const validate = async (scriptID) => {
       console.log(
         `Failure: log length is ${log.length} instead of 2 (see temp/${timeStamp}.json})`
       );
-      console.log(JSON.stringify(log, null, 2));
     }
     else if (acts.length !== 3) {
       console.log(

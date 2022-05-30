@@ -431,9 +431,9 @@ Also ensure that Testaro can read all those directories and write to `REPORTDIR`
 
 Place a script into `SCRIPTDIR` and, optionally, a batch into `BATCHDIR`. Each should be named `idValue.json`, where `idValue` is replaced with the value of its `id` property. That value must consist of only lower-case ASCII letters and digits.
 
-Then execute the statement `node create scriptID` or `node create scriptID batchID`, replacing `scriptID` and `batchID` with the `id` values of the script and the batch, respectively.
+Then execute the statement `node high scriptID` or `node high scriptID batchID`, replacing `scriptID` and `batchID` with the `id` values of the script and the batch, respectively.
 
-The `create` module will call the `handleRequest` function of the `run` module on the script, or, if there is a batch, will create host scripts and sequentially call the `handleRequest` function on each script. The results will be saved in report files in the `REPORTDIR` directory.
+The `high` module will call the `runJob` function of the `create` module, which in turn will call the `handleRequest` function of the `run` module. The results will be saved in report files in the `REPORTDIR` directory.
 
 If there is no batch, the report file will be named with a unique timestamp, suffixed with a `.json` extension. If there is a batch, then the base of each report file’s name will be the same timestamp, suffixed with `-hostID`, where `hostID` is the value of the `id` property of the `host` object in the batch file. For example, if you execute `node create script01 wikis`, you might get these report files deposited into `REPORTDIR`:
 - `enp46j-wikipedia.json`

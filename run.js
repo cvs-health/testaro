@@ -1243,6 +1243,8 @@ exports.handleRequest = async report => {
     if (! report.id) {
       report.id = Math.floor((Date.now() - Date.UTC(2022, 1)) / 2000).toString(36);
     }
+    // Add a time stamp to the report.
+    report.timeStamp = report.id.replace(/-.+/, '');
     // Add the script commands to the report as its initial acts.
     report.acts = JSON.parse(JSON.stringify(report.script.commands));
     // Inject url acts where necessary to undo DOM changes.
