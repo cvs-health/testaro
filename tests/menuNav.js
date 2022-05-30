@@ -77,7 +77,7 @@ exports.reporter = async (page, withItems) => {
   if (menus.length) {
     // FUNCTION DEFINITIONS START
     // Returns text associated with an element.
-    const {allText} = require('../procs/test/allText');
+    const {allText} = require('../procs/allText');
     // Returns the index of the focused menu item in an array of menu items.
     const focusedMenuItem = async menuItems => await page.evaluate(menuItems => {
       const focus = document.activeElement;

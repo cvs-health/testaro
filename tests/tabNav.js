@@ -74,7 +74,7 @@ exports.reporter = async (page, withItems) => {
   if (tabLists.length) {
     // FUNCTION DEFINITIONS START
     // Returns text associated with an element.
-    const {allText} = require('../procs/test/allText');
+    const {allText} = require('../procs/allText');
     // Returns the index of the focused tab in an array of tabs.
     const focusedTab = async tabs => await page.evaluate(tabs => {
       const focus = document.activeElement;

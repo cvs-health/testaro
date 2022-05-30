@@ -7,7 +7,7 @@
 */
 exports.reporter = async (page, withItems) => {
   // Get an object with arrays of block and inline links as properties.
-  const linkTypes = await require('../procs/test/linksByType').linksByType(page);
+  const linkTypes = await require('../procs/linksByType').linksByType(page);
   return await page.$eval('body', (body, args) => {
     const withItems = args[0];
     const linkTypes = args[1];

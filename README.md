@@ -438,7 +438,7 @@ If there is no batch, the report file will be named with a unique timestamp, suf
 
 #### Watch
 
-In watch mode, Testaro periodically checks for a job to be run by it, containing a script and, optionally, a batch. When such a job exists, Testaro runs the script, or creates a set of host scripts and sequentially runs them. After running the script or each host script, Testaro converts the report to JSON and disposes of it as specified.
+In watch mode, Testaro periodically checks for a job to be run by it, containing a script and, optionally, a batch. When such a job exists, Testaro runs the script, or uses the batch to create a set of host scripts and sequentially runs them. After running the script or each host script, Testaro converts the report to JSON and disposes of it as specified.
 
 Testaro checks periodically. The interval between checks, in seconds, is specified by an `INTERVAL` environment variable.
 
@@ -460,7 +460,9 @@ The `batch` property is optional. The object may also include other properties. 
 
 When Testaro finds job files in the directory, Testaro runs the first job, writes the report(s) into the report directory, and moves the job file into the ex-jobs directory.
 
-Since Testaro runs the first job (i.e. the job whose name is first in ASCII order), whoever populates the directory with job files has control over the order in which Testaro runs them.
+Testaro suspends checking while it is running any job. Therefore, even though the currently running job file remains in `JOBDIR`, Testaro will not try to run it again.
+
+Since Testaro runs the first job (i.e. the job whose name is first in ASCII order), whoever populates the directory with job files has control over the order in which Testaro runs them. To force a new job to be run before the already waiting jobs, one can give it a `jobID` (and thus filename base) that comes before that of the first waiting job.
 
 In order to make directory watching possible, you must define these environment variables:
 - `REPORTDIR`
@@ -480,8 +482,9 @@ When the API receives the reports, it can dispose of them as desired. Each repor
 The `jobID` property can be used for an association between each report and the job that it arose from. The `timeStamp` property can be used for an association of all the reports in a batched job. And the `id` property (which begins with the time stamp) is unique to each report.
 
 In order to make network watching possible, you must define these environment variables:
-- `JOB_URL`
-- `REPORT_URL`
+- `PROTOCOL` (`http` or `https`)
+- `JOB_URL` (not including the authorization code)
+- `REPORT_URL` (not including the authorization code)
 
 ### Environment variables
 

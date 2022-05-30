@@ -12,7 +12,7 @@
 exports.reporter = async (page, withItems, revealAll) => {
   // If required, make all elements visible.
   if (revealAll) {
-    await require('../procs/test/allVis').allVis(page);
+    await require('../procs/allVis').allVis(page);
   }
   // Get data on the focusable visible elements with and without indicators.
   const data = await page.$$eval('body *:visible', (elements, withItems) => {

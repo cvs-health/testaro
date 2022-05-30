@@ -700,7 +700,7 @@ const doActs = async (report, actIndex, page) => {
             // If the act is a revelation:
             if (act.type === 'reveal') {
               // Make all elements in the page visible.
-              await require('./procs/test/allVis').allVis(page);
+              await require('./procs/allVis').allVis(page);
               act.result = 'All elements visible.';
             }
             // Otherwise, if the act is a tenon request:

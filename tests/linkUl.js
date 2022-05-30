@@ -9,7 +9,7 @@
 */
 exports.reporter = async (page, withItems) => {
   // Identify the links in the page, by type.
-  const linkTypes = await require('../procs/test/linksByType').linksByType(page);
+  const linkTypes = await require('../procs/linksByType').linksByType(page);
   return await page.evaluate(args => {
     const withItems = args[0];
     const linkTypes = args[1];
