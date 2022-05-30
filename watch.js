@@ -64,7 +64,18 @@ const checkNetJob = async () => {
       });
       response.on('end', () => {
         try {
-          resolve(JSON.parse(chunks.join('')));
+          const jobJSON = chunks.join('');
+          const job = JSON.parse(jobJSON);
+          // If a qualifying job was received:
+          if (job.jobID) {
+            // Return it.
+            resolve(job);
+          }
+          // Otherwise, i.e. if there was no qualifying job:
+          else {
+            // Return this.
+            resolve({});
+          }
         }
         catch(error) {
           resolve({
@@ -77,7 +88,7 @@ const checkNetJob = async () => {
     });
     request.end();
   });
-  return job.jobID ? job : {};
+  return job;
 };
 // Writes a directory report.
 const writeDirReport = async report => {
@@ -144,10 +155,17 @@ const runHost = async (jobID, timeStamp, id, script) => {
   };
   await handleRequest(report);
   if (watchType === 'dir') {
-    await writeDirReport(report);
+    return await writeDirReport(report);
   }
   else {
-    await writeNetReport(report);
+    const ack = await writeNetReport(report);
+    if (ack.error) {
+      console.log(JSON.stringify(ack, null, 2));
+      return false;
+    }
+    else {
+      return true;
+    }
   }
 };
 // Runs a job and returns a report file for the script or each host.
@@ -160,21 +178,22 @@ const runJob = async job => {
         const timeStamp = Math.floor((Date.now() - Date.UTC(2022, 1)) / 2000).toString(36);
         // If there is a batch:
         if (batch) {
-          // Convert the script to a batch-based set of scripts.
+          // Convert the script to a set of host scripts.
           const specs = batchify(script, batch, timeStamp);
-          // For each script:
-          while (specs.length) {
+          // For each host script:
+          let success = true;
+          while (specs.length && success) {
             // Run it and return the result with a host-suffixed timestamp ID.
             const spec = specs.shift();
             const {id} = spec;
             const hostScript = spec.script;
-            return await runHost(jobID, timeStamp, id, hostScript);
+            success = await runHost(jobID, timeStamp, id, hostScript);
           }
         }
         // Otherwise, i.e. if there is no batch:
         else {
           // Run the script and submit a report with a timestamp ID.
-          return await runHost(jobID, timeStamp, timeStamp, script);
+          await runHost(jobID, timeStamp, timeStamp, script);
         }
       }
       catch(error) {
@@ -192,32 +211,48 @@ const runJob = async job => {
     }
   }
   else {
-    console.log('ERROR: no job ID specified in job');
+    console.log('ERROR: no job ID property in job');
     return {
-      error: 'ERROR: no job ID specified in job'
+      error: 'ERROR: no job ID property in job'
     };
   }
 };
 // Repeatedly checks for jobs, runs them, and submits reports.
-exports.cycle = async () => {
+const cycle = async () => {
   const intervalMS = Number.parseInt(interval);
   let statusOK = true;
+  let empty = false;
   while (statusOK) {
-    await wait(1000 * intervalMS);
-    const job = watchType === 'dir' ? await checkDirJob() : await checkNetJob();
-    const report = await runJob(job);
+    if (empty) {
+      await wait(1000 * intervalMS);
+    }
+    // Check for a job.
+    let job;
     if (watchType === 'dir') {
-      const writeSuccess = await writeDirReport(report);
-      statusOK = writeSuccess;
+      job = await checkDirJob();
+    }
+    else if (watchType === 'net') {
+      job = await checkNetJob();
     }
     else {
-      const ack = await writeNetReport(report);
-      if (ack.error) {
-        statusOK = false;
+      job = {};
+      console.log('ERROR: invalid WATCH_TYPE environment variable');
+      statusOK = false;
+    }
+    // If there was one:
+    if (job.jobID) {
+      // Run it.
+      statusOK = await runJob(job);
+      if (statusOK) {
+        await exifyJob(job.jobID, job.timeStamp);
       }
     }
-    if (statusOK) {
-      await exifyJob(job.jobID, job.timeStamp);
+    else {
+      empty = true;
     }
   }
 };
+
+// ########## OPERATION
+
+cycle();
