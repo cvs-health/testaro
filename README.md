@@ -446,6 +446,8 @@ In watch mode, Testaro periodically checks for a job to be run by it, containing
 
 Testaro checks periodically. The interval between checks, in seconds, is specified by an `INTERVAL` environment variable.
 
+After Testaro starts watching, its behavior depends on the environment variable `WATCH_FOREVER`. If its value is `true`, watching continues indefinitely. If its value is `false` or it has no value, watching stops after the first job is found and run.
+
 To make Testaro start watching, execute the statement `node watch`.
 
 There are two ways for Testaro to watch for jobs.
@@ -511,16 +513,15 @@ You may store these environment variables in an untracked `.env` file if you wis
 
 ### Validators
 
-Testaro can be validated with the _executors_ located in the `validation/executors` directory. Executors are modules that run Testaro with the low-level method and write the results to the standard output.
+Testaro and its custom tests can be validated with the _executors_ located in the `validation/executors` directory.
 
 The executors are:
 
 - `low`: validates low-level invocation
-- `high`: validates high-level invocation
+- `high1`: validates high-level invocation of a script without a batch
+- `high2`: validates high-level invocation of a script with a batch
 - `watchDir`: validates directory watching
 - `watchNet`: validates network watching
-- `app`: reports whether Testaro runs correctly with a script
-- `simple`: validates the report from the `simple` sample script
 - `tests`: validates all the custom tests (not the test packages)
 
 To execute any executor `xyz`, call it with the statement `node validation/executors/xyz`.

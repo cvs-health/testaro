@@ -6,7 +6,8 @@
 // ########## IMPORTS
 
 // Module to keep secrets local.
-require('dotenv').config({override: true});
+// require('dotenv').config({override: true});
+require('dotenv').config();
 // Module to read and write files.
 const fs = require('fs/promises');
 // Module to make HTTP(S) requests.
@@ -23,10 +24,12 @@ const watchType = process.env.WATCH_TYPE;
 const jobURL = process.env.JOB_URL;
 const authCode = process.env.AUTH_CODE;
 const jobDir = process.env.JOBDIR;
-const exjobDir = process.env.EXJOBDIR;
+const exJobDir = process.env.EXJOBDIR;
 const reportURL = process.env.REPORT_URL;
 const reportDir = process.env.REPORTDIR;
 const interval = process.env.INTERVAL;
+// Values of process.env properties are coerced to strings.
+const watchForever = process.env.WATCH_FOREVER == 'true';
 
 // ########## FUNCTIONS
 
@@ -131,9 +134,11 @@ const writeNetReport = async report => {
   });
   return ack;
 };
-// Archives a job file.
-const exifyJob = async (jobID, timeStamp) => {
-  await fs.rename(`${jobDir}/${jobID}.json`, `${exjobDir}/${timeStamp}.json`);
+// Archives a job.
+const exifyJob = async (job) => {
+  const jobJSON = JSON.stringify(job, null, 2);
+  await fs.writeFile(`${exJobDir}/${job.timeStamp}.json`, jobJSON);
+  await fs.rm(`${jobDir}/${job.jobID}.json`);
 };
 // Waits.
 const wait = ms => {
@@ -176,6 +181,7 @@ const runJob = async job => {
       try {
         // Identify the start time and a timestamp.
         const timeStamp = Math.floor((Date.now() - Date.UTC(2022, 1)) / 2000).toString(36);
+        job.timeStamp = timeStamp;
         // If there is a batch:
         if (batch) {
           // Convert the script to a set of host scripts.
@@ -189,11 +195,12 @@ const runJob = async job => {
             const hostScript = spec.script;
             success = await runHost(jobID, timeStamp, id, hostScript);
           }
+          return success;
         }
         // Otherwise, i.e. if there is no batch:
         else {
           // Run the script and submit a report with a timestamp ID.
-          await runHost(jobID, timeStamp, timeStamp, script);
+          return await runHost(jobID, timeStamp, timeStamp, script);
         }
       }
       catch(error) {
@@ -218,10 +225,11 @@ const runJob = async job => {
   }
 };
 // Repeatedly checks for jobs, runs them, and submits reports.
-const cycle = async () => {
+const cycle = async forever => {
   const intervalMS = Number.parseInt(interval);
   let statusOK = true;
   let empty = false;
+  console.log(`Watching started with intervals of ${interval} seconds when idle`);
   while (statusOK) {
     if (empty) {
       await wait(1000 * intervalMS);
@@ -242,17 +250,23 @@ const cycle = async () => {
     // If there was one:
     if (job.jobID) {
       // Run it.
+      console.log(`Running job ${job.jobID}`);
       statusOK = await runJob(job);
+      console.log(`Job ${job.jobID} finished with time stamp ${job.timeStamp}`);
       if (statusOK) {
-        await exifyJob(job.jobID, job.timeStamp);
+        await exifyJob(job);
+        // If watching was specified for only 1 job, stop.
+        statusOK = forever;
       }
     }
     else {
       empty = true;
     }
   }
+  console.log('Watching ended');
 };
 
 // ########## OPERATION
 
-cycle();
+// Start watching, as specified, either forever or until 1 job is run.
+cycle(watchForever);
