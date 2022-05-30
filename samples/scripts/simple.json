@@ -15,7 +15,8 @@
     },
     {
       "type": "test",
-      "which": "bulk"
+      "which": "bulk",
+      "what": "bulk"
     }
   ]
 }

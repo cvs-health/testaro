@@ -513,6 +513,7 @@ Testaro can be validated with the _executors_ located in the `validation/executo
 The executors are:
 
 - `low`: validates low-level invocation
+- `high`: validates high-level invocation
 - `app`: reports whether Testaro runs correctly with a script
 - `test`: runs the `simple` sample script
 - `tests`: validates the custom tests (not the test packages)

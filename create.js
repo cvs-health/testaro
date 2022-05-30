@@ -60,13 +60,16 @@ const runJob = async (scriptID, batchID) => {
         // Run the script and save the result with a timestamp ID.
         await runHost(timeStamp, script);
       }
+      return timeStamp;
     }
     catch(error) {
       console.log(`ERROR: ${error.message}\n${error.stack}`);
+      return null;
     }
   }
   else {
     console.log('ERROR: no script specified');
+    return null;
   }
 };
 
