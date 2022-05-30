@@ -517,9 +517,11 @@ The executors are:
 
 - `low`: validates low-level invocation
 - `high`: validates high-level invocation
+- `watchDir`: validates directory watching
+- `watchNet`: validates network watching
 - `app`: reports whether Testaro runs correctly with a script
-- `test`: runs the `simple` sample script
-- `tests`: validates the custom tests (not the test packages)
+- `simple`: validates the report from the `simple` sample script
+- `tests`: validates all the custom tests (not the test packages)
 
 To execute any executor `xyz`, call it with the statement `node validation/executors/xyz`.
 
