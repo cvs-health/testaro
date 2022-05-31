@@ -12,6 +12,6 @@ process.env.WATCH_FOREVER = false;
 require('../../watch');
 // Copy a job into JOBDIR after 7 seconds.
 setTimeout(() => {
-  fs.copyFile(`${__dirname}/../protoJobs/simple1.json`, `${__dirname}/../jobs/val1.json`);
+  fs.copyFile(`${__dirname}/../protoJobs/val1.json`, `${__dirname}/../jobs/val1.json`);
   console.log('Job copied into job directory after 7 seconds');
 }, 7000);

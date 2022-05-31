@@ -10,9 +10,6 @@
 require('dotenv').config();
 // Module to read and write files.
 const fs = require('fs/promises');
-// Module to make HTTP(S) requests.
-const protocol = process.env.PROTOCOL;
-const client = require(protocol);
 // Module to perform tests.
 const {handleRequest} = require('./run');
 // Module to convert a script and a batch to a batch-based array of scripts.
@@ -21,6 +18,10 @@ const {batchify} = require('./batchify');
 // ########## CONSTANTS
 
 const watchType = process.env.WATCH_TYPE;
+let client;
+if (watchType === 'net') {
+  client = require(process.env.PROTOCOL || 'https');
+}
 const jobURL = process.env.JOB_URL;
 const authCode = process.env.AUTH_CODE;
 const jobDir = process.env.JOBDIR;
@@ -59,7 +60,7 @@ const checkDirJob = async () => {
 // Checks for a network job.
 const checkNetJob = async () => {
   const job = await new Promise(resolve => {
-    const wholeURL = `${jobURL}?authCode=${authCode}`;
+    const wholeURL = `${process.env.PROTOCOL}://${jobURL}?authCode=${authCode}`;
     const request = client.request(wholeURL, response => {
       const chunks = [];
       response.on('data', chunk => {
@@ -99,7 +100,8 @@ const writeDirReport = async report => {
   if (id && jobID) {
     const reportJSON = JSON.stringify(report, null, 2);
     try {
-      await fs.writeFile(`${reportDir}/${report.id}.json`, reportJSON);
+      await fs.writeFile(`${reportDir}/${id}.json`, reportJSON);
+      console.log(`Report ${id}.json saved`);
       return true;
     }
     catch(error) {
@@ -111,7 +113,8 @@ const writeDirReport = async report => {
 // Submits a network report.
 const writeNetReport = async report => {
   const ack = await new Promise(resolve => {
-    const request = client.request(reportURL, {method: 'POST'}, response => {
+    const wholeURL = `${process.env.PROTOCOL}://${reportURL}`;
+    const request = client.request(wholeURL, {method: 'POST'}, response => {
       const chunks = [];
       response.on('data', chunk => {
         chunks.push(chunk);
@@ -131,6 +134,7 @@ const writeNetReport = async report => {
     });
     request.write(JSON.stringify(report, null, 2));
     request.end();
+    console.log(`Report with ID ${report.id} submitted`);
   });
   return ack;
 };
@@ -179,7 +183,7 @@ const runJob = async job => {
   if (jobID) {
     if (script) {
       try {
-        // Identify the start time and a timestamp.
+        // Identify the start time and a time stamp.
         const timeStamp = Math.floor((Date.now() - Date.UTC(2022, 1)) / 2000).toString(36);
         job.timeStamp = timeStamp;
         // If there is a batch:
@@ -189,7 +193,7 @@ const runJob = async job => {
           // For each host script:
           let success = true;
           while (specs.length && success) {
-            // Run it and return the result with a host-suffixed timestamp ID.
+            // Run it and write or submit a report with a host-suffixed time-stamp ID.
             const spec = specs.shift();
             const {id} = spec;
             const hostScript = spec.script;
@@ -254,7 +258,12 @@ const cycle = async forever => {
       statusOK = await runJob(job);
       console.log(`Job ${job.jobID} finished with time stamp ${job.timeStamp}`);
       if (statusOK) {
-        await exifyJob(job);
+        // If the job was a file:
+        if (watchType === 'dir') {
+          // Archive it.
+          await exifyJob(job);
+          console.log(`Job archived as ${job.timeStamp}.json`);
+        }
         // If watching was specified for only 1 job, stop.
         statusOK = forever;
       }

@@ -8,7 +8,7 @@ process.env.WATCH_FOREVER = false;
 process.env.PROTOCOL = 'http';
 process.env.JOB_URL = 'localhost:3007/job';
 process.env.REPORT_URL = 'localhost:3007/report';
-process.env.AUTHCODE = 'testarauth';
+process.env.AUTH_CODE = 'testarauth';
 process.env.PROTOCOL = 'http';
 const http = require('http');
 // Start a timer.
@@ -35,13 +35,19 @@ const requestHandler = (request, response) => {
     // If the request method is GET:
     if (method === 'GET') {
       // If a job is validly requested:
-      if (requestURL === '/job?authcode=testarauth') {
+      if (requestURL === '/job?authCode=testarauth') {
         // If at least 7 seconds has elapsed since timing started:
         if (Date.now() > startTime + 7000) {
           // Respond with a job.
-          const jobJSON = await fs.readFile(`${__dirname}/../protoJobs/simple1.json`);
+          const jobJSON = await fs.readFile(`${__dirname}/../protoJobs/val1.json`);
+
           await response.end(jobJSON);
           jobGiven = true;
+        }
+        // Otherwise, i.e. if timing started less than 7 seconds ago:
+        else {
+          // Send an empty-object response.
+          await response.end('{}');
         }
       }
       else {
@@ -63,7 +69,7 @@ const requestHandler = (request, response) => {
             const bodyJSON = bodyParts.join('');
             const body = JSON.parse(bodyJSON);
             if (body.jobID && body.script && body.acts) {
-              ack.result = 'Success: Report submitted';
+              ack.result = 'Success: Valid report submitted';
             }
             else {
               ack.result = 'Failure: Report invalid';
@@ -87,16 +93,6 @@ const server = http.createServer({}, requestHandler);
 // Start a server listening for Testaro requests.
 server.listen(3007, () => {
   console.log('Job server listening on port 3007');
-  // Send a job to Testaro on request after 7 seconds.
-  setTimeout(() => {
-    fs.copyFile(`${__dirname}/../protoJobs/simple1.json`, `${__dirname}/../jobs/val1.json`);
-    console.log('Job copied into job directory after 7 seconds');
-  }, 7000);
 });
 // Start checking for jobs every 5 seconds.
 require('../../watch');
-// Copy a job into JOBDIR after 7 seconds.
-setTimeout(() => {
-  fs.copyFile(`${__dirname}/../protoJobs/simple1.json`, `${__dirname}/../jobs/val1.json`);
-  console.log('Job copied into job directory after 7 seconds');
-}, 7000);
