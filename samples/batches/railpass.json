@@ -1,0 +1,11 @@
+{
+  "id": "railpass",
+  "what": "Railpass",
+  "hosts": [
+    {
+      "id": "railpass",
+      "which": "https://www.railpass.com/",
+      "what": "Railpass"
+    }
+  ]
+}
