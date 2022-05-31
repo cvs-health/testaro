@@ -1,5 +1,5 @@
 // watchDir.js
-// Validator for directory watching.
+// Validator for network watching.
 
 const fs = require('fs/promises');
 process.env.WATCH_TYPE = 'net';
@@ -19,6 +19,7 @@ let jobGiven = false;
 setTimeout(() => {
   require('../../watch');
 }, 5000);
+let server;
 // Handles Testaro requests to the server.
 const requestHandler = (request, response) => {
   const {method} = request;
@@ -35,13 +36,14 @@ const requestHandler = (request, response) => {
     // If the request method is GET:
     if (method === 'GET') {
       // If a job is validly requested:
+      console.log('Server got a job request from Testaro');
       if (requestURL === '/job?authCode=testarauth') {
         // If at least 7 seconds has elapsed since timing started:
         if (Date.now() > startTime + 7000) {
           // Respond with a job.
           const jobJSON = await fs.readFile(`${__dirname}/../protoJobs/val1.json`);
-
           await response.end(jobJSON);
+          console.log('Server sent job val1 to Testaro');
           jobGiven = true;
         }
         // Otherwise, i.e. if timing started less than 7 seconds ago:
@@ -60,11 +62,13 @@ const requestHandler = (request, response) => {
     }
     // Otherwise, if the request method is POST:
     else if (method === 'POST') {
+      console.log('Server got report from Testaro');
       const ack = {};
       // If a report is validly submitted:
-      if (requestURL === '/report?authcode=testarauth') {
+      if (requestURL === '/report?authCode=testarauth') {
         // If a job was earlier given to Testaro:
         if (jobGiven) {
+          // Respond, reporting success or failure.
           try {
             const bodyJSON = bodyParts.join('');
             const body = JSON.parse(bodyJSON);
@@ -85,14 +89,18 @@ const requestHandler = (request, response) => {
       }
       const ackJSON = JSON.stringify(ack);
       response.end(ackJSON);
+      console.log(`Server responded: ${ack.result}`);
+      // This ends the validation, so stop the server.
+      server.close();
+      console.log('Server closed');
     }
   });
 };
 // Create a server.
-const server = http.createServer({}, requestHandler);
+server = http.createServer({}, requestHandler);
 // Start a server listening for Testaro requests.
 server.listen(3007, () => {
-  console.log('Job server listening on port 3007');
+  console.log('Job and report server listening on port 3007');
 });
 // Start checking for jobs every 5 seconds.
 require('../../watch');
