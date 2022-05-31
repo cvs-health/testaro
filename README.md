@@ -66,6 +66,7 @@ Some of the dependencies of Testaro are published as Github packages. Installing
     //npm.pkg.github.com/:username=abc
     //npm.pkg.github.com/:_authToken=xyz
     ```
+
 Once you have done that, you can install Testaro as you would install any `npm` package.
 
 ## Payment
@@ -489,6 +490,7 @@ When the API receives the reports, it can dispose of them as desired. Each repor
 - `jobID`
 - `timeStamp`
 - `id`
+
 The `jobID` property can be used for an association between each report and the job that it arose from. The `timeStamp` property can be used for an association of all the reports in a batched job. And the `id` property (which begins with the time stamp) is unique to each report.
 
 In order to make network watching possible, you must define these environment variables:
@@ -603,7 +605,6 @@ Further development is contemplated, is taking place, or is welcomed, on:
 - autocomplete attributes
 - inclusion of other test packages, such as:
    - FAE (https://github.com/opena11y/evaluation-library)
-   - Tenon
 
 ## Corrections
 
