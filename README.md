@@ -258,6 +258,28 @@ The `tenon` test requires two commands:
 - A command of type `tenonRequest`.
 - A command of type `test` with `tenon` as the value of `which`.
 
+Example:
+
+```json
+  {
+    "type": "tenonRequest",
+    "id": "a",
+    "withNewContent": true,
+    "what": "request for Tenon test"
+  }
+  ```
+
+  followed by
+
+```json
+  {
+    "type": "test",
+    "which": "tenon",
+    "id": "a",
+    "what": "Tenon API version 2"
+  }
+```
+
 The reason for this is that the Tenon API operates asynchronously. You ask it to perform a test, and it puts your request into a queue. To learn whether Tenon has completed your test, you make a status request. You can continue making status requests until Tenon replies that your test has been completed. Then you submit a request for the test result, and Tenon replies with the result. (As of May 2022, status requests were observed to misreport still-running tests as completed. The `tenon` test works around that.)
 
 Tenon says that tests are typically completed in 3 to 6 seconds but that the latency can be longer, depending on demand.

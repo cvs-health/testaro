@@ -1,0 +1,158 @@
+{
+  "id": "asp10",
+  "what": "AATT, Alfa, Axe, IBM, Tenon, WAVE, and 16 custom tests",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "webkit",
+      "what": "used for tests on which chromium fails on some URLs"
+    },
+    {
+      "type": "url",
+      "which": "https://*",
+      "what": "any page"
+    },
+    {
+      "type": "tenonRequest",
+      "id": "a",
+      "withNewContent": true,
+      "what": "request for Tenon test"
+    },
+    {
+      "type": "test",
+      "which": "motion",
+      "what": "spontaneous change of content",
+      "delay": 2400,
+      "interval": 2600,
+      "count": 5
+    },
+    {
+      "type": "test",
+      "which": "axe",
+      "withItems": true,
+      "rules": [],
+      "what": "Axe core, all rules"
+    },
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "used for most tests"
+    },
+    {
+      "type": "url",
+      "which": "https://*",
+      "what": "any page"
+    },
+    {
+      "type": "test",
+      "which": "bulk",
+      "what": "count of visible elements"
+    },
+    {
+      "type": "test",
+      "which": "embAc",
+      "what": "active elements incorrectly embedded in each other",
+      "withItems": true
+    },
+    {
+      "type": "test",
+      "which": "focAll",
+      "what": "Tab-focusability"
+    },
+    {
+      "type": "test",
+      "which": "focInd",
+      "what": "focus indicators",
+      "withItems": true,
+      "revealAll": true
+    },
+    {
+      "type": "test",
+      "which": "focOp",
+      "what": "focusability and operability of elements",
+      "withItems": true
+    },
+    {
+      "type": "test",
+      "which": "hover",
+      "what": "hover-triggered content changes",
+      "withItems": true
+    },
+    {
+      "type": "test",
+      "which": "labClash",
+      "what": "unlabeled and mislabeled form controls",
+      "withItems": true
+    },
+    {
+      "type": "test",
+      "which": "linkUl",
+      "what": "underlining of inline links",
+      "withItems": true
+    },
+    {
+      "type": "test",
+      "which": "menuNav",
+      "what": "keyboard navigation within true-focus menus",
+      "withItems": true
+    },
+    {
+      "type": "test",
+      "which": "radioSet",
+      "what": "grouping of radio buttons in fieldsets",
+      "withItems": true
+    },
+    {
+      "type": "test",
+      "which": "role",
+      "what": "validity and necessity of role assignments"
+    },
+    {
+      "type": "test",
+      "which": "styleDiff",
+      "what": "style consistency of headings, buttons, and links",
+      "withItems": true
+    },
+    {
+      "type": "test",
+      "which": "tabNav",
+      "what": "keyboard navigation within tab lists",
+      "withItems": true
+    },
+    {
+      "type": "test",
+      "which": "zIndex",
+      "what": "elements with non-auto z indexes",
+      "withItems": true
+    },
+    {
+      "type": "test",
+      "which": "ibm",
+      "withItems": true,
+      "what": "IBM Accessibility Checker"
+    },
+    {
+      "type": "test",
+      "which": "aatt",
+      "what": "AATT with HTML CodeSniffer"
+    },
+    {
+      "type": "test",
+      "which": "alfa",
+      "what": "Siteimprove alfa"
+    },
+    {
+      "type": "test",
+      "which": "wave",
+      "reportType": 4,
+      "what": "WAVE, report-type 4"
+    },
+    {
+      "type": "test",
+      "which": "tenon",
+      "id": "a",
+      "what": "Tenon API version 2"
+    }
+  ]
+}
