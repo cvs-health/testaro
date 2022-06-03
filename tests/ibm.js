@@ -30,23 +30,29 @@ const run = async content => {
 // Reports the result of an IBM test.
 const report = (result, withItems) => {
   const data = {};
-  if (result) {
-    data.totals = result.report.summary.counts;
-    if (withItems) {
-      data.items = result.report.results;
-      data.items.forEach(item => {
-        delete item.apiArgs;
-        delete item.category;
-        delete item.ignored;
-        delete item.messageArgs;
-        delete item.reasonId;
-        delete item.ruleTime;
-        delete item.value;
-      });
+  if (result && result.report && result.report.summary) {
+    const totals = result.report.summary.counts;
+    if (totals) {
+      data.totals = totals;
+      if (withItems) {
+        data.items = result.report.results;
+        data.items.forEach(item => {
+          delete item.apiArgs;
+          delete item.category;
+          delete item.ignored;
+          delete item.messageArgs;
+          delete item.reasonId;
+          delete item.ruleTime;
+          delete item.value;
+        });
+      }
+    }
+    else {
+      data.error = 'ERROR: ibm test delivered no totals';
     }
   }
   else {
-    data.error = 'ERROR: ibm test failed';
+    data.error = 'ERROR: ibm test delivered no report summary';
   }
   return data;
 };
