@@ -1,0 +1,11 @@
+{
+  "id": "siteimprove",
+  "what": "Siteimprove",
+  "hosts": [
+    {
+      "id": "siteimprove",
+      "which": "https://www.siteimprove.com/",
+      "what": "Siteimprove"
+    }
+  ]
+}

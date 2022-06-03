@@ -1,0 +1,11 @@
+{
+  "id": "siteimprovea11y",
+  "what": "Siteimprove accessibility",
+  "hosts": [
+    {
+      "id": "siteimprovea11y",
+      "which": "https://www.siteimprove.com/platform/accessibility/",
+      "what": "Siteimprove accessibility"
+    }
+  ]
+}

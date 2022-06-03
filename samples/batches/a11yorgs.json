@@ -1,0 +1,276 @@
+{
+  "id": "a11yorgs",
+  "what": "Pages expected to pass all accessibility tests",
+  "hosts": [
+    {
+      "id": "iaap",
+      "which": "https://www.accessibilityassociation.org/s/",
+      "what": "IAAP"
+    },
+    {
+      "id": "w3cwaiaria",
+      "which": "https://www.w3.org/WAI/standards-guidelines/aria/",
+      "what": "W3C WAI-ARIA"
+    },
+    {
+      "id": "mozilla",
+      "which": "https://www.mozilla.org/en-US/",
+      "what": "Mozilla"
+    },
+    {
+      "id": "uswds",
+      "which": "https://designsystem.digital.gov/documentation/accessibility/",
+      "what": "U.S. Web Design System"
+    },
+    {
+      "id": "deque",
+      "which": "https://deque.com/",
+      "what": "Deque"
+    },
+    {
+      "id": "levelaccess",
+      "which": "https://www.levelaccess.com/",
+      "what": "Level Access"
+    },
+    {
+      "id": "tpgi",
+      "which": "https://www.tpgi.com/",
+      "what": "TPGi"
+    },
+    {
+      "id": "usablenet",
+      "which": "https://usablenet.com/",
+      "what": "UsableNet"
+    },
+    {
+      "id": "evinced",
+      "which": "https://www.evinced.com/",
+      "what": "Evinced"
+    },
+    {
+      "id": "accessibe",
+      "which": "https://accessibe.com/",
+      "what": "AccessiBe"
+    },
+    {
+      "id": "siteimprove",
+      "which": "https://siteimprove.com/en-us/accessibility/",
+      "what": "Siteimprove"
+    },
+    {
+      "id": "a11yshield",
+      "which": "https://www.accessibilityshield.com/",
+      "what": "Accessibility Shield"
+    },
+    {
+      "id": "barrierbreak",
+      "which": "https://www.barrierbreak.com/",
+      "what": "Barrier Break"
+    },
+    {
+      "id": "converge",
+      "which": "https://convergeaccessibility.com/",
+      "what": "Converge Accessibility"
+    },
+    {
+      "id": "crawford",
+      "which": "https://www.crawfordtech.com/accessibilitynow",
+      "what": "Crawford Technologies"
+    },
+    {
+      "id": "essential",
+      "which": "https://www.essentialaccessibility.com/",
+      "what": "eSSENTIAL Accessibility"
+    },
+    {
+      "id": "microassist",
+      "which": "https://www.microassist.com/",
+      "what": "Microassist"
+    },
+    {
+      "id": "mindscreen",
+      "which": "https://www.mindscreen.de/",
+      "what": "mindscreen"
+    },
+    {
+      "id": "onlineada",
+      "which": "https://onlineada.com/",
+      "what": "Online ADA"
+    },
+    {
+      "id": "tenon",
+      "which": "https://tenon.io/",
+      "what": "Tenon"
+    },
+    {
+      "id": "weco",
+      "which": "https://theweco.com/",
+      "what": "WeCo"
+    },
+    {
+      "id": "zugang",
+      "which": "https://www.access-for-all.ch/ch/",
+      "what": "Zugang für alle"
+    },
+    {
+      "id": "aph",
+      "which": "https://www.aph.org/accessibility-solutions/",
+      "what": "American Printing House"
+    },
+    {
+      "id": "dac",
+      "which": "https://www.digitalaccessibilitycentre.org/",
+      "what": "Digital Accessibility Centre"
+    },
+    {
+      "id": "ubb",
+      "which": "https://www.bfit-bund.de/DE/Home/home_node.html",
+      "what": "Überwachungsstelle des BFIT-Bund"
+    },
+    {
+      "id": "hearcolors",
+      "which": "https://www.hearcolors.com.mx/",
+      "what": "Fundación Hearcolors"
+    },
+    {
+      "id": "knowbility",
+      "which": "https://knowbility.org/",
+      "what": "Knowbility"
+    },
+    {
+      "id": "peat",
+      "which": "https://www.peatworks.org/",
+      "what": "PEAT"
+    },
+    {
+      "id": "viscardi",
+      "which": "https://www.viscardicenter.org/digital-accessibility-services/web-accessibility/",
+      "what": "Viscardi Center"
+    },
+    {
+      "id": "blindspot",
+      "which": "https://myblindspot.org/",
+      "what": "My Blind Spot"
+    },
+    {
+      "id": "a11yoz",
+      "which": "https://www.accessibilityoz.com/",
+      "what": "AccessibilityOz"
+    },
+    {
+      "id": "visionaus",
+      "which": "https://www.visionaustralia.org/services/digital-access",
+      "what": "Vision Australia"
+    },
+    {
+      "id": "abilitynet",
+      "which": "https://www.abilitynet.org.uk/",
+      "what": "AbilityNet"
+    },
+    {
+      "id": "audioeye",
+      "which": "https://www.audioeye.com/",
+      "what": "AudioEye"
+    },
+    {
+      "id": "funka",
+      "which": "https://www.funka.com/en/",
+      "what": "Funka"
+    },
+    {
+      "id": "accessibleweb",
+      "which": "https://accessibleweb.com/",
+      "what": "Accessible Web"
+    },
+    {
+      "id": "atos",
+      "which": "https://atos.net/en/lp/accessibility-and-assistive-technology-iux",
+      "what": "Atos"
+    },
+    {
+      "id": "equalentry",
+      "which": "https://equalentry.com/",
+      "what": "Equal Entry"
+    },
+    {
+      "id": "gatechcidi",
+      "which": "https://cidi.gatech.edu/",
+      "what": "Georgia Tech CIDI"
+    },
+    {
+      "id": "webaim",
+      "which": "https://webaim.org/",
+      "what": "WebAIM"
+    },
+    {
+      "id": "csuncd",
+      "which": "https://www.csun.edu/cod",
+      "what": "CSUN Center on Disabilities"
+    },
+    {
+      "id": "makesense",
+      "which": "https://mk-sense.com/",
+      "what": "Make-Sense"
+    },
+    {
+      "id": "faciliti",
+      "which": "https://www.facil-iti.fr/",
+      "what": "FACIL’iti"
+    },
+    {
+      "id": "aaatraq",
+      "which": "https://aaatraq.com/",
+      "what": "AAAtraq"
+    },
+    {
+      "id": "accessibleorg",
+      "which": "https://accessible.org/",
+      "what": "Accessible.org"
+    },
+    {
+      "id": "ab11y",
+      "which": "https://www.ab11y.com/",
+      "what": "Ab11y"
+    },
+    {
+      "id": "digitala11y",
+      "which": "https://www.digitala11y.com/",
+      "what": "DigitalA11Y"
+    },
+    {
+      "id": "teachaccess",
+      "which": "https://teachaccess.org/",
+      "what": "Teach Access"
+    },
+    {
+      "id": "tetralogical",
+      "which": "https://tetralogical.com/",
+      "what": "TetraLogical"
+    },
+    {
+      "id": "adaexpertise",
+      "which": "https://adaexpertise.com/",
+      "what": "ADA Expertise Consulting"
+    },
+    {
+      "id": "aten",
+      "which": "https://atendesigngroup.com/",
+      "what": "Aten Design Group"
+    },
+    {
+      "id": "holistica11y",
+      "which": "https://holistica11y.com/",
+      "what": "HolisticA11Y"
+    },
+    {
+      "id": "zenythgroup",
+      "which": "https://zenythgroup.com/index",
+      "what": "Zenyth Group"
+    },
+    {
+      "id": "boia",
+      "which": "https://www.boia.org/",
+      "what": "Bureau of Internet Accessibility"
+    }
+  ]
+}

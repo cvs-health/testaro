@@ -1,0 +1,36 @@
+{
+  "id": "greiner",
+  "what": "Greiner’s Fine Men’s Clothing",
+  "hosts": [
+    {
+      "id": "greinerhome",
+      "which": "http://greinersclothing.com/",
+      "what": "Greiner’s Fine Men’s Clothing: Home"
+    },
+    {
+      "id": "greinerabout",
+      "which": "https://greinersclothing.com/about-us/",
+      "what": "Greiner’s Fine Men’s Clothing: About Us"
+    },
+    {
+      "id": "greinercol",
+      "which": "https://greinersclothing.com/collections-fw2018-2/",
+      "what": "Greiner’s Fine Men’s Clothing: Collections"
+    },
+    {
+      "id": "greinermasks",
+      "which": "https://greinersclothing.com/covid19masks/",
+      "what": "Greiner’s Fine Men’s Clothing: COVID-19 Masks"
+    },
+    {
+      "id": "greinermeasure",
+      "which": "https://greinersclothing.com/made-to-measure/",
+      "what": "Greiner’s Fine Men’s Clothing: Made to Measure"
+    },
+    {
+      "id": "greinercontact",
+      "which": "https://greinersclothing.com/contact-2/",
+      "what": "Greiner’s Fine Men’s Clothing: Contact + Locations"
+    }
+  ]
+}
