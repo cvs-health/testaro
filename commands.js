@@ -104,18 +104,18 @@ exports.commands = {
         what: [false, 'string', 'isState', 'comment']
       }
     ],
-    test: [
-      'Perform a test',
-      {
-        which: [true, 'string', 'isTest', 'test name'],
-        what: [false, 'string', 'hasLength', 'comment']
-      }
-    ],
     tenonRequest: [
       'Request a Tenon test',
       {
         id: [true, 'string', 'hasLength', 'ID for this test instance'],
         withNewContent: [true, 'boolean', '', 'true: use a URL; false: use page content'],
+        what: [false, 'string', 'hasLength', 'comment']
+      }
+    ],
+    test: [
+      'Perform a test',
+      {
+        which: [true, 'string', 'isTest', 'test name'],
         what: [false, 'string', 'hasLength', 'comment']
       }
     ],
