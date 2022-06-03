@@ -17,13 +17,13 @@
       "type": "tenonRequest",
       "withNewContent": true,
       "id": "a",
-      "what": "tenon request"
+      "what": "Tenon API version 2 test request"
     },
     {
       "type": "test",
       "which": "tenon",
       "id": "a",
-      "what": "result of prior tenon request"
+      "what": "Tenon API version 2 result retrieval"
     }
   ]
 }

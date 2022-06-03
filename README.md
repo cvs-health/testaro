@@ -265,7 +265,7 @@ Example:
     "type": "tenonRequest",
     "id": "a",
     "withNewContent": true,
-    "what": "request for Tenon test"
+    "what": "Tenon API version 2 test request"
   }
   ```
 
@@ -276,7 +276,7 @@ Example:
     "type": "test",
     "which": "tenon",
     "id": "a",
-    "what": "Tenon API version 2"
+    "what": "Tenon API version 2 result retrieval"
   }
 ```
 
