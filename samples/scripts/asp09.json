@@ -141,11 +141,6 @@
       "which": "wave",
       "reportType": 4,
       "what": "WAVE, report-type 4"
-    },
-    {
-      "type": "score",
-      "which": "asp09",
-      "what": "5 packages and 16 custom tests, with empirical duplication discounts"
     }
   ]
 }
