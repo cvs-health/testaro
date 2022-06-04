@@ -24,18 +24,18 @@ const {getCompliance} = require('accessibility-checker');
 const run = async content => {
   const nowLabel = (new Date()).toISOString().slice(0, 19);
   // Return the result of a test.
-  const report = await getCompliance(content, nowLabel);
-  return report;
+  const ibmReport = await getCompliance(content, nowLabel);
+  return ibmReport;
 };
-// Reports the result of an IBM test.
-const report = (result, withItems) => {
+// Trims an IBM report.
+const report = (ibmReport, withItems) => {
   const data = {};
-  if (result && result.report && result.report.summary) {
-    const totals = result.report.summary.counts;
+  if (ibmReport && ibmReport.report && ibmReport.report.summary) {
+    const totals = ibmReport.report.summary.counts;
     if (totals) {
       data.totals = totals;
       if (withItems) {
-        data.items = result.report.results;
+        data.items = ibmReport.report.results;
         data.items.forEach(item => {
           delete item.apiArgs;
           delete item.category;
@@ -62,13 +62,13 @@ const doTest = async (content, withItems, timeLimit) => {
   let timeoutID;
   const wait = new Promise(resolve => {
     timeoutID = setTimeout(() => {
-      resolve('');
+      resolve({});
     }, 1000 * timeLimit);
   });
   // Conduct and report the test.
-  const result = run(content);
+  const ibmReport = run(content);
   // Wait for the report until the time limit expires.
-  const resultIfFast = await Promise.race([result, wait]);
+  const ibmReportIfFast = await Promise.race([ibmReport, wait]);
   // Delete the report files.
   try {
     const reportNames = await fs.readdir('results');
@@ -80,14 +80,16 @@ const doTest = async (content, withItems, timeLimit) => {
     console.log('ibm test created no result files.');
   }
   // Return the result.
-  if (resultIfFast) {
+  if (ibmReportIfFast.report) {
     clearTimeout(timeoutID);
-    const typeResult = report(result, withItems);
-    return typeResult;
+    const ibmTypeReport = report(ibmReportIfFast, withItems);
+    return ibmTypeReport;
   }
   else {
     console.log('ERROR: getting ibm test report took too long');
-    return 'ERROR: getting ibm test report took too long';
+    return {
+      error: 'ERROR: getting ibm test report took too long'
+    };
   }
 };
 // Returns results of one or two IBM tests.

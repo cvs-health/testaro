@@ -1,0 +1,22 @@
+{
+  "id": "alfa",
+  "what": "Alfa test package",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "used for most tests"
+    },
+    {
+      "type": "url",
+      "which": "https://*",
+      "what": "any page"
+    },
+    {
+      "type": "test",
+      "which": "alfa",
+      "what": "Siteimprove alfa"
+    }
+  ]
+}
