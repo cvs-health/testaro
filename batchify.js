@@ -16,6 +16,7 @@ exports.batchify = (script, batch, timeStamp) => {
     });
     const spec = {
       id: `${timeStamp}-${host.id}`,
+      host,
       script: newScript
     };
     return spec;

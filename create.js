@@ -21,9 +21,10 @@ const reportDir = process.env.REPORTDIR;
 // ########## FUNCTIONS
 
 // Runs one script and writes a report file.
-const runHost = async (id, script) => {
+const runHost = async (id, script, host = {}) => {
   const report = {
     id,
+    host,
     log: [],
     script,
     acts: []
@@ -43,16 +44,16 @@ exports.runJob = async (scriptID, batchID) => {
       // If there is a batch:
       let batch = null;
       if (batchID) {
-        // Convert the script to a batch-based set of scripts.
+        // Convert the script to a batch-based set of host scripts.
         const batchJSON = await fs.readFile(`${batchDir}/${batchID}.json`, 'utf8');
         batch = JSON.parse(batchJSON);
         const specs = batchify(script, batch, timeStamp);
-        // For each script:
+        // For each host script:
         while (specs.length) {
           const spec = specs.shift();
-          const {id, script} = spec;
+          const {id, host, script} = spec;
           // Run it and save the result with a host-suffixed ID.
-          await runHost(id, script);
+          await runHost(id, script, host);
         }
       }
       // Otherwise, i.e. if there is no batch:
