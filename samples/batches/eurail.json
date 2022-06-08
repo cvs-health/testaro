@@ -1,0 +1,11 @@
+{
+  "id": "eurail",
+  "what": "Eurail",
+  "hosts": [
+    {
+      "id": "eurail",
+      "which": "https://www.eurail.com/en",
+      "what": "Eurail"
+    }
+  ]
+}

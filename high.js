@@ -1,5 +1,8 @@
-// high.js
-// Invokes Testaro with the high-level method.
+/*
+  high.js
+  Invokes Testaro with the high-level method.
+  Usage example: node high tp10 weborgs
+*/
 
 const {runJob} = require('./create');
 const scriptID = process.argv[2];
