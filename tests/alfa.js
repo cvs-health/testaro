@@ -4,11 +4,13 @@
 */
 
 // IMPORTS
+
 const {Audit} = require('@siteimprove/alfa-act');
 const {Scraper} = require('@siteimprove/alfa-scraper');
 const alfaRules = require('@siteimprove/alfa-rules');
 
 // FUNCTIONS
+
 // Conducts and reports an alfa test.
 exports.reporter = async page => {
   // Get the document containing the summaries of the alfa rules.
@@ -104,6 +106,11 @@ exports.reporter = async page => {
   }
   catch(error) {
     console.log(`ERROR: navigation to URL timed out (${error})`);
-    return {result: {error: 'ERROR: navigation to URL timed out'}};
+    return {
+      result: {
+        prevented: true,
+        error: 'ERROR: navigation to URL timed out'
+      }
+    };
   }
 };

@@ -107,15 +107,19 @@ exports.reporter = async (tenonData, id) => {
     // Otherwise, if the test is still running after a wait for its status:
     else {
       // Report the test status.
-      return {result: {
-        error: 'ERROR: test status not completed',
-        testStatus
-      }};
+      return {
+        result: {
+          prevented: true,
+          error: 'ERROR: test status not completed',
+          testStatus
+        }
+      };
     }
   }
   else {
     return {
       result: {
+        prevented: true,
         error: 'ERROR: tenon authorization and test data incomplete'
       }
     };

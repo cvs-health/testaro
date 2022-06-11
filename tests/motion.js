@@ -110,6 +110,11 @@ exports.reporter = async (page, delay, interval, count) => {
   // Otherwise, i.e. if the shooting failed:
   else {
     // Return failure.
-    return {result: {error: 'ERROR: screenshots failed'}};
+    return {
+      result: {
+        prevented: true,
+        error: 'ERROR: screenshots failed'
+      }
+    };
   }
 };

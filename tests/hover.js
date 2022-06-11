@@ -212,6 +212,7 @@ exports.reporter = async (page, withItems) => {
   const triggers = await page.$$(selectors.join(', '))
   .catch(error => {
     console.log(`ERROR getting hover triggers (${error.message})`);
+    data.prevented = true;
     return [];
   });
   // If they number more than the sample size limit, sample them.

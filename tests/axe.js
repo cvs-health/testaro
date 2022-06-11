@@ -16,10 +16,11 @@ exports.reporter = async (page, withItems, rules = []) => {
   await injectAxe(page)
   .catch(error => {
     console.log(`ERROR: Axe injection failed (${error.message})`);
-    data.result = 'ERROR: axe injection failed';
+    data.prevented = true;
+    data.error = 'ERROR: axe injection failed';
   });
   // If the injection succeeded:
-  if (! data.result) {
+  if (! data.prevented) {
     // Get the data on the elements violating the specified axe-core rules.
     const axeOptions = {};
     if (rules.length) {
@@ -100,6 +101,7 @@ exports.reporter = async (page, withItems, rules = []) => {
     // Otherwise, i.e. if the test failed:
     else {
       // Report this.
+      data.prevented = true;
       data.error = 'ERROR: axe failed';
       console.log('ERROR: axe failed');
     }

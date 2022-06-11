@@ -48,10 +48,12 @@ const report = (ibmReport, withItems) => {
       }
     }
     else {
+      data.prevented = true;
       data.error = 'ERROR: ibm test delivered no totals';
     }
   }
   else {
+    data.prevented = true;
     data.error = 'ERROR: ibm test delivered no report summary';
   }
   return data;
@@ -88,6 +90,7 @@ const doTest = async (content, withItems, timeLimit) => {
   else {
     console.log('ERROR: getting ibm test report took too long');
     return {
+      prevented: true,
       error: 'ERROR: getting ibm test report took too long'
     };
   }
@@ -100,12 +103,18 @@ exports.reporter = async (page, withItems, withNewContent) => {
     const timeLimit = 15;
     const typeContent = await page.content();
     result.content = await doTest(typeContent, withItems, timeLimit);
+    if (result.content.prevented) {
+      result.prevented = true;
+    }
   }
   // If a test with new content is to be performed:
   if ([true, undefined].includes(withNewContent)) {
     const timeLimit = 20;
     const typeContent = page.url();
     result.url = await doTest(typeContent, withItems, timeLimit);
+    if (result.content.prevented) {
+      result.prevented = true;
+    }
   }
   return {result};
 };

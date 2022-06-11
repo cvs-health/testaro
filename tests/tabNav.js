@@ -3,66 +3,71 @@
   This test reports nonstandard keyboard navigation among tab elements in tab lists.
   Standards are based on https://www.w3.org/TR/wai-aria-practices-1.1/#tabpanel.
 */
-exports.reporter = async (page, withItems) => {
-  // Initialize a report.
-  const data = {
-    totals: {
-      navigations: {
-        all: {
+
+// CONSTANTS
+
+const data = {
+  totals: {
+    navigations: {
+      all: {
+        total: 0,
+        correct: 0,
+        incorrect: 0
+      },
+      specific: {
+        tab: {
           total: 0,
           correct: 0,
           incorrect: 0
         },
-        specific: {
-          tab: {
-            total: 0,
-            correct: 0,
-            incorrect: 0
-          },
-          left: {
-            total: 0,
-            correct: 0,
-            incorrect: 0
-          },
-          right: {
-            total: 0,
-            correct: 0,
-            incorrect: 0
-          },
-          up: {
-            total: 0,
-            correct: 0,
-            incorrect: 0
-          },
-          down: {
-            total: 0,
-            correct: 0,
-            incorrect: 0
-          },
-          home: {
-            total: 0,
-            correct: 0,
-            incorrect: 0
-          },
-          end: {
-            total: 0,
-            correct: 0,
-            incorrect: 0
-          }
+        left: {
+          total: 0,
+          correct: 0,
+          incorrect: 0
+        },
+        right: {
+          total: 0,
+          correct: 0,
+          incorrect: 0
+        },
+        up: {
+          total: 0,
+          correct: 0,
+          incorrect: 0
+        },
+        down: {
+          total: 0,
+          correct: 0,
+          incorrect: 0
+        },
+        home: {
+          total: 0,
+          correct: 0,
+          incorrect: 0
+        },
+        end: {
+          total: 0,
+          correct: 0,
+          incorrect: 0
         }
-      },
-      tabElements: {
-        total: 0,
-        correct: 0,
-        incorrect: 0
-      },
-      tabLists: {
-        total: 0,
-        correct: 0,
-        incorrect: 0
       }
+    },
+    tabElements: {
+      total: 0,
+      correct: 0,
+      incorrect: 0
+    },
+    tabLists: {
+      total: 0,
+      correct: 0,
+      incorrect: 0
     }
-  };
+  }
+};
+
+// FUNCTIONS
+
+exports.reporter = async (page, withItems) => {
   if (withItems) {
     data.tabElements = {
       incorrect: [],
@@ -182,6 +187,7 @@ exports.reporter = async (page, withItems) => {
           .catch(error => {
             console.log(`ERROR: could not get tag name (${error.message})`);
             found = false;
+            data.prevented = true;
             return 'ERROR: not found';
           });
           if (found) {
@@ -260,7 +266,10 @@ exports.reporter = async (page, withItems) => {
         if (! orientation) {
           orientation = 'horizontal';
         }
-        if (orientation !== 'ERROR') {
+        if (orientation === 'ERROR') {
+          data.prevented = true;
+        }
+        else {
           const tabs = await firstTabList.$$('[role=tab]');
           // If the tablist contains at least 2 tab elements:
           if (tabs.length > 1) {

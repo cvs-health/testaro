@@ -11,11 +11,6 @@ exports.reporter = async (page, withItems) => {
   return await page.$eval('body', (body, args) => {
     const withItems = args[0];
     const linkTypes = args[1];
-    // Initialize the data to be returned.
-    const data = {totals: {}};
-    if (withItems) {
-      data.items = {};
-    }
     // Identify the settable style properties to be compared for all tag names.
     const mainStyles = [
       'borderStyle',
@@ -39,6 +34,15 @@ exports.reporter = async (page, withItems) => {
     const headingStyles = [
       'fontSize'
     ];
+    // Initialize the data to be returned.
+    const data = {
+      mainStyles,
+      headingStyles,
+      totals: {}
+    };
+    if (withItems) {
+      data.items = {};
+    }
     // Identify the heading tag names to be analyzed.
     const headingNames = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
     // Identify the other nonlink tag names to be analyzed.

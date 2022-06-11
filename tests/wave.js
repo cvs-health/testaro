@@ -32,6 +32,7 @@ exports.reporter = async (page, reportType) => {
           }
           catch (error) {
             return resolve({
+              prevented: true,
               error: 'WAVE did not return JSON.',
               report
             });

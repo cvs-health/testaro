@@ -151,7 +151,10 @@ exports.reporter = async (page, withItems) => {
   }, withItems)
   .catch(error => {
     console.log(`ERROR: labClash failed (${error.message})`);
-    const data = {error: 'ERROR: labClash failed'};
+    const data = {
+      prevented: true,
+      error: 'ERROR: labClash failed'
+    };
     return {result: data};
   });
 };

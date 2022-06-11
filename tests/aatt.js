@@ -53,13 +53,23 @@ exports.reporter = async (page, waitLong) => {
     }
     catch (error) {
       console.log(`ERROR processing AATT report (${error.message})`);
-      return {result: 'ERROR processing AATT report'};
+      return {
+        result: {
+          prevented: true,
+          error: 'ERROR processing AATT report'
+        }
+      };
     }
   }
   // Otherwise, i.e. if the result did not arrive within the time limit:
   else {
     // Report the failure.
     console.log('ERROR: getting report took too long');
-    return {result: 'ERROR: getting AATT report took too long'};
+    return {
+      result: {
+        prevented: true,
+        error: 'ERROR: getting AATT report took too long'
+      }
+    };
   }
 };
