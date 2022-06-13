@@ -1,0 +1,63 @@
+{
+  "id": "digicert",
+  "what": "moves on DigiCert website",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "Chrome"
+    },
+    {
+      "type": "url",
+      "which": "https://order.digicert.com/",
+      "what": "DigiCert"
+    },
+    {
+      "type": "focus",
+      "what": "button",
+      "which": "Choose payment plan"
+    },
+    {
+      "type": "press",
+      "which": "ArrowDown",
+      "again": 2,
+      "what": "Choose 2-year plan"
+    },
+    {
+      "type": "press",
+      "which": "Enter",
+      "what": "Commit to choose 2-year plan"
+    },
+    {
+      "type": "button",
+      "which": "I don't have",
+      "what": "I don’t have my CSR"
+    },
+    {
+      "type": "select",
+      "which": "Server app details",
+      "what": "NGINX"
+    },
+    {
+      "type": "text",
+      "which": "main website",
+      "what": "jpdev.pro"
+    },
+    {
+      "type": "button",
+      "which": "Continue",
+      "what": "Continue"
+    },
+    {
+      "type": "wait",
+      "what": "url",
+      "which": "step2"
+    },
+    {
+      "type": "test",
+      "which": "bulk",
+      "what": "count of visible elements"
+    }
+  ]
+}

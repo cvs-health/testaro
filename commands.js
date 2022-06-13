@@ -1,7 +1,7 @@
 exports.commands = {
   etc: {
     button: [
-      'Click a button',
+      'Click a button or submit input',
       {
         which: [true, 'string', 'hasLength', 'substring of button text'],
         index: [false, 'number', '', 'index among matches if not 0'],
@@ -94,7 +94,7 @@ exports.commands = {
       {
         which: [true, 'string', 'hasLength', 'substring of select-list text'],
         index: [false, 'number', '', 'index among matches if not 0'],
-        what: [true, 'string', 'hasLength', 'substring of option text']
+        what: [true, 'string', 'hasLength', 'substring of option text content']
       }
     ],
     state: [

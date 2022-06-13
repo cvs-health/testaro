@@ -15,7 +15,7 @@ const waits = Number.parseInt(process.env.WAITS) || 0;
 const urlInject = process.env.URL_INJECT || 'yes';
 // CSS selectors for targets of moves.
 const moves = {
-  button: 'button, [role=button]',
+  button: 'button, [role=button], input[type=submit]',
   checkbox: 'input[type=checkbox]',
   focus: true,
   link: 'a, [role=link]',
@@ -292,7 +292,13 @@ const textOf = async (page, element) => {
       // Return its visible labels, descriptions, and legend if the first input in a fieldset.
       totalText = await page.evaluate(element => {
         const {tagName} = element;
-        const ownText = ['A', 'BUTTON'].includes(tagName) ? element.textContent : '';
+        let ownText = '';
+        if (['A', 'BUTTON'].includes(tagName)) {
+          ownText = element.textContent;
+        }
+        else if (tagName === 'INPUT' && element.type === 'submit') {
+          ownText = element.value;
+        }
         // HTML link elements have no labels property.
         const labels = tagName !== 'A' ? Array.from(element.labels) : [];
         const labelTexts = labels.map(label => label.textContent);
@@ -378,10 +384,10 @@ const matchElement = async (page, selector, matchText, index = 0) => {
         return ! matchText || bodyText.includes(matchText);
       },
       [slimText, slimBody],
-      {timeout: 2000}
+      {timeout: 4000}
     )
     .catch(async error => {
-      console.log(`ERROR: text to match not in body (${error.message})`);
+      console.log(`ERROR: text “${matchText}” not in body (${error.message})`);
     });
     // If there is no text to be matched or the body contained it:
     if (textInBodyJSHandle) {
@@ -967,10 +973,21 @@ const doActs = async (report, actIndex, page) => {
                 }
                 // Otherwise, if it is selecting an option in a select list, perform it.
                 else if (act.type === 'select') {
-                  await whichElement.selectOption({what: act.what});
-                  const optionText = await whichElement.$eval(
-                    'option:selected', el => el.textContent
-                  );
+                  const options = await whichElement.$$('option');
+                  let optionText = '';
+                  if (options && Array.isArray(options) && options.length) {
+                    const optionTexts = [];
+                    for (const option of options) {
+                      const optionText = await option.textContent();
+                      optionTexts.push(optionText);
+                    }
+                    const matchTexts = optionTexts.map((text, index) => text.includes(act.what) ? index : -1);
+                    const index = matchTexts.filter(text => text > -1)[act.index || 0];
+                    if (index !== undefined) {
+                      await whichElement.selectOption({index});
+                      optionText = optionTexts[index];
+                    }
+                  }
                   act.result = optionText
                     ? `&ldquo;${optionText}}&rdquo; selected`
                     : 'ERROR: option not found';
