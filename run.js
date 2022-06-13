@@ -12,12 +12,13 @@ const {commands} = require('./commands');
 const debug = process.env.DEBUG === 'true';
 // Set WAITS environment variable to a positive number to insert delays (in ms).
 const waits = Number.parseInt(process.env.WAITS) || 0;
+const urlInject = process.env.URL_INJECT || 'yes';
 // CSS selectors for targets of moves.
 const moves = {
-  button: 'button',
+  button: 'button, [role=button]',
   checkbox: 'input[type=checkbox]',
   focus: true,
-  link: 'a',
+  link: 'a, [role=link]',
   radio: 'input[type=radio]',
   select: 'select',
   text: 'input[type=text]'
@@ -549,7 +550,7 @@ const isTrue = (object, specs) => {
   }
   return [actual, satisfied];
 };
-// Adds an error result to an act.
+// Adds a wait error result to an act.
 const waitError = (page, act, error, what) => {
   console.log(`ERROR waiting for ${what} (${error.message})`);
   act.result = {url: page.url()};
@@ -623,28 +624,44 @@ const doActs = async (report, actIndex, page) => {
         else if (act.type === 'wait') {
           const {what, which} = act;
           console.log(`>> for ${what} to include “${which}”`);
-          // Wait 5 seconds for the specified text to appear in the specified place.
+          // Wait 5 or 10 seconds for the specified text, and quit if it does not.
           let successJSHandle;
           if (act.what === 'url') {
             successJSHandle = await page.waitForFunction(
               text => document.URL.includes(text), act.which, {timeout: 5000}
             )
-            .catch(error => waitError(page, act, error, 'URL'));
+            .catch(error => {
+              actIndex = acts.length;
+              return waitError(page, act, error, 'URL');
+            });
           }
           else if (act.what === 'title') {
             successJSHandle = await page.waitForFunction(
               text => document.title.includes(text), act.which, {timeout: 5000}
             )
-            .catch(error => waitError(page, act, error, 'title'));
+            .catch(error => {
+              actIndex = acts.length;
+              return waitError(page, act, error, 'title');
+            });
           }
           else if (act.what === 'body') {
             successJSHandle = await page.waitForFunction(
               matchText => {
-                const innerText = document.body.innerText;
-                return innerText.includes(matchText);
-              }, which, {timeout: 5000}
+                const innerText = document && document.body && document.body.innerText;
+                if (innerText) {
+                  return innerText.includes(matchText);
+                }
+                else {
+                  actIndex = acts.length;
+                  console.log('ERROR finding document body');
+                  return false;
+                }
+              }, which, {timeout: 20000}
             )
-            .catch(error => waitError(page, act, error, 'body'));
+            .catch(error => {
+              actIndex = acts.length;
+              return waitError(page, act, error, 'body');
+            });
           }
           if (successJSHandle) {
             act.result = {url: page.url()};
@@ -663,18 +680,20 @@ const doActs = async (report, actIndex, page) => {
           // If the state is valid:
           const stateIndex = ['loaded', 'idle'].indexOf(act.which);
           if (stateIndex !== -1) {
-            // Wait for it.
+            // Wait for it, and quit if it does not appear.
             await page.waitForLoadState(
               ['domcontentloaded', 'networkidle'][stateIndex], {timeout: [10000, 5000][stateIndex]}
             )
             .catch(error => {
               console.log(`ERROR waiting for page to be ${act.which} (${error.message})`);
               act.result = `ERROR waiting for page to be ${act.which}`;
+              actIndex = acts.length;
             });
           }
           else {
             console.log('ERROR: invalid state');
             act.result = 'ERROR: invalid state';
+            actIndex = acts.length;
           }
         }
         // Otherwise, if the act is a page switch:
@@ -933,7 +952,13 @@ const doActs = async (report, actIndex, page) => {
                 else if (act.type === 'link') {
                   const href = await whichElement.getAttribute('href');
                   const target = await whichElement.getAttribute('target');
-                  await whichElement.click({timeout: 2000});
+                  await whichElement.click({timeout: 2000})
+                  .catch(async () => {
+                    await whichElement.click({
+                      force: true,
+                      timeout: 10000
+                    });
+                  });
                   act.result = {
                     href: href || 'NONE',
                     target: target || 'NONE',
@@ -1247,8 +1272,10 @@ exports.handleRequest = async report => {
     report.timeStamp = report.id.replace(/-.+/, '');
     // Add the script commands to the report as its initial acts.
     report.acts = JSON.parse(JSON.stringify(report.script.commands));
-    // Inject url acts where necessary to undo DOM changes.
-    injectURLActs(report.acts);
+    // Inject url acts where necessary to undo DOM changes, if specified.
+    if (urlInject === 'yes') {
+      injectURLActs(report.acts);
+    }
     // Perform the acts, asynchronously adding to the log and report.
     await doScript(report);
   }
