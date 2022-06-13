@@ -373,7 +373,7 @@ const textOf = async (page, element) => {
 const matchElement = async (page, selector, matchText, index = 0) => {
   // If the page still exists:
   if (page) {
-    // Wait 2 seconds until the body contains any text to be matched.
+    // Wait 6 seconds until the body contains any text to be matched.
     const slimText = debloat(matchText);
     const bodyText = await page.textContent('body');
     const slimBody = debloat(bodyText);
@@ -384,7 +384,7 @@ const matchElement = async (page, selector, matchText, index = 0) => {
         return ! matchText || bodyText.includes(matchText);
       },
       [slimText, slimBody],
-      {timeout: 4000}
+      {timeout: 6000}
     )
     .catch(async error => {
       console.log(`ERROR: text “${matchText}” not in body (${error.message})`);
@@ -597,12 +597,12 @@ const doActs = async (report, actIndex, page) => {
         if (truth[1]) {
           // If the performance of commands is to stop:
           if (act.jump === 0) {
-            // Set the command index to cause a stop.
+            // Set the act index to cause a stop.
             actIndex = -2;
           }
           // Otherwise, if there is a numerical jump:
           else if (act.jump) {
-            // Set the command index accordingly.
+            // Set the act index accordingly.
             actIndex += act.jump - 1;
           }
           // Otherwise, if there is a named next command:
@@ -634,20 +634,22 @@ const doActs = async (report, actIndex, page) => {
           let successJSHandle;
           if (act.what === 'url') {
             successJSHandle = await page.waitForFunction(
-              text => document.URL.includes(text), act.which, {timeout: 5000}
+              text => document.URL.includes(text) ? 'yes' : 'no', act.which, {timeout: 5000}
             )
             .catch(error => {
-              actIndex = acts.length;
-              return waitError(page, act, error, 'URL');
+              actIndex = -2;
+              waitError(page, act, error, 'URL');
+              return 'error';
             });
           }
           else if (act.what === 'title') {
             successJSHandle = await page.waitForFunction(
-              text => document.title.includes(text), act.which, {timeout: 5000}
+              text => document.title.includes(text) ? 'yes' : 'no', act.which, {timeout: 5000}
             )
             .catch(error => {
-              actIndex = acts.length;
-              return waitError(page, act, error, 'title');
+              actIndex = -2;
+              waitError(page, act, error, 'title');
+              return 'error';
             });
           }
           else if (act.what === 'body') {
@@ -655,21 +657,25 @@ const doActs = async (report, actIndex, page) => {
               matchText => {
                 const innerText = document && document.body && document.body.innerText;
                 if (innerText) {
-                  return innerText.includes(matchText);
+                  return innerText.includes(matchText) ? 'yes' : 'no';
                 }
                 else {
-                  actIndex = acts.length;
+                  actIndex = -2;
                   console.log('ERROR finding document body');
-                  return false;
+                  console.log(`document null? ${document === null}`);
+                  console.log(`body null? ${document.body === null}`);
+                  return 'error';
                 }
               }, which, {timeout: 20000}
             )
             .catch(error => {
-              actIndex = acts.length;
-              return waitError(page, act, error, 'body');
+              actIndex = -2;
+              waitError(page, act, error, 'body');
+              return 'error';
             });
           }
-          if (successJSHandle) {
+          const success = await successJSHandle.jsonValue();
+          if (success === 'yes') {
             act.result = {url: page.url()};
             if (act.what === 'title') {
               act.result.title = await page.title();
@@ -679,6 +685,18 @@ const doActs = async (report, actIndex, page) => {
               console.log(`ERROR waiting for stability after ${act.what} (${error.message})`);
               act.result.error = `ERROR waiting for stability after ${act.what}`;
             });
+          }
+          else if (success === 'no') {
+            act.result = {
+              error: 'ERROR: Awaited condition did not occur'
+            };
+            actIndex = -2;
+          }
+          else if (success === 'error') {
+            act.result = {
+              error: 'ERROR awaiting condition'
+            };
+            actIndex = -2;
           }
         }
         // Otherwise, if the act is a wait for a state:
@@ -693,13 +711,13 @@ const doActs = async (report, actIndex, page) => {
             .catch(error => {
               console.log(`ERROR waiting for page to be ${act.which} (${error.message})`);
               act.result = `ERROR waiting for page to be ${act.which}`;
-              actIndex = acts.length;
+              actIndex = -2;
             });
           }
           else {
             console.log('ERROR: invalid state');
             act.result = 'ERROR: invalid state';
-            actIndex = acts.length;
+            actIndex = -2;
           }
         }
         // Otherwise, if the act is a page switch:
@@ -963,6 +981,9 @@ const doActs = async (report, actIndex, page) => {
                     await whichElement.click({
                       force: true,
                       timeout: 10000
+                    })
+                    .catch(() => {
+                      actIndex = -2;
                     });
                   });
                   act.result = {
@@ -989,7 +1010,7 @@ const doActs = async (report, actIndex, page) => {
                     }
                   }
                   act.result = optionText
-                    ? `&ldquo;${optionText}}&rdquo; selected`
+                    ? `“${optionText}” selected`
                     : 'ERROR: option not found';
                 }
                 // Otherwise, if it is entering text on the element:
