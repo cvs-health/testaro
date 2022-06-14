@@ -256,7 +256,7 @@ const launch = async typeName => {
       // Make its console messages appear in the Playwright console.
       page.on('console', msg => {
         const msgText = msg.text();
-        console.log(msgText);
+        console.log(`[${msgText}]`);
         logCount++;
         logSize += msgText.length;
         const msgLC = msgText.toLowerCase();
@@ -502,8 +502,9 @@ const visit = async (act, page, isStrict) => {
           // If the visit fails:
           if (response === 'error') {
             // Give up.
-            console.log(`ERROR: Visits to ${requestedURL} failed`);
-            act.result = `ERROR: Visit to ${requestedURL} failed`;
+            const errorMsg = `ERROR: Visits to ${requestedURL} failed`;
+            console.log(errorMsg);
+            act.result = errorMsg;
             await page.goto('about:blank')
             .catch(error => {
               console.log(`ERROR: Navigation to blank page failed (${error.message})`);
@@ -630,48 +631,41 @@ const doActs = async (report, actIndex, page) => {
         else if (act.type === 'wait') {
           const {what, which} = act;
           console.log(`>> for ${what} to include “${which}”`);
-          // Wait 5 or 10 seconds for the specified text, and quit if it does not.
+          // Wait 5 or 10 seconds for the specified text, and quit if it does not appear.
           let successJSHandle;
           if (act.what === 'url') {
-            successJSHandle = await page.waitForFunction(
-              text => document.URL.includes(text) ? 'yes' : 'no', act.which, {timeout: 5000}
-            )
+            await page.waitForURL(act.which, {timeout: 15000})
             .catch(error => {
               actIndex = -2;
               waitError(page, act, error, 'URL');
-              return 'error';
             });
           }
           else if (act.what === 'title') {
-            successJSHandle = await page.waitForFunction(
-              text => document.title.includes(text) ? 'yes' : 'no', act.which, {timeout: 5000}
+            await page.waitForFunction(
+              text => document && document.title && document.title.includes(text),
+              act.which,
+              {
+                polling: 1000,
+                timeout: 5000
+              }
             )
             .catch(error => {
               actIndex = -2;
               waitError(page, act, error, 'title');
-              return 'error';
             });
           }
           else if (act.what === 'body') {
-            successJSHandle = await page.waitForFunction(
-              matchText => {
-                const innerText = document && document.body && document.body.innerText;
-                if (innerText) {
-                  return innerText.includes(matchText) ? 'yes' : 'no';
-                }
-                else {
-                  actIndex = -2;
-                  console.log('ERROR finding document body');
-                  console.log(`document null? ${document === null}`);
-                  console.log(`body null? ${document.body === null}`);
-                  return 'error';
-                }
-              }, which, {timeout: 20000}
+            await page.waitForFunction(
+              text => document && document.body && document.body.innerText.includes(text),
+              act.which,
+              {
+                polling: 2000,
+                timeout: 10000
+              }
             )
             .catch(error => {
               actIndex = -2;
               waitError(page, act, error, 'body');
-              return 'error';
             });
           }
           const success = await successJSHandle.jsonValue();
@@ -682,8 +676,9 @@ const doActs = async (report, actIndex, page) => {
             }
             await page.waitForLoadState('networkidle', {timeout: 10000})
             .catch(error => {
-              console.log(`ERROR waiting for stability after ${act.what} (${error.message})`);
-              act.result.error = `ERROR waiting for stability after ${act.what}`;
+              const errorMsg = `ERROR waiting for stability after ${act.what}`;
+              console.log(`${errorMsg} (${error.message})`);
+              act.result.error = errorMsg;
             });
           }
           else if (success === 'no') {
@@ -978,12 +973,14 @@ const doActs = async (report, actIndex, page) => {
                   const target = await whichElement.getAttribute('target');
                   await whichElement.click({timeout: 2000})
                   .catch(async () => {
+                    console.log('ERROR: First attempt to click link timed out');
                     await whichElement.click({
                       force: true,
                       timeout: 10000
                     })
                     .catch(() => {
                       actIndex = -2;
+                      console.log('ERROR: Second (forced) attempt to click link timed out');
                     });
                   });
                   act.result = {
@@ -1224,7 +1221,9 @@ const doActs = async (report, actIndex, page) => {
     // Otherwise, i.e. if the command is invalid:
     else {
       // Add an error result to the act.
-      act.result = `ERROR: Invalid command of type ${act.type}`;
+      const errorMsg = `ERROR: Invalid command of type ${act.type}`;
+      act.result = errorMsg;
+      console.log(errorMsg);
     }
     // Perform the remaining acts.
     await doActs(report, actIndex + 1, page);

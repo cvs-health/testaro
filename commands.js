@@ -100,8 +100,8 @@ exports.commands = {
     state: [
       'Wait until the page reaches a load state',
       {
-        which: [true, 'string', 'hasLength', '“loaded” or “idle”'],
-        what: [false, 'string', 'isState', 'comment']
+        which: [true, 'string', 'isState', '“loaded” or “idle”'],
+        what: [false, 'string', 'hasLength', 'comment']
       }
     ],
     tenonRequest: [
