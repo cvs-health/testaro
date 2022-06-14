@@ -369,68 +369,84 @@ const textOf = async (page, element) => {
     return null;
   }
 };
-// Returns an element case-insensitively matching a text.
+// Returns an element of a type case-insensitively matching a text.
 const matchElement = async (page, selector, matchText, index = 0) => {
-  // If the page still exists:
-  if (page) {
-    // Wait 6 seconds until the body contains any text to be matched.
-    const slimText = debloat(matchText);
-    const bodyText = await page.textContent('body');
-    const slimBody = debloat(bodyText);
-    const textInBodyJSHandle = await page.waitForFunction(
-      args => {
-        const matchText = args[0];
-        const bodyText = args[1];
-        return ! matchText || bodyText.includes(matchText);
-      },
-      [slimText, slimBody],
-      {timeout: 6000}
-    )
-    .catch(async error => {
-      console.log(`ERROR: text “${matchText}” not in body (${error.message})`);
-    });
-    // If there is no text to be matched or the body contained it:
-    if (textInBodyJSHandle) {
-      const lcText = matchText ? matchText.toLowerCase() : '';
-      // Identify the selected elements.
-      const selections = await page.$$(`body ${selector}`);
-      // If there are any:
-      if (selections.length) {
-        // If there are enough to make a match possible:
-        if (index < selections.length) {
-          // Return the nth one including any specified text, or the count of candidates if none.
-          const elementTexts = [];
-          let nth = 0;
-          for (const element of selections) {
-            const elementText = await textOf(page, element);
-            elementTexts.push(elementText);
-            if ((! lcText || elementText.includes(lcText)) && nth++ === index) {
-              return element;
-            }
-          }
-          return elementTexts;
+  if (matchText) {
+    // If the page still exists:
+    if (page) {
+      // Wait 6 seconds until the body contains any text to be matched.
+      let found = true;
+      const slimText = debloat(matchText);
+      await page.waitForFunction(
+        text => {
+          const bodyText = document && document.body && document.body.innerText;
+          return bodyText && bodyText.toLowerCase().includes(text);
+        },
+        slimText,
+        {
+          polling: 2000,
+          timeout: 10000
         }
-        // Otherwise, i.e. if there are too few to make a match possible:
+      )
+      .catch(async error => {
+        console.log(`ERROR: Wait for “${matchText}” to appear in body timed out (${error.message})`);
+        found = false;
+      });
+      // If the text was found:
+      if (found) {
+        const lcText = matchText.toLowerCase();
+        // Identify the elements of the specified type.
+        const selections = await page.$$(`body ${selector}`);
+        // If there are any:
+        if (selections.length) {
+          // If there are enough to make a match possible:
+          if (index < selections.length) {
+            // Return the specified one, if any.
+            let matchIndex = -1;
+            for (const selection of selections) {
+              const selectionText = await textOf(page, selection);
+              if (selectionText.includes(lcText)) {
+                if (++matchIndex === index) {
+                  return selection;
+                }
+              }
+            }
+            // None satisfied the specifications, so return a failure.
+            console.log('ERROR: Specified element not found');
+            return null;
+          }
+          // Otherwise, i.e. if there are too few such elements to make a match possible:
+          else {
+            // Return a failure.
+            console.log('ERROR: Specified elements fewer than specified');
+            return null;
+          }
+        }
+        // Otherwise, i.e. if there are no elements of the specified type:
         else {
-          // Return the count of candidates.
-          return selections.length;
+          // Return a failure.
+          console.log(`ERROR: No '${selector}' element found`);
+          return null;
         }
       }
-      // Otherwise, i.e. if there are no selected elements, return 0.
+      // Otherwise, i.e. if the text was not found in the body:
       else {
-        return 0;
+        // Return a failure.
+        console.log('ERROR: Specified text not found in document body');
+        return null;
       }
     }
-    // Otherwise, i.e. if the body did not contain it:
+    // Otherwise, i.e. if the page no longer exists:
     else {
-      // Return the failure.
-      return -1;
+      // Return a failure.
+      console.log('ERROR: Page gone');
+      return null;
     }
   }
-  // Otherwise, i.e. if the page no longer exists:
+  // Otherwise, i.e. if no text was specified:
   else {
-    // Return null.
-    console.log('ERROR: Page gone');
+    // Return a failure.
+    console.log('ERROR: No text specified');
     return null;
   }
 };
@@ -502,7 +518,7 @@ const visit = async (act, page, isStrict) => {
           // If the visit fails:
           if (response === 'error') {
             // Give up.
-            const errorMsg = `ERROR: Visits to ${requestedURL} failed`;
+            const errorMsg = `ERROR: Attemts to visit ${requestedURL} failed`;
             console.log(errorMsg);
             act.result = errorMsg;
             await page.goto('about:blank')
@@ -632,7 +648,6 @@ const doActs = async (report, actIndex, page) => {
           const {what, which} = act;
           console.log(`>> for ${what} to include “${which}”`);
           // Wait 5 or 10 seconds for the specified text, and quit if it does not appear.
-          let successJSHandle;
           if (act.what === 'url') {
             await page.waitForURL(act.which, {timeout: 15000})
             .catch(error => {
@@ -663,56 +678,34 @@ const doActs = async (report, actIndex, page) => {
                 timeout: 10000
               }
             )
-            .catch(error => {
+            .catch(async error => {
               actIndex = -2;
               waitError(page, act, error, 'body');
             });
           }
-          const success = await successJSHandle.jsonValue();
-          if (success === 'yes') {
+          // If the text was found:
+          if (actIndex > -2) {
+            // Add this to the report.
             act.result = {url: page.url()};
             if (act.what === 'title') {
               act.result.title = await page.title();
             }
-            await page.waitForLoadState('networkidle', {timeout: 10000})
-            .catch(error => {
-              const errorMsg = `ERROR waiting for stability after ${act.what}`;
-              console.log(`${errorMsg} (${error.message})`);
-              act.result.error = errorMsg;
-            });
-          }
-          else if (success === 'no') {
-            act.result = {
-              error: 'ERROR: Awaited condition did not occur'
-            };
-            actIndex = -2;
-          }
-          else if (success === 'error') {
-            act.result = {
-              error: 'ERROR awaiting condition'
-            };
-            actIndex = -2;
           }
         }
         // Otherwise, if the act is a wait for a state:
         else if (act.type === 'state') {
-          // If the state is valid:
+          // Wait for it, and quit if it does not appear.
           const stateIndex = ['loaded', 'idle'].indexOf(act.which);
-          if (stateIndex !== -1) {
-            // Wait for it, and quit if it does not appear.
-            await page.waitForLoadState(
-              ['domcontentloaded', 'networkidle'][stateIndex], {timeout: [10000, 5000][stateIndex]}
-            )
-            .catch(error => {
-              console.log(`ERROR waiting for page to be ${act.which} (${error.message})`);
-              act.result = `ERROR waiting for page to be ${act.which}`;
-              actIndex = -2;
-            });
-          }
-          else {
-            console.log('ERROR: invalid state');
-            act.result = 'ERROR: invalid state';
+          await page.waitForLoadState(
+            ['domcontentloaded', 'networkidle'][stateIndex], {timeout: [10000, 5000][stateIndex]}
+          )
+          .catch(error => {
+            console.log(`ERROR waiting for page to be ${act.which} (${error.message})`);
+            act.result = `ERROR waiting for page to be ${act.which}`;
             actIndex = -2;
+          });
+          if (actIndex > -2) {
+            act.result = `Page became ${act.which}`;
           }
         }
         // Otherwise, if the act is a page switch:
@@ -981,13 +974,16 @@ const doActs = async (report, actIndex, page) => {
                     .catch(() => {
                       actIndex = -2;
                       console.log('ERROR: Second (forced) attempt to click link timed out');
+                      act.result = 'ERROR: Normal and forced click attempts timed out';
                     });
                   });
-                  act.result = {
-                    href: href || 'NONE',
-                    target: target || 'NONE',
-                    move: 'clicked'
-                  };
+                  if (actIndex > -2) {
+                    act.result = {
+                      href: href || 'NONE',
+                      target: target || 'NONE',
+                      move: 'clicked'
+                    };
+                  }
                 }
                 // Otherwise, if it is selecting an option in a select list, perform it.
                 else if (act.type === 'select') {
