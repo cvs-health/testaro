@@ -371,10 +371,11 @@ const textOf = async (page, element) => {
 };
 // Returns an element of a type case-insensitively matching a text.
 const matchElement = async (page, selector, matchText, index = 0) => {
+  console.log(`Selector is ${selector}`);
   if (matchText) {
     // If the page still exists:
     if (page) {
-      // Wait 6 seconds until the body contains any text to be matched.
+      // Wait 10 seconds until the body contains any text to be matched.
       let found = true;
       const slimText = debloat(matchText);
       await page.waitForFunction(
@@ -396,23 +397,32 @@ const matchElement = async (page, selector, matchText, index = 0) => {
       if (found) {
         const lcText = matchText.toLowerCase();
         // Identify the elements of the specified type.
-        const selections = await page.$$(`body ${selector}`);
+        const selections = await page.$$(selector);
         // If there are any:
         if (selections.length) {
           // If there are enough to make a match possible:
           if (index < selections.length) {
             // Return the specified one, if any.
-            let matchIndex = -1;
+            let matchCount = 0;
+            const selectionTexts = [];
+            const selectionHTMLs = [];
             for (const selection of selections) {
               const selectionText = await textOf(page, selection);
+              const selectionHTML = await selection.innerHTML();
+              selectionTexts.push(selectionText);
+              selectionHTMLs.push(selectionHTML);
               if (selectionText.includes(lcText)) {
-                if (++matchIndex === index) {
+                if (matchCount++ === index) {
                   return selection;
                 }
               }
             }
             // None satisfied the specifications, so return a failure.
-            console.log('ERROR: Specified element not found');
+            console.log(
+              `ERROR: Text found in only ${matchCount} (not ${index + 1}) of ${selections.length}`
+            );
+            console.log(`Candidate texts:\n${selectionTexts.join('\n')}`);
+            console.log(`Candidate HTMLs:\n>> ${selectionHTMLs.join('\n>> ')}`);
             return null;
           }
           // Otherwise, i.e. if there are too few such elements to make a match possible:
@@ -897,30 +907,8 @@ const doActs = async (report, actIndex, page) => {
               const selector = typeof moves[act.type] === 'string' ? moves[act.type] : act.what;
               // Identify the element to perform the move on.
               const whichElement = await matchElement(page, selector, act.which || '', act.index);
-              // If there were enough candidates but no text match:
-              if (Array.isArray(whichElement)) {
-                // Add the result to the act.
-                act.result = {
-                  candidateCount: whichElement.length,
-                  error: 'ERROR: no element with matching text found',
-                  candidateTexts: whichElement
-                };
-              }
-              // Otherwise, if the body did not contain the text:
-              else if (whichElement === -1) {
-                // Add the failure to the act.
-                act.result = 'ERROR: body did not contain text to match';
-              }
-              // Otherwise, if there were not enough candidates:
-              else if (typeof whichElement === 'number') {
-                // Add the failure to the act.
-                act.result = {
-                  candidateCount: whichElement,
-                  error: 'ERROR: too few such elements to allow a match'
-                };
-              }
-              // Otherwise, if a match was found:
-              else if (whichElement !== null) {
+              // If a match was found:
+              if (whichElement !== null) {
                 // If the move is a button click, perform it.
                 if (act.type === 'button') {
                   await whichElement.click({timeout: 3000});
@@ -1027,9 +1015,9 @@ const doActs = async (report, actIndex, page) => {
                   act.result = 'ERROR: move unknown';
                 }
               }
-              // Otherwise, i.e. if the page was gone:
+              // Otherwise, i.e. if no match was found:
               else {
-                act.result = 'ERROR: page gone, so matching element not found';
+                act.result = 'ERROR: Specified element not found';
               }
             }
             // Otherwise, if the act is a keypress:
