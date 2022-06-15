@@ -291,7 +291,7 @@ const textOf = async (page, element) => {
     if (['A', 'BUTTON', 'INPUT', 'SELECT'].includes(tagName)) {
       // Return its visible labels, descriptions, and legend if the first input in a fieldset.
       totalText = await page.evaluate(element => {
-        const {tagName} = element;
+        const {tagName, ariaLabel} = element;
         let ownText = '';
         if (['A', 'BUTTON'].includes(tagName)) {
           ownText = element.textContent;
@@ -302,6 +302,9 @@ const textOf = async (page, element) => {
         // HTML link elements have no labels property.
         const labels = tagName !== 'A' ? Array.from(element.labels) : [];
         const labelTexts = labels.map(label => label.textContent);
+        if (ariaLabel) {
+          labelTexts.push(ariaLabel);
+        }
         const refIDs = new Set([
           element.getAttribute('aria-labelledby') || '',
           element.getAttribute('aria-describedby') || ''
@@ -616,7 +619,7 @@ const doActs = async (report, actIndex, page) => {
         if (truth[1]) {
           // If the performance of commands is to stop:
           if (act.jump === 0) {
-            // Set the act index to cause a stop.
+            // Stop.
             actIndex = -2;
           }
           // Otherwise, if there is a numerical jump:
@@ -1019,9 +1022,10 @@ const doActs = async (report, actIndex, page) => {
               }
               // Otherwise, i.e. if no match was found:
               else {
-                const report = 'ERROR: Specified element not found';
-                act.result = report;
-                console.log(report);
+                // Stop.
+                act.result = matchResult;
+                console.log('ERROR: Specified element not found');
+                actIndex = -2;
               }
             }
             // Otherwise, if the act is a keypress:
