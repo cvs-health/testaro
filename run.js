@@ -371,93 +371,77 @@ const textOf = async (page, element) => {
 };
 // Returns an element of a type case-insensitively matching a text.
 const matchElement = async (page, selector, matchText, index = 0) => {
-  console.log(`Selector is ${selector}`);
   if (matchText) {
     // If the page still exists:
     if (page) {
-      // Wait 10 seconds until the body contains any text to be matched.
-      let found = true;
       const slimText = debloat(matchText);
-      await page.waitForFunction(
-        text => {
-          const bodyText = document && document.body && document.body.innerText;
-          return bodyText && bodyText.toLowerCase().includes(text);
-        },
-        slimText,
-        {
-          polling: 2000,
-          timeout: 10000
-        }
-      )
-      .catch(async error => {
-        console.log(`ERROR: Wait for “${matchText}” to appear in body timed out (${error.message})`);
-        found = false;
-      });
-      // If the text was found:
-      if (found) {
-        const lcText = matchText.toLowerCase();
-        // Identify the elements of the specified type.
-        const selections = await page.$$(selector);
-        // If there are any:
-        if (selections.length) {
-          // If there are enough to make a match possible:
-          if (index < selections.length) {
-            // Return the specified one, if any.
-            let matchCount = 0;
-            const selectionTexts = [];
-            const selectionHTMLs = [];
-            for (const selection of selections) {
-              const selectionText = await textOf(page, selection);
-              const selectionHTML = await selection.innerHTML();
-              selectionTexts.push(selectionText);
-              selectionHTMLs.push(selectionHTML);
-              if (selectionText.includes(lcText)) {
-                if (matchCount++ === index) {
-                  return selection;
-                }
+      // Identify the elements of the specified type.
+      const selections = await page.$$(selector);
+      // If there are any:
+      if (selections.length) {
+        // If there are enough to make a match possible:
+        if (index < selections.length) {
+          // Return the specified one, if any.
+          let matchCount = 0;
+          const selectionTexts = [];
+          for (const selection of selections) {
+            const selectionText = await textOf(page, selection);
+            selectionTexts.push(selectionText);
+            if (selectionText.includes(slimText)) {
+              if (matchCount++ === index) {
+                return {
+                  success: true,
+                  matchingElement: selection
+                };
               }
             }
-            // None satisfied the specifications, so return a failure.
-            console.log(
-              `ERROR: Text found in only ${matchCount} (not ${index + 1}) of ${selections.length}`
-            );
-            console.log(`Candidate texts:\n${selectionTexts.join('\n')}`);
-            console.log(`Candidate HTMLs:\n>> ${selectionHTMLs.join('\n>> ')}`);
-            return null;
           }
-          // Otherwise, i.e. if there are too few such elements to make a match possible:
-          else {
-            // Return a failure.
-            console.log('ERROR: Specified elements fewer than specified');
-            return null;
-          }
+          // None satisfied the specifications, so return a failure.
+          return {
+            success: false,
+            error: 'exhausted',
+            message: `Text found in only ${matchCount} (not ${index + 1}) of ${selections.length}`,
+            candidateTexts: selectionTexts
+          };
         }
-        // Otherwise, i.e. if there are no elements of the specified type:
+        // Otherwise, i.e. if there are too few such elements to make a match possible:
         else {
           // Return a failure.
-          console.log(`ERROR: No '${selector}' element found`);
-          return null;
+          return {
+            success: false,
+            error: 'fewer',
+            message: `Count of '${selector}' elements only ${selections.length}`
+          };
         }
       }
-      // Otherwise, i.e. if the text was not found in the body:
+      // Otherwise, i.e. if there are no elements of the specified type:
       else {
         // Return a failure.
-        console.log('ERROR: Specified text not found in document body');
-        return null;
+        return {
+          success: false,
+          error: 'none',
+          message: `No '${selector}' elements found`
+        };
       }
     }
     // Otherwise, i.e. if the page no longer exists:
     else {
       // Return a failure.
-      console.log('ERROR: Page gone');
-      return null;
+      return {
+        success: false,
+        error: 'gone',
+        message: 'Page gone'
+      };
     }
   }
   // Otherwise, i.e. if no text was specified:
   else {
     // Return a failure.
-    console.log('ERROR: No text specified');
-    return null;
+    return {
+      success: false,
+      error: 'text',
+      message: 'No text specified'
+    };
   }
 };
 // Returns a string with any final slash removed.
@@ -589,6 +573,14 @@ const waitError = (page, act, error, what) => {
   act.result = {url: page.url()};
   act.result.error = `ERROR waiting for ${what}`;
   return false;
+};
+// Waits.
+const wait = ms => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve('');
+    }, ms);
+  });
 };
 // Recursively performs the acts in a report.
 const doActs = async (report, actIndex, page) => {
@@ -905,26 +897,34 @@ const doActs = async (report, actIndex, page) => {
             // Otherwise, if the act is a move:
             else if (moves[act.type]) {
               const selector = typeof moves[act.type] === 'string' ? moves[act.type] : act.what;
-              // Identify the element to perform the move on.
-              const whichElement = await matchElement(page, selector, act.which || '', act.index);
+              // Wait 10 seconds until the element to perform the move on is identified.
+              let matchResult = {success: false};
+              let tries = 0;
+              while (tries++ < 5 && ! matchResult.success) {
+                matchResult = await matchElement(page, selector, act.which || '', act.index);
+                if (! matchResult.success) {
+                  await wait(2000);
+                }
+              }
               // If a match was found:
-              if (whichElement !== null) {
+              if (matchResult.success) {
+                const {matchElement} = matchResult;
                 // If the move is a button click, perform it.
                 if (act.type === 'button') {
-                  await whichElement.click({timeout: 3000});
+                  await matchElement.click({timeout: 3000});
                   act.result = 'clicked';
                 }
                 // Otherwise, if it is checking a radio button or checkbox, perform it.
                 else if (['checkbox', 'radio'].includes(act.type)) {
-                  await whichElement.waitForElementState('stable', {timeout: 2000})
+                  await matchElement.waitForElementState('stable', {timeout: 2000})
                   .catch(error => {
                     console.log(`ERROR waiting for stable ${act.type} (${error.message})`);
                     act.result = `ERROR waiting for stable ${act.type}`;
                   });
                   if (! act.result) {
-                    const isEnabled = await whichElement.isEnabled();
+                    const isEnabled = await matchElement.isEnabled();
                     if (isEnabled) {
-                      await whichElement.check({
+                      await matchElement.check({
                         force: true,
                         timeout: 2000
                       })
@@ -945,17 +945,17 @@ const doActs = async (report, actIndex, page) => {
                 }
                 // Otherwise, if it is focusing the element, perform it.
                 else if (act.type === 'focus') {
-                  await whichElement.focus({timeout: 2000});
+                  await matchElement.focus({timeout: 2000});
                   act.result = 'focused';
                 }
                 // Otherwise, if it is clicking a link, perform it.
                 else if (act.type === 'link') {
-                  const href = await whichElement.getAttribute('href');
-                  const target = await whichElement.getAttribute('target');
-                  await whichElement.click({timeout: 2000})
+                  const href = await matchElement.getAttribute('href');
+                  const target = await matchElement.getAttribute('target');
+                  await matchElement.click({timeout: 2000})
                   .catch(async () => {
                     console.log('ERROR: First attempt to click link timed out');
-                    await whichElement.click({
+                    await matchElement.click({
                       force: true,
                       timeout: 10000
                     })
@@ -975,7 +975,7 @@ const doActs = async (report, actIndex, page) => {
                 }
                 // Otherwise, if it is selecting an option in a select list, perform it.
                 else if (act.type === 'select') {
-                  const options = await whichElement.$$('option');
+                  const options = await matchElement.$$('option');
                   let optionText = '';
                   if (options && Array.isArray(options) && options.length) {
                     const optionTexts = [];
@@ -986,7 +986,7 @@ const doActs = async (report, actIndex, page) => {
                     const matchTexts = optionTexts.map((text, index) => text.includes(act.what) ? index : -1);
                     const index = matchTexts.filter(text => text > -1)[act.index || 0];
                     if (index !== undefined) {
-                      await whichElement.selectOption({index});
+                      await matchElement.selectOption({index});
                       optionText = optionTexts[index];
                     }
                   }
@@ -1005,19 +1005,23 @@ const doActs = async (report, actIndex, page) => {
                     what = what.replace(/__[A-Z]+__/, envValue);
                   }
                   // Enter the text.
-                  await whichElement.type(act.what);
+                  await matchElement.type(act.what);
                   report.presses += act.what.length;
                   act.result = 'entered';
                 }
                 // Otherwise, i.e. if the move is unknown, add the failure to the act.
                 else {
                   // Report the error.
-                  act.result = 'ERROR: move unknown';
+                  const report = 'ERROR: move unknown';
+                  act.result = report;
+                  console.log(report);
                 }
               }
               // Otherwise, i.e. if no match was found:
               else {
-                act.result = 'ERROR: Specified element not found';
+                const report = 'ERROR: Specified element not found';
+                act.result = report;
+                console.log(report);
               }
             }
             // Otherwise, if the act is a keypress:
