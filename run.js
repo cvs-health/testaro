@@ -908,23 +908,23 @@ const doActs = async (report, actIndex, page) => {
               }
               // If a match was found:
               if (matchResult.success) {
-                const {matchElement} = matchResult;
+                const {matchingElement} = matchResult;
                 // If the move is a button click, perform it.
                 if (act.type === 'button') {
-                  await matchElement.click({timeout: 3000});
+                  await matchingElement.click({timeout: 3000});
                   act.result = 'clicked';
                 }
                 // Otherwise, if it is checking a radio button or checkbox, perform it.
                 else if (['checkbox', 'radio'].includes(act.type)) {
-                  await matchElement.waitForElementState('stable', {timeout: 2000})
+                  await matchingElement.waitForElementState('stable', {timeout: 2000})
                   .catch(error => {
                     console.log(`ERROR waiting for stable ${act.type} (${error.message})`);
                     act.result = `ERROR waiting for stable ${act.type}`;
                   });
                   if (! act.result) {
-                    const isEnabled = await matchElement.isEnabled();
+                    const isEnabled = await matchingElement.isEnabled();
                     if (isEnabled) {
-                      await matchElement.check({
+                      await matchingElement.check({
                         force: true,
                         timeout: 2000
                       })
@@ -945,17 +945,17 @@ const doActs = async (report, actIndex, page) => {
                 }
                 // Otherwise, if it is focusing the element, perform it.
                 else if (act.type === 'focus') {
-                  await matchElement.focus({timeout: 2000});
+                  await matchingElement.focus({timeout: 2000});
                   act.result = 'focused';
                 }
                 // Otherwise, if it is clicking a link, perform it.
                 else if (act.type === 'link') {
-                  const href = await matchElement.getAttribute('href');
-                  const target = await matchElement.getAttribute('target');
-                  await matchElement.click({timeout: 2000})
+                  const href = await matchingElement.getAttribute('href');
+                  const target = await matchingElement.getAttribute('target');
+                  await matchingElement.click({timeout: 2000})
                   .catch(async () => {
                     console.log('ERROR: First attempt to click link timed out');
-                    await matchElement.click({
+                    await matchingElement.click({
                       force: true,
                       timeout: 10000
                     })
@@ -975,7 +975,7 @@ const doActs = async (report, actIndex, page) => {
                 }
                 // Otherwise, if it is selecting an option in a select list, perform it.
                 else if (act.type === 'select') {
-                  const options = await matchElement.$$('option');
+                  const options = await matchingElement.$$('option');
                   let optionText = '';
                   if (options && Array.isArray(options) && options.length) {
                     const optionTexts = [];
@@ -986,7 +986,7 @@ const doActs = async (report, actIndex, page) => {
                     const matchTexts = optionTexts.map((text, index) => text.includes(act.what) ? index : -1);
                     const index = matchTexts.filter(text => text > -1)[act.index || 0];
                     if (index !== undefined) {
-                      await matchElement.selectOption({index});
+                      await matchingElement.selectOption({index});
                       optionText = optionTexts[index];
                     }
                   }
@@ -1005,7 +1005,7 @@ const doActs = async (report, actIndex, page) => {
                     what = what.replace(/__[A-Z]+__/, envValue);
                   }
                   // Enter the text.
-                  await matchElement.type(act.what);
+                  await matchingElement.type(act.what);
                   report.presses += act.what.length;
                   act.result = 'entered';
                 }
