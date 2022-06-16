@@ -900,7 +900,7 @@ const doActs = async (report, actIndex, page) => {
             // Otherwise, if the act is a move:
             else if (moves[act.type]) {
               const selector = typeof moves[act.type] === 'string' ? moves[act.type] : act.what;
-              // Wait 10 seconds until the element to perform the move on is identified.
+              // Try up to 5 times, every 2 seconds, to identify the element to perform the move on.
               let matchResult = {success: false};
               let tries = 0;
               while (tries++ < 5 && ! matchResult.success) {
