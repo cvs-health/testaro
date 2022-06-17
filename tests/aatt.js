@@ -12,7 +12,7 @@ const retest = async (page, waitLong, triesLeft) => {
   // If the limit on tries has not been exhausted:
   if (triesLeft) {
     // Set the limit in seconds on the wait for the result.
-    const timeLimit = waitLong ? 30 : 6;
+    const timeLimit = waitLong ? 12 : 6;
     // Get the HTML of the document body.
     const source = await page.content();
     // Return the result of a test with the HTML CodeSniffer WCAG 2.1 AA ruleset as a string.
@@ -41,7 +41,7 @@ const retest = async (page, waitLong, triesLeft) => {
       };
     }
     else {
-      console.log(`ERROR: Test aatt timed out at ${timeLimit} seconds with ${triesLeft} tries left`);
+      console.log(`ERROR: Test aatt timed out at ${timeLimit} seconds; tries left: ${triesLeft - 1}`);
       return retest(page, waitLong, --triesLeft);
     }
   }
@@ -86,6 +86,9 @@ exports.reporter = async (page, waitLong, tryLimit = 4) => {
     }
     catch (error) {
       console.log(`ERROR processing AATT report (${error.message})`);
+      console.log(
+        `JSON report starts with ${reportJSON.slice(0, 50)} and ends with ${reportJSON.slice(-50)}`
+      );
       return {
         result: {
           prevented: true,
@@ -97,11 +100,12 @@ exports.reporter = async (page, waitLong, tryLimit = 4) => {
   // Otherwise, i.e. if the limit on tries was exhausted:
   else {
     // Report the failure.
-    console.log('ERROR: getting report took too long');
+    const error = 'ERROR: Getting AATT report took too long';
+    console.log(error);
     return {
       result: {
         prevented: true,
-        error: 'ERROR: getting AATT report took too long'
+        error
       }
     };
   }
