@@ -23,7 +23,7 @@ Testaro includes some of its own accessibility tests. In addition, it performs t
 - [alfa](https://alfa.siteimprove.com/) (Siteimprove alfa)
 - [Automated Accessibility Testing Tool](https://www.npmjs.com/package/aatt) (Paypal AATT, running HTML CodeSniffer)
 - [axe-playwright](https://www.npmjs.com/package/axe-playwright) (Deque Axe-core)
-- [Tenon](https://tenon.io/documentation/what-tenon-tests.php)
+- [Tenon](https://tenon.io/documentation/what-tenon-tests.php) (Level Access)
 - [WAVE API](https://wave.webaim.org/api/) (WebAIM WAVE)
 
 As of this version, the counts of tests in the packages referenced above were:
@@ -560,6 +560,8 @@ The `tests` executor makes use of the scripts in the `validation/tests/scripts` 
 
 You can define additional Testaro commands and functionality. Contributions are welcome.
 
+Please report any issues, including feature requests, at the [repository](https://github.com/jrpool/testaro/issues).
+
 ## Accessibility principles
 
 The rationales motivating the Testaro-defined tests can be found in comments within the files of those tests, in the `tests` directory. Unavoidably, each test is opinionated. Testaro itself, however, can accommodate other tests representing different opinions. Testaro is intended to be neutral with respect to questions such as the criteria for accessibility, the severities of accessibility issues, whether accessibility is binary or graded, and the distinction between usability and accessibility.
@@ -594,53 +596,23 @@ The files in the `temp` directory are presumed ephemeral and are not tracked by 
 
 ## Related packages
 
-[Testilo](https://www.npmjs.com/package/testilo) is an application that facilitates the use of Testaro.
+[Testilo](https://www.npmjs.com/package/testilo) is an application that:
+- produces scores and adds them to the JSON report files of Testaro
+- produces human-oriented HTML digests from scored reports
+- produces human-oriented HTML reports comparing the scores of hosts
 
 Testaro is derived from [Autotest](https://github.com/jrpool/autotest).
 
 Testaro omits some functionalities of Autotest, such as:
 - tests producing results intended to be human-inspected
-- scoring
+- scoring (performed now by Testilo)
 - file operations for score aggregation, report revision, and HTML reports
 - a web user interface
 
 ## Origin
 
-Work on the custom tests in this package began in 2017, and work on the multi-package federation that Testaro implements began in early 2018. These two aspects were combined into the [Autotest](https://github.com/jrpool/autotest) package in early 2021 and into this more single-purpose package, Testaro, in January 2022.
+Work on the custom tests in this package began in 2017, and work on the multi-package federation that Testaro implements began in early 2018. These two aspects were combined into the [Autotest](https://github.com/jrpool/autotest) package in early 2021 and into the more single-purpose packages, Testaro and Testilo, in January 2022.
 
 ## Etymology
 
 “Testaro” means “collection of tests” in Esperanto.
-
-## Future work
-
-### Improvements
-
-Further development is contemplated, is taking place, or is welcomed, on:
-- addition of Tenon to the set of packages
-- links with href="#"
-- links and buttons styled non-distinguishably
-- first focused element not first focusable element in DOM
-- never-visible skip links
-- buttons with no text content
-- modal dialogs
-- autocomplete attributes
-- inclusion of other test packages, such as:
-   - FAE (https://github.com/opena11y/evaluation-library)
-
-## Corrections
-
-Issues found or reported with the current version that need diagnosis and correction include:
-
-### hover
-
-There seem to be a couple of problems with the hover test:
-- The score for unhoverability is documented as 2 times the count of unhoverables, but is reported as 1 time that count.
-- The list of unhoverables in the report is empty.
-Observed after inquiry by Tobias Christian Jensen of Siteimprove on 2022-05-09.
-
-### axe
-
-Configuration to include best practices and experimental tests.
-
-Investigation of tags, including wcag2a, wcag2aa, wcag21a, wcag21aa, best-practice, wcag***, ACT, cat.*.
