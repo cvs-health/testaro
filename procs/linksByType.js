@@ -1,90 +1,54 @@
 // Returns an object classifying the links in a page by layout.
 exports.linksByType = async page => await page.evaluateHandle(() => {
   // FUNCTION DEFINITIONS START
-  // Returns whether an element has fluid display.
-  const hasFluidDisplay = element => {
-    const display = window.getComputedStyle(element).display;
-    return display.startsWith('inline') || display.startsWith('flex');
-  };
-  // Returns whether an element and its children have fluid display.
-  const isFluid = element => {
-    if (hasFluidDisplay(element)) {
-      return Array.from(element.children).every(child => hasFluidDisplay(child));
-    }
-    else {
-      return false;
-    }
-  };
-  // Returns whether all siblings of an element have fluid display.
-  const hasFluidSiblings = element => {
-    const preSib = element.previousElementSibling;
-    if (preSib) {
-      const postSib = element.nextElementSibling;
-      if (postSib) {
-        return isFluid(preSib) && isFluid(postSib);
-      }
-      else {
-        return isFluid(preSib);
-      }
-    }
-    else {
-      const postSib = element.nextElementSibling;
-      if (postSib) {
-        return isFluid(postSib);
-      }
-      else {
-        return true;
-      }
-    }
-  };
   // Removes spacing characters from a text.
   const despace = text => text.replace(/\s/g, '');
-  // Returns whether an element has text that is less than its nearest nonfluid ancestor’s.
-  const hasAdjacentText = element => {
-    // Recursively returns the first ancestor element with nonfluid display.
-    const blockOf = node => {
-      const parentElement = node.parentElement;
-      if (hasFluidDisplay(parentElement)) {
-        return blockOf(parentElement);
-      }
-      else {
-        return parentElement;
-      }
-    };
-    // Identify the text of the element.
-    const elementText = despace(element.textContent);
-    // Identify the text of its nearest nonfluid ancestor.
-    const blockText = despace(blockOf(element).textContent);
-    // If the element has any text:
-    if (elementText) {
-      // Return whether it is less than its nearest nonfluid ancestor’s.
-      return despace(blockText).length > elementText.length;
+  // Returns whether a list is a list entirely of links.
+  const isLinkList = list => {
+    const listItems = Array.from(list.children);
+    if (listItems.length > 1) {
+      return listItems.length > 1 && listItems.every(item => {
+        if (item.tagName === 'LI') {
+          const {children} = item;
+          if (children.length === 1) {
+            const link = children[0];
+            if (link.tagName === 'A') {
+              const itemText = despace(item.textContent);
+              const linkText = despace(link.textContent);
+              return itemText.length === linkText.length;
+            }
+            else {
+              return false;
+            }
+          }
+          else {
+            return false;
+          }
+        }
+        else {
+          return false;
+        }
+      });
     }
-    // Otherwise, i.e. if the element has no text:
     else {
-      // Return no.
       return false;
     }
   };
   // FUNCTION DEFINITIONS END
-  // Get the links in the page.
-  const links = Array
-  .from(document.body.getElementsByTagName('a'))
-  .filter(element => ! element.hasAttribute('role'));
-  // Initialize an object classifying the links.
-  const linkTypes = {
-    inline: [],
-    block: []
-  };
-  // Populate it.
-  links.forEach(link => {
-    if (isFluid(link) && hasFluidSiblings(link) && hasAdjacentText(link)) {
-      linkTypes.inline.push(link);
-    }
-    else {
-      linkTypes.block.push(link);
+  // Identify the list links in the page.
+  const lists = Array.from(document.body.querySelectorAll('ul, ol'));
+  const listLinks = [];
+  lists.forEach(list => {
+    if (isLinkList(list)) {
+      listLinks.push(... Array.from(list.querySelectorAll('a')));
     }
   });
-  // Return it.
-  return linkTypes;
+  // Identify the adjacent links in the page.
+  const allLinks = Array.from(document.body.querySelectorAll('a'));
+  const adjacentLinks = allLinks.filter(link => ! listLinks.includes(link));
+  // Return the data.
+  return {
+    adjacent: adjacentLinks,
+    list: listLinks
+  };
 });

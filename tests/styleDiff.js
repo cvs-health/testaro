@@ -1,12 +1,12 @@
 /*
   styleDiff
   This test reports style differences among links, buttons, and headings. It assumes
-  that an accessible page employs few or only one style for inline links, and likewise
-  for non-inline links, buttons, and headings at each level. The test considers only
+  that an accessible page employs few or only one style for adjacent links, and likewise
+  for list links, buttons, and headings at each level. The test considers only
   particular style properties, listed in the 'mainStyles' and 'headingStyles' arrays.
 */
 exports.reporter = async (page, withItems) => {
-  // Get an object with arrays of block and inline links as properties.
+  // Get an object with arrays of list and adjacent links as properties.
   const linkTypes = await require('../procs/linksByType').linksByType(page);
   return await page.$eval('body', (body, args) => {
     const withItems = args[0];
@@ -51,8 +51,8 @@ exports.reporter = async (page, withItems) => {
     const elementClasses = {
       headings: {},
       other: {
-        aInline: linkTypes.inline,
-        aBlock: linkTypes.block
+        aAdjacent: linkTypes.adjacent,
+        aList: linkTypes.list
       }
     };
     // For each heading tag name:

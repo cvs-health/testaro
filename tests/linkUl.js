@@ -1,11 +1,12 @@
 /*
   linkUl
-  This test reports failures to underline inline links. Underlining and color are the
-  traditional style properties that identify links. Collections of links in blocks can be
-  recognized without underlines, but inline links are difficult or impossible to distinguish
-  visually from surrounding text if not underlined. Underlining inline links only on hover
-  provides an indicator valuable only to mouse users, and even they must traverse the text with
-  a mouse merely to discover which passages are links.
+  This test reports failures to underline links that are adjacent to nonlink text. Underlining
+  and color are the traditional style properties that identify links. Lists of links containing
+  only links can be recognized without underlines, but other links are difficult or impossible to
+  distinguish visually from surrounding text if not underlined. Underlining adjacent links only on
+  hover provides an indicator valuable only to mouse users, and even they must traverse the text
+  with a mouse merely to discover which passages are links. This tests treats links as adjacent
+  unless they are in an ordered or unordered list of at least 2 links with no other text.
 */
 exports.reporter = async (page, withItems) => {
   // Identify the links in the page, by type.
@@ -17,14 +18,14 @@ exports.reporter = async (page, withItems) => {
     // Returns a space-minimized copy of a string.
     const compact = string => string.replace(/[\t\n]/g, '').replace(/\s{2,}/g, ' ').trim();
     // FUNCTION DEFINITION END
-    // Identify the inline links.
-    const inLinks = linkTypes.inline;
-    const inLinkCount = inLinks.length;
+    // Identify the adjacent links.
+    const adjacentLinks = linkTypes.adjacent;
+    const adjacentLinkCount = adjacentLinks.length;
     let underlined = 0;
-    const ulInLinkTexts = [];
-    const nulInLinkTexts = [];
+    const ulAdjacentLinkTexts = [];
+    const nulAdjacentLinkTexts = [];
     // For each of them:
-    inLinks.forEach(link => {
+    adjacentLinks.forEach(link => {
       // Identify the text of the link if itemization is required.
       const text = withItems ? compact(link.textContent) : '';
       // If it is underlined:
@@ -33,22 +34,24 @@ exports.reporter = async (page, withItems) => {
         underlined++;
         // If required, add its text to the array of their texts.
         if (withItems) {
-          ulInLinkTexts.push(text);
+          ulAdjacentLinkTexts.push(text);
         }
       }
       // Otherwise, if it is not underlined and itemization is required:
       else if (withItems) {
         // Add its text to the array of texts of non-underlined inline links.
-        nulInLinkTexts.push(text);
+        nulAdjacentLinkTexts.push(text);
       }
     });
     // Get the percentage of underlined links among all inline links.
-    const underlinedPercent = inLinkCount ? Math.floor(100 * underlined / inLinkCount) : 'N/A';
+    const underlinedPercent = adjacentLinkCount
+    ? Math.floor(100 * underlined / adjacentLinkCount)
+    : 'N/A';
     const data = {
       totals: {
-        links: inLinks.length + linkTypes.block.length,
-        inline: {
-          total: inLinkCount,
+        links: adjacentLinks.length + linkTypes.list.length,
+        adjacent: {
+          total: adjacentLinkCount,
           underlined,
           underlinedPercent
         }
@@ -56,8 +59,8 @@ exports.reporter = async (page, withItems) => {
     };
     if (withItems) {
       data.items = {
-        underlined: ulInLinkTexts,
-        notUnderlined: nulInLinkTexts
+        underlined: ulAdjacentLinkTexts,
+        notUnderlined: nulAdjacentLinkTexts
       };
     }
     return {result: data};

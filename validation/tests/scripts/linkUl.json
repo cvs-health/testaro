@@ -10,52 +10,52 @@
     {
       "type": "url",
       "which": "__targets__/linkUl/good.html",
-      "what": "page with underlined inline links"
+      "what": "page with underlined adjacent links"
     },
     {
       "type": "test",
       "which": "linkUl",
-      "what": "link underlining",
+      "what": "adjacent-link underlining",
       "withItems": false,
       "expect": [
         ["totals.links", "=", 6],
-        ["totals.inline.total", "=", 2],
-        ["totals.inline.underlined", "=", 2],
-        ["totals.inline.underlinedPercent", "=", 100]
+        ["totals.adjacent.total", "=", 2],
+        ["totals.adjacent.underlined", "=", 2],
+        ["totals.adjacent.underlinedPercent", "=", 100]
       ]
     },
     {
       "type": "url",
       "which": "__targets__/linkUl/bad.html",
-      "what": "page without underlined inline links"
+      "what": "page with nonunderlined adjacent links"
     },
     {
       "type": "test",
       "which": "linkUl",
-      "what": "link underlining",
+      "what": "adjacent-link underlining",
       "withItems": false,
       "expect": [
-        ["totals.links", "=", 2],
-        ["totals.inline.total", "=", 2],
-        ["totals.inline.underlined", "=", 0],
-        ["totals.inline.underlinedPercent", "=", 0]
+        ["totals.links", "=", 6],
+        ["totals.adjacent.total", "=", 6],
+        ["totals.adjacent.underlined", "=", 0],
+        ["totals.adjacent.underlinedPercent", "=", 0]
       ]
     },
     {
       "type": "url",
       "which": "__targets__/linkUl/na.html",
-      "what": "page without inline links"
+      "what": "page without adjacent links"
     },
     {
       "type": "test",
       "which": "linkUl",
-      "what": "link underlining",
+      "what": "adjacent-link underlining",
       "withItems": false,
       "expect": [
         ["totals.links", "=", 2],
-        ["totals.inline.total", "=", 0],
-        ["totals.inline.underlined", "=", 0],
-        ["totals.inline.underlinedPercent", "=", "N/A"]
+        ["totals.adjacent.total", "=", 0],
+        ["totals.adjacent.underlined", "=", 0],
+        ["totals.adjacent.underlinedPercent", "=", "N/A"]
       ]
     }
   ]

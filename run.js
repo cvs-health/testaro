@@ -36,7 +36,7 @@ const tests = {
   hover: 'hover-caused content additions',
   ibm: 'IBM Accessibility Checker',
   labClash: 'labeling inconsistencies',
-  linkUl: 'inline-link underlining',
+  linkUl: 'adjacent-link underlining',
   menuNav: 'keyboard navigation between focusable menu items',
   motion: 'motion',
   radioSet: 'fieldset grouping of radio buttons',

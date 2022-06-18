@@ -2,15 +2,34 @@
 <html lang="en-US">
   <head>
     <meta charset="utf-8">
-    <title>Page without underlined inline links</title>
+    <title>Page without underlined adjacent links</title>
     <meta name="description" content="tester">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      .nude > li > a {
+        text-decoration: none;
+      }
+    </style>
   </head>
   <body>
     <main>
-      <h1>Page without underlined inline links</h1>
-      <p>This paragraph contains an inline link to <a style="text-decoration: overline" href="https://en.wikipedia.org">English information</a> that has an overline instead of an underline.</p>
-      <p>This paragraph contains an inline link to <a style="text-decoration: none" href="https://fr.wikipedia.org">French information</a> without any underline.</p>
+      <h1>Page without underlined adjacent links</h1>
+      <p>This paragraph contains an adjacent link to <a style="text-decoration: overline" href="https://en.wikipedia.org">English information</a> that has an overline instead of an underline.</p>
+      <p>This paragraph contains an adjacent link to <a style="text-decoration: none" href="https://fr.wikipedia.org">French information</a> without any underline.</p>
+      <p>This paragraph introduces a list of nonunderlined links, but it contains only 1 link, so that link fails to be classified as a list link.</p>
+      <ul class="nude"</ul>
+        <li><a href="https://eus.wikipedia.org">Basque information</a></li>
+      </ul>
+      <p>This paragraph introduces a list of nonunderlined links, but it contains an item that is not a link, so its link fails to be classified as a list link.</p>
+      <ul class="nude">
+        <li><span>Spanish information is not available</span></li>
+        <li><a href="https://eo.wikipedia.org">Esperanto information</a></li>
+      </ul>
+      <p>This paragraph introduces a list of nonunderlined links, but it contains additional text, so its links fail to be classified as a list link.</p>
+      <ul class="nude">
+        <li><a href="https://fr.wikipedia.org">French information</a> is available, as well as</li>
+        <li><a href="https://tr.wikipedia.org">Turkish information</a></li>
+      </ul>
     </main>
   </body>
 </html>
