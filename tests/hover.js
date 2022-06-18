@@ -9,9 +9,9 @@
   has the tag name 'A' or 'BUTTON' or otherwise the descendants of the element. The only
   elements counted as being made visible by hovering are those with tag names 'A', 'BUTTON',
   'INPUT', and 'SPAN', and those with 'role="menuitem"' attributes. The test waits 700 ms after
-  each hover in case of delayed effects. Despite this delay, the test makes the execution time
-  practical by randomly sampling targets instead of hovering over all of them. Therefore, the
-  results may vary from one execution to another.
+  each hover in case of delayed effects. Despite this delay, the test can make the execution time
+  practical by randomly sampling targets instead of hovering over all of them. When sampling is
+  performed, the results may vary from one execution to another.
 */
 
 // CONSTANTS
@@ -201,7 +201,7 @@ const find = async (withItems, page, triggers) => {
     await find(withItems, page, triggers.slice(1));
   }
 };
-exports.reporter = async (page, withItems) => {
+exports.reporter = async (page, sampleSize = Infinity, withItems) => {
   // Identify the triggers.
   const selectors = [
     'body a:visible',
@@ -217,8 +217,7 @@ exports.reporter = async (page, withItems) => {
   });
   // If they number more than the sample size limit, sample them.
   const triggerCount = triggers.length;
-  const sampleSize = 15;
-  const triggerSample = triggerCount > sampleSize ? getSample(triggers, 15) : triggers;
+  const triggerSample = triggerCount > sampleSize ? getSample(triggers, sampleSize) : triggers;
   // Find and document the hover-triggered disclosures.
   await find(withItems, page, triggerSample);
   // If the triggers were sampled:

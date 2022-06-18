@@ -179,6 +179,7 @@ exports.commands = {
     hover: [
       'Perform a hover test',
       {
+        sampleSize: [false, 'number', '', 'number of triggers to sample, if fewer than all'],
         withItems: [true, 'boolean']
       }
     ],
