@@ -4,70 +4,69 @@
   Standards are based on https://www.w3.org/TR/wai-aria-practices-1.1/#tabpanel.
 */
 
-// CONSTANTS
+// FUNCTIONS
 
-const data = {
-  totals: {
-    navigations: {
-      all: {
+// Tests tab-list navigation and reports results.
+exports.reporter = async (page, withItems) => {
+  // Initialize the results.
+  const data = {
+    totals: {
+      navigations: {
+        all: {
+          total: 0,
+          correct: 0,
+          incorrect: 0
+        },
+        specific: {
+          tab: {
+            total: 0,
+            correct: 0,
+            incorrect: 0
+          },
+          left: {
+            total: 0,
+            correct: 0,
+            incorrect: 0
+          },
+          right: {
+            total: 0,
+            correct: 0,
+            incorrect: 0
+          },
+          up: {
+            total: 0,
+            correct: 0,
+            incorrect: 0
+          },
+          down: {
+            total: 0,
+            correct: 0,
+            incorrect: 0
+          },
+          home: {
+            total: 0,
+            correct: 0,
+            incorrect: 0
+          },
+          end: {
+            total: 0,
+            correct: 0,
+            incorrect: 0
+          }
+        }
+      },
+      tabElements: {
         total: 0,
         correct: 0,
         incorrect: 0
       },
-      specific: {
-        tab: {
-          total: 0,
-          correct: 0,
-          incorrect: 0
-        },
-        left: {
-          total: 0,
-          correct: 0,
-          incorrect: 0
-        },
-        right: {
-          total: 0,
-          correct: 0,
-          incorrect: 0
-        },
-        up: {
-          total: 0,
-          correct: 0,
-          incorrect: 0
-        },
-        down: {
-          total: 0,
-          correct: 0,
-          incorrect: 0
-        },
-        home: {
-          total: 0,
-          correct: 0,
-          incorrect: 0
-        },
-        end: {
-          total: 0,
-          correct: 0,
-          incorrect: 0
-        }
+      tabLists: {
+        total: 0,
+        correct: 0,
+        incorrect: 0
       }
-    },
-    tabElements: {
-      total: 0,
-      correct: 0,
-      incorrect: 0
-    },
-    tabLists: {
-      total: 0,
-      correct: 0,
-      incorrect: 0
     }
-  }
-};
-
-// FUNCTIONS
-
-exports.reporter = async (page, withItems) => {
+  };
   if (withItems) {
     data.tabElements = {
       incorrect: [],
