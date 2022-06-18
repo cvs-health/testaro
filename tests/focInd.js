@@ -43,6 +43,7 @@ exports.reporter = async (page, withItems, revealAll) => {
         outlinePresent: []
       };
     }
+    // Add facts about an element to the result.
     const addElementFacts = (element, status) => {
       const type = data.totals.types[status];
       type.total++;
@@ -60,34 +61,47 @@ exports.reporter = async (page, withItems, revealAll) => {
         });
       }
     };
+    // For each visible element descendant of the body:
     elements.forEach(element => {
+      // If it is Tab-focusable:
       if (element.tabIndex === 0) {
+        // Increment the total of focusable elements.
         data.totals.total++;
+        // Get its style properties when not focused.
         const styleBlurred = Object.assign({}, window.getComputedStyle(element));
+        // Focus it.
         element.focus({preventScroll: true});
+        // Get its style properties when focused.
         const styleFocused = window.getComputedStyle(element);
+        // Determine whether it has an outline when and only when focused.
         const hasOutline
-          = styleBlurred.outlineWidth === '0px'
-          && styleFocused.outlineWidth !== '0px';
+        = styleBlurred.outlineWidth === '0px'
+        && styleFocused.outlineWidth !== '0px';
+        // If so:
         if (hasOutline) {
+          // Add this to the result.
           addElementFacts(element, 'outlinePresent');
         }
+        // Otherwise:
         else {
+          // Returns whether one of its style properties differs between focused and not focused.
           const diff = prop => styleFocused[prop] !== styleBlurred[prop];
+          // Determine whether it has another focus indicator deemed valid.
           const hasIndicator
-            = diff('borderStyle')
-            && styleBlurred.borderWidth !== '0px'
-            && styleFocused.borderWidth !== '0px'
-            || (styleFocused.borderStyle !== 'none' && diff('borderWidth'))
-            || diff('outlineStyle')
-            && styleBlurred.outlineWidth !== '0px'
-            && styleFocused.outlineWidth !== '0px'
-            || (styleFocused.outlineStyle !== 'none' && diff('outlineWidth'))
-            || diff('fontSize')
-            || diff('fontStyle')
-            || diff('textDecorationLine')
-            || diff('textDecorationStyle')
-            || diff('textDecorationThickness');
+          = diff('borderStyle')
+          && styleBlurred.borderWidth !== '0px'
+          && styleFocused.borderWidth !== '0px'
+          || (styleFocused.borderStyle !== 'none' && diff('borderWidth'))
+          || diff('outlineStyle')
+          && styleBlurred.outlineWidth !== '0px'
+          && styleFocused.outlineWidth !== '0px'
+          || (styleFocused.outlineStyle !== 'none' && diff('outlineWidth'))
+          || diff('fontSize')
+          || diff('fontStyle')
+          || diff('textDecorationLine')
+          || diff('textDecorationStyle')
+          || diff('textDecorationThickness');
+          // Add the determination to the result.
           const status = hasIndicator ? 'nonOutlinePresent' : 'indicatorMissing';
           addElementFacts(element, status);
         }
