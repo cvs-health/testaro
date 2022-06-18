@@ -53,14 +53,14 @@ const getSample = (population, sampleSize) => {
     return [];
   }
 };
+// Returns the text of an element.
+const textOf = async (element, limit) => {
+  let text = await element.textContent();
+  text = text.trim() || await element.innerHTML();
+  return text.trim().replace(/\s*/sg, '').slice(0, limit);
+};
 // Recursively finds and reports triggers and targets.
 const find = async (withItems, page, triggers) => {
-  if (withItems) {
-    data.items = {
-      triggers: [],
-      unhoverables: []
-    };
-  }
   // If any potential disclosure triggers remain:
   if (triggers.length) {
     // Identify the first of them.
@@ -181,12 +181,6 @@ const find = async (withItems, page, triggers) => {
       }
       catch (error) {
         console.log('ERROR hovering');
-        // Returns the text of an element.
-        const textOf = async (element, limit) => {
-          let text = await element.textContent();
-          text = text.trim() || await element.innerHTML();
-          return text.trim().replace(/\s*/sg, '').slice(0, limit);
-        };
         data.totals.unhoverables++;
         if (withItems) {
           data.items.unhoverables.push({
@@ -201,7 +195,16 @@ const find = async (withItems, page, triggers) => {
     await find(withItems, page, triggers.slice(1));
   }
 };
+// Performs hover test and reports results.
 exports.reporter = async (page, sampleSize = Infinity, withItems) => {
+  // If details are to be reported:
+  if (withItems) {
+    // Add properties for details to the initialized result.
+    data.items = {
+      triggers: [],
+      unhoverables: []
+    };
+  }
   // Identify the triggers.
   const selectors = [
     'body a:visible',
