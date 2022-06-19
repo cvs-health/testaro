@@ -15,7 +15,9 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
     await require('../procs/allVis').allVis(page);
   }
   // Get data on the focusable visible elements with and without indicators.
-  const data = await page.$$eval('body *:visible', async (elements, withItems) => {
+  const data = await page.$$eval('body *:visible', async (elements, args) => {
+    const allowedDelay = args[0];
+    const withItems = args[1];
     // Initialize the data.
     const data = {
       totals: {
@@ -141,6 +143,6 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
       }
     };
     return data;
-  }, withItems);
+  }, [allowedDelay, withItems]);
   return {result: data};
 };
