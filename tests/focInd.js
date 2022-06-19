@@ -84,23 +84,32 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
         // If it has no outline when not focused:
         const outlineDelay = new Promise();
         if (styleBlurred.outlineWidth === '0px') {
+        // If an outline appeared immediately on focus:
+        if (styleDec.outlineWidth !== '0px') {
+          // Add facts about the element to the result.
+          outlineDelay.resolve(0);
+          addElementFacts(element, 'outlinePresent', 0);
+        }
+        // Otherwise, if a wait for an outline is allowed:
+        else if (allowedDelay) {
           // Determine how long an outline takes to appear or whether it times out.
           const focusTime = Date.now();
-          const deadline = focusTime + allowedDelay;
-          const interval = setInterval(() => {
-            if (styleDec.outlineWidth !== '0px') {
-              outlineDelay.resolve(Date.now() - focusTime);
-              clearInterval(interval);
+            const deadline = focusTime + allowedDelay;
+            const interval = setInterval(() => {
+              if (styleDec.outlineWidth !== '0px') {
+                outlineDelay.resolve(Date.now() - focusTime);
+                clearInterval(interval);
+              }
+              else if (Date.now() > deadline) {
+                outlineDelay.resolve(null);
+                clearInterval(interval);
+              }
+            }, 100);
+            // If it appeared before the wait limit:
+            if (await outlineDelay) {
+              // Add facts about the element to the result.
+              addElementFacts(element, 'outlinePresent', outlineDelay);
             }
-            else if (Date.now() > deadline) {
-              outlineDelay.resolve(null);
-              clearInterval(interval);
-            }
-          }, 100);
-          // If it appeared before the wait limit:
-          if (await outlineDelay) {
-            // Add facts about the element to the result.
-            addElementFacts(element, 'outlinePresent', outlineDelay);
           }
         }
         // Otherwise, i.e. if it has an outline when not focused:
