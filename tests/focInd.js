@@ -87,7 +87,6 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
         // If an outline appeared immediately on focus:
         if (styleDec.outlineWidth !== '0px') {
           // Add facts about the element to the result.
-          outlineDelay.resolve(0);
           addElementFacts(element, 'outlinePresent', 0);
         }
         // Otherwise, if a wait for an outline is allowed:
@@ -112,16 +111,16 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
             }
           }
         }
-        // Otherwise, i.e. if it has an outline when not focused:
+        // Otherwise, i.e. if a focus outline was not immediate and a wait is not allowed:
         else {
           // Disregard whether it acquires an outline when focused.
           outlineDelay.resolve(null);
         }
-        // If it acquires to cognizable outline when focused:
+        // If no outline was allowed:
         if (outlineDelay === null) {
-          // Returns whether one of its style properties differs between focused and not focused.
+          // Returns whether a style property differs between focused and not focused.
           const diff = prop => styleDec[prop] !== styleBlurred[prop];
-          // Determine whether it has another focus indicator deemed valid.
+          // Determine whether the element has another allowed focus indicator.
           const hasIndicator
           = diff('borderStyle')
           && styleBlurred.borderWidth !== '0px'
