@@ -121,20 +121,20 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
             }
           }
         }
-        // If no outline was allowed:
+        // If no allowed outline appeared:
         if (! hasOutline) {
           // Returns whether a style property differs between focused and not focused.
           const diff = prop => styleDec[prop] !== styleBlurred[prop];
           // Determine whether the element has another allowed focus indicator.
+          const hasDiffOutline = styleDec.outlineWidth !== '0px'
+          && styleDec.outlineColor !== 'rgba(0, 0, 0, 0)'
+          && (diff('outlineStyle') || diff('outlineWidth'));
+          const hasDiffBorder = styleDec.borderWidth !== '0px'
+          && styleDec.borderColor !== 'rgba(0, 0, 0, 0)'
+          && (diff('borderStyle') || diff('borderWidth'));
           const hasIndicator
-          = diff('borderStyle')
-          && styleBlurred.borderWidth !== '0px'
-          && styleDec.borderWidth !== '0px'
-          || (styleDec.borderStyle !== 'none' && diff('borderWidth'))
-          || diff('outlineStyle')
-          && styleBlurred.outlineWidth !== '0px'
-          && styleDec.outlineWidth !== '0px'
-          || (styleDec.outlineStyle !== 'none' && diff('outlineWidth'))
+          = hasDiffOutline
+          || hasDiffBorder
           || diff('fontSize')
           || diff('fontStyle')
           || diff('textDecorationLine')

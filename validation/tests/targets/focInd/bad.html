@@ -6,26 +6,47 @@
     <meta name="description" content="tester">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-      input[type=text]:focus {
-        outline: none;
-      }
-      input[type=checkbox]:focus {
+      #button:focus, #checkbox:focus {
         outline: 3px blue solid;
         outline-offset: 2px;
+      }
+      #slowLink:focus, #sluggishLink:focus {
+        border: 2px green solid;
+        outline: none;
+      }
+      #checkbox {
+        transition-property: outline;
+        transition-delay: 35ms;
+        transition-duration: 40ms;
+      }
+      #slowLink {
+        transition-property: border;
+        transition-delay: 125ms;
+      }
+      #sluggishLink {
+        transition-property: border;
+        transition-delay: 525ms;
       }
       #special:focus {
         outline: none;
         text-decoration-line: underline overline;
-        text-decoration-color: orange;
+        text-decoration-color: darkorange;
+      }
+      #textInput:focus {
+        outline: none;
       }
     </style>
   </head>
   <body>
     <main>
       <h1>Page with mixed focus indication</h1>
-      <p>This paragraph contains a link to <a href="https://en.wikipedia.org">information</a>, a <button type="button">button</button>, and a <label>text input <input type="text"></label>. The link and button exhibit default focus indicators, but the input has none.</p>
-      <p>This paragraph contains a checkbox with an enhanced focus-indication outline. <label><input type="checkbox"> I am human</label></p>
-      <p>This paragraph contains a button with a non-outline focus indicator. <button id="special" type="button">special button</button></p>
+      <p>This paragraph contains a link to <a href="https://en.wikipedia.org">English information</a>, which exhibits a default focus indicator.</p>
+      <p>This paragraph contains a <button id="button" type="button">button</button> with a custom outline as its focus indicator.</p>
+      <p>This paragraph contains a <label>text input <input id="textInput" type="text"></label> with the focus indicator suppressed.</p>
+      <p>This paragraph contains a checkbox with an enhanced focus-indication outline that finishes appearing 75 ms after the checkbox becomes focused. <label><input id="checkbox" type="checkbox"> I am a bad page.</label></p>
+      <p>This paragraph contains a link to <a id="slowLink" href="https://fr.wikipedia.org">French information</a> with a custom border as its only focus indicator. The border appears 125 ms after the link becomes focused.</p>
+      <p>This paragraph contains a link to <a id="sluggishLink" href="https://de.wikipedia.org">German information</a> with a custom border as its only focus indicator. The border appears 525 ms after the link becomes focused.</p>
+      <p>This paragraph contains a button with a focus indicator consisting solely of an underline and an overline. <button id="special" type="button">special button</button></p>
     </main>
   </body>
 </html>
