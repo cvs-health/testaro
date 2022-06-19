@@ -166,8 +166,9 @@ exports.commands = {
     focInd: [
       'Perform a focInd test',
       {
-        withItems: [true, 'boolean'],
-        revealAll: [true, 'boolean', '', 'whether to make all elements visible first']
+        revealAll: [true, 'boolean', '', 'whether to make all elements visible first'],
+        allowedDelay: [true, 'number', '', 'milliseconds to wait for an outline'],
+        withItems: [true, 'boolean']
       }
     ],
     focOp: [
