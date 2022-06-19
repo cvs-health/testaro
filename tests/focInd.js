@@ -1,7 +1,8 @@
 /*
   focInd
   This test reports focusable elements without focus indicators, with non-outline focus
-  indicators, and with outline focus indicators. It as based on the assumption that outlines are
+  indicators, and with outline focus indicators. An outline is recognized if it has non-zero
+  line thickness and non-transparent color. The test is based on the assumption that outlines are
   the standard and thus most familiar focus indicator. Other focus indicators are assumed better
   than none, but more likely to be misunderstood. For example, underlines may be mistaken for
   selection indicators. Some pages delay the appearance of focus indicators. This test waits for
@@ -87,7 +88,7 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
         // If it has no outline when not focused:
         if (styleBlurred.outlineWidth === '0px') {
           // If an outline appeared immediately on focus:
-          if (styleDec.outlineWidth !== '0px') {
+          if (styleDec.outlineWidth !== '0px' && styleDec.outlineColor !== 'rgba(0, 0, 0, 0)') {
             // Add facts about the element to the result.
             addElementFacts(element, 'outlinePresent', 0);
             hasOutline = true;
@@ -99,7 +100,9 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
               const focusTime = Date.now();
               const deadline = focusTime + allowedDelay;
               const interval = setInterval(() => {
-                if (styleDec.outlineWidth !== '0px') {
+                if (
+                  styleDec.outlineWidth !== '0px' && styleDec.outlineColor !== 'rgba(0, 0, 0, 0)'
+                ) {
                   resolve(Date.now() - focusTime);
                   clearInterval(interval);
                 }
@@ -110,9 +113,10 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
               }, 100);
             });
             // If it appeared before the wait limit:
-            if (await outlineDelay) {
+            const delay = await outlineDelay;
+            if (delay) {
               // Add facts about the element to the result.
-              addElementFacts(element, 'outlinePresent', outlineDelay);
+              addElementFacts(element, 'outlinePresent', delay);
               hasOutline = true;
             }
           }
