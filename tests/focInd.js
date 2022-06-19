@@ -81,43 +81,42 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
         const styleBlurred = Object.assign({}, styleDec);
         // Focus it, potentially changing the properties in its style declaration.
         element.focus({preventScroll: true});
+        let hasOutline = false;
         // If it has no outline when not focused:
-        const outlineDelay = new Promise();
         if (styleBlurred.outlineWidth === '0px') {
-        // If an outline appeared immediately on focus:
-        if (styleDec.outlineWidth !== '0px') {
-          // Add facts about the element to the result.
-          addElementFacts(element, 'outlinePresent', 0);
-        }
-        // Otherwise, if a wait for an outline is allowed:
-        else if (allowedDelay) {
-          // Determine how long an outline takes to appear or whether it times out.
-          const focusTime = Date.now();
-            const deadline = focusTime + allowedDelay;
-            const interval = setInterval(() => {
-              if (styleDec.outlineWidth !== '0px') {
-                outlineDelay.resolve(Date.now() - focusTime);
-                clearInterval(interval);
-              }
-              else if (Date.now() > deadline) {
-                outlineDelay.resolve(null);
-                clearInterval(interval);
-              }
-            }, 100);
+          // If an outline appeared immediately on focus:
+          if (styleDec.outlineWidth !== '0px') {
+            // Add facts about the element to the result.
+            addElementFacts(element, 'outlinePresent', 0);
+            hasOutline = true;
+          }
+          // Otherwise, if a wait for an outline is allowed:
+          else if (allowedDelay) {
+            // Determine how long an outline takes to appear or whether it times out.
+            const outlineDelay = new Promise(resolve => {
+              const focusTime = Date.now();
+              const deadline = focusTime + allowedDelay;
+              const interval = setInterval(() => {
+                if (styleDec.outlineWidth !== '0px') {
+                  resolve(Date.now() - focusTime);
+                  clearInterval(interval);
+                }
+                else if (Date.now() > deadline) {
+                  resolve(null);
+                  clearInterval(interval);
+                }
+              }, 100);
+            });
             // If it appeared before the wait limit:
             if (await outlineDelay) {
               // Add facts about the element to the result.
               addElementFacts(element, 'outlinePresent', outlineDelay);
+              hasOutline = true;
             }
           }
         }
-        // Otherwise, i.e. if a focus outline was not immediate and a wait is not allowed:
-        else {
-          // Disregard whether it acquires an outline when focused.
-          outlineDelay.resolve(null);
-        }
         // If no outline was allowed:
-        if (outlineDelay === null) {
+        if (! hasOutline) {
           // Returns whether a style property differs between focused and not focused.
           const diff = prop => styleDec[prop] !== styleBlurred[prop];
           // Determine whether the element has another allowed focus indicator.
