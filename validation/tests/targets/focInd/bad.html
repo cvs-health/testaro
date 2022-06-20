@@ -7,21 +7,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
       #button:focus, #checkbox:focus {
-        outline: 3px blue solid;
+        outline: 3px solid blue;
         outline-offset: 2px;
-      }
-      #slowLink:focus, #sluggishLink:focus {
-        border: 2px green solid;
-        outline: none;
       }
       #checkbox {
         transition-property: outline;
         transition-delay: 35ms;
         transition-duration: 40ms;
       }
+      #outlinedInput {
+        outline: 2px solid black;
+      }
+      #outlinedInput:focus {
+        outline: 2px solid brown;
+      }
       #slowLink {
         transition-property: border;
         transition-delay: 125ms;
+      }
+      #slowLink:focus, #sluggishLink:focus {
+        border: 2px solid green;
+        outline: none;
       }
       #sluggishLink {
         transition-property: border;
@@ -35,6 +41,12 @@
       #textInput:focus {
         outline: none;
       }
+      #thickOutlineInput {
+        outline: 1px solid black;
+      }
+      #thickOutlineInput:focus {
+        outline: 4px solid black;
+      }
     </style>
   </head>
   <body>
@@ -43,6 +55,8 @@
       <p>This paragraph contains a link to <a href="https://en.wikipedia.org">English information</a>, which exhibits a default focus indicator.</p>
       <p>This paragraph contains a <button id="button" type="button">button</button> with a custom outline as its focus indicator.</p>
       <p>This paragraph contains a <label>text input <input id="textInput" type="text"></label> with the focus indicator suppressed.</p>
+      <p>This paragraph contains a <label>text input <input id="outlinedInput" type="text"></label> with a custom outline, which changes only color when the input is focused.</p>
+      <p>This paragraph contains a <label>text input <input id="thickOutlineInput" type="text"></label> with a custom outline, which changes only thickness when the input is focused.</p>
       <p>This paragraph contains a checkbox with an enhanced focus-indication outline that finishes appearing 75 ms after the checkbox becomes focused. <label><input id="checkbox" type="checkbox"> I am a bad page.</label></p>
       <p>This paragraph contains a link to <a id="slowLink" href="https://fr.wikipedia.org">French information</a> with a custom border as its only focus indicator. The border appears 125 ms after the link becomes focused.</p>
       <p>This paragraph contains a link to <a id="sluggishLink" href="https://de.wikipedia.org">German information</a> with a custom border as its only focus indicator. The border appears 525 ms after the link becomes focused.</p>
