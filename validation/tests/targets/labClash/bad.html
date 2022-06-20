@@ -12,6 +12,10 @@
       <p>This paragraph contains an empty <button type="button" aria-label></button> button, with no accessible name.</p>
       <p>This is another <button id="labButton" type="button" aria-labelledby="buttonLabel">button</button> with its text content overridden by both an explicit label and a reference label as a <label id="buttonLabel" for="labButton">special type of button</label>.</p>
       <p>This is an implicitly and attribute-labeled <label>checkbox input <input id="cbox" type="checkbox" aria-label="a checkbox-type input"></label>.</p>
+      <p style="display: flex; align-items: center;">
+        <span>Here is an image input without a text alternative:</span>
+        <input type="image" src="delete.png" width="30rem">
+      </p>
       <p><span id="textInputLabel">Who is your favorite actor?</span> <input type="text" aria-labelledby="textInputLabel" aria-label="your favorite actor">.</p>
       <p>What do you think? Enter your thoughts into this text area, which is unlabeled.</p>
       <p><textarea aria-label></textarea></p>

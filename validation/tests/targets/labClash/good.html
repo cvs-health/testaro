@@ -10,6 +10,10 @@
     <main>
       <h1>Page with standard labeling</h1>
       <p>This paragraph contains a <button type="button">button</button> with its text content as accessible name, another <button id="labButton" type="button">button</button> with its text content overridden by an explicit label as a <label for="labButton">special type of button</label>, an <label>implicitly labeled text input <input type="text"></label>, and an explicitly labeled <label for="cbox">checkbox input</label>: <input id="cbox" type="checkbox">.</p>
+      <p style="display: flex; align-items: center;">
+        <span>Here is an image input with a text alternative:</span>
+        <input type="image" src="delete.png" alt="delete" width="30rem">
+      </p>
       <p>This <label>implicitly labeled text input <input id="textInput" type="text"></label> also has an explicit label, which validly provides <label for="textInput">additional information</label>.</p>
       <p><span id="what">What do you think?</span> Enter your thoughts into this text area, which is labeled by reference.</p>
       <p><textarea aria-labelledby="what"></textarea></p>

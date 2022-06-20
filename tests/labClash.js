@@ -71,33 +71,32 @@ exports.reporter = async (page, withItems) => {
           }
         }
       }
-      // Content label if details required.
-      if (withItems) {
-        // Of button.
-        if (labelee.tagName === 'BUTTON') {
-          const content = debloat(labelee.textContent);
-          if (content) {
-            texts.content = content;
-          }
+      // Content label.
+      // Of button.
+      if (labelee.tagName === 'BUTTON') {
+        const content = debloat(labelee.textContent);
+        if (content) {
+          texts.content = content;
         }
-        // Of submit input.
-        else if (labelee.tagName === 'INPUT' && labelee.type === 'submit' && labelee.value) {
-          const content = debloat(labelee.value);
-          if (content) {
-            texts.content = content;
-          }
+      }
+      // Of submit input.
+      else if (labelee.tagName === 'INPUT' && labelee.type === 'submit' && labelee.value) {
+        const content = debloat(labelee.value);
+        if (content) {
+          texts.content = content;
+        }
+      }
+      // Of image input.
+      else if (labelee.tagName === 'INPUT' && labelee.type === 'image' && labelee.alt) {
+        const content = debloat(labelee.alt);
+        if (content) {
+          texts.content = content;
         }
       }
       const {totals} = data;
       const labelTypeCount = labelTypes.length;
       // If it is well labeled:
-      if (
-        labelTypeCount === 1
-        || ! labelTypeCount && (
-          labelee.tagName === 'BUTTON' && debloat(labelee.textContent).length
-          || labelee.tagName === 'INPUT' && labelee.type === 'submit' && labelee.value
-        )
-      ) {
+      if (labelTypeCount === 1 || (texts.content && ! labelTypeCount)) {
         // Increment the count of well-labeled items in the report.
         totals.wellLabeled++;
         // Add data on the item to the report, if required.

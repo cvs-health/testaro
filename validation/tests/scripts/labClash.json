@@ -20,7 +20,7 @@
       "expect": [
         ["totals.mislabeled", "=", 0],
         ["totals.unlabeled", "=", 0],
-        ["totals.wellLabeled", "=", 6]
+        ["totals.wellLabeled", "=", 7]
       ]
     },
     {
@@ -35,7 +35,7 @@
       "withItems": false,
       "expect": [
         ["totals.mislabeled", "=", 3],
-        ["totals.unlabeled", "=", 2],
+        ["totals.unlabeled", "=", 3],
         ["totals.wellLabeled", "=", 0]
       ]
     }
