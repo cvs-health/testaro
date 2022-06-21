@@ -5,7 +5,7 @@
   for list links, buttons, and headings at each level. The test considers only
   particular style properties, listed in the 'mainStyles' and 'headingStyles' arrays.
 */
-exports.reporter = async page => {
+exports.reporter = async (page, withItems) => {
   // Get an object with arrays of list links and adjacent links as properties.
   const linkTypes = await require('../procs/linksByType').linksByType(page);
   return await page.$eval('body', (body, linkTypes) => {
@@ -49,9 +49,11 @@ exports.reporter = async page => {
       buttonStyles,
       headingStyles,
       listLinkStyles,
-      totals: {},
-      styleTotals: {}
+      totals: {}
     };
+    if (withItems) {
+      data.items = {};
+    }
     // Initialize an object of elements to be analyzed, including links.
     const elements = {
       buttons: [],
@@ -78,7 +80,7 @@ exports.reporter = async page => {
       elements.headings[tagName] = Array.from(body.getElementsByTagName(tagName));
     });
     // Tabulates the distribution of style properties for elements of a type.
-    const tallyStyles = (typeName, elements, typeStyles) => {
+    const tallyStyles = (typeName, elements, typeStyles, withItems) => {
       // If there are any elements:
       const elementCount = elements.length;
       if (elementCount) {
@@ -92,62 +94,54 @@ exports.reporter = async page => {
           // Get its values on the style properties to be compared.
           const styleDec = window.getComputedStyle(element);
           const style = {};
-          // Identify the styles to be compared.
           const styles = mainStyles.concat(typeStyles);
           styles.forEach(styleName => {
             style[styleName] = styleDec[styleName];
           });
-          // Get a text representation of the style.
+          // Get a text representation of the style, limited to those properties.
           const styleText = JSON.stringify(style);
-          // Increment the total of elements with that style declaration.
+          // Increment the total of elements with that style.
           styleTexts[styleText] = ++styleTexts[styleText] || 1;
-          // For each style property:
-          styles.forEach(styleName => {
-            const styleValue = style[styleName];
-            // Increment the total of elements with the same value on it as the element.
-            if (styleProps[styleName]) {
-              styleProps[styleName][styleValue] = ++styleProps[styleName][styleValue] || 1;
+          // If details are to be reported:
+          if (withItems) {
+            // Add the element’s values and text to the style details.
+            if (! styleProps[typeName]) {
+              styleProps[typeName] = {};
             }
-            else {
-              styleProps[styleName] = {[styleValue]: 1};
-            }
-          });
+            const elementText = element.textContent.trim().replace(/\s/c, ' ');
+            // For each style property being compared:
+            styles.forEach(styleName => {
+              if (! styleProps[typeName][styleName]) {
+                styleProps[typeName][styleName] = {};
+              }
+              if (! styleProps[typeName][styleName][style[styleName]]) {
+                styleProps[typeName][styleName][style[styleName]] = [];
+              }
+              styleProps[typeName][styleName][style[styleName]].push(elementText);
+            });
+          }
         });
         // Add the total to the result.
         data.totals[typeName] = {total: elementCount};
         const styleCounts = Object.values(styleTexts);
-        // If the elements in the element class differ in style:
+        // If the elements of the type differ in style:
         if (styleCounts.length > 1) {
           // Add the distribution of its style counts to the result.
           data.totals[typeName].subtotals = styleCounts.sort((a, b) => b - a);
+          // If details are to be reported:
+          if (withItems) {
+            // Add the element values and texts to the result.
+            data.items[typeName] = styleProps[typeName];
+          }
         }
-        // For each style property:
-        Object.keys(styleProps).forEach(styleProp => {
-          // Ignore it if all the elements have the same value.
-          if (Object.keys(styleProps[styleProp]).length === 1) {
-            delete styleProps[styleProp];
-          }
-          // Otherwise:
-          else {
-            if (! data.styleTotals[typeName][styleProp]) {
-              data.styleTotals[typeName][styleProp] = {};
-            }
-            // Sort the values in order of decreasing count.
-            const sortedEntries = Object.entries(styleProps[styleProp]).sort((a, b) => b[1] - a[1]);
-            sortedEntries.forEach(entry => {
-              const propData = data.styleTotals[typeName][styleProp];
-              propData[entry[0]] = (propData[entry[0]] || 0) + entry[1];
-            });
-          }
-        });
       }
     };
     // Report the style-property distributions for the element types.
-    tallyStyles('button', elements.buttons, buttonStyles);
-    tallyStyles('adjacentLink', elements.links.adjacent, []);
-    tallyStyles('listLink', elements.links.list, listLinkStyles);
+    tallyStyles('button', elements.buttons, buttonStyles, withItems);
+    tallyStyles('adjacentLink', elements.links.adjacent, [], withItems);
+    tallyStyles('listLink', elements.links.list, listLinkStyles, withItems);
     headingNames.forEach(headingName => {
-      tallyStyles(headingName, elements.headings[headingName], headingStyles);
+      tallyStyles(headingName, elements.headings[headingName], headingStyles, withItems);
     });
     return {result: data};
   }, linkTypes);
