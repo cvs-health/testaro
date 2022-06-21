@@ -225,12 +225,6 @@ exports.commands = {
         withItems: [true, 'boolean']
       }
     ],
-    styleDiff: [
-      'Perform a styleDiff test',
-      {
-        withItems: [true, 'boolean']
-      }
-    ],
     tabNav: [
       'Perform a tabNav test',
       {
