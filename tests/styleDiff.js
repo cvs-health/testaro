@@ -119,7 +119,7 @@ exports.reporter = async page => {
         // If the elements in the element class differ in style:
         if (styleCounts.length > 1) {
           // Add the distribution of its style counts to the result.
-          data.totals[typeName].styleTotals = styleCounts.sort((a, b) => b - a);
+          data.totals[typeName].subtotals = styleCounts.sort((a, b) => b - a);
         }
         // For each style property:
         Object.keys(styleProps).forEach(styleProp => {
