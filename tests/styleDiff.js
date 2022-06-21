@@ -140,8 +140,8 @@ exports.reporter = async (page, withItems) => {
             }
             // Otherwise:
             else {
-              if (! data.items[tagName][styleProp]) {
-                data.items[tagName][styleProp] = {};
+              if (! data.items[typeName][styleProp]) {
+                data.items[typeName][styleProp] = {};
               }
               // Sort the values in order of decreasing count.
               const sortedEntries = Object.entries(styleProps[styleProp]).sort((a, b) => b[1] - a[1]);
