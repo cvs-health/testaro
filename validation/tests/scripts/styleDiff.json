@@ -15,6 +15,7 @@
     {
       "type": "test",
       "which": "styleDiff",
+      "withItems": true,
       "what": "styleDiff",
       "expect": [
         ["totals.adjacentLink.total", "=", 2],
@@ -37,6 +38,7 @@
     {
       "type": "test",
       "which": "styleDiff",
+      "withItems": true,
       "what": "styleDiff",
       "expect": [
         ["totals.adjacentLink.total", "=", 2],
@@ -52,7 +54,8 @@
         ["totals.button.subtotals.1", "=", 1],
         ["totals.h1.subtotals"],
         ["totals.h2.subtotals.0", "=", 3],
-        ["totals.h2.subtotals.1", "=", 1]
+        ["totals.h2.subtotals.1", "=", 1],
+        ["items.adjacentLink.textDecorationStyle.double.0", "=", "French information"]
       ]
     }
   ]

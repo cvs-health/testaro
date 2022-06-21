@@ -8,7 +8,9 @@
 exports.reporter = async (page, withItems) => {
   // Get an object with arrays of list links and adjacent links as properties.
   const linkTypes = await require('../procs/linksByType').linksByType(page);
-  return await page.$eval('body', (body, linkTypes) => {
+  return await page.$eval('body', (body, args) => {
+    const linkTypes = args[0];
+    const withItems = args[1];
     // Identify the settable style properties to be compared for all tag names.
     const mainStyles = [
       'fontStyle',
@@ -86,9 +88,6 @@ exports.reporter = async (page, withItems) => {
       if (elementCount) {
         const styleProps = {};
         const styleTexts = {};
-        if (! data.styleTotals[typeName]) {
-          data.styleTotals[typeName] = {};
-        }
         // For each element:
         elements.forEach(element => {
           // Get its values on the style properties to be compared.
@@ -108,7 +107,7 @@ exports.reporter = async (page, withItems) => {
             if (! styleProps[typeName]) {
               styleProps[typeName] = {};
             }
-            const elementText = element.textContent.trim().replace(/\s/c, ' ');
+            const elementText = element.textContent.trim().replace(/\s/g, ' ');
             // For each style property being compared:
             styles.forEach(styleName => {
               if (! styleProps[typeName][styleName]) {
@@ -130,6 +129,12 @@ exports.reporter = async (page, withItems) => {
           data.totals[typeName].subtotals = styleCounts.sort((a, b) => b - a);
           // If details are to be reported:
           if (withItems) {
+            // Delete the data on uniform style properties.
+            Object.keys(styleProps[typeName]).forEach(styleName => {
+              if (Object.keys(styleProps[typeName][styleName]).length === 1) {
+                delete styleProps[typeName][styleName];
+              }
+            });
             // Add the element values and texts to the result.
             data.items[typeName] = styleProps[typeName];
           }
@@ -144,5 +149,5 @@ exports.reporter = async (page, withItems) => {
       tallyStyles(headingName, elements.headings[headingName], headingStyles, withItems);
     });
     return {result: data};
-  }, linkTypes);
+  }, [linkTypes, withItems]);
 };
