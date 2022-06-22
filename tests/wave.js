@@ -20,14 +20,26 @@ exports.reporter = async (page, reportType) => {
         response.on('data', chunk => {
           report += chunk;
         });
-        // When the data arrive, return them as an object.
+        // When the data arrive:
         response.on('end', () => {
           try {
+            // Delete unnecessary properties.
             const result = JSON.parse(report);
             const {categories} = result;
             delete categories.feature;
             delete categories.structure;
             delete categories.aria;
+            // Add WCAG information from the WAVE documentation.
+            const waveDocJSON = await fs.readFile('procs/wavedoc.json');
+            const waveDoc = JSON.parse(waveDocJSON);
+            categories.forEach(category => {
+              const {items} = category;
+              Object.keys(items).forEach(issueName => {
+                const issueDoc = waveDoc.find((issue => issue.name === issueName));
+                const {guidelines} = issueDoc;
+                items[issueName].wcag = guidelines;
+              });
+            })
             return resolve(result);
           }
           catch (error) {
