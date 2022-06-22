@@ -2,16 +2,22 @@
   hover
   This test reports unexpected effects of hovering. The effects include elements that are made
   visible, elements whose opacities are changed, elements with ancestors whose opacities are
-  changed, and elements that cannot be hovered over. Only Playwright-visible elements that have
-  'A', 'BUTTON', and 'LI' tag names or have 'onmouseenter' or 'onmouseover' attributes are
-  considered as hovering targets. The elements considered when the effects of hovering are
+  changed, and elements that cannot be hovered over. Only Playwright-visible elements in the
+  DOM that have 'A', 'BUTTON', and 'LI' tag names or have 'onmouseenter' or 'onmouseover' attributes
+  are considered as hovering targets. The elements considered when the effects of hovering are
   examined are the descendants of the grandparent of the element hovered over if that element
   has the tag name 'A' or 'BUTTON' or otherwise the descendants of the element. The only
   elements counted as being made visible by hovering are those with tag names 'A', 'BUTTON',
   'INPUT', and 'SPAN', and those with 'role="menuitem"' attributes. The test waits 700 ms after
-  each hover in case of delayed effects. Despite this delay, the test can make the execution time
-  practical by randomly sampling targets instead of hovering over all of them. When sampling is
-  performed, the results may vary from one execution to another.
+  each hover in case of delayed effects. Despite this delay, the test can make the execution
+  time practical by randomly sampling targets instead of hovering over all of them. When
+  sampling is performed, the results may vary from one execution to another. An element is
+  reported as unhoverable when it fails the Playwright actionability checks for hovering, i.e.
+  when it fails to be attached to the DOM, visible, stable (not or no longer animating), and
+  able to receive events. All target candidates satisfy the first two conditions, so only the
+  last two might fail. Playwright defines the ability to receive events as being the target of
+  an action on the location where the center of the element is, rather than some other element
+  with a higher zIndex value in the same location being the target.
 */
 
 // CONSTANTS
