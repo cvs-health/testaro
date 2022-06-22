@@ -4,6 +4,7 @@
   specifies a WAVE report type: 1, 2, 3, or 4. The larger the number, the more detailed (and
   expensive) the report.
 */
+const fs = require('fs/promises');
 const https = require('https');
 exports.reporter = async (page, reportType) => {
   const waveKey = process.env.WAVE_KEY;
@@ -21,7 +22,7 @@ exports.reporter = async (page, reportType) => {
           report += chunk;
         });
         // When the data arrive:
-        response.on('end', () => {
+        response.on('end', async () => {
           try {
             // Delete unnecessary properties.
             const result = JSON.parse(report);
@@ -32,7 +33,8 @@ exports.reporter = async (page, reportType) => {
             // Add WCAG information from the WAVE documentation.
             const waveDocJSON = await fs.readFile('procs/wavedoc.json');
             const waveDoc = JSON.parse(waveDocJSON);
-            categories.forEach(category => {
+            Object.keys(categories).forEach(categoryName => {
+              const category = categories[categoryName];
               const {items} = category;
               Object.keys(items).forEach(issueName => {
                 const issueDoc = waveDoc.find((issue => issue.name === issueName));
@@ -45,7 +47,7 @@ exports.reporter = async (page, reportType) => {
           catch (error) {
             return resolve({
               prevented: true,
-              error: 'WAVE did not return JSON.',
+              error: error.message,
               report
             });
           }
