@@ -1,5 +1,10 @@
 /*
   focOp
+
+  WARNING: The chromium and firefox browsers in Playwright make errors on this test by
+  misclassifying the cursor property values of the computed styles of elements. Launch the
+  webkit browser to run this test.
+
   This test reports descrepancies between Tab-focusability and operability. The standard
   practice is to make focusable elements operable and vice versa. If focusable elements are not
   operable, users are likely to be surprised that nothing happens when they try to operate such
