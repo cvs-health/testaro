@@ -6,7 +6,7 @@
   Experimental, needs-review, and best-practice rules are ignored.
 */
 // IMPORTS
-const {injectAxe, getViolations} = require('axe-playwright');
+const {injectAxe, getAxeResults} = require('axe-playwright');
 // FUNCTIONS
 // Conducts and reports an Axe test.
 exports.reporter = async (page, withItems, rules = []) => {
@@ -22,69 +22,43 @@ exports.reporter = async (page, withItems, rules = []) => {
   // If the injection succeeded:
   if (! data.prevented) {
     // Get the data on the elements violating the specified axe-core rules.
-    const axeOptions = {};
+    const axeOptions = {
+      resultTypes: ['violations']
+    };
     if (rules.length) {
       axeOptions.runOnly = rules;
     }
-    const axeReport = await getViolations(page, null, axeOptions)
+    else {
+      axeOptions.runOnly = ['experimental', 'best-practice', 'wcag2a', 'wcag2aa', 'wcag2aaa', 'wcag21a', 'wcag21aa', 'wcag21aaa'];
+    }
+    const axeReport = await getAxeResults(page, null, axeOptions)
     .catch(error => {
       console.log(`ERROR: Axe failed (${error.message}'`);
       return '';
     });
     // If the test succeeded:
-    if (Array.isArray(axeReport)) {
+    const {violations} = axeReport;
+    if (violations) {
+      // Delete irrelevant properties from the report.
+      delete axeReport.inapplicable;
+      delete axeReport.passes;
       // Initialize a report.
-      data.warnings = 0;
-      data.violations = {
+      data.totals = {
         minor: 0,
         moderate: 0,
         serious: 0,
         critical: 0
       };
       if (withItems) {
-        data.items = [];
+        data.details = axeReport;
       }
-      // If there were any violations:
-      if (axeReport.length) {
-        // FUNCTION DEFINITIONS START
-        // Compacts a check violation.
-        const compactCheck = checkObj => {
-          return {
-            check: checkObj.id,
-            description: checkObj.message,
-            impact: checkObj.impact
-          };
-        };
-        // Compacts a violating element.
-        const compactViolator = elObj => {
-          const out = {
-            selector: elObj.target[0],
-            impact: elObj.impact
-          };
-          if (elObj.any && elObj.any.length) {
-            out['must pass any of'] = elObj.any.map(checkObj => compactCheck(checkObj));
-          }
-          if (elObj.none && elObj.none.length) {
-            out['must pass all of'] = elObj.none.map(checkObj => compactCheck(checkObj));
-          }
-          return out;
-        };
-        // Compacts a violated rule.
-        const compactRule = rule => {
-          const out = {
-            rule: rule.id,
-            description: rule.description,
-            impact: rule.impact,
-            elements: {}
-          };
-          if (rule.nodes && rule.nodes.length) {
-            out.elements = rule.nodes.map(el => compactViolator(el));
-          }
-          return out;
-        };
-        // FUNCTION DEFINITIONS END
+      // If there were any issues:
+      if (incomplete.length || violations.length) {
+        // For each incomplete issue:
+        incomplete.forEach(issue => {
+        });
         // For each rule violated:
-        axeReport.forEach(rule => {
+        violations.forEach(rule => {
           // For each element violating the rule:
           rule.nodes.forEach(element => {
             // Increment the element count of the impact of its violation.
@@ -97,6 +71,7 @@ exports.reporter = async (page, withItems, rules = []) => {
           }
         });
       }
+      data.wholeReport = axeReport;
     }
     // Otherwise, i.e. if the test failed:
     else {
