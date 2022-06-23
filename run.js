@@ -64,10 +64,25 @@ const tenonData = {
   accessToken: '',
   requestIDs: {}
 };
+// Keywords in log messages indicating errors.
+const errorWords = [
+  'failed',
+  'error',
+  'suspicious',
+  'refused',
+  'content security policy',
+  'unrecognized',
+  'requires',
+  'warning',
+  'missing',
+  'deprecated'
+];
 // ########## VARIABLES
 // Facts about the current session.
 let logCount = 0;
 let logSize = 0;
+let errorLogCount = 0;
+let errorLogSize = 0;
 let prohibitedCount = 0;
 let visitTimeoutCount = 0;
 let visitRejectionCount = 0;
@@ -253,12 +268,18 @@ const launch = async typeName => {
     browserContext = await browser.newContext(viewport);
     // When a page is added to the browser context:
     browserContext.on('page', page => {
-      // Make its console messages appear in the Playwright console.
+      // Make its console messages get reported and appear in the Playwright console.
       page.on('console', msg => {
         const msgText = msg.text();
         console.log(`[${msgText}]`);
+        const msgTextLC = msgText.toLowerCase();
+        const msgLength = msgText.length;
         logCount++;
-        logSize += msgText.length;
+        logSize += msgLength;
+        if (errorWords.some(word => msgTextLC.includes(word))) {
+          errorLogCount++;
+          errorLogSize += msgLength;
+        }
         const msgLC = msgText.toLowerCase();
         if (msgText.includes('403') && (msgLC.includes('status') || msgLC.includes('prohibited'))) {
           prohibitedCount++;
@@ -1224,7 +1245,13 @@ const doActs = async (report, actIndex, page) => {
 // Performs the commands in a script.
 const doScript = async (report) => {
   // Reinitialize the log statistics.
-  logCount = logSize = prohibitedCount = visitTimeoutCount = visitRejectionCount= 0;
+  logCount = 0;
+  logSize = 0;
+  errorLogCount = 0;
+  errorLogSize = 0;
+  prohibitedCount = 0;
+  visitTimeoutCount = 0;
+  visitRejectionCount = 0;
   // Add the start time to the report.
   const startTime = new Date();
   report.startTime = startTime.toISOString().slice(0, 19);
@@ -1239,6 +1266,8 @@ const doScript = async (report) => {
   // Add the log statistics to the report.
   report.logCount = logCount;
   report.logSize = logSize;
+  report.errorLogCount = errorLogCount;
+  report.errorLogSize = errorLogSize;
   report.prohibitedCount = prohibitedCount;
   report.visitTimeoutCount = visitTimeoutCount;
   report.visitRejectionCount = visitRejectionCount;
