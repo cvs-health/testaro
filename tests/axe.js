@@ -3,7 +3,20 @@
   This test implements the axe-core ruleset for accessibility.
 
   The rules argument defaults to all rules; otherwise, specify an array of rule names.
-  Experimental, needs-review, and best-practice rules are ignored.
+
+  The detailLevel argument specifies how many result categories are to be included in the
+  details. 0 = none; 1 = violations; 2 = violations and incomplete; 3 = violations, incomplete,
+  and passes; 4 = violations, incomplete, passes, and inapplicable. Regardless of the value of this
+  argument, Axe-core is instructed to report all nodes with violation or incomplete results, but only
+  1 node per rule found to be passed or inapplicable. Therefore, from the results of this test it
+  is possible to count the rules passed and the inapplicable rules, but not the nodes for which each
+  rule is passed or inapplicable. To count those nodes, one would need to revise the 'resultTypes'
+  property of the 'axeOptions' object.
+
+  The report of this test shows rule totals by result category and, within the violation and
+  incomplete categories, node totals by severity. It does not show rule or node totals by test
+  category (“tag”), such as 'wcag21aaa'. Scoring can consider test categories by getting the value
+  of the 'tags' property of each rule.
 */
 // IMPORTS
 const {injectAxe, getAxeResults} = require('axe-playwright');
