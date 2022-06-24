@@ -65,9 +65,12 @@ exports.reporter = async (page, waitLong, tryLimit = 4) => {
       const issueArray = JSON.parse(reportJSON);
       // Remove the notices from the array.
       const nonNotices = issueArray.filter(issue => issue.type !== 'notice');
-      // Convert the technique property from a string to an array of strings.
+      // For each non-notice issue:
+      let errors = 0;
+      let warnings = 0;
       nonNotices.forEach(issue => {
         if (issue.type) {
+          // Convert the technique property from a string to an array of strings.
           const longTech = issue.techniques;
           issue.techniques = longTech.replace(/a><a/g, 'a>%<a').split('%');
           issue.id = issue
@@ -75,12 +78,24 @@ exports.reporter = async (page, waitLong, tryLimit = 4) => {
           .map(technique => technique.replace(/^.+?>|<\/a>$/g, ''))
           .sort()
           .join('+');
+          // Add the issue to the totals.
+          if (issue.type === 'error') {
+            errors++;
+          }
+          else if (issue.type === 'warning') {
+            warnings++;
+          }
         }
       });
+      // Return the result.
       return {
         result: {
+          totals: {
+            errors,
+            warnings
+          },
           report: nonNotices,
-          triesLeft
+          preventionCount: tryLimit - triesLeft - 1
         }
       };
     }

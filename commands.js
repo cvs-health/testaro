@@ -206,7 +206,7 @@ exports.commands = {
       }
     ],
     menuNav: [
-      'Perform a tabNav test',
+      'Perform a menuNav test',
       {
         withItems: [true, 'boolean']
       }

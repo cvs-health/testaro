@@ -5,10 +5,13 @@
   line thickness and non-transparent color. The test is based on the assumption that outlines are
   the standard and thus most familiar focus indicator. Other focus indicators are assumed better
   than none, but more likely to be misunderstood. For example, underlines may be mistaken for
-  selection indicators. Some pages delay the appearance of focus indicators. This test waits for
-  focus indicators to appear if specified and, if there is a delay, reports on its magnitude.
+  selection indicators. Some pages delay the appearance of focus indicators. If a wait is
+  specified, the test checks every 100 ms for an outline until the allow wait time expires,
+  and once more after it expires. If no outline appears by then, the test checks for other focus
+  indicators. If an outline does not appear immediately but appears on a subsequent check, the test
+  reports the amount of the delay.
 
-  Bug: This test fails to recognize outlines when run with firefox.
+  WARNING: This test fails to recognize outlines when run with firefox.
 */
 exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
   // If required, make all elements visible.

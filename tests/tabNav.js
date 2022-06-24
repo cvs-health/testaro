@@ -1,6 +1,6 @@
 /*
   tabNav
-  This test reports nonstandard keyboard navigation among tab elements in tab lists.
+  This test reports nonstandard keyboard navigation among tab elements in visible tab lists.
   Standards are based on https://www.w3.org/TR/wai-aria-practices-1.1/#tabpanel.
 */
 
@@ -73,8 +73,8 @@ exports.reporter = async (page, withItems) => {
       correct: []
     };
   }
-  // Identify an array of the tablists.
-  const tabLists = await page.$$('[role=tablist]');
+  // Identify an array of the visible tablists.
+  const tabLists = await page.$$('[role=tablist]:visible');
   if (tabLists.length) {
     // FUNCTION DEFINITIONS START
     // Returns text associated with an element.
@@ -94,22 +94,34 @@ exports.reporter = async (page, withItems) => {
     ) => {
       let pressed = true;
       // Click the tab element, to make the focus on it effective.
-      await tabElement.click({timeout: 1500})
+      await tabElement.click({
+        timeout: 500
+      })
+      .catch(async error => {
+        await tabElement.click({
+          force: true
+        });
+      })
       .catch(error => {
         console.log(`ERROR: could not click tab element ${itemData.text} (${error.message})`);
-        pressed = false;
+      pressed = false;
       });
+      // Increment the counts of navigations and key navigations.
+      data.totals.navigations.all.total++;
+      data.totals.navigations.specific[keyProp].total++;
+      const {navigationErrors} = itemData;
+      // If the click succeeded:
       if (pressed) {
         // Refocus the tab element and press the specified key (page.keyboard.press may fail).
-        await tabElement.press(keyName)
+        await tabElement.press(keyName, {
+          timeout: 1000
+        })
         .catch(error => {
           console.log(`ERROR: could not press ${keyName} (${error.message})`);
           pressed = false;
         });
+        // If the refocus and keypress succeeded:
         if (pressed) {
-          // Increment the counts of navigations and key navigations.
-          data.totals.navigations.all.total++;
-          data.totals.navigations.specific[keyProp].total++;
           // Identify which tab element is now focused, if any.
           const focusIndex = await focusedTab(tabs);
           // If the focus is correct:
@@ -128,14 +140,35 @@ exports.reporter = async (page, withItems) => {
             // If itemization is required:
             if (withItems) {
               // Update the element report.
-              itemData.navigationErrors.push(keyName);
+              navigationErrors.push(keyName);
             }
           }
           return elementIsCorrect;
         }
+        // Otherwise, i.e. if the refocus or keypress failed:
         else {
+          // Increment the counts of incorrect navigations and incorrect key navigations.
+          data.totals.navigations.all.incorrect++;
+          data.totals.navigations.specific[keyProp].incorrect++;
+          // If itemization is required and a focus failure has not yet been reported:
+          if (withItems && ! navigationErrors.includes('focus')) {
+            // Update the element report.
+            navigationErrors.push('focus');
+          }
           return false;
         }
+      }
+      // Otherwise, i.e. if the click failed:
+      else {
+        // Increment the counts of incorrect navigations and incorrect key navigations.
+        data.totals.navigations.all.incorrect++;
+        data.totals.navigations.specific[keyProp].incorrect++;
+        // If itemization is required and a click failure has not yet been reported:
+        if (withItems && ! navigationErrors.includes('click')) {
+          // Update the element report.
+          navigationErrors.push('click');
+        }
+        return false;
       }
     };
     // Returns the index to which an arrow key should move the focus.

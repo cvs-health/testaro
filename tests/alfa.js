@@ -44,7 +44,13 @@ exports.reporter = async page => {
       });
       await rulePage.close();
     }
-    const data = [];
+    const data = {
+      totals: {
+        failures: 0,
+        warnings: 0
+      },
+      items: []
+    };
     await Scraper.with(async scraper => {
       for (const input of await scraper.scrape(page.url())) {
         const audit = Audit.of(input, alfaRules.default);
@@ -96,7 +102,13 @@ exports.reporter = async page => {
               if (etcTags.length) {
                 outcomeData.etcTags = etcTags;
               }
-              data.push(outcomeData);
+              if (outcomeData.verdict === 'failed') {
+                data.totals.failures++;
+              }
+              else if (outcomeData.verdict === 'cantTell') {
+                data.totals.warnings++;
+              }
+              data.items.push(outcomeData);
             }
           }
         });
