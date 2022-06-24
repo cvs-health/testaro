@@ -9,7 +9,8 @@
   between screen shots (interval), and how many screen shots to make (count). The test compares the
   screen shots and reports 9 statistics:
     0. bytes: an array of the sizes of the screen shots, in bytes
-    1. localRatios: an array of the ratios of bytes of the larger to the smaller of adjacent pairs of screen shots
+    1. localRatios: an array of the ratios of bytes of the larger to the smaller of adjacent pairs
+      of screen shots
     2. meanLocalRatio: the mean of the ratios in the localRatios array
     3. maxLocalRatio: the greatest of the ratios in the localRatios array
     4. globalRatio: the ratio of bytes of the largest to the smallest screen shot
@@ -17,6 +18,10 @@
     6. meanPixelChange: the mean of the counts in the pixelChanges array
     7. maxPixelChange: the greatest of the counts in the pixelChanges array
     8. changeFrequency: what fraction of the adjacent pairs of screen shots has pixel differences
+  
+  WARNING: This test uses the Playwright page.screenshot method, which produces incorrect results
+  when the browser type is chromium and is not implemented for the firefox browser type. The only
+  browser type usable with this test is webkit.
 */
 const pixelmatch = require('pixelmatch');
 const {PNG} = require('pngjs');
