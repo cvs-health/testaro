@@ -88,7 +88,6 @@ const doTest = async (content, withItems, timeLimit) => {
     return ibmTypeReport;
   }
   else {
-    console.log('ERROR: getting ibm test report took too long');
     return {
       prevented: true,
       error: 'ERROR: getting ibm test report took too long'
@@ -105,6 +104,7 @@ exports.reporter = async (page, withItems, withNewContent) => {
     result.content = await doTest(typeContent, withItems, timeLimit);
     if (result.content.prevented) {
       result.prevented = true;
+      console.log('ERROR: Getting ibm test report from page took too long');
     }
   }
   // If a test with new content is to be performed:
@@ -112,8 +112,9 @@ exports.reporter = async (page, withItems, withNewContent) => {
     const timeLimit = 20;
     const typeContent = page.url();
     result.url = await doTest(typeContent, withItems, timeLimit);
-    if (result.content.prevented) {
+    if (result.url.prevented) {
       result.prevented = true;
+      console.log('ERROR: Getting ibm test report from URL took too long');
     }
   }
   return {result};

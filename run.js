@@ -239,6 +239,7 @@ const isValidReport = async report => {
 const closeBrowser = async () => {
   const browser = browserContext && browserContext.browser();
   if (browser) {
+    console.log(`Closing browser, version ${browser.version()}`);
     await browser.close();
   }
 };
