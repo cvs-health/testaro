@@ -153,7 +153,7 @@ exports.commands = {
     axe: [
       'Perform an Axe test',
       {
-        withItems: [true, 'boolean'],
+        detailLevel: [true, 'number', '', 'count to include of: violations, incomplete, passes, inapplicable'],
         rules: [true, 'array', 'areStrings', 'rule names, or empty if all']
       }
     ],

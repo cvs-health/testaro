@@ -9,7 +9,7 @@
 const {injectAxe, getAxeResults} = require('axe-playwright');
 // FUNCTIONS
 // Conducts and reports an Axe test.
-exports.reporter = async (page, withItems, rules = []) => {
+exports.reporter = async (page, detailLevel, rules = []) => {
   // Initialize the report.
   const data = {};
   // Inject axe-core into the page.
@@ -23,7 +23,7 @@ exports.reporter = async (page, withItems, rules = []) => {
   if (! data.prevented) {
     // Get the data on the elements violating the specified axe-core rules.
     const axeOptions = {
-      resultTypes: ['violations']
+      resultTypes: ['violations', 'incomplete']
     };
     if (rules.length) {
       axeOptions.runOnly = rules;
@@ -37,41 +37,50 @@ exports.reporter = async (page, withItems, rules = []) => {
       return '';
     });
     // If the test succeeded:
-    const {violations} = axeReport;
+    const {inapplicable, passes, incomplete, violations} = axeReport;
     if (violations) {
-      // Delete irrelevant properties from the report.
-      delete axeReport.inapplicable;
-      delete axeReport.passes;
-      // Initialize a report.
+      // Initialize the result.
       data.totals = {
-        minor: 0,
-        moderate: 0,
-        serious: 0,
-        critical: 0
+        rulesNA: 0,
+        rulesPassed: 0,
+        rulesWarned: 0,
+        rulesViolated: 0,
+        warnings: {
+          minor: 0,
+          moderate: 0,
+          serious: 0,
+          critical: 0
+        },
+        violations: {
+          minor: 0,
+          moderate: 0,
+          serious: 0,
+          critical: 0
+        }
       };
-      if (withItems) {
-        data.details = axeReport;
-      }
-      // If there were any issues:
-      if (incomplete.length || violations.length) {
-        // For each incomplete issue:
-        incomplete.forEach(issue => {
+      data.details = axeReport;
+      // Populate the totals.
+      const {totals} = data;
+      totals.rulesNA = inapplicable.length;
+      totals.rulesPassed = passes.length;
+      incomplete.forEach(rule => {
+        totals.rulesWarned++;
+        rule.nodes.forEach(node => {
+          totals.warnings[node.impact]++;
         });
-        // For each rule violated:
-        violations.forEach(rule => {
-          // For each element violating the rule:
-          rule.nodes.forEach(element => {
-            // Increment the element count of the impact of its violation.
-            data.violations[element.impact]++;
-          });
-          // If details are required:
-          if (withItems) {
-            // Add it to the report.
-            data.items.push(compactRule(rule));
-          }
+      });
+      violations.forEach(rule => {
+        totals.rulesViolated++;
+        rule.nodes.forEach(node => {
+          totals.violations[node.impact]++;
         });
-      }
-      data.wholeReport = axeReport;
+      });
+      // Delete irrelevant properties from the report details.
+      const irrelevants = ['inapplicable', 'passes', 'incomplete', 'violations']
+      .slice(0, 4 - detailLevel);
+      irrelevants.forEach(irrelevant => {
+        delete axeReport[irrelevant];
+      });
     }
     // Otherwise, i.e. if the test failed:
     else {
