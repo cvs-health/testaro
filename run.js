@@ -70,16 +70,17 @@ const tenonData = {
 };
 // Keywords in log messages indicating errors.
 const errorWords = [
-  'failed',
-  'error',
-  'suspicious',
-  'refused',
   'content security policy',
-  'unrecognized',
-  'requires',
-  'warning',
+  'deprecated',
+  'error',
+  'failed',
   'missing',
-  'deprecated'
+  'but not used',
+  'refused',
+  'requires',
+  'suspicious',
+  'unrecognized',
+  'warning'
 ];
 
 // ########## VARIABLES

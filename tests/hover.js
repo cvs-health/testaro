@@ -28,6 +28,7 @@ const targetSelectors = ['a', 'button', 'input', '[role=menuitem]', 'span']
 .join(', ');
 // Initialize the result.
 const data = {
+  populationSize: 0,
   totals: {
     triggers: 0,
     madeVisible: 0,
@@ -83,13 +84,9 @@ const find = async (withItems, page, triggers) => {
       if (['A', 'BUTTON'].includes(tagName)) {
         const rootJSHandle = await page.evaluateHandle(
           firstTrigger => {
-            const parent = firstTrigger.parentElement;
-            if (parent) {
-              return parent.parentElement || parent;
-            }
-            else {
-              return firstTrigger;
-            }
+            const parent = firstTrigger.parentElement || firstTrigger;
+            const grandparent = parent.parentElement || parent;
+            return grandparent;
           },
           firstTrigger
         );
@@ -226,6 +223,7 @@ exports.reporter = async (page, sampleSize = Infinity, withItems) => {
   });
   // If they number more than the sample size limit, sample them.
   const triggerCount = triggers.length;
+  data.populationSize = triggerCount;
   const triggerSample = triggerCount > sampleSize ? getSample(triggers, sampleSize) : triggers;
   // Find and document the hover-triggered disclosures.
   await find(withItems, page, triggerSample);

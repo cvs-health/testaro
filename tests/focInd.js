@@ -128,7 +128,7 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
         if (! hasOutline) {
           // Returns whether a style property differs between focused and not focused.
           const diff = prop => styleDec[prop] !== styleBlurred[prop];
-          // Determine whether the element has another allowed focus indicator.
+          // Determine whether the element has another recognized focus indicator.
           const hasDiffOutline = styleDec.outlineWidth !== '0px'
           && styleDec.outlineColor !== 'rgba(0, 0, 0, 0)'
           && (diff('outlineStyle') || diff('outlineWidth'));
@@ -138,6 +138,7 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
           const hasIndicator
           = hasDiffOutline
           || hasDiffBorder
+          || diff('box-shadow')
           || diff('fontSize')
           || diff('fontStyle')
           || diff('textDecorationLine')
