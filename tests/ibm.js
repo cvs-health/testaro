@@ -19,12 +19,13 @@
 */
 // Import required modules.
 const fs = require('fs').promises;
-const {getCompliance} = require('accessibility-checker');
+const {getCompliance, close} = require('accessibility-checker');
 // Runs the IBM test.
 const run = async content => {
   const nowLabel = (new Date()).toISOString().slice(0, 19);
   // Return the result of a test.
   const ibmReport = await getCompliance(content, nowLabel);
+  await close();
   return ibmReport;
 };
 // Trims an IBM report.
@@ -67,11 +68,11 @@ const doTest = async (content, withItems, timeLimit) => {
       resolve({});
     }, 1000 * timeLimit);
   });
-  // Conduct and report the test.
+  // Conduct the test and get a Promise of the report.
   const ibmReport = run(content);
-  // Wait for the report until the time limit expires.
+  // Wait for completion or until the time limit expires.
   const ibmReportIfFast = await Promise.race([ibmReport, wait]);
-  // Delete the report files.
+  // Delete existing report files.
   try {
     const reportNames = await fs.readdir('results');
     for (const reportName of reportNames) {

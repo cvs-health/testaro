@@ -2,12 +2,16 @@
   index.js
   testaro main script.
 */
+
 // ########## IMPORTS
+
 // Module to keep secrets.
 require('dotenv').config();
 // Requirements for commands.
 const {commands} = require('./commands');
+
 // ########## CONSTANTS
+
 // Set DEBUG environment variable to 'true' to add debugging features.
 const debug = process.env.DEBUG === 'true';
 // Set WAITS environment variable to a positive number to insert delays (in ms).
@@ -77,7 +81,9 @@ const errorWords = [
   'missing',
   'deprecated'
 ];
+
 // ########## VARIABLES
+
 // Facts about the current session.
 let logCount = 0;
 let logSize = 0;
@@ -91,7 +97,11 @@ let actCount = 0;
 let browserContext;
 let browserTypeName;
 let requestedURL = '';
+// All browsers launched.
+let browsers = [];
+
 // ########## VALIDATORS
+
 // Validates a browser type.
 const isBrowserType = type => ['chromium', 'firefox', 'webkit'].includes(type);
 // Validates a load state.
@@ -234,13 +244,17 @@ const isValidReport = async report => {
     return false;
   }
 };
+
 // ########## OTHER FUNCTIONS
-// Closes any existing browser.
-const closeBrowser = async () => {
-  const browser = browserContext && browserContext.browser();
-  if (browser) {
-    console.log(`Closing browser, version ${browser.version()}`);
-    await browser.close();
+
+// Closes all existing browsers.
+const closeBrowsers = async () => {
+  for (const browserObj of browsers) {
+    const {browser, typeName} = browserObj;
+    if (browser) {
+      console.log(`Closing ${typeName} browser, version ${browser.version()}`);
+      await browser.close();
+    }
   }
 };
 // Launches a browser.
@@ -249,7 +263,7 @@ const launch = async typeName => {
   // If the specified browser type exists:
   if (browserType) {
     // Close any existing browser.
-    await closeBrowser();
+    await closeBrowsers();
     // Launch a browser of the specified type.
     const browserOptions = {};
     if (debug) {
@@ -259,6 +273,11 @@ const launch = async typeName => {
       browserOptions.slowMo = waits;
     }
     const browser = await browserType.launch(browserOptions);
+    // Register it.
+    browsers.push({
+      browser,
+      typeName
+    });
     // Create a new context (window) in it, taller if debugging is on.
     const viewport = debug ? {
       viewPort: {
@@ -1262,8 +1281,8 @@ const doScript = async (report) => {
   report.testTimes = [];
   // Perform the specified acts.
   await doActs(report, 0, null);
-  // Close the browser.
-  await closeBrowser();
+  // Close all browsers.
+  await closeBrowsers();
   // Add the log statistics to the report.
   report.logCount = logCount;
   report.logSize = logSize;

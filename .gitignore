@@ -3,6 +3,7 @@ node_modules/
 
 # Temporary files
 temp/
+results/
 
 # Secrets
 .env
