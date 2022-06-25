@@ -1,30 +1,27 @@
 /*
   hover
-  This test reports unexpected effects of hovering. The effects include additions and removals
-  of visible elements, opacity changes, and unhoverable elements. Only Playwright-visible elements
-  in the DOM that have 'A', 'BUTTON', and 'LI' tag names or have 'onmouseenter' or 'onmouseover'
-  attributes are considered as hovering targets. The elements considered when the impacts of
-  hovering are examined are the descendants of the great grandparent of the element hovered over
-  if that element has the tag name 'A' or 'BUTTON', or otherwise the descendants of the element.
-  The only visible elements counted as being added or removed by hovering are those with tag names
-  'A', 'BUTTON', 'INPUT', and 'SPAN', and those with 'role="menuitem"' attributes. The test checks
-  up to 4 times for hovering impacts at intervals of 0.3 second. Despite this delay, the test can
-  make the execution time practical by randomly sampling targets instead of hovering over all of
-  them. When sampling is performed, the results may vary from one execution to another. An element
-  is reported as unhoverable when it fails the Playwright actionability checks for hovering, i.e.
-  when it fails to be attached to the DOM, visible, stable (not or no longer animating), and
-  able to receive events. All target candidates satisfy the first two conditions, so only the
-  last two might fail. Playwright defines the ability to receive events as being the target of
-  an action on the location where the center of the element is, rather than some other element
-  with a higher zIndex value in the same location being the target.
+  This test reports unexpected impacts of hovering. The effects include additions and removals
+  of visible elements, opacity changes, and unhoverable elements. The elements that are
+  subjected to hovering (called “triggers”) are the Playwright-visible elements that have 'A',
+  'BUTTON', or 'LI' tag names or have 'onmouseenter' or 'onmouseover' attributes. When such an
+  element is hovered over, the test examines the impacts on descendants of the great grandparents
+  of the elements with tag names 'A' and 'BUTTON', and otherwise the descendants of the elements
+  themselves. Four impacts are counted: (1) an element is added or becomes visible, (2) an element
+  is removed or becomes invisible, (3) the opacity of an element changes, and (4) the element is
+  a descendant of an element whose opacity changes. The test checks up to 4 times for hovering
+  impacts at intervals of 0.3 second. Despite this delay, the test can make the execution time
+  practical by randomly sampling targets instead of hovering over all of them. When sampling is
+  performed, the results may vary from one execution to another. An element is reported as
+  unhoverable when it fails the Playwright actionability checks for hovering, i.e. fails to be
+  attached to the DOM, visible, stable (not or no longer animating), and able to receive events.
+  All triggers satisfy the first two conditions, so only the last two might fail. Playwright
+  defines the ability to receive events as being the target of an action on the location where
+  the center of the element is, rather than some other element with a higher zIndex value in
+  the same location being the target.
 */
 
 // CONSTANTS
 
-// Selectors of active elements likely to be disclosed by a hover.
-const targetSelectors = ['a', 'button', 'input', '[role=menuitem]', 'span']
-.map(selector => `${selector}:visible`)
-.join(', ');
 // Initialize the result.
 const data = {
   populationSize: 0,
@@ -61,9 +58,9 @@ const textOf = async (element, limit) => {
   text = text.trim() || await element.innerHTML();
   return text.trim().replace(/\s*/sg, '').slice(0, limit);
 };
-// Recursively finds and reports triggers and targets.
+// Recursively reports impacts of hovering over triggers.
 const find = async (withItems, page, triggers) => {
-  // If any potential disclosure triggers remain:
+  // If any potential triggers remain:
   if (triggers.length) {
     // Identify the first of them.
     const firstTrigger = triggers[0];
@@ -74,9 +71,8 @@ const find = async (withItems, page, triggers) => {
     });
     if (tagNameJSHandle) {
       const tagName = await tagNameJSHandle.jsonValue();
-      // Identify the root of a subtree likely to contain disclosed elements.
+      // Identify the root of a subtree likely to contain impacted elements.
       let root = firstTrigger;
-      const triggerText = await firstTrigger.textContent();
       if (['A', 'BUTTON'].includes(tagName)) {
         const rootJSHandle = await page.evaluateHandle(
           firstTrigger => {
@@ -88,38 +84,39 @@ const find = async (withItems, page, triggers) => {
           firstTrigger
         );
         root = rootJSHandle.asElement();
-        if (triggerText === 'Issues') {
-          console.log('Before hover on Issues:');
-          console.log(await root.innerHTML());
-        }
-      }
-      // Identify the visible active descendants of the root before the hover.
-      const preVisibles = await root.$$(targetSelectors);
-      if (triggerText === 'Issues' || triggerText === 'Press/Media') {
-        console.log('PreVisible count:');
-        console.log(preVisibles.length);
       }
       // Identify all the descendants of the root.
-      const descendants = await root.$$('*');
-      if (triggerText === 'Issues' || triggerText === 'Press/Media') {
-        console.log('PreAll count:');
-        console.log(descendants.length);
-      }
-      // Identify their opacities before the hover.
-      const preOpacities = await page.evaluate(descendants => descendants.map(
-        descendant => window.getComputedStyle(descendant).opacity
-      ), descendants);
+      const preDescendants = await root.$$('*');
+      // Identify their opacities.
+      const preOpacities = await page.evaluate(elements => elements.map(
+        element => window.getComputedStyle(element).opacity
+      ), preDescendants);
       try {
-        // Hover over the potential trigger.
+        // Hover over the trigger.
         await firstTrigger.hover({
           timeout: 500,
           noWaitAfter: true
         });
-        // Repeatedly seeks the changes in descendants and their opacities.
+        // Repeatedly seeks impacts.
         const getImpacts = async (interval, triesLeft) => {
           if (triesLeft--) {
-            const hoverDescendants = await root.$$(targetSelectors);
-            const hoverOpacities = await page.evaluate(descendants => descendants.map(
+            const postDescendants = await root.$$('*');
+            const remainerIndexes = preDescendants
+            .map((element, index) => postDescendants.includes(element) ? index : -1)
+            .filter(index => index > -1);
+            const remainerPreOpacities = remainerIndexes.map(index => preOpacities[index]);
+            const remainers = remainerIndexes.map(index => preDescendants[index]);
+            const remainerPostOpacities = await page.evaluate(
+              elements => elements.map(element => window.getComputedStyle(element).opacity),
+              remainers
+            );
+            const opacityChangers = remainerIndexes.map(index => preDescendants[index]);
+            .filter((total, pre, index) => total + pre === remainerPostOpacities[index] ? 0 : 1, 0);
+            const prePostDescendants = preDescendants
+            .filter(element => postDescendants.includes(element));
+            const additions = hoverDescendants.filter(element => ! descendants.includes(element));
+            const removals = descendants.filter(element => ! hoverDescendants.includes(element));
+            const postOpacities = await page.evaluate(descendants => descendants.map(
               descendant => {
                 if (descendant) {
                   return window.getComputedStyle(descendant).opacity;
@@ -129,8 +126,6 @@ const find = async (withItems, page, triggers) => {
                 }
               }
             ), descendants);
-            const additions = hoverDescendants.filter(element => ! descendants.includes(element));
-            const removals = descendants.filter(element => ! hoverDescendants.includes(element));
             const changes = descendants.filter(
               (element, index) => {
                 const hoverOpacity = hoverOpacities[index];
@@ -160,12 +155,6 @@ const find = async (withItems, page, triggers) => {
         const impacts = await getImpacts(300, 4);
         // If there were any:
         if (impacts) {
-          if (triggerText === 'Issues' || triggerText === 'Press/Media') {
-            console.log('Hover impacts:');
-            console.log(`Additions: ${impacts.additions}`);
-            console.log(`Removals: ${impacts.removals}`);
-            console.log(`Opacity changes: ${impacts.changes}`);
-          }
           // Count the pre-hover descendants of the root with impacted opacities.
           const opacityEffectCount = impacts.changes.length
           ? await page.evaluate(elements => elements.reduce(
@@ -186,6 +175,7 @@ const find = async (withItems, page, triggers) => {
           const {additions, removals, changes} = impacts;
           data.totals.triggers++;
           data.totals.additions += additions.length;
+          data.totals.removals += removals.length;
           data.totals.opacityChanges += changes.length;
           data.totals.opacityEffects += opacityEffectCount;
           // If details are to be reported:
@@ -212,7 +202,7 @@ const find = async (withItems, page, triggers) => {
                 text: textOf(element, 50)
               }));
               return {
-                tagName,
+                tagName: trigger.tagName,
                 id: trigger.id || '',
                 text: textOf(trigger, 50),
                 additions,
@@ -268,7 +258,7 @@ exports.reporter = async (page, sampleSize = Infinity, withItems) => {
   const triggerCount = triggers.length;
   data.populationSize = triggerCount;
   const triggerSample = triggerCount > sampleSize ? getSample(triggers, sampleSize) : triggers;
-  // Find and document the hover-triggered disclosures.
+  // Find and document the hover-triggered impacts.
   await find(withItems, page, triggerSample);
   // If the triggers were sampled:
   if (triggerCount > sampleSize) {
