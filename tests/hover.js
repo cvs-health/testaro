@@ -5,19 +5,22 @@
   subjected to hovering (called “triggers”) are the Playwright-visible elements that have 'A',
   'BUTTON', or 'LI' tag names or have 'onmouseenter' or 'onmouseover' attributes. When such an
   element is hovered over, the test examines the impacts on descendants of the great grandparents
-  of the elements with tag names 'A' and 'BUTTON', and otherwise the descendants of the elements
-  themselves. Four impacts are counted: (1) an element is added or becomes visible, (2) an element
-  is removed or becomes invisible, (3) the opacity of an element changes, and (4) the element is
-  a descendant of an element whose opacity changes. The test checks up to 4 times for hovering
-  impacts at intervals of 0.3 second. Despite this delay, the test can make the execution time
-  practical by randomly sampling targets instead of hovering over all of them. When sampling is
-  performed, the results may vary from one execution to another. An element is reported as
-  unhoverable when it fails the Playwright actionability checks for hovering, i.e. fails to be
-  attached to the DOM, visible, stable (not or no longer animating), and able to receive events.
-  All triggers satisfy the first two conditions, so only the last two might fail. Playwright
-  defines the ability to receive events as being the target of an action on the location where
-  the center of the element is, rather than some other element with a higher zIndex value in
-  the same location being the target.
+  of the elements with tag names 'A' and 'BUTTON', grandparents of elements with tag name 'LI',
+  and otherwise the descendants of the elements themselves. Four impacts are counted: (1) an
+  element is added or becomes visible, (2) an element is removed or becomes invisible, (3) the
+  opacity of an element changes, and (4) the element is a descendant of an element whose opacity
+  changes. The test checks up to 4 times for hovering impacts at intervals of 0.3 second.
+
+  Despite this delay, the test can make the execution time practical by randomly sampling targets
+  instead of hovering over all of them. When sampling is performed, the results may vary from one
+  execution to another.
+
+  An element is reported as unhoverable when it fails the Playwright actionability checks for
+  hovering, i.e. fails to be attached to the DOM, visible, stable (not or no longer animating), and
+  able to receive events. All triggers satisfy the first two conditions, so only the last two might
+  fail. Playwright defines the ability to receive events as being the target of an action on the
+  location where the center of the element is, rather than some other element with a higher zIndex
+  value in the same location being the target.
 */
 
 // CONSTANTS
@@ -73,13 +76,13 @@ const find = async (withItems, page, triggers) => {
       const tagName = await tagNameJSHandle.jsonValue();
       // Identify the root of a subtree likely to contain impacted elements.
       let root = firstTrigger;
-      if (['A', 'BUTTON'].includes(tagName)) {
+      if (['A', 'BUTTON', 'LI'].includes(tagName)) {
         const rootJSHandle = await page.evaluateHandle(
           firstTrigger => {
             const parent = firstTrigger.parentElement || firstTrigger;
             const grandparent = parent.parentElement || parent;
             const greatGrandparent = grandparent.parentElement || parent;
-            return greatGrandparent;
+            return firstTrigger.tagName === 'LI' ? grandparent : greatGrandparent;
           },
           firstTrigger
         );
