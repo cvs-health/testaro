@@ -25,7 +25,6 @@ const run = async content => {
   const nowLabel = (new Date()).toISOString().slice(0, 19);
   // Return the result of a test.
   const ibmReport = await getCompliance(content, nowLabel);
-  await close();
   return ibmReport;
 };
 // Trims an IBM report.
@@ -118,5 +117,6 @@ exports.reporter = async (page, withItems, withNewContent) => {
       console.log('ERROR: Getting ibm test report from URL took too long');
     }
   }
+  await close();
   return {result};
 };

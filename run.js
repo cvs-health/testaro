@@ -289,9 +289,12 @@ const launch = async typeName => {
     browserContext = await browser.newContext(viewport);
     // When a page is added to the browser context:
     browserContext.on('page', page => {
-      // Make its console messages get reported and appear in the Playwright console.
+      // Make abbreviations of its console messages get reported in the Playwright console.
       page.on('console', msg => {
-        const msgText = msg.text();
+        let msgText = msg.text();
+        if (msgText.length > 300) {
+          msgText = `${msgText.slice(0, 150)} ... ${msgText.slice(-150)}`;
+        }
         console.log(`[${msgText}]`);
         const msgTextLC = msgText.toLowerCase();
         const msgLength = msgText.length;
