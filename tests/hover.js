@@ -14,10 +14,11 @@
   Despite this delay, the test can make the execution time practical by randomly sampling triggers
   instead of hovering over all of them. When sampling is performed, the results may vary from one
   execution to another. Because hover impacts typically occur near the beginning of a page,
-  sampling is governed by three parameters:
-    headSize: the size of an initial subset of triggers (“head”)
-    headSample: the size of the sample to be drawn from the head
-    tailSample: the size of the sample to be drawn from the remainder of the page
+  sampling is governed by three optional parameters (defaults in parentheses):
+    headSize (0): the size of an initial subset of triggers (“head”)
+    headSampleSize (-1): the size of the sample to be drawn from the head
+    tailSampleSize (-1): the size of the sample to be drawn from the remainder of the page
+  A sample size of -1 means that there is no sampling, and the entire population is tested.
 
   An element is reported as unhoverable when it fails the Playwright actionability checks for
   hovering, i.e. fails to be attached to the DOM, visible, stable (not or no longer animating), and
@@ -31,13 +32,15 @@
 
 // Initialize the result.
 const data = {
-  populationSize: 0,
   totals: {
+    triggers: 0,
+    headTriggers: 0,
+    tailTriggers: 0,
     impactTriggers: 0,
     additions: 0,
     removals: 0,
     opacityChanges: 0,
-    opacityEffects: 0,
+    opacityImpact: 0,
     unhoverables: 0
   }
 };
@@ -51,12 +54,15 @@ const getSample = (population, sampleSize) => {
     return [];
   }
   else if (sampleSize > 0 && sampleSize < popSize) {
-    const popData = population.map(item => ({
-      item,
-      sorter: Math.random()
-    }));
-    popData.sort((a, b) => a.sorter < b.sorter);
-    return popData.slice(0, sampleSize).map(obj => obj.item);
+    const popData = [];
+    for (const trigger of population) {
+      popData.push({
+        trigger,
+        sorter: Math.random()
+      });
+    };
+    popData.sort((a, b) => a.sorter - b.sorter);
+    return popData.slice(0, sampleSize).map(obj => obj.trigger);
   }
   else {
     return population;
@@ -69,7 +75,7 @@ const textOf = async (element, limit) => {
   return text.trim().replace(/\s*/sg, '').slice(0, limit);
 };
 // Recursively reports impacts of hovering over triggers.
-const find = async (withItems, page, sample, popRatio) => {
+const find = async (withItems, page, region, sample, popRatio) => {
   // If any potential triggers remain:
   if (sample.length) {
     // Identify the first of them.
@@ -133,9 +139,9 @@ const find = async (withItems, page, sample, popRatio) => {
             }
             const opacityChangers = remainers
             .filter(remainer => remainer.postOpacity !== remainer.preOpacity);
-            const opacityImpact = await page.evaluate(changers => changers.reduce(
+            const opacityImpact = opacityChangers ? await page.evaluate(changers => changers.reduce(
               (total, current) => total + current.element.querySelectorAll('*').length, 0
-            ), opacityChangers);
+            ), opacityChangers) : 0;
             if (additionCount || removalCount || opacityChangers.length) {
               return {
                 additionCount,
@@ -180,7 +186,7 @@ const find = async (withItems, page, sample, popRatio) => {
           // If details are to be reported:
           if (withItems) {
             // Report them.
-            data.items.impactTriggers.push({
+            data.items[region].impactTriggers.push({
               tagName,
               text: await textOf(firstTrigger, 50),
               additions: additionCount,
@@ -196,7 +202,7 @@ const find = async (withItems, page, sample, popRatio) => {
         data.totals.unhoverables++;
         if (withItems) {
           const id = await firstTrigger.getAttribute('id');
-          data.items.unhoverables.push({
+          data.items[region].unhoverables.push({
             tagName,
             id: id || '',
             text: await textOf(firstTrigger, 50)
@@ -205,22 +211,25 @@ const find = async (withItems, page, sample, popRatio) => {
       }
     }
     // Process the remaining potential triggers.
-    await find(withItems, page, sample.slice(1), popRatio);
+    await find(withItems, page, region, sample.slice(1), popRatio);
   }
 };
-// Performs hover test and reports results.
+// Performs the hover test and reports results.
 exports.reporter = async (
-  page, headSize = 0, headSampleSize = 0, tailSampleSize = Infinity, withItems
+  page, headSize = 0, headSampleSize = -1, tailSampleSize = -1, withItems
 ) => {
-  data.headSize = headSize;
-  data.headSampleSize = headSampleSize;
-  data.tailSampleSize = tailSampleSize;
   // If details are to be reported:
   if (withItems) {
     // Add properties for details to the initialized result.
     data.items = {
-      impactTriggers: [],
-      unhoverables: []
+      head: {
+        impactTriggers: [],
+        unhoverables: []
+      },
+      tail: {
+        impactTriggers: [],
+        unhoverables: []
+      }
     };
   }
   // Identify the triggers.
@@ -236,15 +245,19 @@ exports.reporter = async (
   const tailTriggers = triggers.slice(headSize);
   const headTriggerCount = headTriggers.length;
   const tailTriggerCount = tailTriggers.length;
-  data.triggerCount = headTriggerCount + tailTriggerCount;
-  data.headTriggerCount = headTriggerCount;
-  data.tailTriggerCount = tailTriggerCount;
+  data.totals.triggers = headTriggerCount + tailTriggerCount;
+  data.totals.headTriggers = headTriggerCount;
+  data.totals.tailTriggers = tailTriggerCount;
   // Get the head and tail samples.
   const headSample = getSample(headTriggers, headSampleSize);
-  const tailSample = getSample(tailTriggers, tailSampleSize);
+  const tailSample = tailSampleSize === -1 ? tailTriggers : getSample(tailTriggers, tailSampleSize);
   // Find and document the impacts.
-  await find(withItems, page, headSample, headTriggerCount / headSample.length);
-  await find(withItems, page, tailSample, tailTriggerCount / tailSample.length);
+  if (headSample.length) {
+    await find(withItems, page, 'head', headSample, headTriggerCount / headSample.length);
+  }
+  if (tailSample.length) {
+    await find(withItems, page, 'tail', tailSample, tailTriggerCount / tailSample.length);
+  }
   // Round the reported totals.
   Object.keys(data.totals).forEach(key => {
     data.totals[key] = Math.round(data.totals[key]);
