@@ -26,7 +26,7 @@
 const data = {
   populationSize: 0,
   totals: {
-    triggers: 0,
+    impactTriggers: 0,
     additions: 0,
     removals: 0,
     opacityChanges: 0,
@@ -104,39 +104,24 @@ const find = async (withItems, page, triggers) => {
             const remainerIndexes = preDescendants
             .map((element, index) => postDescendants.includes(element) ? index : -1)
             .filter(index => index > -1);
-            const remainerPreOpacities = remainerIndexes.map(index => preOpacities[index]);
-            const remainers = remainerIndexes.map(index => preDescendants[index]);
-            const remainerPostOpacities = await page.evaluate(
-              elements => elements.map(element => window.getComputedStyle(element).opacity),
-              remainers
-            );
-            const opacityChangers = remainerIndexes.map(index => preDescendants[index]);
-            .filter((total, pre, index) => total + pre === remainerPostOpacities[index] ? 0 : 1, 0);
-            const prePostDescendants = preDescendants
-            .filter(element => postDescendants.includes(element));
-            const additions = hoverDescendants.filter(element => ! descendants.includes(element));
-            const removals = descendants.filter(element => ! hoverDescendants.includes(element));
-            const postOpacities = await page.evaluate(descendants => descendants.map(
-              descendant => {
-                if (descendant) {
-                  return window.getComputedStyle(descendant).opacity;
-                }
-                else {
-                  return null;
-                }
-              }
-            ), descendants);
-            const changes = descendants.filter(
-              (element, index) => {
-                const hoverOpacity = hoverOpacities[index];
-                return hoverOpacity && hoverOpacity !== preOpacities[index];
-              }
-            );
-            if (additions.length || removals.length || changes.length) {
+            const remainers = remainerIndexes.map(index => ({
+              element: preDescendants[index],
+              preOpacity: preOpacities[index],
+              postOpacity: await page.evaluate(element, element => window.getComputedStyle(element).opacity)
+            }), preDescendants[index]);
+            const opacityChangers = remainers
+            .filter(remainer => remainer.postOpacity !== remainer.preOpacity);
+            const opacityImpact = await page.evaluate(changers => changers.reduce(
+              (total, current) => total + current.element.querySelectorAll('*').length, 0
+            ), opacityChangers);
+            const additions = postDescendants.filter(element => ! preDescendants.includes(element));
+            const removals = preDescendants.filter(element => ! postDescendants.includes(element));
+            if (additions.length || removals.length || opacityChangers.length) {
               return {
                 additions,
                 removals,
-                changes
+                opacityChangers,
+                opacityImpact
               };
             }
             else {
@@ -155,12 +140,6 @@ const find = async (withItems, page, triggers) => {
         const impacts = await getImpacts(300, 4);
         // If there were any:
         if (impacts) {
-          // Count the pre-hover descendants of the root with impacted opacities.
-          const opacityEffectCount = impacts.changes.length
-          ? await page.evaluate(elements => elements.reduce(
-            (total, current) => total + 1 + current.querySelectorAll('*').length, 0
-          ), impacts.changes)
-          : 0;
           // Hover over the upper-left corner of the page, to undo any impacts.
           await page.hover('body', {
             position: {
@@ -171,47 +150,24 @@ const find = async (withItems, page, triggers) => {
           // Wait for any delayed and/or slowed hover reaction.
           await page.waitForTimeout(200);
           await root.waitForElementState('stable');
-          // Increment the counts of triggers and targets.
-          const {additions, removals, changes} = impacts;
-          data.totals.triggers++;
+          // Increment the counts of triggers and impacts.
+          const {additions, removals, opacityChangers, opacityImpact} = impacts;
+          data.totals.impactTriggers++;
           data.totals.additions += additions.length;
           data.totals.removals += removals.length;
-          data.totals.opacityChanges += changes.length;
-          data.totals.opacityEffects += opacityEffectCount;
+          data.totals.opacityChangers += opacityChangers.length;
+          data.totals.opacityImpact += opacityImpact;
           // If details are to be reported:
           if (withItems) {
             // Report them.
-            const triggerDataJSHandle = await page.evaluateHandle(args => {
-              // Returns the text of an element.
-              const textOf = (element, limit) => {
-                const text = element.textContent.trim() || element.outerHTML.trim();
-                return text.replace(/\s{2,}/sg, ' ').slice(0, limit);
-              };
-              const trigger = args[0];
-              const impacts = args[1];
-              const additions = impacts.additions.map(element => ({
-                tagName: element.tagName,
-                text: textOf(element, 50)
-              }));
-              const removals = impacts.removals.map(element => ({
-                tagName: element.tagName,
-                text: textOf(element, 50)
-              }));
-              const opacityChanges = impacts.changes.map(element => ({
-                tagName: element.tagName,
-                text: textOf(element, 50)
-              }));
-              return {
-                tagName: trigger.tagName,
-                id: trigger.id || '',
-                text: textOf(trigger, 50),
-                additions,
-                removals,
-                opacityChanges
-              };
-            }, [firstTrigger, impacts]);
-            const triggerData = await triggerDataJSHandle.jsonValue();
-            data.items.triggers.push(triggerData);
+            data.items.impactTriggers.push({
+              tagName,
+              text: await textOf(firstTrigger, 50),
+              additions: additions.length,
+              removals: removals.length,
+              opacityChangers: opacityChangers.length,
+              opacityImpact
+            });
           }
         }
       }
@@ -219,9 +175,10 @@ const find = async (withItems, page, triggers) => {
         console.log(`ERROR hovering (${error.message})`);
         data.totals.unhoverables++;
         if (withItems) {
+          const id = await firstTrigger.getAttribute('id');
           data.items.unhoverables.push({
             tagName,
-            id: firstTrigger.id || '',
+            id: id || '',
             text: await textOf(firstTrigger, 50)
           });
         }
@@ -237,18 +194,13 @@ exports.reporter = async (page, sampleSize = Infinity, withItems) => {
   if (withItems) {
     // Add properties for details to the initialized result.
     data.items = {
-      triggers: [],
+      impactTriggers: [],
       unhoverables: []
     };
   }
   // Identify the triggers.
-  const selectors = [
-    'body a:visible',
-    'body button:visible',
-    'body li:visible, body [onmouseenter]:visible',
-    'body [onmouseover]:visible'
-  ];
-  const triggers = await page.$$(selectors.join(', '))
+  const selectors = ['a', 'button', 'li', '[onmouseenter]', '[onmouseover]'];
+  const triggers = await page.$$(selectors.map(selector => `body ${selector}:visible`).join(', '))
   .catch(error => {
     console.log(`ERROR getting hover triggers (${error.message})`);
     data.prevented = true;
