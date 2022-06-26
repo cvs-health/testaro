@@ -101,25 +101,35 @@ const find = async (withItems, page, triggers) => {
         const getImpacts = async (interval, triesLeft) => {
           if (triesLeft--) {
             const postDescendants = await root.$$('*');
-            const remainerIndexes = preDescendants
-            .map((element, index) => postDescendants.includes(element) ? index : -1)
-            .filter(index => index > -1);
-            const remainers = remainerIndexes.map(index => ({
-              element: preDescendants[index],
-              preOpacity: preOpacities[index],
-              postOpacity: await page.evaluate(element, element => window.getComputedStyle(element).opacity)
-            }), preDescendants[index]);
+            const remainerIndexes = await page.evaluate(args => {
+              const preDescendants = args[0];
+              const postDescendants = args[1];
+              const remainerIndexes = preDescendants
+              .map((element, index) => postDescendants.includes(element) ? index : -1)
+              .filter(index => index > -1);
+              return remainerIndexes;
+            }, [preDescendants, postDescendants]);
+            const additionCount = postDescendants.length - remainerIndexes.length;
+            const removalCount = preDescendants.length - remainerIndexes.length;
+            const remainers = [];
+            for (const index of remainerIndexes) {
+              remainers.push({
+                element: preDescendants[index],
+                preOpacity: preOpacities[index],
+                postOpacity: await page.evaluate(
+                  element => window.getComputedStyle(element).opacity, preDescendants[index]
+                )
+              });
+            }
             const opacityChangers = remainers
             .filter(remainer => remainer.postOpacity !== remainer.preOpacity);
             const opacityImpact = await page.evaluate(changers => changers.reduce(
               (total, current) => total + current.element.querySelectorAll('*').length, 0
             ), opacityChangers);
-            const additions = postDescendants.filter(element => ! preDescendants.includes(element));
-            const removals = preDescendants.filter(element => ! postDescendants.includes(element));
-            if (additions.length || removals.length || opacityChangers.length) {
+            if (additionCount || removalCount || opacityChangers.length) {
               return {
-                additions,
-                removals,
+                additionCount,
+                removalCount,
                 opacityChangers,
                 opacityImpact
               };
@@ -151,11 +161,11 @@ const find = async (withItems, page, triggers) => {
           await page.waitForTimeout(200);
           await root.waitForElementState('stable');
           // Increment the counts of triggers and impacts.
-          const {additions, removals, opacityChangers, opacityImpact} = impacts;
+          const {additionCount, removalCount, opacityChangers, opacityImpact} = impacts;
           data.totals.impactTriggers++;
-          data.totals.additions += additions.length;
-          data.totals.removals += removals.length;
-          data.totals.opacityChangers += opacityChangers.length;
+          data.totals.additions += additionCount;
+          data.totals.removals += removalCount;
+          data.totals.opacityChanges += opacityChangers.length;
           data.totals.opacityImpact += opacityImpact;
           // If details are to be reported:
           if (withItems) {
@@ -163,9 +173,9 @@ const find = async (withItems, page, triggers) => {
             data.items.impactTriggers.push({
               tagName,
               text: await textOf(firstTrigger, 50),
-              additions: additions.length,
-              removals: removals.length,
-              opacityChangers: opacityChangers.length,
+              additions: additionCount,
+              removals: removalCount,
+              opacityChanges: opacityChangers.length,
               opacityImpact
             });
           }
