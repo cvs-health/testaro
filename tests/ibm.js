@@ -99,7 +99,7 @@ exports.reporter = async (page, withItems, withNewContent) => {
   // If a test with existing content is to be performed:
   const result = {};
   if (! withNewContent) {
-    const timeLimit = 15;
+    const timeLimit = 20;
     const typeContent = await page.content();
     result.content = await doTest(typeContent, withItems, timeLimit);
     if (result.content.prevented) {

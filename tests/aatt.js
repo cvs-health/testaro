@@ -95,7 +95,7 @@ exports.reporter = async (page, waitLong, tryLimit = 4) => {
             warnings
           },
           report: nonNotices,
-          preventionCount: tryLimit - triesLeft - 1
+          preventionCount: tryLimit - triesLeft
         }
       };
     }
