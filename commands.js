@@ -143,13 +143,6 @@ exports.commands = {
     ]
   },
   tests: {
-    aatt: [
-      'Perform an AATT test with HTML CodeSniffer',
-      {
-        waitLong: [false, 'boolean', '', 'whether to wait 12 instead of 6 seconds for a result'],
-        tryLimit: [false, 'number', '', 'times to try the test before giving up; default 4']
-      }
-    ],
     axe: [
       'Perform an Axe test',
       {
