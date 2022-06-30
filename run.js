@@ -29,7 +29,6 @@ const moves = {
 };
 // Names and descriptions of tests.
 const tests = {
-  aatt: 'AATT with HTML CodeSniffer WCAG 2.1 AA ruleset',
   alfa: 'alfa',
   axe: 'Axe',
   bulk: 'count of visible elements',
@@ -38,6 +37,7 @@ const tests = {
   focInd: 'focus indicators',
   focOp: 'focusability and operability',
   hover: 'hover-caused content additions',
+  htmlcs: 'HTML CodeSniffer WCAG 2.1 A, AA, and AAA rulesets',
   ibm: 'IBM Accessibility Checker',
   labClash: 'labeling inconsistencies',
   linkUl: 'adjacent-link underlining',
@@ -53,7 +53,7 @@ const tests = {
 };
 // Tests that may change the DOM.
 const domChangers = new Set([
-  'axe', 'focAll', 'focInd', 'focOp', 'hover', 'ibm', 'menuNav', 'wave'
+  'axe', 'focAll', 'focInd', 'focOp', 'hover', 'htmlcs', 'ibm', 'menuNav', 'wave'
 ]);
 // Browser types available in PlayWright.
 const browserTypeNames = {

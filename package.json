@@ -27,7 +27,6 @@
     "@siteimprove/alfa-playwright": "*",
     "@siteimprove/alfa-rules": "*",
     "@siteimprove/alfa-scraper": "*",
-    "aatt": "*",
     "accessibility-checker": "*",
     "axe-playwright": "*",
     "dotenv": "*",

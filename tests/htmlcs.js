@@ -1,5 +1,5 @@
 /*
-  aatt
+  htmlcs
   This test implements the HTML CodeSniffer ruleset.
 */
 
