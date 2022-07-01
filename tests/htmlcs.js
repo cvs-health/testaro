@@ -10,7 +10,7 @@ exports.reporter = async page => {
     path: `${__dirname}/../htmlcs/HTMLCS.js`
   });
   let messageStrings = [];
-  for (const standard of ['WCAG2A', 'WCAG2AA', 'WCAG2AAA']) {
+  for (const standard of ['WCAG2AA']) {
     const nextIssues = await page.evaluate(standard => HTMLCS_RUNNER.run(standard), standard);
     messageStrings.push(... nextIssues);
   }
@@ -38,13 +38,14 @@ exports.reporter = async page => {
         descriptions that state the contrast ratio of an element, most descriptions are
         generic, so typically many issues share a description.
       */
-      if (! result[parts[0]][parts[1]]) {
-        result[parts[0]][parts[1]] = {};
+      const issueCode = parts[1].replace(/^WCAG2|\.Principle\d\.Guideline[\d_]+/g, '');
+      if (! result[parts[0]][issueCode]) {
+        result[parts[0]][issueCode] = {};
       }
-      if (! result[parts[0]][parts[1]][parts[4]]) {
-        result[parts[0]][parts[1]][parts[4]] = [];
+      if (! result[parts[0]][issueCode][parts[4]]) {
+        result[parts[0]][issueCode][parts[4]] = [];
       }
-      result[parts[0]][parts[1]][parts[4]].push({
+      result[parts[0]][issueCode][parts[4]].push({
         tagName: parts[2],
         id: parts[3],
         code: parts[5]
