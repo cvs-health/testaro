@@ -32,14 +32,19 @@ exports.reporter = async page => {
     }
     // If it is an error or a warning (not a notice):
     else if (['Error', 'Warning'].includes(parts[0])) {
-      // Add the issue to the result.
+      /*
+        Add the issue to an issueClass.issueCode.description array in the result.
+        This saves space, because, although some descriptions are issue-specific, such as
+        descriptions that state the contrast ratio of an element, most descriptions are
+        generic, so typically many issues share a description.
+      */
       if (! result[parts[0]][parts[1]]) {
-        result[parts[0]][parts[1]] = {
-          description: parts[4],
-          issues: []
-        };
+        result[parts[0]][parts[1]] = {};
       }
-      result[parts[0]][parts[1]].issues.push({
+      if (! result[parts[0]][parts[1]][parts[4]]) {
+        result[parts[0]][parts[1]][parts[4]] = [];
+      }
+      result[parts[0]][parts[1]][parts[4]].push({
         tagName: parts[2],
         id: parts[3],
         code: parts[5]
