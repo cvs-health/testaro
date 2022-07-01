@@ -37,7 +37,7 @@ const tests = {
   focInd: 'focus indicators',
   focOp: 'focusability and operability',
   hover: 'hover-caused content additions',
-  htmlcs: 'HTML CodeSniffer WCAG 2.1 A, AA, and AAA rulesets',
+  htmlcs: 'HTML CodeSniffer WCAG 2.1 AA ruleset',
   ibm: 'IBM Accessibility Checker',
   labClash: 'labeling inconsistencies',
   linkUl: 'adjacent-link underlining',
@@ -560,7 +560,7 @@ const visit = async (act, page, isStrict) => {
           // If the visit fails:
           if (response === 'error') {
             // Give up.
-            const errorMsg = `ERROR: Attemts to visit ${requestedURL} failed`;
+            const errorMsg = `ERROR: Attempts to visit ${requestedURL} failed`;
             console.log(errorMsg);
             act.result = errorMsg;
             await page.goto('about:blank')
