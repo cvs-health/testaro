@@ -21,16 +21,16 @@ Testaro uses:
 Testaro includes some of its own accessibility tests. In addition, it performs the tests in:
 - [accessibility-checker](https://www.npmjs.com/package/accessibility-checker) (the IBM Equal Access Accessibility Checker)
 - [alfa](https://alfa.siteimprove.com/) (Siteimprove alfa)
-- [Automated Accessibility Testing Tool](https://www.npmjs.com/package/aatt) (Paypal AATT, running HTML CodeSniffer)
+- [HTML CodeSniffer](https://www.npmjs.com/package/html_codesniffer) (Squiz HTML CodeSniffer)
 - [axe-playwright](https://www.npmjs.com/package/axe-playwright) (Deque Axe-core)
 - [Tenon](https://tenon.io/documentation/what-tenon-tests.php) (Level Access)
 - [WAVE API](https://wave.webaim.org/api/) (WebAIM WAVE)
 
 As of this version, the counts of tests in the packages referenced above were:
-- AATT: 98
 - Alfa: 103
 - Axe-core: 138
 - Equal Access: 163
+- HTML CodeSniffer: 98
 - Tenon: 180
 - WAVE: 110
 - subtotal: 612
@@ -81,7 +81,7 @@ To use Testaro, you must specify what it should do. You do this with a script an
 
 ### Introduction
 
-To use Testaro, you provide a **script** to it. The script contains **commands**. Testaro __runs__ the script, i.e. performs the commands in it and writes a report of the results.
+To use Testaro, you provide a **script** to it. The script contains **commands**. Testaro _runs_ the script, i.e. performs the commands in it and writes a report of the results.
 
 A script is a JSON file with the properties:
 
@@ -280,15 +280,15 @@ Example:
   }
 ```
 
-The reason for this is that the Tenon API operates asynchronously. You ask it to perform a test, and it puts your request into a queue. To learn whether Tenon has completed your test, you make a status request. You can continue making status requests until Tenon replies that your test has been completed. Then you submit a request for the test result, and Tenon replies with the result. (As of May 2022, status requests were observed to misreport still-running tests as completed. The `tenon` test works around that.)
+The reason for this is that the Tenon API operates asynchronously. You ask it to perform a test, and it puts your request into a queue. To learn whether Tenon has completed your test, you make a status request. You can continue making status requests until Tenon replies that your test has been completed. Then you submit a request for the test result, and Tenon replies with the result. (As of May 2022, status requests were observed to misreport still-running tests as completed. The `tenon` test works around that by requesting only the result and using the response to determine whether the tests have been completed.)
 
 Tenon says that tests are typically completed in 3 to 6 seconds but that the latency can be longer, depending on demand.
 
-Therefore, you can include a `tenonRequest` command early in your script, and a `tenon` test late in your script. Tenon will move your request through its queue while Testaro is processing your script. When Testaro reaches your `tenon` test command, Tenon will most likely have completed your test. If not, the `tenon` test will wait and then make a second request before giving up.
+Therefore, you can include a `tenonRequest` command early in your script, and a `tenon` test command late in your script. Tenon will move your request through its queue while Testaro is processing your script. When Testaro reaches your `tenon` test command, Tenon will most likely have completed your test. If not, the `tenon` test will wait and then make a second request before giving up.
 
 Thus, a `tenon` test actually does not perform any test; it merely collects the result. The page that was active when the `tenonRequest` command was performed is the one that Tenon tests.
 
-In case you want to perform more than one `tenon` test, you can do so. Just give each pair of commands a distinct `id` property, so each `tenon` test command will request the correct result.
+In case you want to perform more than one `tenon` test with the same script, you can do so. Just give each pair of commands a distinct `id` property, so each `tenon` test command will request the correct result.
 
 Tenon recommends giving it a public URL rather than giving it the content of a page, if possible. So, it is best to give the `withNewContent` property of the `tenonRequest` command the value `true`, unless the page is not public.
 
@@ -408,9 +408,11 @@ You may wish to have Testaro perform the same sequence of tests on multiple web 
 
 With a batch, you can execute a single statement to run a script multiple times, one per host. On each call, Testaro takes one of the hosts in the batch and substitutes it for each host specified in a `url` command of the script. The result is a _host script_. Testaro sequentially runs all of those host scripts.
 
+Therefore, you cannot use a batch with a script that changes URLs.
+
 ## Samples
 
-The `samples` directory contains examples of scripts and batches. If you wish to use them in their current locations, you can give `SCRIPTDIR` the value `'samples/scripts'` and `BATCHDIR` the value `'samples/batches'`. Then execute `node create sss` or `node create sss bbb` to run the `sss` script alone or with the `bbb` batch (e.g., `node create simple weborgs`). The `create` module will create a job, run the script or host scripts, and save the report(s) in the directory that you have specified with the `REPORTDIR` environment variable.
+The `samples` directory contains examples of scripts and batches. If you wish to use them in their current locations, you can give `SCRIPTDIR` the value `'samples/scripts'` and `BATCHDIR` the value `'samples/batches'`. Then execute `node high sss` to run the `sss` script alone or `node high sss bbb` to run the `sss` script with the `bbb` batch (e.g., `node create simple weborgs`). The `high` module will create a job, run the script or host scripts, and save the report(s) in the directory that you have specified with the `REPORTDIR` environment variable.
 
 ## Execution
 
