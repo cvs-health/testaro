@@ -1,6 +1,6 @@
 {
   "name": "testaro",
-  "version": "4.15.0",
+  "version": "5.0.0",
   "description": "Automation of accessibility testing",
   "main": "index.js",
   "scripts": {
@@ -27,7 +27,6 @@
     "@siteimprove/alfa-playwright": "*",
     "@siteimprove/alfa-rules": "*",
     "@siteimprove/alfa-scraper": "*",
-    "aatt": "*",
     "accessibility-checker": "*",
     "axe-playwright": "*",
     "dotenv": "*",
