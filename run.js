@@ -257,6 +257,7 @@ const closeBrowsers = async () => {
       await browser.close();
     }
   }
+  browsers = [];
 };
 // Launches a browser.
 const launch = async typeName => {

@@ -6321,10 +6321,8 @@
           self.output(messages[i]);
           msgCount[messages[i].type]++;
         }
-        console.log("done");
       }, function () {
         console.log("Something in HTML_CodeSniffer failed to parse. Cannot run.");
-        console.log("done");
       }, "en");
       return Array.from(messageStrings);
     };
