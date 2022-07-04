@@ -1306,11 +1306,12 @@ const doScript = async (report) => {
     value: ((new Date()).toISOString().slice(0, 19))
   });
 };
-// Injects url acts into a report where necessary to undo DOM changes.
-const injectURLActs = acts => {
+// Injects launch and url acts into a report where necessary to undo DOM changes.
+const injectLaunches = acts => {
   let injectMore = true;
   while (injectMore) {
-    const injectIndex = acts.findIndex((act, index) =>
+    const injectIndex = acts.findIndex(
+      (act, index) =>
       index < acts.length - 1
       && act.type === 'test'
       && acts[index + 1].type === 'test'
@@ -1320,6 +1321,14 @@ const injectURLActs = acts => {
       injectMore = false;
     }
     else {
+      const lastBrowserType = acts.reduce((browserType, act, index) => {
+        if (act.type === 'launch' && index < injectIndex) {
+          return act.which;
+        }
+        else {
+          return browserType;
+        }
+      }, '');
       const lastURL = acts.reduce((url, act, index) => {
         if (act.type === 'url' && index < injectIndex) {
           return act.which;
@@ -1328,11 +1337,20 @@ const injectURLActs = acts => {
           return url;
         }
       }, '');
-      acts.splice(injectIndex + 1, 0, {
-        type: 'url',
-        which: lastURL,
-        what: 'URL'
-      });
+      acts.splice(
+        injectIndex + 1,
+        0,
+        {
+          type: 'launch',
+          which: lastBrowserType,
+          what: `${lastBrowserType} browser`
+        },
+        {
+          type: 'url',
+          which: lastURL,
+          what: 'URL'
+        }
+      );
     }
   }
 };
@@ -1355,9 +1373,12 @@ exports.handleRequest = async report => {
     report.timeStamp = report.id.replace(/-.+/, '');
     // Add the script commands to the report as its initial acts.
     report.acts = JSON.parse(JSON.stringify(report.script.commands));
-    // Inject url acts where necessary to undo DOM changes, if specified.
+    /*
+      Inject launch and url acts where necessary to undo DOM changes, if specified.
+      Injection of url acts alone does not guarantee test independence.
+    */
     if (urlInject === 'yes') {
-      injectURLActs(report.acts);
+      injectLaunches(report.acts);
     }
     // Perform the acts, asynchronously adding to the log and report.
     await doScript(report);
