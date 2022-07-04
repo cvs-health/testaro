@@ -36,7 +36,7 @@ const tests = {
   focAll: 'focusable and Tab-focused elements',
   focInd: 'focus indicators',
   focOp: 'focusability and operability',
-  hover: 'hover-caused content additions',
+  hover: 'hover-caused content changes',
   htmlcs: 'HTML CodeSniffer WCAG 2.1 AA ruleset',
   ibm: 'IBM Accessibility Checker',
   labClash: 'labeling inconsistencies',

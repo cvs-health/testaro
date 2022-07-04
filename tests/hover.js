@@ -198,7 +198,7 @@ const find = async (withItems, page, region, sample, popRatio) => {
         }
       }
       catch (error) {
-        console.log(`ERROR hovering (${error.message})`);
+        console.log(`ERROR hovering (${error.message.replace(/\n.+/s, '')})`);
         data.totals.unhoverables++;
         if (withItems) {
           const id = await firstTrigger.getAttribute('id');
