@@ -30,20 +30,7 @@
 
 // CONSTANTS
 
-// Initialize the result.
-const data = {
-  totals: {
-    triggers: 0,
-    headTriggers: 0,
-    tailTriggers: 0,
-    impactTriggers: 0,
-    additions: 0,
-    removals: 0,
-    opacityChanges: 0,
-    opacityImpact: 0,
-    unhoverables: 0
-  }
-};
+const data = {};
 
 // FUNCTIONS
 
@@ -218,6 +205,18 @@ const find = async (withItems, page, region, sample, popRatio) => {
 exports.reporter = async (
   page, headSize = 0, headSampleSize = -1, tailSampleSize = -1, withItems
 ) => {
+  // Initialize the result.
+  data.totals = {
+    triggers: 0,
+    headTriggers: 0,
+    tailTriggers: 0,
+    impactTriggers: 0,
+    additions: 0,
+    removals: 0,
+    opacityChanges: 0,
+    opacityImpact: 0,
+    unhoverables: 0
+  };
   // If details are to be reported:
   if (withItems) {
     // Add properties for details to the initialized result.
