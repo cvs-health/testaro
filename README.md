@@ -292,6 +292,38 @@ In case you want to perform more than one `tenon` test with the same script, you
 
 Tenon recommends giving it a public URL rather than giving it the content of a page, if possible. So, it is best to give the `withNewContent` property of the `tenonRequest` command the value `true`, unless the page is not public.
 
+###### HTML CodeSniffer
+
+The `htmlcs` test makes use of the`htmlcs/HTMLCS.js` file. That file was created, and can be recreated if necessary, as follows:
+
+1. Clone the (HTML CodeSniffer package)[https://github.com/squizlabs/HTML_CodeSniffer].
+1. Make that package’s directory the active directory.
+1. Install the HTML CodeSniffer dependencies by executing `npm install`.
+1. Build the HTML CodeSniffer auditor by executing `grunt build`.
+1. Copy the `build/HTMLCS.js` and `build/licence.txt` files into the `htmlcs` directory of Testaro.
+1. Edit the Testaro copy of `htmlcs/HTMLCS.js` to produce the changes shown below.
+
+The changes in `htmlcs/HTMLCS.js` are:
+
+```diff
+479a480
+>     '4_1_2_attribute': 'attribute',
+6482a6484
+>     var messageStrings = new Set();
+6496d6497
+<         console.log('done');
+6499d6499
+<         console.log('done');
+6500a6501
+>       return Array.from(messageStrings);
+6531c6532,6534
+<       console.log('[HTMLCS] ' + typeName + '|' + msg.code + '|' + nodeName + '|' + elementId + '|' + msg.msg + '|' + html);
+---
+>       messageStrings.add(
+>         typeName + '|' + msg.code + '|' + nodeName + '|' + elementId + '|' + msg.msg + '|' + html
+>       );
+```
+
 ##### Branching
 
 An example of a **branching** command is:
@@ -613,94 +645,7 @@ Testaro omits some functionalities of Autotest, such as:
 
 ## Code style
 
-The JavaScript code in this project conforms to the following ESLint configurations.
-
-In `.eslintrc.json`:
-
-```json
-{
-  "env": {
-    "browser": true,
-    "commonjs": true,
-    "es2021": true,
-    "node": true
-  },
-  "extends": "eslint:recommended",
-  "parserOptions": {
-    "ecmaVersion": 2021
-  },
-  "rules": {
-    "indent": [
-      "error",
-      2,
-      {
-        "MemberExpression": 0,
-        "ObjectExpression": "first"
-      }
-    ],
-    "linebreak-style": [
-      "error",
-      "unix"
-    ],
-    "quotes": [
-      "error",
-      "single"
-    ],
-    "semi": [
-      "error",
-      "always"
-    ],
-    "no-use-before-define": [
-      "error"
-    ],
-    "brace-style": [
-      "error",
-      "stroustrup"
-    ]
-  }
-}
-```
-
-In `settings.json` of VSCode:
-
-```json
-"eslint.options": {
-  "overrideConfig": {
-    "parserOptions": {
-      "ecmaVersion": "latest",
-    },
-    "rules": {
-      "indent": [
-        "error",
-        2,
-        {
-          "MemberExpression": 0,
-          "ObjectExpression": "first"
-        }
-      ],
-      "linebreak-style": [
-        "error",
-        "unix"
-      ],
-      "quotes": [
-        "error",
-        "single"
-      ],
-      "semi": [
-        "error",
-        "always"
-      ],
-      "no-use-before-define": [
-        "error"
-      ],
-      "brace-style": [
-        "error",
-        "stroustrup"
-      ]
-    }
-  }
-```
-
+The JavaScript code in this project generally conforms to the ESLint configuration file `.eslintrc`. However, the `htmlcs/HTMLCS.js` file implements an older version of JavaScript. Its style is regulated by the `htmlcs/.eslintrc.json` file.
 
 ## Origin
 

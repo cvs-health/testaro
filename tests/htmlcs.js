@@ -21,11 +21,11 @@ exports.reporter = async page => {
       const nextIssues = await page.evaluate(standard => {
         let issues = null;
         try {
-          issues = HTMLCS_RUNNER.run(standard);
+          issues = window['HTMLCS_RUNNER'].run(standard);
         }
         catch(error) {
           console.log(`ERROR executing HTMLCS_RUNNER on ${document.URL} (${error.message})`);
-        };
+        }
         return issues;
       }, standard);
       if (nextIssues) {
@@ -36,7 +36,7 @@ exports.reporter = async page => {
         result.error = 'ERROR executing HTMLCS_RUNNER in the page';
         break;
       }
-    };
+    }
     if (! result.prevented) {
       // Sort the issues by class and standard.
       messageStrings.sort();
