@@ -611,6 +611,97 @@ Testaro omits some functionalities of Autotest, such as:
 - file operations for score aggregation, report revision, and HTML reports
 - a web user interface
 
+## Code style
+
+The JavaScript code in this project conforms to the following ESLint configurations.
+
+In `.eslintrc.json`:
+
+```json
+{
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": 2021
+  },
+  "rules": {
+    "indent": [
+      "error",
+      2,
+      {
+        "MemberExpression": 0,
+        "ObjectExpression": "first"
+      }
+    ],
+    "linebreak-style": [
+      "error",
+      "unix"
+    ],
+    "quotes": [
+      "error",
+      "single"
+    ],
+    "semi": [
+      "error",
+      "always"
+    ],
+    "no-use-before-define": [
+      "error"
+    ],
+    "brace-style": [
+      "error",
+      "stroustrup"
+    ]
+  }
+}
+```
+
+In `settings.json` of VSCode:
+
+```json
+"eslint.options": {
+  "overrideConfig": {
+    "parserOptions": {
+      "ecmaVersion": "latest",
+    },
+    "rules": {
+      "indent": [
+        "error",
+        2,
+        {
+          "MemberExpression": 0,
+          "ObjectExpression": "first"
+        }
+      ],
+      "linebreak-style": [
+        "error",
+        "unix"
+      ],
+      "quotes": [
+        "error",
+        "single"
+      ],
+      "semi": [
+        "error",
+        "always"
+      ],
+      "no-use-before-define": [
+        "error"
+      ],
+      "brace-style": [
+        "error",
+        "stroustrup"
+      ]
+    }
+  }
+```
+
+
 ## Origin
 
 Work on the custom tests in this package began in 2017, and work on the multi-package federation that Testaro implements began in early 2018. These two aspects were combined into the [Autotest](https://github.com/jrpool/autotest) package in early 2021 and into the more single-purpose packages, Testaro and Testilo, in January 2022.

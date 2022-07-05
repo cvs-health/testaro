@@ -7,12 +7,16 @@
   },
   "extends": "eslint:recommended",
   "parserOptions": {
-    "ecmaVersion": "latest"
+    "ecmaVersion": 2021
   },
   "rules": {
     "indent": [
       "error",
-      2
+      2,
+      {
+        "MemberExpression": 0,
+        "ObjectExpression": "first"
+      }
     ],
     "linebreak-style": [
       "error",
@@ -27,8 +31,11 @@
       "always"
     ],
     "no-use-before-define": [
+      "error"
+    ],
+    "brace-style": [
       "error",
-      "always"
+      "stroustrup"
     ]
   }
 }
