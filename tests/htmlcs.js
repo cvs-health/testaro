@@ -28,7 +28,7 @@ exports.reporter = async page => {
         }
         return issues;
       }, standard);
-      if (nextIssues) {
+      if (nextIssues && nextIssues.every(issue => typeof issue === 'string')) {
         messageStrings.push(... nextIssues);
       }
       else {
