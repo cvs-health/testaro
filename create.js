@@ -9,6 +9,7 @@
 require('dotenv').config();
 // Module to read and write files.
 const fs = require('fs/promises');
+const {spawn} = require('child_process');
 const {handleRequest} = require('./run');
 // Module to convert a script and a batch to a batch-based array of scripts.
 const {batchify} = require('./batchify');
@@ -21,10 +22,10 @@ const reportDir = process.env.REPORTDIR;
 // ########## FUNCTIONS
 
 // Runs one script and writes a report file.
-const runHost = async (id, script, host = {}) => {
+const runHost = async (id, script) => {
   const report = {
     id,
-    host,
+    host: {},
     log: [],
     script,
     acts: []
@@ -50,10 +51,29 @@ exports.runJob = async (scriptID, batchID) => {
         const specs = batchify(script, batch, timeStamp);
         // For each host script:
         while (specs.length) {
+          // Run it and save the report with a host-suffixed ID.
           const spec = specs.shift();
-          const {id, host, script} = spec;
-          // Run it and save the result with a host-suffixed ID.
-          await runHost(id, script, host);
+          const {id, timeLimit, host, script} = spec;
+          const subprocess = spawn(
+            'node runHost', id, JSON.stringify(script), JSON.stringify(host),
+            {
+              detached: true
+            }
+          );
+          subprocess.unref();
+          const startTime = Date.now();
+          const reportNameEnd = `-${host.id}.json`;
+          // At 5-second intervals:
+          const reCheck = setInterval(async () => {
+            // If the time limit has been reached or the report has been written:
+            if (
+              Date.now() - startTime > 1000 * timeLimit
+              || await fs.readdir(reportDir).find(fileName => fileName.endsWith(reportNameEnd))
+            ) {
+              // Stop checking.
+              clearInterval(reCheck);
+            }
+          }, 5000);
         }
       }
       // Otherwise, i.e. if there is no batch:
