@@ -1310,8 +1310,7 @@ const doScript = async (report) => {
 const injectLaunches = acts => {
   let injectMore = true;
   while (injectMore) {
-    const injectIndex = acts.findIndex(
-      (act, index) =>
+    const injectIndex = acts.findIndex((act, index) =>
       index < acts.length - 1
       && act.type === 'test'
       && acts[index + 1].type === 'test'
