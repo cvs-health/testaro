@@ -9,7 +9,7 @@
 require('dotenv').config();
 // Module to read and write files.
 const fs = require('fs/promises');
-const {spawn} = require('child_process');
+const {fork} = require('child_process');
 const {handleRequest} = require('./run');
 // Module to convert a script and a batch to a batch-based array of scripts.
 const {batchify} = require('./batchify');
@@ -49,32 +49,37 @@ exports.runJob = async (scriptID, batchID) => {
         const batchJSON = await fs.readFile(`${batchDir}/${batchID}.json`, 'utf8');
         batch = JSON.parse(batchJSON);
         const specs = batchify(script, batch, timeStamp);
-        // For each host script:
-        while (specs.length) {
-          // Run it and save the report with a host-suffixed ID.
-          const spec = specs.shift();
-          const {id, timeLimit, host, script} = spec;
-          const subprocess = spawn(
-            'node runHost', id, JSON.stringify(script), JSON.stringify(host),
-            {
-              detached: true
-            }
-          );
-          subprocess.unref();
-          const startTime = Date.now();
-          const reportNameEnd = `-${host.id}.json`;
-          // At 5-second intervals:
-          const reCheck = setInterval(async () => {
-            // If the time limit has been reached or the report has been written:
-            if (
-              Date.now() - startTime > 1000 * timeLimit
-              || await fs.readdir(reportDir).find(fileName => fileName.endsWith(reportNameEnd))
-            ) {
-              // Stop checking.
-              clearInterval(reCheck);
-            }
-          }, 5000);
-        }
+        // Recursively run each host script and save a report.
+        const runHosts = specs => {
+          if (specs.length) {
+            // Run the first one and save the report with a host-suffixed ID.
+            const spec = specs.shift();
+            const {id, timeLimit, host, script} = spec;
+            const subprocess = fork(
+              'runHost', [id, JSON.stringify(script), JSON.stringify(host)],
+              {
+                detached: true
+              }
+            );
+            subprocess.unref();
+            const startTime = Date.now();
+            const reportNameEnd = `-${host.id}.json`;
+            // At 5-second intervals:
+            const reCheck = setInterval(async () => {
+              // If the time limit has been reached or the report has been written:
+              const reportNames = await fs.readdir(reportDir);
+              if (
+                Date.now() - startTime > 1000 * timeLimit
+                || reportNames.find(fileName => fileName.endsWith(reportNameEnd))
+              ) {
+                // Stop checking.
+                clearInterval(reCheck);
+                // Run the next host script.
+                runHosts(specs);
+              }
+            }, 5000);
+          }
+        };
       }
       // Otherwise, i.e. if there is no batch:
       else {
