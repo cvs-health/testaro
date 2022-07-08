@@ -50,7 +50,8 @@ exports.runJob = async (scriptID, batchID) => {
         const batchJSON = await fs.readFile(`${batchDir}/${batchID}.json`, 'utf8');
         batch = JSON.parse(batchJSON);
         const specs = batchify(script, batch, timeStamp);
-        // Recursively run each host script and save a report.
+        const batchSize = specs.length;
+        const sizedRep = `${batchSize} report${batchSize > 1 ? 's' : ''}`;
         // FUNCTION DEFINITION START
         const runHosts = specs => {
           if (specs.length) {
@@ -77,24 +78,26 @@ exports.runJob = async (scriptID, batchID) => {
               }
             }, 5000);
           }
+          else {
+            console.log(`${sizedRep} ${timeStamp}-....json in ${process.env.REPORTDIR}`);
+          }
         };
         // FUNCTION DEFINITION END
+        // Recursively run each host script and save the reports.
         runHosts(specs);
       }
       // Otherwise, i.e. if there is no batch:
       else {
         // Run the script and save the result with a timestamp ID.
         await runHost(timeStamp, script);
+        console.log(`Report ${timeStamp}.json in ${process.env.REPORTDIR}`);
       }
-      return timeStamp;
     }
     catch(error) {
       console.log(`ERROR: ${error.message}\n${error.stack}`);
-      return null;
     }
   }
   else {
     console.log('ERROR: no script specified');
-    return null;
   }
 };
