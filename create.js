@@ -40,6 +40,7 @@ exports.runJob = async (scriptID, batchID) => {
     try {
       const scriptJSON = await fs.readFile(`${scriptDir}/${scriptID}.json`, 'utf8');
       const script = JSON.parse(scriptJSON);
+      const {timeLimit} = script;
       // Identify the start time and a timestamp.
       const timeStamp = Math.floor((Date.now() - Date.UTC(2022, 1)) / 2000).toString(36);
       // If there is a batch:
@@ -50,11 +51,12 @@ exports.runJob = async (scriptID, batchID) => {
         batch = JSON.parse(batchJSON);
         const specs = batchify(script, batch, timeStamp);
         // Recursively run each host script and save a report.
+        // FUNCTION DEFINITION START
         const runHosts = specs => {
           if (specs.length) {
             // Run the first one and save the report with a host-suffixed ID.
             const spec = specs.shift();
-            const {id, timeLimit, host, script} = spec;
+            const {id, host, script} = spec;
             const subprocess = fork(
               'runHost', [id, JSON.stringify(script), JSON.stringify(host)],
               {
@@ -63,23 +65,21 @@ exports.runJob = async (scriptID, batchID) => {
             );
             subprocess.unref();
             const startTime = Date.now();
-            const reportNameEnd = `-${host.id}.json`;
             // At 5-second intervals:
             const reCheck = setInterval(async () => {
               // If the time limit has been reached or the report has been written:
               const reportNames = await fs.readdir(reportDir);
-              if (
-                Date.now() - startTime > 1000 * timeLimit
-                || reportNames.find(fileName => fileName.endsWith(reportNameEnd))
-              ) {
+              if (Date.now() - startTime > 1000 * timeLimit || reportNames.includes(`${id}.json`)) {
                 // Stop checking.
                 clearInterval(reCheck);
-                // Run the next host script.
+                // Run the script of the next host.
                 runHosts(specs);
               }
             }, 5000);
           }
         };
+        // FUNCTION DEFINITION END
+        runHosts(specs);
       }
       // Otherwise, i.e. if there is no batch:
       else {
