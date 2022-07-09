@@ -103,7 +103,9 @@ exports.reporter = async (page, withItems) => {
         });
       })
       .catch(error => {
-        console.log(`ERROR: could not click tab element ${itemData.text} (${error.message})`);
+        console.log(
+          `ERROR clicking tab element ${itemData.text} (${error.message.replace(/\n.+/s, '')})`
+        );
       pressed = false;
       });
       // Increment the counts of navigations and key navigations.

@@ -89,9 +89,12 @@ A script is a JSON file with the properties:
 {
   "what": "string: description of the script",
   "strict": "boolean: whether redirections should be treated as failures",
+  "timeLimit": "number: limit in seconds on the execution of this script",
   "commands": "array of objects: the commands to be performed"
 }
 ```
+
+The `timeLimit` property is optional. If it is omitted, a default of 300 seconds (5 minutes) is set.
 
 ### Example
 
@@ -101,6 +104,7 @@ Here is an example of a script:
 {
   what: 'Test example.com with alfa',
   strict: true,
+  timeLimit: 15,
   commands: [
     {
       type: 'launch',
@@ -486,13 +490,13 @@ Relative paths must be relative to the Testaro project directory. For example, i
 
 Also ensure that Testaro can read all those directories and write to `REPORTDIR`.
 
-Place a script into `SCRIPTDIR` and, optionally, a batch into `BATCHDIR`. Each should be named `idValue.json`, where `idValue` is replaced with the value of its `id` property. That value must consist of only lower-case ASCII letters and digits.
+Place a script into `SCRIPTDIR` and, optionally, a batch into `BATCHDIR`. Each should be named `idvalue.json`, where `idvalue` is replaced with the value of its `id` property. That value must consist of only lower-case ASCII letters and digits.
 
 Then execute the statement `node high scriptID` or `node high scriptID batchID`, replacing `scriptID` and `batchID` with the `id` values of the script and the batch, respectively.
 
 The `high` module will call the `runJob` function of the `create` module, which in turn will call the `handleRequest` function of the `run` module. The results will be saved in report files in the `REPORTDIR` directory.
 
-If there is no batch, the report file will be named with a unique timestamp, suffixed with a `.json` extension. If there is a batch, then the base of each report file’s name will be the same timestamp, suffixed with `-hostID`, where `hostID` is the value of the `id` property of the `host` object in the batch file. For example, if you execute `node create script01 wikis`, you might get these report files deposited into `REPORTDIR`:
+If there is no batch, the report file will be named with a unique timestamp, suffixed with a `.json` extension. If there is a batch, then the base of each report file’s name will be the same timestamp, suffixed with `-hostid`, where `hostid` is the value of the `id` property of the `host` object in the batch file. For example, if you execute `node create script01 wikis`, you might get these report files deposited into `REPORTDIR`:
 - `enp46j-wikipedia.json`
 - `enp45j-wiktionary.json`
 - `enp45j-wikidata.json`
@@ -601,6 +605,16 @@ Please report any issues, including feature requests, at the [repository](https:
 The rationales motivating the Testaro-defined tests can be found in comments within the files of those tests, in the `tests` directory. Unavoidably, each test is opinionated. Testaro itself, however, can accommodate other tests representing different opinions. Testaro is intended to be neutral with respect to questions such as the criteria for accessibility, the severities of accessibility issues, whether accessibility is binary or graded, and the distinction between usability and accessibility.
 
 ## Testing challenges
+
+### Abnormal termination
+
+On rare occasions a test throws an error that terminates the Node process and cannot be handled with a `try`-`catch` structure. It has been observed, for example, that the `ibm` test does this when run on the host at `https://zenythgroup.com/index`.
+
+If a single process performed all of the commands in a batch-based script, the process could perform tens of thousands of commands, and such an error could stop the process at any point.
+
+To handle this risk, Testaro processes batch-based jobs by forking a new process for each host. If such an error occurs, it crashes the child process, preventing a report for that host from being written. The parent process waits for the report to appear in the `REPORTDIR` directory until the time limit. When it fails to appear, the parent process continues to the next host.
+
+If you are using high-level invocation, your terminal will show the standard output of the parent process and, if there is a batch, the current child process, too. If you interrupt the process with `CTRL-c`, you will send a `SIGINT` signal to the parent process, which will handle it by sending a message to the child process telling it to terminate itself, and then the parent process will terminate by skipping the remaining hosts.
 
 ### Activation
 

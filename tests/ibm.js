@@ -104,7 +104,7 @@ exports.reporter = async (page, withItems, withNewContent) => {
     result.content = await doTest(typeContent, withItems, timeLimit);
     if (result.content.prevented) {
       result.prevented = true;
-      console.log('ERROR: Getting ibm test report from page took too long');
+      console.log(`ERROR: Getting ibm test report from page timed out at ${timeLimit} seconds`);
     }
   }
   // If a test with new content is to be performed:
@@ -114,7 +114,7 @@ exports.reporter = async (page, withItems, withNewContent) => {
     result.url = await doTest(typeContent, withItems, timeLimit);
     if (result.url.prevented) {
       result.prevented = true;
-      console.log('ERROR: Getting ibm test report from URL took too long');
+      console.log(`ERROR: Getting ibm test report from URL timed out at ${timeLimit} seconds`);
     }
   }
   await close();

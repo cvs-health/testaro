@@ -59,6 +59,7 @@ exports.runJob = async (scriptID, batchID) => {
         const specs = batchify(script, batch, timeStamp);
         const batchSize = specs.length;
         const sizedRep = `${batchSize} report${batchSize > 1 ? 's' : ''}`;
+        const timeoutHosts = [];
         // FUNCTION DEFINITION START
         // Recursively runs host scripts.
         const runHosts = specs => {
@@ -81,11 +82,15 @@ exports.runJob = async (scriptID, batchID) => {
               if (healthy) {
                 // If the time limit has been reached or the report has been written:
                 const reportNames = await fs.readdir(reportDir);
-                if (
-                  Date.now() - startTime > 1000 * timeLimit || reportNames.includes(`${id}.json`)
-                ) {
+                const timedOut = Date.now() - startTime > 1000 * timeLimit;
+                if (timedOut || reportNames.includes(`${id}.json`)) {
                   // Stop checking.
                   clearInterval(reCheck);
+                  // If the cause is a timeout:
+                  if (timedOut) {
+                    // Add the host to the array of timed-out hosts.
+                    timeoutHosts.push(id);
+                  }
                   // Run the script of the next host.
                   runHosts(specs);
                 }
@@ -101,6 +106,9 @@ exports.runJob = async (scriptID, batchID) => {
           }
           else {
             console.log(`${sizedRep} ${timeStamp}-....json in ${process.env.REPORTDIR}`);
+            if (timeoutHosts.length) {
+              console.log(`Reports not created:\n${JSON.stringify(timeoutHosts), null, 2}`);
+            }
           }
         };
         // FUNCTION DEFINITION END
