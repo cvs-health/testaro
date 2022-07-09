@@ -633,6 +633,12 @@ const wait = ms => {
 };
 // Recursively performs the acts in a report.
 const doActs = async (report, actIndex, page) => {
+  process.on('message', message => {
+    if (message === 'interrupt') {
+      console.log('ERROR: Terminal interrupted doActs');
+      process.exit();
+    }
+  });
   const {acts} = report;
   // If any more commands are to be performed:
   if (actIndex > -1 && actIndex < acts.length) {

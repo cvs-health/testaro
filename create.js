@@ -36,11 +36,18 @@ const runHost = async (id, script) => {
 };
 // Runs a file-based job and writes a report file for the script or each host.
 exports.runJob = async (scriptID, batchID) => {
+  let healthy = true;
+  process.on('SIGINT', () => {
+    console.log('ERROR: Terminal interrupted runJob');
+    healthy = false;
+  });
   if (scriptID) {
     try {
       const scriptJSON = await fs.readFile(`${scriptDir}/${scriptID}.json`, 'utf8');
       const script = JSON.parse(scriptJSON);
-      const {timeLimit} = script;
+      // Get the time limit of the script or, if none, set it to 5 minutes.
+      let {timeLimit} = script;
+      timeLimit = timeLimit || 300;
       // Identify the start time and a timestamp.
       const timeStamp = Math.floor((Date.now() - Date.UTC(2022, 1)) / 2000).toString(36);
       // If there is a batch:
@@ -53,8 +60,10 @@ exports.runJob = async (scriptID, batchID) => {
         const batchSize = specs.length;
         const sizedRep = `${batchSize} report${batchSize > 1 ? 's' : ''}`;
         // FUNCTION DEFINITION START
+        // Recursively runs host scripts.
         const runHosts = specs => {
-          if (specs.length) {
+          // If any scripts remain to be run and the process has not been interrupted:
+          if (specs.length && healthy) {
             // Run the first one and save the report with a host-suffixed ID.
             const spec = specs.shift();
             const {id, host, script} = spec;
@@ -68,13 +77,25 @@ exports.runJob = async (scriptID, batchID) => {
             const startTime = Date.now();
             // At 5-second intervals:
             const reCheck = setInterval(async () => {
-              // If the time limit has been reached or the report has been written:
-              const reportNames = await fs.readdir(reportDir);
-              if (Date.now() - startTime > 1000 * timeLimit || reportNames.includes(`${id}.json`)) {
+              // If the user has not interrupted the process:
+              if (healthy) {
+                // If the time limit has been reached or the report has been written:
+                const reportNames = await fs.readdir(reportDir);
+                if (
+                  Date.now() - startTime > 1000 * timeLimit || reportNames.includes(`${id}.json`)
+                ) {
+                  // Stop checking.
+                  clearInterval(reCheck);
+                  // Run the script of the next host.
+                  runHosts(specs);
+                }
+              }
+              // Otherwise, i.e. if the user has interrupted the process:
+              else {
+                // Tell the script run to quit.
+                subprocess.send('interrupt');
                 // Stop checking.
                 clearInterval(reCheck);
-                // Run the script of the next host.
-                runHosts(specs);
               }
             }, 5000);
           }

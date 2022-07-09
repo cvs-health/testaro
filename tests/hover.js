@@ -158,7 +158,10 @@ const find = async (withItems, page, region, sample, popRatio) => {
             position: {
               x: 0,
               y: 0
-            }
+            },
+            timeout: 500,
+            force: true,
+            noWaitAfter: true
           });
           // Wait for any delayed and/or slowed hover reaction.
           await page.waitForTimeout(200);
