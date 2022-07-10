@@ -37,6 +37,7 @@ const runHost = async (id, script) => {
 // Runs a file-based job and writes a report file for the script or each host.
 exports.runJob = async (scriptID, batchID) => {
   let healthy = true;
+  let childAlive = true;
   process.on('SIGINT', () => {
     console.log('ERROR: Terminal interrupted runJob');
     healthy = false;
@@ -60,35 +61,46 @@ exports.runJob = async (scriptID, batchID) => {
         const batchSize = specs.length;
         const sizedRep = `${batchSize} report${batchSize > 1 ? 's' : ''}`;
         const timeoutHosts = [];
+        const crashHosts = [];
         // FUNCTION DEFINITION START
         // Recursively runs host scripts.
         const runHosts = specs => {
           // If any scripts remain to be run and the process has not been interrupted:
           if (specs.length && healthy) {
+            childAlive = true;
             // Run the first one and save the report with a host-suffixed ID.
             const spec = specs.shift();
             const {id, host, script} = spec;
             const subprocess = fork(
               'runHost', [id, JSON.stringify(script), JSON.stringify(host)],
               {
-                detached: true
+                detached: true,
+                stdio: [0, 1, 'ipc']
               }
             );
+            subprocess.on('exit', () => {
+              childAlive = false;
+            });
             const startTime = Date.now();
             // At 5-second intervals:
             const reCheck = setInterval(async () => {
               // If the user has not interrupted the process:
               if (healthy) {
-                // If the time limit has been reached or the report has been written:
+                // If there is no need to keep checking:
                 const reportNames = await fs.readdir(reportDir);
                 const timedOut = Date.now() - startTime > 1000 * timeLimit;
-                if (timedOut || reportNames.includes(`${id}.json`)) {
+                if (timedOut || reportNames.includes(`${id}.json`) || ! childAlive) {
                   // Stop checking.
                   clearInterval(reCheck);
                   // If the cause is a timeout:
                   if (timedOut) {
                     // Add the host to the array of timed-out hosts.
                     timeoutHosts.push(id);
+                  }
+                  // Otherwise, if the cause is a child crash:
+                  else if (! childAlive) {
+                    // Add the host to the array of crashed hosts.
+                    crashHosts.push(id);
                   }
                   // Run the script of the next host.
                   runHosts(specs);
@@ -107,6 +119,9 @@ exports.runJob = async (scriptID, batchID) => {
             console.log(`${sizedRep} ${timeStamp}-....json in ${process.env.REPORTDIR}`);
             if (timeoutHosts.length) {
               console.log(`Reports not created:\n${JSON.stringify(timeoutHosts), null, 2}`);
+            }
+            if (crashHosts.length) {
+              console.log(`Hosts crashed:\n${JSON.stringify(crashHosts), null, 2}`);
             }
           }
         };
