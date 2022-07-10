@@ -74,7 +74,6 @@ exports.runJob = async (scriptID, batchID) => {
                 detached: true
               }
             );
-            subprocess.unref();
             const startTime = Date.now();
             // At 5-second intervals:
             const reCheck = setInterval(async () => {
