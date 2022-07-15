@@ -1,0 +1,62 @@
+input type=checkbox	role=checkbox
+td	role=cell if the ancestor table element is exposed as a role=table
+td	role=gridcell if the ancestor table element is exposed as a role=grid or treegrid
+th	role=columnheader, rowheader or cell if the ancestor table element is exposed as a role=table
+td	role=columnheader, rowheader or gridcell if the ancestor table element is exposed as a role=grid or treegrid
+dd	role=definition	
+dt	role=term	
+hr	role=separator	
+li	role=listitem	
+ol	role=list	
+tr	role=row	
+ul	role=list	
+dfn	role=term
+nav	role=navigation	
+SVG	role=graphics-document	
+html	role=document
+main	role=main	
+math	role=math	
+menu	role=list	
+aside	role=complementary	
+table	role=table	
+tbody	role=rowgroup	
+tfoot	role=rowgroup	
+thead	role=rowgroup	
+button	role=button	
+dialog	role=dialog	
+figure	role=figure	
+output	role=status	
+article	role=article	
+details	role=group	
+section	role=region if the section element has an accessible name
+summary	role=button	
+datalist	role=listbox	
+fieldset	role=group	
+h1 to h6	role=heading, aria-level = the number in the element's tag name
+\
+progress	role=progressbar	
+textarea	role=textbox	
+a with href	role=link	
+area with href	role=link	
+img with alt=""	role=presentation
+input type=image	role=button	
+input type=radio	role=radio	
+input type=range	role=slider	
+input type=reset	role=button	
+input type=button	role=button	
+input type=number	role=spinbutton	
+input type=submit	role=button	
+img with alt="some text"	role=img	
+img without an alt attribute	role=img	
+input type=url with no list attribute	role=textbox	
+input type=tel, with no list attribute	role=textbox	
+input type=email with no list attribute	role=textbox	
+input type=search, with no list attribute	role=searchbox	
+form	If the form element has an accessible name: role=form. Otherwise, no corresponding role.	
+input type=text or with a missing or invalid type, with no list attribute	role=textbox	
+select (with a multiple attribute or a size attribute having value greater than 1)	role=listbox	
+select (with NO multiple attribute and NO size attribute having value greater than 1)	role=combobox	
+option element that is in a list of options or that represents a suggestion in a datalist	role=option	
+footer	If not a descendant of an article, aside, main, nav or section element, or an element with role=article, complementary, main, navigation or region then role=contentinfo. Otherwise no corresponding role.	
+header	If not a descendant of an article, aside, main, nav or section element, or an element with role=article, complementary, main, navigation or region then role=banner. Otherwise no corresponding role	
+input type=text, search, tel, url, email, or with a missing or invalid type, with a list attribute	role=combobox	
