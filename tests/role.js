@@ -120,6 +120,58 @@ exports.reporter = async page => await page.$eval('body', body => {
     'treegrid',
     'treeitem',
   ]);
+  // Implicit roles
+  const implicitRoles = {
+    article: 'article',
+    aside: 'complementary',
+    button: 'button',
+    datalist: 'listbox',
+    dd: 'definition',
+    details: 'group',
+    dfn: 'term',
+    dialog: 'dialog',
+    dt: 'term',
+    fieldset: 'group',
+    figure: 'figure',
+    h1: 'heading',
+    h2: 'heading',
+    h3: 'heading',
+    h4: 'heading',
+    h5: 'heading',
+    h6: 'heading',
+    hr: 'separator',
+    html: 'document',
+    li: 'listitem',
+    main: 'main',
+    math: 'math',
+    menu: 'list',
+    nav: 'navigation',
+    ol: 'list',
+    output: 'status',
+    progress: 'progressbar',
+    summary: 'button',
+    SVG: 'graphics-document',
+    table: 'table',
+    tbody: 'rowgroup',
+    textarea: 'textbox',
+    tfoot: 'rowgroup',
+    thead: 'rowgroup',
+    tr: 'row',
+    ul: 'list'
+  };
+  // FUNCTIONS
+  const dataInit = (data, tagName, role) => {
+    if (! data.tagNames[tagName]) {
+      data.tagNames[tagName] = {};
+    }
+    if (! data.tagNames[tagName][role]) {
+      data.tagNames[tagName][role] = {
+        bad: 0,
+        redundant: 0
+      };
+    }
+  };
+  // OPERATION
   // Remove the deprecated roles from the non-abstract roles.
   goodRoles.forEach(role => {
     if (badRoles.has(role)) {
@@ -128,34 +180,41 @@ exports.reporter = async page => await page.$eval('body', body => {
   });
   // Identify all elements with role attributes.
   const roleElements = Array.from(body.querySelectorAll('[role]'));
-  // Identify those with roles that are either deprecated or invalid.
-  const bads = roleElements.filter(element => {
-    const role = element.getAttribute('role');
-    return badRoles.has(role) || ! goodRoles.has(role);
-  });
   // Initialize the result.
   const data = {
     roleElements: roleElements.length,
-    badRoleElements: bads.length,
+    badRoleElements: 0,
+    redundantRoleElements: 0,
     tagNames: {}
   };
-  // For each element with a deprecated role:
-  bads.forEach(element => {
-    // Identify its facts.
-    const tagName = element.tagName;
+  // Identify the elements with redundant roles and bad roles.
+  roleElements.forEach(element => {
     const role = element.getAttribute('role');
-    // Add them to the result.
-    if (data.tagNames[tagName]) {
-      if (data.tagNames[tagName][role]) {
-        data.tagNames[tagName][role]++;
+    const tagName = element.tagName;
+    // If the role is not absolutely valid:
+    if (! goodRoles.has(role)) {
+      // If it is bad or redundant:
+      if (badRoles.has(role)) {
+        dataInit(data, tagName, role);
+        // Add the facts to the result.
+        if (role === implicitRoles[tagName.toLowerCase()]) {
+          data.redundantRoleElements++;
+          data.tagNames[tagName][role].redundant++;
+        }
+        else {
+          data.badRoleElements++;
+          data.tagNames[tagName][role].bad++;
+        }
       }
+      // Otherwise, i.e. if it is absolutely invalid:
       else {
-        data.tagNames[tagName][role] = 1;
+        // Add the facts to the result.
+        data.badRoleElements++;
+        dataInit(data, tagName, role);
+        data.tagNames[tagName][role].bad++;
       }
-    }
-    else {
-      data.tagNames[tagName] = {[role]: 1};
     }
   });
+  // Return the result.
   return {result: data};
 });
