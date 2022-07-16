@@ -28,10 +28,6 @@
   value in the same location being the target.
 */
 
-// CONSTANTS
-
-const data = {};
-
 // FUNCTIONS
 
 // Samples a population and returns the sample.
@@ -62,14 +58,13 @@ const textOf = async (element, limit) => {
   return text.trim().replace(/\s*/sg, '').slice(0, limit);
 };
 // Recursively reports impacts of hovering over triggers.
-const find = async (withItems, page, region, sample, popRatio) => {
+const find = async (data, withItems, page, region, sample, popRatio) => {
   // If any potential triggers remain:
   if (sample.length) {
     // Identify the first of them.
     const firstTrigger = sample[0];
     const tagNameJSHandle = await firstTrigger.getProperty('tagName')
     .catch(error => {
-      console.log(`ERROR getting trigger tag name (${error.message})`);
       return '';
     });
     if (tagNameJSHandle) {
@@ -89,7 +84,7 @@ const find = async (withItems, page, region, sample, popRatio) => {
         root = rootJSHandle.asElement();
       }
       // Identify all the descendants of the root.
-      const preDescendants = await root.$$('*');
+      const preDescendants = await root.$$(':visible');
       // Identify their opacities.
       const preOpacities = await page.evaluate(elements => elements.map(
         element => window.getComputedStyle(element).opacity
@@ -102,8 +97,11 @@ const find = async (withItems, page, region, sample, popRatio) => {
         });
         // Repeatedly seeks impacts.
         const getImpacts = async (interval, triesLeft) => {
+          // If the allowed trial count has not yet been exhausted:
           if (triesLeft--) {
-            const postDescendants = await root.$$('*');
+            // Get the collection of descendants of the root.
+            const postDescendants = await root.$$(':visible');
+            // Identify the prior descandants of the root still in existence.
             const remainerIndexes = await page.evaluate(args => {
               const preDescendants = args[0];
               const postDescendants = args[1];
@@ -112,6 +110,7 @@ const find = async (withItems, page, region, sample, popRatio) => {
               .filter(index => index > -1);
               return remainerIndexes;
             }, [preDescendants, postDescendants]);
+            // Get the count of elements added by the hover event.
             const additionCount = postDescendants.length - remainerIndexes.length;
             const removalCount = preDescendants.length - remainerIndexes.length;
             const remainers = [];
@@ -201,7 +200,7 @@ const find = async (withItems, page, region, sample, popRatio) => {
       }
     }
     // Process the remaining potential triggers.
-    await find(withItems, page, region, sample.slice(1), popRatio);
+    await find(data, withItems, page, region, sample.slice(1), popRatio);
   }
 };
 // Performs the hover test and reports results.
@@ -209,16 +208,18 @@ exports.reporter = async (
   page, headSize = 0, headSampleSize = -1, tailSampleSize = -1, withItems
 ) => {
   // Initialize the result.
-  data.totals = {
-    triggers: 0,
-    headTriggers: 0,
-    tailTriggers: 0,
-    impactTriggers: 0,
-    additions: 0,
-    removals: 0,
-    opacityChanges: 0,
-    opacityImpact: 0,
-    unhoverables: 0
+  const data = {
+    totals: {
+      triggers: 0,
+      headTriggers: 0,
+      tailTriggers: 0,
+      impactTriggers: 0,
+      additions: 0,
+      removals: 0,
+      opacityChanges: 0,
+      opacityImpact: 0,
+      unhoverables: 0
+    }
   };
   // If details are to be reported:
   if (withItems) {
@@ -255,10 +256,10 @@ exports.reporter = async (
   const tailSample = tailSampleSize === -1 ? tailTriggers : getSample(tailTriggers, tailSampleSize);
   // Find and document the impacts.
   if (headSample.length) {
-    await find(withItems, page, 'head', headSample, headTriggerCount / headSample.length);
+    await find(data, withItems, page, 'head', headSample, headTriggerCount / headSample.length);
   }
   if (tailSample.length) {
-    await find(withItems, page, 'tail', tailSample, tailTriggerCount / tailSample.length);
+    await find(data, withItems, page, 'tail', tailSample, tailTriggerCount / tailSample.length);
   }
   // Round the reported totals.
   Object.keys(data.totals).forEach(key => {

@@ -18,7 +18,8 @@
       "what": "role",
       "expect": [
         ["roleElements", "=", 1],
-        ["badRoleElements", "=", 0]
+        ["badRoleElements", "=", 0],
+        ["redundantRoleElements", "=", 0]
       ]
     },
     {
@@ -31,11 +32,19 @@
       "which": "role",
       "what": "role",
       "expect": [
-        ["roleElements", "=", 3],
-        ["badRoleElements", "=", 3],
-        ["tagNames.SECTION.main", "=", 1],
-        ["tagNames.SECTION.section", "=", 1],
-        ["tagNames.H2.heading", "=", 1]
+        ["roleElements", "=", 9],
+        ["badRoleElements", "=", 6],
+        ["redundantRoleElements", "=", 3],
+        ["tagNames.SECTION.main.bad", "=", 1],
+        ["tagNames.SECTION.section.bad", "=", 1],
+        ["tagNames.H2.heading.bad", "=", 0],
+        ["tagNames.H2.heading.redundant", "=", 1],
+        ["tagNames.H3.heading.bad", "=", 2],
+        ["tagNames.H3.heading.redundant", "=", 1],
+        ["tagNames.INPUT.spinbutton.redundant", "=", 1],
+        ["tagNames.INPUT.textbox.bad", "=", 1],
+        ["tagNames.INPUT.textbox.redundant", "=", 0],
+        ["tagNames.INPUT.combobox.bad", "=", 1]
       ]
     }
   ]

@@ -138,7 +138,7 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
           const hasIndicator
           = hasDiffOutline
           || hasDiffBorder
-          || diff('box-shadow')
+          || diff('boxShadow')
           || diff('fontSize')
           || diff('fontStyle')
           || diff('textDecorationLine')

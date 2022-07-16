@@ -133,12 +133,6 @@ exports.reporter = async page => await page.$eval('body', body => {
     dt: 'term',
     fieldset: 'group',
     figure: 'figure',
-    h1: 'heading',
-    h2: 'heading',
-    h3: 'heading',
-    h4: 'heading',
-    h5: 'heading',
-    h6: 'heading',
     hr: 'separator',
     html: 'document',
     li: 'listitem',
@@ -173,6 +167,60 @@ exports.reporter = async page => await page.$eval('body', body => {
         role: 'link',
         attributes: {
           href: /./
+        }
+      }
+    ],
+    h1: [
+      {
+        role: 'heading',
+        attributes: {
+          'aria-level': /^1$/
+        }
+      }
+    ],
+    h2: [
+      {
+        role: 'heading',
+        attributes: {
+          'aria-level': /^2$/
+        }
+      },
+      {
+        role: 'heading',
+        attributes: {
+          'aria-level': false
+        }
+      }
+    ],
+    h3: [
+      {
+        role: 'heading',
+        attributes: {
+          'aria-level': /^3$/
+        }
+      }
+    ],
+    h4: [
+      {
+        role: 'heading',
+        attributes: {
+          'aria-level': /^4$/
+        }
+      }
+    ],
+    h5: [
+      {
+        role: 'heading',
+        attributes: {
+          'aria-level': /^5$/
+        }
+      }
+    ],
+    h6: [
+      {
+        role: 'heading',
+        attributes: {
+          'aria-level': /^6$/
         }
       }
     ],
@@ -347,10 +395,10 @@ exports.reporter = async page => await page.$eval('body', body => {
   };
   // Identify the th and td elements with redundant roles.
   const gridHeaders = Array.from(
-    document.body.querySelectorAll('table[role=grid] th, table[role=treegrid th')
+    document.body.querySelectorAll('table[role=grid] th, table[role=treegrid] th')
   );
   const gridCells = Array.from(
-    document.body.querySelectorAll('table[role=grid] td, table[role=treegrid td')
+    document.body.querySelectorAll('table[role=grid] td, table[role=treegrid] td')
   );
   const tableHeaders = Array.from(
     document.body.querySelectorAll('table[role=table] th, table:not([role]) th')
