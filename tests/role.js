@@ -159,6 +159,153 @@ exports.reporter = async page => await page.$eval('body', body => {
     tr: 'row',
     ul: 'list'
   };
+  const implicitAttributes = {
+    a: [
+      {
+        role: 'link',
+        attributes: {
+          href: /./
+        }
+      }
+    ],
+    area: [
+      {
+        role: 'link',
+        attributes: {
+          href: /./
+        }
+      }
+    ],
+    input: [
+      {
+        role: 'checkbox',
+        attributes: {
+          type: /^checkbox$/
+        }
+      },
+      {
+        role: 'button',
+        attributes: {
+          type: /^(?:button|image|reset|submit)$/
+        }
+      },
+      {
+        role: 'combobox',
+        attributes: {
+          type: /^(?:email|search|tel|text|url)$/,
+          list: true
+        }
+      },
+      {
+        role: 'combobox',
+        attributes: {
+          type: false,
+          list: true
+        }
+      },
+      {
+        role: 'radio',
+        attributes: {
+          type: /^radio$/
+        }
+      },
+      {
+        role: 'searchbox',
+        attributes: {
+          type: /^search$/,
+          list: false
+        }
+      },
+      {
+        role: 'slider',
+        attributes: {
+          type: /^range$/
+        }
+      },
+      {
+        role: 'spinbutton',
+        attributes: {
+          type: /^number$/
+        }
+      },
+      {
+        role: 'textbox',
+        attributes: {
+          type: /^(?:email|tel|text|url)$/,
+          list: false
+        }
+      },
+      {
+        role: 'textbox',
+        attributes: {
+          type: false,
+          list: false
+        }
+      },
+      {
+        role: 'checkbox',
+        attributes: {
+          type: /^checkbox$/
+        }
+      },
+      {
+        role: 'checkbox',
+        attributes: {
+          type: /^checkbox$/
+        }
+      },
+    ],
+    img: [
+      {
+        role: 'presentation',
+        attributes: {
+          alt: /^$/
+        }
+      },
+      {
+        role: 'img',
+        attributes: {
+          alt: /./
+        }
+      },
+      {
+        role: 'img',
+        attributes: {
+          alt: false
+        }
+      }
+    ],
+    select: [
+      {
+        role: 'listbox',
+        attributes: {
+          multiple: true
+        }
+      },
+      {
+        role: 'listbox',
+        attributes: {
+          size: /^(?:[2-9]|[1-9]\d+)$/
+        }
+      },
+      {
+        role: 'combobox',
+        attributes: {
+          multiple: false,
+          size: false
+        }
+      },
+      {
+        role: 'combobox',
+        attributes: {
+          multiple: false,
+          size: /^1$/
+        }
+      }
+    ]
+  };
+  // Array of th and td elements with redundant roles.
+  const redundantCells = [];
   // FUNCTIONS
   const dataInit = (data, tagName, role) => {
     if (! data.tagNames[tagName]) {
@@ -170,6 +317,17 @@ exports.reporter = async page => await page.$eval('body', body => {
         redundant: 0
       };
     }
+  };
+  const tallyTableRedundancy = (elements, okRoles, tagName) => {
+    elements.forEach(element => {
+      const role = element.getAttribute('role');
+      if (okRoles.includes(role)) {
+        dataInit(data, tagName, role);
+        data.redundantRoleElements++;
+        data.tagNames[tagName][role].redundant++;
+        redundantCells.push(element);
+      }
+    });
   };
   // OPERATION
   // Remove the deprecated roles from the non-abstract roles.
@@ -187,8 +345,25 @@ exports.reporter = async page => await page.$eval('body', body => {
     redundantRoleElements: 0,
     tagNames: {}
   };
-  // Identify the elements with redundant roles and bad roles.
-  roleElements.forEach(element => {
+  // Identify the th and td elements with redundant roles.
+  const gridHeaders = Array.from(
+    document.body.querySelectorAll('table[role=grid] th, table[role=treegrid th')
+  );
+  const gridCells = Array.from(
+    document.body.querySelectorAll('table[role=grid] td, table[role=treegrid td')
+  );
+  const tableHeaders = Array.from(
+    document.body.querySelectorAll('table[role=table] th, table:not([role]) th')
+  );
+  const tableCells = Array.from(
+    document.body.querySelectorAll('table[role=table] td, table:not([role]) td')
+  );
+  tallyTableRedundancy(gridHeaders, ['columnheader', 'rowheader', 'gridcell'], 'TH');
+  tallyTableRedundancy(gridCells, ['gridcell'], 'TD');
+  tallyTableRedundancy(tableHeaders, ['columnheader', 'rowheader', 'cell'], 'TH');
+  tallyTableRedundancy(tableCells, ['cell'], 'TD');
+  // Identify the additional elements with redundant roles and bad roles.
+  roleElements.filter(element => ! redundantCells.includes(element)).forEach(element => {
     const role = element.getAttribute('role');
     const tagName = element.tagName;
     // If the role is not absolutely valid:
@@ -196,11 +371,37 @@ exports.reporter = async page => await page.$eval('body', body => {
       // If it is bad or redundant:
       if (badRoles.has(role)) {
         dataInit(data, tagName, role);
-        // Add the facts to the result.
-        if (role === implicitRoles[tagName.toLowerCase()]) {
+        const lcTagName = tagName.toLowerCase();
+        // If it is simply redundant:
+        if (role === implicitRoles[lcTagName]) {
           data.redundantRoleElements++;
           data.tagNames[tagName][role].redundant++;
         }
+        // Otherwise, if it is attributionally redundant:
+        else if (
+          implicitAttributes[lcTagName] && implicitAttributes[lcTagName].some(
+            criterion => role === criterion.role && Object.keys(criterion.attributes).every(
+              attributeName => {
+                const rule = criterion.attributes[attributeName];
+                const exists = element.hasAttribute(attributeName);
+                const value = exists ? element.getAttribute(attributeName) : null;
+                if (rule === true) {
+                  return exists;
+                }
+                else if (rule === false) {
+                  return ! exists;
+                }
+                else {
+                  return rule.test(value);
+                }
+              }
+            )
+          )
+        ) {
+          data.redundantRoleElements++;
+          data.tagNames[tagName][role].redundant++;
+        }
+        // Otherwise, i.e. if it is absolutely invalid:
         else {
           data.badRoleElements++;
           data.tagNames[tagName][role].bad++;
