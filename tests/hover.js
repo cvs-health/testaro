@@ -190,12 +190,17 @@ const find = async (data, withItems, page, region, sample, popRatio) => {
         console.log(`ERROR hovering (${error.message.replace(/\n.+/s, '')})`);
         data.totals.unhoverables++;
         if (withItems) {
-          const id = await firstTrigger.getAttribute('id');
-          data.items[region].unhoverables.push({
-            tagName,
-            id: id || '',
-            text: await textOf(firstTrigger, 50)
-          });
+          try {
+            const id = await firstTrigger.getAttribute('id');
+            data.items[region].unhoverables.push({
+              tagName,
+              id: id || '',
+              text: await textOf(firstTrigger, 50)
+            });
+          }
+          catch(error) {
+            console.log('ERROR itemizing unhoverable element');
+          }
         }
       }
     }

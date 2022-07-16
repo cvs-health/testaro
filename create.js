@@ -121,7 +121,9 @@ exports.runJob = async (scriptID, batchID) => {
               console.log(`Reports not created:\n${JSON.stringify(timeoutHosts), null, 2}`);
             }
             if (crashHosts.length) {
-              console.log(`Hosts crashed:\n${JSON.stringify(crashHosts), null, 2}`);
+              console.log(
+                `Hosts crashed with or without report:\n${JSON.stringify(crashHosts, null, 2)}`
+              );
             }
           }
         };
