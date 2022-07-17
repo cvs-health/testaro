@@ -497,6 +497,9 @@ const matchElement = async (page, selector, matchText, index = 0) => {
 const deSlash = string => string.endsWith('/') ? string.slice(0, -1) : string;
 // Tries to visit a URL.
 const goto = async (page, url, timeout, waitUntil, isStrict) => {
+  if (url.startsWith('file://.')) {
+    url = url.replace('file://', `file://${__dirname}/`);
+  }
   const response = await page.goto(url, {
     timeout,
     waitUntil

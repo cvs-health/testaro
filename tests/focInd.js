@@ -83,8 +83,21 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
         data.totals.total++;
         // Get a live style declaration of its properties.
         const styleDec = window.getComputedStyle(element);
-        // Freeze a copy to preserve the style properties when not focused.
-        const styleBlurred = Object.assign({}, styleDec);
+        // Get the relevant style properties.
+        const styleBlurred = {};
+        [
+          'outlineWidth',
+          'outlineColor',
+          'borderWidth',
+          'boxShadow',
+          'fontSize',
+          'fontStyle',
+          'textDecorationLine',
+          'textDecorationStyle',
+          'textDecorationThickness'
+        ].forEach(styleName => {
+          styleBlurred[styleName] = styleDec[styleName];
+        });
         // Focus it, potentially changing the properties in its style declaration.
         element.focus({preventScroll: true});
         let hasOutline = false;
