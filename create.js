@@ -75,7 +75,7 @@ exports.runJob = async (scriptID, batchID) => {
               'runHost', [id, JSON.stringify(script), JSON.stringify(host)],
               {
                 detached: true,
-                stdio: [0, 1, 'ipc']
+                stdio: [0, 1, 'ignore', 'ipc']
               }
             );
             subprocess.on('exit', () => {
