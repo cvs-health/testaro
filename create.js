@@ -89,7 +89,8 @@ exports.runJob = async (scriptID, batchID) => {
                 // If there is no need to keep checking:
                 const reportNames = await fs.readdir(reportDir);
                 const timedOut = Date.now() - startTime > 1000 * timeLimit;
-                if (timedOut || reportNames.includes(`${id}.json`) || ! childAlive) {
+                const reportWritten = reportNames.includes(`${id}.json`);
+                if (timedOut || reportWritten || ! childAlive) {
                   // Stop checking.
                   clearInterval(reCheck);
                   // If the cause is a timeout:
@@ -98,7 +99,7 @@ exports.runJob = async (scriptID, batchID) => {
                     timeoutHosts.push(id);
                   }
                   // Otherwise, if the cause is a child crash:
-                  else if (! childAlive) {
+                  else if (! (childAlive || reportWritten)) {
                     // Add the host to the array of crashed hosts.
                     crashHosts.push(id);
                   }
