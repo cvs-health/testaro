@@ -30,6 +30,8 @@ const runHost = async (id, script) => {
     script,
     acts: []
   };
+  const protoReportJSON = JSON.stringify(report, null, 2);
+  await fs.writeFile(`${reportDir}/${id}.json`, protoReportJSON);
   await handleRequest(report);
   const reportJSON = JSON.stringify(report, null, 2);
   await fs.writeFile(`${reportDir}/${id}.json`, reportJSON);
@@ -64,13 +66,15 @@ exports.runJob = async (scriptID, batchID) => {
         const crashHosts = [];
         // FUNCTION DEFINITION START
         // Recursively runs host scripts.
-        const runHosts = specs => {
+        const runHosts = async specs => {
           // If any scripts remain to be run and the process has not been interrupted:
           if (specs.length && healthy) {
             childAlive = true;
             // Run the first one and save the report with a host-suffixed ID.
             const spec = specs.shift();
             const {id, host, script} = spec;
+            console.log('About to run runHost');
+            await fs.writeFile(`${reportDir}/${id}-test.json`, 'Only a test\n');
             const subprocess = fork(
               'runHost', [id, JSON.stringify(script), JSON.stringify(host)],
               {
@@ -86,11 +90,13 @@ exports.runJob = async (scriptID, batchID) => {
             const reCheck = setInterval(async () => {
               // If the user has not interrupted the process:
               if (healthy) {
+                console.log('Healthy');
                 // If there is no need to keep checking:
                 const reportNames = await fs.readdir(reportDir);
                 const timedOut = Date.now() - startTime > 1000 * timeLimit;
                 const reportWritten = reportNames.includes(`${id}.json`);
                 if (timedOut || reportWritten || ! childAlive) {
+                  console.log('About to stop checking');
                   // Stop checking.
                   clearInterval(reCheck);
                   // If the cause is a timeout:
@@ -100,6 +106,8 @@ exports.runJob = async (scriptID, batchID) => {
                   }
                   // Otherwise, if the cause is a child crash:
                   else if (! (childAlive || reportWritten)) {
+                    console.log(`Child still alive? ${childAlive}`);
+                    console.log(`Report written? ${reportWritten}`);
                     // Add the host to the array of crashed hosts.
                     crashHosts.push(id);
                   }
