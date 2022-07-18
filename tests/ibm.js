@@ -21,21 +21,34 @@
 const fs = require('fs').promises;
 const {getCompliance, close} = require('accessibility-checker');
 // Runs the IBM test.
-const run = async content => {
+const run = async (content, timeLimit) => {
   const nowLabel = (new Date()).toISOString().slice(0, 19);
-  // Return the result of a test.
-  const ibmReport = await getCompliance(content, nowLabel);
-  return ibmReport;
+  // Start the timeout clock.
+  let timeoutID;
+  const timeout = new Promise(resolve => {
+    timeoutID = setTimeout(() => {
+      resolve(null);
+    }, 1000 * timeLimit);
+  });
+  // Return the result of the test, or null if it timed out.
+  const ibmReport = getCompliance(content, nowLabel)
+  .catch(error => {
+    console.log(`ERROR: getCompliance failed (${error.message.replace(/\n+/s, '')}).`);
+    return null;
+  });
+  const result = await Promise.race([ibmReport, timeout]);
+  clearTimeout(timeoutID);
+  return result;
 };
 // Trims an IBM report.
-const report = (ibmReport, withItems) => {
+const trimReport = (report, withItems) => {
   const data = {};
-  if (ibmReport && ibmReport.report && ibmReport.report.summary) {
-    const totals = ibmReport.report.summary.counts;
+  if (report && report.report && report.report.summary) {
+    const totals = report.report.summary.counts;
     if (totals) {
       data.totals = totals;
       if (withItems) {
-        data.items = ibmReport.report.results;
+        data.items = report.report.results;
         data.items.forEach(item => {
           delete item.apiArgs;
           delete item.category;
@@ -58,34 +71,25 @@ const report = (ibmReport, withItems) => {
   }
   return data;
 };
-// Performs an IBM test.
+// Performs an IBM test and return the result.
 const doTest = async (content, withItems, timeLimit) => {
-  // Start a timeout clock.
-  let timeoutID;
-  const wait = new Promise(resolve => {
-    timeoutID = setTimeout(() => {
-      resolve({});
-    }, 1000 * timeLimit);
-  });
-  // Conduct the test and get a Promise of the report.
-  const ibmReport = run(content);
-  // Wait for completion or until the time limit expires.
-  const ibmReportIfFast = await Promise.race([ibmReport, wait]);
-  // Delete existing report files.
-  try {
-    const reportNames = await fs.readdir('results');
-    for (const reportName of reportNames) {
-      await fs.rm(`results/${reportName}`);
+  // Conduct the test and get the result.
+  const report = await run(content, timeLimit);
+  // If the test did not time out:
+  if (report) {
+    // Delete any report files.
+    try {
+      const reportNames = await fs.readdir('results');
+      for (const reportName of reportNames) {
+        await fs.rm(`results/${reportName}`);
+      }
     }
-  }
-  catch(error) {
-    console.log('ibm test created no result files.');
-  }
-  // Return the result.
-  if (ibmReportIfFast.report) {
-    clearTimeout(timeoutID);
-    const ibmTypeReport = report(ibmReportIfFast, withItems);
-    return ibmTypeReport;
+    catch(error) {
+      console.log('ibm test created no result files.');
+    }
+    // Return the result.
+    const typeReport = trimReport(report, withItems);
+    return typeReport;
   }
   else {
     return {
