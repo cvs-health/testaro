@@ -20,9 +20,10 @@ const runHost = async (id, scriptJSON, hostJSON) => {
   };
   await handleRequest(report);
   const reportJSON = JSON.stringify(report, null, 2);
-  process.send(reportJSON);
-  process.disconnect();
-  process.exit();
+  process.send(reportJSON, () => {
+    process.disconnect();
+    process.exit();
+  });
 };
 
 // ########## OPERATION
