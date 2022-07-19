@@ -15,6 +15,7 @@ const {handleRequest} = require('./run');
 const {batchify} = require('./batchify');
 
 // ########## CONSTANTS
+
 const scriptDir = process.env.SCRIPTDIR;
 const batchDir = process.env.BATCHDIR;
 const reportDir = process.env.REPORTDIR;
@@ -25,6 +26,7 @@ const timeoutHosts = [];
 
 let healthy = true;
 let timeLimit = 300;
+let reportCount = 0;
 
 // ########## FUNCTIONS
 
@@ -41,16 +43,8 @@ const runHost = async (id, script) => {
   const reportJSON = JSON.stringify(report, null, 2);
   await fs.writeFile(`${reportDir}/${id}.json`, reportJSON);
 };
-// Waits.
-const wait = ms => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve('');
-    }, ms);
-  });
-};
 // Recursively runs host scripts.
-const runHosts = async specs => {
+const runHosts = async (timeStamp, specs) => {
   // If any scripts remain to be run and the process has not been interrupted:
   if (specs.length && healthy) {
     // Run the first one and save the report with a host-suffixed ID.
@@ -64,13 +58,14 @@ const runHosts = async specs => {
         stdio: [0, 1, 2, 'ipc']
       }
     );
-    // If the execution continues past the deadline:
+    // If the execution continues until the deadline:
     const timer = setTimeout(async () => {
       clearTimeout(timer);
       // Record the host as timed out.
       timeoutHosts.push(id);
       // Kill the child process.
       subprocess.send('interrupt');
+      console.log(`Script for host ${id} exceeded time limit, so was killed`);
       // Run the remaining host scripts.
       await runHosts(specs);
     }, script.timeLimit || timeLimit);
@@ -79,6 +74,7 @@ const runHosts = async specs => {
       clearTimeout(timer);
       // Record the host as crashed.
       crashHosts.push(id);
+      console.log(`Script for host ${id} crashed`);
       // Run the remaining host scripts.
       await runHosts(specs);
     });
@@ -87,19 +83,21 @@ const runHosts = async specs => {
       clearTimeout(timer);
       // Save it as a file.
       await fs.writeFile(`${reportDir}/${id}.json`, message);
+      console.log(`Report ${id}.json saved in ${reportDir}`);
+      reportCount++;
       // Run the remaining host scripts.
       await runHosts(specs);
     });
-
-    const startTime = Date.now();
-    console.log(`${sizedRep} ${timeStamp}-....json in ${process.env.REPORTDIR}`);
+  }
+  // Otherwise, i.e. if no more host scripts are to be run:
+  else {
+    // Report the metadata.
+    console.log(`Count of ${timeStamp}- reports saved in ${reportDir}: ${reportCount}`);
     if (timeoutHosts.length) {
-      console.log(`Reports not created:\n${JSON.stringify(timeoutHosts), null, 2}`);
+      console.log(`Hosts timed out:\n${JSON.stringify(timeoutHosts, null, 2)}`);
     }
     if (crashHosts.length) {
-      console.log(
-        `Hosts crashed with or without report:\n${JSON.stringify(crashHosts, null, 2)}`
-      );
+      console.log(`Hosts crashed:\n${JSON.stringify(crashHosts, null, 2)}`);
     }
   }
 };
@@ -124,12 +122,8 @@ exports.runJob = async (scriptID, batchID) => {
         const batchJSON = await fs.readFile(`${batchDir}/${batchID}.json`, 'utf8');
         batch = JSON.parse(batchJSON);
         const specs = batchify(script, batch, timeStamp);
-        const batchSize = specs.length;
-        const sizedRep = `${batchSize} report${batchSize > 1 ? 's' : ''}`;
-        const timeoutHosts = [];
-        const crashHosts = [];
         // Recursively run each host script and save the reports.
-        runHosts(specs);
+        runHosts(timeStamp, specs);
       }
       // Otherwise, i.e. if there is no batch:
       else {
