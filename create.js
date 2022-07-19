@@ -70,32 +70,30 @@ exports.runJob = async (scriptID, batchID) => {
             childAlive = true;
             // Run the first one and save the report with a host-suffixed ID.
             const spec = specs.shift();
-            console.log(`spec is:\n${JSON.stringify(spec, null, 2)}`);
             const {id, host, script} = spec;
-            console.log('About to run runHost');
-            await fs.writeFile(`${reportDir}/${id}-test.txt`, 'Only a test\n');
             const subprocess = fork(
               'runHost', [id, JSON.stringify(script), JSON.stringify(host)],
               {
                 detached: true,
-                stdio: [0, 1, 'ignore', 'ipc']
+                stdio: [0, 1, 2, 'ipc']
               }
             );
             subprocess.on('exit', () => {
               childAlive = false;
+            });
+            subprocess.on('message', async message => {
+              await fs.writeFile(`${reportDir}/${id}.json`, message);
             });
             const startTime = Date.now();
             // At 5-second intervals:
             const reCheck = setInterval(async () => {
               // If the user has not interrupted the process:
               if (healthy) {
-                console.log('Healthy');
                 // If there is no need to keep checking:
                 const reportNames = await fs.readdir(reportDir);
                 const timedOut = Date.now() - startTime > 1000 * timeLimit;
                 const reportWritten = reportNames.includes(`${id}.json`);
                 if (timedOut || reportWritten || ! childAlive) {
-                  console.log('About to stop checking');
                   // Stop checking.
                   clearInterval(reCheck);
                   // If the cause is a timeout:
@@ -105,8 +103,6 @@ exports.runJob = async (scriptID, batchID) => {
                   }
                   // Otherwise, if the cause is a child crash:
                   else if (! (childAlive || reportWritten)) {
-                    console.log(`Child still alive? ${childAlive}`);
-                    console.log(`Report written? ${reportWritten}`);
                     // Add the host to the array of crashed hosts.
                     crashHosts.push(id);
                   }
