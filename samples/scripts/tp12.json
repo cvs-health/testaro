@@ -2,6 +2,7 @@
   "id": "tp12",
   "what": "Alfa, Axe, HTML CodeSniffer, IBM, Tenon, WAVE, and 16 custom tests",
   "strict": true,
+  "timeLimit": 300,
   "commands": [
     {
       "type": "launch",
@@ -148,15 +149,15 @@
     },
     {
       "type": "test",
-      "which": "tenon",
-      "id": "a",
-      "what": "Tenon API version 2 result retrieval"
-    },
-    {
-      "type": "test",
       "which": "wave",
       "reportType": 4,
       "what": "WAVE, report-type 4"
+    },
+    {
+      "type": "test",
+      "which": "tenon",
+      "id": "a",
+      "what": "Tenon API version 2 result retrieval"
     }
   ]
 }
