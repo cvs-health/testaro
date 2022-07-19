@@ -66,22 +66,32 @@ exports.reporter = async (page, withItems) => {
       }
       return radios;
     }, []);
-    // Get an array of all radio buttons.
-    const allRadios = Array.from(document.body.querySelectorAll('input[type=radio'));
-    // Tabulate the results.
-    const totals = data.totals;
-    totals.total = allRadios.length;
-    totals.inSet = setRadios.length;
-    totals.percent = totals.total ? Math.floor(100 * totals.inSet / totals.total) : 'N.A.';
-    // If itemization is required:
-    if (withItems) {
-      // Add it to the results.
-      const nonSetRadios = allRadios.filter(radio => ! setRadios.includes(radio));
-      const items = data.items;
-      items.inSet = setRadios.map(radio => textOf(radio));
-      items.notInSet = nonSetRadios.map(radio => textOf(radio));
+    if (setRadios) {
+      // Get an array of all radio buttons.
+      const allRadios = Array.from(document.body.querySelectorAll('input[type=radio'));
+      // Tabulate the results.
+      const totals = data.totals;
+      totals.total = allRadios.length;
+      totals.inSet = setRadios.length;
+      totals.percent = totals.total ? Math.floor(100 * totals.inSet / totals.total) : 'N.A.';
+      // If itemization is required:
+      if (withItems) {
+        // Add it to the results.
+        const nonSetRadios = allRadios.filter(radio => ! setRadios.includes(radio));
+        const items = data.items;
+        items.inSet = setRadios.map(radio => textOf(radio));
+        items.notInSet = nonSetRadios.map(radio => textOf(radio));
+      }
+      return {result: data};
     }
-    return {result: data};
+    else {
+      return {
+        result: {
+          prevented: true,
+          error: 'ERROR identifying homogeneous field sets'
+        }
+      };
+    }
   }, args);
   return await dataJSHandle.jsonValue();
 };

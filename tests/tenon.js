@@ -6,6 +6,7 @@ const https = require('https');
 // Wait until a time limit in seconds expires.
 const wait = timeLimit => new Promise(resolve => setTimeout(resolve, 1000 * timeLimit));
 exports.reporter = async (tenonData, id) => {
+  console.log('Started retrieving tenon');
   if (tenonData && tenonData.accessToken && tenonData.requestIDs && tenonData.requestIDs[id]) {
     // Shared request options.
     const requestOptions = {
@@ -98,10 +99,13 @@ exports.reporter = async (tenonData, id) => {
       }
       // Otherwise, i.e. if the test is still running or failed:
       else {
-        return {result: {
-          error: 'ERROR: Tenon result not retrieved',
-          status
-        }};
+        return {
+          result: {
+            prevented: true,
+            error: 'ERROR: Tenon result not retrieved',
+            status
+          }
+        };
       }
     }
     // Otherwise, if the test is still running after a wait for its status:
