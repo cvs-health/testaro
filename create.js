@@ -30,8 +30,6 @@ const runHost = async (id, script) => {
     script,
     acts: []
   };
-  const protoReportJSON = JSON.stringify(report, null, 2);
-  await fs.writeFile(`${reportDir}/${id}.json`, protoReportJSON);
   await handleRequest(report);
   const reportJSON = JSON.stringify(report, null, 2);
   await fs.writeFile(`${reportDir}/${id}.json`, reportJSON);
@@ -72,9 +70,10 @@ exports.runJob = async (scriptID, batchID) => {
             childAlive = true;
             // Run the first one and save the report with a host-suffixed ID.
             const spec = specs.shift();
+            console.log(`spec is:\n${JSON.stringify(spec, null, 2)}`);
             const {id, host, script} = spec;
             console.log('About to run runHost');
-            await fs.writeFile(`${reportDir}/${id}-test.json`, 'Only a test\n');
+            await fs.writeFile(`${reportDir}/${id}-test.txt`, 'Only a test\n');
             const subprocess = fork(
               'runHost', [id, JSON.stringify(script), JSON.stringify(host)],
               {
@@ -148,7 +147,7 @@ exports.runJob = async (scriptID, batchID) => {
       }
     }
     catch(error) {
-      console.log(`ERROR: ${error.message}\n${error.stack}`);
+      console.log(`ERROR running job (${error.message})\n${error.stack}`);
     }
   }
   else {

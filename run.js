@@ -249,23 +249,54 @@ const isValidReport = async report => {
 // ########## OTHER FUNCTIONS
 
 // Closes all existing browsers.
-const closeBrowsers = async () => {
+const closeBrowsers = () => {
   for (const browserObj of browsers) {
     const {browser, typeName} = browserObj;
+    console.log(`Browser to be closed is ${JSON.stringify(browser, null, 2)}`);
     if (browser) {
       console.log(`Closing ${typeName} browser, version ${browser.version()}`);
-      await browser.close();
+      console.log(`Is the browser connected? ${browser.isConnected()}`);
+      browser.close()
+      .then(
+        () => {
+          console.log('Successfully closed browser');
+        },
+        error => {
+          console.log(`ERROR trying to close browser (${error.message})`);
+        }
+      );
     }
-  }
+  };
   browsers = [];
 };
+// Closes all existing browsers.
+/*
+const closeBrowsers = async () => {
+  for (const browserObj of browsers) {
+    try {
+      const {browser, typeName} = browserObj;
+      console.log(`Browser to be closed is ${JSON.stringify(browser, null, 2)}`);
+      if (browser) {
+        console.log(`Closing ${typeName} browser, version ${browser.version()}`);
+        console.log(`Is the browser connected? ${browser.isConnected()}`);
+        await browser.close();
+        console.log('Successfully closed browser');
+      }
+    }
+    catch(error) {
+      console.log('ERROR trying to close browser');
+    };
+  };
+  browsers = [];
+};
+*/
 // Launches a browser.
 const launch = async typeName => {
   const browserType = require('playwright')[typeName];
   // If the specified browser type exists:
   if (browserType) {
     // Close any existing browser.
-    await closeBrowsers();
+    closeBrowsers();
     // Launch a browser of the specified type.
     const browserOptions = {};
     if (debug) {
@@ -1278,6 +1309,7 @@ const doActs = async (report, actIndex, page) => {
 };
 // Performs the commands in a script.
 const doScript = async (report) => {
+  console.log('Starting doScript');
   // Reinitialize the log statistics.
   logCount = 0;
   logSize = 0;
@@ -1294,10 +1326,13 @@ const doScript = async (report) => {
   report.amountRead = 0;
   report.testTimes = [];
   // Perform the specified acts.
+  console.log('About to run doActs');
   await doActs(report, 0, null);
+  console.log('Ran doActs');
   // Close all browsers.
-  await closeBrowsers();
+  // await closeBrowsers();
   // Add the log statistics to the report.
+  console.log('Closed browsers');
   report.logCount = logCount;
   report.logSize = logSize;
   report.errorLogCount = errorLogCount;
@@ -1305,6 +1340,7 @@ const doScript = async (report) => {
   report.prohibitedCount = prohibitedCount;
   report.visitTimeoutCount = visitTimeoutCount;
   report.visitRejectionCount = visitRejectionCount;
+  console.log('Added counts to report');
   // Add the end time and duration to the report.
   const endTime = new Date();
   report.endTime = endTime.toISOString().slice(0, 19);
@@ -1314,6 +1350,7 @@ const doScript = async (report) => {
     event: 'endTime',
     value: ((new Date()).toISOString().slice(0, 19))
   });
+  console.log('Finishing doScript');
 };
 // Injects launch and url acts into a report where necessary to undo DOM changes.
 const injectLaunches = acts => {
@@ -1364,6 +1401,7 @@ const injectLaunches = acts => {
 };
 // Handles a request.
 exports.handleRequest = async report => {
+  console.log('Starting handleRequest');
   // If the report object is valid:
   if(isValidReport(report)) {
     // Add a start time to the log.
@@ -1389,7 +1427,9 @@ exports.handleRequest = async report => {
       injectLaunches(report.acts);
     }
     // Perform the acts, asynchronously adding to the log and report.
+    console.log('About to run doScript');
     await doScript(report);
+    console.log('Ran doScript');
   }
   else {
     console.log('ERROR: options missing or invalid');

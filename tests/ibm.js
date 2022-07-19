@@ -103,7 +103,7 @@ exports.reporter = async (page, withItems, withNewContent) => {
   // If a test with existing content is to be performed:
   const result = {};
   if (! withNewContent) {
-    const timeLimit = 13;
+    const timeLimit = 7;
     const typeContent = await page.content();
     result.content = await doTest(typeContent, withItems, timeLimit);
     if (result.content.prevented) {
@@ -113,7 +113,7 @@ exports.reporter = async (page, withItems, withNewContent) => {
   }
   // If a test with new content is to be performed:
   if ([true, undefined].includes(withNewContent)) {
-    const timeLimit = 13;
+    const timeLimit = 11;
     const typeContent = page.url();
     result.url = await doTest(typeContent, withItems, timeLimit);
     if (result.url.prevented) {
