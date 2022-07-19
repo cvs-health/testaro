@@ -19,6 +19,7 @@ const {batchify} = require('./batchify');
 const scriptDir = process.env.SCRIPTDIR;
 const batchDir = process.env.BATCHDIR;
 const reportDir = process.env.REPORTDIR;
+const successHosts = [];
 const crashHosts = [];
 const timeoutHosts = [];
 
@@ -55,38 +56,41 @@ const runHosts = async (timeStamp, specs) => {
       'runHost', [id, JSON.stringify(script), JSON.stringify(host)],
       {
         detached: true,
-        stdio: [0, 1, 2, 'ipc']
+        stdio: [0, 1, 'ignore', 'ipc']
       }
     );
-    // If the execution continues until the deadline:
+    // If the child process times out:
     const timer = setTimeout(async () => {
       clearTimeout(timer);
       // Record the host as timed out.
       timeoutHosts.push(id);
       // Kill the child process.
-      subprocess.send('interrupt');
-      console.log(`Script for host ${id} exceeded time limit, so was killed`);
+      subprocess.kill();
+      console.log(`Script for host ${id} exceeded ${timeLimit}-second time limit, so was killed`);
       // Run the remaining host scripts.
-      await runHosts(specs);
-    }, script.timeLimit || timeLimit);
-    // If the child process crashes:
-    subprocess.on('exit', async () => {
-      clearTimeout(timer);
-      // Record the host as crashed.
-      crashHosts.push(id);
-      console.log(`Script for host ${id} crashed`);
-      // Run the remaining host scripts.
-      await runHosts(specs);
-    });
-    // If the child process sends a report:
+      await runHosts(timeStamp, specs);
+    }, 1000 * (script.timeLimit || timeLimit));
+    // If the child process succeeds:
     subprocess.on('message', async message => {
       clearTimeout(timer);
-      // Save it as a file.
+      // Save its report as a file.
       await fs.writeFile(`${reportDir}/${id}.json`, message);
       console.log(`Report ${id}.json saved in ${reportDir}`);
       reportCount++;
+      successHosts.push(id);
       // Run the remaining host scripts.
-      await runHosts(specs);
+      await runHosts(timeStamp, specs);
+    });
+    // If the child process ends:
+    subprocess.on('exit', async () => {
+      // If it ended in a crash:
+      if (! (successHosts.includes(id) || timeoutHosts.includes(id))) {
+        clearTimeout(timer);
+        crashHosts.push(id);
+        console.log(`Script for host ${id} crashed`);
+        // Run the remaining host scripts.
+        await runHosts(timeStamp, specs);
+      }
     });
   }
   // Otherwise, i.e. if no more host scripts are to be run:

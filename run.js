@@ -259,62 +259,70 @@ const launch = async typeName => {
     if (waits) {
       browserOptions.slowMo = waits;
     }
-    const browser = await browserType.launch(browserOptions);
-    // Create a new context (window) in it, taller if debugging is on.
-    const viewport = debug ? {
-      viewPort: {
-        width: 1280,
-        height: 1120
-      }
-    } : {};
-    browserContext = await browser.newContext(viewport);
-    // When a page is added to the browser context:
-    browserContext.on('page', page => {
-      // Make abbreviations of its console messages get reported in the Playwright console.
-      page.on('console', msg => {
-        const msgText = msg.text();
-        const parts = [msgText.slice(0, 75)];
-        if (msgText.length > 75) {
-          parts.push(msgText.slice(75, 150));
-          if (msgText.length > 150) {
-            const tail = msgText.slice(150).slice(-150);
-            if (msgText.length > 300) {
-              parts.push('...');
-            }
-            parts.push(tail.slice(0, 75));
-            if (tail.length > 75) {
-              parts.push(tail.slice(75));
+    let healthy = true;
+    const browser = await browserType.launch(browserOptions)
+    .catch(error => {
+      healthy = false;
+      console.log(`ERROR launching browser: ${error.message.replace(/\n.+/s, '')}`);
+    });
+    // If the launch succeeded:
+    if (healthy) {
+      // Create a new context (window) in it, taller if debugging is on.
+      const viewport = debug ? {
+        viewPort: {
+          width: 1280,
+          height: 1120
+        }
+      } : {};
+      browserContext = await browser.newContext(viewport);
+      // When a page is added to the browser context:
+      browserContext.on('page', page => {
+        // Make abbreviations of its console messages get reported in the Playwright console.
+        page.on('console', msg => {
+          const msgText = msg.text();
+          const parts = [msgText.slice(0, 75)];
+          if (msgText.length > 75) {
+            parts.push(msgText.slice(75, 150));
+            if (msgText.length > 150) {
+              const tail = msgText.slice(150).slice(-150);
+              if (msgText.length > 300) {
+                parts.push('...');
+              }
+              parts.push(tail.slice(0, 75));
+              if (tail.length > 75) {
+                parts.push(tail.slice(75));
+              }
             }
           }
-        }
-        const indentedMsg = parts.map(part => `    | ${part}`).join('\n');
-        console.log(`\n${indentedMsg}`);
-        const msgTextLC = msgText.toLowerCase();
-        const msgLength = msgText.length;
-        logCount++;
-        logSize += msgLength;
-        if (errorWords.some(word => msgTextLC.includes(word))) {
-          errorLogCount++;
-          errorLogSize += msgLength;
-        }
-        const msgLC = msgText.toLowerCase();
-        if (msgText.includes('403') && (msgLC.includes('status') || msgLC.includes('prohibited'))) {
-          prohibitedCount++;
-        }
+          const indentedMsg = parts.map(part => `    | ${part}`).join('\n');
+          console.log(`\n${indentedMsg}`);
+          const msgTextLC = msgText.toLowerCase();
+          const msgLength = msgText.length;
+          logCount++;
+          logSize += msgLength;
+          if (errorWords.some(word => msgTextLC.includes(word))) {
+            errorLogCount++;
+            errorLogSize += msgLength;
+          }
+          const msgLC = msgText.toLowerCase();
+          if (msgText.includes('403') && (msgLC.includes('status') || msgLC.includes('prohibited'))) {
+            prohibitedCount++;
+          }
+        });
       });
-    });
-    // Open the first page of the context.
-    const page = await browserContext.newPage();
-    if (debug) {
-      page.setViewportSize({
-        width: 1280,
-        height: 1120
-      });
+      // Open the first page of the context.
+      const page = await browserContext.newPage();
+      if (debug) {
+        page.setViewportSize({
+          width: 1280,
+          height: 1120
+        });
+      }
+      // Wait until it is stable.
+      await page.waitForLoadState('domcontentloaded');
+      // Update the name of the current browser type and store it in the page.
+      page.browserTypeName = browserTypeName = typeName;
     }
-    // Wait until it is stable.
-    await page.waitForLoadState('domcontentloaded');
-    // Update the name of the current browser type and store it in the page.
-    page.browserTypeName = browserTypeName = typeName;
   }
 };
 // Normalizes spacing characters and cases in a string.
