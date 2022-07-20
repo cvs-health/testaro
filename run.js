@@ -634,6 +634,15 @@ const wait = ms => {
     }, ms);
   });
 };
+// Adds an error result to an act.
+const addError = (act, error) => {
+  act.result = {
+    error
+  };
+  if (act.type === 'test') {
+    act.result.prevented = true;
+  }
+};
 // Recursively performs the acts in a report.
 const doActs = async (report, actIndex, page) => {
   process.on('message', message => {
@@ -761,11 +770,11 @@ const doActs = async (report, actIndex, page) => {
           )
           .catch(error => {
             console.log(`ERROR waiting for page to be ${act.which} (${error.message})`);
-            act.result = `ERROR waiting for page to be ${act.which}`;
+            addError(act, `ERROR waiting for page to be ${act.which}`);
             actIndex = -2;
           });
           if (actIndex > -2) {
-            act.result = `Page became ${act.which}`;
+            addError(`Page became ${act.which}`);
           }
         }
         // Otherwise, if the act is a page switch:
@@ -977,7 +986,7 @@ const doActs = async (report, actIndex, page) => {
                   await matchingElement.waitForElementState('stable', {timeout: 2000})
                   .catch(error => {
                     console.log(`ERROR waiting for stable ${act.type} (${error.message})`);
-                    act.result = `ERROR waiting for stable ${act.type}`;
+                    addError(act, `ERROR waiting for stable ${act.type}`);
                   });
                   if (! act.result) {
                     const isEnabled = await matchingElement.isEnabled();
@@ -988,7 +997,7 @@ const doActs = async (report, actIndex, page) => {
                       })
                       .catch(error => {
                         console.log(`ERROR checking ${act.type} (${error.message})`);
-                        act.result = `ERROR checking ${act.type}`;
+                        addError(act, `ERROR checking ${act.type}`);
                       });
                       if (! act.result) {
                         act.result = 'checked';
@@ -1250,19 +1259,19 @@ const doActs = async (report, actIndex, page) => {
           // Otherwise, i.e. if redirection is prohibited but occurred:
           else {
             // Add the error result to the act.
-            act.result = `ERROR: Page URL wrong (${url})`;
+            addError(act, `ERROR: Page URL wrong (${url})`);
           }
         }
         // Otherwise, i.e. if the required page URL does not exist:
         else {
           // Add an error result to the act.
-          act.result = 'ERROR: Page has no URL';
+          addError(act, 'ERROR: Page has no URL');
         }
       }
       // Otherwise, i.e. if no page exists:
       else {
         // Add an error result to the act.
-        act.result = 'ERROR: No page identified';
+        addError(act, 'ERROR: No page identified');
       }
     }
     // Otherwise, i.e. if the command is invalid:
