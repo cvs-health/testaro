@@ -56,7 +56,7 @@ const runHosts = async (timeStamp, specs) => {
       'runHost', [id, JSON.stringify(script), JSON.stringify(host)],
       {
         detached: true,
-        stdio: [0, 1, 2, 'ipc']
+        stdio: [0, 1, 'ignore', 'ipc']
       }
     );
     let runMoreTimer = null;

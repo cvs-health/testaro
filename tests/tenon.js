@@ -6,7 +6,6 @@ const https = require('https');
 // Wait until a time limit in seconds expires.
 const wait = timeLimit => new Promise(resolve => setTimeout(resolve, 1000 * timeLimit));
 exports.reporter = async (tenonData, id) => {
-  console.log('Started retrieving tenon');
   if (tenonData && tenonData.accessToken && tenonData.requestIDs && tenonData.requestIDs[id]) {
     // Shared request options.
     const requestOptions = {
@@ -102,7 +101,7 @@ exports.reporter = async (tenonData, id) => {
         return {
           result: {
             prevented: true,
-            error: 'ERROR: Tenon result not retrieved',
+            error: 'ERROR: Tenon test stalled or crashed',
             status
           }
         };
