@@ -59,19 +59,27 @@ const runHosts = async (timeStamp, specs) => {
         stdio: [0, 1, 2, 'ipc']
       }
     );
+    let runMoreTimer = null;
     // If the child process times out:
     const timer = setTimeout(async () => {
       clearTimeout(timer);
       // Record the host as timed out.
       timeoutHosts.push(id);
       // Kill the child process.
-      subprocess.kill();
+      subprocess.kill('SIGKILL');
       console.log(`Script for host ${id} exceeded ${timeLimit}-second time limit, so was killed`);
-      // Run the remaining host scripts.
-      await runHosts(timeStamp, specs);
+      // Run the remaining host scripts after a 10-second wait.
+      runMoreTimer = setTimeout(async () => {
+        clearTimeout(runMoreTimer);
+        if (! (successHosts.includes(id) || crashHosts.includes(id))) {
+          console.log('Continuing with the remaining host scripts');
+          await runHosts(timeStamp, specs);
+        }
+      }, 10000);
     }, 1000 * (script.timeLimit || timeLimit));
     // If the child process succeeds:
     subprocess.on('message', async message => {
+      clearTimeout(runMoreTimer);
       clearTimeout(timer);
       // Save its report as a file.
       await fs.writeFile(`${reportDir}/${id}.json`, message);
@@ -83,8 +91,9 @@ const runHosts = async (timeStamp, specs) => {
     });
     // If the child process ends:
     subprocess.on('exit', async () => {
-      // If it ended in a crash:
+      // If its end was not due to success or a timeout:
       if (! (successHosts.includes(id) || timeoutHosts.includes(id))) {
+        clearTimeout(runMoreTimer);
         clearTimeout(timer);
         crashHosts.push(id);
         console.log(`Script for host ${id} crashed`);
