@@ -112,6 +112,7 @@ const runHosts = async (timeStamp, specs) => {
     if (crashHosts.length) {
       console.log(`Hosts crashed:\n${JSON.stringify(crashHosts, null, 2)}`);
     }
+    return '';
   }
 };
 // Runs a file-based job and writes a report file for the script or each host.
@@ -136,7 +137,7 @@ exports.runJob = async (scriptID, batchID) => {
         batch = JSON.parse(batchJSON);
         const specs = batchify(script, batch, timeStamp);
         // Recursively run each host script and save the reports.
-        runHosts(timeStamp, specs);
+        await runHosts(timeStamp, specs);
       }
       // Otherwise, i.e. if there is no batch:
       else {

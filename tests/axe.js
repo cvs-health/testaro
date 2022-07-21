@@ -24,7 +24,7 @@ const {injectAxe, getAxeResults} = require('axe-playwright');
 // Conducts and reports an Axe test.
 exports.reporter = async (page, detailLevel, rules = []) => {
   // Initialize the report.
-  const data = {};
+  let data = {};
   // Inject axe-core into the page.
   await injectAxe(page)
   .catch(error => {
@@ -104,5 +104,15 @@ exports.reporter = async (page, detailLevel, rules = []) => {
     }
   }
   // Return the result.
+  try {
+    JSON.stringify(data);
+  }
+  catch(error) {
+    console.log(`ERROR: axe result cannot be made JSON (${error.message})`);
+    data = {
+      prevented: true,
+      error: `ERROR: axe result cannot be made JSON (${error.message})`
+    };
+  }
   return {result: data};
 };

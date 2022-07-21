@@ -18,8 +18,29 @@ const runHost = async (id, scriptJSON, hostJSON) => {
     script: JSON.parse(scriptJSON),
     acts: []
   };
+  let reportJSON = JSON.stringify(report, null, 2);
   await handleRequest(report);
-  const reportJSON = JSON.stringify(report, null, 2);
+  report.acts.forEach(act => {
+    try {
+      JSON.stringify(act);
+    }
+    catch (error) {
+      console.log(`ERROR: act of type ${act.type} malformatted`);
+      act = {
+        type: act.type || 'ERROR',
+        which: act.which || 'N/A',
+        prevented: true,
+        error: error.message
+      };
+      console.log(`act changed to:\n${JSON.stringify(act, null, 2)}`);
+    }
+  });
+  try {
+    reportJSON = JSON.stringify(report, null, 2);
+  }
+  catch(error) {
+    console.log(`ERROR: report for host ${id} not JSON (${error.message})`);
+  }
   process.send(reportJSON, () => {
     process.disconnect();
     process.exit();
