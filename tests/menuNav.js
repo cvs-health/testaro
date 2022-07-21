@@ -6,7 +6,7 @@
 */
 exports.reporter = async (page, withItems) => {
   // Initialize a report.
-  const data = {
+  let data = {
     totals: {
       navigations: {
         all: {
@@ -238,12 +238,22 @@ exports.reporter = async (page, withItems) => {
         // If the menu contains at least 2 direct menu items:
         if (menuItems.length > 1) {
           // Test its menu items.
-          const isCorrect = await testMenuItems(firstMenu, menuItems, 0, orientation, true);
-          // Increment the data.
-          data.totals.menus.total++;
-          data.totals.menus[isCorrect ? 'correct' : 'incorrect']++;
-          // Process the remaining menus.
-          await testMenus(menus.slice(1));
+          let isCorrect = false;
+          try {
+            isCorrect = await testMenuItems(firstMenu, menuItems, 0, orientation, true);
+            // Increment the data.
+            data.totals.menus.total++;
+            data.totals.menus[isCorrect ? 'correct' : 'incorrect']++;
+            // Process the remaining menus.
+            await testMenus(menus.slice(1));
+          }
+          catch(error) {
+            console.log(`ERROR: menuNav could not perform tests (${error.message})`);
+            data = {
+              prevented: true,
+              error: error.message
+            };
+          }
         }
       }
     };
