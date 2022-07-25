@@ -500,6 +500,7 @@ const goto = async (page, url, timeout, waitUntil, isStrict) => {
   if (url.startsWith('file://.')) {
     url = url.replace('file://', `file://${__dirname}/`);
   }
+  // Visit the URL.
   const response = await page.goto(url, {
     timeout,
     waitUntil
@@ -509,25 +510,37 @@ const goto = async (page, url, timeout, waitUntil, isStrict) => {
     visitTimeoutCount++;
     return 'error';
   });
+  // If the visit succeeded:
   if (typeof response !== 'string') {
     const httpStatus = response.status();
+    // If the response status was normal:
     if ([200, 304].includes(httpStatus) || url.startsWith('file:')) {
+      // If the browser was redirected in violation of a strictness requirement.
       const actualURL = page.url();
       if (isStrict && deSlash(actualURL) !== deSlash(url)) {
+        // Return an error.
         console.log(`ERROR: Visit to ${url} redirected to ${actualURL}`);
         return 'redirection';
       }
+      // Otherwise, i.e. if no prohibited redirection occurred:
       else {
+        // Press the Escape key to dismiss any modal dialog.
+        await page.keyboard.press('Escape');
+        // Return the response.
         return response;
       }
     }
+    // Otherwise, i.e. if the response status was abnormal:
     else {
+      // Return an error.
       console.log(`ERROR: Visit to ${url} got status ${httpStatus}`);
       visitRejectionCount++;
       return 'error';
     }
   }
+  // Otherwise, i.e. if the visit failed:
   else {
+    // Return an error.
     return 'error';
   }
 };
