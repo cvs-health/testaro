@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /*
   continuum
   This test implements the Continuum ruleset.
@@ -6,7 +7,8 @@
 // FUNCTIONS
 // Runs Continuum on the page.
 exports.reporter = async page => {
-  const result = {};
+  let result = {};
+  // Inject the continuum scripts into the page, exposing the continuum object.
   for (const fileName of ['continuum.conf', 'AccessEngine.community', 'Continuum.community']) {
     if (! result.prevented) {
       await page.addScriptTag({
@@ -20,65 +22,24 @@ exports.reporter = async page => {
     }
   }
   if (! result.prevented) {
-    continuum.setUp(null, null, window);
-    for (const standard of ['WCAG2AA']) {
-      const nextIssues = await page.evaluate(standard => {
-        let issues = null;
-        try {
-          issues = window['HTMLCS_RUNNER'].run(standard);
-        }
-        catch(error) {
-          console.log(`ERROR executing HTMLCS_RUNNER on ${document.URL} (${error.message})`);
-        }
-        return issues;
-      }, standard);
-      if (nextIssues && nextIssues.every(issue => typeof issue === 'string')) {
-        messageStrings.push(... nextIssues);
+    // Run the Continuum ruleset and get the result.
+    result = await page.evaluate(async () => {
+      continuum.setUp(null, null, window);
+      let bigResult = await continuum.runAllTests();
+      if (Array.isArray(bigResult) && bigResult.length) {
+        return bigResult.map(bigItem => {
+          const item = bigItem._rawEngineJsonObject;
+          delete item.fingerprint.encoding;
+          if (item.element.length > 200) {
+            item.element = `${item.element.slice(0, 100)} ... ${item.element.slice(-100)}`;
+          }
+          return item;
+        });
       }
       else {
-        result.prevented = true;
-        result.error = 'ERROR executing HTMLCS_RUNNER in the page';
-        break;
+        return [];
       }
-    }
-    if (! result.prevented) {
-      // Sort the issues by class and standard.
-      messageStrings.sort();
-      // Remove any duplicate issues.
-      messageStrings = [... new Set(messageStrings)];
-      // Initialize the result.
-      result.Error = {};
-      result.Warning = {};
-      // For each issue:
-      messageStrings.forEach(string => {
-        const parts = string.split(/\|/, 6);
-        const partCount = parts.length;
-        if (partCount < 6) {
-          console.log(`ERROR: Issue string ${string} has too few parts`);
-        }
-        // If it is an error or a warning (not a notice):
-        else if (['Error', 'Warning'].includes(parts[0])) {
-          /*
-            Add the issue to an issueClass.issueCode.description array in the result.
-            This saves space, because, although some descriptions are issue-specific, such as
-            descriptions that state the contrast ratio of an element, most descriptions are
-            generic, so typically many issues share a description.
-          */
-          const issueCode = parts[1].replace(/^WCAG2|\.Principle\d\.Guideline[\d_]+/g, '');
-          if (! result[parts[0]][issueCode]) {
-            result[parts[0]][issueCode] = {};
-          }
-          if (! result[parts[0]][issueCode][parts[4]]) {
-            result[parts[0]][issueCode][parts[4]] = [];
-          }
-          result[parts[0]][issueCode][parts[4]].push({
-            tagName: parts[2],
-            id: parts[3],
-            code: parts[5]
-          });
-        }
-      });
-    }
+    });
   }
   return {result};
 };

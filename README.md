@@ -21,6 +21,7 @@ Testaro uses:
 Testaro includes some of its own accessibility tests. In addition, it performs the tests in:
 - [accessibility-checker](https://www.npmjs.com/package/accessibility-checker) (the IBM Equal Access Accessibility Checker)
 - [alfa](https://alfa.siteimprove.com/) (Siteimprove alfa)
+- [Continuum Community Edition](https://www.webaccessibility.com/tools/)
 - [HTML CodeSniffer](https://www.npmjs.com/package/html_codesniffer) (Squiz HTML CodeSniffer)
 - [axe-playwright](https://www.npmjs.com/package/axe-playwright) (Deque Axe-core)
 - [Tenon](https://tenon.io/documentation/what-tenon-tests.php) (Level Access)
@@ -29,13 +30,14 @@ Testaro includes some of its own accessibility tests. In addition, it performs t
 As of this version, the counts of tests in the packages referenced above were:
 - Alfa: 103
 - Axe-core: 138
+- Continuum Community Edition: 267
 - Equal Access: 163
 - HTML CodeSniffer: 98
 - Tenon: 180
 - WAVE: 110
 - subtotal: 612
 - Testaro tests: 16
-- grand total: 808
+- grand total: 1075
 
 ## Code organization
 

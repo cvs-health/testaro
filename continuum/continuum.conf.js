@@ -13,6 +13,7 @@ window.LevelAccess_AccessContinuumConfiguration = {
     1140, /* Section 508 and 255 (Revised 2017) */
     1471 /* WCAG 2.0 Level A & AA Baseline */
   ],
-  "includePotentialAccessibilityConcerns": true,
+  // includePotentialAccessibilityConcerns may be true only in the Professional Edition.
+  "includePotentialAccessibilityConcerns": false,
   "ampApiToken": null
 }

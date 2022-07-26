@@ -32,6 +32,7 @@ const tests = {
   alfa: 'alfa',
   axe: 'Axe',
   bulk: 'count of visible elements',
+  continuum: 'Level Access Continuum, community edition',
   embAc: 'active elements embedded in links or buttons',
   focAll: 'focusable and Tab-focused elements',
   focInd: 'focus indicators',
@@ -53,7 +54,7 @@ const tests = {
 };
 // Tests that may change the DOM.
 const domChangers = new Set([
-  'axe', 'focAll', 'focInd', 'focOp', 'hover', 'htmlcs', 'ibm', 'menuNav', 'wave'
+  'axe', 'continuum', 'focAll', 'focInd', 'focOp', 'hover', 'htmlcs', 'ibm', 'menuNav', 'wave'
 ]);
 // Browser types available in PlayWright.
 const browserTypeNames = {
