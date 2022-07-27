@@ -75,12 +75,14 @@ const errorWords = [
   'deprecated',
   'error',
   'failed',
+  'invalid',
   'missing',
   'but not used',
   'refused',
   'requires',
   'suspicious',
   'unrecognized',
+  'violates',
   'warning'
 ];
 
