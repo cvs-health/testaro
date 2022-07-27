@@ -6,7 +6,7 @@ Federated accessibility test automation
 
 Testaro is a collection of collections of web accessibility tests.
 
-The purpose of Testaro is to provide programmatic access to over 800 accessibility tests defined in several test packages and in Testaro itself.
+The purpose of Testaro is to provide programmatic access to 1075 accessibility tests defined in several test packages and in Testaro itself.
 
 ## System requirements
 
