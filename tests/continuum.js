@@ -22,11 +22,17 @@ exports.reporter = async page => {
     }
   }
   if (! result.prevented) {
-    // Run the Continuum ruleset and get the result.
+    // Run the Continuum ruleset and get the result, failing if none within 20 seconds.
     result = await page.evaluate(async () => {
       continuum.setUp(null, null, window);
-      let bigResult = await continuum.runAllTests();
-      if (Array.isArray(bigResult) && bigResult.length) {
+      const bigResultPromise = continuum.runAllTests();
+      const deadlinePromise = new Promise(resolve => {
+        setTimeout(() => {
+          resolve('timeout');
+        }, 20000);
+      });
+      const bigResult = await Promise.race([bigResultPromise, deadlinePromise]);
+      if (Array.isArray(bigResult)) {
         return bigResult.map(bigItem => {
           const item = bigItem._rawEngineJsonObject;
           delete item.fingerprint.encoding;
@@ -36,8 +42,17 @@ exports.reporter = async page => {
           return item;
         });
       }
+      else if (bigResult === 'timeout') {
+        return {
+          prevented: true,
+          error: 'ERROR: Running all tests timed out'
+        };
+      }
       else {
-        return [];
+        return {
+          prevented: true,
+          error: 'ERROR: Invalid result'
+        };
       }
     });
   }
