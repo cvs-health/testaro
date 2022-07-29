@@ -2,7 +2,7 @@
   "id": "tp12",
   "what": "Alfa, Axe, Continuum, HTML CodeSniffer, IBM, Tenon, WAVE, and 16 custom tests",
   "strict": true,
-  "timeLimit": 300,
+  "timeLimit": 400,
   "commands": [
     {
       "type": "launch",
