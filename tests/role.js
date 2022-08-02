@@ -2,15 +2,19 @@
   role
   This test reports role assignment that violate either an applicable standard or an applicable
   recommendation from WAI-ARIA. Invalid roles include those that are abstract and thus prohibited
-  from direct use, and those that are implicit in HTML elements and thus advised against. The math
-  role has been removed, because of poor adoption and exclusion from HTML5. The img role has
-  accessibility uses, so is not classified as deprecated. See:
+  from direct use, and those that are implicit in HTML elements and thus advised against. Roles
+  that explicitly confirm implicit roles are deemed redundant and can be scored as less serious
+  than roles that override implicit roles. The math role has been removed, because of poor
+  adoption and exclusion from HTML5. The img role has accessibility uses, so is not classified
+  as deprecated. See:
     https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/Role_Img
     https://www.w3.org/TR/html-aria/
     https://www.w3.org/TR/wai-aria/#roles_categorization
 */
 exports.reporter = async page => await page.$eval('body', body => {
+
   // CONSTANTS
+
   const badRoles = new Set([
     'article',
     'banner',
@@ -354,46 +358,9 @@ exports.reporter = async page => await page.$eval('body', body => {
   };
   // Array of th and td elements with redundant roles.
   const redundantCells = [];
-  // FUNCTIONS
-  const dataInit = (data, tagName, role) => {
-    if (! data.tagNames[tagName]) {
-      data.tagNames[tagName] = {};
-    }
-    if (! data.tagNames[tagName][role]) {
-      data.tagNames[tagName][role] = {
-        bad: 0,
-        redundant: 0
-      };
-    }
-  };
-  const tallyTableRedundancy = (elements, okRoles, tagName) => {
-    elements.forEach(element => {
-      const role = element.getAttribute('role');
-      if (okRoles.includes(role)) {
-        dataInit(data, tagName, role);
-        data.redundantRoleElements++;
-        data.tagNames[tagName][role].redundant++;
-        redundantCells.push(element);
-      }
-    });
-  };
-  // OPERATION
-  // Remove the deprecated roles from the non-abstract roles.
-  goodRoles.forEach(role => {
-    if (badRoles.has(role)) {
-      goodRoles.delete(role);
-    }
-  });
-  // Identify all elements with role attributes.
+  // Elements with role attributes.
   const roleElements = Array.from(body.querySelectorAll('[role]'));
-  // Initialize the result.
-  const data = {
-    roleElements: roleElements.length,
-    badRoleElements: 0,
-    redundantRoleElements: 0,
-    tagNames: {}
-  };
-  // Identify the th and td elements with redundant roles.
+  // th and td elements with redundant roles.
   const gridHeaders = Array.from(
     document.body.querySelectorAll('table[role=grid] th, table[role=treegrid] th')
   );
@@ -406,6 +373,50 @@ exports.reporter = async page => await page.$eval('body', body => {
   const tableCells = Array.from(
     document.body.querySelectorAll('table[role=table] td, table:not([role]) td')
   );
+  // Initialized result.
+  const data = {
+    roleElements: roleElements.length,
+    badRoleElements: 0,
+    redundantRoleElements: 0,
+    tagNames: {}
+  };
+
+  // FUNCTIONS
+
+  // Initializes the results.
+  const dataInit = (data, tagName, role) => {
+    if (! data.tagNames[tagName]) {
+      data.tagNames[tagName] = {};
+    }
+    if (! data.tagNames[tagName][role]) {
+      data.tagNames[tagName][role] = {
+        bad: 0,
+        redundant: 0
+      };
+    }
+  };
+  // 
+  const tallyTableRedundancy = (elements, okRoles, tagName) => {
+    elements.forEach(element => {
+      const role = element.getAttribute('role');
+      if (okRoles.includes(role)) {
+        dataInit(data, tagName, role);
+        data.redundantRoleElements++;
+        data.tagNames[tagName][role].redundant++;
+        redundantCells.push(element);
+      }
+    });
+  };
+
+  // OPERATION
+
+  // Remove the deprecated roles from the non-abstract roles.
+  goodRoles.forEach(role => {
+    if (badRoles.has(role)) {
+      goodRoles.delete(role);
+    }
+  });
+  // Identify the table elements with redundant roles.
   tallyTableRedundancy(gridHeaders, ['columnheader', 'rowheader', 'gridcell'], 'TH');
   tallyTableRedundancy(gridCells, ['gridcell'], 'TD');
   tallyTableRedundancy(tableHeaders, ['columnheader', 'rowheader', 'cell'], 'TH');
@@ -422,6 +433,7 @@ exports.reporter = async page => await page.$eval('body', body => {
         const lcTagName = tagName.toLowerCase();
         // If it is simply redundant:
         if (role === implicitRoles[lcTagName]) {
+          // Update the results.
           data.redundantRoleElements++;
           data.tagNames[tagName][role].redundant++;
         }
@@ -446,18 +458,20 @@ exports.reporter = async page => await page.$eval('body', body => {
             )
           )
         ) {
+          // Update the results.
           data.redundantRoleElements++;
           data.tagNames[tagName][role].redundant++;
         }
         // Otherwise, i.e. if it is absolutely invalid:
         else {
+          // Update the results.
           data.badRoleElements++;
           data.tagNames[tagName][role].bad++;
         }
       }
       // Otherwise, i.e. if it is absolutely invalid:
       else {
-        // Add the facts to the result.
+        // Update the results.
         data.badRoleElements++;
         dataInit(data, tagName, role);
         data.tagNames[tagName][role].bad++;
