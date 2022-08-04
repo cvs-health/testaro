@@ -196,6 +196,12 @@ exports.commands = {
         withItems: [true, 'boolean']
       }
     ],
+    linkTo: [
+      'Perform a linkTo test',
+      {
+        withItems: [true, 'boolean']
+      }
+    ],
     linkUl: [
       'Perform a linkUl test',
       {

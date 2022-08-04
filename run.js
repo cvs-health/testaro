@@ -41,6 +41,7 @@ const tests = {
   htmlcs: 'HTML CodeSniffer WCAG 2.1 AA ruleset',
   ibm: 'IBM Accessibility Checker',
   labClash: 'labeling inconsistencies',
+  linkTo: 'links without destinations',
   linkUl: 'adjacent-link underlining',
   menuNav: 'keyboard navigation between focusable menu items',
   motion: 'motion',
