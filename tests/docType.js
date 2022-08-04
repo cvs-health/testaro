@@ -6,5 +6,7 @@
 exports.reporter = async page => {
   // Identify the visible links without href attributes.
   const docType = await page.evaluate(() => document.doctype);
-  return {result: Boolean(docType)};
+  return {result: {
+    docHasType: Boolean(docType)
+  }};
 };

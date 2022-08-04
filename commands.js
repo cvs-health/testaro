@@ -170,6 +170,12 @@ exports.commands = {
         withItems: [true, 'boolean']
       }
     ],
+    focVis: [
+      'Perform a focVis test',
+      {
+        withItems: [true, 'boolean']
+      }
+    ],
     hover: [
       'Perform a hover test',
       {
@@ -222,6 +228,12 @@ exports.commands = {
         count: [true, 'number', '', 'count of screen shots to make']
       }
     ],
+    nonTable: [
+      'Perform a nonTable test',
+      {
+        withItems: [true, 'boolean']
+      }
+    ],
     radioSet: [
       'Perform a radioSet test',
       {
@@ -244,6 +256,12 @@ exports.commands = {
       'Perform a Tenon test',
       {
         id: [true, 'string', 'hasLength', 'ID of the requested test instance']
+      }
+    ],
+    titledEl: [
+      'Perform a titledEl test',
+      {
+        withItems: [true, 'boolean']
       }
     ],
     wave: [
