@@ -220,6 +220,12 @@ exports.commands = {
         withItems: [true, 'boolean']
       }
     ],
+    miniText: [
+      'Perform a miniText test',
+      {
+        withItems: [true, 'boolean']
+      }
+    ],
     motion: [
       'Perform a motion test',
       {

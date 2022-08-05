@@ -46,6 +46,7 @@ const tests = {
   linkTo: 'links without destinations',
   linkUl: 'adjacent-link underlining',
   menuNav: 'keyboard navigation between focusable menu items',
+  miniText: 'text smaller than 11 pixels',
   motion: 'motion',
   nonTable: 'table elements used for layout',
   radioSet: 'fieldset grouping of radio buttons',

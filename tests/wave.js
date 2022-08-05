@@ -41,7 +41,7 @@ exports.reporter = async (page, reportType) => {
                 const {guidelines} = issueDoc;
                 items[issueName].wcag = guidelines;
               });
-            })
+            });
             return resolve(result);
           }
           catch (error) {
