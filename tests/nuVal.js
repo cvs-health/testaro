@@ -10,10 +10,11 @@ exports.reporter = async page => {
     const request = https.request(
       {
         host: 'validator.nu',
-        path: '?parser=html&out=json',
+        path: '/?parser=html&out=json',
         method: 'POST',
         headers: {
-          'Content-Type': 'text/html; charset=utf8'
+          'User-Agent': 'Mozilla/5.0',
+          'Content-Type': 'text/html; charset=utf-8'
         }
       },
       response => {

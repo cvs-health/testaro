@@ -1,8 +1,8 @@
 {
-  "id": "tp14",
-  "what": "Alfa, Axe, Continuum, HTML CodeSniffer, IBM, Tenon, WAVE, and 16 custom tests",
+  "id": "tp15",
+  "what": "Alfa, Axe, Continuum, HTML CodeSniffer, IBM, Nu Html Checker, Tenon, WAVE, and 22 custom tests",
   "strict": true,
-  "timeLimit": 400,
+  "timeLimit": 500,
   "commands": [
     {
       "type": "launch",
@@ -151,6 +151,11 @@
       "which": "ibm",
       "withItems": true,
       "what": "IBM Accessibility Checker, with page content and again with URL"
+    },
+    {
+      "type": "test",
+      "which": "nuVal",
+      "what": "Nu Html Checker"
     },
     {
       "type": "test",

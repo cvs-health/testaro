@@ -6,7 +6,7 @@ Federated accessibility test automation
 
 Testaro is a collection of collections of web accessibility tests.
 
-The purpose of Testaro is to provide programmatic access to 1075 accessibility tests defined in several test packages and in Testaro itself.
+The purpose of Testaro is to provide programmatic access to 1228 accessibility tests defined in several test packages and in Testaro itself.
 
 ## System requirements
 
@@ -26,6 +26,9 @@ Testaro includes some of its own accessibility tests. In addition, it performs t
 - [axe-playwright](https://www.npmjs.com/package/axe-playwright) (Deque Axe-core)
 - [Tenon](https://tenon.io/documentation/what-tenon-tests.php) (Level Access)
 - [WAVE API](https://wave.webaim.org/api/) (WebAIM WAVE)
+- [Nu Html Checker](https://github.com/validator/validator)
+
+Some of the Testaro tests are derived from tests performed by the [BBC Accessibility Standards Checker](https://github.com/bbc/bbc-a11y).
 
 As of this version, the counts of tests in the packages referenced above were:
 - Alfa: 103
@@ -35,9 +38,10 @@ As of this version, the counts of tests in the packages referenced above were:
 - HTML CodeSniffer: 98
 - Tenon: 180
 - WAVE: 110
+- Nu Html Checker: 147
 - subtotal: 612
-- Testaro tests: 16
-- grand total: 1075
+- Testaro tests: 22
+- grand total: 1228
 
 ## Code organization
 
@@ -329,6 +333,10 @@ The changes in `htmlcs/HTMLCS.js` are:
 >         typeName + '|' + msg.code + '|' + nodeName + '|' + elementId + '|' + msg.msg + '|' + html
 >       );
 ```
+
+###### BBC Accessibility Standards Checker
+
+The BBC Accessibility Standards Checker has obsolete dependencies with security vulnerabilities. Therefore, it is not used as a dependency of Testaro. Instead, 6 of its tests were reimplemented, in some case with revisions, as Testaro tests. They were drawn from the 18 automated tests of the Checker. The other 12 tests were found too duplicative of other tests to justify reimplementation.
 
 ##### Branching
 
