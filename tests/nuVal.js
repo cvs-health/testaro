@@ -10,7 +10,10 @@ exports.reporter = async page => {
     try {
       const request = https.request(
         {
-          // Alternatives (more timeout-prone): host=validator.nu; path=/?parser=html@out=json
+          /*
+            Alternatives (more timeout-prone): host=validator.nu; path=/?parser=html@out=json
+            That host crashes instead of ending with a fatal error.
+          */
           host: 'validator.w3.org',
           path: '/nu/?parser=html&out=json',
           method: 'POST',
