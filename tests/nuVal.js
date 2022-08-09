@@ -10,9 +10,9 @@ exports.reporter = async page => {
     try {
       const request = https.request(
         {
-          // Alternatives: host=validator.w3.org; path=/nu/?parser=html@out=json
-          host: 'validator.nu',
-          path: '/?parser=html&out=json',
+          // Alternatives (more timeout-prone): host=validator.nu; path=/?parser=html@out=json
+          host: 'validator.w3.org',
+          path: '/nu/?parser=html&out=json',
           method: 'POST',
           headers: {
             'User-Agent': 'Mozilla/5.0',
