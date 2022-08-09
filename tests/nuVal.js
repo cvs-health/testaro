@@ -1,6 +1,11 @@
 /*
   nuVal
   This test subjects a page to the Nu Html Checker.
+  That API erratically replaces left and right double quotation marks with invalid UTF-8, which
+  appears as 2 or 3 successive instances of the replacement character (U+fffd). Therefore, this
+  test removes all such quotation marks and the replacement character. That causes
+  'Bad value “” for' to become 'Bad value  for'. Since the corruption of quotation marks is
+  erratic, no better solution is known.
 */
 const https = require('https');
 exports.reporter = async page => {
@@ -30,8 +35,8 @@ exports.reporter = async page => {
           // When the data arrive:
           response.on('end', async () => {
             try {
-              // Delete unnecessary properties.
-              const result = JSON.parse(report);
+              // Delete left and right quotation marks and their erratic invalid replacements.
+              const result = JSON.parse(report.replace(/[\u{fffd}“”]/ug, ''));
               return resolve(result);
             }
             catch (error) {
