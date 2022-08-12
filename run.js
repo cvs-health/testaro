@@ -429,7 +429,7 @@ const textOf = async (page, element) => {
     return null;
   }
 };
-// Returns an element of a type case-insensitively matching a text.
+// Returns an element of a type case-insensitively including a text.
 const matchElement = async (page, selector, matchText, index = 0) => {
   if (matchText) {
     // If the page still exists:
@@ -648,7 +648,7 @@ const isTrue = (object, specs) => {
 // Adds a wait error result to an act.
 const waitError = (page, act, error, what) => {
   console.log(`ERROR waiting for ${what} (${error.message})`);
-  act.result = {url: page.url()};
+  act.result.url = page.url();
   act.result.error = `ERROR waiting for ${what}`;
   return false;
 };
@@ -742,6 +742,7 @@ const doActs = async (report, actIndex, page) => {
         else if (act.type === 'wait') {
           const {what, which} = act;
           console.log(`>> for ${what} to include “${which}”`);
+          act.result = {};
           // Wait 5 or 10 seconds for the specified text, and quit if it does not appear.
           if (act.what === 'url') {
             await page.waitForURL(act.which, {timeout: 15000})
@@ -752,8 +753,19 @@ const doActs = async (report, actIndex, page) => {
           }
           else if (act.what === 'title') {
             await page.waitForFunction(
-              text => document && document.title && document.title.includes(text),
-              act.which,
+              act => {
+                const found = document
+                && document.title
+                && document.title.toLowerCase().includes(act.which.toLowerCase());
+                if (found) {
+                  act.result.title = document.title;
+                  return true;
+                }
+                else {
+                  return false;
+                }
+              },
+              act,
               {
                 polling: 1000,
                 timeout: 5000
@@ -766,7 +778,9 @@ const doActs = async (report, actIndex, page) => {
           }
           else if (act.what === 'body') {
             await page.waitForFunction(
-              text => document && document.body && document.body.innerText.includes(text),
+              text => document
+              && document.body
+              && document.body.innerText.toLowerCase().includes(text.toLowerCase()),
               act.which,
               {
                 polling: 2000,
@@ -778,13 +792,43 @@ const doActs = async (report, actIndex, page) => {
               waitError(page, act, error, 'body');
             });
           }
+          else if (act.what === 'mailLink') {
+            await page.waitForFunction(
+              act => {
+                const mailLinks = document
+                && document.body
+                && document.body.querySelectorAll('a[href^=mailto:]');
+                if (mailLinks && mailLinks.size) {
+                  const a11yLink = Array
+                  .from(mailLinks)
+                  .find(link => link.textContent.toLowerCase().includes(act.which.toLowerCase()));
+                  if (a11yLink) {
+                    act.result.address = a11yLink.href.replace(/^mailto:/, '');
+                    return true;
+                  }
+                  else {
+                    return false;
+                  }
+                }
+                else {
+                  return false;
+                }
+              },
+              act,
+              {
+                polling: 1000,
+                timeout: 5000
+              }
+            )
+            .catch(async error => {
+              actIndex = -2;
+              waitError(page, act, error, 'mailLink');
+            });
+          }
           // If the text was found:
           if (actIndex > -2) {
             // Add this to the report.
-            act.result = {url: page.url()};
-            if (act.what === 'title') {
-              act.result.title = await page.title();
-            }
+            act.result.url = page.url();
           }
         }
         // Otherwise, if the act is a wait for a state:
