@@ -741,27 +741,30 @@ const doActs = async (report, actIndex, page) => {
         // Otherwise, if the act is a wait for text:
         else if (act.type === 'wait') {
           const {what, which} = act;
-          console.log(`>> for ${what} to include “${which}”`);
-          act.result = {};
-          console.log(`The act with result initialized is:\n${JSON.stringify(act, null, 2)}`);
-          // Wait 5 or 10 seconds for the specified text, and quit if it does not appear.
+          let found = {};
+          // Wait for the specified text, and quit if it does not appear.
           if (what === 'url') {
-            await page.waitForURL(which, {timeout: 15000})
+            const isFound = await page.waitForURL(which, {timeout: 15000})
             .catch(error => {
               actIndex = -2;
               waitError(page, act, error, 'URL');
             });
+            if (isFound) {
+              return {
+                url: page.url()
+              };
+            }
           }
           else if (what === 'title') {
             await page.waitForFunction(
               act => {
-                const found = document
+                const isFound = document
                 && document.title
                 && document.title.toLowerCase().includes(act.which.toLowerCase());
-                if (found) {
-                  act.result.title = document.title;
-                  console.log(`The act with title added is:\n${JSON.stringify(act, null, 2)}`);
-                  return true;
+                if (isFound) {
+                  return {
+                    title: document.title
+                  };
                 }
                 else {
                   return false;
@@ -779,7 +782,7 @@ const doActs = async (report, actIndex, page) => {
             });
           }
           else if (what === 'body') {
-            await page.waitForFunction(
+            const isFound = await page.waitForFunction(
               text => document
               && document.body
               && document.body.innerText.toLowerCase().includes(text.toLowerCase()),
@@ -793,10 +796,15 @@ const doActs = async (report, actIndex, page) => {
               actIndex = -2;
               waitError(page, act, error, 'body');
             });
+            if (isFound) {
+              return {
+                body: which
+              };
+            }
           }
           else if (what === 'mailLink') {
             await page.waitForFunction(
-              act => {
+              text => {
                 const mailLinks = document
                 && document.body
                 && document.body.querySelectorAll('a[href^="mailto:"]');
@@ -805,8 +813,10 @@ const doActs = async (report, actIndex, page) => {
                   .from(mailLinks)
                   .find(link => link.textContent.toLowerCase().includes(act.which.toLowerCase()));
                   if (a11yLink) {
-                    act.result.address = a11yLink.href.replace(/^mailto:/, '');
-                    return true;
+                    const address = a11yLink.href.replace(/^mailto:/, '');
+                    return {
+                      mailLink: address
+                    };
                   }
                   else {
                     return false;
@@ -816,7 +826,7 @@ const doActs = async (report, actIndex, page) => {
                   return false;
                 }
               },
-              act,
+              which,
               {
                 polling: 1000,
                 timeout: 5000
