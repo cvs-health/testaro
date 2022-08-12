@@ -1,5 +1,5 @@
 /*
-  index.js
+  run.js
   testaro main script.
 */
 
@@ -103,6 +103,7 @@ let errorLogSize = 0;
 let prohibitedCount = 0;
 let visitTimeoutCount = 0;
 let visitRejectionCount = 0;
+let visitLatency = 0;
 let actCount = 0;
 // Facts about the current browser.
 let browserContext;
@@ -511,6 +512,7 @@ const goto = async (page, url, timeout, waitUntil, isStrict) => {
     url = url.replace('file://', `file://${__dirname}/`);
   }
   // Visit the URL.
+  const startTime = Date.now();
   const response = await page.goto(url, {
     timeout,
     waitUntil
@@ -520,6 +522,7 @@ const goto = async (page, url, timeout, waitUntil, isStrict) => {
     visitTimeoutCount++;
     return 'error';
   });
+  visitLatency += Math.round((Date.now() - startTime) / 1000);
   // If the visit succeeded:
   if (typeof response !== 'string') {
     const httpStatus = response.status();
@@ -733,7 +736,7 @@ const doActs = async (report, actIndex, page) => {
         // If the command is a url:
         if (act.type === 'url') {
           // Visit it and wait until it is stable.
-          page = await visit(act, page, report.strict);
+          page = await visit(act, page, report.isStrict);
         }
         // Otherwise, if the act is a wait for text:
         else if (act.type === 'wait') {
@@ -1335,6 +1338,7 @@ const doScript = async (report) => {
   report.prohibitedCount = prohibitedCount;
   report.visitTimeoutCount = visitTimeoutCount;
   report.visitRejectionCount = visitRejectionCount;
+  report.visitLatency = visitLatency;
   // Add the end time and duration to the report.
   const endTime = new Date();
   report.endTime = endTime.toISOString().slice(0, 19);

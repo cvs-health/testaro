@@ -93,6 +93,7 @@ A script is a JSON file with the properties:
 
 ```json
 {
+  "id": "string consisting of lower-case ASCII letters and digits",
   "what": "string: description of the script",
   "strict": "boolean: whether redirections should be treated as failures",
   "timeLimit": "number: limit in seconds on the execution of this script",
@@ -100,32 +101,33 @@ A script is a JSON file with the properties:
 }
 ```
 
-The `timeLimit` property is optional. If it is omitted, a default of 300 seconds (5 minutes) is set.
+The `timeLimit` property is optional. If it is omitted, a default of 300 seconds (5 minutes) is set. 
 
 ### Example
 
 Here is an example of a script:
 
-```javascript
+```json
 {
-  what: 'Test example.com with alfa',
+  "id": "samplescript",
+  what: "Test example.com with alfa",
   strict: true,
-  timeLimit: 15,
+  timeLimit: 65,
   commands: [
     {
-      type: 'launch',
-      which: 'chromium',
-      what: 'Chromium browser'
+      type: "launch",
+      which: "chromium",
+      what: "Chromium browser"
     },
     {
-      type: 'url',
-      which: 'https://example.com/',
-      what: 'page with a few accessibility defects'
+      type: "url",
+      which: "https://example.com/",
+      what: "page with a few accessibility defects"
     },
     {
-      type: 'test',
-      which: 'alfa',
-      what: 'Siteimprove alfa package'
+      type: "test",
+      which: "alfa",
+      what: "Siteimprove alfa package"
     }
   ]
 }
@@ -302,6 +304,10 @@ In case you want to perform more than one `tenon` test with the same script, you
 
 Tenon recommends giving it a public URL rather than giving it the content of a page, if possible. So, it is best to give the `withNewContent` property of the `tenonRequest` command the value `true`, unless the page is not public.
 
+###### Continuum
+
+The `continuum` test makes use of the files in the `continuum` directory. The test inserts the contents of all three files into the page as scripts and then uses them to perform the tests of the Continuum package.
+
 ###### HTML CodeSniffer
 
 The `htmlcs` test makes use of the`htmlcs/HTMLCS.js` file. That file was created, and can be recreated if necessary, as follows:
@@ -336,7 +342,7 @@ The changes in `htmlcs/HTMLCS.js` are:
 
 ###### BBC Accessibility Standards Checker
 
-The BBC Accessibility Standards Checker has obsolete dependencies with security vulnerabilities. Therefore, it is not used as a dependency of Testaro. Instead, 6 of its tests were reimplemented, in some case with revisions, as Testaro tests. They were drawn from the 18 automated tests of the Checker. The other 12 tests were found too duplicative of other tests to justify reimplementation.
+The BBC Accessibility Standards Checker has obsolete dependencies with security vulnerabilities. Therefore, it is not used as a dependency of Testaro. Instead, 6 of its tests are reimplemented, in some case with revisions, as Testaro tests. They are drawn from the 18 automated tests of the Checker. The other 12 tests were found too duplicative of other tests to justify reimplementation.
 
 ##### Branching
 
@@ -436,18 +442,18 @@ A typical use for an `expect` property is checking the correctness of a Testaro 
 
 You may wish to have Testaro perform the same sequence of tests on multiple web pages. In that case, you can create a _batch_, with the following structure:
 
-```javascript
+```json
 {
-  what: 'Web leaders',
+  what: "Web leaders",
   hosts: {
-    id: 'w3c',
-    which: 'https://www.w3.org/',
-    what: 'W3C'
+    id: "w3c",
+    which: "https://www.w3.org/",
+    what: "W3C"
   },
   {
-    id: 'wikimedia',
-    which: 'https://www.wikimedia.org/',
-    what: 'Wikimedia'
+    id: "wikimedia",
+    which: "https://www.wikimedia.org/",
+    what: "Wikimedia"
   }
 }
 ```
@@ -487,7 +493,7 @@ The argument of `require` is a path relative to the directory of the module in w
 
 Another Node.js package that has Testaro as a dependency can execute the same statements, except changing `'./run'` to `'testaro/run'`.
 
-Testaro will run the script and populate the `log` and `acts` arrays of the `report` object. When Testaro finishes, the `log` and `acts` properties will contain the results. The final statement can further process the `report` object as desired in the `then` callback.
+Testaro will run the script and modify the properties of the `report` object. When Testaro finishes, the `log`, `acts`, and other properties of `report` will contain the results. The final statement can further process the `report` object as desired in the `then` callback.
 
 #### High-level
 
@@ -500,7 +506,7 @@ Relative paths must be relative to the Testaro project directory. For example, i
 
 Also ensure that Testaro can read all those directories and write to `REPORTDIR`.
 
-Place a script into `SCRIPTDIR` and, optionally, a batch into `BATCHDIR`. Each should be named `idvalue.json`, where `idvalue` is replaced with the value of its `id` property. That value must consist of only lower-case ASCII letters and digits.
+Place a script into `SCRIPTDIR` and, optionally, a batch into `BATCHDIR`. Each should be named with a `.json` extension., where `idvalue` is replaced with the value of its `id` property. That value must consist of only lower-case ASCII letters and digits.
 
 Then execute the statement `node high scriptID` or `node high scriptID batchID`, replacing `scriptID` and `batchID` with the `id` values of the script and the batch, respectively.
 
