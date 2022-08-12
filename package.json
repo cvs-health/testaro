@@ -1,6 +1,6 @@
 {
   "name": "testaro",
-  "version": "5.7.3",
+  "version": "5.7.4",
   "description": "Automation of accessibility testing",
   "main": "index.js",
   "scripts": {
