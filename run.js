@@ -70,7 +70,7 @@ const browserTypeNames = {
   'firefox': 'Firefox'
 };
 // Items that may be waited for.
-const waitables = ['url', 'title', 'body'];
+const waitables = ['url', 'title', 'body', 'mailLink'];
 // Tenon data.
 const tenonData = {
   accessToken: '',
@@ -743,15 +743,16 @@ const doActs = async (report, actIndex, page) => {
           const {what, which} = act;
           console.log(`>> for ${what} to include “${which}”`);
           act.result = {};
+          console.log(`The act with result initialized is:\n${JSON.stringify(act, null, 2)}`);
           // Wait 5 or 10 seconds for the specified text, and quit if it does not appear.
-          if (act.what === 'url') {
-            await page.waitForURL(act.which, {timeout: 15000})
+          if (what === 'url') {
+            await page.waitForURL(which, {timeout: 15000})
             .catch(error => {
               actIndex = -2;
               waitError(page, act, error, 'URL');
             });
           }
-          else if (act.what === 'title') {
+          else if (what === 'title') {
             await page.waitForFunction(
               act => {
                 const found = document
@@ -759,6 +760,7 @@ const doActs = async (report, actIndex, page) => {
                 && document.title.toLowerCase().includes(act.which.toLowerCase());
                 if (found) {
                   act.result.title = document.title;
+                  console.log(`The act with title added is:\n${JSON.stringify(act, null, 2)}`);
                   return true;
                 }
                 else {
@@ -776,12 +778,12 @@ const doActs = async (report, actIndex, page) => {
               waitError(page, act, error, 'title');
             });
           }
-          else if (act.what === 'body') {
+          else if (what === 'body') {
             await page.waitForFunction(
               text => document
               && document.body
               && document.body.innerText.toLowerCase().includes(text.toLowerCase()),
-              act.which,
+              which,
               {
                 polling: 2000,
                 timeout: 10000
@@ -792,12 +794,12 @@ const doActs = async (report, actIndex, page) => {
               waitError(page, act, error, 'body');
             });
           }
-          else if (act.what === 'mailLink') {
+          else if (what === 'mailLink') {
             await page.waitForFunction(
               act => {
                 const mailLinks = document
                 && document.body
-                && document.body.querySelectorAll('a[href^=mailto:]');
+                && document.body.querySelectorAll('a[href^="mailto:"]');
                 if (mailLinks && mailLinks.size) {
                   const a11yLink = Array
                   .from(mailLinks)
@@ -827,8 +829,10 @@ const doActs = async (report, actIndex, page) => {
           }
           // If the text was found:
           if (actIndex > -2) {
+            console.log(`The act after the text was found is:\n${JSON.stringify(act, null, 2)}`);
             // Add this to the report.
             act.result.url = page.url();
+            console.log(`The act after the URL was added is:\n${JSON.stringify(act, null, 2)}`);
           }
         }
         // Otherwise, if the act is a wait for a state:
