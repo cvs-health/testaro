@@ -648,6 +648,7 @@ const isTrue = (object, specs) => {
 // Adds a wait error result to an act.
 const waitError = (page, act, error, what) => {
   console.log(`ERROR waiting for ${what} (${error.message})`);
+  act.result.found = false;
   act.result.url = page.url();
   act.result.error = `ERROR waiting for ${what}`;
   return false;
@@ -741,65 +742,56 @@ const doActs = async (report, actIndex, page) => {
         // Otherwise, if the act is a wait for text:
         else if (act.type === 'wait') {
           const {what, which} = act;
-          let found = {};
+          const result = act.result = {};
           // Wait for the specified text, and quit if it does not appear.
           if (what === 'url') {
-            const isFound = await page.waitForURL(which, {timeout: 15000})
-            .catch(error => {
+            try {
+              await page.waitForURL(which, {timeout: 15000});
+              result.found = true;
+              result.url = page.url();
+            }
+            catch(error) {
               actIndex = -2;
               waitError(page, act, error, 'URL');
-            });
-            if (isFound) {
-              return {
-                url: page.url()
-              };
             }
           }
           else if (what === 'title') {
-            await page.waitForFunction(
-              act => {
-                const isFound = document
+            try {
+              await page.waitForFunction(
+                text => document
                 && document.title
-                && document.title.toLowerCase().includes(act.which.toLowerCase());
-                if (isFound) {
-                  return {
-                    title: document.title
-                  };
+                && document.title.toLowerCase().includes(act.which.toLowerCase()),
+                which,
+                {
+                  polling: 1000,
+                  timeout: 5000
                 }
-                else {
-                  return false;
-                }
-              },
-              act,
-              {
-                polling: 1000,
-                timeout: 5000
-              }
-            )
-            .catch(error => {
+              );
+              result.found = true;
+              result.title = await page.title(); 
+            }
+            catch(error) {
               actIndex = -2;
               waitError(page, act, error, 'title');
-            });
+            }
           }
           else if (what === 'body') {
-            const isFound = await page.waitForFunction(
-              text => document
-              && document.body
-              && document.body.innerText.toLowerCase().includes(text.toLowerCase()),
-              which,
-              {
-                polling: 2000,
-                timeout: 10000
-              }
-            )
-            .catch(async error => {
+            try {
+              await page.waitForFunction(
+                text => document
+                && document.body
+                && document.body.innerText.toLowerCase().includes(text.toLowerCase()),
+                which,
+                {
+                  polling: 2000,
+                  timeout: 10000
+                }
+              );
+              result.found = true;
+            }
+            catch(error) {
               actIndex = -2;
               waitError(page, act, error, 'body');
-            });
-            if (isFound) {
-              return {
-                body: which
-              };
             }
           }
           else if (what === 'mailLink') {
@@ -1134,7 +1126,9 @@ const doActs = async (report, actIndex, page) => {
                       const optionText = await option.textContent();
                       optionTexts.push(optionText);
                     }
-                    const matchTexts = optionTexts.map((text, index) => text.includes(act.what) ? index : -1);
+                    const matchTexts = optionTexts.map(
+                      (text, index) => text.includes(act.what) ? index : -1
+                    );
                     const index = matchTexts.filter(text => text > -1)[act.index || 0];
                     if (index !== undefined) {
                       await matchingElement.selectOption({index});
@@ -1230,7 +1224,7 @@ const doActs = async (report, actIndex, page) => {
                     }
                     // If there is a current element:
                     if (currentElement) {
-                      // If it was already reached within this command performance:
+                      // If it was already reached within this act:
                       if (currentElement.dataset.pressesReached === actCount.toString(10)) {
                         // Report the error.
                         console.log(`ERROR: ${currentElement.tagName} element reached again`);
@@ -1364,6 +1358,8 @@ const doActs = async (report, actIndex, page) => {
       const errorMsg = `ERROR: Invalid command of type ${act.type}`;
       act.result = errorMsg;
       console.log(errorMsg);
+      // Quit.
+      actIndex = -2;
     }
     // Perform the remaining acts.
     await doActs(report, actIndex + 1, page);
