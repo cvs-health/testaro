@@ -795,46 +795,41 @@ const doActs = async (report, actIndex, page) => {
             }
           }
           else if (what === 'mailLink') {
-            await page.waitForFunction(
-              text => {
-                const mailLinks = document
-                && document.body
-                && document.body.querySelectorAll('a[href^="mailto:"]');
-                if (mailLinks && mailLinks.size) {
-                  const a11yLink = Array
-                  .from(mailLinks)
-                  .find(link => link.textContent.toLowerCase().includes(act.which.toLowerCase()));
-                  if (a11yLink) {
-                    const address = a11yLink.href.replace(/^mailto:/, '');
-                    return {
-                      mailLink: address
-                    };
+            try {
+              const addressJSHandle = await page.waitForFunction(
+                text => {
+                  const mailLinks = document
+                  && document.body
+                  && document.body.querySelectorAll('a[href^="mailto:"]');
+                  if (mailLinks && mailLinks.size) {
+                    const a11yLink = Array
+                    .from(mailLinks)
+                    .find(link => link.textContent.toLowerCase().includes(text.toLowerCase()));
+                    if (a11yLink) {
+                      return a11yLink.href.replace(/^mailto:/, '');
+                    }
+                    else {
+                      return false;
+                    }
                   }
                   else {
                     return false;
                   }
+                },
+                which,
+                {
+                  polling: 1000,
+                  timeout: 5000
                 }
-                else {
-                  return false;
-                }
-              },
-              which,
-              {
-                polling: 1000,
-                timeout: 5000
-              }
-            )
-            .catch(async error => {
+              );
+              const address = await addressJSHandle.jsonValue();
+              result.found = true;
+              result.address = address;
+            }
+            catch(error) {
               actIndex = -2;
               waitError(page, act, error, 'mailLink');
-            });
-          }
-          // If the text was found:
-          if (actIndex > -2) {
-            console.log(`The act after the text was found is:\n${JSON.stringify(act, null, 2)}`);
-            // Add this to the report.
-            act.result.url = page.url();
-            console.log(`The act after the URL was added is:\n${JSON.stringify(act, null, 2)}`);
+            }
           }
         }
         // Otherwise, if the act is a wait for a state:
