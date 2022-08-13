@@ -742,6 +742,7 @@ const doActs = async (report, actIndex, page) => {
         // Otherwise, if the act is a wait for text:
         else if (act.type === 'wait') {
           const {what, which} = act;
+          console.log(`>> ${what}`);
           const result = act.result = {};
           // Wait for the specified text, and quit if it does not appear.
           if (what === 'url') {
@@ -760,7 +761,7 @@ const doActs = async (report, actIndex, page) => {
               await page.waitForFunction(
                 text => document
                 && document.title
-                && document.title.toLowerCase().includes(act.which.toLowerCase()),
+                && document.title.toLowerCase().includes(text.toLowerCase()),
                 which,
                 {
                   polling: 1000,
@@ -801,10 +802,11 @@ const doActs = async (report, actIndex, page) => {
                   const mailLinks = document
                   && document.body
                   && document.body.querySelectorAll('a[href^="mailto:"]');
-                  if (mailLinks && mailLinks.size) {
+                  if (mailLinks && mailLinks.length) {
+                    const textLC = text.toLowerCase();
                     const a11yLink = Array
                     .from(mailLinks)
-                    .find(link => link.textContent.toLowerCase().includes(text.toLowerCase()));
+                    .find(link => link.textContent.toLowerCase().includes(textLC));
                     if (a11yLink) {
                       return a11yLink.href.replace(/^mailto:/, '');
                     }
