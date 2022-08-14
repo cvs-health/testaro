@@ -28,6 +28,10 @@
   value in the same location being the target.
 */
 
+// VARIABLES
+
+let hasTimedOut = false;
+
 // FUNCTIONS
 
 // Samples a population and returns the sample.
@@ -59,8 +63,8 @@ const textOf = async (element, limit) => {
 };
 // Recursively reports impacts of hovering over triggers.
 const find = async (data, withItems, page, region, sample, popRatio) => {
-  // If any potential triggers remain:
-  if (sample.length) {
+  // If any potential triggers remain and the test has not timed out:
+  if (sample.length && ! hasTimedOut) {
     // Identify the first of them.
     const firstTrigger = sample[0];
     const tagNameJSHandle = await firstTrigger.getProperty('tagName')
@@ -83,7 +87,7 @@ const find = async (data, withItems, page, region, sample, popRatio) => {
         );
         root = rootJSHandle.asElement();
       }
-      // Identify all the descendants of the root.
+      // Identify all the visible descendants of the root.
       const preDescendants = await root.$$(':visible');
       // Identify their opacities.
       const preOpacities = await page.evaluate(elements => elements.map(
@@ -95,6 +99,7 @@ const find = async (data, withItems, page, region, sample, popRatio) => {
           timeout: 500,
           noWaitAfter: true
         });
+        // FUNCTION DEFINITION START
         // Repeatedly seeks impacts.
         const getImpacts = async (interval, triesLeft) => {
           // If the allowed trial count has not yet been exhausted:
@@ -148,6 +153,7 @@ const find = async (data, withItems, page, region, sample, popRatio) => {
             return null;
           }
         };
+        // FUNCTION DEFINITION END
         // Repeatedly seek impacts of the hover at intervals.
         const impacts = await getImpacts(300, 4);
         // If there were any:
@@ -213,7 +219,7 @@ exports.reporter = async (
   page, headSize = 0, headSampleSize = -1, tailSampleSize = -1, withItems
 ) => {
   // Initialize the result.
-  const data = {
+  let data = {
     totals: {
       triggers: 0,
       headTriggers: 0,
@@ -259,6 +265,18 @@ exports.reporter = async (
   // Get the head and tail samples.
   const headSample = getSample(headTriggers, headSampleSize);
   const tailSample = tailSampleSize === -1 ? tailTriggers : getSample(tailTriggers, tailSampleSize);
+  // Set a time limit to handle pages that slow the operations of this test.
+  const timeout = setTimeout((headSample, tailSample) => {
+    hasTimedOut = true;
+    data = {
+      prevented: true,
+      error: 'ERROR: hover test timed out'
+    };
+    console.log(
+      `ERROR: hover test timed out at ${headSample.length + tailSample.length} seconds`
+    );
+    clearTimeout(timeout);
+  }, 1000 * (headSample.length + tailSample.length));
   // Find and document the impacts.
   if (headSample.length) {
     await find(data, withItems, page, 'head', headSample, headTriggerCount / headSample.length);
