@@ -106,6 +106,7 @@ let visitRejectionCount = 0;
 let visitLatency = 0;
 let actCount = 0;
 // Facts about the current browser.
+let browser;
 let browserContext;
 let browserTypeName;
 let requestedURL = '';
@@ -257,11 +258,23 @@ const isValidReport = async report => {
 
 // ########## OTHER FUNCTIONS
 
+// Closes the current browser.
+const browserClose = async () => {
+  if (browser) {
+    const contexts = browser.contexts();
+    for (const context of contexts) {
+      await context.close();
+    }
+    await browser.close();
+  }
+};
 // Launches a browser.
 const launch = async typeName => {
   const browserType = require('playwright')[typeName];
   // If the specified browser type exists:
   if (browserType) {
+    // Close the current browser, if any.
+    await browserClose();
     // Launch a browser of that type.
     const browserOptions = {};
     if (debug) {
@@ -271,7 +284,7 @@ const launch = async typeName => {
       browserOptions.slowMo = waits;
     }
     let healthy = true;
-    const browser = await browserType.launch(browserOptions)
+    browser = await browserType.launch(browserOptions)
     .catch(error => {
       healthy = false;
       console.log(`ERROR launching browser: ${error.message.replace(/\n.+/s, '')}`);
