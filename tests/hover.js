@@ -65,153 +65,170 @@ const textOf = async (element, limit) => {
 const find = async (data, withItems, page, region, sample, popRatio) => {
   // If any potential triggers remain and the test has not timed out:
   if (sample.length && ! hasTimedOut) {
-    // Identify the first of them.
-    const firstTrigger = sample[0];
-    const tagNameJSHandle = await firstTrigger.getProperty('tagName')
-    .catch(error => {
-      return '';
-    });
-    if (tagNameJSHandle) {
-      const tagName = await tagNameJSHandle.jsonValue();
-      // Identify the root of a subtree likely to contain impacted elements.
-      let root = firstTrigger;
-      if (['A', 'BUTTON', 'LI'].includes(tagName)) {
-        const rootJSHandle = await page.evaluateHandle(
-          firstTrigger => {
-            const parent = firstTrigger.parentElement || firstTrigger;
-            const grandparent = parent.parentElement || parent;
-            const greatGrandparent = grandparent.parentElement || parent;
-            return firstTrigger.tagName === 'LI' ? grandparent : greatGrandparent;
-          },
-          firstTrigger
-        );
-        root = rootJSHandle.asElement();
-      }
-      // Identify all the visible descendants of the root.
-      const preDescendants = await root.$$(':visible');
-      // Identify their opacities.
-      const preOpacities = await page.evaluate(elements => elements.map(
-        element => window.getComputedStyle(element).opacity
-      ), preDescendants);
-      try {
-        // Hover over the trigger.
-        await firstTrigger.hover({
-          timeout: 500,
-          noWaitAfter: true
-        });
-        // FUNCTION DEFINITION START
-        // Repeatedly seeks impacts.
-        const getImpacts = async (interval, triesLeft) => {
-          // If the allowed trial count has not yet been exhausted:
-          if (triesLeft--) {
-            // Get the collection of descendants of the root.
-            const postDescendants = await root.$$(':visible');
-            // Identify the prior descandants of the root still in existence.
-            const remainerIndexes = await page.evaluate(args => {
-              const preDescendants = args[0];
-              const postDescendants = args[1];
-              const remainerIndexes = preDescendants
-              .map((element, index) => postDescendants.includes(element) ? index : -1)
-              .filter(index => index > -1);
-              return remainerIndexes;
-            }, [preDescendants, postDescendants]);
-            // Get the count of elements added by the hover event.
-            const additionCount = postDescendants.length - remainerIndexes.length;
-            const removalCount = preDescendants.length - remainerIndexes.length;
-            const remainers = [];
-            for (const index of remainerIndexes) {
-              remainers.push({
-                element: preDescendants[index],
-                preOpacity: preOpacities[index],
-                postOpacity: await page.evaluate(
-                  element => window.getComputedStyle(element).opacity, preDescendants[index]
-                )
-              });
-            }
-            const opacityChangers = remainers
-            .filter(remainer => remainer.postOpacity !== remainer.preOpacity);
-            const opacityImpact = opacityChangers ? await page.evaluate(changers => changers.reduce(
-              (total, current) => total + current.element.querySelectorAll('*').length, 0
-            ), opacityChangers) : 0;
-            if (additionCount || removalCount || opacityChangers.length) {
-              return {
-                additionCount,
-                removalCount,
-                opacityChangers,
-                opacityImpact
-              };
-            }
-            else {
-              return await new Promise(resolve => {
-                setTimeout(() => {
-                  resolve(getImpacts(interval, triesLeft));
-                }, interval);
-              });
-            }
-          }
-          else {
-            return null;
-          }
-        };
-        // FUNCTION DEFINITION END
-        // Repeatedly seek impacts of the hover at intervals.
-        const impacts = await getImpacts(300, 4);
-        // If there were any:
-        if (impacts) {
-          // Hover over the upper-left corner of the page, to undo any impacts.
-          await page.hover('body', {
-            position: {
-              x: 0,
-              y: 0
+    // Get and report the impacts until and unless the test times out.
+    try {
+      // Identify the first of them.
+      const firstTrigger = sample[0];
+      const tagNameJSHandle = await firstTrigger.getProperty('tagName')
+      .catch(error => '');
+      if (tagNameJSHandle) {
+        const tagName = await tagNameJSHandle.jsonValue();
+        // Identify the root of a subtree likely to contain impacted elements.
+        let root = firstTrigger;
+        if (['A', 'BUTTON', 'LI'].includes(tagName)) {
+          const rootJSHandle = await page.evaluateHandle(
+            firstTrigger => {
+              const parent = firstTrigger.parentElement || firstTrigger;
+              const grandparent = parent.parentElement || parent;
+              const greatGrandparent = grandparent.parentElement || parent;
+              return firstTrigger.tagName === 'LI' ? grandparent : greatGrandparent;
             },
+            firstTrigger
+          );
+          root = rootJSHandle.asElement();
+        }
+        // Identify all the visible descendants of the root.
+        const preDescendants = await root.$$(':visible');
+        // Identify their opacities.
+        const preOpacities = await page.evaluate(elements => elements.map(
+          element => window.getComputedStyle(element).opacity
+        ), preDescendants);
+        try {
+          // Hover over the trigger.
+          await firstTrigger.hover({
             timeout: 500,
-            force: true,
             noWaitAfter: true
           });
-          // Wait for any delayed and/or slowed hover reaction.
-          await page.waitForTimeout(200);
-          await root.waitForElementState('stable');
-          // Increment the counts of triggers and impacts.
-          const {additionCount, removalCount, opacityChangers, opacityImpact} = impacts;
-          data.totals.impactTriggers += popRatio;
-          data.totals.additions += popRatio * additionCount;
-          data.totals.removals += popRatio * removalCount;
-          data.totals.opacityChanges += popRatio * opacityChangers.length;
-          data.totals.opacityImpact += popRatio * opacityImpact;
-          // If details are to be reported:
-          if (withItems) {
-            // Report them.
-            data.items[region].impactTriggers.push({
-              tagName,
-              text: await textOf(firstTrigger, 50),
-              additions: additionCount,
-              removals: removalCount,
-              opacityChanges: opacityChangers.length,
-              opacityImpact
+          // FUNCTION DEFINITION START
+          // Repeatedly seeks impacts.
+          const getImpacts = async (interval, triesLeft) => {
+            // If the allowed trial count has not yet been exhausted:
+            if (triesLeft-- && ! hasTimedOut) {
+              // Get the collection of descendants of the root.
+              const postDescendants = await root.$$(':visible');
+              // Identify the prior descandants of the root still in existence.
+              const remainerIndexes = await page.evaluate(args => {
+                const preDescendants = args[0];
+                const postDescendants = args[1];
+                const remainerIndexes = preDescendants
+                .map((element, index) => postDescendants.includes(element) ? index : -1)
+                .filter(index => index > -1);
+                return remainerIndexes;
+              }, [preDescendants, postDescendants]);
+              // Get the count of elements added by the hover event.
+              const additionCount = postDescendants.length - remainerIndexes.length;
+              const removalCount = preDescendants.length - remainerIndexes.length;
+              const remainers = [];
+              for (const index of remainerIndexes) {
+                remainers.push({
+                  element: preDescendants[index],
+                  preOpacity: preOpacities[index],
+                  postOpacity: await page.evaluate(
+                    element => window.getComputedStyle(element).opacity, preDescendants[index]
+                  )
+                });
+              }
+              const opacityChangers = remainers
+              .filter(remainer => remainer.postOpacity !== remainer.preOpacity);
+              const opacityImpact = opacityChangers ? await page.evaluate(changers => changers.reduce(
+                (total, current) => total + current.element.querySelectorAll('*').length, 0
+              ), opacityChangers) : 0;
+              if (additionCount || removalCount || opacityChangers.length) {
+                return {
+                  additionCount,
+                  removalCount,
+                  opacityChangers,
+                  opacityImpact
+                };
+              }
+              else {
+                return await new Promise(resolve => {
+                  setTimeout(() => {
+                    resolve(getImpacts(interval, triesLeft));
+                  }, interval);
+                });
+              }
+            }
+            else {
+              return null;
+            }
+          };
+          // FUNCTION DEFINITION END
+          // Repeatedly seek impacts of the hover at intervals.
+          const impacts = await getImpacts(300, 4);
+          // If there were any:
+          if (impacts) {
+            // Hover over the upper-left corner of the page, to undo any impacts.
+            await page.hover('body', {
+              position: {
+                x: 0,
+                y: 0
+              },
+              timeout: 500,
+              force: true,
+              noWaitAfter: true
             });
+            // Wait for any delayed and/or slowed hover reaction.
+            await page.waitForTimeout(200);
+            await root.waitForElementState('stable');
+            // Increment the counts of triggers and impacts.
+            const {additionCount, removalCount, opacityChangers, opacityImpact} = impacts;
+            if (hasTimedOut) {
+              return Promise.resolve('');
+            }
+            else {
+              data.totals.impactTriggers += popRatio;
+              data.totals.additions += popRatio * additionCount;
+              data.totals.removals += popRatio * removalCount;
+              data.totals.opacityChanges += popRatio * opacityChangers.length;
+              data.totals.opacityImpact += popRatio * opacityImpact;
+              // If details are to be reported:
+              if (withItems) {
+                // Report them.
+                data.items[region].impactTriggers.push({
+                  tagName,
+                  text: await textOf(firstTrigger, 50),
+                  additions: additionCount,
+                  removals: removalCount,
+                  opacityChanges: opacityChangers.length,
+                  opacityImpact
+                });
+              }
+            }
+          }
+        }
+        catch (error) {
+          console.log(`ERROR hovering (${error.message.replace(/\n.+/s, '')})`);
+          if (hasTimedOut) {
+            return Promise.resolve('');
+          }
+          else {
+            data.totals.unhoverables++;
+            if (withItems) {
+              try {
+                const id = await firstTrigger.getAttribute('id');
+                data.items[region].unhoverables.push({
+                  tagName,
+                  id: id || '',
+                  text: await textOf(firstTrigger, 50)
+                });
+              }
+              catch(error) {
+                console.log('ERROR itemizing unhoverable element');
+              }
+            }
           }
         }
       }
-      catch (error) {
-        console.log(`ERROR hovering (${error.message.replace(/\n.+/s, '')})`);
-        data.totals.unhoverables++;
-        if (withItems) {
-          try {
-            const id = await firstTrigger.getAttribute('id');
-            data.items[region].unhoverables.push({
-              tagName,
-              id: id || '',
-              text: await textOf(firstTrigger, 50)
-            });
-          }
-          catch(error) {
-            console.log('ERROR itemizing unhoverable element');
-          }
-        }
-      }
+      // Process the remaining potential triggers.
+      await find(data, withItems, page, region, sample.slice(1), popRatio);
     }
-    // Process the remaining potential triggers.
-    await find(data, withItems, page, region, sample.slice(1), popRatio);
+    catch(error) {
+      console.log(`ERROR: Test quit when remaining sample size was ${sample.length}`);
+    }
+  }
+  else {
+    return Promise.resolve('');
   }
 };
 // Performs the hover test and reports results.
@@ -266,28 +283,33 @@ exports.reporter = async (
   const headSample = getSample(headTriggers, headSampleSize);
   const tailSample = tailSampleSize === -1 ? tailTriggers : getSample(tailTriggers, tailSampleSize);
   // Set a time limit to handle pages that slow the operations of this test.
-  const timeout = setTimeout((headSample, tailSample) => {
+  const timeLimit = Math.round(1.3 * (headSample.length + tailSample.length));
+  const timeout = setTimeout(async () => {
+    await page.close();
+    console.log(
+      `ERROR: hover test timed out at ${timeLimit} seconds; page closed`
+    );
     hasTimedOut = true;
     data = {
       prevented: true,
       error: 'ERROR: hover test timed out'
     };
-    console.log(
-      `ERROR: hover test timed out at ${headSample.length + tailSample.length} seconds`
-    );
     clearTimeout(timeout);
-  }, 1000 * (headSample.length + tailSample.length));
+  }, 1000 * timeLimit);
   // Find and document the impacts.
-  if (headSample.length) {
+  if (headSample.length && ! hasTimedOut) {
     await find(data, withItems, page, 'head', headSample, headTriggerCount / headSample.length);
   }
-  if (tailSample.length) {
+  if (tailSample.length && ! hasTimedOut) {
     await find(data, withItems, page, 'tail', tailSample, tailTriggerCount / tailSample.length);
   }
+  clearTimeout(timeout);
   // Round the reported totals.
-  Object.keys(data.totals).forEach(key => {
-    data.totals[key] = Math.round(data.totals[key]);
-  });
+  if (! hasTimedOut) {
+    Object.keys(data.totals).forEach(key => {
+      data.totals[key] = Math.round(data.totals[key]);
+    });
+  }
   // Return the result.
   return {result: data};
 };
