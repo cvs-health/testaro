@@ -262,7 +262,7 @@ const launch = async typeName => {
   const browserType = require('playwright')[typeName];
   // If the specified browser type exists:
   if (browserType) {
-    // Launch a browser of the specified type.
+    // Launch a browser of that type.
     const browserOptions = {};
     if (debug) {
       browserOptions.headless = false;
