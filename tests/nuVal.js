@@ -11,7 +11,7 @@ const https = require('https');
 exports.reporter = async page => {
   const pageContent = await page.content();
   // Get the data from a Nu validation.
-  const data = await new Promise((resolve, reject) => {
+  const dataPromise = new Promise(resolve => {
     try {
       const request = https.request(
         {
@@ -40,7 +40,7 @@ exports.reporter = async page => {
               return resolve(result);
             }
             catch (error) {
-              console.log(`Validation failed (${error.message})`);
+              console.log(`ERROR: Validation failed (${error.message})`);
               return resolve({
                 prevented: true,
                 error: error.message,
@@ -54,7 +54,7 @@ exports.reporter = async page => {
       request.end();
       request.on('error', error => {
         console.log(error.message);
-        return reject({
+        return resolve({
           prevented: true,
           error: error.message
         });
@@ -62,11 +62,22 @@ exports.reporter = async page => {
     }
     catch(error) {
       console.log(error.message);
-      return reject({
+      return resolve({
         prevented: true,
         error: error.message
       });
     }
   });
+  const timeoutPromise = new Promise(resolve => {
+    const timeLimit = 12;
+    const timeoutID = setTimeout(() => {
+      resolve({
+        prevented: true,
+        error: `ERROR: Validation timed out at ${timeLimit} seconds`
+      });
+      clearTimeout(timeoutID);
+    }, 1000 * timeLimit);
+  });
+  const data = await Promise.race([dataPromise, timeoutPromise]);
   return {result: data};
 };
