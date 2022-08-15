@@ -442,7 +442,7 @@ const textOf = async (page, element) => {
     return null;
   }
 };
-// Returns an element of a type case-insensitively matching a text.
+// Returns an element of a type case-insensitively including a text.
 const matchElement = async (page, selector, matchText, index = 0) => {
   if (matchText) {
     // If the page still exists:
@@ -454,14 +454,18 @@ const matchElement = async (page, selector, matchText, index = 0) => {
       if (selections.length) {
         // If there are enough to make a match possible:
         if (index < selections.length) {
-          // Return the specified one, if any.
+          // For each element of the specified type:
           let matchCount = 0;
           const selectionTexts = [];
           for (const selection of selections) {
+            // Add its text to the list of texts of such elements.
             const selectionText = await textOf(page, selection);
             selectionTexts.push(selectionText);
+            // If its text includes the specified text:
             if (selectionText.includes(slimText)) {
+              // If the count of such elements with such texts found so far is the specified count:
               if (matchCount++ === index) {
+                // Return it as the matching element.
                 return {
                   success: true,
                   matchingElement: selection
@@ -661,7 +665,8 @@ const isTrue = (object, specs) => {
 // Adds a wait error result to an act.
 const waitError = (page, act, error, what) => {
   console.log(`ERROR waiting for ${what} (${error.message})`);
-  act.result = {url: page.url()};
+  act.result.found = false;
+  act.result.url = page.url();
   act.result.error = `ERROR waiting for ${what}`;
   return false;
 };
@@ -754,53 +759,95 @@ const doActs = async (report, actIndex, page) => {
         // Otherwise, if the act is a wait for text:
         else if (act.type === 'wait') {
           const {what, which} = act;
-          console.log(`>> for ${what} to include “${which}”`);
-          // Wait 5 or 10 seconds for the specified text, and quit if it does not appear.
-          if (act.what === 'url') {
-            await page.waitForURL(act.which, {timeout: 15000})
-            .catch(error => {
+          console.log(`>> ${what}`);
+          const result = act.result = {};
+          // Wait for the specified text, and quit if it does not appear.
+          if (what === 'url') {
+            try {
+              await page.waitForURL(which, {timeout: 15000});
+              result.found = true;
+              result.url = page.url();
+            }
+            catch(error) {
               actIndex = -2;
               waitError(page, act, error, 'URL');
-            });
+            }
           }
-          else if (act.what === 'title') {
-            await page.waitForFunction(
-              text => {
-                return document
+          else if (what === 'title') {
+            try {
+              await page.waitForFunction(
+                text => document
                 && document.title
-                && document.title.toLowerCase().includes(text.toLowerCase());
-              },
-              act.which,
-              {
-                polling: 1000,
-                timeout: 5000
-              }
-            )
-            .catch(error => {
+                && document.title.toLowerCase().includes(text.toLowerCase()),
+                which,
+                {
+                  polling: 1000,
+                  timeout: 5000
+                }
+              );
+              result.found = true;
+              result.title = await page.title(); 
+            }
+            catch(error) {
               actIndex = -2;
               waitError(page, act, error, 'title');
-            });
+            }
           }
-          else if (act.what === 'body') {
-            await page.waitForFunction(
-              text => document && document.body && document.body.innerText.includes(text),
-              act.which,
-              {
-                polling: 2000,
-                timeout: 10000
-              }
-            )
-            .catch(async error => {
+          else if (what === 'body') {
+            try {
+              await page.waitForFunction(
+                text => document
+                && document.body
+                && document.body.innerText.toLowerCase().includes(text.toLowerCase()),
+                which,
+                {
+                  polling: 2000,
+                  timeout: 10000
+                }
+              );
+              result.found = true;
+            }
+            catch(error) {
               actIndex = -2;
               waitError(page, act, error, 'body');
-            });
+            }
           }
-          // If the text was found:
-          if (actIndex > -2) {
-            // Add this to the report.
-            act.result = {url: page.url()};
-            if (act.what === 'title') {
-              act.result.title = await page.title();
+          else if (what === 'mailLink') {
+            try {
+              const addressJSHandle = await page.waitForFunction(
+                text => {
+                  const mailLinks = document
+                  && document.body
+                  && document.body.querySelectorAll('a[href^="mailto:"]');
+                  if (mailLinks && mailLinks.length) {
+                    const textLC = text.toLowerCase();
+                    const a11yLink = Array
+                    .from(mailLinks)
+                    .find(link => link.textContent.toLowerCase().includes(textLC));
+                    if (a11yLink) {
+                      return a11yLink.href.replace(/^mailto:/, '');
+                    }
+                    else {
+                      return false;
+                    }
+                  }
+                  else {
+                    return false;
+                  }
+                },
+                which,
+                {
+                  polling: 1000,
+                  timeout: 5000
+                }
+              );
+              const address = await addressJSHandle.jsonValue();
+              result.found = true;
+              result.address = address;
+            }
+            catch(error) {
+              actIndex = -2;
+              waitError(page, act, error, 'mailLink');
             }
           }
         }
@@ -1058,24 +1105,36 @@ const doActs = async (report, actIndex, page) => {
                   await matchingElement.focus({timeout: 2000});
                   act.result = 'focused';
                 }
-                // Otherwise, if it is clicking a link, perform it.
+                // Otherwise, if it is clicking a link:
                 else if (act.type === 'link') {
+                  // Try to click it.
                   const href = await matchingElement.getAttribute('href');
                   const target = await matchingElement.getAttribute('target');
-                  await matchingElement.click({timeout: 2000})
-                  .catch(async () => {
-                    console.log('ERROR: First attempt to click link timed out');
+                  await matchingElement.click({timeout: 3000})
+                  // If it cannot be clicked within 3 seconds:
+                  .catch(async error => {
+                    // Try to force-click it without actionability checks.
+                    const errorSummary = error.message.replace(/\n.+/, '');
+                    console.log(`ERROR: Link to ${href} not clickable (${errorSummary})`);
                     await matchingElement.click({
-                      force: true,
-                      timeout: 10000
+                      force: true
                     })
-                    .catch(() => {
+                    // If it cannot be force-clicked:
+                    .catch(error => {
+                      // Quit and report the failure.
                       actIndex = -2;
-                      console.log('ERROR: Second (forced) attempt to click link timed out');
-                      act.result = 'ERROR: Normal and forced click attempts timed out';
+                      const errorSummary = error.message.replace(/\n.+/, '');
+                      console.log(`ERROR: Link to ${href} not force-clickable (${errorSummary})`);
+                      act.result = {
+                        href: href || 'NONE',
+                        target: target || 'NONE',
+                        error: 'ERROR: Normal and forced attempts to click link timed out'
+                      };
                     });
                   });
+                  // If it was clicked:
                   if (actIndex > -2) {
+                    // Report the success.
                     act.result = {
                       href: href || 'NONE',
                       target: target || 'NONE',
@@ -1093,7 +1152,9 @@ const doActs = async (report, actIndex, page) => {
                       const optionText = await option.textContent();
                       optionTexts.push(optionText);
                     }
-                    const matchTexts = optionTexts.map((text, index) => text.includes(act.what) ? index : -1);
+                    const matchTexts = optionTexts.map(
+                      (text, index) => text.includes(act.what) ? index : -1
+                    );
                     const index = matchTexts.filter(text => text > -1)[act.index || 0];
                     if (index !== undefined) {
                       await matchingElement.selectOption({index});
@@ -1189,7 +1250,7 @@ const doActs = async (report, actIndex, page) => {
                     }
                     // If there is a current element:
                     if (currentElement) {
-                      // If it was already reached within this command performance:
+                      // If it was already reached within this act:
                       if (currentElement.dataset.pressesReached === actCount.toString(10)) {
                         // Report the error.
                         console.log(`ERROR: ${currentElement.tagName} element reached again`);
@@ -1323,6 +1384,8 @@ const doActs = async (report, actIndex, page) => {
       const errorMsg = `ERROR: Invalid command of type ${act.type}`;
       act.result = errorMsg;
       console.log(errorMsg);
+      // Quit.
+      actIndex = -2;
     }
     // Perform the remaining acts.
     await doActs(report, actIndex + 1, page);
