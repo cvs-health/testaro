@@ -441,14 +441,18 @@ const matchElement = async (page, selector, matchText, index = 0) => {
       if (selections.length) {
         // If there are enough to make a match possible:
         if (index < selections.length) {
-          // Return the specified one, if any.
+          // For each element of the specified type:
           let matchCount = 0;
           const selectionTexts = [];
           for (const selection of selections) {
+            // Add its text to the list of texts of such elements.
             const selectionText = await textOf(page, selection);
             selectionTexts.push(selectionText);
+            // If its text includes the specified text:
             if (selectionText.includes(slimText)) {
+              // If the count of such elements with such texts found so far is the specified count:
               if (matchCount++ === index) {
+                // Return it as the matching element.
                 return {
                   success: true,
                   matchingElement: selection
@@ -1088,24 +1092,36 @@ const doActs = async (report, actIndex, page) => {
                   await matchingElement.focus({timeout: 2000});
                   act.result = 'focused';
                 }
-                // Otherwise, if it is clicking a link, perform it.
+                // Otherwise, if it is clicking a link:
                 else if (act.type === 'link') {
+                  // Try to click it.
                   const href = await matchingElement.getAttribute('href');
                   const target = await matchingElement.getAttribute('target');
-                  await matchingElement.click({timeout: 2000})
-                  .catch(async () => {
-                    console.log('ERROR: First attempt to click link timed out');
+                  await matchingElement.click({timeout: 3000})
+                  // If it cannot be clicked within 3 seconds:
+                  .catch(async error => {
+                    // Try to force-click it without actionability checks.
+                    const errorSummary = error.message.replace(/\n.+/, '');
+                    console.log(`ERROR: Link to ${href} not clickable (${errorSummary})`);
                     await matchingElement.click({
-                      force: true,
-                      timeout: 10000
+                      force: true
                     })
-                    .catch(() => {
+                    // If it cannot be force-clicked:
+                    .catch(error => {
+                      // Quit and report the failure.
                       actIndex = -2;
-                      console.log('ERROR: Second (forced) attempt to click link timed out');
-                      act.result = 'ERROR: Normal and forced click attempts timed out';
+                      const errorSummary = error.message.replace(/\n.+/, '');
+                      console.log(`ERROR: Link to ${href} not force-clickable (${errorSummary})`);
+                      act.result = {
+                        href: href || 'NONE',
+                        target: target || 'NONE',
+                        error: 'ERROR: Normal and forced attempts to click link timed out'
+                      };
                     });
                   });
+                  // If it was clicked:
                   if (actIndex > -2) {
+                    // Report the success.
                     act.result = {
                       href: href || 'NONE',
                       target: target || 'NONE',
