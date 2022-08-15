@@ -70,7 +70,7 @@ const browserTypeNames = {
   'firefox': 'Firefox'
 };
 // Items that may be waited for.
-const waitables = ['url', 'title', 'body'];
+const waitables = ['url', 'title', 'body', 'mailLink'];
 // Tenon data.
 const tenonData = {
   accessToken: '',
@@ -765,7 +765,11 @@ const doActs = async (report, actIndex, page) => {
           }
           else if (act.what === 'title') {
             await page.waitForFunction(
-              text => document && document.title && document.title.includes(text),
+              text => {
+                return document
+                && document.title
+                && document.title.toLowerCase().includes(text.toLowerCase());
+              },
               act.which,
               {
                 polling: 1000,
