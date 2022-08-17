@@ -11,7 +11,7 @@ exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) =>
     selector += ':visible';
   }
   const data = page.$$eval(selector, (elements, detailLevel) => {
-    const getSibInfo = (nodeType, nodeValue) => {
+    const getSibInfo = (more, nodeType, nodeValue) => {
       const sibInfo = {
         type: nodeType
       };
@@ -48,7 +48,7 @@ exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) =>
             const labelerIDs = document.getElementById(value).split(/\s/);
             const labelers = [];
             labelerIDs.forEach(id => {
-              const labeler = document.getElementById(labeler);
+              const labeler = document.getElementById(id);
               if (labeler) {
                 labelers.push(labeler.textContent);
               }
@@ -57,7 +57,7 @@ exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) =>
               datum.labelers = labelers;
             }
           }
-        };
+        }
         const {labels, textContent} = element;
         if (textContent) {
           datum.textContent = textContent;
@@ -75,7 +75,7 @@ exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) =>
             const more = element.previousSibling;
             const {nodeType, nodeValue} = more;
             if (more && ! (nodeType === 3 && nodeValue === '')) {
-              const sibInfo = getSibInfo(nodeType, nodeValue);
+              const sibInfo = getSibInfo(more, nodeType, nodeValue);
               datum.siblings.before.unshift(sibInfo);
             }
           }
@@ -84,7 +84,7 @@ exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) =>
             const more = element.nextSibling;
             const {nodeType, nodeValue} = more;
             if (more && ! (nodeType === 3 && nodeValue === '')) {
-              const sibInfo = getSibInfo(nodeType, nodeValue);
+              const sibInfo = getSibInfo(more, nodeType, nodeValue);
               datum.siblings.after.push(sibInfo);
             }
           }
@@ -92,8 +92,5 @@ exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) =>
       });
     }
   }, detailLevel);
-  await page.evaluate({
-  const elements = await page.$$('body :visible');
-  data.visibleElements = visibleElements.length;
   return {result: data};
 };
