@@ -150,6 +150,15 @@ exports.commands = {
         rules: [true, 'array', 'areStrings', 'rule names, or empty if all']
       }
     ],
+    elements: [
+      'Perform an elements test',
+      {
+        detailLevel: [true, 'number', '', '0 = counts, 1 = selves, 2 = also sibling nodes'],
+        tagName: [false, 'string', '', 'tag name of elements'],
+        onlyVisible: [false, 'boolean', '', 'whether to exclude invisible elements'],
+        attribute: [false, 'string', 'hasLength', 'required attribute or attribute=value']
+      }
+    ],
     embAc: [
       'Perform an embAc test',
       {

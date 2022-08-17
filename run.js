@@ -70,7 +70,7 @@ const browserTypeNames = {
   'firefox': 'Firefox'
 };
 // Items that may be waited for.
-const waitables = ['url', 'title', 'body', 'mailLink'];
+const waitables = ['url', 'title', 'body'];
 // Tenon data.
 const tenonData = {
   accessToken: '',
