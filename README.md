@@ -6,7 +6,7 @@ Federated accessibility test automation
 
 Testaro is a collection of collections of web accessibility tests.
 
-The purpose of Testaro is to provide programmatic access to 1228 accessibility tests defined in several test packages and in Testaro itself.
+The purpose of Testaro is to provide programmatic access to 1230 accessibility tests defined in several test packages and in Testaro itself.
 
 ## System requirements
 
@@ -40,8 +40,8 @@ As of this version, the counts of tests in the packages referenced above were:
 - WAVE: 110
 - Nu Html Checker: 147
 - subtotal: 612
-- Testaro tests: 22
-- grand total: 1228
+- Testaro tests: 24
+- grand total: 1230
 
 ## Code organization
 
@@ -234,6 +234,14 @@ This command causes Testaro to alter the `display` and `visibility` style proper
 
 The possible commands of type `test` are enumerated in the `tests` object defined in the `index.js` file.
 
+A test performs operations and reports results. The results may or may not directly indicate that a page passes or fails requirements. Typically, accessibility tests report successes and failures. But a test in Testaro is defined less restrictively, so it can report any results. As one example, the Testaro `elements` test reports facts about certain elements on a page, without asserting that those facts are successes or failures.
+
+The term “test” has two meanings for Testaro:
+- A command is a test (test command) if its `type` property has the value `test`.
+- A package, such as Continuum, performs multiple tests (packaged tests).
+
+Thus, if a command of type `test` runs Continuum, Continuum performs multiple tests and reports their results.
+
 ###### Examples
 
 An example of a **packaged test** is:
@@ -266,7 +274,7 @@ In this case, Testaro runs the `motion` test with the specified parameters.
 
 ###### Tenon
 
-The `tenon` test requires two commands:
+Most packaged tests require only one command, but the `tenon` test requires two commands:
 - A command of type `tenonRequest`.
 - A command of type `test` with `tenon` as the value of `which`.
 
@@ -342,7 +350,7 @@ The changes in `htmlcs/HTMLCS.js` are:
 
 ###### BBC Accessibility Standards Checker
 
-The BBC Accessibility Standards Checker has obsolete dependencies with security vulnerabilities. Therefore, it is not used as a dependency of Testaro. Instead, 6 of its tests are reimplemented, in some case with revisions, as Testaro tests. They are drawn from the 18 automated tests of the Checker. The other 12 tests were found too duplicative of other tests to justify reimplementation.
+The BBC Accessibility Standards Checker has obsolete dependencies with security vulnerabilities. Therefore, it is not used as a dependency of Testaro. Instead, 6 of its tests are reimplemented, in some cases with revisions, as Testaro tests. They are drawn from the 18 automated tests of the Checker. The other 12 tests were found too duplicative of other tests to justify reimplementation.
 
 ##### Branching
 
