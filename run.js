@@ -34,6 +34,7 @@ const tests = {
   bulk: 'count of visible elements',
   continuum: 'Level Access Continuum, community edition',
   docType: 'document without a doctype property',
+  elements: 'data on specified elements',
   embAc: 'active elements embedded in links or buttons',
   focAll: 'focusable and Tab-focused elements',
   focInd: 'focus indicators',
@@ -810,44 +811,6 @@ const doActs = async (report, actIndex, page) => {
             catch(error) {
               actIndex = -2;
               waitError(page, act, error, 'body');
-            }
-          }
-          else if (what === 'mailLink') {
-            try {
-              const addressJSHandle = await page.waitForFunction(
-                text => {
-                  const mailLinks = document
-                  && document.body
-                  && document.body.querySelectorAll('a[href^="mailto:"]');
-                  if (mailLinks && mailLinks.length) {
-                    const textLC = text.toLowerCase();
-                    const a11yLink = Array
-                    .from(mailLinks)
-                    .find(link => link.textContent.toLowerCase().includes(textLC));
-                    if (a11yLink) {
-                      return a11yLink.href.replace(/^mailto:/, '');
-                    }
-                    else {
-                      return false;
-                    }
-                  }
-                  else {
-                    return false;
-                  }
-                },
-                which,
-                {
-                  polling: 1000,
-                  timeout: 5000
-                }
-              );
-              const address = await addressJSHandle.jsonValue();
-              result.found = true;
-              result.address = address;
-            }
-            catch(error) {
-              actIndex = -2;
-              waitError(page, act, error, 'mailLink');
             }
           }
         }
