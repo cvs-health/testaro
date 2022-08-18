@@ -110,9 +110,9 @@ exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) =>
           while (more) {
             more = more.nextSibling;
             if (more) {
-              const {nodeType, nodeValue} = more;
-              if (! (nodeType === 3 && nodeValue === '')) {
-                const sibInfo = getSibInfo(more, nodeType, compact(nodeValue));
+              const {nodeType, textContent} = more;
+              if (! (nodeType === 3 && textContent === '')) {
+                const sibInfo = getSibInfo(more, nodeType, compact(textContent));
                 datum.siblings.after.push(sibInfo);
               }
             }
