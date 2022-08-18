@@ -82,6 +82,7 @@ const errorWords = [
   'content security policy',
   'deprecated',
   'error',
+  'expected',
   'failed',
   'invalid',
   'missing',
