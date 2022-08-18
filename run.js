@@ -56,6 +56,7 @@ const tests = {
   styleDiff: 'style inconsistencies',
   tabNav: 'keyboard navigation between tab elements',
   tenon: 'Tenon',
+  title: 'page title',
   titledEl: 'title attributes on inappropriate elements',
   wave: 'WAVE',
   zIndex: 'z indexes'

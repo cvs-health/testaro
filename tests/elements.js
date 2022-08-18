@@ -46,8 +46,10 @@ exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) =>
       // For each specified element:
       elements.forEach(element => {
         // Initialize data on it.
+        const parent = element.parentElement;
         const datum = {
           tagName: element.tagName,
+          parentTagName: parent ? parent.tagName : '',
           code: compact(element.outerHTML),
           attributes: [],
           textContent: compact(element.textContent)
