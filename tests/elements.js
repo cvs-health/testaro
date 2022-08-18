@@ -4,7 +4,7 @@
 */
 exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) => {
   // Determine a selector of the specified elements.
-  let selector = tagName;
+  let selector = tagName || '*';
   if (attribute) {
     selector += `[${attribute}]`;
   }
