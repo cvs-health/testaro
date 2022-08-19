@@ -1,6 +1,11 @@
 /*
   elements
   This test reports data about specified elements.
+  Meanings of detailLevel values:
+    0. Only total element count; no detail.
+    1. Also data on each specified element.
+    2. Data on each specified element also include the text content of the parent element.
+    3. Data on each specified element also include data on its sibling nodes.
 */
 exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) => {
   // Determine a selector of the specified elements.
@@ -90,8 +95,13 @@ exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) =>
           // Add their texts to the element data.
           datum.labels = Array.from(labels).map(label => compact(label.textContent));
         }
+        // If the parental text content is required:
+        if (detailLevel > 1) {
+          // Add it to the element data.
+          datum.parentTextContent = parent ? parent.textContent : '';
+        }
         // If sibling itemization is required:
-        if (detailLevel === 2) {
+        if (detailLevel === 3) {
           // Add the sibling data to the element data.
           datum.siblings = {
             before: [],

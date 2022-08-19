@@ -153,7 +153,7 @@ exports.commands = {
     elements: [
       'Perform an elements test',
       {
-        detailLevel: [true, 'number', '', '0 = counts, 1 = selves, 2 = also sibling nodes'],
+        detailLevel: [true, 'number', '', '0 to 3, to specify the level of detail'],
         tagName: [false, 'string', '', 'tag name of elements'],
         onlyVisible: [false, 'boolean', '', 'whether to exclude invisible elements'],
         attribute: [false, 'string', 'hasLength', 'required attribute or attribute=value']
