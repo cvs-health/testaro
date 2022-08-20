@@ -1097,13 +1097,29 @@ const doActs = async (report, actIndex, page) => {
                       };
                     });
                   });
+                  let loadState = 'idle';
+                  // Wait up to 3 seconds for the resulting page to be idle.
+                  await page.waitForLoadState('networkidle', {timeout: 3000})
+                  // If the wait times out:
+                  .catch(async () => {
+                    loadState = 'loaded';
+                    // Wait up to 2 seconds for the page to be loaded.
+                    await page.waitForLoadState('domcontentloaded', {timeout: 2000})
+                    // If the wait times out:
+                    .catch(() => {
+                      loadState = 'incomplete';
+                      // Proceed but report the timeout.
+                      console.log('ERROR waiting for page to load after link activation');
+                    });
+                  });
                   // If it was clicked:
                   if (actIndex > -2) {
                     // Report the success.
                     act.result = {
                       href: href || 'NONE',
                       target: target || 'NONE',
-                      move: 'clicked'
+                      move: 'clicked',
+                      loadState
                     };
                   }
                 }

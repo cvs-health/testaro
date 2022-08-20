@@ -32,7 +32,7 @@ exports.commands = {
       }
     ],
     link: [
-      'Click a link',
+      'Click a link and wait for the page to be idle or loaded',
       {
         which: [true, 'string', 'hasLength', 'substring of link text'],
         index: [false, 'number', '', 'index among matches if not 0'],
