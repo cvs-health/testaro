@@ -1060,7 +1060,7 @@ const doActs = async (report, actIndex, page) => {
                     act.result.success = false;
                     act.result.error = `ERROR waiting for stable ${act.type}`;
                   });
-                  if (! act.result) {
+                  if (! act.result.error) {
                     const isEnabled = await matchingElement.isEnabled();
                     if (isEnabled) {
                       await matchingElement.check({
@@ -1069,29 +1069,35 @@ const doActs = async (report, actIndex, page) => {
                       })
                       .catch(error => {
                         console.log(`ERROR checking ${act.type} (${error.message})`);
-                        addError(act, `ERROR checking ${act.type}`);
+                        act.result.success = false;
+                        act.result.error = `ERROR checking ${act.type}`;
                       });
-                      if (! act.result) {
-                        act.result = 'checked';
+                      if (! act.result.error) {
+                        act.result.success = true;
+                        act.result.move = 'checked';
                       }
                     }
                     else {
                       const report = `ERROR: could not check ${act.type} because disabled`;
                       console.log(report);
-                      act.result = report;
+                      act.result.success = false;
+                      act.result.error = report;
                     }
                   }
                 }
                 // Otherwise, if it is focusing the element, perform it.
                 else if (act.type === 'focus') {
                   await matchingElement.focus({timeout: 2000});
-                  act.result = 'focused';
+                  act.result.success = true;
+                  act.result.move = 'focused';
                 }
                 // Otherwise, if it is clicking a link:
                 else if (act.type === 'link') {
                   // Try to click it.
                   const href = await matchingElement.getAttribute('href');
                   const target = await matchingElement.getAttribute('target');
+                  act.result.href = href || 'NONE';
+                  act.result.target = target || 'NONE';
                   await matchingElement.click({timeout: 3000})
                   // If it cannot be clicked within 3 seconds:
                   .catch(async error => {
@@ -1107,37 +1113,30 @@ const doActs = async (report, actIndex, page) => {
                       actIndex = -2;
                       const errorSummary = error.message.replace(/\n.+/, '');
                       console.log(`ERROR: Link to ${href} not force-clickable (${errorSummary})`);
-                      act.result = {
-                        href: href || 'NONE',
-                        target: target || 'NONE',
-                        error: 'ERROR: Normal and forced attempts to click link timed out'
-                      };
+                      act.result.success = false;
+                      act.result.error = 'ERROR: Normal and forced click  attempts timed out';
                     });
                   });
-                  let loadState = 'idle';
-                  // Wait up to 3 seconds for the resulting page to be idle.
-                  await page.waitForLoadState('networkidle', {timeout: 3000})
-                  // If the wait times out:
-                  .catch(async () => {
-                    loadState = 'loaded';
-                    // Wait up to 2 seconds for the page to be loaded.
-                    await page.waitForLoadState('domcontentloaded', {timeout: 2000})
+                  // If the link click succeeded:
+                  if (! act.result.error) {
+                    act.result.success = true;
+                    act.result.move = 'clicked';
+                    // Wait up to 3 seconds for the resulting page to be idle.
+                    let loadState = 'idle';
+                    await page.waitForLoadState('networkidle', {timeout: 3000})
                     // If the wait times out:
-                    .catch(() => {
-                      loadState = 'incomplete';
-                      // Proceed but report the timeout.
-                      console.log('ERROR waiting for page to load after link activation');
+                    .catch(async () => {
+                      loadState = 'loaded';
+                      // Wait up to 2 seconds for the page to be loaded.
+                      await page.waitForLoadState('domcontentloaded', {timeout: 2000})
+                      // If the wait times out:
+                      .catch(() => {
+                        loadState = 'incomplete';
+                        // Proceed but report the timeout.
+                        console.log('ERROR waiting for page to load after link activation');
+                      });
                     });
-                  });
-                  // If it was clicked:
-                  if (actIndex > -2) {
-                    // Report the success.
-                    act.result = {
-                      href: href || 'NONE',
-                      target: target || 'NONE',
-                      move: 'clicked',
-                      loadState
-                    };
+                    act.result.loadState = loadState;
                   }
                 }
                 // Otherwise, if it is selecting an option in a select list, perform it.
