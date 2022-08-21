@@ -764,8 +764,9 @@ const doActs = async (report, actIndex, page) => {
           const {what, which} = act;
           console.log(`>> ${what}`);
           const result = act.result = {};
-          // Wait for the specified text, and quit if it does not appear.
+          // If the text is to be the URL:
           if (what === 'url') {
+            // Wait for it up to 15 seconds and quit on failure.
             try {
               await page.waitForURL(which, {timeout: 15000});
               result.found = true;
@@ -776,7 +777,9 @@ const doActs = async (report, actIndex, page) => {
               waitError(page, act, error, 'URL');
             }
           }
+          // Otherwise, if the text is to be a substring of the page title:
           else if (what === 'title') {
+            // Wait for it up to 5 seconds and quit on failure.
             try {
               await page.waitForFunction(
                 text => document
@@ -789,14 +792,16 @@ const doActs = async (report, actIndex, page) => {
                 }
               );
               result.found = true;
-              result.title = await page.title(); 
+              result.title = await page.title();
             }
             catch(error) {
               actIndex = -2;
               waitError(page, act, error, 'title');
             }
           }
+          // Otherwise, if the text is to be a substring of the text of the page body:
           else if (what === 'body') {
+            // Wait for it up to 10 seconds and quit on failure.
             try {
               await page.waitForFunction(
                 text => document
@@ -818,27 +823,33 @@ const doActs = async (report, actIndex, page) => {
         }
         // Otherwise, if the act is a wait for a state:
         else if (act.type === 'state') {
-          // Wait for it, and quit if it does not appear.
+          // Wait for it up to 5 or 10 seconrds, and quit on failure.
           const stateIndex = ['loaded', 'idle'].indexOf(act.which);
           await page.waitForLoadState(
             ['domcontentloaded', 'networkidle'][stateIndex], {timeout: [10000, 5000][stateIndex]}
           )
           .catch(error => {
             console.log(`ERROR waiting for page to be ${act.which} (${error.message})`);
-            addError(act, `ERROR waiting for page to be ${act.which}`);
+            act.result = {
+              success: false,
+              error: `ERROR waiting for page to be ${act.which}`
+            };
             actIndex = -2;
           });
           if (actIndex > -2) {
-            addError(`Page became ${act.which}`);
+            act.result = {
+              success: true,
+              state: act.which
+            };
           }
         }
         // Otherwise, if the act is a page switch:
         else if (act.type === 'page') {
           // Wait for a page to be created and identify it as current.
           page = await browserContext.waitForEvent('page');
-          // Wait until it is stable and thus ready for the next act.
+          // Wait up to 20 seconds until it is idle.
           await page.waitForLoadState('networkidle', {timeout: 20000});
-          // Add the resulting URL and any description of it to the act.
+          // Add the resulting URL to the act.
           const result = {
             url: page.url()
           };
@@ -855,7 +866,9 @@ const doActs = async (report, actIndex, page) => {
             if (act.type === 'reveal') {
               // Make all elements in the page visible.
               await require('./procs/allVis').allVis(page);
-              act.result = 'All elements visible.';
+              act.result = {
+                success: true
+              };
             }
             // Otherwise, if the act is a tenon request:
             else if (act.type === 'tenonRequest') {
@@ -1010,38 +1023,42 @@ const doActs = async (report, actIndex, page) => {
                 });
                 testReport.result.failureCount = failureCount;
               }
+              testReport.result.success = true;
               report.testTimes.push([act.which, Math.round((Date.now() - startTime) / 1000)]);
               report.testTimes.sort((a, b) => b[1] - a[1]);
               // Add the result object (possibly an array) to the act.
               const resultCount = Object.keys(testReport.result).length;
-              act.result = resultCount ? testReport.result : 'NONE';
+              act.result = resultCount ? testReport.result : {success: false};
             }
             // Otherwise, if the act is a move:
             else if (moves[act.type]) {
               const selector = typeof moves[act.type] === 'string' ? moves[act.type] : act.what;
               // Try up to 5 times, every 2 seconds, to identify the element to perform the move on.
-              let matchResult = {success: false};
+              let matchResult = {found: false};
               let tries = 0;
-              while (tries++ < 5 && ! matchResult.success) {
+              while (tries++ < 5 && ! matchResult.found) {
                 matchResult = await matchElement(page, selector, act.which || '', act.index);
-                if (! matchResult.success) {
+                if (! matchResult.found) {
                   await wait(2000);
                 }
               }
               // If a match was found:
-              if (matchResult.success) {
+              if (matchResult.found) {
+                act.result = {found: true};
                 const {matchingElement} = matchResult;
                 // If the move is a button click, perform it.
                 if (act.type === 'button') {
                   await matchingElement.click({timeout: 3000});
-                  act.result = 'clicked';
+                  act.result.success = true;
+                  act.result.move = 'clicked';
                 }
                 // Otherwise, if it is checking a radio button or checkbox, perform it.
                 else if (['checkbox', 'radio'].includes(act.type)) {
                   await matchingElement.waitForElementState('stable', {timeout: 2000})
                   .catch(error => {
                     console.log(`ERROR waiting for stable ${act.type} (${error.message})`);
-                    addError(act, `ERROR waiting for stable ${act.type}`);
+                    act.result.success = false;
+                    act.result.error = `ERROR waiting for stable ${act.type}`;
                   });
                   if (! act.result) {
                     const isEnabled = await matchingElement.isEnabled();
@@ -1343,8 +1360,11 @@ const doActs = async (report, actIndex, page) => {
           }
           // Otherwise, i.e. if redirection is prohibited but occurred:
           else {
-            // Add the error result to the act.
-            addError(act, `ERROR: Page URL wrong (${url})`);
+            // Add an error result to the act.
+            act.result = {
+              success: false,
+              error: `ERROR: Page URL wrong (${url})`
+            };
           }
         }
         // Otherwise, i.e. if the required page URL does not exist:
