@@ -445,85 +445,6 @@ const textOf = async (page, element) => {
     return null;
   }
 };
-// Returns an element of a type case-insensitively including a text.
-const matchElement = async (page, selector, matchText, index = 0) => {
-  if (matchText) {
-    // If the page still exists:
-    if (page) {
-      const slimText = debloat(matchText);
-      // Identify the elements of the specified type.
-      const selections = await page.$$(selector);
-      // If there are any:
-      if (selections.length) {
-        // If there are enough to make a match possible:
-        if (index < selections.length) {
-          // For each element of the specified type:
-          let matchCount = 0;
-          const selectionTexts = [];
-          for (const selection of selections) {
-            // Add its text to the list of texts of such elements.
-            const selectionText = await textOf(page, selection);
-            selectionTexts.push(selectionText);
-            // If its text includes the specified text:
-            if (selectionText.includes(slimText)) {
-              // If the count of such elements with such texts found so far is the specified count:
-              if (matchCount++ === index) {
-                // Return it as the matching element.
-                return {
-                  success: true,
-                  matchingElement: selection
-                };
-              }
-            }
-          }
-          // None satisfied the specifications, so return a failure.
-          return {
-            success: false,
-            error: 'exhausted',
-            message: `Text found in only ${matchCount} (not ${index + 1}) of ${selections.length}`,
-            candidateTexts: selectionTexts
-          };
-        }
-        // Otherwise, i.e. if there are too few such elements to make a match possible:
-        else {
-          // Return a failure.
-          return {
-            success: false,
-            error: 'fewer',
-            message: `Count of '${selector}' elements only ${selections.length}`
-          };
-        }
-      }
-      // Otherwise, i.e. if there are no elements of the specified type:
-      else {
-        // Return a failure.
-        return {
-          success: false,
-          error: 'none',
-          message: `No '${selector}' elements found`
-        };
-      }
-    }
-    // Otherwise, i.e. if the page no longer exists:
-    else {
-      // Return a failure.
-      return {
-        success: false,
-        error: 'gone',
-        message: 'Page gone'
-      };
-    }
-  }
-  // Otherwise, i.e. if no text was specified:
-  else {
-    // Return a failure.
-    return {
-      success: false,
-      error: 'text',
-      message: 'No text specified'
-    };
-  }
-};
 // Returns a string with any final slash removed.
 const deSlash = string => string.endsWith('/') ? string.slice(0, -1) : string;
 // Tries to visit a URL.
@@ -1033,18 +954,88 @@ const doActs = async (report, actIndex, page) => {
             // Otherwise, if the act is a move:
             else if (moves[act.type]) {
               const selector = typeof moves[act.type] === 'string' ? moves[act.type] : act.what;
-              // Try up to 5 times, every 2 seconds, to identify the element to perform the move on.
-              let matchResult = {found: false};
+              // Try for up to 10 seconds to identify the element to perform the move on.
+              act.result = {found: false};
               let tries = 0;
-              while (tries++ < 5 && ! matchResult.found) {
+              while (tries++ < 5 && ! act.result.found) {
+                if (act.which) {
+                  // If the page still exists:
+                  if (page) {
+                    const slimText = debloat(act.which);
+                    // Identify the elements of the specified type.
+                    const selections = await page.$$(selector);
+                    // If there are any:
+                    if (selections.length) {
+                      // If there are enough to make a match possible:
+                      if (act.index < selections.length) {
+                        // For each element of the specified type:
+                        let matchCount = 0;
+                        const selectionTexts = [];
+                        for (const selection of selections) {
+                          // Add its text to the list of texts of such elements.
+                          const selectionText = await textOf(page, selection);
+                          selectionTexts.push(selectionText);
+                          // If its text includes the specified text:
+                          if (selectionText.includes(slimText)) {
+                            // If the element has the specified index among such elements:
+                            if (matchCount++ === act.index) {
+                              // Report it as the matching element and stop checking.
+                              act.result.found = true;
+                              act.result.text = slimText;
+                              break;
+                            }
+                          }
+                        }
+                        // If no element satisfied the specifications:
+                        if (! act.result.found) {
+                          act.result.success = false;
+                          act.result.error = 'exhausted';
+                          act.result.typeElementCount = selections.length;
+                          act.result.textElementCount = --matchCount;
+                          act.result.message = 'Not enough elements have the specified text'
+                          act.result.candidateTexts = selectionTexts;
+                        };
+                      }
+                      // Otherwise, i.e. if there are too few such elements to make a match possible:
+                      else {
+                        // Return a failure.
+                        act.result.success = false;
+                        act.result.error = 'fewer';
+                        act.result.typeElementCount = selections.length;
+                        act.result.message = 'Elements of specified type too few';
+                      }
+                    }
+                    // Otherwise, i.e. if there are no elements of the specified type:
+                    else {
+                      // Return a failure.
+                      act.result.success = false;
+                      act.result.error = 'none';
+                      act.result.typeElementCount = 0;
+                      act.result.message = 'No elements specified type found';
+                    }
+                  }
+                  // Otherwise, i.e. if the page no longer exists:
+                  else {
+                    // Return a failure.
+                    act.result.success = false;
+                    act.result.error = 'gone';
+                    act.result.message = 'Page gone';
+                  }
+                }
+                // Otherwise, i.e. if no text was specified:
+                else {
+                  // Return a failure.
+                  act.result.success = false;
+                  act.result.error = 'text';
+                  act.result.message = 'No text specified';
+                }
                 matchResult = await matchElement(page, selector, act.which || '', act.index);
                 if (! matchResult.found) {
                   await wait(2000);
                 }
               }
               // If a match was found:
-              if (matchResult.found) {
-                act.result = {found: true};
+              if (act.result.found) {
                 const {matchingElement} = matchResult;
                 // If the move is a button click, perform it.
                 if (act.type === 'button') {
