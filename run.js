@@ -1158,9 +1158,9 @@ const doActs = async (report, actIndex, page) => {
                       optionText = optionTexts[index];
                     }
                   }
-                  act.result = optionText
-                    ? `“${optionText}” selected`
-                    : 'ERROR: option not found';
+                  act.result.success = true;
+                  act.result.move = 'selected';
+                  act.result.option = optionText;
                 }
                 // Otherwise, if it is entering text on the element:
                 else if (act.type === 'text') {
@@ -1175,13 +1175,15 @@ const doActs = async (report, actIndex, page) => {
                   // Enter the text.
                   await matchingElement.type(act.what);
                   report.presses += act.what.length;
-                  act.result = 'entered';
+                  act.result.success = true;
+                  act.result.move = 'entered';
                 }
                 // Otherwise, i.e. if the move is unknown, add the failure to the act.
                 else {
                   // Report the error.
                   const report = 'ERROR: move unknown';
-                  act.result = report;
+                  act.result.success = false;
+                  act.result.error = report;
                   console.log(report);
                 }
               }
