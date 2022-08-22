@@ -958,17 +958,17 @@ const doActs = async (report, actIndex, page) => {
               act.result = {found: false};
               let selection = {};
               let tries = 0;
+              const slimText = debloat(act.which);
               while (tries++ < 5 && ! act.result.found) {
                 if (act.which) {
                   // If the page still exists:
                   if (page) {
-                    const slimText = debloat(act.which);
                     // Identify the elements of the specified type.
                     const selections = await page.$$(selector);
                     // If there are any:
                     if (selections.length) {
                       // If there are enough to make a match possible:
-                      if (act.index < selections.length) {
+                      if ((act.index || 0) < selections.length) {
                         // For each element of the specified type:
                         let matchCount = 0;
                         const selectionTexts = [];
@@ -978,8 +978,9 @@ const doActs = async (report, actIndex, page) => {
                           selectionTexts.push(selectionText);
                           // If its text includes the specified text:
                           if (selectionText.includes(slimText)) {
+                            console.log()
                             // If the element has the specified index among such elements:
-                            if (matchCount++ === act.index) {
+                            if (matchCount++ === (act.index || 0)) {
                               // Report it as the matching element and stop checking.
                               act.result.found = true;
                               act.result.text = slimText;
@@ -1092,7 +1093,7 @@ const doActs = async (report, actIndex, page) => {
                   // If it cannot be clicked within 3 seconds:
                   .catch(async error => {
                     // Try to force-click it without actionability checks.
-                    const errorSummary = error.message.replace(/\n.+/, '');
+                    const errorSummary = error.message.replace(/\n.+/s, '');
                     console.log(`ERROR: Link to ${href} not clickable (${errorSummary})`);
                     await selection.click({
                       force: true
@@ -1101,7 +1102,7 @@ const doActs = async (report, actIndex, page) => {
                     .catch(error => {
                       // Quit and report the failure.
                       actIndex = -2;
-                      const errorSummary = error.message.replace(/\n.+/, '');
+                      const errorSummary = error.message.replace(/\n.+/s, '');
                       console.log(`ERROR: Link to ${href} not force-clickable (${errorSummary})`);
                       act.result.success = false;
                       act.result.error = 'ERROR: Normal and forced click  attempts timed out';
