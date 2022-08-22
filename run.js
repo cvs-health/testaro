@@ -603,10 +603,10 @@ const wait = ms => {
   });
 };
 // Adds an error result to an act.
-const addError = (act, error) => {
-  act.result = {
-    error
-  };
+const addError = (act, error, message) => {
+  act.result.success = false;
+  act.result.error = error;
+  act.result.message = message;
   if (act.type === 'test') {
     act.result.prevented = true;
   }
@@ -956,6 +956,7 @@ const doActs = async (report, actIndex, page) => {
               const selector = typeof moves[act.type] === 'string' ? moves[act.type] : act.what;
               // Try for up to 10 seconds to identify the element to perform the move on.
               act.result = {found: false};
+              let selection = {};
               let tries = 0;
               while (tries++ < 5 && ! act.result.found) {
                 if (act.which) {
@@ -971,7 +972,7 @@ const doActs = async (report, actIndex, page) => {
                         // For each element of the specified type:
                         let matchCount = 0;
                         const selectionTexts = [];
-                        for (const selection of selections) {
+                        for (selection of selections) {
                           // Add its text to the list of texts of such elements.
                           const selectionText = await textOf(page, selection);
                           selectionTexts.push(selectionText);
@@ -1029,32 +1030,30 @@ const doActs = async (report, actIndex, page) => {
                   act.result.error = 'text';
                   act.result.message = 'No text specified';
                 }
-                matchResult = await matchElement(page, selector, act.which || '', act.index);
-                if (! matchResult.found) {
+                if (! act.result.found) {
                   await wait(2000);
                 }
               }
               // If a match was found:
               if (act.result.found) {
-                const {matchingElement} = matchResult;
                 // If the move is a button click, perform it.
                 if (act.type === 'button') {
-                  await matchingElement.click({timeout: 3000});
+                  await selection.click({timeout: 3000});
                   act.result.success = true;
                   act.result.move = 'clicked';
                 }
                 // Otherwise, if it is checking a radio button or checkbox, perform it.
                 else if (['checkbox', 'radio'].includes(act.type)) {
-                  await matchingElement.waitForElementState('stable', {timeout: 2000})
+                  await selection.waitForElementState('stable', {timeout: 2000})
                   .catch(error => {
                     console.log(`ERROR waiting for stable ${act.type} (${error.message})`);
                     act.result.success = false;
                     act.result.error = `ERROR waiting for stable ${act.type}`;
                   });
                   if (! act.result.error) {
-                    const isEnabled = await matchingElement.isEnabled();
+                    const isEnabled = await selection.isEnabled();
                     if (isEnabled) {
-                      await matchingElement.check({
+                      await selection.check({
                         force: true,
                         timeout: 2000
                       })
@@ -1078,24 +1077,24 @@ const doActs = async (report, actIndex, page) => {
                 }
                 // Otherwise, if it is focusing the element, perform it.
                 else if (act.type === 'focus') {
-                  await matchingElement.focus({timeout: 2000});
+                  await selection.focus({timeout: 2000});
                   act.result.success = true;
                   act.result.move = 'focused';
                 }
                 // Otherwise, if it is clicking a link:
                 else if (act.type === 'link') {
                   // Try to click it.
-                  const href = await matchingElement.getAttribute('href');
-                  const target = await matchingElement.getAttribute('target');
+                  const href = await selection.getAttribute('href');
+                  const target = await selection.getAttribute('target');
                   act.result.href = href || 'NONE';
                   act.result.target = target || 'NONE';
-                  await matchingElement.click({timeout: 3000})
+                  await selection.click({timeout: 3000})
                   // If it cannot be clicked within 3 seconds:
                   .catch(async error => {
                     // Try to force-click it without actionability checks.
                     const errorSummary = error.message.replace(/\n.+/, '');
                     console.log(`ERROR: Link to ${href} not clickable (${errorSummary})`);
-                    await matchingElement.click({
+                    await selection.click({
                       force: true
                     })
                     // If it cannot be force-clicked:
@@ -1132,7 +1131,7 @@ const doActs = async (report, actIndex, page) => {
                 }
                 // Otherwise, if it is selecting an option in a select list, perform it.
                 else if (act.type === 'select') {
-                  const options = await matchingElement.$$('option');
+                  const options = await selection.$$('option');
                   let optionText = '';
                   if (options && Array.isArray(options) && options.length) {
                     const optionTexts = [];
@@ -1145,7 +1144,7 @@ const doActs = async (report, actIndex, page) => {
                     );
                     const index = matchTexts.filter(text => text > -1)[act.index || 0];
                     if (index !== undefined) {
-                      await matchingElement.selectOption({index});
+                      await selection.selectOption({index});
                       optionText = optionTexts[index];
                     }
                   }
@@ -1164,7 +1163,7 @@ const doActs = async (report, actIndex, page) => {
                     what = what.replace(/__[A-Z]+__/, envValue);
                   }
                   // Enter the text.
-                  await matchingElement.type(act.what);
+                  await selection.type(act.what);
                   report.presses += act.what.length;
                   act.result.success = true;
                   act.result.move = 'entered';
@@ -1181,7 +1180,9 @@ const doActs = async (report, actIndex, page) => {
               // Otherwise, i.e. if no match was found:
               else {
                 // Stop.
-                act.result = matchResult;
+                act.result.success = false;
+                act.result.error = 'absent';
+                act.result.message = 'ERROR: specified element not found';
                 console.log('ERROR: Specified element not found');
                 actIndex = -2;
               }
@@ -1197,7 +1198,10 @@ const doActs = async (report, actIndex, page) => {
                 await page.keyboard.press(key);
               }
               const qualifier = act.again ? `${1 + act.again} times` : 'once';
-              act.result = `pressed ${qualifier}`;
+              act.result = {
+                success: true,
+                message: `pressed ${qualifier}`
+              };
             }
             // Otherwise, if it is a repetitive keyboard navigation:
             else if (act.type === 'presses') {
@@ -1328,6 +1332,7 @@ const doActs = async (report, actIndex, page) => {
               }
               // Add the result to the act.
               act.result = {
+                success: true,
                 status,
                 totals: {
                   presses,
@@ -1347,7 +1352,11 @@ const doActs = async (report, actIndex, page) => {
             // Otherwise, i.e. if the act type is unknown:
             else {
               // Add the error result to the act.
-              act.result = 'ERROR: invalid command type';
+              act.result = {
+                success: false,
+                error: 'badType',
+                message: 'ERROR: invalid command type'
+              };
             }
           }
           // Otherwise, i.e. if redirection is prohibited but occurred:
@@ -1355,27 +1364,32 @@ const doActs = async (report, actIndex, page) => {
             // Add an error result to the act.
             act.result = {
               success: false,
-              error: `ERROR: Page URL wrong (${url})`
+              error: 'redirection',
+              message: `ERROR: Page redirected to (${url})`
             };
           }
         }
         // Otherwise, i.e. if the required page URL does not exist:
         else {
           // Add an error result to the act.
-          addError(act, 'ERROR: Page has no URL');
+          addError(act, 'noURL', 'ERROR: Page has no URL');
         }
       }
       // Otherwise, i.e. if no page exists:
       else {
         // Add an error result to the act.
-        addError(act, 'ERROR: No page identified');
+        addError(act, 'noPage', 'ERROR: No page identified');
       }
     }
     // Otherwise, i.e. if the command is invalid:
     else {
       // Add an error result to the act.
       const errorMsg = `ERROR: Invalid command of type ${act.type}`;
-      act.result = errorMsg;
+      act.result = {
+        success: false,
+        error: 'badCommand',
+        message: errorMsg
+      };
       console.log(errorMsg);
       // Quit.
       actIndex = -2;
