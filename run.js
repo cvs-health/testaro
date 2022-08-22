@@ -619,6 +619,7 @@ const doActs = async (report, actIndex, page) => {
       console.log(`>>>> ${act.type}${whichSuffix}`);
       // Increment the count of commands performed.
       actCount++;
+      act.startTime = Date.now();
       // If the command is an index changer:
       if (act.type === 'next') {
         const condition = act.if;
@@ -1386,6 +1387,7 @@ const doActs = async (report, actIndex, page) => {
         // Add an error result to the act.
         addError(act, 'noPage', 'ERROR: No page identified');
       }
+      act.endTime = Date.now();
     }
     // Otherwise, i.e. if the command is invalid:
     else {
