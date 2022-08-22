@@ -1111,7 +1111,7 @@ const doActs = async (report, actIndex, page) => {
                     try {
                       await selection.click({timeout: 5000});
                       // Wait for the new content to load.
-                      await page.waitForLoadState('domcontentloaded', {timeout: 4000});
+                      await page.waitForLoadState('domcontentloaded', {timeout: 6000});
                       act.result.success = true;
                       act.result.move = 'clicked';
                       act.result.newURL = page.url();
