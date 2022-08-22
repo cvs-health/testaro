@@ -316,6 +316,8 @@ Tenon recommends giving it a public URL rather than giving it the content of a p
 
 The `continuum` test makes use of the files in the `continuum` directory. The test inserts the contents of all three files into the page as scripts and then uses them to perform the tests of the Continuum package.
 
+Level Access on 22 August 2022 granted authorization for the copying of the `AccessEngine.community.js` file insofar as necessary for allowing Continuum community edition tests to be included in Testaro.
+
 ###### HTML CodeSniffer
 
 The `htmlcs` test makes use of the`htmlcs/HTMLCS.js` file. That file was created, and can be recreated if necessary, as follows:

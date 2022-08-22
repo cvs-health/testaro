@@ -12,7 +12,7 @@ const {commands} = require('./commands');
 
 // ########## CONSTANTS
 
-// Set DEBUG environment variable to 'true' to add debugging features.
+// Set DEBUG environment variable to 'true,' to add debugging features.
 const debug = process.env.DEBUG === 'true';
 // Set WAITS environment variable to a positive number to insert delays (in ms).
 const waits = Number.parseInt(process.env.WAITS) || 0;
@@ -294,16 +294,11 @@ const launch = async typeName => {
     });
     // If the launch succeeded:
     if (healthy) {
-      // Create a new context (window) in it, taller if debugging is on.
-      const viewport = debug ? {
-        viewPort: {
-          width: 1280,
-          height: 1120
-        }
-      } : {};
-      browserContext = await browser.newContext(viewport);
-      // When a page is added to the browser context:
-      browserContext.on('page', page => {
+      browserContext = await browser.newContext();
+      // When a page (i.e. browser tab) is added to the browser context (i.e. browser window):
+      browserContext.on('page', async page => {
+        // Activate the page.
+        await page.bringToFront();
         // Make abbreviations of its console messages get reported in the Playwright console.
         page.on('console', msg => {
           const msgText = msg.text();
@@ -339,12 +334,6 @@ const launch = async typeName => {
       });
       // Open the first page of the context.
       const page = await browserContext.newPage();
-      if (debug) {
-        page.setViewportSize({
-          width: 1280,
-          height: 1120
-        });
-      }
       // Wait until it is stable.
       await page.waitForLoadState('domcontentloaded');
       // Update the name of the current browser type and store it in the page.
@@ -636,8 +625,8 @@ const doActs = async (report, actIndex, page) => {
         const logSuffix = condition.length === 3 ? ` ${condition[1]} ${condition[2]}` : '';
         console.log(`>> ${condition[0]}${logSuffix}`);
         // Identify the act to be checked.
-        const ifActIndex = report.acts.map(act => act.type !== 'next').lastIndexOf(true);
-        // Determine whether its jump condition is true.
+        const ifActIndex = report.acts.map(act => act.type !== 'next').lastIndexOf(true,);
+        // Determine whether its jump condition is true,.
         const truth = isTrue(report.acts[ifActIndex].result, condition);
         // Add the result to the act.
         act.result = {
@@ -647,7 +636,7 @@ const doActs = async (report, actIndex, page) => {
           value: truth[0],
           jumpRequired: truth[1]
         };
-        // If the condition is true:
+        // If the condition is true,:
         if (truth[1]) {
           // If the performance of commands is to stop:
           if (act.jump === 0) {
@@ -788,7 +777,7 @@ const doActs = async (report, actIndex, page) => {
               // Make all elements in the page visible.
               await require('./procs/allVis').allVis(page);
               act.result = {
-                success: true
+                success: true,
               };
             }
             // Otherwise, if the act is a tenon request:
@@ -978,7 +967,6 @@ const doActs = async (report, actIndex, page) => {
                           selectionTexts.push(selectionText);
                           // If its text includes the specified text:
                           if (selectionText.includes(slimText)) {
-                            console.log()
                             // If the element has the specified index among such elements:
                             if (matchCount++ === (act.index || 0)) {
                               // Report it as the matching element and stop checking.
@@ -994,9 +982,9 @@ const doActs = async (report, actIndex, page) => {
                           act.result.error = 'exhausted';
                           act.result.typeElementCount = selections.length;
                           act.result.textElementCount = --matchCount;
-                          act.result.message = 'Not enough elements have the specified text'
+                          act.result.message = 'Not enough elements have the specified text';
                           act.result.candidateTexts = selectionTexts;
-                        };
+                        }
                       }
                       // Otherwise, i.e. if there are too few such elements to make a match possible:
                       else {
@@ -1084,50 +1072,67 @@ const doActs = async (report, actIndex, page) => {
                 }
                 // Otherwise, if it is clicking a link:
                 else if (act.type === 'link') {
-                  // Try to click it.
                   const href = await selection.getAttribute('href');
                   const target = await selection.getAttribute('target');
                   act.result.href = href || 'NONE';
-                  act.result.target = target || 'NONE';
-                  await selection.click({timeout: 3000})
-                  // If it cannot be clicked within 3 seconds:
-                  .catch(async error => {
-                    // Try to force-click it without actionability checks.
-                    const errorSummary = error.message.replace(/\n.+/s, '');
-                    console.log(`ERROR: Link to ${href} not clickable (${errorSummary})`);
-                    await selection.click({
-                      force: true
-                    })
-                    // If it cannot be force-clicked:
-                    .catch(error => {
+                  act.result.target = target || 'DEFAULT';
+                  // If the destination is a new page:
+                  if (target && target !== '_self') {
+                    // Click the link and wait for the resulting page event.
+                    try {
+                      const [newPage] = await Promise.all([
+                        page.context().waitForEvent('page', {timeout: 6000}),
+                        selection.click({timeout: 5000})
+                      ]);
+                      // Wait for the new page to load.
+                      await newPage.waitForLoadState('domcontentloaded', {timeout: 6000});
+                      // Make the new page the current page.
+                      page = newPage;
+                      act.result.success = true;
+                      act.result.move = 'clicked';
+                      act.result.newURL = page.url();
+                    }
+                    // If the click, event, or load failed:
+                    catch(error) {
                       // Quit and report the failure.
-                      actIndex = -2;
-                      const errorSummary = error.message.replace(/\n.+/s, '');
-                      console.log(`ERROR: Link to ${href} not force-clickable (${errorSummary})`);
+                      console.log(
+                        `ERROR clicking new-page link (${error.message.replace(/\n.+/s, '')})`
+                      );
                       act.result.success = false;
-                      act.result.error = 'ERROR: Normal and forced click  attempts timed out';
-                    });
-                  });
-                  // If the link click succeeded:
-                  if (! act.result.error) {
-                    act.result.success = true;
-                    act.result.move = 'clicked';
-                    // Wait up to 3 seconds for the resulting page to be idle.
-                    let loadState = 'idle';
-                    await page.waitForLoadState('networkidle', {timeout: 3000})
-                    // If the wait times out:
-                    .catch(async () => {
-                      loadState = 'loaded';
-                      // Wait up to 2 seconds for the page to be loaded.
-                      await page.waitForLoadState('domcontentloaded', {timeout: 2000})
-                      // If the wait times out:
-                      .catch(() => {
-                        loadState = 'incomplete';
-                        // Proceed but report the timeout.
-                        console.log('ERROR waiting for page to load after link activation');
+                      act.result.error = 'unclickable';
+                      act.result.message = 'ERROR: click and new-page navigation timed out';
+                      actIndex = -2;
+                    }
+                  }
+                  // Otherwise, i.e. if the destination is in the current page:
+                  else {
+                    // Click the link and wait for the resulting navigation.
+                    await selection.click({timeout: 5000})
+                    // If the click and navigation time out:
+                    .catch(async error => {
+                      // Try to force-click it and wait for the navigation.
+                      const errorSummary = error.message.replace(/\n.+/s, '');
+                      console.log(`ERROR: Link to ${href} not clickable (${errorSummary})`);
+                      await selection.click({
+                        force: true,
+                        timeout: 3000
+                      })
+                      // If it cannot be force-clicked:
+                      .catch(error => {
+                        // Quit and report the failure.
+                        actIndex = -2;
+                        const errorSummary = error.message.replace(/\n.+/s, '');
+                        console.log(`ERROR: Link to ${href} not force-clickable (${errorSummary})`);
+                        act.result.success = false;
+                        act.result.error = 'unclickable';
+                        act.result.message = 'ERROR: Normal and forced click attempts timed out';
                       });
                     });
-                    act.result.loadState = loadState;
+                    // If the link click succeeded:
+                    if (! act.result.error) {
+                      act.result.success = true;
+                      act.result.move = 'clicked';
+                    }
                   }
                 }
                 // Otherwise, if it is selecting an option in a select list, perform it.
