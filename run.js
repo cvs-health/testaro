@@ -12,7 +12,7 @@ const {commands} = require('./commands');
 
 // ########## CONSTANTS
 
-// Set DEBUG environment variable to 'true,' to add debugging features.
+// Set DEBUG environment variable to 'true' to add debugging features.
 const debug = process.env.DEBUG === 'true';
 // Set WAITS environment variable to a positive number to insert delays (in ms).
 const waits = Number.parseInt(process.env.WAITS) || 0;
@@ -492,11 +492,11 @@ const visit = async (act, page, isStrict) => {
   // Identify the URL.
   const resolved = act.which.replace('__dirname', __dirname);
   requestedURL = resolved;
-  // Visit it and wait 15 seconds or until the network is idle.
+  // Visit it and wait until the network is idle.
   let response = await goto(page, requestedURL, 15000, 'networkidle', isStrict);
   // If the visit fails:
   if (response === 'error') {
-    // Try again, but waiting 10 seconds or until the DOM is loaded.
+    // Try again until the DOM is loaded.
     response = await goto(page, requestedURL, 10000, 'domcontentloaded', isStrict);
     // If the visit fails:
     if (response === 'error') {
@@ -507,15 +507,15 @@ const visit = async (act, page, isStrict) => {
       await launch(newBrowserName);
       // Identify its only page as current.
       page = browserContext.pages()[0];
-      // Try again, waiting 10 seconds or until the network is idle.
+      // Try again until the network is idle.
       response = await goto(page, requestedURL, 10000, 'networkidle', isStrict);
       // If the visit fails:
       if (response === 'error') {
-        // Try again, but waiting 5 seconds or until the DOM is loaded.
+        // Try again until the DOM is loaded.
         response = await goto(page, requestedURL, 5000, 'domcontentloaded', isStrict);
         // If the visit fails:
         if (response === 'error') {
-          // Try again, waiting 5 seconds or until a load.
+          // Try again or until a load.
           response = await goto(page, requestedURL, 5000, 'load', isStrict);
           // If the visit fails:
           if (response === 'error') {
@@ -626,8 +626,8 @@ const doActs = async (report, actIndex, page) => {
         const logSuffix = condition.length === 3 ? ` ${condition[1]} ${condition[2]}` : '';
         console.log(`>> ${condition[0]}${logSuffix}`);
         // Identify the act to be checked.
-        const ifActIndex = report.acts.map(act => act.type !== 'next').lastIndexOf(true,);
-        // Determine whether its jump condition is true,.
+        const ifActIndex = report.acts.map(act => act.type !== 'next').lastIndexOf(true);
+        // Determine whether its jump condition is true.
         const truth = isTrue(report.acts[ifActIndex].result, condition);
         // Add the result to the act.
         act.result = {
@@ -637,7 +637,7 @@ const doActs = async (report, actIndex, page) => {
           value: truth[0],
           jumpRequired: truth[1]
         };
-        // If the condition is true,:
+        // If the condition is true:
         if (truth[1]) {
           // If the performance of commands is to stop:
           if (act.jump === 0) {
@@ -677,7 +677,7 @@ const doActs = async (report, actIndex, page) => {
           const result = act.result = {};
           // If the text is to be the URL:
           if (what === 'url') {
-            // Wait for it up to 15 seconds and quit on failure.
+            // Wait for it and quit on failure.
             try {
               await page.waitForURL(which, {timeout: 15000});
               result.found = true;
@@ -690,7 +690,7 @@ const doActs = async (report, actIndex, page) => {
           }
           // Otherwise, if the text is to be a substring of the page title:
           else if (what === 'title') {
-            // Wait for it up to 5 seconds and quit on failure.
+            // Wait for it and quit on failure.
             try {
               await page.waitForFunction(
                 text => document
@@ -712,7 +712,7 @@ const doActs = async (report, actIndex, page) => {
           }
           // Otherwise, if the text is to be a substring of the text of the page body:
           else if (what === 'body') {
-            // Wait for it up to 10 seconds and quit on failure.
+            // Wait for it and quit on failure.
             try {
               await page.waitForFunction(
                 text => document
@@ -734,10 +734,10 @@ const doActs = async (report, actIndex, page) => {
         }
         // Otherwise, if the act is a wait for a state:
         else if (act.type === 'state') {
-          // Wait for it up to 5 or 10 seconrds, and quit on failure.
+          // Wait for it and quit on failure.
           const stateIndex = ['loaded', 'idle'].indexOf(act.which);
           await page.waitForLoadState(
-            ['domcontentloaded', 'networkidle'][stateIndex], {timeout: [10000, 5000][stateIndex]}
+            ['domcontentloaded', 'networkidle'][stateIndex], {timeout: [10000, 15000][stateIndex]}
           )
           .catch(error => {
             console.log(`ERROR waiting for page to be ${act.which} (${error.message})`);
@@ -758,8 +758,8 @@ const doActs = async (report, actIndex, page) => {
         else if (act.type === 'page') {
           // Wait for a page to be created and identify it as current.
           page = await browserContext.waitForEvent('page');
-          // Wait up to 20 seconds until it is idle.
-          await page.waitForLoadState('networkidle', {timeout: 20000});
+          // Wait until it is idle.
+          await page.waitForLoadState('networkidle', {timeout: 15000});
           // Add the resulting URL to the act.
           const result = {
             url: page.url()
@@ -778,7 +778,7 @@ const doActs = async (report, actIndex, page) => {
               // Make all elements in the page visible.
               await require('./procs/allVis').allVis(page);
               act.result = {
-                success: true,
+                success: true
               };
             }
             // Otherwise, if the act is a tenon request:
@@ -944,7 +944,7 @@ const doActs = async (report, actIndex, page) => {
             // Otherwise, if the act is a move:
             else if (moves[act.type]) {
               const selector = typeof moves[act.type] === 'string' ? moves[act.type] : act.what;
-              // Try for up to 10 seconds to identify the element to perform the move on.
+              // Try to identify the element to perform the move on.
               act.result = {found: false};
               let selection = {};
               let tries = 0;
@@ -1086,7 +1086,7 @@ const doActs = async (report, actIndex, page) => {
                         selection.click({timeout: 5000})
                       ]);
                       // Wait for the new page to load.
-                      await newPage.waitForLoadState('domcontentloaded', {timeout: 6000});
+                      await newPage.waitForLoadState('domcontentloaded', {timeout: 10000});
                       // Make the new page the current page.
                       page = newPage;
                       act.result.success = true;
@@ -1101,34 +1101,32 @@ const doActs = async (report, actIndex, page) => {
                       );
                       act.result.success = false;
                       act.result.error = 'unclickable';
-                      act.result.message = 'ERROR: click and new-page navigation timed out';
+                      act.result.message = 'ERROR: click, navigation, or load timed out';
                       actIndex = -2;
                     }
                   }
                   // Otherwise, i.e. if the destination is in the current page:
                   else {
                     // Click the link and wait for the resulting navigation.
-                    await selection.click({timeout: 5000})
-                    // If the click and navigation time out:
-                    .catch(async error => {
-                      // Try to force-click it and wait for the navigation.
-                      const errorSummary = error.message.replace(/\n.+/s, '');
-                      console.log(`ERROR: Link to ${href} not clickable (${errorSummary})`);
-                      await selection.click({
-                        force: true,
-                        timeout: 3000
-                      })
-                      // If it cannot be force-clicked:
-                      .catch(error => {
-                        // Quit and report the failure.
-                        actIndex = -2;
-                        const errorSummary = error.message.replace(/\n.+/s, '');
-                        console.log(`ERROR: Link to ${href} not force-clickable (${errorSummary})`);
-                        act.result.success = false;
-                        act.result.error = 'unclickable';
-                        act.result.message = 'ERROR: Normal and forced click attempts timed out';
-                      });
-                    });
+                    try {
+                      await selection.click({timeout: 5000});
+                      // Wait for the new content to load.
+                      await page.waitForLoadState('domcontentloaded', {timeout: 4000});
+                      act.result.success = true;
+                      act.result.move = 'clicked';
+                      act.result.newURL = page.url();
+                    }
+                    // If the click or load failed:
+                    catch(error) {
+                      // Quit and report the failure.
+                      console.log(
+                        `ERROR clicking link (${error.message.replace(/\n.+/s, '')})`
+                      );
+                      act.result.success = false;
+                      act.result.error = 'unclickable';
+                      act.result.message = 'ERROR: click or load timed out';
+                      actIndex = -2;
+                    }
                     // If the link click succeeded:
                     if (! act.result.error) {
                       act.result.success = true;
