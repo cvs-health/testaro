@@ -4,5 +4,8 @@
 */
 exports.reporter = async page => {
   const title = await page.title();
-  return {result: title};
+  return {result: {
+    success: true,
+    title
+  }};
 };

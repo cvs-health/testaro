@@ -1082,8 +1082,8 @@ const doActs = async (report, actIndex, page) => {
                     // Click the link and wait for the resulting page event.
                     try {
                       const [newPage] = await Promise.all([
-                        page.context().waitForEvent('page', {timeout: 6000}),
-                        selection.click({timeout: 5000})
+                        page.context().waitForEvent('page', {timeout: 7000}),
+                        selection.click({timeout: 4000})
                       ]);
                       // Wait for the new page to load.
                       await newPage.waitForLoadState('domcontentloaded', {timeout: 10000});
