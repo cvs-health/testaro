@@ -24,6 +24,7 @@ const moves = {
   focus: true,
   link: 'a, [role=link]',
   radio: 'input[type=radio]',
+  search: 'input[type=search]',
   select: 'select',
   text: 'input[type=text]'
 };
@@ -1026,6 +1027,36 @@ const doActs = async (report, actIndex, page) => {
               }
               // If a match was found:
               if (act.result.found) {
+                // FUNCTION DEFINITION START
+                // Perform an action and wait for a page load.
+                const doAndWait = async actionIsClick => {
+                  try {
+                    const [newPage] = await Promise.all([
+                      page.context().waitForEvent('page', {timeout: 7000}),
+                      actionIsClick ? selection.click({timeout: 4000}) : selection.press('Enter')
+                    ]);
+                    // Wait for the new page to load.
+                    await newPage.waitForLoadState('domcontentloaded', {timeout: 10000});
+                    // Make the new page the current page.
+                    page = newPage;
+                    act.result.success = true;
+                    act.result.move = actionIsClick ? 'clicked' : 'Enter pressed';
+                    act.result.newURL = page.url();
+                  }
+                  // If the action, event, or load failed:
+                  catch(error) {
+                    // Quit and report the failure.
+                    const action = actionIsClick ? 'clicking' : 'pressing Enter';
+                    console.log(
+                      `ERROR ${action} (${error.message.replace(/\n.+/s, '')})`
+                    );
+                    act.result.success = false;
+                    act.result.error = 'moveFailure';
+                    act.result.message = 'ERROR: move, navigation, or load timed out';
+                    actIndex = -2;
+                  }
+                };
+                // FUNCTION DEFINITION END
                 // If the move is a button click, perform it.
                 if (act.type === 'button') {
                   await selection.click({timeout: 3000});
@@ -1080,30 +1111,7 @@ const doActs = async (report, actIndex, page) => {
                   // If the destination is a new page:
                   if (target && target !== '_self') {
                     // Click the link and wait for the resulting page event.
-                    try {
-                      const [newPage] = await Promise.all([
-                        page.context().waitForEvent('page', {timeout: 7000}),
-                        selection.click({timeout: 4000})
-                      ]);
-                      // Wait for the new page to load.
-                      await newPage.waitForLoadState('domcontentloaded', {timeout: 10000});
-                      // Make the new page the current page.
-                      page = newPage;
-                      act.result.success = true;
-                      act.result.move = 'clicked';
-                      act.result.newURL = page.url();
-                    }
-                    // If the click, event, or load failed:
-                    catch(error) {
-                      // Quit and report the failure.
-                      console.log(
-                        `ERROR clicking new-page link (${error.message.replace(/\n.+/s, '')})`
-                      );
-                      act.result.success = false;
-                      act.result.error = 'unclickable';
-                      act.result.message = 'ERROR: click, navigation, or load timed out';
-                      actIndex = -2;
-                    }
+                    doAndWait(true);
                   }
                   // Otherwise, i.e. if the destination is in the current page:
                   else {
@@ -1157,8 +1165,8 @@ const doActs = async (report, actIndex, page) => {
                   act.result.move = 'selected';
                   act.result.option = optionText;
                 }
-                // Otherwise, if it is entering text on the element:
-                else if (act.type === 'text') {
+                // Otherwise, if it is entering text on a text- or search-input element:
+                else if (['text', 'search'].includes(act.type)) {
                   // If the text contains a placeholder for an environment variable:
                   let {what} = act;
                   if (/__[A-Z]+__/.test(what)) {
@@ -1172,6 +1180,11 @@ const doActs = async (report, actIndex, page) => {
                   report.presses += act.what.length;
                   act.result.success = true;
                   act.result.move = 'entered';
+                  // If the input is a search input:
+                  if (act.type === 'search') {
+                    // Press the Enter key and wait for a new page to load.
+                    doAndWait(false);
+                  }
                 }
                 // Otherwise, i.e. if the move is unknown, add the failure to the act.
                 else {

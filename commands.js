@@ -3,7 +3,7 @@ exports.commands = {
     button: [
       'Click a button or submit input',
       {
-        which: [true, 'string', 'hasLength', 'substring of button text'],
+        which: [false, 'string', 'hasLength', 'substring of button text'],
         index: [false, 'number', '', 'index among matches if not 0'],
         what: [false, 'string', 'hasLength', 'comment']
       }
@@ -21,7 +21,7 @@ exports.commands = {
       {
         what: [true, 'string', 'isFocusable', 'selector of element to be focused'],
         index: [false, 'number', '', 'index among matches if not 0'],
-        which: [true, 'string', 'hasLength', 'substring of element text']
+        which: [false, 'string', 'hasLength', 'substring of element text']
       }
     ],
     launch: [
@@ -34,7 +34,7 @@ exports.commands = {
     link: [
       'Click a link and wait for the page to be idle or loaded',
       {
-        which: [true, 'string', 'hasLength', 'substring of link text'],
+        which: [false, 'string', 'hasLength', 'substring of link text'],
         index: [false, 'number', '', 'index among matches if not 0'],
         what: [false, 'string', 'hasLength', 'comment']
       }
@@ -78,7 +78,7 @@ exports.commands = {
     radio: [
       'Check a radio button',
       {
-        which: [true, 'string', 'hasLength', 'substring of radio-button text'],
+        which: [true, '', 'hasLength', 'substring of radio-button text'],
         index: [false, 'number', '', 'index among matches if not 0'],
         what: [false, 'string', 'hasLength', 'comment']
       }
@@ -89,10 +89,18 @@ exports.commands = {
         what: [false, 'string', 'hasLength', 'comment']
       }
     ],
+    search: [
+      'Enter text into a search input, optionally with 1 placeholder for an all-caps literal environment variable',
+      {
+        which: [false, 'string', 'hasLength', 'substring of input text'],
+        index: [false, 'number', '', 'index among matches if not 0'],
+        what: [true, 'string', 'hasLength', 'text to enter, with optional __PLACEHOLDER__']
+      }
+    ],
     select: [
       'Select a select option',
       {
-        which: [true, 'string', 'hasLength', 'substring of select-list text'],
+        which: [false, 'string', 'hasLength', 'substring of select-list text'],
         index: [false, 'number', '', 'index among matches if not 0'],
         what: [true, 'string', 'hasLength', 'substring of option text content']
       }
@@ -122,7 +130,7 @@ exports.commands = {
     text: [
       'Enter text into a text input, optionally with 1 placeholder for an all-caps literal environment variable',
       {
-        which: [true, 'string', 'hasLength', 'substring of input text'],
+        which: [false, 'string', 'hasLength', 'substring of input text'],
         index: [false, 'number', '', 'index among matches if not 0'],
         what: [true, 'string', 'hasLength', 'text to enter, with optional __PLACEHOLDER__']
       }
