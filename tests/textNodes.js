@@ -1,25 +1,20 @@
 /*
-  elements
-  This test reports data about specified elements.
+  textNodes
+  This test reports data about specified text nodes.
   Meanings of detailLevel values:
-    0. Only total element count; no detail.
-    1. Also data on each specified element.
-    2. Data on each specified element also include the text content of the parent element.
-    3. Data on each specified element also include data on its sibling nodes.
+    0. Only total node count; no detail.
+    1+. Count of ancestor elements of each node to provide data on.
 */
-exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) => {
-  // Determine a selector of the specified elements.
-  let selector = tagName || '*';
-  if (attribute) {
-    selector += `[${attribute}]`;
-  }
-  if (onlyVisible) {
-    selector += ':visible';
-  }
+exports.reporter = async (page, detailLevel, text) => {
   let data = {};
-  // Get the data on the elements.
+  // Get the data on the text nodes.
   try {
-    data = await page.$$eval(selector, (elements, detailLevel) => {
+    data = await page.evaluate(args => {
+      const detailLevel = args[0];
+      const text = args[1];
+      // Normalize the body.
+      const normBody = document.body.normalize();
+      
       // FUNCTION DEFINITIONS START
       // Compacts a string.
       const compact = string => string.replace(/\s+/g, ' ').trim();
@@ -143,7 +138,7 @@ exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) =>
         });
         return data;
       }
-    }, detailLevel);
+    }, [detailLevel, text]);
   }
   catch(error) {
     console.log(`ERROR performing test (${error.message})`);

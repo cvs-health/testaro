@@ -78,7 +78,7 @@ exports.commands = {
     radio: [
       'Check a radio button',
       {
-        which: [true, '', 'hasLength', 'substring of radio-button text'],
+        which: [true, 'string', 'hasLength', 'substring of radio-button text'],
         index: [false, 'number', '', 'index among matches if not 0'],
         what: [false, 'string', 'hasLength', 'comment']
       }
@@ -162,9 +162,9 @@ exports.commands = {
       'Perform an elements test',
       {
         detailLevel: [true, 'number', '', '0 to 3, to specify the level of detail'],
-        tagName: [false, 'string', '', 'tag name of elements'],
+        tagName: [false, 'string', 'hasLength', 'tag name of elements'],
         onlyVisible: [false, 'boolean', '', 'whether to exclude invisible elements'],
-        attribute: [false, 'string', 'hasLength', 'required attribute or attribute=value']
+        attribute: [false, 'string', 'hasLength', 'required attribute selector']
       }
     ],
     embAc: [
@@ -279,6 +279,13 @@ exports.commands = {
       'Perform a Tenon test',
       {
         id: [true, 'string', 'hasLength', 'ID of the requested test instance']
+      }
+    ],
+    textNodes: [
+      'Perform a textNodes test',
+      {
+        detailLevel: [true, 'number', '', '0 to 3, to specify the level of detail'],
+        text: [false, 'string', 'hasLength', 'case-insensiteve substring of the text node']
       }
     ],
     titledEl: [

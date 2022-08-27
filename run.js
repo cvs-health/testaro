@@ -964,10 +964,10 @@ const doActs = async (report, actIndex, page) => {
                         let matchCount = 0;
                         const selectionTexts = [];
                         for (selection of selections) {
-                          // Add its text to the list of texts of such elements.
-                          const selectionText = await textOf(page, selection);
+                          // Add its text or an empty string to the list of texts of such elements.
+                          const selectionText = slimText ? await textOf(page, selection) : '';
                           selectionTexts.push(selectionText);
-                          // If its text includes the specified text:
+                          // If its text includes any specified text:
                           if (selectionText.includes(slimText)) {
                             // If the element has the specified index among such elements:
                             if (matchCount++ === (act.index || 0)) {
@@ -980,17 +980,20 @@ const doActs = async (report, actIndex, page) => {
                         }
                         // If no element satisfied the specifications:
                         if (! act.result.found) {
+                          // Add the failure data to the report.
                           act.result.success = false;
                           act.result.error = 'exhausted';
                           act.result.typeElementCount = selections.length;
-                          act.result.textElementCount = --matchCount;
-                          act.result.message = 'Not enough elements have the specified text';
+                          if (slimText) {
+                            act.result.textElementCount = --matchCount;
+                          }
+                          act.result.message = 'Not enough specified elements exist';
                           act.result.candidateTexts = selectionTexts;
                         }
                       }
                       // Otherwise, i.e. if there are too few such elements to make a match possible:
                       else {
-                        // Return a failure.
+                        // Add the failure data to the report.
                         act.result.success = false;
                         act.result.error = 'fewer';
                         act.result.typeElementCount = selections.length;
@@ -999,16 +1002,16 @@ const doActs = async (report, actIndex, page) => {
                     }
                     // Otherwise, i.e. if there are no elements of the specified type:
                     else {
-                      // Return a failure.
+                      // Add the failure data to the report.
                       act.result.success = false;
                       act.result.error = 'none';
                       act.result.typeElementCount = 0;
-                      act.result.message = 'No elements specified type found';
+                      act.result.message = 'No elements of specified type found';
                     }
                   }
                   // Otherwise, i.e. if the page no longer exists:
                   else {
-                    // Return a failure.
+                    // Add the failure data to the report.
                     act.result.success = false;
                     act.result.error = 'gone';
                     act.result.message = 'Page gone';
@@ -1016,7 +1019,7 @@ const doActs = async (report, actIndex, page) => {
                 }
                 // Otherwise, i.e. if no text was specified:
                 else {
-                  // Return a failure.
+                  // Add the failure data to the report.
                   act.result.success = false;
                   act.result.error = 'text';
                   act.result.message = 'No text specified';
@@ -1028,7 +1031,7 @@ const doActs = async (report, actIndex, page) => {
               // If a match was found:
               if (act.result.found) {
                 // FUNCTION DEFINITION START
-                // Perform an action and wait for a page load.
+                // Perform a click or Enter keypress and wait for a page load.
                 const doAndWait = async actionIsClick => {
                   try {
                     const [newPage] = await Promise.all([
