@@ -26,7 +26,7 @@ exports.reporter = async (page, detailLevel, text) => {
         const data = {
           tagName: element.tagName
         };
-        if (! ['SCRIPT', 'SVG'].includes(element.tagName)) {
+        if (! ['SCRIPT', 'SVG', 'svg'].includes(element.tagName)) {
           if (withText) {
             data.text = element.textContent;
           }
