@@ -285,7 +285,7 @@ exports.commands = {
       'Perform a textNodes test',
       {
         detailLevel: [true, 'number', '', '0 to 3, to specify the level of detail'],
-        text: [false, 'string', 'hasLength', 'case-insensiteve substring of the text node']
+        text: [false, 'string', 'hasLength', 'case-insensitive substring of the text node']
       }
     ],
     titledEl: [

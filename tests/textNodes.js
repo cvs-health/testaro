@@ -58,6 +58,27 @@ exports.reporter = async (page, detailLevel, text) => {
         if (labels) {
           data.labels = Array.from(labels).map(label => compact(label.textContent));
         }
+        // Add data on its child elements, if any, to the data.
+        if (element.childElementCount) {
+          const children = Array.from(element.children);
+          data.children = [];
+          children.forEach(child => {
+            const childData = {
+              tagName: child.tagName,
+              text: compact(child.textContent)
+            };
+            const childAttributes = child.attributes;
+            if (childAttributes) {
+              childData.attributes = [];
+              for (const attribute of childAttributes) {
+                childData.attributes.push({
+                  name: attribute.name,
+                  value: attribute.value
+                });
+              }
+            }
+          });
+        }
         return data;
       };
       // FUNCTION DEFINITIONS END
