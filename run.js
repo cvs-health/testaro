@@ -687,7 +687,7 @@ const doActs = async (report, actIndex, page) => {
             }
             catch(error) {
               actIndex = -2;
-              waitError(page, act, error, 'URL');
+              waitError(page, act, error, 'text in the URL');
             }
           }
           // Otherwise, if the text is to be a substring of the page title:
@@ -709,7 +709,7 @@ const doActs = async (report, actIndex, page) => {
             }
             catch(error) {
               actIndex = -2;
-              waitError(page, act, error, 'title');
+              waitError(page, act, error, 'text in the title');
             }
           }
           // Otherwise, if the text is to be a substring of the text of the page body:
@@ -730,7 +730,7 @@ const doActs = async (report, actIndex, page) => {
             }
             catch(error) {
               actIndex = -2;
-              waitError(page, act, error, 'body');
+              waitError(page, act, error, 'text in the body');
             }
           }
         }
@@ -950,80 +950,71 @@ const doActs = async (report, actIndex, page) => {
               act.result = {found: false};
               let selection = {};
               let tries = 0;
-              const slimText = debloat(act.which);
+              const slimText = act.which ? debloat(act.which) : '';
               while (tries++ < 5 && ! act.result.found) {
-                if (act.which) {
-                  // If the page still exists:
-                  if (page) {
-                    // Identify the elements of the specified type.
-                    const selections = await page.$$(selector);
-                    // If there are any:
-                    if (selections.length) {
-                      // If there are enough to make a match possible:
-                      if ((act.index || 0) < selections.length) {
-                        // For each element of the specified type:
-                        let matchCount = 0;
-                        const selectionTexts = [];
-                        for (selection of selections) {
-                          // Add its text or an empty string to the list of texts of such elements.
-                          const selectionText = slimText ? await textOf(page, selection) : '';
-                          selectionTexts.push(selectionText);
-                          // If its text includes any specified text:
-                          if (selectionText.includes(slimText)) {
-                            // If the element has the specified index among such elements:
-                            if (matchCount++ === (act.index || 0)) {
-                              // Report it as the matching element and stop checking.
-                              act.result.found = true;
-                              act.result.text = slimText;
-                              break;
-                            }
+                // If the page still exists:
+                if (page) {
+                  // Identify the elements of the specified type.
+                  const selections = await page.$$(selector);
+                  // If there are any:
+                  if (selections.length) {
+                    // If there are enough to make a match possible:
+                    if ((act.index || 0) < selections.length) {
+                      // For each element of the specified type:
+                      let matchCount = 0;
+                      const selectionTexts = [];
+                      for (selection of selections) {
+                        // Add its text or an empty string to the list of texts of such elements.
+                        const selectionText = slimText ? await textOf(page, selection) : '';
+                        selectionTexts.push(selectionText);
+                        // If its text includes any specified text:
+                        if (selectionText.includes(slimText)) {
+                          // If the element has the specified index among such elements:
+                          if (matchCount++ === (act.index || 0)) {
+                            // Report it as the matching element and stop checking.
+                            act.result.found = true;
+                            act.result.text = slimText;
+                            break;
                           }
-                        }
-                        // If no element satisfied the specifications:
-                        if (! act.result.found) {
-                          // Add the failure data to the report.
-                          act.result.success = false;
-                          act.result.error = 'exhausted';
-                          act.result.typeElementCount = selections.length;
-                          if (slimText) {
-                            act.result.textElementCount = --matchCount;
-                          }
-                          act.result.message = 'Not enough specified elements exist';
-                          act.result.candidateTexts = selectionTexts;
                         }
                       }
-                      // Otherwise, i.e. if there are too few such elements to make a match possible:
-                      else {
+                      // If no element satisfied the specifications:
+                      if (! act.result.found) {
                         // Add the failure data to the report.
                         act.result.success = false;
-                        act.result.error = 'fewer';
+                        act.result.error = 'exhausted';
                         act.result.typeElementCount = selections.length;
-                        act.result.message = 'Elements of specified type too few';
+                        if (slimText) {
+                          act.result.textElementCount = --matchCount;
+                        }
+                        act.result.message = 'Not enough specified elements exist';
+                        act.result.candidateTexts = selectionTexts;
                       }
                     }
-                    // Otherwise, i.e. if there are no elements of the specified type:
+                    // Otherwise, i.e. if there are too few such elements to make a match possible:
                     else {
                       // Add the failure data to the report.
                       act.result.success = false;
-                      act.result.error = 'none';
-                      act.result.typeElementCount = 0;
-                      act.result.message = 'No elements of specified type found';
+                      act.result.error = 'fewer';
+                      act.result.typeElementCount = selections.length;
+                      act.result.message = 'Elements of specified type too few';
                     }
                   }
-                  // Otherwise, i.e. if the page no longer exists:
+                  // Otherwise, i.e. if there are no elements of the specified type:
                   else {
                     // Add the failure data to the report.
                     act.result.success = false;
-                    act.result.error = 'gone';
-                    act.result.message = 'Page gone';
+                    act.result.error = 'none';
+                    act.result.typeElementCount = 0;
+                    act.result.message = 'No elements of specified type found';
                   }
                 }
-                // Otherwise, i.e. if no text was specified:
+                // Otherwise, i.e. if the page no longer exists:
                 else {
                   // Add the failure data to the report.
                   act.result.success = false;
-                  act.result.error = 'text';
-                  act.result.message = 'No text specified';
+                  act.result.error = 'gone';
+                  act.result.message = 'Page gone';
                 }
                 if (! act.result.found) {
                   await wait(2000);
@@ -1036,7 +1027,7 @@ const doActs = async (report, actIndex, page) => {
                 const doAndWait = async actionIsClick => {
                   try {
                     const [newPage] = await Promise.all([
-                      page.context().waitForEvent('page', {timeout: 7000}),
+                      page.context().waitForEvent('page', {timeout: 10000}),
                       actionIsClick ? selection.click({timeout: 4000}) : selection.press('Enter')
                     ]);
                     // Wait for the new page to load.
