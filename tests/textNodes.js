@@ -3,7 +3,7 @@
   This test reports data about specified text nodes.
   Meanings of detailLevel values:
     0. Only total node count; no detail.
-    1+. Count of ancestor elements of each node to provide data on.
+    1+. Count of ancestry levels to provide data on (1 = text node, 2 = also parent, etc.)
 */
 exports.reporter = async (page, detailLevel, text) => {
   let data = {};
@@ -12,136 +12,99 @@ exports.reporter = async (page, detailLevel, text) => {
     data = await page.evaluate(args => {
       const detailLevel = args[0];
       const text = args[1];
+      const matchNodes = [];
       // Normalize the body.
-      const normBody = document.body.normalize();
-      
+      document.body.normalize();
       // FUNCTION DEFINITIONS START
       // Compacts a string.
       const compact = string => string.replace(/\s+/g, ' ').trim();
-      // Gets data on a sibling node of an element.
-      const getSibInfo = (node, nodeType, text) => {
-        const sibInfo = {
-          type: nodeType
+      // Compacts and lower-cases a string.
+      const normalize = string => compact(string).toLowerCase();
+      // Gets data on an element.
+      const getElementData = element => {
+        // Initialize the data.
+        const data = {
+          tagName: element.tagName,
+          text: element.textContent
         };
-        if (nodeType === 1) {
-          sibInfo.tagName = node.tagName;
-          sibInfo.attributes = [];
-          node.attributes.forEach(attribute => {
-            sibInfo.attributes.push({
-              name: attribute.name,
-              value: attribute.value
+        // Add data on its attributes, if any, to the data.
+        const {attributes} = element;
+        if (attributes) {
+          data.attributes = [];
+          for (const attribute of attributes) {
+            const {name, value} = attribute;
+            data.attributes.push({
+              name,
+              value
             });
-          });
+            // If any attribute is a labeler reference:
+            if (name === 'aria-labelledby') {
+              // Add the label texts to the data.
+              const labelerIDs = value.split(/\s+/);
+              data.refLabels = [];
+              labelerIDs.forEach(id => {
+                const labeler = document.getElementById(id);
+                if (labeler) {
+                  data.refLabels.push(compact(labeler.textContent));
+                }
+              });
+            }
+          }
         }
-        else if (nodeType === 3) {
-          sibInfo.text = compact(text);
+        // Add data on its labels, if any, to the data.
+        const {labels} = element;
+        if (labels) {
+          data.labels = labels.map(label => compact(label.textContent));
         }
-        return sibInfo;
       };
       // FUNCTION DEFINITIONS END
-      // Initialize the data with the count of the specified elements.
-      const data = {
-        total: elements.length
-      };
+      const normText = normalize(text);
+      // Create a collection of the text nodes.
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      // Get their count.
+      const data = {nodeCount: 0};
+      while(walker.currentNode) {
+        if (walker.nextNode()) {
+          if (normalize(walker.currentNode.value).includes(normText)) {
+            data.nodeCount++;
+            matchNodes.push(walker.currentNode);
+          }
+        }
+      }
       // If no itemization is required:
       if (detailLevel === 0) {
-        // Return the element count.
+        // Return the node count.
         return data;
       }
       // Otherwise, i.e. if itemization is required:
       else {
         // Initialize the item data.
         data.items = [];
-        // For each specified element:
-        elements.forEach(element => {
-          // Initialize data on it.
-          const parent = element.parentElement;
-          const datum = {
-            tagName: element.tagName,
-            parentTagName: parent ? parent.tagName : '',
-            code: compact(element.outerHTML),
-            attributes: [],
-            textContent: compact(element.textContent)
-          };
-          // For each of its attributes:
-          for (const attribute of element.attributes) {
-            // Add data on the attribute to the element data.
-            const {name, value} = attribute;
-            datum.attributes.push({
-              name,
-              value
-            });
-            // If the element has reference labels:
-            if (name === 'aria-labelledby') {
-              // Add their texts to the element data.
-              const labelerIDs = value.split(/\s+/);
-              const labelers = [];
-              labelerIDs.forEach(id => {
-                const labeler = document.getElementById(id);
-                if (labeler) {
-                  labelers.push(compact(labeler.textContent));
-                }
-              });
-              if (labelers.length) {
-                datum.labelers = labelers;
-              }
-            }
-          }
-          // If the element has text content:
-          const {labels, textContent} = element;
-          const compactContent = compact(textContent);
-          if (compactContent) {
-            // Add it to the element data.
-            datum.textContent = compactContent;
-          }
-          // If the element has labels:
-          if (labels && labels.length) {
-            // Add their texts to the element data.
-            datum.labels = Array.from(labels).map(label => compact(label.textContent));
-          }
-          // If the parental text content is required:
+        // For each text node matching the specified text:
+        matchNodes.forEach(node => {
+          // Initialize the data on it.
+          const itemData = {text: compact(node.value)};
+          // If ancestral itemization is required:
           if (detailLevel > 1) {
-            // Add it to the element data.
-            datum.parentTextContent = parent ? parent.textContent : '';
-          }
-          // If sibling itemization is required:
-          if (detailLevel === 3) {
-            // Add the sibling data to the element data.
-            datum.siblings = {
-              before: [],
-              after: []
-            };
-            let more = element;
-            while (more) {
-              more = more.previousSibling;
-              if (more) {
-                const {nodeType, nodeValue} = more;
-                if (! (nodeType === 3 && nodeValue === '')) {
-                  const sibInfo = getSibInfo(more, nodeType, nodeValue);
-                  datum.siblings.before.unshift(sibInfo);
-                }
-              }
-            }
-            more = element;
-            while (more) {
-              more = more.nextSibling;
-              if (more) {
-                const {nodeType, textContent} = more;
-                if (! (nodeType === 3 && textContent === '')) {
-                  const sibInfo = getSibInfo(more, nodeType, compact(textContent));
-                  datum.siblings.after.push(sibInfo);
-                }
-              }
+            // Add the ancestral data to the item data.
+            itemData.ancestors = [];
+            let base = node;
+            let currentLevel = 1;
+            while(currentLevel++ < detailLevel) {
+              const newBase = base.parentElement;
+              itemData.ancestors.push(getElementData(newBase));
+              base = newBase;
             }
           }
-          data.items.push(datum);
+          // Add the node data to the itemization.
+          data.items.push(itemData);
         });
-        return data;
       }
+      return data;
     }, [detailLevel, text]);
   }
   catch(error) {
-    console.log(`ERROR performing test (${error.message})`);
+    console.log(`ERROR performing test (${error.message.replace(/\n.+/s, '')})`);
     data = {
       prevented: true,
       error: 'ERROR performing test'
