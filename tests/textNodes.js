@@ -63,12 +63,16 @@ exports.reporter = async (page, detailLevel, text) => {
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
       // Get their count.
       const data = {nodeCount: 0};
-      while(walker.currentNode) {
+      let more = true;
+      while(more) {
         if (walker.nextNode()) {
-          if (normalize(walker.currentNode.value).includes(normText)) {
+          if (normalize(walker.currentNode.nodeValue).includes(normText)) {
             data.nodeCount++;
             matchNodes.push(walker.currentNode);
           }
+        }
+        else {
+          more = false;
         }
       }
       // If no itemization is required:
@@ -83,7 +87,7 @@ exports.reporter = async (page, detailLevel, text) => {
         // For each text node matching the specified text:
         matchNodes.forEach(node => {
           // Initialize the data on it.
-          const itemData = {text: compact(node.value)};
+          const itemData = {text: compact(node.nodeValue)};
           // If ancestral itemization is required:
           if (detailLevel > 1) {
             // Add the ancestral data to the item data.
