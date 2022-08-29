@@ -21,12 +21,14 @@ exports.reporter = async (page, detailLevel, text) => {
       // Compacts and lower-cases a string.
       const normalize = string => compact(string).toLowerCase();
       // Gets data on an element.
-      const getElementData = element => {
+      const getElementData = (element, withText) => {
         // Initialize the data.
         const data = {
-          tagName: element.tagName,
-          text: element.textContent
+          tagName: element.tagName
         };
+        if (withText) {
+          data.text = element.textContent;
+        }
         // Add data on its attributes, if any, to the data.
         const {attributes} = element;
         if (attributes) {
@@ -54,7 +56,7 @@ exports.reporter = async (page, detailLevel, text) => {
         // Add data on its labels, if any, to the data.
         const {labels} = element;
         if (labels) {
-          data.labels = labels.map(label => compact(label.textContent));
+          data.labels = Array.from(labels).map(label => compact(label.textContent));
         }
         return data;
       };
@@ -100,7 +102,7 @@ exports.reporter = async (page, detailLevel, text) => {
             let currentLevel = 1;
             while(currentLevel++ < detailLevel) {
               const newBase = base.parentElement;
-              itemData.ancestors.push(getElementData(newBase));
+              itemData.ancestors.push(getElementData(newBase, currentLevel > 2));
               base = newBase;
             }
           }
