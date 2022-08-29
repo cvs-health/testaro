@@ -26,58 +26,47 @@ exports.reporter = async (page, detailLevel, text) => {
         const data = {
           tagName: element.tagName
         };
-        if (withText) {
-          data.text = element.textContent;
-        }
-        // Add data on its attributes, if any, to the data.
-        const {attributes} = element;
-        if (attributes) {
-          data.attributes = [];
-          for (const attribute of attributes) {
-            const {name, value} = attribute;
-            data.attributes.push({
-              name,
-              value
-            });
-            // If any attribute is a labeler reference:
-            if (name === 'aria-labelledby') {
-              // Add the label texts to the data.
-              const labelerIDs = value.split(/\s+/);
-              data.refLabels = [];
-              labelerIDs.forEach(id => {
-                const labeler = document.getElementById(id);
-                if (labeler) {
-                  data.refLabels.push(compact(labeler.textContent));
-                }
-              });
-            }
+        if (! ['SCRIPT', 'SVG'].includes(element.tagName)) {
+          if (withText) {
+            data.text = element.textContent;
           }
-        }
-        // Add data on its labels, if any, to the data.
-        const {labels} = element;
-        if (labels) {
-          data.labels = Array.from(labels).map(label => compact(label.textContent));
-        }
-        // Add data on its child elements, if any, to the data.
-        if (element.childElementCount) {
-          const children = Array.from(element.children);
-          data.children = [];
-          children.forEach(child => {
-            const childData = {
-              tagName: child.tagName,
-              text: compact(child.textContent)
-            };
-            const childAttributes = child.attributes;
-            if (childAttributes) {
-              childData.attributes = [];
-              for (const attribute of childAttributes) {
-                childData.attributes.push({
-                  name: attribute.name,
-                  value: attribute.value
+          // Add data on its attributes, if any, to the data.
+          const {attributes} = element;
+          if (attributes) {
+            data.attributes = [];
+            for (const attribute of attributes) {
+              const {name, value} = attribute;
+              data.attributes.push({
+                name,
+                value
+              });
+              // If any attribute is a labeler reference:
+              if (name === 'aria-labelledby') {
+                // Add the label texts to the data.
+                const labelerIDs = value.split(/\s+/);
+                data.refLabels = [];
+                labelerIDs.forEach(id => {
+                  const labeler = document.getElementById(id);
+                  if (labeler) {
+                    data.refLabels.push(compact(labeler.textContent));
+                  }
                 });
               }
             }
-          });
+          }
+          // Add data on its labels, if any, to the data.
+          const {labels} = element;
+          if (labels && labels.length) {
+            data.labels = Array.from(labels).map(label => compact(label.textContent));
+          }
+          // Add data on its child elements, if any, to the data.
+          if (element.childElementCount) {
+            const children = Array.from(element.children);
+            data.children = [];
+            children.forEach(child => {
+              data.children.push(getElementData(child, true));
+            });
+          }
         }
         return data;
       };
