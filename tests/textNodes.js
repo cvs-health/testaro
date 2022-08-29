@@ -56,6 +56,7 @@ exports.reporter = async (page, detailLevel, text) => {
         if (labels) {
           data.labels = labels.map(label => compact(label.textContent));
         }
+        return data;
       };
       // FUNCTION DEFINITIONS END
       const normText = normalize(text);
@@ -66,7 +67,10 @@ exports.reporter = async (page, detailLevel, text) => {
       let more = true;
       while(more) {
         if (walker.nextNode()) {
-          if (normalize(walker.currentNode.nodeValue).includes(normText)) {
+          if (
+            normalize(walker.currentNode.nodeValue).includes(normText)
+            && walker.currentNode.parentElement.tagName !== 'SCRIPT'
+          ) {
             data.nodeCount++;
             matchNodes.push(walker.currentNode);
           }
