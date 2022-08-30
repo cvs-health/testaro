@@ -723,7 +723,7 @@ const doActs = async (report, actIndex, page) => {
                 which,
                 {
                   polling: 2000,
-                  timeout: 10000
+                  timeout: 15000
                 }
               );
               result.found = true;
@@ -1027,11 +1027,11 @@ const doActs = async (report, actIndex, page) => {
                 const doAndWait = async actionIsClick => {
                   try {
                     const [newPage] = await Promise.all([
-                      page.context().waitForEvent('page', {timeout: 10000}),
+                      page.context().waitForEvent('page', {timeout: 15000}),
                       actionIsClick ? selection.click({timeout: 4000}) : selection.press('Enter')
                     ]);
                     // Wait for the new page to load.
-                    await newPage.waitForLoadState('domcontentloaded', {timeout: 10000});
+                    await newPage.waitForLoadState('domcontentloaded', {timeout: 15000});
                     // Make the new page the current page.
                     page = newPage;
                     act.result.success = true;

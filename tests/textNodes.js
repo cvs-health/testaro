@@ -15,6 +15,15 @@ exports.reporter = async (page, detailLevel, text) => {
       const matchNodes = [];
       // Normalize the body.
       document.body.normalize();
+      // Make a copy of the body.
+      const tempBody = document.body.cloneNode(true);
+      // Insert it into the document.
+      document.body.appendChild(tempBody);
+      // Remove the irrelevant text content from the copy.
+      const extraElements = Array.from(tempBody.querySelectorAll('style, script, svg'));
+      extraElements.forEach(element => {
+        element.textContent = '';
+      });
       // FUNCTION DEFINITIONS START
       // Compacts a string.
       const compact = string => string.replace(/\s+/g, ' ').trim();
@@ -73,16 +82,13 @@ exports.reporter = async (page, detailLevel, text) => {
       // FUNCTION DEFINITIONS END
       const normText = normalize(text);
       // Create a collection of the text nodes.
-      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      const walker = document.createTreeWalker(tempBody, NodeFilter.SHOW_TEXT);
       // Get their count.
       const data = {nodeCount: 0};
       let more = true;
       while(more) {
         if (walker.nextNode()) {
-          if (
-            normalize(walker.currentNode.nodeValue).includes(normText)
-            && walker.currentNode.parentElement.tagName !== 'SCRIPT'
-          ) {
+          if (normalize(walker.currentNode.nodeValue).includes(normText)) {
             data.nodeCount++;
             matchNodes.push(walker.currentNode);
           }
@@ -120,6 +126,7 @@ exports.reporter = async (page, detailLevel, text) => {
           data.items.push(itemData);
         });
       }
+      document.body.removeChild(tempBody);
       return data;
     }, [detailLevel, text]);
   }
