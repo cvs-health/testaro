@@ -24,7 +24,7 @@ const moves = {
   focus: true,
   link: 'a, [role=link]',
   radio: 'input[type=radio]',
-  search: 'input[type=search], input[type=text][aria-label*=search i]',
+  search: 'input[type=search], input[type=text][aria-label*=search i], input[type=text][placeholder*=search i]',
   select: 'select',
   text: 'input[type=text]'
 };
