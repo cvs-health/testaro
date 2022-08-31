@@ -24,7 +24,7 @@ const moves = {
   focus: true,
   link: 'a, [role=link]',
   radio: 'input[type=radio]',
-  search: 'input[type=search]',
+  search: 'input[type=search], input[type=text][aria-label*=search i]',
   select: 'select',
   text: 'input[type=text]'
 };
@@ -1162,6 +1162,14 @@ const doActs = async (report, actIndex, page) => {
                 }
                 // Otherwise, if it is entering text on a text- or search-input element:
                 else if (['text', 'search'].includes(act.type)) {
+                  act.result.attributes = {};
+                  const {attributes} = act.result;
+                  const type = await selection.getAttribute('type');
+                  const label = await selection.getAttribute('aria-label');
+                  const labelRefs = await selection.getAttribute('aria-labelledby');
+                  attributes.type = type || '';
+                  attributes.label = label || '';
+                  attributes.labelRefs = labelRefs || '';
                   // If the text contains a placeholder for an environment variable:
                   let {what} = act;
                   if (/__[A-Z]+__/.test(what)) {
