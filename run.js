@@ -24,9 +24,9 @@ const moves = {
   focus: true,
   link: 'a, [role=link]',
   radio: 'input[type=radio]',
-  search: 'input[type=search], input[type=text][aria-label*=search i], input[type=text][placeholder*=search i]',
+  search: 'input[type=search], input[aria-label*=search i], input[placeholder*=search i]',
   select: 'select',
-  text: 'input[type=text]'
+  text: 'input[type=text], input:not([type])'
 };
 // Names and descriptions of tests.
 const tests = {
@@ -450,7 +450,9 @@ const goto = async (page, url, timeout, waitUntil, isStrict) => {
     waitUntil
   })
   .catch(error => {
-    console.log(`ERROR: Visit to ${url} timed out before ${waitUntil} (${error.message})`);
+    console.log(
+      `ERROR: Visit to ${url} timed out before ${waitUntil} (${error.message.replace(/\n.+/s, '')})`
+    );
     visitTimeoutCount++;
     return 'error';
   });
