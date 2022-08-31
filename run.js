@@ -114,6 +114,7 @@ let actCount = 0;
 let browser;
 let browserContext;
 let browserTypeName;
+let currentPage;
 let requestedURL = '';
 
 // ########## VALIDATORS
@@ -273,6 +274,8 @@ const browserClose = async () => {
     await browser.close();
   }
 };
+// Returns the first line of an error message.
+const errorStart = error => error.message.replace(/\n.+/s, '');
 // Launches a browser.
 const launch = async typeName => {
   const browserType = require('playwright')[typeName];
@@ -292,15 +295,15 @@ const launch = async typeName => {
     browser = await browserType.launch(browserOptions)
     .catch(error => {
       healthy = false;
-      console.log(`ERROR launching browser: ${error.message.replace(/\n.+/s, '')}`);
+      console.log(`ERROR launching browser (${errorStart(error)})`);
     });
     // If the launch succeeded:
     if (healthy) {
       browserContext = await browser.newContext();
       // When a page (i.e. browser tab) is added to the browser context (i.e. browser window):
       browserContext.on('page', async page => {
-        // Activate the page.
-        await page.bringToFront();
+        // Make the page current.
+        currentPage = page;
         // Make abbreviations of its console messages get reported in the Playwright console.
         page.on('console', msg => {
           const msgText = msg.text();
@@ -335,11 +338,11 @@ const launch = async typeName => {
         });
       });
       // Open the first page of the context.
-      const page = await browserContext.newPage();
+      currentPage = await browserContext.newPage();
       // Wait until it is stable.
-      await page.waitForLoadState('domcontentloaded');
+      await currentPage.waitForLoadState('domcontentloaded', {timeout: 15000});
       // Update the name of the current browser type and store it in the page.
-      page.browserTypeName = browserTypeName = typeName;
+      currentPage.browserTypeName = browserTypeName = typeName;
     }
   }
 };
@@ -450,9 +453,7 @@ const goto = async (page, url, timeout, waitUntil, isStrict) => {
     waitUntil
   })
   .catch(error => {
-    console.log(
-      `ERROR: Visit to ${url} timed out before ${waitUntil} (${error.message.replace(/\n.+/s, '')})`
-    );
+    console.log(`ERROR: Visit to ${url} timed out before ${waitUntil} (${errorStart(error)})`);
     visitTimeoutCount++;
     return 'error';
   });
@@ -1025,32 +1026,35 @@ const doActs = async (report, actIndex, page) => {
               // If a match was found:
               if (act.result.found) {
                 // FUNCTION DEFINITION START
-                // Perform a click or Enter keypress and wait for a page load.
-                const doAndWait = async actionIsClick => {
+                // Perform a click or Enter keypress and wait for the network to be idle.
+                const doAndWait = async isClick => {
+                  const move = isClick ? 'click' : 'Enter keypress';
                   try {
-                    const [newPage] = await Promise.all([
-                      page.context().waitForEvent('page', {timeout: 15000}),
-                      actionIsClick ? selection.click({timeout: 4000}) : selection.press('Enter')
-                    ]);
-                    // Wait for the new page to load.
-                    await newPage.waitForLoadState('domcontentloaded', {timeout: 15000});
-                    // Make the new page the current page.
-                    page = newPage;
+                    await isClick
+                      ? selection.click({timeout: 4000})
+                      : selection.press('Enter', {timeout: 4000});
                     act.result.success = true;
-                    act.result.move = actionIsClick ? 'clicked' : 'Enter pressed';
-                    act.result.newURL = page.url();
+                    act.result.move = move;
                   }
-                  // If the action, event, or load failed:
                   catch(error) {
-                    // Quit and report the failure.
-                    const action = actionIsClick ? 'clicking' : 'pressing Enter';
-                    console.log(
-                      `ERROR ${action} (${error.message.replace(/\n.+/s, '')})`
-                    );
                     act.result.success = false;
                     act.result.error = 'moveFailure';
-                    act.result.message = 'ERROR: move, navigation, or load timed out';
+                    act.result.message = `ERROR: ${move} failed`;
+                    console.log(`ERROR: ${move} failed (${errorStart(error)})`);
                     actIndex = -2;
+                  }
+                  if (act.result.success) {
+                    try {
+                      await page.context().waitForEvent('networkidle', {timeout: 10000});
+                      act.result.idleTimely = true;
+                    }
+                    catch(error) {
+                      console.log(`ERROR: Network busy after ${move} (${errorStart(error)})`);
+                      act.result.idleTimely = false;
+                    }
+                    // If the move created a new page, make it current.
+                    page = currentPage;
+                    act.result.newURL = page.url();
                   }
                 };
                 // FUNCTION DEFINITION END
@@ -1107,7 +1111,7 @@ const doActs = async (report, actIndex, page) => {
                   act.result.target = target || 'DEFAULT';
                   // If the destination is a new page:
                   if (target && target !== '_self') {
-                    // Click the link and wait for the resulting page event.
+                    // Click the link and wait for the network to be idle.
                     doAndWait(true);
                   }
                   // Otherwise, i.e. if the destination is in the current page:
@@ -1124,9 +1128,7 @@ const doActs = async (report, actIndex, page) => {
                     // If the click or load failed:
                     catch(error) {
                       // Quit and report the failure.
-                      console.log(
-                        `ERROR clicking link (${error.message.replace(/\n.+/s, '')})`
-                      );
+                      console.log(`ERROR clicking link (${errorStart(error)})`);
                       act.result.success = false;
                       act.result.error = 'unclickable';
                       act.result.message = 'ERROR: click or load timed out';
@@ -1187,7 +1189,7 @@ const doActs = async (report, actIndex, page) => {
                   act.result.move = 'entered';
                   // If the input is a search input:
                   if (act.type === 'search') {
-                    // Press the Enter key and wait for a new page to load.
+                    // Press the Enter key and wait for a network to be idle.
                     doAndWait(false);
                   }
                 }
