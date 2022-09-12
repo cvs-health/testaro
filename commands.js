@@ -162,7 +162,7 @@ exports.commands = {
       'Perform an elements test',
       {
         detailLevel: [true, 'number', '', '0 to 3, to specify the level of detail'],
-        tagName: [false, 'string', 'hasLength', 'tag name of elements'],
+        tagName: [false, 'string', 'hasLength', 'tag name (upper-case) of elements'],
         onlyVisible: [false, 'boolean', '', 'whether to exclude invisible elements'],
         attribute: [false, 'string', 'hasLength', 'required attribute selector']
       }

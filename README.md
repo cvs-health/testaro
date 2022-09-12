@@ -75,6 +75,8 @@ Some of the dependencies of Testaro are published as Github packages. Installing
 
 Once you have done that, you can install Testaro as you would install any `npm` package.
 
+However, if the Playwright dependency is ever updated to a newer version, you must also reinstall its browers by executing the statement `npx playwright install`.
+
 ## Payment
 
 All of the tests that Testaro can perform are free of cost, except those in the Tenon and WAVE packages. The owner of each of those packages gives new registrants a free allowance of credits before it becomes necessary to pay for use of the API of the package. The required environment variables for authentication and payment are described below under “Environment variables”.
