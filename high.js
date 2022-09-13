@@ -1,7 +1,7 @@
 /*
   high.js
   Invokes Testaro with the high-level method.
-  Usage example: node high tp12 weborgs
+  Usage example: node high tp15 weborgs
 */
 
 const {runJob} = require('./create');

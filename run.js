@@ -304,24 +304,30 @@ const launch = async typeName => {
       browserContext.on('page', async page => {
         // Make the page current.
         currentPage = page;
-        // Make abbreviations of its console messages get reported in the Playwright console.
+        // Make its console messages get reported in the Playwright console.
         page.on('console', msg => {
           const msgText = msg.text();
-          const parts = [msgText.slice(0, 75)];
-          if (msgText.length > 75) {
-            parts.push(msgText.slice(75, 150));
-            if (msgText.length > 150) {
-              const tail = msgText.slice(150).slice(-150);
-              if (msgText.length > 300) {
-                parts.push('...');
-              }
-              parts.push(tail.slice(0, 75));
-              if (tail.length > 75) {
-                parts.push(tail.slice(75));
+          let indentedMsg = '';
+          if (debug) {
+            indentedMsg = `    | ${msg.text()}`;
+          }
+          else {
+            const parts = [msgText.slice(0, 75)];
+            if (msgText.length > 75) {
+              parts.push(msgText.slice(75, 150));
+              if (msgText.length > 150) {
+                const tail = msgText.slice(150).slice(-150);
+                if (msgText.length > 300) {
+                  parts.push('...');
+                }
+                parts.push(tail.slice(0, 75));
+                if (tail.length > 75) {
+                  parts.push(tail.slice(75));
+                }
               }
             }
+            indentedMsg = parts.map(part => `    | ${part}`).join('\n');
           }
-          const indentedMsg = parts.map(part => `    | ${part}`).join('\n');
           console.log(`\n${indentedMsg}`);
           const msgTextLC = msgText.toLowerCase();
           const msgLength = msgText.length;
@@ -682,7 +688,7 @@ const doActs = async (report, actIndex, page) => {
           const result = act.result = {};
           // If the text is to be the URL:
           if (what === 'url') {
-            // Wait for it and quit on failure.
+            // Wait for the URL to be the exact text and quit on failure.
             try {
               await page.waitForURL(which, {timeout: 15000});
               result.found = true;
@@ -695,7 +701,7 @@ const doActs = async (report, actIndex, page) => {
           }
           // Otherwise, if the text is to be a substring of the page title:
           else if (what === 'title') {
-            // Wait for it and quit on failure.
+            // Wait for the page title to include the text, case-insensitively, and quit on failure.
             try {
               await page.waitForFunction(
                 text => document
@@ -717,7 +723,7 @@ const doActs = async (report, actIndex, page) => {
           }
           // Otherwise, if the text is to be a substring of the text of the page body:
           else if (what === 'body') {
-            // Wait for it and quit on failure.
+            // Wait for the body to include the text, case-insensitively, and quit on failure.
             try {
               await page.waitForFunction(
                 text => document
@@ -949,13 +955,12 @@ const doActs = async (report, actIndex, page) => {
             // Otherwise, if the act is a move:
             else if (moves[act.type]) {
               const selector = typeof moves[act.type] === 'string' ? moves[act.type] : act.what;
-              // Try to identify the element to perform the move on.
+              // Try up to 5 times to:
               act.result = {found: false};
               let selection = {};
               let tries = 0;
               const slimText = act.which ? debloat(act.which) : '';
               while (tries++ < 5 && ! act.result.found) {
-                // If the page still exists:
                 if (page) {
                   // Identify the elements of the specified type.
                   const selections = await page.$$(selector);
@@ -967,16 +972,17 @@ const doActs = async (report, actIndex, page) => {
                       let matchCount = 0;
                       const selectionTexts = [];
                       for (selection of selections) {
-                        // Add its text or an empty string to the list of texts of such elements.
+                        // Add its lower-case text or an empty string to the list of element texts.
                         const selectionText = slimText ? await textOf(page, selection) : '';
                         selectionTexts.push(selectionText);
-                        // If its text includes any specified text:
+                        // If its text includes any specified text, case-insensitively:
                         if (selectionText.includes(slimText)) {
                           // If the element has the specified index among such elements:
                           if (matchCount++ === (act.index || 0)) {
                             // Report it as the matching element and stop checking.
                             act.result.found = true;
-                            act.result.text = slimText;
+                            act.result.textSpec = slimText;
+                            act.result.textContent = selectionText;
                             break;
                           }
                         }
