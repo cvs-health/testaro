@@ -9,7 +9,7 @@
 */
 exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) => {
   // Determine a selector of the specified elements.
-  let selector = tagName || '*';
+  let selector = `body ${tagName.toLowerCase() || '*'}`;
   if (attribute) {
     selector += `[${attribute}]`;
   }
@@ -19,7 +19,11 @@ exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) =>
   let data = {};
   // Get the data on the elements.
   try {
-    data = await page.$$eval(selector, (elements, detailLevel) => {
+    const locator = page.locator(selector);
+    data = await locator.evaluateAll((elements, detailLevel) => {
+      if (elements[0].tagName === 'DIV') {
+        console.log(document.body.innerHTML);
+      }
       // FUNCTION DEFINITIONS START
       // Compacts a string.
       const compact = string => string.replace(/\s+/g, ' ').trim();
