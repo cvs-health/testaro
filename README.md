@@ -593,9 +593,9 @@ In order to make network watching possible, you must define these environment va
 
 As mentioned above, using the high-level method to run Testaro jobs requires `SCRIPTDIR`, `BATCHDIR`, and `REPORTDIR` environment variables.
 
-If a `tenon` test is included in the script, environment variables named `TENON_USER` and `TENON_PASSWORD` must exist, with your Tenon username and password, respectively, as their values.
+If a `tenon` test is included in the script, environment variables named `TENON_USER` and `TENON_PASSWORD` must exist, with your Tenon username and password, respectively, as their values. You can obtain those from [Tenon](https://tenon.io/documentation/overview).
 
-If a `wave` test is included in the script, an environment variable named `WAVE_KEY` must exist, with your WAVE API key as its value.
+If a `wave` test is included in the script, an environment variable named `WAVE_KEY` must exist, with your WAVE API key as its value. You can get it from [WebAIM](https://wave.webaim.org/api/).
 
 The `text` command can interpolate the value of an environment variable into text that it enters on a page, as documented in the `commands.js` file.
 
