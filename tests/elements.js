@@ -21,9 +21,6 @@ exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) =>
   try {
     const locator = page.locator(selector);
     data = await locator.evaluateAll((elements, detailLevel) => {
-      if (elements[0].tagName === 'DIV') {
-        console.log(document.body.innerHTML);
-      }
       // FUNCTION DEFINITIONS START
       // Compacts a string.
       const compact = string => string.replace(/\s+/g, ' ').trim();
