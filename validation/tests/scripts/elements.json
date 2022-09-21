@@ -52,6 +52,18 @@
       "expect": [
         ["total", "=", 2]
       ]
+    },
+    {
+      "type": "test",
+      "which": "elements",
+      "what": "elements",
+      "detailLevel": 1,
+      "tagName": "LI",
+      "attribute": "class=first",
+      "expect": [
+        ["total", "=", 1],
+        ["items"]
+      ]
     }
   ]
 }
