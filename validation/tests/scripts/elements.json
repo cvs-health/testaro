@@ -1,0 +1,57 @@
+{
+  "what": "validation of docType test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/elements/index.html",
+      "what": "page with a shadow root"
+    },
+    {
+      "type": "test",
+      "which": "elements",
+      "what": "elements",
+      "detailLevel": 0,
+      "expect": [
+        ["total", "=", 16]
+      ]
+    },
+    {
+      "type": "test",
+      "which": "elements",
+      "what": "elements",
+      "detailLevel": 0,
+      "tagName": "P",
+      "expect": [
+        ["total", "=", 4]
+      ]
+    },
+    {
+      "type": "test",
+      "which": "elements",
+      "what": "elements",
+      "detailLevel": 0,
+      "tagName": "LI",
+      "onlyVisible": true,
+      "expect": [
+        ["total", "=", 2]
+      ]
+    },
+    {
+      "type": "test",
+      "which": "elements",
+      "what": "elements",
+      "detailLevel": 0,
+      "tagName": "P",
+      "attribute": "class",
+      "expect": [
+        ["total", "=", 2]
+      ]
+    }
+  ]
+}
