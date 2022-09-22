@@ -9,7 +9,7 @@
 */
 exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) => {
   // Determine a selector of the specified elements.
-  let selector = `body ${tagName.toLowerCase() || '*'}`;
+  let selector = `body ${tagName ? tagName.toLowerCase() : '*'}`;
   if (attribute) {
     selector += `[${attribute}]`;
   }
