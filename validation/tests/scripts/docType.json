@@ -1,0 +1,37 @@
+{
+  "what": "validation of docType test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/docType/good.html",
+      "what": "page with doctype"
+    },
+    {
+      "type": "test",
+      "which": "docType",
+      "what": "doctype",
+      "expect": [
+        ["docHasType", "=", true]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/docType/bad.html",
+      "what": "page without doctype"
+    },
+    {
+      "type": "test",
+      "which": "docType",
+      "what": "doctype",
+      "expect": [
+        ["docHasType", "=", false]
+      ]
+    }
+  ]
+}

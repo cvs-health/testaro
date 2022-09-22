@@ -1,4 +1,4 @@
-// watchDir.js
+// watchNet.js
 // Validator for network watching.
 
 const fs = require('fs/promises');

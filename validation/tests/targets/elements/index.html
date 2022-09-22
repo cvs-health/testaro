@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Page</title>
+    <meta name="description" content="tester">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <main>
+      <h1>Page</h1>
+      <h2>Main part</h2>
+      <p class="first">This is a paragraph.</p>
+      <p>This is a list:</p>
+      <ul lang="eo">
+        <li class="first">Io</li>
+        <li>Io alia</li>
+        <li class="last" hidden>Io tute alia</li>
+      </ul>
+      <h2>Auxiliary part</h2>
+      <p>This is a summary.</p>
+      <div id="host"></div>
+      <div id="guest">
+        <h3>Details</h3>
+        <p class="sole">Here are some details.</p>
+      </div>
+      <label for="input0">Input something.</label>
+      <input id="input0">
+      <label for="input0">Did you input anything?</label>
+      <p id="input1Label">Input something else.</p>
+      <input aria-labelledby="input1Label">
+    </main>
+    <script>
+      document
+      .getElementById('host')
+      .attachShadow({mode: 'open'})
+      .appendChild(document.getElementById('guest'));
+    </script>
+  </body>
+</html>

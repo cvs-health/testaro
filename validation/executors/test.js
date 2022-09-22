@@ -1,15 +1,17 @@
-// app.js
-// Validator for Testaro tests.
+// test.js
+// Validator for one Testaro test.
+// Execution example: node validation/executors/test focOp
 
 const fs = require('fs').promises;
 const {handleRequest} = require(`${__dirname}/../../run`);
+const test = process.argv[2];
 const validateTests = async () => {
   const totals = {
     attempts: 0,
     successes: 0
   };
   const scriptFileNames = await fs.readdir(`${__dirname}/../tests/scripts`);
-  for (const scriptFileName of scriptFileNames.filter(fileName => fileName === 'styleDiff.json')) {
+  for (const scriptFileName of scriptFileNames.filter(fileName => fileName === `${test}.json`)) {
     const rawScriptJSON = await fs
     .readFile(`${__dirname}/../tests/scripts/${scriptFileName}`, 'utf8');
     const scriptJSON = rawScriptJSON

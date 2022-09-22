@@ -1,4 +1,4 @@
-// app.js
+// tests.js
 // Validator for Testaro tests.
 
 const fs = require('fs').promises;

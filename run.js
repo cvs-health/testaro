@@ -568,23 +568,34 @@ const isTrue = (object, specs) => {
     propertyTree.shift();
     actual = actual[propertyTree[0]];
   }
-  // Determine whether the expectation was fulfilled.
-  if (relation === '=') {
-    satisfied = actual === criterion;
+  if (actual === undefined) {
+    return [null, false];
   }
-  else if (relation === '<') {
-    satisfied = actual < criterion;
+  else {
+    // Determine whether the expectation was fulfilled.
+    if (relation === '=') {
+      satisfied = actual === criterion;
+    }
+    else if (relation === '<') {
+      satisfied = actual < criterion;
+    }
+    else if (relation === '>') {
+      satisfied = actual > criterion;
+    }
+    else if (relation === '!') {
+      satisfied = actual !== criterion;
+    }
+    else if (relation === 'i') {
+      satisfied = actual.includes(criterion);
+    }
+    else if (relation === '!i') {
+      satisfied = ! actual.includes(criterion);
+    }
+    else if (! relation) {
+      satisfied = actual === undefined;
+    }
+    return [actual, satisfied];
   }
-  else if (relation === '>') {
-    satisfied = actual > criterion;
-  }
-  else if (relation === '!') {
-    satisfied = actual !== criterion;
-  }
-  else if (! relation) {
-    satisfied = actual === undefined;
-  }
-  return [actual, satisfied];
 };
 // Adds a wait error result to an act.
 const waitError = (page, act, error, what) => {

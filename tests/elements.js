@@ -8,8 +8,8 @@
     3. Data on each specified element also include data on its sibling nodes.
 */
 exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) => {
-  // Determine a selector of the specified elements.
-  let selector = tagName || '*';
+  // Determine a selector of the specified elements, including any descendants of open shadow roots.
+  let selector = `body ${tagName ? tagName.toLowerCase() : '*'}`;
   if (attribute) {
     selector += `[${attribute}]`;
   }
@@ -19,7 +19,8 @@ exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) =>
   let data = {};
   // Get the data on the elements.
   try {
-    data = await page.$$eval(selector, (elements, detailLevel) => {
+    const locator = page.locator(selector);
+    data = await locator.evaluateAll((elements, detailLevel) => {
       // FUNCTION DEFINITIONS START
       // Compacts a string.
       const compact = string => string.replace(/\s+/g, ' ').trim();
@@ -28,10 +29,11 @@ exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) =>
         const sibInfo = {
           type: nodeType
         };
+        // If the sibling node is an element:
         if (nodeType === 1) {
           sibInfo.tagName = node.tagName;
           sibInfo.attributes = [];
-          node.attributes.forEach(attribute => {
+          Array.from(node.attributes).forEach(attribute => {
             sibInfo.attributes.push({
               name: attribute.name,
               value: attribute.value
@@ -106,12 +108,12 @@ exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) =>
           }
           // If the parental text content is required:
           if (detailLevel > 1) {
-            // Add it to the element data.
-            datum.parentTextContent = parent ? parent.textContent : '';
+            // Add it (excluding any shadow-root descendants) to the element data.
+            datum.parentTextContent = parent ? compact(parent.textContent) : '';
           }
           // If sibling itemization is required:
           if (detailLevel === 3) {
-            // Add the sibling data to the element data.
+            // Add data on the siblings, excluding any descendants of shadow roots, to the data.
             datum.siblings = {
               before: [],
               after: []
