@@ -16,7 +16,7 @@ exports.reporter = async (page, withItems) => {
     }
   );
   const data = {
-    totals: badLinkTexts.length
+    total: badLinkTexts.length
   };
   if (withItems) {
     data.items = badLinkTexts;

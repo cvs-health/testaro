@@ -91,6 +91,12 @@
     },
     {
       "type": "test",
+      "which": "linkTo",
+      "withItems": true,
+      "what": "links without destinations"
+    },
+    {
+      "type": "test",
       "which": "linkUl",
       "withItems": true,
       "what": "underlining of inline links"

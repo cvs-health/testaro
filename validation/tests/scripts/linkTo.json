@@ -1,0 +1,26 @@
+{
+  "what": "validation of linkTo test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/linkTo/index.html",
+      "what": "page with links with and without destinations"
+    },
+    {
+      "type": "test",
+      "which": "linkTo",
+      "what": "links without destinations",
+      "withItems": true,
+      "expect": [
+        ["total", "=", 1],
+        ["items.0", "=", "nothing at all"]
+      ]
+    }
+  ]
+}
