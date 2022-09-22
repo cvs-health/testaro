@@ -20,7 +20,7 @@ exports.reporter = async (page, withItems) => {
     return badLinks;
   });
   const data = {
-    totals: badLinks.length
+    total: badLinks.length
   };
   if (withItems) {
     data.items = badLinks;

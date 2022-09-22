@@ -1,0 +1,26 @@
+{
+  "what": "validation of focVis test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/focVis/index.html",
+      "what": "page with links inside and outside the viewport"
+    },
+    {
+      "type": "test",
+      "which": "focVis",
+      "what": "off-display focused links",
+      "withItems": true,
+      "expect": [
+        ["total", "=", 1],
+        ["items.0", "=", "Basque information"]
+      ]
+    }
+  ]
+}
