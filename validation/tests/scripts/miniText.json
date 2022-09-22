@@ -1,0 +1,27 @@
+{
+  "what": "validation of miniText test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/miniText/index.html",
+      "what": "page with text in various font sizes"
+    },
+    {
+      "type": "test",
+      "which": "miniText",
+      "what": "small text",
+      "withItems": true,
+      "expect": [
+        ["total", "=", 3],
+        ["items.0", "i", "rem"],
+        ["items.2", "i", "named"]
+      ]
+    }
+  ]
+}

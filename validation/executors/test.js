@@ -60,5 +60,7 @@ const validateTests = async () => {
     }
   }
   console.log(`Grand totals: attempts ${totals.attempts}, successes ${totals.successes}`);
+  return Promise.resolve('');
 };
-validateTests();
+validateTests()
+.then(() => '');

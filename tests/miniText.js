@@ -39,7 +39,7 @@ exports.reporter = async (page, withItems) => {
     }
   );
   const data = {
-    totals: miniTexts.length
+    total: miniTexts.length
   };
   if (withItems) {
     data.items = miniTexts;

@@ -1440,6 +1440,9 @@ const doActs = async (report, actIndex, page) => {
     // Perform the remaining acts.
     await doActs(report, actIndex + 1, page);
   }
+  else {
+    await browserClose();
+  }
 };
 // Performs the commands in a script.
 const doScript = async (report) => {
