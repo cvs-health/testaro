@@ -28,7 +28,7 @@
       "detailLevel": 0,
       "tagName": "P",
       "expect": [
-        ["total", "=", 4]
+        ["total", "=", 5]
       ]
     },
     {
