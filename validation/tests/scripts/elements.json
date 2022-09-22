@@ -79,7 +79,7 @@
       "expect": [
         ["total", "=", 2],
         ["items.0.labels.1", "i", "anything"],
-        ["items.1.labelers", "i", "something else"]
+        ["items.1.labelers.0", "i", "something else"]
       ]
     },
     {
@@ -101,10 +101,11 @@
       "detailLevel": 2,
       "tagName": "LI",
       "onlyVisible": true,
-      "attribute": "class=first",
+      "attribute": "class",
       "expect": [
+        ["total", "=", 1],
         ["items.0.parentTextContent", "i", "alia"],
-        ["items.0.parentTextContent", "!i", "tute"]
+        ["items.0.parentTextContent", "i", "tute"]
       ]
     },
     {
@@ -116,9 +117,14 @@
       "attribute": "class=first",
       "expect": [
         ["items.0.textContent", "=", "This is a paragraph."],
-        ["items.0.parentTextContent", "i", "details"],
-        ["items.0.siblings.before.0.tagName", "=", "H1"],
-        ["items.0.siblings.after.5.textContent", "i", "Here"]
+        ["items.0.parentTagName", "=", "MAIN"],
+        ["items.0.parentTextContent", "i", "something."],
+        ["items.0.siblings.before.0.type", "=", 3],
+        ["items.0.siblings.before.1.type", "=", 1],
+        ["items.0.siblings.before.1.tagName", "=", "H1"],
+        ["items.0.siblings.after.12.type", "=", 1],
+        ["items.0.siblings.after.12.tagName", "=", "LABEL"],
+        ["items.0.siblings.after.12.attributes.0.name", "=", "for"]
       ]
     }
   ]
