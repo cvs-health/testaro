@@ -78,7 +78,7 @@
       "tagName": "INPUT",
       "expect": [
         ["total", "=", 2],
-        ["items.0.labelers", "i", "anything"],
+        ["items.0.labels.1", "i", "anything"],
         ["items.1.labelers", "i", "something else"]
       ]
     },

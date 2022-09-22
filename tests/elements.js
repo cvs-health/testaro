@@ -29,10 +29,11 @@ exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) =>
         const sibInfo = {
           type: nodeType
         };
+        // If the sibling node is an element:
         if (nodeType === 1) {
           sibInfo.tagName = node.tagName;
           sibInfo.attributes = [];
-          node.attributes.forEach(attribute => {
+          Array.from(node.attributes).forEach(attribute => {
             sibInfo.attributes.push({
               name: attribute.name,
               value: attribute.value
