@@ -581,6 +581,12 @@ const isTrue = (object, specs) => {
   else if (relation === '!') {
     satisfied = actual !== criterion;
   }
+  else if (relation === 'i') {
+    satisfied = actual.includes(criterion);
+  }
+  else if (relation === '!i') {
+    satisfied = ! actual.includes(criterion);
+  }
   else if (! relation) {
     satisfied = actual === undefined;
   }

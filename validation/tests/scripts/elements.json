@@ -1,5 +1,5 @@
 {
-  "what": "validation of docType test",
+  "what": "validation of elements test",
   "strict": true,
   "commands": [
     {
@@ -18,7 +18,7 @@
       "what": "elements",
       "detailLevel": 0,
       "expect": [
-        ["total", "=", 16]
+        ["total", "=", 21]
       ]
     },
     {
@@ -62,7 +62,63 @@
       "attribute": "class=first",
       "expect": [
         ["total", "=", 1],
-        ["items"]
+        ["items.0.tagName", "=", "LI"],
+        ["items.0.parentTagName", "=", "UL"],
+        ["items.0.code", "i", "first"],
+        ["items.0.attributes.0.name", "=", "class"],
+        ["items.0.attributes.0.value", "=", "first"],
+        ["items.0.textContent", "=", "Io"]
+      ]
+    },
+    {
+      "type": "test",
+      "which": "elements",
+      "what": "elements",
+      "detailLevel": 1,
+      "tagName": "INPUT",
+      "expect": [
+        ["total", "=", 2],
+        ["items.0.labelers", "i", "anything"],
+        ["items.1.labelers", "i", "something else"]
+      ]
+    },
+    {
+      "type": "test",
+      "which": "elements",
+      "what": "elements",
+      "detailLevel": 2,
+      "tagName": "LI",
+      "attribute": "class=first",
+      "expect": [
+        ["items.0.textContent", "=", "Io"],
+        ["items.0.parentTextContent", "i", "tute"]
+      ]
+    },
+    {
+      "type": "test",
+      "which": "elements",
+      "what": "elements",
+      "detailLevel": 2,
+      "tagName": "LI",
+      "onlyVisible": true,
+      "attribute": "class=first",
+      "expect": [
+        ["items.0.parentTextContent", "i", "alia"],
+        ["items.0.parentTextContent", "!i", "tute"]
+      ]
+    },
+    {
+      "type": "test",
+      "which": "elements",
+      "what": "elements",
+      "detailLevel": 3,
+      "tagName": "P",
+      "attribute": "class=first",
+      "expect": [
+        ["items.0.textContent", "=", "This is a paragraph."],
+        ["items.0.parentTextContent", "i", "details"],
+        ["items.0.siblings.before.0.tagName", "=", "H1"],
+        ["items.0.siblings.after.5.textContent", "i", "Here"]
       ]
     }
   ]

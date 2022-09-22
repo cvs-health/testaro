@@ -442,11 +442,16 @@ For example, a `test` command might have this `expect` property:
 
 That would state the expectation that the `result` property of the `acts` item for that test in the report will have a `total.links` property with the value 5, a `total.links.underlined` property with a value less than 6, **no** `total.links.outlined` property, and a `docLang` property with a value different from `es-ES`.
 
+The first item in each array is an identifier of a property within the `result` property. The item has the format of a string with `.` delimiters. Each `.`-delimited segment its the name of the next property in the hierarchy. If the current object is an array, the next segment must be a non-negative integer, representing the index of an element of the array. For example, `items.1.attributes.0` references the first element of the array that is the `attributes` property of the object that is the second element of the array that is the `items` property of `result`. (In JavaScript, this would be written `items[1].attributes[0]`, but in the `expect` property all property names are `.`-delimited.)
+
 The second item in each array, if there are 3 items in the array, is an operator, drawn from:
 - `<`: less than
 - `=`: equal to
 - `>`: greater than
 - `!`: unequal to
+- `i`: includes
+
+The third item in each array, if there are 3 items in the array, is the criterion with which the value of the first property is compared.
 
 A typical use for an `expect` property is checking the correctness of a Testaro test. Thus, the validation scripts in the `validation/tests/scripts` directory all contain `test` commands with `expect` properties. See the “Validation” section below.
 
