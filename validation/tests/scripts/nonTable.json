@@ -1,0 +1,62 @@
+{
+  "what": "validation of nonTable test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/nonTable/good.html",
+      "what": "page with underlined adjacent links"
+    },
+    {
+      "type": "test",
+      "which": "linkUl",
+      "what": "adjacent-link underlining",
+      "withItems": false,
+      "expect": [
+        ["totals.links", "=", 6],
+        ["totals.adjacent.total", "=", 2],
+        ["totals.adjacent.underlined", "=", 2],
+        ["totals.adjacent.underlinedPercent", "=", 100]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/linkUl/bad.html",
+      "what": "page with nonunderlined adjacent links"
+    },
+    {
+      "type": "test",
+      "which": "linkUl",
+      "what": "adjacent-link underlining",
+      "withItems": false,
+      "expect": [
+        ["totals.links", "=", 6],
+        ["totals.adjacent.total", "=", 6],
+        ["totals.adjacent.underlined", "=", 0],
+        ["totals.adjacent.underlinedPercent", "=", 0]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/linkUl/na.html",
+      "what": "page without adjacent links"
+    },
+    {
+      "type": "test",
+      "which": "linkUl",
+      "what": "adjacent-link underlining",
+      "withItems": false,
+      "expect": [
+        ["totals.links", "=", 2],
+        ["totals.adjacent.total", "=", 0],
+        ["totals.adjacent.underlined", "=", 0],
+        ["totals.adjacent.underlinedPercent", "=", "N/A"]
+      ]
+    }
+  ]
+}

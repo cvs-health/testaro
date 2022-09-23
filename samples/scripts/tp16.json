@@ -103,6 +103,12 @@
     },
     {
       "type": "test",
+      "which": "miniText",
+      "withItems": true,
+      "what": "small text"
+    },
+    {
+      "type": "test",
       "which": "menuNav",
       "withItems": true,
       "what": "keyboard navigation within true-focus menus"
