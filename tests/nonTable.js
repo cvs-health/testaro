@@ -58,7 +58,7 @@ exports.reporter = async (page, withItems) => {
   });
   // Return the result.
   const data = {
-    totals: badTableTexts.length
+    total: badTableTexts.length
   };
   if (withItems) {
     data.items = badTableTexts;

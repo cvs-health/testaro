@@ -9,53 +9,19 @@
     },
     {
       "type": "url",
-      "which": "__targets__/nonTable/good.html",
-      "what": "page with underlined adjacent links"
+      "which": "__targets__/nonTable/index.html",
+      "what": "page with a real table and 3 pseudotables"
     },
     {
       "type": "test",
-      "which": "linkUl",
-      "what": "adjacent-link underlining",
-      "withItems": false,
+      "which": "nonTable",
+      "what": "tables used for layout",
+      "withItems": true,
       "expect": [
-        ["totals.links", "=", 6],
-        ["totals.adjacent.total", "=", 2],
-        ["totals.adjacent.underlined", "=", 2],
-        ["totals.adjacent.underlinedPercent", "=", 100]
-      ]
-    },
-    {
-      "type": "url",
-      "which": "__targets__/linkUl/bad.html",
-      "what": "page with nonunderlined adjacent links"
-    },
-    {
-      "type": "test",
-      "which": "linkUl",
-      "what": "adjacent-link underlining",
-      "withItems": false,
-      "expect": [
-        ["totals.links", "=", 6],
-        ["totals.adjacent.total", "=", 6],
-        ["totals.adjacent.underlined", "=", 0],
-        ["totals.adjacent.underlinedPercent", "=", 0]
-      ]
-    },
-    {
-      "type": "url",
-      "which": "__targets__/linkUl/na.html",
-      "what": "page without adjacent links"
-    },
-    {
-      "type": "test",
-      "which": "linkUl",
-      "what": "adjacent-link underlining",
-      "withItems": false,
-      "expect": [
-        ["totals.links", "=", 2],
-        ["totals.adjacent.total", "=", 0],
-        ["totals.adjacent.underlined", "=", 0],
-        ["totals.adjacent.underlinedPercent", "=", "N/A"]
+        ["total", "=", 3],
+        ["items.0", "i", "Unit"],
+        ["items.1", "i", "Sales"],
+        ["items.2", "i", "Chime"]
       ]
     }
   ]
