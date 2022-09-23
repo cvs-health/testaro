@@ -1,0 +1,141 @@
+{
+  "what": "validation of elements test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/textNodes/index.html",
+      "what": "page with a shadow root"
+    },
+    {
+      "type": "test",
+      "which": "textNodes",
+      "what": "text nodes",
+      "detailLevel": 0,
+      "expect": [
+        ["nodeCount", "=", 34]
+      ]
+    },
+    {
+      "type": "test",
+      "which": "textNodes",
+      "what": "text nodes",
+      "detailLevel": 0,
+      "text": "alia",
+      "expect": [
+        ["nodeCount", "=", 2]
+      ]
+    },
+    {
+      "type": "test",
+      "which": "textNodes",
+      "what": "text nodes",
+      "detailLevel": 0,
+      "tagName": "P",
+      "expect": [
+        ["total", "=", 5]
+      ]
+    },
+    {
+      "type": "test",
+      "which": "elements",
+      "what": "elements",
+      "detailLevel": 0,
+      "tagName": "LI",
+      "onlyVisible": true,
+      "expect": [
+        ["total", "=", 2]
+      ]
+    },
+    {
+      "type": "test",
+      "which": "elements",
+      "what": "elements",
+      "detailLevel": 0,
+      "tagName": "P",
+      "attribute": "class",
+      "expect": [
+        ["total", "=", 2]
+      ]
+    },
+    {
+      "type": "test",
+      "which": "elements",
+      "what": "elements",
+      "detailLevel": 1,
+      "tagName": "LI",
+      "attribute": "class=first",
+      "expect": [
+        ["total", "=", 1],
+        ["items.0.tagName", "=", "LI"],
+        ["items.0.parentTagName", "=", "UL"],
+        ["items.0.code", "i", "first"],
+        ["items.0.attributes.0.name", "=", "class"],
+        ["items.0.attributes.0.value", "=", "first"],
+        ["items.0.textContent", "=", "Io"]
+      ]
+    },
+    {
+      "type": "test",
+      "which": "elements",
+      "what": "elements",
+      "detailLevel": 1,
+      "tagName": "INPUT",
+      "expect": [
+        ["total", "=", 2],
+        ["items.0.labels.1", "i", "anything"],
+        ["items.1.labelers.0", "i", "something else"]
+      ]
+    },
+    {
+      "type": "test",
+      "which": "elements",
+      "what": "elements",
+      "detailLevel": 2,
+      "tagName": "LI",
+      "attribute": "class=first",
+      "expect": [
+        ["items.0.textContent", "=", "Io"],
+        ["items.0.parentTextContent", "i", "tute"]
+      ]
+    },
+    {
+      "type": "test",
+      "which": "elements",
+      "what": "elements",
+      "detailLevel": 2,
+      "tagName": "LI",
+      "onlyVisible": true,
+      "attribute": "class",
+      "expect": [
+        ["total", "=", 1],
+        ["items.0.parentTextContent", "i", "alia"],
+        ["items.0.parentTextContent", "i", "tute"]
+      ]
+    },
+    {
+      "type": "test",
+      "which": "elements",
+      "what": "elements",
+      "detailLevel": 3,
+      "tagName": "P",
+      "attribute": "class=first",
+      "expect": [
+        ["items.0.textContent", "=", "This is a paragraph."],
+        ["items.0.parentTagName", "=", "MAIN"],
+        ["items.0.parentTextContent", "i", "something."],
+        ["items.0.siblings.before.0.type", "=", 3],
+        ["items.0.siblings.before.1.type", "=", 1],
+        ["items.0.siblings.before.1.tagName", "=", "H1"],
+        ["items.0.siblings.after.12.type", "=", 1],
+        ["items.0.siblings.after.12.tagName", "=", "LABEL"],
+        ["items.0.siblings.after.12.attributes.0.name", "=", "for"]
+      ]
+    }
+  ]
+}
