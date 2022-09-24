@@ -18,7 +18,7 @@
       "what": "text nodes",
       "detailLevel": 0,
       "expect": [
-        ["nodeCount", "=", 34]
+        ["nodeCount", "=", 35]
       ]
     },
     {
@@ -38,7 +38,7 @@
       "detailLevel": 1,
       "text": "alia",
       "expect": [
-        ["total", "=", 2],
+        ["nodeCount", "=", 2],
         ["items.0.text", "=", "Io alia"]
       ]
     },
@@ -49,13 +49,13 @@
       "detailLevel": 2,
       "text": "This is the",
       "expect": [
-        ["total", "=", 2],
+        ["nodeCount", "=", 2],
         ["items.0.text", "=", "This is the first button"],
         ["items.1.text", "=", "This is the second button"],
         ["items.0.ancestors.0.tagName", "=", "BUTTON"],
         ["items.1.ancestors.0.tagName", "=", "BUTTON"],
-        ["items.0.ancestors.0.attributes.0.name", "=", "type"],
-        ["items.0.ancestors.0.attributes.0.value", "=", "button"],
+        ["items.0.ancestors.0.attributes.0.name", "=", "id"],
+        ["items.0.ancestors.0.attributes.0.value", "=", "button0"],
         ["items.1.ancestors.0.attributes.1.name", "=", "aria-labelledby"],
         ["items.1.ancestors.0.attributes.1.value", "=", "button1Label"],
         ["items.0.ancestors.0.refLabels"],
@@ -73,7 +73,7 @@
       "detailLevel": 3,
       "text": "tute alia",
       "expect": [
-        ["total", "=", 1],
+        ["nodeCount", "=", 1],
         ["items.0.text", "=", "Io tute alia"],
         ["items.0.ancestors.0.tagName", "=", "LI"],
         ["items.0.ancestors.1.tagName", "=", "UL"],

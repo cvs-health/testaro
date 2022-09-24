@@ -6,7 +6,7 @@
     1-3. Count of ancestry levels to provide data on (1 = text node, 2 = also parent,
       3 = also grandparent)
 */
-exports.reporter = async (page, detailLevel, text) => {
+exports.reporter = async (page, detailLevel, text = '') => {
   let data = {};
   // Get the data on the text nodes.
   try {
@@ -14,14 +14,10 @@ exports.reporter = async (page, detailLevel, text) => {
       const detailLevel = args[0];
       const text = args[1];
       const matchNodes = [];
-      // Make a copy of the body.
-      const tempBody = document.body.cloneNode(true);
-      // Collapse any adjacent text nodes in the copy.
-      tempBody.normalize();
-      // Insert it into the document.
-      document.body.appendChild(tempBody);
-      // Remove the irrelevant text content from the copy.
-      const extraElements = Array.from(tempBody.querySelectorAll('style, script, svg'));
+      // Collapse any adjacent text nodes.
+      document.body.normalize();
+      // Remove the irrelevant text content.
+      const extraElements = Array.from(document.body.querySelectorAll('style, script, svg'));
       extraElements.forEach(element => {
         element.textContent = '';
       });
@@ -86,13 +82,14 @@ exports.reporter = async (page, detailLevel, text) => {
       // FUNCTION DEFINITIONS END
       const stdText = standardize(text);
       // Create a collection of the text nodes.
-      const walker = document.createTreeWalker(tempBody, NodeFilter.SHOW_TEXT);
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
       // Get their count.
       const data = {nodeCount: 0};
       let more = true;
       while(more) {
         if (walker.nextNode()) {
-          if (standardize(walker.currentNode.nodeValue).includes(stdText)) {
+          const stdCurrent = standardize(walker.currentNode.nodeValue);
+          if (stdCurrent.includes(stdText)) {
             data.nodeCount++;
             matchNodes.push(walker.currentNode);
           }
@@ -101,13 +98,8 @@ exports.reporter = async (page, detailLevel, text) => {
           more = false;
         }
       }
-      // If no itemization is required:
-      if (detailLevel === 0) {
-        // Return the node count.
-        return data;
-      }
-      // Otherwise, i.e. if itemization is required:
-      else {
+      // If itemization is required:
+      if (detailLevel > 0) {
         // Initialize the item data.
         data.items = [];
         // For each text node matching any specified text:
@@ -133,7 +125,6 @@ exports.reporter = async (page, detailLevel, text) => {
           data.items.push(itemData);
         });
       }
-      document.body.removeChild(tempBody);
       return data;
     }, [detailLevel, text]);
   }

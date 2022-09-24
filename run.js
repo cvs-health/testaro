@@ -65,7 +65,17 @@ const tests = {
 };
 // Tests that may change the DOM.
 const domChangers = new Set([
-  'axe', 'continuum', 'focAll', 'focInd', 'focOp', 'hover', 'htmlcs', 'ibm', 'menuNav', 'wave'
+  'axe',
+  'continuum',
+  'focAll',
+  'focInd',
+  'focOp',
+  'hover',
+  'htmlcs',
+  'ibm',
+  'menuNav',
+  'textNodes',
+  'wave'
 ]);
 // Browser types available in PlayWright.
 const browserTypeNames = {
@@ -557,23 +567,29 @@ const visit = async (act, page, isStrict) => {
 };
 // Returns a property value and whether it satisfies an expectation.
 const isTrue = (object, specs) => {
-  let satisfied;
   const property = specs[0];
   const propertyTree = property.split('.');
-  const relation = specs[1];
-  const criterion = specs[2];
   let actual = property.length ? object[propertyTree[0]] : object;
   // Identify the actual value of the specified property.
   while (propertyTree.length > 1 && actual !== undefined) {
     propertyTree.shift();
     actual = actual[propertyTree[0]];
   }
-  if (actual === undefined) {
-    return [null, false];
+  // If the expectation is that the property does not exist:
+  if (specs.length === 1) {
+    // Return whether the expectation is satisfied.
+    return [actual, actual === undefined];
   }
-  else {
+  // Otherwise, i.e. if the expectation is of a property value:
+  else if (specs.length === 3) {
     // Determine whether the expectation was fulfilled.
-    if (relation === '=') {
+    const relation = specs[1];
+    const criterion = specs[2];
+    let satisfied;
+    if (actual === undefined) {
+      return [null, false];
+    }
+    else if (relation === '=') {
       satisfied = actual === criterion;
     }
     else if (relation === '<') {
@@ -591,10 +607,11 @@ const isTrue = (object, specs) => {
     else if (relation === '!i') {
       satisfied = ! actual.includes(criterion);
     }
-    else if (! relation) {
-      satisfied = actual === undefined;
-    }
     return [actual, satisfied];
+  }
+  // Otherwise, i.e. if the specifications are invalid:
+  else {
+    //
   }
 };
 // Adds a wait error result to an act.

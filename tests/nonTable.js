@@ -6,7 +6,7 @@
 exports.reporter = async (page, withItems) => {
   // Identify the tables used for layout.
   const badTableTexts = await page.$$eval('table', tables => {
-    // Initialiyze an array of pseudotable texts.
+    // Initialize an array of pseudotable texts.
     const badTableTexts = [];
     // FUNCTION DEFINITIONS START
     // Returns a space-minimized copy of a string.
