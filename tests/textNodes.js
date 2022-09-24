@@ -3,7 +3,8 @@
   This test reports data about specified text nodes.
   Meanings of detailLevel values:
     0. Only total node count; no detail.
-    1+. Count of ancestry levels to provide data on (1 = text node, 2 = also parent, etc.)
+    1-3. Count of ancestry levels to provide data on (1 = text node, 2 = also parent,
+      3 = also grandparent)
 */
 exports.reporter = async (page, detailLevel, text) => {
   let data = {};
@@ -13,10 +14,10 @@ exports.reporter = async (page, detailLevel, text) => {
       const detailLevel = args[0];
       const text = args[1];
       const matchNodes = [];
-      // Normalize the body.
-      document.body.normalize();
       // Make a copy of the body.
       const tempBody = document.body.cloneNode(true);
+      // Collapse any adjacent text nodes in the copy.
+      tempBody.normalize();
       // Insert it into the document.
       document.body.appendChild(tempBody);
       // Remove the irrelevant text content from the copy.
@@ -28,8 +29,11 @@ exports.reporter = async (page, detailLevel, text) => {
       // Compacts a string.
       const compact = string => string.replace(/\s+/g, ' ').trim();
       // Compacts and lower-cases a string.
-      const normalize = string => compact(string).toLowerCase();
-      // Gets data on an element.
+      const standardize = string => compact(string).toLowerCase();
+      /*
+        Gets data (tagName, text if specified, attributes, refLabels, labels, and children)
+        on an element.
+      */
       const getElementData = (element, withText) => {
         // Initialize the data.
         const data = {
@@ -80,7 +84,7 @@ exports.reporter = async (page, detailLevel, text) => {
         return data;
       };
       // FUNCTION DEFINITIONS END
-      const normText = normalize(text);
+      const stdText = standardize(text);
       // Create a collection of the text nodes.
       const walker = document.createTreeWalker(tempBody, NodeFilter.SHOW_TEXT);
       // Get their count.
@@ -88,7 +92,7 @@ exports.reporter = async (page, detailLevel, text) => {
       let more = true;
       while(more) {
         if (walker.nextNode()) {
-          if (normalize(walker.currentNode.nodeValue).includes(normText)) {
+          if (standardize(walker.currentNode.nodeValue).includes(stdText)) {
             data.nodeCount++;
             matchNodes.push(walker.currentNode);
           }
@@ -106,18 +110,21 @@ exports.reporter = async (page, detailLevel, text) => {
       else {
         // Initialize the item data.
         data.items = [];
-        // For each text node matching the specified text:
+        // For each text node matching any specified text:
         matchNodes.forEach(node => {
           // Initialize the data on it.
           const itemData = {text: compact(node.nodeValue)};
           // If ancestral itemization is required:
           if (detailLevel > 1) {
-            // Add the ancestral data to the item data.
+            // Add the ancestral data, starting with the parent, to the item data.
             itemData.ancestors = [];
             let base = node;
             let currentLevel = 1;
+            // For each specified ancestral distance:
             while(currentLevel++ < detailLevel) {
+              // Add data on it to the data on the text node.
               const newBase = base.parentElement;
+              // Omit the text of the text node if the ancestor is its parent.
               itemData.ancestors.push(getElementData(newBase, currentLevel > 2));
               base = newBase;
             }
