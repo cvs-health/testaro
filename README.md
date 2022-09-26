@@ -625,7 +625,11 @@ The executors are:
 - `watchNet`: validates network watching
 - `tests`: validates all the custom tests (not the test packages)
 
-To execute any executor `xyz`, call it with the statement `node validation/executors/xyz`.
+To validate any single Testaro custom test `xyz`, enter the statement `npm run test1 xyz`.
+
+To validate all of the Testaro custom tests, enter the statement `npm test`.
+
+To execute any executor `xyz` other than `test` or  `tests`, call it with the statement `node validation/executors/xyz`.
 
 The `tests` executor makes use of the scripts in the `validation/tests/scripts` directory, and they, in turn, run tests on HTML files in the `validation/tests/targets` directory.
 

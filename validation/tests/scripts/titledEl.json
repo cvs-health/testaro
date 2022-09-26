@@ -1,0 +1,28 @@
+{
+  "what": "validation of titledEl test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/titledEl/index.html",
+      "what": "page with valid and invalid title attributes"
+    },
+    {
+      "type": "test",
+      "which": "titledEl",
+      "what": "title attributes on inappropriate elements",
+      "withItems": true,
+      "expect": [
+        ["total", "=", 1],
+        ["items.0.tagName", "=", "P"],
+        ["items.0.text", "=", "This paragraph has an invalid title element."],
+        ["items.0.title", "=", "invalid title"]
+      ]
+    }
+  ]
+}

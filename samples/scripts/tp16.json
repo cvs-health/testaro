@@ -1,6 +1,6 @@
 {
-  "id": "tp15",
-  "what": "Alfa, Axe, Continuum, HTML CodeSniffer, IBM, Nu Html Checker, Tenon, WAVE, and 24 custom tests",
+  "id": "tp16",
+  "what": "Alfa, Axe, Continuum, HTML CodeSniffer, IBM, Nu Html Checker, Tenon, WAVE, and 19 custom tests",
   "strict": true,
   "timeLimit": 500,
   "commands": [
@@ -141,6 +141,12 @@
       "which": "tabNav",
       "withItems": true,
       "what": "keyboard navigation within tab lists"
+    },
+    {
+      "type": "test",
+      "which": "titledEl",
+      "withItems": true,
+      "what": "title attributes on inappropriate elements"
     },
     {
       "type": "test",
