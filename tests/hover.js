@@ -47,7 +47,7 @@ const getSample = (population, sampleSize) => {
         trigger,
         sorter: Math.random()
       });
-    };
+    }
     popData.sort((a, b) => a.sorter - b.sorter);
     return popData.slice(0, sampleSize).map(obj => obj.trigger);
   }
@@ -70,7 +70,7 @@ const find = async (data, withItems, page, region, sample, popRatio) => {
       // Identify the first of them.
       const firstTrigger = sample[0];
       const tagNameJSHandle = await firstTrigger.getProperty('tagName')
-      .catch(error => '');
+      .catch(() => '');
       if (tagNameJSHandle) {
         const tagName = await tagNameJSHandle.jsonValue();
         // Identify the root of a subtree likely to contain impacted elements.
@@ -282,8 +282,8 @@ exports.reporter = async (
   // Get the head and tail samples.
   const headSample = getSample(headTriggers, headSampleSize);
   const tailSample = tailSampleSize === -1 ? tailTriggers : getSample(tailTriggers, tailSampleSize);
-  // Set a time limit to handle pages that slow the operations of this test.
-  const timeLimit = Math.round(1.3 * (headSample.length + tailSample.length));
+  // Set a time limit to cover possible 1.9 seconds per trigger.
+  const timeLimit = Math.round(2.2 * (headSample.length + tailSample.length));
   const timeout = setTimeout(async () => {
     await page.close();
     console.log(
