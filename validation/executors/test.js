@@ -6,10 +6,6 @@ const fs = require('fs').promises;
 const {handleRequest} = require(`${__dirname}/../../run`);
 const test = process.argv[2];
 const validateTests = async () => {
-  const totals = {
-    attempts: 0,
-    successes: 0
-  };
   const scriptFileNames = await fs.readdir(`${__dirname}/../tests/scripts`);
   for (const scriptFileName of scriptFileNames.filter(fileName => fileName === `${test}.json`)) {
     const rawScriptJSON = await fs
@@ -29,37 +25,25 @@ const validateTests = async () => {
       console.log('Failure: Log empty or invalid');
       console.log(JSON.stringify(log, null, 2));
     }
+    const testActs = acts.filter(act => act.type && act.type === 'test');
     if (
-      acts.length === script.commands.length
-      && acts.every(
-        act => act.type && act.type === 'test'
-          ? act.result && act.result.failureCount !== undefined
-          : true
-      )
+      testActs.length === script.commands.filter(cmd => cmd.type === 'test').length
+      && testActs.every(testAct => testAct.result && testAct.result.failureCount !== undefined)
     ) {
-      totals.attempts++;
-      totals.successes++;
       console.log('Success: Reports have been correctly populated');
-      if (acts.every(
-        act => act.type === 'test' ? act.result.failureCount === 0 : true
-      )) {
-        totals.attempts++;
-        totals.successes++;
+      if (testActs.every(testAct => testAct.result.failureCount === 0)) {
         console.log('Success: No failures');
       }
       else {
-        totals.attempts++;
-        console.log('Failure: At least one test has at least one failure');
+        console.log('Failure: The test has at least one failure');
         console.log(JSON.stringify(acts, null, 2));
       }
     }
     else {
-      totals.attempts++;
       console.log('Failure: Reports empty or invalid');
       console.log(JSON.stringify(acts, null, 2));
     }
   }
-  console.log(`Grand totals: attempts ${totals.attempts}, successes ${totals.successes}`);
   return Promise.resolve('');
 };
 validateTests()

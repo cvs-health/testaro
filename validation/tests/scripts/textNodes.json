@@ -18,7 +18,7 @@
       "what": "text nodes",
       "detailLevel": 0,
       "expect": [
-        ["nodeCount", "=", 34]
+        ["nodeCount", "=", 35]
       ]
     },
     {
@@ -35,106 +35,54 @@
       "type": "test",
       "which": "textNodes",
       "what": "text nodes",
-      "detailLevel": 0,
-      "tagName": "P",
-      "expect": [
-        ["total", "=", 5]
-      ]
-    },
-    {
-      "type": "test",
-      "which": "elements",
-      "what": "elements",
-      "detailLevel": 0,
-      "tagName": "LI",
-      "onlyVisible": true,
-      "expect": [
-        ["total", "=", 2]
-      ]
-    },
-    {
-      "type": "test",
-      "which": "elements",
-      "what": "elements",
-      "detailLevel": 0,
-      "tagName": "P",
-      "attribute": "class",
-      "expect": [
-        ["total", "=", 2]
-      ]
-    },
-    {
-      "type": "test",
-      "which": "elements",
-      "what": "elements",
       "detailLevel": 1,
-      "tagName": "LI",
-      "attribute": "class=first",
+      "text": "alia",
       "expect": [
-        ["total", "=", 1],
-        ["items.0.tagName", "=", "LI"],
-        ["items.0.parentTagName", "=", "UL"],
-        ["items.0.code", "i", "first"],
-        ["items.0.attributes.0.name", "=", "class"],
-        ["items.0.attributes.0.value", "=", "first"],
-        ["items.0.textContent", "=", "Io"]
+        ["nodeCount", "=", 2],
+        ["items.0.text", "=", "Io alia"]
       ]
     },
     {
       "type": "test",
-      "which": "elements",
-      "what": "elements",
-      "detailLevel": 1,
-      "tagName": "INPUT",
-      "expect": [
-        ["total", "=", 2],
-        ["items.0.labels.1", "i", "anything"],
-        ["items.1.labelers.0", "i", "something else"]
-      ]
-    },
-    {
-      "type": "test",
-      "which": "elements",
-      "what": "elements",
+      "which": "textNodes",
+      "what": "text nodes",
       "detailLevel": 2,
-      "tagName": "LI",
-      "attribute": "class=first",
+      "text": "This is the",
       "expect": [
-        ["items.0.textContent", "=", "Io"],
-        ["items.0.parentTextContent", "i", "tute"]
+        ["nodeCount", "=", 2],
+        ["items.0.text", "=", "This is the first button"],
+        ["items.1.text", "=", "This is the second button"],
+        ["items.0.ancestors.0.tagName", "=", "BUTTON"],
+        ["items.1.ancestors.0.tagName", "=", "BUTTON"],
+        ["items.0.ancestors.0.attributes.0.name", "=", "id"],
+        ["items.0.ancestors.0.attributes.0.value", "=", "button0"],
+        ["items.1.ancestors.0.attributes.1.name", "=", "aria-labelledby"],
+        ["items.1.ancestors.0.attributes.1.value", "=", "button1Label"],
+        ["items.0.ancestors.0.refLabels"],
+        ["items.1.ancestors.0.refLabels.0", "=", "Click the second button."],
+        ["items.0.ancestors.0.labels.0", "=", "Click the first button."],
+        ["items.0.ancestors.0.labels.1", "=", "Did you click it?"],
+        ["items.1.ancestors.0.labels"],
+        ["items.0.ancestors.0.children"]
       ]
     },
     {
       "type": "test",
-      "which": "elements",
-      "what": "elements",
-      "detailLevel": 2,
-      "tagName": "LI",
-      "onlyVisible": true,
-      "attribute": "class",
-      "expect": [
-        ["total", "=", 1],
-        ["items.0.parentTextContent", "i", "alia"],
-        ["items.0.parentTextContent", "i", "tute"]
-      ]
-    },
-    {
-      "type": "test",
-      "which": "elements",
-      "what": "elements",
+      "which": "textNodes",
+      "what": "text nodes",
       "detailLevel": 3,
-      "tagName": "P",
-      "attribute": "class=first",
+      "text": "tute alia",
       "expect": [
-        ["items.0.textContent", "=", "This is a paragraph."],
-        ["items.0.parentTagName", "=", "MAIN"],
-        ["items.0.parentTextContent", "i", "something."],
-        ["items.0.siblings.before.0.type", "=", 3],
-        ["items.0.siblings.before.1.type", "=", 1],
-        ["items.0.siblings.before.1.tagName", "=", "H1"],
-        ["items.0.siblings.after.12.type", "=", 1],
-        ["items.0.siblings.after.12.tagName", "=", "LABEL"],
-        ["items.0.siblings.after.12.attributes.0.name", "=", "for"]
+        ["nodeCount", "=", 1],
+        ["items.0.text", "=", "Io tute alia"],
+        ["items.0.ancestors.0.tagName", "=", "LI"],
+        ["items.0.ancestors.1.tagName", "=", "UL"],
+        ["items.0.ancestors.0.attributes.0.name", "=", "class"],
+        ["items.0.ancestors.0.attributes.0.value", "=", "last"],
+        ["items.0.ancestors.1.attributes.0.name", "=", "lang"],
+        ["items.0.ancestors.1.attributes.0.value", "=", "eo"],
+        ["items.0.ancestors.1.children.1.tagName", "=", "LI"],
+        ["items.0.ancestors.1.children.2.attributes.1.name", "=", "hidden"]
       ]
     }
   ]
