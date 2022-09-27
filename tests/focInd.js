@@ -83,27 +83,30 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
         data.totals.total++;
         // Get a live style declaration of its properties.
         const styleDec = window.getComputedStyle(element);
-        // Get the relevant style properties.
+        // Get the relevant style properties and save them as the blurred styles.
         const styleBlurred = {};
-        [
+        const indicatorStyleNames = [
           'outlineWidth',
           'outlineColor',
+          'outlineStyle',
           'borderWidth',
+          'borderStyle',
           'boxShadow',
           'fontSize',
           'fontStyle',
           'textDecorationLine',
           'textDecorationStyle',
           'textDecorationThickness'
-        ].forEach(styleName => {
+        ];
+        indicatorStyleNames.forEach(styleName => {
           styleBlurred[styleName] = styleDec[styleName];
         });
-        // Focus it, potentially changing the properties in its style declaration.
+        // Focus the element, potentially changing the properties in its style declaration.
         element.focus({preventScroll: true});
         let hasOutline = false;
         // If it has no outline when not focused:
         if (styleBlurred.outlineWidth === '0px') {
-          // If an outline appeared immediately on focus:
+          // If a non-transparent outline appeared immediately on focus:
           if (styleDec.outlineWidth !== '0px' && styleDec.outlineColor !== 'rgba(0, 0, 0, 0)') {
             // Add facts about the element to the result.
             addElementFacts(element, 'outlinePresent', 0);
@@ -111,7 +114,7 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
           }
           // Otherwise, if a wait for an outline is allowed:
           else if (allowedDelay) {
-            // Determine how long an outline takes to appear or whether it times out.
+            // Determine whether an outline appears and, if so, when, checking every 0.1 second.
             const outlineDelay = new Promise(resolve => {
               const focusTime = Date.now();
               const deadline = focusTime + allowedDelay;
@@ -128,7 +131,7 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
                 }
               }, 100);
             });
-            // If it appeared before the wait limit:
+            // If it appeared before the deadline:
             const delay = await outlineDelay;
             if (delay) {
               // Add facts about the element to the result.
@@ -151,18 +154,13 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
           const hasIndicator
           = hasDiffOutline
           || hasDiffBorder
-          || diff('boxShadow')
-          || diff('fontSize')
-          || diff('fontStyle')
-          || diff('textDecorationLine')
-          || diff('textDecorationStyle')
-          || diff('textDecorationThickness');
+          || indicatorStyleNames.slice(5).reduce((any, styleName) => any || diff(styleName), false);
           // Add the determination to the result.
           const status = hasIndicator ? 'nonOutlinePresent' : 'indicatorMissing';
           addElementFacts(element, status);
         }
       }
-    };
+    }
     return data;
   }, [allowedDelay, withItems]);
   return {result: data};
