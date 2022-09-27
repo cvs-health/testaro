@@ -27,13 +27,10 @@ const validateTests = async () => {
       console.log('Failure: Log empty or invalid');
       console.log(JSON.stringify(log, null, 2));
     }
+    const testActs = acts.filter(act => act.type && act.type === 'test');
     if (
-      acts.length === script.commands.length
-      && acts.every(
-        act => act.type && act.type === 'test'
-          ? act.result && act.result.failureCount !== undefined
-          : true
-      )
+      testActs.length === script.commands.filter(cmd => cmd.type === 'test').length
+      && testActs.every(act => act.result && act.result.failureCount !== undefined)
     ) {
       totals.attempts++;
       totals.successes++;
