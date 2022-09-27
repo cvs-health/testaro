@@ -92,92 +92,87 @@ exports.reporter = async (page, withItems) => {
     const testKey = async (
       tabs, tabElement, keyName, keyProp, goodIndex, elementIsCorrect, itemData
     ) => {
-      const {navigationErrors} = itemData;
-      if (navigationErrors) {
-        let pressed = true;
-        // Click the tab element, to make the focus on it effective.
+      let pressed = true;
+      // Click the tab element, to make the focus on it effective.
+      await tabElement.click({
+        timeout: 500
+      })
+      .catch(async error => {
+        console.log(
+          `ERROR clicking tab element ${itemData.text} (${error.message.replace(/\n.+/s, '')})`
+        );
         await tabElement.click({
-          timeout: 500
-        })
-        .catch(async error => {
-          console.log(
-            `ERROR clicking tab element ${itemData.text} (${error.message.replace(/\n.+/s, '')})`
-          );
-          await tabElement.click({
-            force: true
-          });
+          force: true
+        });
+      })
+      .catch(error => {
+        console.log(
+          `ERROR force-clicking tab element ${itemData.text} (${error.message.replace(/\n.+/s, '')})`
+        );
+        pressed = false;
+      });
+      // Increment the counts of navigations and key navigations.
+      data.totals.navigations.all.total++;
+      data.totals.navigations.specific[keyProp].total++;
+      const {navigationErrors} = itemData;
+      // If the click succeeded:
+      if (pressed) {
+        // Refocus the tab element and press the specified key (page.keyboard.press may fail).
+        await tabElement.press(keyName, {
+          timeout: 1000
         })
         .catch(error => {
-          console.log(
-            `ERROR force-clicking tab element ${itemData.text} (${error.message.replace(/\n.+/s, '')})`
-          );
+          console.log(`ERROR: could not press ${keyName} (${error.message})`);
           pressed = false;
         });
-        // Increment the counts of navigations and key navigations.
-        data.totals.navigations.all.total++;
-        data.totals.navigations.specific[keyProp].total++;
-        // If the click succeeded:
+        // If the refocus and keypress succeeded:
         if (pressed) {
-          // Refocus the tab element and press the specified key (page.keyboard.press may fail).
-          await tabElement.press(keyName, {
-            timeout: 1000
-          })
-          .catch(error => {
-            console.log(`ERROR: could not press ${keyName} (${error.message})`);
-            pressed = false;
-          });
-          // If the refocus and keypress succeeded:
-          if (pressed) {
-            // Identify which tab element is now focused, if any.
-            const focusIndex = await focusedTab(tabs);
-            // If the focus is correct:
-            if (focusIndex === goodIndex) {
-              // Increment the counts of correct navigations and correct key navigations.
-              data.totals.navigations.all.correct++;
-              data.totals.navigations.specific[keyProp].correct++;
-            }
-            // Otherwise, i.e. if the focus is incorrect:
-            else {
-              // Increment the counts of incorrect navigations and incorrect key navigations.
-              data.totals.navigations.all.incorrect++;
-              data.totals.navigations.specific[keyProp].incorrect++;
-              // Update the element status to incorrect.
-              elementIsCorrect = false;
-              // If itemization is required:
-              if (withItems) {
-                // Update the element report.
-                navigationErrors.push(keyName);
-              }
-            }
-            return elementIsCorrect;
+          // Identify which tab element is now focused, if any.
+          const focusIndex = await focusedTab(tabs);
+          // If the focus is correct:
+          if (focusIndex === goodIndex) {
+            // Increment the counts of correct navigations and correct key navigations.
+            data.totals.navigations.all.correct++;
+            data.totals.navigations.specific[keyProp].correct++;
           }
-          // Otherwise, i.e. if the refocus or keypress failed:
+          // Otherwise, i.e. if the focus is incorrect:
           else {
             // Increment the counts of incorrect navigations and incorrect key navigations.
             data.totals.navigations.all.incorrect++;
             data.totals.navigations.specific[keyProp].incorrect++;
-            // If itemization is required and a focus failure has not yet been reported:
-            if (withItems && ! navigationErrors.includes('focus')) {
+            // Update the element status to incorrect.
+            elementIsCorrect = false;
+            // If itemization is required:
+            if (withItems) {
               // Update the element report.
-              navigationErrors.push('focus');
+              navigationErrors.push(keyName);
             }
-            return false;
           }
+          return elementIsCorrect;
         }
-        // Otherwise, i.e. if the click failed:
+        // Otherwise, i.e. if the refocus or keypress failed:
         else {
           // Increment the counts of incorrect navigations and incorrect key navigations.
           data.totals.navigations.all.incorrect++;
           data.totals.navigations.specific[keyProp].incorrect++;
-          // If itemization is required and a click failure has not yet been reported:
-          if (withItems && ! navigationErrors.includes('click')) {
+          // If itemization is required and a focus failure has not yet been reported:
+          if (withItems && ! navigationErrors.includes('focus')) {
             // Update the element report.
-            navigationErrors.push('click');
+            navigationErrors.push('focus');
           }
           return false;
         }
       }
+      // Otherwise, i.e. if the click failed:
       else {
+        // Increment the counts of incorrect navigations and incorrect key navigations.
+        data.totals.navigations.all.incorrect++;
+        data.totals.navigations.specific[keyProp].incorrect++;
+        // If itemization is required and a click failure has not yet been reported:
+        if (withItems && ! navigationErrors.includes('click')) {
+          // Update the element report.
+          navigationErrors.push('click');
+        }
         return false;
       }
     };
