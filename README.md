@@ -6,7 +6,7 @@ Federated accessibility test automation
 
 Testaro is a collection of collections of web accessibility tests.
 
-The purpose of Testaro is to provide programmatic access to 1230 accessibility tests defined in several test packages and in Testaro itself.
+The purpose of Testaro is to provide programmatic access to accessibility tests defined in several test packages and in Testaro itself.
 
 ## System requirements
 
@@ -39,9 +39,16 @@ As of this version, the counts of tests in the packages referenced above were:
 - Tenon: 180
 - WAVE: 110
 - Nu Html Checker: 147
-- subtotal: 612
-- Testaro tests: 24
-- grand total: 1230
+- subtotal: 1206
+- Testaro tests: 23
+- grand total: 1229
+
+## Quasi-tests
+
+Reports produced by Testaro contain data in addition to the results of these tests. Such data can be used like tests. In particular, the data include:
+- Latency (how long a time each test takes)
+- Test prevention (the failure of tests to run on particular targets)
+- Logging (browser messaging, including about document errors, during testing)
 
 ## Code organization
 
