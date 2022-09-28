@@ -1,5 +1,5 @@
 {
-  "what": "validation of bulk test",
+  "what": "validation of allHidden test",
   "strict": true,
   "commands": [
     {
@@ -9,30 +9,170 @@
     },
     {
       "type": "url",
-      "which": "__targets__/bulk/good.html",
-      "what": "small page"
+      "which": "__targets__/allHidden/good.html",
+      "what": "page with nothing hidden"
     },
     {
       "type": "test",
-      "which": "bulk",
-      "what": "visible element count",
+      "which": "allHidden",
+      "what": "entirely or mainly hidden page",
       "expect": [
-        ["visibleElements", ">", 1],
-        ["visibleElements", "<", 5]
+        ["hidden.document", "=", false],
+        ["hidden.body", "=", false],
+        ["hidden.main", "=", false],
+        ["reallyHidden.document", "=", false],
+        ["reallyHidden.body", "=", false],
+        ["reallyHidden.main", "=", false],
+        ["visHidden.document", "=", false],
+        ["visHidden.body", "=", false],
+        ["visHidden.main", "=", false],
+        ["ariaHidden.document", "=", false],
+        ["ariaHidden.body", "=", false],
+        ["ariaHidden.main", "=", false]
       ]
     },
     {
       "type": "url",
-      "which": "__targets__/bulk/bad.html",
-      "what": "large page"
+      "which": "__targets__/allHidden/noBody.html",
+      "what": "page with no body"
     },
     {
       "type": "test",
-      "which": "bulk",
-      "what": "visible element count",
+      "which": "allHidden",
+      "what": "entirely or mainly hidden page",
       "expect": [
-        ["visibleElements", ">", 30],
-        ["visibleElements", "<", 40]
+        ["hidden.document", "=", false],
+        ["hidden.body", "=", false],
+        ["hidden.main", "=", false],
+        ["reallyHidden.document", "=", false],
+        ["reallyHidden.body", "=", false],
+        ["reallyHidden.main", "=", false],
+        ["visHidden.document", "=", false],
+        ["visHidden.body", "=", false],
+        ["visHidden.main", "=", false],
+        ["ariaHidden.document", "=", false],
+        ["ariaHidden.body", "=", false],
+        ["ariaHidden.main", "=", false]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/allHidden/noMain.html",
+      "what": "page with no main landmark"
+    },
+    {
+      "type": "test",
+      "which": "allHidden",
+      "what": "entirely or mainly hidden page",
+      "expect": [
+        ["hidden.document", "=", false],
+        ["hidden.body", "=", false],
+        ["hidden.main", "=", false],
+        ["reallyHidden.document", "=", false],
+        ["reallyHidden.body", "=", false],
+        ["reallyHidden.main", "=", false],
+        ["visHidden.document", "=", false],
+        ["visHidden.body", "=", false],
+        ["visHidden.main", "=", false],
+        ["ariaHidden.document", "=", false],
+        ["ariaHidden.body", "=", false],
+        ["ariaHidden.main", "=", false]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/allHidden/hiddenMain.html",
+      "what": "page with a hidden main landmark"
+    },
+    {
+      "type": "test",
+      "which": "allHidden",
+      "what": "entirely or mainly hidden page",
+      "expect": [
+        ["hidden.document", "=", false],
+        ["hidden.body", "=", false],
+        ["hidden.main", "=", true],
+        ["reallyHidden.document", "=", false],
+        ["reallyHidden.body", "=", false],
+        ["reallyHidden.main", "=", true],
+        ["visHidden.document", "=", false],
+        ["visHidden.body", "=", false],
+        ["visHidden.main", "=", false],
+        ["ariaHidden.document", "=", false],
+        ["ariaHidden.body", "=", false],
+        ["ariaHidden.main", "=", false]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/allHidden/visHiddenMain.html",
+      "what": "page with a visually hidden main landmark"
+    },
+    {
+      "type": "test",
+      "which": "allHidden",
+      "what": "entirely or mainly hidden page",
+      "expect": [
+        ["hidden.document", "=", false],
+        ["hidden.body", "=", false],
+        ["hidden.main", "=", false],
+        ["reallyHidden.document", "=", false],
+        ["reallyHidden.body", "=", false],
+        ["reallyHidden.main", "=", true],
+        ["visHidden.document", "=", false],
+        ["visHidden.body", "=", false],
+        ["visHidden.main", "=", true],
+        ["ariaHidden.document", "=", false],
+        ["ariaHidden.body", "=", false],
+        ["ariaHidden.main", "=", false]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/allHidden/ariaHiddenMain.html",
+      "what": "page with an ARIA-hidden main landmark"
+    },
+    {
+      "type": "test",
+      "which": "allHidden",
+      "what": "entirely or mainly hidden page",
+      "expect": [
+        ["hidden.document", "=", false],
+        ["hidden.body", "=", false],
+        ["hidden.main", "=", false],
+        ["reallyHidden.document", "=", false],
+        ["reallyHidden.body", "=", false],
+        ["reallyHidden.main", "=", true],
+        ["visHidden.document", "=", false],
+        ["visHidden.body", "=", false],
+        ["visHidden.main", "=", true],
+        ["ariaHidden.document", "=", false],
+        ["ariaHidden.body", "=", false],
+        ["ariaHidden.main", "=", true]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/allHidden/mixedHidden0.html",
+      "what": "page with mixed hidden states"
+    },
+    {
+      "type": "test",
+      "which": "allHidden",
+      "what": "entirely or mainly hidden page",
+      "expect": [
+        ["hidden.document", "=", false],
+        ["hidden.body", "=", false],
+        ["hidden.main", "=", false],
+        ["reallyHidden.document", "=", false],
+        ["reallyHidden.body", "=", false],
+        ["reallyHidden.main", "=", true],
+        ["visHidden.document", "=", false],
+        ["visHidden.body", "=", false],
+        ["visHidden.main", "=", true],
+        ["ariaHidden.document", "=", false],
+        ["ariaHidden.body", "=", false],
+        ["ariaHidden.main", "=", true]
       ]
     }
   ]
