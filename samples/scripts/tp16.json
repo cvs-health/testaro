@@ -40,8 +40,18 @@
     },
     {
       "type": "test",
+      "which": "allHidden",
+      "what": "document entirely or mainly hidden"
+    },
+    {
+      "type": "test",
       "which": "bulk",
       "what": "count of visible elements"
+    },
+    {
+      "type": "test",
+      "which": "docType",
+      "what": "missing or invalid doctype declaration"
     },
     {
       "type": "test",
