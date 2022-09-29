@@ -163,16 +163,64 @@
       "expect": [
         ["hidden.document", "=", false],
         ["hidden.body", "=", false],
-        ["hidden.main", "=", false],
+        ["hidden.main", "=", true],
         ["reallyHidden.document", "=", false],
         ["reallyHidden.body", "=", false],
         ["reallyHidden.main", "=", true],
         ["visHidden.document", "=", false],
-        ["visHidden.body", "=", false],
-        ["visHidden.main", "=", true],
+        ["visHidden.body", "=", true],
+        ["visHidden.main", "=", false],
+        ["ariaHidden.document", "=", true],
+        ["ariaHidden.body", "=", false],
+        ["ariaHidden.main", "=", false]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/allHidden/mixedHidden1.html",
+      "what": "page with mixed hidden states"
+    },
+    {
+      "type": "test",
+      "which": "allHidden",
+      "what": "entirely or mainly hidden page",
+      "expect": [
+        ["hidden.document", "=", true],
+        ["hidden.body", "=", false],
+        ["hidden.main", "=", false],
+        ["reallyHidden.document", "=", true],
+        ["reallyHidden.body", "=", false],
+        ["reallyHidden.main", "=", false],
+        ["visHidden.document", "=", false],
+        ["visHidden.body", "=", true],
+        ["visHidden.main", "=", false],
         ["ariaHidden.document", "=", false],
         ["ariaHidden.body", "=", false],
         ["ariaHidden.main", "=", true]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/allHidden/semiHidden.html",
+      "what": "page with mixed hidden states"
+    },
+    {
+      "type": "test",
+      "which": "allHidden",
+      "what": "entirely or mainly hidden page",
+      "expect": [
+        ["hidden.document", "=", false],
+        ["hidden.body", "=", false],
+        ["hidden.main", "=", true],
+        ["reallyHidden.document", "=", false],
+        ["reallyHidden.body", "=", false],
+        ["reallyHidden.main", "=", false],
+        ["visHidden.document", "=", false],
+        ["visHidden.body", "=", false],
+        ["visHidden.main", "=", false],
+        ["ariaHidden.document", "=", false],
+        ["ariaHidden.body", "=", false],
+        ["ariaHidden.main", "=", false]
       ]
     }
   ]
