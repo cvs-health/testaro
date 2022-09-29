@@ -36,7 +36,11 @@ const validateTests = async () => {
       }
       else {
         console.log('Failure: The test has at least one failure');
-        console.log(JSON.stringify(acts, null, 2));
+        console.log(
+          JSON.stringify(
+            acts.filter(act => act.type === 'test' && act.result.failureCount), null, 2
+          )
+        );
       }
     }
     else {

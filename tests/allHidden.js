@@ -43,6 +43,7 @@ exports.reporter = async page => {
         data.reallyHidden[element] = true;
       }
     });
+    return data;
   });
   return {result: data};
 };

@@ -31,6 +31,7 @@ const moves = {
 // Names and descriptions of tests.
 const tests = {
   alfa: 'alfa',
+  allHidden: 'page that is entirely or mostly hidden',
   axe: 'Axe',
   bulk: 'count of visible elements',
   continuum: 'Level Access Continuum, community edition',
