@@ -13,12 +13,8 @@
 
   Despite this delay, the test can make the execution time practical by randomly sampling triggers
   instead of hovering over all of them. When sampling is performed, the results may vary from one
-  execution to another. Because hover impacts typically occur near the beginning of a page,
-  sampling is governed by three optional parameters (defaults in parentheses):
-    headSize (0): the size of an initial subset of triggers (“head”)
-    headSampleSize (-1): the size of the sample to be drawn from the head
-    tailSampleSize (-1): the size of the sample to be drawn from the remainder of the page
-  A sample size of -1 means that there is no sampling, and the entire population is tested.
+  execution to another. Because hover impacts typically occur near the beginning of a page, the
+  probability of the inclusion of a trigger in a sample decreases with the index of the trigger.
 
   An element is reported as unhoverable when it fails the Playwright actionability checks for
   hovering, i.e. fails to be attached to the DOM, visible, stable (not or no longer animating), and
@@ -37,10 +33,22 @@ let hasTimedOut = false;
 // Samples a population and returns the sample.
 const getSample = (population, sampleSize) => {
   const popSize = population.length;
+  if (sampleSize >= popSize) {
+    return population;
+  }
+  else {
+    sampleSize = Math.floor(Math.max(1, sampleSize));
+    const ratio = index => {
+      const meanRatio = sampleSize / popSize;
+      const itemRatio = meanRatio - index;
+    };
+  }
   if (sampleSize === 0) {
     return [];
   }
   else if (sampleSize > 0 && sampleSize < popSize) {
+    // Sampling probability of a trigger with index is:
+    // (1 + Math.sin(Math.PI * index / popSize + Math.PI / 2)) * sampleSize / popSize
     const popData = [];
     for (const trigger of population) {
       popData.push({
@@ -280,7 +288,7 @@ exports.reporter = async (
   data.totals.headTriggers = headTriggerCount;
   data.totals.tailTriggers = tailTriggerCount;
   // Get the head and tail samples.
-  const headSample = getSample(headTriggers, headSampleSize);
+  const headSample = headSampleSize === -1 ? headTriggers : getSample(headTriggers, headSampleSize);
   const tailSample = tailSampleSize === -1 ? tailTriggers : getSample(tailTriggers, tailSampleSize);
   // Set a time limit to cover possible 1.9 seconds per trigger.
   const timeLimit = Math.round(2.2 * (headSample.length + tailSample.length));
