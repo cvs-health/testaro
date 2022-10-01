@@ -25,7 +25,8 @@
         ["totals.removals", "=", 0],
         ["totals.opacityChanges", "=", 0],
         ["totals.opacityImpact", "=", 0],
-        ["totals.unhoverables", "=", 0]
+        ["totals.unhoverables", "=", 0],
+        ["items.impactTriggers.0"]
       ]
     },
     {
@@ -46,7 +47,40 @@
         ["totals.removals", "=", 0],
         ["totals.opacityChanges", "=", 1],
         ["totals.opacityImpact", "=", 1],
-        ["totals.unhoverables", "=", 1]
+        ["totals.unhoverables", "=", 1],
+        ["items.impactTriggers.0.tagName", "=", "A"],
+        ["items.impactTriggers.1.tagName", "=", "BUTTON"],
+        ["items.impactTriggers.0.text", "=", "information"],
+        ["items.impactTriggers.0.additions", "=", 0],
+        ["items.impactTriggers.1.additions", "=", 3],
+        ["items.impactTriggers.0.opacityChanges", "=", 1],
+        ["items.impactTriggers.1.opacityImpact", "=", 0],
+        ["items.unhoverables.0.tagName", "=", "BUTTON"],
+        ["items.unhoverables.0.id", "=", "smallButton"],
+        ["items.unhoverables.0.text", "=", "button"]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/hover/large.html",
+      "what": "page with deviant hover behavior"
+    },
+    {
+      "type": "test",
+      "which": "hover",
+      "what": "hover",
+      "sampleSize": 10,
+      "withItems": true,
+      "expect": [
+        ["totals.triggers", "=", 20],
+        ["totals.impactTriggers", ">", -1],
+        ["totals.impactTriggers", "<", 6],
+        ["totals.additions", ">", -1],
+        ["totals.additions", "<", 6],
+        ["totals.removals", "=", 0],
+        ["totals.opacityChanges", "=", 0],
+        ["totals.opacityImpact", "=", 0],
+        ["totals.unhoverables", "=", 0]
       ]
     }
   ]
