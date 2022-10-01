@@ -62,7 +62,7 @@ const textOf = async (element, limit) => {
   return text.trim().replace(/\s*/sg, '').slice(0, limit);
 };
 // Recursively reports impacts of hovering over triggers.
-const find = async (data, withItems, page, sample, popRatio) => {
+const find = async (data, withItems, page, sample) => {
   // If any triggers remain and the test has not timed out:
   if (sample.length && ! hasTimedOut) {
     // Get and report the impacts until and unless the test times out.
@@ -229,7 +229,7 @@ const find = async (data, withItems, page, sample, popRatio) => {
         }
       }
       // Process the remaining potential triggers.
-      await find(data, withItems, page, sample.slice(1), popRatio);
+      await find(data, withItems, page, sample.slice(1));
     }
     catch(error) {
       console.log(`ERROR: Test quit when remaining sample size was ${sample.length}`);
@@ -290,10 +290,7 @@ exports.reporter = async (page, sampleSize = -1, withItems) => {
   }, 1000 * timeLimit);
   // Find and document the impacts.
   if (data.sampleSize && ! hasTimedOut) {
-    await find(data, withItems, page, sample, headTriggerCount / headSample.length);
-  }
-  if (tailSample.length && ! hasTimedOut) {
-    await find(data, withItems, page, 'tail', tailSample, tailTriggerCount / tailSample.length);
+    await find(data, withItems, page, sample);
   }
   clearTimeout(timeout);
   // Round the reported totals.
