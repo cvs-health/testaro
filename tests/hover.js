@@ -270,7 +270,7 @@ exports.reporter = async (page, sampleSize = -1, withItems) => {
     data.prevented = true;
     return [];
   });
-  data.totals.triggers = triggers;
+  data.totals.triggers = triggers.length;
   // Get the sample.
   const sample = getSample(triggers, sampleSize);
   data.sampleSize = sample.length;
