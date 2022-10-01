@@ -63,11 +63,11 @@ const textOf = async (element, limit) => {
 };
 // Recursively reports impacts of hovering over triggers.
 const find = async (data, withItems, page, sample, popRatio) => {
-  // If any potential triggers remain and the test has not timed out:
+  // If any triggers remain and the test has not timed out:
   if (sample.length && ! hasTimedOut) {
     // Get and report the impacts until and unless the test times out.
     try {
-      // Identify the first of them.
+      // Identify the first trigger and its sampling probability.
       const firstTrigger = sample[0];
       const tagNameJSHandle = await firstTrigger[0].getProperty('tagName')
       .catch(() => '');
@@ -211,14 +211,14 @@ const find = async (data, withItems, page, sample, popRatio) => {
             return Promise.resolve('');
           }
           else {
-            data.totals.unhoverables++;
+            data.totals.unhoverables += 1 / firstTrigger[1];
             if (withItems) {
               try {
-                const id = await firstTrigger.getAttribute('id');
+                const id = await firstTrigger[0].getAttribute('id');
                 data.items.unhoverables.push({
                   tagName,
                   id: id || '',
-                  text: await textOf(firstTrigger, 50)
+                  text: await textOf(firstTrigger[0], 50)
                 });
               }
               catch(error) {
@@ -258,14 +258,8 @@ exports.reporter = async (page, sampleSize = -1, withItems) => {
   if (withItems) {
     // Add properties for details to the initialized result.
     data.items = {
-      head: {
-        impactTriggers: [],
-        unhoverables: []
-      },
-      tail: {
-        impactTriggers: [],
-        unhoverables: []
-      }
+      impactTriggers: [],
+      unhoverables: []
     };
   }
   // Identify the triggers.
