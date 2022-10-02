@@ -10,7 +10,9 @@ exports.reporter = async (page, withItems) => {
     badTitleElements => {
       // FUNCTION DEFINITION START
       // Returns a space-minimized copy of a string.
-      const compact = string => string.replace(/[\t\n]/g, '').replace(/\s{2,}/g, ' ').trim();
+      const compact = string => string
+      ? string.replace(/[\t\n]/g, '').replace(/\s{2,}/g, ' ').trim()
+      : '';
       // FUNCTION DEFINITION END
       return badTitleElements.map(element => ({
         tagName: element.tagName,
