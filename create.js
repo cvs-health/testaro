@@ -26,8 +26,10 @@ const timeoutHosts = [];
 // ########## VARIABLES
 
 let healthy = true;
+// Set 5 minutes as a default time limit per host script.
 let timeLimit = 300;
 let reportCount = 0;
+let specCount = Infinity;
 
 // ########## FUNCTIONS
 
@@ -46,12 +48,19 @@ const runHost = async (id, script) => {
 };
 // Recursively runs host scripts.
 const runHosts = async (timeStamp, specs) => {
-  // If any scripts remain to be run and the process has not been interrupted:
+  if (specs.length >= specCount) {
+    console.log(`ERROR: Tried to run again with host count ${specs.length}`);
+    return;
+  }
+  else {
+    specCount = specs.length;
+  }
+  // If any host scripts remain to be run and the process has not been interrupted:
   if (specs.length && healthy) {
-    // Run the first one and save the report with a host-suffixed ID.
+    // Remove the first host script from the list.
     const spec = specs.shift();
     const {id, host, script} = spec;
-    // Fork a child process to run the script for that host.
+    // Fork a child process to run that host script.
     const subprocess = fork(
       'runHost', [id, JSON.stringify(script), JSON.stringify(host)],
       {
@@ -60,18 +69,20 @@ const runHosts = async (timeStamp, specs) => {
       }
     );
     let runMoreTimer = null;
-    // If the child process times out:
+    // Let it run until it ends or, if the script or default time limit expires:
     const timer = setTimeout(async () => {
       clearTimeout(timer);
-      // Record the host as timed out.
+      // Record the host script as timed out.
       timeoutHosts.push(id);
       // Kill the child process.
       subprocess.kill('SIGKILL');
-      console.log(`Script for host ${id} exceeded ${timeLimit}-second time limit, so was killed`);
-      // Run the remaining host scripts after a 10-second wait.
+      console.log(`Script for host ${id} took more than ${timeLimit} seconds, so was killed`);
+      // Wait 10 seconds. Then:
       runMoreTimer = setTimeout(async () => {
         clearTimeout(runMoreTimer);
+        // If the timeout did not coincide with the termination of the script:
         if (! (successHosts.includes(id) || crashHosts.includes(id))) {
+          // Run the remaining host scripts.
           console.log('Continuing with the remaining host scripts');
           await runHosts(timeStamp, specs);
         }
@@ -91,15 +102,20 @@ const runHosts = async (timeStamp, specs) => {
     });
     // If the child process ends:
     subprocess.on('exit', async () => {
-      // If its end was not due to success or a timeout:
-      if (! (successHosts.includes(id) || timeoutHosts.includes(id))) {
-        clearTimeout(runMoreTimer);
-        clearTimeout(timer);
-        crashHosts.push(id);
-        console.log(`Script for host ${id} crashed`);
-        // Run the remaining host scripts.
-        await runHosts(timeStamp, specs);
-      }
+      // Wait 5 seconds, then:
+      const postExitTimer = setTimeout(async () => {
+        clearTimeout(postExitTimer);
+        // If its end was not due to success or a timeout:
+        if (! (successHosts.includes(id) || timeoutHosts.includes(id))) {
+          clearTimeout(runMoreTimer);
+          clearTimeout(timer);
+          // Record the host as having crashed.
+          crashHosts.push(id);
+          console.log(`Script for host ${id} crashed`);
+          // Run the remaining host scripts.
+          await runHosts(timeStamp, specs);
+        }
+      }, 5000);
     });
   }
   // Otherwise, i.e. if no more host scripts are to be run:
