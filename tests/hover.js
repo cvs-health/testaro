@@ -273,13 +273,13 @@ exports.reporter = async (page, sampleSize = -1, withItems) => {
   data.totals.triggers = triggers.length;
   // Get the sample.
   const sample = getSample(triggers, sampleSize);
-  data.sampleSize = sample.length;
-  // Set a time limit to cover possible 1.9 seconds per trigger.
-  const timeLimit = Math.round(2.2 * data.sampleSize);
+  data.totals.triggerSample = sample.length;
+  // Set a time limit to cover possible 2 seconds per trigger.
+  const timeLimit = Math.round(2.8 * sample.length + 2);
   const timeout = setTimeout(async () => {
     await page.close();
     console.log(
-      `ERROR: hover test timed out at ${timeLimit} seconds; page closed`
+      `ERROR: hover test on sample of ${sample.length} triggers timed out at ${timeLimit} seconds; page closed`
     );
     hasTimedOut = true;
     data = {
@@ -289,7 +289,7 @@ exports.reporter = async (page, sampleSize = -1, withItems) => {
     clearTimeout(timeout);
   }, 1000 * timeLimit);
   // Find and document the impacts.
-  if (data.sampleSize && ! hasTimedOut) {
+  if (sample.length && ! hasTimedOut) {
     await find(data, withItems, page, sample);
   }
   clearTimeout(timeout);
