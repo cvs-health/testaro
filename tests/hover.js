@@ -1,17 +1,22 @@
 /*
   hover
   This test reports unexpected impacts of hovering. The effects include additions and removals
-  of visible elements, opacity changes, and unhoverable elements. The elements that are
-  subjected to hovering (called “triggers”) are the Playwright-visible elements that have 'A',
-  'BUTTON', or 'LI' tag names or have 'onmouseenter' or 'onmouseover' attributes. When such an
-  element is hovered over, the test examines the impacts on descendants of the great grandparents
-  of the elements with tag names 'A' and 'BUTTON', grandparents of elements with tag name 'LI',
-  and otherwise the descendants of the elements themselves. Four impacts are counted: (1) an
-  element is added or becomes visible, (2) an element is removed or becomes invisible, (3) the
-  opacity of an element changes, and (4) the element is a descendant of an element whose opacity
+  of visible elements, opacity changes, unhoverable elements, and suppression of hover indication.
+  The elements that are subjected to hovering (called “triggers”) are the Playwright-visible
+  elements that have 'A', 'BUTTON', or 'LI' tag names or have 'onmouseenter' or 'onmouseover'
+  attributes.
+  
+  When such an element is hovered over, the test examines the impacts on descendants of the great
+  grandparents of the elements with tag names 'A' and 'BUTTON', grandparents of elements with tag
+  name 'LI', and otherwise the descendants of the elements themselves. Four impacts are counted:
+  (1) an element is added or becomes visible, (2) an element is removed or becomes invisible, (3)
+  the opacity of an element changes, and (4) the element is a descendant of an element whose opacity
   changes. The test checks up to 4 times for hovering impacts at intervals of 0.3 second.
 
-  Despite this delay, the test can make the execution time practical by randomly sampling triggers
+  The test also examines how the hover event is indicated to the user with the mouse cursor and with
+  style changes.
+
+  Despite the delay, the test can make the execution time practical by randomly sampling triggers
   instead of hovering over all of them. When sampling is performed, the results may vary from one
   execution to another. Because hover impacts typically occur near the beginning of a page, the
   probability of the inclusion of a trigger in a sample decreases with the index of the trigger.
@@ -61,6 +66,81 @@ const textOf = async (element, limit) => {
   text = text.trim() || await element.innerHTML();
   return text.trim().replace(/\s*/sg, '').slice(0, limit);
 };
+// Repeatedly seeks impacts.
+const getImpacts = async (
+  interval, triesLeft, root, page, preDescendants, preOpacities, firstTrigger
+) => {
+  // If the allowed trial count has not yet been exhausted:
+  if (triesLeft-- && ! hasTimedOut) {
+    // Get the collection of descendants of the root.
+    const postDescendants = await root.$$(':visible');
+    // Identify the prior descandants of the root still in existence.
+    const remainerIndexes = await page.evaluate(args => {
+      const preDescendants = args[0];
+      const postDescendants = args[1];
+      const remainerIndexes = preDescendants
+      .map((element, index) => postDescendants.includes(element) ? index : -1)
+      .filter(index => index > -1);
+      return remainerIndexes;
+    }, [preDescendants, postDescendants]);
+    // Get the impacts of the hover event.
+    const additionCount = postDescendants.length - remainerIndexes.length;
+    const removalCount = preDescendants.length - remainerIndexes.length;
+    const remainers = [];
+    for (const index of remainerIndexes) {
+      remainers.push({
+        element: preDescendants[index],
+        preOpacity: preOpacities[index],
+        postOpacity: await page.evaluate(
+          element => window.getComputedStyle(element).opacity, preDescendants[index]
+        )
+      });
+    }
+    const opacityChangers = remainers
+    .filter(remainer => remainer.postOpacity !== remainer.preOpacity);
+    const opacityImpact = opacityChangers
+      ? await page.evaluate(changers => changers.reduce(
+        (total, current) => total + current.element.querySelectorAll('*').length, 0
+      ), opacityChangers)
+      : 0;
+    // If there are any impacts:
+    if (additionCount || removalCount || opacityChangers.length) {
+      // Return them as estimated population impacts.
+      return {
+        additionCount: additionCount / firstTrigger[1],
+        removalCount: removalCount / firstTrigger[1],
+        opacityChanges: opacityChangers.length / firstTrigger[1],
+        opacityImpact: opacityImpact / firstTrigger[1]
+      };
+    }
+    // Otherwise, i.e. if there are no impacts:
+    else {
+      // Try again.
+      return await new Promise(resolve => {
+        setTimeout(() => {
+          resolve(getImpacts(interval, triesLeft));
+        }, interval);
+      });
+    }
+  }
+  // Otherwise, i.e. if the allowed trial count has been exhausted:
+  else {
+    // Report non-impact.
+    return null;
+  }
+};
+// Get the hover-related style properties of an element.
+const getHoverStyles = async (page, element) => await page.evaluate(
+  element => {
+    const {cursor, outline, color, backgroundColor} = window.getComputedStyle(element);
+    return {
+      cursor: cursor.replace(/^.+, */, ''),
+      outline,
+      color,
+      backgroundColor
+    };
+  }, element
+);
 // Recursively reports impacts of hovering over triggers.
 const find = async (data, withItems, page, sample) => {
   // If any triggers remain and the test has not timed out:
@@ -93,77 +173,21 @@ const find = async (data, withItems, page, sample) => {
         const preOpacities = await page.evaluate(elements => elements.map(
           element => window.getComputedStyle(element).opacity
         ), preDescendants);
+        // Get the style properties of the trigger.
+        const triggerPreStyles = getHoverStyles(page, firstTrigger[0]);
         try {
           // Hover over the trigger.
           await firstTrigger[0].hover({
             timeout: 500,
             noWaitAfter: true
           });
-          // FUNCTION DEFINITION START
-          // Repeatedly seeks impacts.
-          const getImpacts = async (interval, triesLeft) => {
-            // If the allowed trial count has not yet been exhausted:
-            if (triesLeft-- && ! hasTimedOut) {
-              // Get the collection of descendants of the root.
-              const postDescendants = await root.$$(':visible');
-              // Identify the prior descandants of the root still in existence.
-              const remainerIndexes = await page.evaluate(args => {
-                const preDescendants = args[0];
-                const postDescendants = args[1];
-                const remainerIndexes = preDescendants
-                .map((element, index) => postDescendants.includes(element) ? index : -1)
-                .filter(index => index > -1);
-                return remainerIndexes;
-              }, [preDescendants, postDescendants]);
-              // Get the impacts of the hover event.
-              const additionCount = postDescendants.length - remainerIndexes.length;
-              const removalCount = preDescendants.length - remainerIndexes.length;
-              const remainers = [];
-              for (const index of remainerIndexes) {
-                remainers.push({
-                  element: preDescendants[index],
-                  preOpacity: preOpacities[index],
-                  postOpacity: await page.evaluate(
-                    element => window.getComputedStyle(element).opacity, preDescendants[index]
-                  )
-                });
-              }
-              const opacityChangers = remainers
-              .filter(remainer => remainer.postOpacity !== remainer.preOpacity);
-              const opacityImpact = opacityChangers
-                ? await page.evaluate(changers => changers.reduce(
-                  (total, current) => total + current.element.querySelectorAll('*').length, 0
-                ), opacityChangers)
-                : 0;
-              // If there are any impacts:
-              if (additionCount || removalCount || opacityChangers.length) {
-                // Return them as estimated population impacts.
-                return {
-                  additionCount: additionCount / firstTrigger[1],
-                  removalCount: removalCount / firstTrigger[1],
-                  opacityChanges: opacityChangers.length / firstTrigger[1],
-                  opacityImpact: opacityImpact / firstTrigger[1]
-                };
-              }
-              // Otherwise, i.e. if there are no impacts:
-              else {
-                // Try again.
-                return await new Promise(resolve => {
-                  setTimeout(() => {
-                    resolve(getImpacts(interval, triesLeft));
-                  }, interval);
-                });
-              }
-            }
-            // Otherwise, i.e. if the allowed trial count has been exhausted:
-            else {
-              // Report non-impact.
-              return null;
-            }
-          };
-          // FUNCTION DEFINITION END
+          // Get the style properties of the trigger.
+          const triggerPostStyles = getHoverStyles(page, firstTrigger[0]);
+          
           // Repeatedly seek impacts of the hover at intervals.
-          const impacts = await getImpacts(300, 4);
+          const impacts = await getImpacts(
+            300, 4, root, page, preDescendants, preOpacities, firstTrigger
+          );
           // If there were any:
           if (impacts) {
             // Hover over the upper-left corner of the page, to undo any impacts.
@@ -251,7 +275,9 @@ exports.reporter = async (page, sampleSize = -1, withItems) => {
       removals: 0,
       opacityChanges: 0,
       opacityImpact: 0,
-      unhoverables: 0
+      unhoverables: 0,
+      badCursors: 0,
+      noCursors: 0
     }
   };
   // If details are to be reported:
