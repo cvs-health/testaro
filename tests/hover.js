@@ -131,10 +131,10 @@ const find = async (data, withItems, page, sample) => {
               const opacityChangers = remainers
               .filter(remainer => remainer.postOpacity !== remainer.preOpacity);
               const opacityImpact = opacityChangers
-              ? await page.evaluate(changers => changers.reduce(
-                (total, current) => total + current.element.querySelectorAll('*').length, 0
-              ), opacityChangers)
-              : 0;
+                ? await page.evaluate(changers => changers.reduce(
+                  (total, current) => total + current.element.querySelectorAll('*').length, 0
+                ), opacityChangers)
+                : 0;
               // If there are any impacts:
               if (additionCount || removalCount || opacityChangers.length) {
                 // Return them as estimated population impacts.
