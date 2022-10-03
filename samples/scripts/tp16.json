@@ -87,9 +87,7 @@
     {
       "type": "test",
       "which": "hover",
-      "headSize": 40,
-      "headSampleSize": 15,
-      "tailSampleSize": 10,
+      "sampleSize": 20,
       "withItems": true,
       "what": "hover impacts"
     },

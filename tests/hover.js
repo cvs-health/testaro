@@ -13,12 +13,8 @@
 
   Despite this delay, the test can make the execution time practical by randomly sampling triggers
   instead of hovering over all of them. When sampling is performed, the results may vary from one
-  execution to another. Because hover impacts typically occur near the beginning of a page,
-  sampling is governed by three optional parameters (defaults in parentheses):
-    headSize (0): the size of an initial subset of triggers (“head”)
-    headSampleSize (-1): the size of the sample to be drawn from the head
-    tailSampleSize (-1): the size of the sample to be drawn from the remainder of the page
-  A sample size of -1 means that there is no sampling, and the entire population is tested.
+  execution to another. Because hover impacts typically occur near the beginning of a page, the
+  probability of the inclusion of a trigger in a sample decreases with the index of the trigger.
 
   An element is reported as unhoverable when it fails the Playwright actionability checks for
   hovering, i.e. fails to be attached to the DOM, visible, stable (not or no longer animating), and
@@ -34,25 +30,29 @@ let hasTimedOut = false;
 
 // FUNCTIONS
 
-// Samples a population and returns the sample.
+// Samples a population and returns the sample and each member’s sampling probability.
 const getSample = (population, sampleSize) => {
   const popSize = population.length;
-  if (sampleSize === 0) {
-    return [];
+  // If the sample is at least as large as the population:
+  if (sampleSize >= popSize) {
+    // Return the population as the sample.
+    return population.map(trigger => [trigger, 1]);
   }
-  else if (sampleSize > 0 && sampleSize < popSize) {
-    const popData = [];
-    for (const trigger of population) {
-      popData.push({
-        trigger,
-        sorter: Math.random()
-      });
-    }
-    popData.sort((a, b) => a.sorter - b.sorter);
-    return popData.slice(0, sampleSize).map(obj => obj.trigger);
-  }
+  // Otherwise, i.e. if the sample is smaller than the population:
   else {
-    return population;
+    // Force the sample size to be an integer and at least 1.
+    sampleSize = Math.floor(Math.max(1, sampleSize));
+    const sampleRatio = sampleSize / popSize;
+    // FUNCTION DEFINITION START
+    // Gets the probability of a trigger being sampled.
+    const samProb = index => (1 + Math.sin(Math.PI * index / popSize + Math.PI / 2)) * sampleRatio;
+    // FUNCTION DEFINITION END
+    // Get the sample.
+    const sample = population.map((trigger, index) => {
+      const itemProb = samProb(index);
+      return [trigger, itemProb];
+    }).filter(pair => pair[1] > Math.random());
+    return sample;
   }
 };
 // Returns the text of an element.
@@ -62,28 +62,28 @@ const textOf = async (element, limit) => {
   return text.trim().replace(/\s*/sg, '').slice(0, limit);
 };
 // Recursively reports impacts of hovering over triggers.
-const find = async (data, withItems, page, region, sample, popRatio) => {
-  // If any potential triggers remain and the test has not timed out:
+const find = async (data, withItems, page, sample) => {
+  // If any triggers remain and the test has not timed out:
   if (sample.length && ! hasTimedOut) {
     // Get and report the impacts until and unless the test times out.
     try {
-      // Identify the first of them.
+      // Identify the first trigger and its sampling probability.
       const firstTrigger = sample[0];
-      const tagNameJSHandle = await firstTrigger.getProperty('tagName')
+      const tagNameJSHandle = await firstTrigger[0].getProperty('tagName')
       .catch(() => '');
       if (tagNameJSHandle) {
         const tagName = await tagNameJSHandle.jsonValue();
         // Identify the root of a subtree likely to contain impacted elements.
-        let root = firstTrigger;
+        let root = firstTrigger[0];
         if (['A', 'BUTTON', 'LI'].includes(tagName)) {
           const rootJSHandle = await page.evaluateHandle(
-            firstTrigger => {
-              const parent = firstTrigger.parentElement || firstTrigger;
+            trigger => {
+              const parent = trigger.parentElement || trigger;
               const grandparent = parent.parentElement || parent;
               const greatGrandparent = grandparent.parentElement || parent;
-              return firstTrigger.tagName === 'LI' ? grandparent : greatGrandparent;
+              return trigger.tagName === 'LI' ? grandparent : greatGrandparent;
             },
-            firstTrigger
+            firstTrigger[0]
           );
           root = rootJSHandle.asElement();
         }
@@ -95,7 +95,7 @@ const find = async (data, withItems, page, region, sample, popRatio) => {
         ), preDescendants);
         try {
           // Hover over the trigger.
-          await firstTrigger.hover({
+          await firstTrigger[0].hover({
             timeout: 500,
             noWaitAfter: true
           });
@@ -115,7 +115,7 @@ const find = async (data, withItems, page, region, sample, popRatio) => {
                 .filter(index => index > -1);
                 return remainerIndexes;
               }, [preDescendants, postDescendants]);
-              // Get the count of elements added by the hover event.
+              // Get the impacts of the hover event.
               const additionCount = postDescendants.length - remainerIndexes.length;
               const removalCount = preDescendants.length - remainerIndexes.length;
               const remainers = [];
@@ -130,18 +130,24 @@ const find = async (data, withItems, page, region, sample, popRatio) => {
               }
               const opacityChangers = remainers
               .filter(remainer => remainer.postOpacity !== remainer.preOpacity);
-              const opacityImpact = opacityChangers ? await page.evaluate(changers => changers.reduce(
+              const opacityImpact = opacityChangers
+              ? await page.evaluate(changers => changers.reduce(
                 (total, current) => total + current.element.querySelectorAll('*').length, 0
-              ), opacityChangers) : 0;
+              ), opacityChangers)
+              : 0;
+              // If there are any impacts:
               if (additionCount || removalCount || opacityChangers.length) {
+                // Return them as estimated population impacts.
                 return {
-                  additionCount,
-                  removalCount,
-                  opacityChangers,
-                  opacityImpact
+                  additionCount: additionCount / firstTrigger[1],
+                  removalCount: removalCount / firstTrigger[1],
+                  opacityChanges: opacityChangers.length / firstTrigger[1],
+                  opacityImpact: opacityImpact / firstTrigger[1]
                 };
               }
+              // Otherwise, i.e. if there are no impacts:
               else {
+                // Try again.
                 return await new Promise(resolve => {
                   setTimeout(() => {
                     resolve(getImpacts(interval, triesLeft));
@@ -149,7 +155,9 @@ const find = async (data, withItems, page, region, sample, popRatio) => {
                 });
               }
             }
+            // Otherwise, i.e. if the allowed trial count has been exhausted:
             else {
+              // Report non-impact.
               return null;
             }
           };
@@ -171,27 +179,27 @@ const find = async (data, withItems, page, region, sample, popRatio) => {
             // Wait for any delayed and/or slowed hover reaction.
             await page.waitForTimeout(200);
             await root.waitForElementState('stable');
-            // Increment the counts of triggers and impacts.
-            const {additionCount, removalCount, opacityChangers, opacityImpact} = impacts;
+            // Increment the estimated counts of triggers and impacts.
+            const {additionCount, removalCount, opacityChanges, opacityImpact} = impacts;
             if (hasTimedOut) {
               return Promise.resolve('');
             }
             else {
-              data.totals.impactTriggers += popRatio;
-              data.totals.additions += popRatio * additionCount;
-              data.totals.removals += popRatio * removalCount;
-              data.totals.opacityChanges += popRatio * opacityChangers.length;
-              data.totals.opacityImpact += popRatio * opacityImpact;
+              data.totals.impactTriggers += 1 / firstTrigger[1];
+              data.totals.additions += additionCount;
+              data.totals.removals += removalCount;
+              data.totals.opacityChanges += opacityChanges;
+              data.totals.opacityImpact += opacityImpact;
               // If details are to be reported:
               if (withItems) {
-                // Report them.
-                data.items[region].impactTriggers.push({
+                // Report them, with probability weighting removed.
+                data.items.impactTriggers.push({
                   tagName,
-                  text: await textOf(firstTrigger, 50),
-                  additions: additionCount,
-                  removals: removalCount,
-                  opacityChanges: opacityChangers.length,
-                  opacityImpact
+                  text: await textOf(firstTrigger[0], 50),
+                  additions: additionCount * firstTrigger[1],
+                  removals: removalCount * firstTrigger[1],
+                  opacityChanges: opacityChanges * firstTrigger[1],
+                  opacityImpact: opacityImpact * firstTrigger[1]
                 });
               }
             }
@@ -203,14 +211,14 @@ const find = async (data, withItems, page, region, sample, popRatio) => {
             return Promise.resolve('');
           }
           else {
-            data.totals.unhoverables++;
+            data.totals.unhoverables += 1 / firstTrigger[1];
             if (withItems) {
               try {
-                const id = await firstTrigger.getAttribute('id');
-                data.items[region].unhoverables.push({
+                const id = await firstTrigger[0].getAttribute('id');
+                data.items.unhoverables.push({
                   tagName,
                   id: id || '',
-                  text: await textOf(firstTrigger, 50)
+                  text: await textOf(firstTrigger[0], 50)
                 });
               }
               catch(error) {
@@ -221,7 +229,7 @@ const find = async (data, withItems, page, region, sample, popRatio) => {
         }
       }
       // Process the remaining potential triggers.
-      await find(data, withItems, page, region, sample.slice(1), popRatio);
+      await find(data, withItems, page, sample.slice(1));
     }
     catch(error) {
       console.log(`ERROR: Test quit when remaining sample size was ${sample.length}`);
@@ -232,15 +240,12 @@ const find = async (data, withItems, page, region, sample, popRatio) => {
   }
 };
 // Performs the hover test and reports results.
-exports.reporter = async (
-  page, headSize = 0, headSampleSize = -1, tailSampleSize = -1, withItems
-) => {
+exports.reporter = async (page, sampleSize = -1, withItems) => {
   // Initialize the result.
   let data = {
     totals: {
       triggers: 0,
-      headTriggers: 0,
-      tailTriggers: 0,
+      triggerSample: 0,
       impactTriggers: 0,
       additions: 0,
       removals: 0,
@@ -253,14 +258,8 @@ exports.reporter = async (
   if (withItems) {
     // Add properties for details to the initialized result.
     data.items = {
-      head: {
-        impactTriggers: [],
-        unhoverables: []
-      },
-      tail: {
-        impactTriggers: [],
-        unhoverables: []
-      }
+      impactTriggers: [],
+      unhoverables: []
     };
   }
   // Identify the triggers.
@@ -271,23 +270,16 @@ exports.reporter = async (
     data.prevented = true;
     return [];
   });
-  // Classify them into head and tail triggers.
-  const headTriggers = triggers.slice(0, headSize);
-  const tailTriggers = triggers.slice(headSize);
-  const headTriggerCount = headTriggers.length;
-  const tailTriggerCount = tailTriggers.length;
-  data.totals.triggers = headTriggerCount + tailTriggerCount;
-  data.totals.headTriggers = headTriggerCount;
-  data.totals.tailTriggers = tailTriggerCount;
-  // Get the head and tail samples.
-  const headSample = getSample(headTriggers, headSampleSize);
-  const tailSample = tailSampleSize === -1 ? tailTriggers : getSample(tailTriggers, tailSampleSize);
-  // Set a time limit to cover possible 1.9 seconds per trigger.
-  const timeLimit = Math.round(2.2 * (headSample.length + tailSample.length));
+  data.totals.triggers = triggers.length;
+  // Get the sample.
+  const sample = getSample(triggers, sampleSize);
+  data.totals.triggerSample = sample.length;
+  // Set a time limit to cover possible 2 seconds per trigger.
+  const timeLimit = Math.round(2.8 * sample.length + 2);
   const timeout = setTimeout(async () => {
     await page.close();
     console.log(
-      `ERROR: hover test timed out at ${timeLimit} seconds; page closed`
+      `ERROR: hover test on sample of ${sample.length} triggers timed out at ${timeLimit} seconds; page closed`
     );
     hasTimedOut = true;
     data = {
@@ -297,11 +289,8 @@ exports.reporter = async (
     clearTimeout(timeout);
   }, 1000 * timeLimit);
   // Find and document the impacts.
-  if (headSample.length && ! hasTimedOut) {
-    await find(data, withItems, page, 'head', headSample, headTriggerCount / headSample.length);
-  }
-  if (tailSample.length && ! hasTimedOut) {
-    await find(data, withItems, page, 'tail', tailSample, tailTriggerCount / tailSample.length);
+  if (sample.length && ! hasTimedOut) {
+    await find(data, withItems, page, sample);
   }
   clearTimeout(timeout);
   // Round the reported totals.

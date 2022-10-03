@@ -196,11 +196,7 @@ exports.commands = {
     hover: [
       'Perform a hover test',
       {
-        headSize: [false, 'number', '', 'count of first triggers to sample separately, if any'],
-        headSampleSize: [false, 'number', '', 'size of the head sample to be drawn, if any'],
-        tailSampleSize: [
-          false, 'number', '', 'size of the non-head sample to be drawn, if not all'
-        ],
+        sampleSize: [false, 'number', '', 'limit on sample size of triggers, if any'],
         withItems: [true, 'boolean']
       }
     ],
