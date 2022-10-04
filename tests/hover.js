@@ -1,25 +1,26 @@
 /*
   hover
   This test reports unexpected impacts of hovering. The effects include additions and removals
-  of visible elements, opacity changes, unhoverable elements, and suppression of hover indication.
+  of visible elements, opacity changes, unhoverable elements, and nonstandard hover indication.
   The elements that are subjected to hovering (called “triggers”) are the Playwright-visible
   elements that have 'A', 'BUTTON', or 'LI' tag names or have 'onmouseenter' or 'onmouseover'
   attributes.
   
-  When such an element is hovered over, the test examines the impacts on descendants of the great
-  grandparents of the elements with tag names 'A' and 'BUTTON', grandparents of elements with tag
-  name 'LI', and otherwise the descendants of the elements themselves. Four impacts are counted:
+  The test examines how the hover event is indicated to the user with the mouse cursor and with
+  changes of the styles of the trigger.
+
+  When a trigger is hovered over, the test also examines the impacts on descendants of the great
+  grandparents of triggers with tag names 'A' and 'BUTTON', grandparents of triggers with tag
+  name 'LI', and otherwise the descendants of the triggers themselves. Four impacts are counted:
   (1) an element is added or becomes visible, (2) an element is removed or becomes invisible, (3)
   the opacity of an element changes, and (4) the element is a descendant of an element whose opacity
   changes. The test checks up to 4 times for hovering impacts at intervals of 0.3 second.
 
-  The test also examines how the hover event is indicated to the user with the mouse cursor and with
-  style changes.
-
   Despite the delay, the test can make the execution time practical by randomly sampling triggers
   instead of hovering over all of them. When sampling is performed, the results may vary from one
-  execution to another. Because hover impacts typically occur near the beginning of a page, the
-  probability of the inclusion of a trigger in a sample decreases with the index of the trigger.
+  execution to another. Because hover impacts typically occur near the beginning of a page with
+  navigation menus, the probability of the inclusion of a trigger in a sample decreases with the
+  index of the trigger.
 
   An element is reported as unhoverable when it fails the Playwright actionability checks for
   hovering, i.e. fails to be attached to the DOM, visible, stable (not or no longer animating), and
