@@ -16,7 +16,7 @@
       "type": "test",
       "which": "hover",
       "what": "hover",
-      "sampleSize": 2,
+      "sampleSize": 5,
       "withItems": true,
       "expect": [
         ["totals.triggers", "=", 4],
@@ -38,7 +38,7 @@
       "type": "test",
       "which": "hover",
       "what": "hover",
-      "sampleSize": 5,
+      "sampleSize": 8,
       "withItems": true,
       "expect": [
         ["totals.triggers", "=", 6],
@@ -72,7 +72,7 @@
       "which": "hover",
       "what": "hover",
       "sampleSize": 10,
-      "withItems": true,
+      "withItems": false,
       "expect": [
         ["totals.triggers", "=", 20],
         ["totals.impactTriggers", ">", -1],
@@ -83,6 +83,26 @@
         ["totals.opacityChanges", "=", 0],
         ["totals.opacityImpact", "=", 0],
         ["totals.unhoverables", "=", 0]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/hover/styleBad.html",
+      "what": "page with deviant trigger styles"
+    },
+    {
+      "type": "test",
+      "which": "hover",
+      "what": "hover",
+      "sampleSize": 5,
+      "withItems": true,
+      "expect": [
+        ["totals.noIndicators", "=", 1],
+        ["totals.noCursors", "=", 1],
+        ["totals.badIndicators", "=", 1],
+        ["items.noIndicators.0.text", "=", "button"],
+        ["items.noCursors.0.tagName", "=", "LI"],
+        ["items.badIndicators.0.id", "=", "li2"]
       ]
     }
   ]

@@ -63,7 +63,7 @@ const getSample = (population, sampleSize) => {
 const textOf = async (element, limit) => {
   let text = await element.textContent();
   text = text.trim() || await element.innerHTML();
-  return text.trim().replace(/\s*/sg, '').slice(0, limit);
+  return text.trim().replace(/\s+/sg, ' ').slice(0, limit);
 };
 // Returns the impacts of hovering over a sampled trigger.
 const getImpacts = async (
@@ -195,17 +195,20 @@ const find = async (data, withItems, page, sample) => {
           // Get the style properties of the trigger.
           const triggerPostStyles = await getHoverStyles(page, firstTrigger[0]);
           // Add cursor and other style defects to the data.
-          const postCursor = triggerPostStyles.cursor;
-          // If there is no cursor on hover:
-          if (postCursor === 'none') {
+          const cursor = triggerPreStyles.cursor;
+          // If the trigger has no cursor:
+          if (cursor === 'none') {
             // Add this fact to the data.
             data.totals.noCursors += totalEstimate;
             if (withItems) {
               data.items.noCursors.push(itemData);
             }
           }
-          // If there is an improper cursor on hover:
-          if ((tagName === 'A' && postCursor !== 'pointer') || postCursor !== 'default') {
+          // If the trigger has an improper cursor:
+          if (
+            tagName === 'A' && cursor !== 'pointer'
+            || tagName === 'BUTTON' && cursor !== 'default'
+          ){
             // Add this fact to the data.
             data.totals.badCursors += totalEstimate;
             if (withItems) {
@@ -214,13 +217,24 @@ const find = async (data, withItems, page, sample) => {
           }
           // If hover indication is required but is absent:
           if (
-            (tagName !== 'LI' || onmouseenter || onmouseover)
+            (tagName === 'BUTTON' || onmouseenter || onmouseover)
             && JSON.stringify(triggerPostStyles) === JSON.stringify(triggerPreStyles)
           ) {
             // Add this fact to the data.
             data.totals.noIndicators += totalEstimate;
             if (withItems) {
               data.items.noIndicators.push(itemData);
+            }
+          }
+          // If hover indication is illicit but is present:
+          if (
+            tagName === 'LI'
+            && JSON.stringify(triggerPostStyles) !== JSON.stringify(triggerPreStyles)
+          ) {
+            // Add this fact to the data.
+            data.totals.badIndicators += totalEstimate;
+            if (withItems) {
+              data.items.badIndicators.push(itemData);
             }
           }
           // If there were any impacts:
@@ -308,7 +322,8 @@ exports.reporter = async (page, sampleSize = -1, withItems) => {
       unhoverables: 0,
       noCursors: 0,
       badCursors: 0,
-      noIndicators: 0
+      noIndicators: 0,
+      badIndicators: 0
     }
   };
   // If details are to be reported:
@@ -319,7 +334,8 @@ exports.reporter = async (page, sampleSize = -1, withItems) => {
       unhoverables: [],
       noCursors: [],
       badCursors: [],
-      noIndicators: []
+      noIndicators: [],
+      badIndicators: []
     };
   }
   // Identify the triggers.

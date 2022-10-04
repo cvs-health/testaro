@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Page with deviant hover indicators</title>
+    <meta name="description" content="tester">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      button, button:hover {
+        color: red;
+        background-color: white;
+        border: 2px solid black;
+      }
+      li.cursorless {
+        cursor: none;
+      }
+      li.hoverChanger:hover {
+        color: blue;
+        background-color: yellow;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Page with deviant hover indicators</h1>
+      <p>This page contains a link to <a href="https://en.wikipedia.org">information</a> and a <button type="button">button</button>. The default style change of the button is prevented.</p>
+      <p>This is a list.</p>
+      <ul>
+        <li>This is a normal list item.</li>
+        <li class="cursorless">This is a list item that loses its cursor when hovered over.</li>
+        <li id="li2" class="hoverChanger">This is a list item that changes when hovered over although it should not.</li>
+      </ul>
+    </main>
+  </body>
+</html>

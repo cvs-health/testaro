@@ -16,7 +16,7 @@
       <p style="position: relative"><button id="smallButton" style="position: absolute; left: 10rem">button</button><button style="position: absolute; left: 11rem; top: -0.5rem; font-size: x-large">bigger button</button></p>
       <p>Hovering over the first of the following list items changes content.</p>
       <ul>
-        <li onmouseover="document.getElementById('listDependent').setAttribute('hidden')">This is a list item.</li>
+        <li onmouseover="document.getElementById('listDependent').setAttribute('hidden', true)">This is a list item.</li>
         <li>This is another list item.</li>
       </ul>
       <p id="listDependent">This paragraph becomes invisible when you hover over the first list item.</p>
