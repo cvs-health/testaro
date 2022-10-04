@@ -14,6 +14,12 @@
       <p id="translucent" style="opacity: 0.4">The first link, when hovered over, changes the opacity of this paragraph from 0.4 to 1. That indirectly changes the opacity of this <span>word</span>, too.</p>
       <p>The small button is mostly covered by a large one here, preventing the small button from receiving a hover event.</p>
       <p style="position: relative"><button id="smallButton" style="position: absolute; left: 10rem">button</button><button style="position: absolute; left: 11rem; top: -0.5rem; font-size: x-large">bigger button</button></p>
+      <p>Hovering over the first of the following list items changes content.</p>
+      <ul>
+        <li onmouseover="document.getElementById('listDependent').setAttribute('hidden')">This is a list item.</li>
+        <li>This is another list item.</li>
+      </ul>
+      <p id="listDependent">This paragraph becomes invisible when you hover over the first list item.</p>
     </main>
   </body>
 </html>
