@@ -173,6 +173,12 @@ exports.commands = {
         withItems: [true, 'boolean']
       }
     ],
+    filter: [
+      'Perform a filter test',
+      {
+        withItems: [true, 'boolean']
+      }
+    ],
     focInd: [
       'Perform a focInd test',
       {

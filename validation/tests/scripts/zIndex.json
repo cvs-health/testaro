@@ -24,7 +24,7 @@
     {
       "type": "url",
       "which": "__targets__/zIndex/bad.html",
-      "what": "page with explicit z-index attributes roles"
+      "what": "page with explicit z-index attributes"
     },
     {
       "type": "test",

@@ -9,31 +9,37 @@
     },
     {
       "type": "url",
-      "which": "__targets__/zIndex/good.html",
-      "what": "page with no explicit z-index attributes"
+      "which": "__targets__/filter/good.html",
+      "what": "page with no filter styles"
     },
     {
       "type": "test",
-      "which": "zIndex",
-      "what": "zIndex",
-      "withItems": false,
+      "which": "filter",
+      "what": "filter",
+      "withItems": true,
       "expect": [
-        ["totals.total", "=", 0]
+        ["totals.styledElements", "=", 0],
+        ["totals.impactedElements", "=", 0]
       ]
     },
     {
       "type": "url",
-      "which": "__targets__/zIndex/bad.html",
-      "what": "page with explicit z-index attributes roles"
+      "which": "__targets__/filter/bad.html",
+      "what": "page with filter styles"
     },
     {
       "type": "test",
-      "which": "zIndex",
-      "what": "zIndex",
-      "withItems": false,
+      "which": "filter",
+      "what": "filter",
+      "withItems": true,
       "expect": [
-        ["totals.total", "=", 2],
-        ["totals.tagNames.BUTTON", "=", 2]
+        ["totals.styledElements", "=", 2],
+        ["totals.impactedElements", "=", 7],
+        ["items.0.tagName", "=", "MAIN"],
+        ["items.1.tagName", "=", "UL"],
+        ["items.1.text", "i", "Item"],
+        ["items.0.impact", "=", 5],
+        ["items.1.impact", "=", 2]
       ]
     }
   ]

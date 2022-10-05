@@ -38,6 +38,7 @@ const tests = {
   docType: 'document without a doctype property',
   elements: 'data on specified elements',
   embAc: 'active elements embedded in links or buttons',
+  filter: 'filter styles on elements',
   focAll: 'focusable and Tab-focused elements',
   focInd: 'focus indicators',
   focOp: 'focusability and operability',
