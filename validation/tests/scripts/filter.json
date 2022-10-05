@@ -1,0 +1,40 @@
+{
+  "what": "validation of filter test",
+  "strict": true,
+  "commands": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/zIndex/good.html",
+      "what": "page with no explicit z-index attributes"
+    },
+    {
+      "type": "test",
+      "which": "zIndex",
+      "what": "zIndex",
+      "withItems": false,
+      "expect": [
+        ["totals.total", "=", 0]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/zIndex/bad.html",
+      "what": "page with explicit z-index attributes roles"
+    },
+    {
+      "type": "test",
+      "which": "zIndex",
+      "what": "zIndex",
+      "withItems": false,
+      "expect": [
+        ["totals.total", "=", 2],
+        ["totals.tagNames.BUTTON", "=", 2]
+      ]
+    }
+  ]
+}

@@ -1,29 +1,37 @@
 /*
   filter
   This test reports elements whose styles include filter. The filter style property is considered
-  inherently inaccessible, because it modifies the rendering of content 
+  inherently inaccessible, because it modifies the rendering of content, overriding user settings,
+  and requires the user to apply custom styles to neutralize it, which is difficult or impossible
+  in some user environments.
 */
+// Returns a space-minimized copy of a string.
+const compact = string => string.replace(/[\t\n]/g, '').replace(/\s{2,}/g, ' ').trim();
+// Runs the test and returns the results.
 exports.reporter = async (page, withItems) => {
-  // Identify the initially visible links.
-  const badLinks = await page.$$eval('a:visible', links => {
-    // FUNCTION DEFINITION START
-    // Returns a space-minimized copy of a string.
-    const compact = string => string.replace(/[\t\n]/g, '').replace(/\s{2,}/g, ' ').trim();
-    // FUNCTION DEFINITION END
-    const badLinks = [];
-    links.forEach(link => {
-      link.focus();
-      if (link.offsetTop + link.offsetHeight <= 0 || link.offsetLeft + link.offsetWidth <= 0) {
-        badLinks.push(compact(link.textContent));
-      }
+  // Identify the elements with filter style properties.
+  const filterElements = await page.$$eval('document.body, document.body *', elements => {
+    const filterElements = elements.filter(element => {
+      const elementStyles = window.getComputedStyle(element);
+      return elementStyles.filter;
     });
-    return badLinks;
+    return filterElements;
   });
   const data = {
-    total: badLinks.length
+    total: filterElements.length
   };
   if (withItems) {
-    data.items = badLinks;
+    data.items = [];
+    for (const filterElement of filterElements) {
+      const tagNameJSHandle = await filterElement.getProperty('tagName');
+      const tagName = await tagNameJSHandle.jsonValue();
+      const text = compact(await filterElement.textContent());
+      const item = {
+        tagName,
+        text
+      };
+      data.items.push(item);
+    }
   }
   return {result: data};
 };
