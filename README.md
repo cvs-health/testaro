@@ -82,15 +82,11 @@ Some of the dependencies of Testaro are published as Github packages. Installing
 
 Once you have done that, you can install Testaro as you would install any `npm` package.
 
-However, if the Playwright dependency is ever updated to a newer version, you must also reinstall its browers by executing the statement `npx playwright install`.
+However, if the Playwright dependency is ever updated to a newer version, you must also reinstall its browsers by executing the statement `npx playwright install`.
 
 ## Payment
 
 All of the tests that Testaro can perform are free of cost, except those in the Tenon and WAVE packages. The owner of each of those packages gives new registrants a free allowance of credits before it becomes necessary to pay for use of the API of the package. The required environment variables for authentication and payment are described below under “Environment variables”.
-
-## Specification
-
-To use Testaro, you must specify what it should do. You do this with a script and optionally a batch.
 
 ## Scripts
 
@@ -102,7 +98,7 @@ A script is a JSON file with the properties:
 
 ```json
 {
-  "id": "string consisting of lower-case ASCII letters and digits",
+  "id": "string consisting of alphanumeric ASCII characters and hyphen-minus (-)",
   "what": "string: description of the script",
   "strict": "boolean: whether redirections should be treated as failures",
   "timeLimit": "number: limit in seconds on the execution of this script",
@@ -158,23 +154,7 @@ Each command has a `type` property and optionally has a `name` property (used in
 
 #### Command sequence
 
-The first two commands in any script have the types `launch` and `url`, respectively, as shown in the example above. They launch a browser and then use it to visit a URL. For example:
-
-```json
-{
-  "type": "launch",
-  "which": "chromium",
-  "what": "Open a page in a Chromium browser"
-}
-```
-
-```json
-{
-  "type": "url",
-  "which": "https://en.wikipedia.org/wiki/Main_Page",
-  "what": "English Wikipedia home page"
-}
-```
+The first two commands in any script have the types `launch` and `url`, respectively, as shown in the example above. They launch a browser and then use it to visit a URL.
 
 #### Command types
 
