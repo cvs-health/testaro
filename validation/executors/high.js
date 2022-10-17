@@ -1,12 +1,12 @@
-// high1.js
-// Validator for high-level invocation of Testaro without a batch.
+// high.js
+// Validator for high-level invocation of Testaro.
 
 const fs = require('fs/promises');
 process.env.SCRIPTDIR = 'samples/scripts';
 process.env.REPORTDIR = 'temp';
-const {runJob} = require('../../create');
+const {doJob} = require('../../run');
 const validate = async (scriptID) => {
-  const timeStamp = await runJob(scriptID);
+  const timeStamp = await doJob(scriptID);
   try {
     const reportJSON = await fs.readFile(`${__dirname}/../../temp/${timeStamp}.json`);
     const report = JSON.parse(reportJSON);
