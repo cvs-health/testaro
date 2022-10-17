@@ -2,6 +2,7 @@
   "id": "simple",
   "what": "Test example.com with bulk",
   "strict": true,
+  "timeLimit": 10,
   "commands": [
     {
       "type": "launch",
