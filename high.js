@@ -52,7 +52,7 @@ const runJob = async scriptID => {
       const timeStamp = Math.floor((Date.now() - Date.UTC(2022, 1)) / 2000).toString(36);
       // Run the script and record the report with the timestamp as name base.
       await runScript(`${timeStamp}-${scriptID}`, script);
-      console.log(`Report ${timeStamp}.json recorded in ${process.env.REPORTDIR}`);
+      console.log(`Report ${timeStamp}-${scriptID}.json recorded in ${process.env.REPORTDIR}`);
     }
     catch(error) {
       console.log(`ERROR running job (${error.message})\n${error.stack}`);
