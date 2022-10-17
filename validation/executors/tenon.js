@@ -2,7 +2,7 @@
 // Test executor for tenon sample script.
 
 const fs = require('fs');
-const {handleRequest} = require('../../run');
+const {doJob} = require('../../run');
 const scriptJSON = fs.readFileSync('samples/scripts/tenon.json', 'utf8');
 const script = JSON.parse(scriptJSON);
 const report = {
@@ -12,7 +12,7 @@ const report = {
   acts: []
 };
 (async () => {
-  await handleRequest(report);
+  await doJob(report);
   console.log(`Report log:\n${JSON.stringify(report.log, null, 2)}\n`);
   console.log(`Report acts:\n${JSON.stringify(report.acts, null, 2)}`);
 })();

@@ -1,25 +1,24 @@
 /*
-  runHost.js
-  Runs a host job and writes a report file.
+  runScript.js
+  Runs a script and writes a report file.
 */
 
 // ########## IMPORTS
 
-const {handleRequest} = require('./run');
+const {doJob} = require('./run');
 
 // ########## FUNCTIONS
 
-// Runs one script and sends the report to the parent.
-const runHost = async (id, scriptJSON, hostJSON) => {
+// Runs a script and returns the report.
+const runScript = async (id, scriptJSON) => {
   const report = {
     id,
-    host: JSON.parse(hostJSON),
     log: [],
     script: JSON.parse(scriptJSON),
     acts: []
   };
   let reportJSON = JSON.stringify(report, null, 2);
-  await handleRequest(report);
+  await doJob(report);
   report.acts.forEach(act => {
     try {
       JSON.stringify(act);
@@ -37,15 +36,13 @@ const runHost = async (id, scriptJSON, hostJSON) => {
   });
   try {
     reportJSON = JSON.stringify(report, null, 2);
+    return reportJSON;
   }
   catch(error) {
     console.log(`ERROR: report for host ${id} not JSON (${error.message})`);
+    return '';
   }
-  process.send(reportJSON, () => {
-    process.disconnect();
-    process.exit();
-  });
 };
 
 // ########## OPERATION
-runHost(... process.argv.slice(2));
+runScript(... process.argv.slice(2));

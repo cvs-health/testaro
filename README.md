@@ -509,8 +509,8 @@ const report = {
   log: [],
   acts: []
 };
-const {handleRequest} = require('./run');
-handleRequest(report)
+const {doJob} = require('./run');
+doJob(report)
 .then(() => …);
 ```
 
@@ -538,7 +538,7 @@ Place a script into `SCRIPTDIR`. It should be named with a `.json` extension.
 
 Then execute the statement `node high scriptID`, replacing `scriptID` with the `id` value of the script, which must also be the base of the name of the script file.
 
-The `high` module will call the `runJob` function of the `create` module, which in turn will call the `handleRequest` function of the `run` module. The result will be saved in a report file in the `REPORTDIR` directory. The report file will be named with a unique timestamp and suffixed with a `.json` extension. The base of the report file’s name will be the same timestamp, suffixed with `--scriptID`, where `scriptID` is the value of the `id` property of the script. For example, if you execute `node high tp18-wiktionary`, you might get a report named `enp45j-tp18-wiktionary.json` file deposited into `REPORTDIR`.
+The `high` module will call the `runJob` function of the `create` module, which in turn will call the `doJob` function of the `run` module. The result will be saved in a report file in the `REPORTDIR` directory. The report file will be named with a unique timestamp and suffixed with a `.json` extension. The base of the report file’s name will be the same timestamp, suffixed with `--scriptID`, where `scriptID` is the value of the `id` property of the script. For example, if you execute `node high tp18-wiktionary`, you might get a report named `enp45j-tp18-wiktionary.json` file deposited into `REPORTDIR`.
 
 #### Watch
 

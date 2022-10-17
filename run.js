@@ -1549,7 +1549,7 @@ const injectLaunches = acts => {
   }
 };
 // Handles a request.
-exports.handleRequest = async report => {
+exports.doJob = async report => {
   // If the report object is valid:
   if(isValidReport(report)) {
     // Add a start time to the log.

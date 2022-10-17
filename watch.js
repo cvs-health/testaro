@@ -1,6 +1,6 @@
 /*
   watch.js
-  Watches for jobs and runs them.
+  Watches for a script and runs it.
 */
 
 // ########## IMPORTS
@@ -11,7 +11,7 @@ require('dotenv').config();
 // Module to read and write files.
 const fs = require('fs/promises');
 // Module to perform tests.
-const {handleRequest} = require('./run');
+const {doJob} = require('./run');
 // Module to convert a script and a batch to a batch-based array of scripts.
 const {batchify} = require('./batchify');
 
@@ -162,7 +162,7 @@ const runHost = async (jobID, timeStamp, id, script) => {
     script,
     acts: []
   };
-  await handleRequest(report);
+  await doJob(report);
   if (watchType === 'dir') {
     return await writeDirReport(report);
   }

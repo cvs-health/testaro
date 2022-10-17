@@ -13,8 +13,8 @@ const validate = async () => {
     log: [],
     acts: []
   };
-  const {handleRequest} = require('../../run');
-  await handleRequest(report);
+  const {doJob} = require('../../run');
+  await doJob(report);
   const {log, acts} = report;
   if (log.length !== 2) {
     console.log(`Failure: log length is ${log.length} instead of 2`);
