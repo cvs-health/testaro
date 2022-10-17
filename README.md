@@ -613,9 +613,9 @@ The executors are:
 - `watchNet`: validates network watching
 - `tests`: validates all the custom tests (not the test packages)
 
-To validate any single Testaro custom test `xyz`, enter the statement `npm run test1 xyz`.
+To validate any single Testaro test `xyz`, enter the statement `npm run test1 xyz`.
 
-To validate all of the Testaro custom tests, enter the statement `npm test`.
+To validate all of the Testaro tests, enter the statement `npm test`.
 
 To execute any executor `xyz` other than `test` or  `tests`, call it with the statement `node validation/executors/xyz`.
 
@@ -637,12 +637,6 @@ The rationales motivating the Testaro-defined tests can be found in comments wit
 
 On rare occasions a test throws an error that terminates the Node process and cannot be handled with a `try`-`catch` structure. It has been observed, for example, that the `ibm` test does this when run on the host at `https://zenythgroup.com/index` or `https://monsido.com`.
 
-If a single process performed all of the commands in a batch-based script, the process could perform tens of thousands of commands, and such an error could stop the process at any point.
-
-To handle this risk, Testaro processes batch-based jobs by forking a new process for each host. If such an error occurs, it crashes the child process, preventing a report for that host from being written. The parent process waits for the report to appear in the `REPORTDIR` directory until the time limit. When it fails to appear, the parent process continues to the next host.
-
-If you are using high-level invocation, your terminal will show the standard output of the parent process and, if there is a batch, the current child process, too. If you interrupt the process with `CTRL-c`, you will send a `SIGINT` signal to the parent process, which will handle it by sending a message to the child process telling it to terminate itself, and then the parent process will terminate by skipping the remaining hosts.
-
 ### Activation
 
 Testing to determine what happens when a control or link is activated is straightforward, except in the context of a comprehensive set of tests of a single page. There, activating a control or link can change the page or navigate away from it, interfering with the remaining planned tests of the page.
@@ -653,7 +647,7 @@ The Playwright “Receives Events” actionability check does **not** check whet
 
 Test packages sometimes do redundant testing, in that two or more packages test for the same issues, although such duplications are not necessarily perfect. This fact creates three problems:
 - One cannot be confident in excluding some tests of some packages on the assumption that they perfectly duplicate tests of other packages.
-- The Testaro report from a script documents each package’s results separately, so a single difect may be documented in multiple locations within the report, making the consumption of the report inefficient.
+- The Testaro report from a script documents each package’s results separately, so a single defect may be documented in multiple locations within the report, making the consumption of the report inefficient.
 - An effort to aggregate the results into a single score may distort the scores by inflating the weights of defects that happen to be discovered by multiple packages.
 
 The tests provided with Testaro do not exclude any apparently duplicative tests from packages.
@@ -672,6 +666,7 @@ The files in the `temp` directory are presumed ephemeral and are not tracked by 
 ## Related packages
 
 [Testilo](https://www.npmjs.com/package/testilo) is an application that:
+- merges batches of hosts into scripts to produce multiple scripts
 - produces scores and adds them to the JSON report files of Testaro
 - produces human-oriented HTML digests from scored reports
 - produces human-oriented HTML reports comparing the scores of hosts
