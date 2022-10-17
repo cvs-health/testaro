@@ -342,6 +342,8 @@ In case you want to perform more than one `tenon` test with the same script, you
 
 Tenon recommends giving it a public URL rather than giving it the content of a page, if possible. So, it is best to give the `withNewContent` property of the `tenonRequest` command the value `true`, unless the page is not public.
 
+If a `tenon` test is included in a script, environment variables named `TENON_USER` and `TENON_PASSWORD` must exist, with your Tenon username and password, respectively, as their values. You can obtain those from [Tenon](https://tenon.io/documentation/overview).
+
 ###### Continuum
 
 The `continuum` test makes use of the files in the `continuum` directory. The test inserts the contents of all three files into the page as scripts and then uses them to perform the tests of the Continuum package.
@@ -379,6 +381,10 @@ The changes in `htmlcs/HTMLCS.js` are:
 >         typeName + '|' + msg.code + '|' + nodeName + '|' + elementId + '|' + msg.msg + '|' + html
 >       );
 ```
+
+###### WAVE
+
+If a `wave` test is included in the script, an environment variable named `WAVE_KEY` must exist, with your WAVE API key as its value. You can get it from [WebAIM](https://wave.webaim.org/api/).
 
 ###### BBC Accessibility Standards Checker
 
@@ -536,11 +542,11 @@ The `high` module will call the `runJob` function of the `create` module, which 
 
 #### Watch
 
-In watch mode, Testaro periodically checks for a script to be run by it. When such a script exists, Testaro runs it. After running the script, Testaro converts the report to JSON and disposes of it as specified.
+In watch mode, Testaro periodically checks for a script to be run by it. When such a script exists, Testaro runs it, produces a report in JSON format, and disposes of the report as specified.
 
-The interval between checks, in seconds, is specified by an `INTERVAL` environment variable.
+Testaro checks periodically. The interval between checks, in seconds, is specified by an `INTERVAL` environment variable.
 
-After Testaro starts watching, its behavior depends on the environment variable `WATCH_FOREVER`. If its value is `true`, watching continues indefinitely. If its value is `false` or it has no value, watching stops after the first job is found and run.
+After Testaro starts watching, its behavior depends on the environment variable `WATCH_FOREVER`. If its value is `true`, watching continues indefinitely. If its value is `false` or it has no value, watching stops after the first script is found and run.
 
 To make Testaro start watching, execute the statement `node watch`.
 
@@ -548,50 +554,43 @@ There are two ways for Testaro to watch for jobs.
 
 ##### Directory watch
 
-With directory watch, Testaro checks whether a particular directory in its host’s filesystem contains a `.json` file, which must be a script.
+With directory watch, Testaro checks whether the watch directory (`WATCHDIR`) in its host’s filesystem contains a script.
 
-When Testaro finds scripts in the directory, Testaro runs the first script, writes the report into the report directory, and moves the script into the  directory.
+When Testaro finds one or more scripts in the watch directory, Testaro runs the first script, writes the report into the report directory, and moves the script into the done directory (`DONEDIR`).
 
-Testaro suspends checking while it is running any job. Therefore, even though the currently running job file remains in `JOBDIR`, Testaro will not try to run it again.
+Testaro suspends checking while it is running a script. Therefore, even though the currently running script file remains in thde watch directory, Testaro will not try to run it again.
 
-Since Testaro runs the first job (i.e. the job whose name is first in ASCII order), whoever populates the directory with job files has control over the order in which Testaro runs them. For example, to force a new job to be run before the already waiting jobs, one can give it a filename that comes before that of the first waiting job.
+Since Testaro runs the first script (i.e. the script whose name is first in ASCII order), whoever populates the directory with script files has control over the order in which Testaro runs them. For example, to force a new script to be run before the already waiting scripts, one can give it a filename that comes before that of the first waiting script.
 
 In order to make directory watching possible, you must define these environment variables:
 - `WATCH_TYPE=dir`
 - `INTERVAL`
 - `WATCH_FOREVER` (`=true` or `=false`)
 - `REPORTDIR`
-- `JOBDIR`
-- `EXJOBDIR`
+- `WATCHDIR`
+- `DONEDIR`
 
 ##### Network watch
 
-With network watch, Testaro asks a particular API whether it has any jobs for the current instance of Testaro, identified by an authorization code. If the response is a JSON representation of an object satisfying the same requirements as given above under “Directory watch”, Testaro runs the job and sends the report(s) to the API.
+Network watching is based on these assumptions:
+- A managing server may be able to give work to multiple workstations that run Testaro.
+- A workstation running Testaro can contact a managing server, but the server may not be able to contact a workstation.
+- The functions of Testaro are limited to those requiring workstation features.
 
-Thus, if there are multiple jobs queued for the Testaro instance, the API is responsible for choosing one of them to send in response.
-
-When the API receives the reports, it can dispose of them as desired. Each report is a JSON representation of an object, which has these identification properties:
-- `jobID`
-- `timeStamp`
-- `id`
-
-The `jobID` property can be used for an association between each report and the job that it arose from. The `timeStamp` property can be used for an association of all the reports in a batched job. And the `id` property (which begins with the time stamp) is unique to each report.
+Given these assumptions, with network watch, the initiator of an interaction is Testaro. When Testaro is available, it requests a script from a server. If the response is a JSON representation of a script, Testaro runs the script and sends the report to the server.
 
 In order to make network watching possible, you must define these environment variables:
 - `WATCH_TYPE=net`
 - `INTERVAL`
 - `WATCH_FOREVER` (`=true` or `=false`)
 - `PROTOCOL` (`=http` or `=https`)
-- `JOB_URL` (not including the authorization code)
-- `REPORT_URL` (not including the authorization code)
+- `WATCH_URL`
+- `REPORT_URL`
+- `TESTARO_ID`
+
+If multiple workstations run Testaro and do work for the same server, each must have a different `TESTARO_ID`.
 
 ### Environment variables
-
-As mentioned above, using the high-level method to run Testaro jobs requires `SCRIPTDIR`, `BATCHDIR`, and `REPORTDIR` environment variables.
-
-If a `tenon` test is included in the script, environment variables named `TENON_USER` and `TENON_PASSWORD` must exist, with your Tenon username and password, respectively, as their values. You can obtain those from [Tenon](https://tenon.io/documentation/overview).
-
-If a `wave` test is included in the script, an environment variable named `WAVE_KEY` must exist, with your WAVE API key as its value. You can get it from [WebAIM](https://wave.webaim.org/api/).
 
 The `text` command can interpolate the value of an environment variable into text that it enters on a page, as documented in the `commands.js` file.
 
