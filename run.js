@@ -1559,12 +1559,10 @@ exports.doJob = async report => {
         value: ((new Date()).toISOString().slice(0, 19))
       }
     );
-    // Add an ID to the report if none exists yet.
-    if (! report.id) {
-      report.id = Math.floor((Date.now() - Date.UTC(2022, 1)) / 2000).toString(36);
-    }
     // Add a time stamp to the report.
-    report.timeStamp = report.id.replace(/-.+/, '');
+    report.timeStamp = Math.floor((Date.now() - Date.UTC(2022, 1)) / 2000).toString(36);
+    // Add an ID to the report.
+    report.id = `${report.timeStamp}-${report.script.id}`;
     // Add the script commands to the report as its initial acts.
     report.acts = JSON.parse(JSON.stringify(report.script.commands));
     /*

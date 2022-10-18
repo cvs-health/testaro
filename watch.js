@@ -137,8 +137,8 @@ const writeNetReport = async report => {
 };
 // Archives a job.
 const archiveJob = async script => {
-  const jobJSON = JSON.stringify(script, null, 2);
-  await fs.writeFile(`${doneDir}/${script.timeStamp}-${script.id}.json`, jobJSON);
+  const scriptJSON = JSON.stringify(script, null, 2);
+  await fs.writeFile(`${doneDir}/${script.timeStamp}-${script.id}.json`, scriptJSON);
   await fs.rm(`${watchDir}/${script.id}.json`);
 };
 // Waits.
