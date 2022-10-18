@@ -91,7 +91,7 @@ const writeDirReport = async report => {
   if (scriptID) {
     try {
       const reportJSON = JSON.stringify(report, null, 2);
-      const reportName = `${reportDir}/${report.timeStamp}-${scriptID}.json`;
+      const reportName = `${report.timeStamp}-${scriptID}.json`;
       await fs.writeFile(`${reportDir}/${reportName}`, reportJSON);
       console.log(`Report ${reportName} saved`);
       return true;
@@ -133,7 +133,7 @@ const writeNetReport = async report => {
 // Archives a job.
 const archiveJob = async script => {
   const jobJSON = JSON.stringify(script, null, 2);
-  await fs.writeFile(`${doneDir}/${script.id}.json`, jobJSON);
+  await fs.writeFile(`${doneDir}/${script.timeStamp}-${script.id}.json`, jobJSON);
   await fs.rm(`${watchDir}/${script.id}.json`);
 };
 // Waits.
