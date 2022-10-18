@@ -37,22 +37,27 @@ const reportDir = process.env.REPORTDIR;
 
 // Checks for a directory job.
 const checkDirJob = async () => {
-  const jobDirFileNames = await fs.readdir(watchDir);
-  const jobFileNames = jobDirFileNames.filter(fileName => fileName.endsWith('.json'));
-  if (jobFileNames.length) {
-    const scriptJSON = await fs.readFile(`${watchDir}/${jobFileNames[0]}`, 'utf8');
-    try {
-      const script = JSON.parse(scriptJSON, null, 2);
-      return script;
+  try {
+    const jobDirFileNames = await fs.readdir(watchDir);
+    const jobFileNames = jobDirFileNames.filter(fileName => fileName.endsWith('.json'));
+    if (jobFileNames.length) {
+      const scriptJSON = await fs.readFile(`${watchDir}/${jobFileNames[0]}`, 'utf8');
+      try {
+        const script = JSON.parse(scriptJSON, null, 2);
+        return script;
+      }
+      catch(error) {
+        return {
+          error: 'ERROR: Script was not JSON',
+          message: error.message
+        };
+      }
     }
-    catch(error) {
-      return {
-        error: 'ERROR: Script was not JSON',
-        message: error.message
-      };
+    else {
+      return {};
     }
   }
-  else {
+  catch {
     return {};
   }
 };
