@@ -27,7 +27,7 @@ if (watchType === 'net') {
 }
 const jobURL = process.env.JOB_URL;
 const worker = process.env.WORKER;
-const jobDir = process.env.JOBDIR;
+const watchDir = process.env.WATCHDIR;
 const doneDir = process.env.DONEDIR;
 const reportURL = process.env.REPORT_URL;
 const reportDir = process.env.REPORTDIR;
@@ -36,10 +36,10 @@ const reportDir = process.env.REPORTDIR;
 
 // Checks for a directory job.
 const checkDirJob = async () => {
-  const jobDirFileNames = await fs.readdir(jobDir);
+  const jobDirFileNames = await fs.readdir(watchDir);
   const jobFileNames = jobDirFileNames.filter(fileName => fileName.endsWith('.json'));
   if (jobFileNames.length) {
-    const scriptJSON = await fs.readFile(`${jobDir}/${jobFileNames[0]}`, 'utf8');
+    const scriptJSON = await fs.readFile(`${watchDir}/${jobFileNames[0]}`, 'utf8');
     try {
       const script = JSON.parse(scriptJSON, null, 2);
       return script;
@@ -132,7 +132,7 @@ const writeNetReport = async report => {
 const archiveJob = async script => {
   const jobJSON = JSON.stringify(script, null, 2);
   await fs.writeFile(`${doneDir}/${script.id}.json`, jobJSON);
-  await fs.rm(`${jobDir}/${script.id}.json`);
+  await fs.rm(`${watchDir}/${script.id}.json`);
 };
 // Waits.
 const wait = ms => {
