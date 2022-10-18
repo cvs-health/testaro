@@ -17,7 +17,7 @@ Testaro is designed to be a workstation-based agent. Testaro can be installed on
 - Allocation of responsibilities among workstations
 - Receiving and fulfilling requests from users for testing
 - Converting user specifications into instructions for workstations
-- Allocation testing responsibilities to human testers
+- Allocating testing responsibilities to human testers
 - Combining reports from workstations and human testers
 - Analyzing and summarizing test results
 - Sending notifications
@@ -105,13 +105,17 @@ However, if the Playwright dependency is ever updated to a newer version, you mu
 
 All of the tests that Testaro can perform are free of cost, except those in the Tenon and WAVE packages. The owner of each of those packages gives new registrants a free allowance of credits before it becomes necessary to pay for use of the API of the package. The required environment variables for authentication and payment are described below under “Environment variables”.
 
+## Jobs
+
+A request to a workstation to do some work is a _job_.
+
 ## Scripts
 
 ### Introduction
 
-To use Testaro, you provide a **script** to it. The script contains **commands**. Testaro _runs_ the script, i.e. performs the commands in it and writes a report of the results.
+A file containing specifications for a job is a _script_. Thus, creating a job means asking a workstation to have Testaro run a particular script.
 
-A script is a JSON file with the properties:
+Every script is a JSON-format file representing a JavaScript object. Its properties are:
 
 ```json
 {
@@ -127,7 +131,7 @@ The `timeLimit` property is optional. If it is omitted, a default of 300 seconds
 
 ### Processing
 
-Testaro initializes a report as a JavaScript object. It has a `script` property, which is a copy of script, and an `acts` property, which is a copy of the `commands` property of the script. Initially, the `commands` and `acts` arrays are identical. During processing, Testaro adds content to the `acts` array. In the resulting report, the `commands` array shows what you asked Testaro to do, and the `acts` array shows what Testaro actually did and the results.
+When Testaro starts performing a job, it initializes a report. The report is a JavaScript object. It has a `script` property, which is a copy of the script, and an `acts` property, which is a copy of the `commands` property of the script. Initially, the `commands` and `acts` arrays are identical. During processing, Testaro adds content to the `acts` array. In the resulting report, the `commands` array shows what you asked Testaro to do, and the `acts` array shows what Testaro actually did and the results. Testaro also gives values to some other properties describing the job session.
 
 ### Example
 
@@ -159,7 +163,7 @@ Here is an example of a script:
 }
 ```
 
-This script tells Testaro to open a page in the Chromium browser, navigate to `example.com`, and perform the tests in the `alfa` package on that URL.
+This script tells Testaro to open a page in the Chromium browser, navigate to `example.com`, and perform the tests in the `alfa` package on that URL, within 65 seconds.
 
 ### Strictness
 

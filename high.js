@@ -26,19 +26,7 @@ let timeLimit = 300;
 
 // ########## FUNCTIONS
 
-// Runs a script and writes a report file.
-const runScript = async (id, script) => {
-  const report = {
-    id,
-    log: [],
-    script,
-    acts: []
-  };
-  await doJob(report);
-  const reportJSON = JSON.stringify(report, null, 2);
-  await fs.writeFile(`${reportDir}/${id}.json`, reportJSON);
-};
-// Runs a file-based job and writes a report file for the script or each host.
+// Performs a file-based job and writes a report file.
 const runJob = async scriptID => {
   try {
     const scriptJSON = await fs.readFile(`${scriptDir}/${scriptID}.json`, 'utf8');
@@ -50,7 +38,16 @@ const runJob = async scriptID => {
     // Identify the start time and a timestamp.
     const timeStamp = Math.floor((Date.now() - Date.UTC(2022, 1)) / 2000).toString(36);
     // Run the script and record the report with the timestamp as name base.
-    await runScript(`${timeStamp}-${scriptID}`, script);
+    const id = `${timeStamp}-${scriptID}`;
+    const report = {
+      id,
+      log: [],
+      script,
+      acts: []
+    };
+    await doJob(report);
+    const reportJSON = JSON.stringify(report, null, 2);
+    await fs.writeFile(`${reportDir}/${id}.json`, reportJSON);
     console.log(`Report ${timeStamp}-${scriptID}.json recorded in ${process.env.REPORTDIR}`);
   }
   catch(error) {
