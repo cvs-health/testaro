@@ -5,6 +5,7 @@
     0. Watch type: 'dir' or 'net'.
     1. How long to watch: 'once' or 'forever'.
     2. How often to check in seconds.
+  Usage example: node watch dir once 15
 */
 
 // ########## IMPORTS
