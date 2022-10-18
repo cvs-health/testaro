@@ -6,14 +6,11 @@
 // ########## IMPORTS
 
 // Module to keep secrets local.
-// require('dotenv').config({override: true});
 require('dotenv').config();
 // Module to read and write files.
 const fs = require('fs/promises');
 // Module to perform tests.
 const {doJob} = require('./run');
-// Module to convert a script and a batch to a batch-based array of scripts.
-const {batchify} = require('./batchify');
 
 // ########## CONSTANTS
 
@@ -23,13 +20,13 @@ if (watchType === 'net') {
   client = require(process.env.PROTOCOL || 'https');
 }
 const jobURL = process.env.JOB_URL;
-const authCode = process.env.AUTH_CODE;
+const id = process.env.ID;
 const jobDir = process.env.JOBDIR;
-const exJobDir = process.env.EXJOBDIR;
+const doneDir = process.env.DONEDIR;
 const reportURL = process.env.REPORT_URL;
 const reportDir = process.env.REPORTDIR;
 const interval = process.env.INTERVAL;
-// Values of process.env properties are coerced to strings.
+// Convert watchForever from a string to a boolean.
 const watchForever = process.env.WATCH_FOREVER == 'true';
 
 // ########## FUNCTIONS
@@ -39,16 +36,14 @@ const checkDirJob = async () => {
   const jobDirFileNames = await fs.readdir(jobDir);
   const jobFileNames = jobDirFileNames.filter(fileName => fileName.endsWith('.json'));
   if (jobFileNames.length) {
-    const firstJobID = jobFileNames[0].slice(0, -5);
-    const jobJSON = await fs.readFile(`${jobDir}/${jobFileNames[0]}`, 'utf8');
+    const scriptJSON = await fs.readFile(`${jobDir}/${jobFileNames[0]}`, 'utf8');
     try {
-      const job = JSON.parse(jobJSON, null, 2);
-      job.jobID = firstJobID;
-      return job;
+      const script = JSON.parse(scriptJSON, null, 2);
+      return script;
     }
     catch(error) {
       return {
-        error: 'ERROR: Job was not JSON',
+        error: 'ERROR: Script was not JSON',
         message: error.message
       };
     }
@@ -59,8 +54,8 @@ const checkDirJob = async () => {
 };
 // Checks for a network job.
 const checkNetJob = async () => {
-  const job = await new Promise(resolve => {
-    const wholeURL = `${process.env.PROTOCOL}://${jobURL}?authCode=${authCode}`;
+  const script = await new Promise(resolve => {
+    const wholeURL = `${process.env.PROTOCOL}://${jobURL}?id=${id}`;
     const request = client.request(wholeURL, response => {
       const chunks = [];
       response.on('data', chunk => {
@@ -68,18 +63,10 @@ const checkNetJob = async () => {
       });
       response.on('end', () => {
         try {
-          const jobJSON = chunks.join('');
-          const job = JSON.parse(jobJSON);
-          // If a qualifying job was received:
-          if (job.jobID) {
-            // Return it.
-            resolve(job);
-          }
-          // Otherwise, i.e. if there was no qualifying job:
-          else {
-            // Return this.
-            resolve({});
-          }
+          const scriptJSON = chunks.join('');
+          const script = JSON.parse(scriptJSON);
+          // Return it.
+          resolve(script);
         }
         catch(error) {
           resolve({
@@ -92,12 +79,12 @@ const checkNetJob = async () => {
     });
     request.end();
   });
-  return job;
+  return script;
 };
 // Writes a directory report.
 const writeDirReport = async report => {
-  const {id, jobID} = report;
-  if (id && jobID) {
+  const {id} = report;
+  if (id) {
     const reportJSON = JSON.stringify(report, null, 2);
     try {
       await fs.writeFile(`${reportDir}/${id}.json`, reportJSON);
@@ -105,7 +92,7 @@ const writeDirReport = async report => {
       return true;
     }
     catch(error) {
-      console.log(`ERROR: Failed to write report ${id} for job ${jobID}`);
+      console.log(`ERROR: Failed to write report ${id}`);
       return false;
     }
   }
@@ -113,7 +100,7 @@ const writeDirReport = async report => {
 // Submits a network report.
 const writeNetReport = async report => {
   const ack = await new Promise(resolve => {
-    const wholeURL = `${process.env.PROTOCOL}://${reportURL}?authCode=${authCode}`;
+    const wholeURL = `${process.env.PROTOCOL}://${reportURL}?id=${id}`;
     const request = client.request(wholeURL, {method: 'POST'}, response => {
       const chunks = [];
       response.on('data', chunk => {
@@ -139,10 +126,10 @@ const writeNetReport = async report => {
   return ack;
 };
 // Archives a job.
-const exifyJob = async (job) => {
-  const jobJSON = JSON.stringify(job, null, 2);
-  await fs.writeFile(`${exJobDir}/${job.timeStamp}.json`, jobJSON);
-  await fs.rm(`${jobDir}/${job.jobID}.json`);
+const archiveJob = async script => {
+  const jobJSON = JSON.stringify(script, null, 2);
+  await fs.writeFile(`${doneDir}/${script.id}.json`, jobJSON);
+  await fs.rm(`${jobDir}/${script.id}.json`);
 };
 // Waits.
 const wait = ms => {
@@ -152,117 +139,84 @@ const wait = ms => {
     }, ms);
   });
 };
-// Runs one script and writes or sends a report.
-const runHost = async (jobID, timeStamp, id, script) => {
-  const report = {
-    jobID,
-    timeStamp,
-    id,
-    log: [],
-    script,
-    acts: []
-  };
-  await doJob(report);
-  if (watchType === 'dir') {
-    return await writeDirReport(report);
-  }
-  else {
-    const ack = await writeNetReport(report);
-    if (ack.error) {
-      console.log(JSON.stringify(ack, null, 2));
-      return false;
-    }
-    else {
-      return true;
-    }
-  }
-};
-// Runs a job and returns a report file for the script or each host.
-const runJob = async job => {
-  const {jobID, script, batch} = job;
-  if (jobID) {
-    if (script) {
-      try {
-        // Identify the start time and a time stamp.
-        const timeStamp = Math.floor((Date.now() - Date.UTC(2022, 1)) / 2000).toString(36);
-        job.timeStamp = timeStamp;
-        // If there is a batch:
-        if (batch) {
-          // Convert the script to a set of host scripts.
-          const specs = batchify(script, batch, timeStamp);
-          // For each host script:
-          let success = true;
-          while (specs.length && success) {
-            // Run it and write or submit a report with a host-suffixed time-stamp ID.
-            const spec = specs.shift();
-            const {id} = spec;
-            const hostScript = spec.script;
-            success = await runHost(jobID, timeStamp, id, hostScript);
-          }
-          return success;
+// Performs a job and returns a report.
+const runJob = async script => {
+  const {id} = script;
+  if (id) {
+    try {
+      // Identify the start time and a time stamp.
+      const timeStamp = Math.floor((Date.now() - Date.UTC(2022, 1)) / 2000).toString(36);
+      script.timeStamp = timeStamp;
+      // Initialize a report.
+      const report = {
+        log: [],
+        script,
+        acts: []
+      };
+      await doJob(report);
+      if (watchType === 'dir') {
+        return await writeDirReport(report);
+      }
+      else {
+        const ack = await writeNetReport(report);
+        if (ack.error) {
+          console.log(JSON.stringify(ack, null, 2));
+          return false;
         }
-        // Otherwise, i.e. if there is no batch:
         else {
-          // Run the script and submit a report with a timestamp ID.
-          return await runHost(jobID, timeStamp, timeStamp, script);
+          return true;
         }
       }
-      catch(error) {
-        console.log(`ERROR: ${error.message}\n${error.stack}`);
-        return {
-          error: `ERROR: ${error.message}\n${error.stack}`
-        };
-      }
     }
-    else {
-      console.log('ERROR: no script specified');
+    catch(error) {
+      console.log(`ERROR: ${error.message}\n${error.stack}`);
       return {
-        error: 'ERROR: no script specified'
+        error: `ERROR: ${error.message}\n${error.stack}`
       };
     }
   }
   else {
-    console.log('ERROR: no job ID property in job');
+    console.log('ERROR: script has no id');
     return {
-      error: 'ERROR: no job ID property in job'
+      error: 'ERROR: script has no id'
     };
   }
 };
-// Repeatedly checks for jobs, runs them, and submits reports.
+// Checks for a job, performs it, and submits a report, once or repeatedly.
 const cycle = async forever => {
-  const intervalMS = Number.parseInt(interval);
+  const intervalMS = 1000 * Number.parseInt(interval);
   let statusOK = true;
   let empty = false;
   console.log(`Watching started with intervals of ${interval} seconds when idle`);
   while (statusOK) {
     if (empty) {
-      await wait(1000 * intervalMS);
+      await wait(intervalMS);
     }
     // Check for a job.
-    let job;
+    let script;
     if (watchType === 'dir') {
-      job = await checkDirJob();
+      script = await checkDirJob();
     }
     else if (watchType === 'net') {
-      job = await checkNetJob();
+      script = await checkNetJob();
     }
     else {
-      job = {};
+      script = {};
       console.log('ERROR: invalid WATCH_TYPE environment variable');
       statusOK = false;
     }
     // If there was one:
-    if (job.jobID) {
+    if (script.id) {
       // Run it.
-      console.log(`Running job ${job.jobID}`);
-      statusOK = await runJob(job);
-      console.log(`Job ${job.jobID} finished with time stamp ${job.timeStamp}`);
+      console.log(`Running script ${script.id}`);
+      statusOK = await runJob(script);
+      console.log(`Job ${script.id} finished with time stamp ${script.timeStamp}`);
       if (statusOK) {
-        // If the job was a file:
+        // If the script was in a directory:
         if (watchType === 'dir') {
-          // Archive it.
-          await exifyJob(job);
-          console.log(`Job archived as ${job.timeStamp}.json`);
+          // Archive the script.
+          await archiveJob(script);
+          console.log(`Job archived as ${script.timeStamp}-${script.id}.json`);
         }
         // If watching was specified for only 1 job, stop.
         statusOK = forever;
