@@ -19,6 +19,8 @@ const {doJob} = require('./run');
 // ########## CONSTANTS
 
 const watchType = process.argv[2];
+const watchForever = process.argv[3] === 'forever';
+const interval = Number.parseInt(process.argv[4]);
 let client;
 if (watchType === 'net') {
   client = require(process.env.PROTOCOL || 'https');
@@ -29,7 +31,6 @@ const jobDir = process.env.JOBDIR;
 const doneDir = process.env.DONEDIR;
 const reportURL = process.env.REPORT_URL;
 const reportDir = process.env.REPORTDIR;
-const interval = process.env.INTERVAL;
 
 // ########## FUNCTIONS
 
