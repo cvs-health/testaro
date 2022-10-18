@@ -1,6 +1,10 @@
 /*
   watch.js
   Watches for a script and runs it.
+  Arguments:
+    0. Watch type: 'dir' or 'net'.
+    1. How long to watch: 'once' or 'forever'.
+    2. How often to check in seconds.
 */
 
 // ########## IMPORTS
@@ -14,20 +18,18 @@ const {doJob} = require('./run');
 
 // ########## CONSTANTS
 
-const watchType = process.env.WATCH_TYPE;
+const watchType = process.argv[2];
 let client;
 if (watchType === 'net') {
   client = require(process.env.PROTOCOL || 'https');
 }
 const jobURL = process.env.JOB_URL;
-const id = process.env.ID;
+const worker = process.env.WORKER;
 const jobDir = process.env.JOBDIR;
 const doneDir = process.env.DONEDIR;
 const reportURL = process.env.REPORT_URL;
 const reportDir = process.env.REPORTDIR;
 const interval = process.env.INTERVAL;
-// Convert watchForever from a string to a boolean.
-const watchForever = process.env.WATCH_FOREVER == 'true';
 
 // ########## FUNCTIONS
 
@@ -55,7 +57,7 @@ const checkDirJob = async () => {
 // Checks for a network job.
 const checkNetJob = async () => {
   const script = await new Promise(resolve => {
-    const wholeURL = `${process.env.PROTOCOL}://${jobURL}?id=${id}`;
+    const wholeURL = `${process.env.PROTOCOL}://${jobURL}?worker=${worker}`;
     const request = client.request(wholeURL, response => {
       const chunks = [];
       response.on('data', chunk => {
@@ -83,7 +85,7 @@ const checkNetJob = async () => {
 };
 // Writes a directory report.
 const writeDirReport = async report => {
-  const {id} = report;
+  const id = report && report.script && report.script.id;
   if (id) {
     const reportJSON = JSON.stringify(report, null, 2);
     try {
@@ -100,7 +102,7 @@ const writeDirReport = async report => {
 // Submits a network report.
 const writeNetReport = async report => {
   const ack = await new Promise(resolve => {
-    const wholeURL = `${process.env.PROTOCOL}://${reportURL}?id=${id}`;
+    const wholeURL = `${process.env.PROTOCOL}://${reportURL}?worker=${worker}`;
     const request = client.request(wholeURL, {method: 'POST'}, response => {
       const chunks = [];
       response.on('data', chunk => {
@@ -121,7 +123,7 @@ const writeNetReport = async report => {
     });
     request.write(JSON.stringify(report, null, 2));
     request.end();
-    console.log(`Report with ID ${report.id} submitted`);
+    console.log(`Report ${report.timeStamp}-${report.script.id} submitted`);
   });
   return ack;
 };
