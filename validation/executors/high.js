@@ -20,7 +20,7 @@ runJob('simple')
 .then(
   // When the report has been written:
   async () => {
-    // Open the report.
+    // Open it.
     const fileNames = await fs.readdir(reportDir);
     const reportNames = fileNames.filter(name => name.endsWith('-simple.json'));
     if (reportNames.length) {
