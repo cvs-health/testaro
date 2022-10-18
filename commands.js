@@ -139,7 +139,8 @@ exports.commands = {
       'Navigate to a new URL',
       {
         which: [true, 'string', 'isURL', 'URL'],
-        what: [false, 'string', 'hasLength', 'comment']
+        what: [false, 'string', 'hasLength', 'comment'],
+        id: [false, 'string', 'hasLength', 'ID of the host']
       }
     ],
     wait: [
