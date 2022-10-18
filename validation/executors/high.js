@@ -15,7 +15,8 @@ process.env.SCRIPTDIR = `${projectRoot}/samples`;
 // ########## OPERATION
 
 // Run the simple script and write a report.
-require(`${projectRoot}/high`)('simple')
+const {runJob} = require(`${projectRoot}/high`);
+runJob('simple')
 .then(
   // When the report has been written:
   async () => {

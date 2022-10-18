@@ -40,29 +40,33 @@ const runScript = async (id, script) => {
 };
 // Runs a file-based job and writes a report file for the script or each host.
 const runJob = async scriptID => {
-  if (scriptID) {
-    try {
-      const scriptJSON = await fs.readFile(`${scriptDir}/${scriptID}.json`, 'utf8');
-      const script = JSON.parse(scriptJSON);
-      // Change the time limit to the script-specified one, if any.
-      if (! script.timeLimit) {
-        script.timeLimit = timeLimit;
-      }
-      // Identify the start time and a timestamp.
-      const timeStamp = Math.floor((Date.now() - Date.UTC(2022, 1)) / 2000).toString(36);
-      // Run the script and record the report with the timestamp as name base.
-      await runScript(`${timeStamp}-${scriptID}`, script);
-      console.log(`Report ${timeStamp}-${scriptID}.json recorded in ${process.env.REPORTDIR}`);
+  try {
+    const scriptJSON = await fs.readFile(`${scriptDir}/${scriptID}.json`, 'utf8');
+    const script = JSON.parse(scriptJSON);
+    // Change the time limit to the script-specified one, if any.
+    if (! script.timeLimit) {
+      script.timeLimit = timeLimit;
     }
-    catch(error) {
-      console.log(`ERROR running job (${error.message})\n${error.stack}`);
-    }
+    // Identify the start time and a timestamp.
+    const timeStamp = Math.floor((Date.now() - Date.UTC(2022, 1)) / 2000).toString(36);
+    // Run the script and record the report with the timestamp as name base.
+    await runScript(`${timeStamp}-${scriptID}`, script);
+    console.log(`Report ${timeStamp}-${scriptID}.json recorded in ${process.env.REPORTDIR}`);
   }
-  else {
-    console.log('ERROR: no script specified');
+  catch(error) {
+    console.log(`ERROR running job (${error.message})\n${error.stack}`);
   }
 };
 
 // ########## OPERATION
 
-runJob(scriptID);
+// If this module was called with a scriptID argument:
+if (scriptID) {
+  // Run the script and write a report.
+  runJob(scriptID);
+}
+// Otherwise, i.e. if it was required by another module:
+else {
+  // Export runJob so the other module can call it.
+  exports.runJob = runJob;
+}
