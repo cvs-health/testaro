@@ -87,16 +87,17 @@ const checkNetJob = async () => {
 };
 // Writes a directory report.
 const writeDirReport = async report => {
-  const id = report && report.script && report.script.id;
-  if (id) {
-    const reportJSON = JSON.stringify(report, null, 2);
+  const scriptID = report && report.script && report.script.id;
+  if (scriptID) {
     try {
-      await fs.writeFile(`${reportDir}/${id}.json`, reportJSON);
-      console.log(`Report ${id}.json saved`);
+      const reportJSON = JSON.stringify(report, null, 2);
+      const reportName = `${reportDir}/${report.timeStamp}-${scriptID}.json`;
+      await fs.writeFile(`${reportDir}/${reportName}`, reportJSON);
+      console.log(`Report ${reportName} saved`);
       return true;
     }
     catch(error) {
-      console.log(`ERROR: Failed to write report ${id}`);
+      console.log(`ERROR: Failed to write report (${error.message})`);
       return false;
     }
   }
@@ -143,7 +144,7 @@ const wait = ms => {
     }, ms);
   });
 };
-// Performs a job and returns a report.
+// Runs a script, time-stamps it, and returns a report.
 const runJob = async script => {
   const {id} = script;
   if (id) {
@@ -211,7 +212,7 @@ const cycle = async forever => {
     }
     // If there was one:
     if (script.id) {
-      // Run it.
+      // Run it, add a timestamp to it, and save a report.
       console.log(`Running script ${script.id}`);
       statusOK = await runJob(script);
       console.log(`Job ${script.id} finished with time stamp ${script.timeStamp}`);
@@ -220,7 +221,7 @@ const cycle = async forever => {
         if (watchType === 'dir') {
           // Archive the script.
           await archiveJob(script);
-          console.log(`Job archived as ${script.timeStamp}-${script.id}.json`);
+          console.log(`Script ${script.id}.json archived as ${script.timeStamp}-${script.id}.json`);
         }
         // If watching was specified for only 1 job, stop.
         statusOK = forever;
