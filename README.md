@@ -8,9 +8,22 @@ Testaro is a collection of collections of web accessibility tests.
 
 The purpose of Testaro is to provide programmatic access to accessibility tests defined in several test packages and in Testaro itself.
 
-## System requirements
+Testaro launches and controls web browsers, performing operations, conducting tests, and recording results.
 
-Version 14 or later of [Node.js](https://nodejs.org/en/).
+Testaro is designed to be a workstation-based agent. Testaro can be installed on a workstation running under OS X or Windows, or potentially Ubuntu Linux. The software that uses Testaro can be installed on the same workstation or any other workstation or server. Such other software can perform functions that do not require workstation features, such as:
+- Test scheduling
+- Monitoring
+- Management of clusters of workstations sharing workloads
+- Allocation of responsibilities among workstations
+- Receiving and fulfilling requests from users for testing
+- Converting user specifications into instructions for workstations
+- Allocating testing responsibilities to human testers
+- Combining reports from workstations and human testers
+- Analyzing and summarizing test results
+- Sending notifications
+- Publishing reports
+
+One software product that performs some such functions is [Testilo](https://www.npmjs.com/package/testilo).
 
 ## Dependencies
 
@@ -58,6 +71,10 @@ The main directories containing code files are:
 - `procs`: shared procedures
 - `validation`: code and artifacts for the validation of Testaro
 
+## System requirements
+
+Version 14 or later of [Node.js](https://nodejs.org/en/).
+
 ## Installation
 
 Some of the dependencies of Testaro are published as Github packages. Installing Testaro therefore requires you to be authorized to read Github packages. If you do not yet have that authorization, you can give it to yourself as follows:
@@ -82,27 +99,27 @@ Some of the dependencies of Testaro are published as Github packages. Installing
 
 Once you have done that, you can install Testaro as you would install any `npm` package.
 
-However, if the Playwright dependency is ever updated to a newer version, you must also reinstall its browers by executing the statement `npx playwright install`.
+However, if the Playwright dependency is ever updated to a newer version, you must also reinstall its browsers by executing the statement `npx playwright install`.
 
 ## Payment
 
 All of the tests that Testaro can perform are free of cost, except those in the Tenon and WAVE packages. The owner of each of those packages gives new registrants a free allowance of credits before it becomes necessary to pay for use of the API of the package. The required environment variables for authentication and payment are described below under “Environment variables”.
 
-## Specification
+## Jobs
 
-To use Testaro, you must specify what it should do. You do this with a script and optionally a batch.
+A request to a workstation to do some work is a _job_.
 
 ## Scripts
 
 ### Introduction
 
-To use Testaro, you provide a **script** to it. The script contains **commands**. Testaro _runs_ the script, i.e. performs the commands in it and writes a report of the results.
+A file containing specifications for a job is a _script_. Thus, creating a job means asking a workstation to have Testaro run a particular script.
 
-A script is a JSON file with the properties:
+Every script is a JSON-format file representing a JavaScript object. Its properties are:
 
 ```json
 {
-  "id": "string consisting of lower-case ASCII letters and digits",
+  "id": "string consisting of alphanumeric ASCII characters and hyphen-minus (-)",
   "what": "string: description of the script",
   "strict": "boolean: whether redirections should be treated as failures",
   "timeLimit": "number: limit in seconds on the execution of this script",
@@ -111,6 +128,10 @@ A script is a JSON file with the properties:
 ```
 
 The `timeLimit` property is optional. If it is omitted, a default of 300 seconds (5 minutes) is set.
+
+### Processing
+
+When Testaro starts performing a job, it initializes a report. The report is a JavaScript object. It has a `script` property, which is a copy of the script, and an `acts` property, which is a copy of the `commands` property of the script. Initially, the `commands` and `acts` arrays are identical. During processing, Testaro adds content to the `acts` array. In the resulting report, the `commands` array shows what you asked Testaro to do, and the `acts` array shows what Testaro actually did and the results. Testaro also gives values to some other properties describing the job session.
 
 ### Example
 
@@ -142,7 +163,7 @@ Here is an example of a script:
 }
 ```
 
-This script tells Testaro to open a page in the Chromium browser, navigate to `example.com`, and perform the tests in the `alfa` package on that URL.
+This script tells Testaro to open a page in the Chromium browser, navigate to `example.com`, and perform the tests in the `alfa` package on that URL, within 65 seconds.
 
 ### Strictness
 
@@ -152,29 +173,13 @@ If the `strict` property is `true`, Testaro will accept redirections that add or
 
 #### Introduction
 
-The `commands` property’s value is an array of command objects.
+The `commands` property’s value is an array of commands (command objects).
 
 Each command has a `type` property and optionally has a `name` property (used in branching, described below). It must or may have other properties, depending on the value of `type`.
 
 #### Command sequence
 
-The first two commands in any script have the types `launch` and `url`, respectively, as shown in the example above. They launch a browser and then use it to visit a URL. For example:
-
-```json
-{
-  "type": "launch",
-  "which": "chromium",
-  "what": "Open a page in a Chromium browser"
-}
-```
-
-```json
-{
-  "type": "url",
-  "which": "https://en.wikipedia.org/wiki/Main_Page",
-  "what": "English Wikipedia home page"
-}
-```
+The first two commands in any script have the types `launch` and `url`, respectively, as shown in the example above. They launch a browser and then use it to visit a URL.
 
 #### Command types
 
@@ -210,7 +215,7 @@ An example of a **navigation** is the command of type `url` above.
 
 Once you have included a `url` command in a script, you do not need to add more `url` commands unless you want the browser to visit a different URL.
 
-However, some tests modify web pages. In those cases, Testaro inserts additional `url` commands into the `script` property of the `options` object, after those tests, to ensure that changes made by one test do not affect subsequent acts.
+However, some tests modify web pages. In those cases, Testaro inserts additional `url` acts into the `acts` array, after those tests, to ensure that changes made by one test do not affect subsequent acts.
 
 Another navigation example is:
 
@@ -241,8 +246,6 @@ This command causes Testaro to alter the `display` and `visibility` style proper
 
 ###### Introduction
 
-The possible commands of type `test` are enumerated in the `tests` object defined in the `index.js` file.
-
 A test performs operations and reports results. The results may or may not directly indicate that a page passes or fails requirements. Typically, accessibility tests report successes and failures. But a test in Testaro is defined less restrictively, so it can report any results. As one example, the Testaro `elements` test reports facts about certain elements on a page, without asserting that those facts are successes or failures.
 
 The term “test” has two meanings for Testaro:
@@ -250,6 +253,28 @@ The term “test” has two meanings for Testaro:
 - A package, such as Continuum, performs multiple tests (packaged tests).
 
 Thus, if a command of type `test` runs Continuum, Continuum performs multiple tests and reports their results.
+
+###### Configuration
+
+Every test in Testaro must have:
+- a property in the `tests` object defined in the `run.js` file, where the property name is the name of the test and the value is a description of the test
+- a `.js` file in the `tests` directory, whose name base is the name of the test
+
+The `commands.js` file (described in detail below) contains this specification for any `test` command:
+
+```json
+test: [
+  'Perform a test',
+  {
+    which: [true, 'string', 'isTest', 'test name'],
+    what: [false, 'string', 'hasLength', 'comment']
+  }
+],
+```
+
+That means that a test (i.e. a command with a `type` property having the value `'test'`) must have a string-valued `which` property and may optionally have a string-valued `what` property.
+
+If a particular test either must have or may have any other properties, those properties must be specified in the `tests` property in `commands.js`.
 
 ###### Examples
 
@@ -321,6 +346,8 @@ In case you want to perform more than one `tenon` test with the same script, you
 
 Tenon recommends giving it a public URL rather than giving it the content of a page, if possible. So, it is best to give the `withNewContent` property of the `tenonRequest` command the value `true`, unless the page is not public.
 
+If a `tenon` test is included in a script, environment variables named `TENON_USER` and `TENON_PASSWORD` must exist, with your Tenon username and password, respectively, as their values. You can obtain those from [Tenon](https://tenon.io/documentation/overview).
+
 ###### Continuum
 
 The `continuum` test makes use of the files in the `continuum` directory. The test inserts the contents of all three files into the page as scripts and then uses them to perform the tests of the Continuum package.
@@ -358,6 +385,10 @@ The changes in `htmlcs/HTMLCS.js` are:
 >         typeName + '|' + msg.code + '|' + nodeName + '|' + elementId + '|' + msg.msg + '|' + html
 >       );
 ```
+
+###### WAVE
+
+If a `wave` test is included in the script, an environment variable named `WAVE_KEY` must exist, with your WAVE API key as its value. You can get it from [WebAIM](https://wave.webaim.org/api/).
 
 ###### BBC Accessibility Standards Checker
 
@@ -420,7 +451,7 @@ In most cases, the array has length 4:
 - 0. Is the property (here `which`) required (`true` or `false`)? The value `true` here means that every `link`-type command **must** contain a `which` property.
 - 1. What format must the property value have (`'string'`, `'array'`, `'boolean'`, or `'number'`)?
 - 2. What other validity criterion applies (if any)? (Empty string if none.) The `hasLength` criterion means that the string must be at least 1 character long.
-- 3. Description of the property. Here, the value of `which` is some substring of the text content of the link that is to be clicked. Thus, a `link` command tells Testaro to find the first link whose text content has this substring and click it.
+- 3. Description of the property. In this example, the description says that the value of `which` must be a substring of the text content of the link that is to be clicked. Thus, a `link` command tells Testaro to find the first link whose text content has this substring and click it.
 
 The validity criterion named in item 2 may be any of these:
 - `'hasLength'`: is not a blank string
@@ -432,9 +463,7 @@ The validity criterion named in item 2 may be any of these:
 - `'isWaitable'`: is `'url'`, `'title'`, or `'body'`
 - `'areStrings'`: is an array of strings
 
-When `commands.js` specifies a `withItems` requirement for a `test`-type command, that requirement is an array of length 2, and is always `[true, 'boolean']`. That means that this `test`-type command must have a `withItems` property, whose value must be `true` or `false`. That property tells Testaro whether to itemize the results of that test.
-
-Any `test` command can also (in addition to the requirements in `commands.js`) contain an `expect` requirement. If it does, that requirement has a different format: an array of any non-0 length. The items in that array specify expectations about the results of the test.
+Any `test` command can also (in addition to the requirements in `commands.js`) contain an `expect` property. If it does, the value of that property must be an array of arrays. Each array specifies expectations about the results of the test.
 
 For example, a `test` command might have this `expect` property:
 
@@ -464,33 +493,9 @@ The third item in each array, if there are 3 items in the array, is the criterio
 
 A typical use for an `expect` property is checking the correctness of a Testaro test. Thus, the validation scripts in the `validation/tests/scripts` directory all contain `test` commands with `expect` properties. See the “Validation” section below.
 
-## Batches
-
-You may wish to have Testaro perform the same sequence of tests on multiple web pages. In that case, you can create a _batch_, with the following structure:
-
-```json
-{
-  what: "Web leaders",
-  hosts: {
-    id: "w3c",
-    which: "https://www.w3.org/",
-    what: "W3C"
-  },
-  {
-    id: "wikimedia",
-    which: "https://www.wikimedia.org/",
-    what: "Wikimedia"
-  }
-}
-```
-
-With a batch, you can execute a single statement to run a script multiple times, one per host. On each call, Testaro takes one of the hosts in the batch and substitutes it for each host specified in a `url` command of the script. The result is a _host script_. Testaro sequentially runs all of those host scripts.
-
-Therefore, you cannot use a batch with a script that changes URLs.
-
 ## Samples
 
-The `samples` directory contains examples of scripts and batches. If you wish to use them in their current locations, you can give `SCRIPTDIR` the value `'samples/scripts'` and `BATCHDIR` the value `'samples/batches'`. Then execute `node high sss` to run the `sss` script alone or `node high sss bbb` to run the `sss` script with the `bbb` batch (e.g., `node create simple weborgs`). The `high` module will create a job, run the script or host scripts, and save the report(s) in the directory that you have specified with the `REPORTDIR` environment variable.
+The `sampleScripts` directory contains examples of scripts. If you wish to use any of them, you can give `SCRIPTDIR` the value `'sampleScripts'`. Then execute `node high sss` to run the `sss` script. The `high` module will create a job, run the script, and save the report in the directory that you have specified with the `REPORTDIR` environment variable.
 
 ## Execution
 
@@ -508,12 +513,12 @@ const report = {
   log: [],
   acts: []
 };
-const {handleRequest} = require('./run');
-handleRequest(report)
+const {doJob} = require('./run');
+doJob(report)
 .then(() => …);
 ```
 
-Replace `{…}` with a script object, like the example script shown above. The low-level method does not allow the use of batches.
+Replace `{…}` with a script object, like the example script shown above.
 
 The argument of `require` is a path relative to the directory of the module in which this code appears. If the module is in a subdirectory, `./run` will need to be revised. In an executor within `validation/executors`, it must be revised to `../../run`.
 
@@ -523,33 +528,29 @@ Testaro will run the script and modify the properties of the `report` object. Wh
 
 #### High-level
 
+High-level invocation allows you to run Testaro with a one-line command.
+
 Make sure that you have defined these environment variables, with absolute or relative paths to directories as their values:
 - `SCRIPTDIR`
-- `BATCHDIR`
 - `REPORTDIR`
 
 Relative paths must be relative to the Testaro project directory. For example, if the script directory is `scripts` in a `testing` directory that is a sibling of the Testaro directory, then a relative-path `SCRIPTDIR` must have the value `../testing/scripts`.
 
 Also ensure that Testaro can read all those directories and write to `REPORTDIR`.
 
-Place a script into `SCRIPTDIR` and, optionally, a batch into `BATCHDIR`. Each should be named with a `.json` extension., where `idvalue` is replaced with the value of its `id` property. That value must consist of only lower-case ASCII letters and digits.
+Place a script into `SCRIPTDIR`. It should be named with a `.json` extension.
 
-Then execute the statement `node high scriptID` or `node high scriptID batchID`, replacing `scriptID` and `batchID` with the `id` values of the script and the batch, respectively.
+Then execute the statement `node high scriptID`, replacing `scriptID` with the `id` value of the script, which must also be the base of the name of the script file.
 
-The `high` module will call the `runJob` function of the `create` module, which in turn will call the `handleRequest` function of the `run` module. The results will be saved in report files in the `REPORTDIR` directory.
-
-If there is no batch, the report file will be named with a unique timestamp, suffixed with a `.json` extension. If there is a batch, then the base of each report file’s name will be the same timestamp, suffixed with `-hostid`, where `hostid` is the value of the `id` property of the `host` object in the batch file. For example, if you execute `node create script01 wikis`, you might get these report files deposited into `REPORTDIR`:
-- `enp46j-wikipedia.json`
-- `enp45j-wiktionary.json`
-- `enp45j-wikidata.json`
+The `high` module will call the `runJob` function of the `create` module, which in turn will call the `doJob` function of the `run` module. The result will be saved in a report file in the `REPORTDIR` directory. The report file will be named with a unique timestamp and suffixed with a `.json` extension. The base of the report file’s name will be the same timestamp, suffixed with `--scriptID`, where `scriptID` is the value of the `id` property of the script. For example, if you execute `node high tp18-wiktionary`, you might get a report named `enp45j-tp18-wiktionary.json` file deposited into `REPORTDIR`.
 
 #### Watch
 
-In watch mode, Testaro periodically checks for a job to be run by it, containing a script and, optionally, a batch. When such a job exists, Testaro runs the script, or uses the batch to create a set of host scripts and sequentially runs them. After running the script or each host script, Testaro converts the report to JSON and disposes of it as specified.
+In watch mode, Testaro periodically checks for a script to be run by it. When such a script exists, Testaro runs it, produces a report in JSON format, and disposes of the report as specified.
 
 Testaro checks periodically. The interval between checks, in seconds, is specified by an `INTERVAL` environment variable.
 
-After Testaro starts watching, its behavior depends on the environment variable `WATCH_FOREVER`. If its value is `true`, watching continues indefinitely. If its value is `false` or it has no value, watching stops after the first job is found and run.
+After Testaro starts watching, its behavior depends on the environment variable `WATCH_FOREVER`. If its value is `true`, watching continues indefinitely. If its value is `false` or it has no value, watching stops after the first script is found and run.
 
 To make Testaro start watching, execute the statement `node watch`.
 
@@ -557,59 +558,43 @@ There are two ways for Testaro to watch for jobs.
 
 ##### Directory watch
 
-With directory watch, Testaro checks whether a particular directory in its host’s filesystem contains a job file. A job file is a JSON-format file named `abc.json` representing an object like this:
+With directory watch, Testaro checks whether the watch directory (`WATCHDIR`) in its host’s filesystem contains a script.
 
-```json
-{
-  "script": {…},
-  "batch": {…}
-}
-```
+When Testaro finds one or more scripts in the watch directory, Testaro runs the first script, writes the report into the report directory, and moves the script into the done directory (`DONEDIR`).
 
-The `batch` property is optional. The value `abc` may be replaced with any string of lower-case ASCII letters and digits.
+Testaro suspends checking while it is running a script. Therefore, even though the currently running script file remains in thde watch directory, Testaro will not try to run it again.
 
-When Testaro finds job files in the directory, Testaro runs the first job, writes the report(s) into the report directory, and moves the job file into the ex-jobs directory.
-
-Testaro suspends checking while it is running any job. Therefore, even though the currently running job file remains in `JOBDIR`, Testaro will not try to run it again.
-
-Since Testaro runs the first job (i.e. the job whose name is first in ASCII order), whoever populates the directory with job files has control over the order in which Testaro runs them. For example, to force a new job to be run before the already waiting jobs, one can give it a filename that comes before that of the first waiting job.
+Since Testaro runs the first script (i.e. the script whose name is first in ASCII order), whoever populates the directory with script files has control over the order in which Testaro runs them. For example, to force a new script to be run before the already waiting scripts, one can give it a filename that comes before that of the first waiting script.
 
 In order to make directory watching possible, you must define these environment variables:
 - `WATCH_TYPE=dir`
 - `INTERVAL`
 - `WATCH_FOREVER` (`=true` or `=false`)
 - `REPORTDIR`
-- `JOBDIR`
-- `EXJOBDIR`
+- `WATCHDIR`
+- `DONEDIR`
 
 ##### Network watch
 
-With network watch, Testaro asks a particular API whether it has any jobs for the current instance of Testaro, identified by an authorization code. If the response is a JSON representation of an object satisfying the same requirements as given above under “Directory watch”, Testaro runs the job and sends the report(s) to the API.
+Network watching is based on these assumptions:
+- A managing server may be able to give work to multiple workstations that run Testaro.
+- A workstation running Testaro can contact a managing server, but the server may not be able to contact a workstation.
+- The functions of Testaro are limited to those requiring workstation features.
 
-Thus, if there are multiple jobs queued for the Testaro instance, the API is responsible for choosing one of them to send in response.
-
-When the API receives the reports, it can dispose of them as desired. Each report is a JSON representation of an object, which has these identification properties:
-- `jobID`
-- `timeStamp`
-- `id`
-
-The `jobID` property can be used for an association between each report and the job that it arose from. The `timeStamp` property can be used for an association of all the reports in a batched job. And the `id` property (which begins with the time stamp) is unique to each report.
+Given these assumptions, with network watch, the initiator of an interaction is Testaro. When Testaro is available, it requests a script from a server. If the response is a JSON representation of a script, Testaro runs the script and sends the report to the server.
 
 In order to make network watching possible, you must define these environment variables:
 - `WATCH_TYPE=net`
 - `INTERVAL`
 - `WATCH_FOREVER` (`=true` or `=false`)
 - `PROTOCOL` (`=http` or `=https`)
-- `JOB_URL` (not including the authorization code)
-- `REPORT_URL` (not including the authorization code)
+- `WATCH_URL`
+- `REPORT_URL`
+- `TESTARO_ID`
+
+If multiple workstations run Testaro and do work for the same server, each must have a different `TESTARO_ID`.
 
 ### Environment variables
-
-As mentioned above, using the high-level method to run Testaro jobs requires `SCRIPTDIR`, `BATCHDIR`, and `REPORTDIR` environment variables.
-
-If a `tenon` test is included in the script, environment variables named `TENON_USER` and `TENON_PASSWORD` must exist, with your Tenon username and password, respectively, as their values. You can obtain those from [Tenon](https://tenon.io/documentation/overview).
-
-If a `wave` test is included in the script, an environment variable named `WAVE_KEY` must exist, with your WAVE API key as its value. You can get it from [WebAIM](https://wave.webaim.org/api/).
 
 The `text` command can interpolate the value of an environment variable into text that it enters on a page, as documented in the `commands.js` file.
 
@@ -632,9 +617,9 @@ The executors are:
 - `watchNet`: validates network watching
 - `tests`: validates all the custom tests (not the test packages)
 
-To validate any single Testaro custom test `xyz`, enter the statement `npm run test1 xyz`.
+To validate any single Testaro test `xyz`, enter the statement `npm run test1 xyz`.
 
-To validate all of the Testaro custom tests, enter the statement `npm test`.
+To validate all of the Testaro tests, enter the statement `npm test`.
 
 To execute any executor `xyz` other than `test` or  `tests`, call it with the statement `node validation/executors/xyz`.
 
@@ -656,12 +641,6 @@ The rationales motivating the Testaro-defined tests can be found in comments wit
 
 On rare occasions a test throws an error that terminates the Node process and cannot be handled with a `try`-`catch` structure. It has been observed, for example, that the `ibm` test does this when run on the host at `https://zenythgroup.com/index` or `https://monsido.com`.
 
-If a single process performed all of the commands in a batch-based script, the process could perform tens of thousands of commands, and such an error could stop the process at any point.
-
-To handle this risk, Testaro processes batch-based jobs by forking a new process for each host. If such an error occurs, it crashes the child process, preventing a report for that host from being written. The parent process waits for the report to appear in the `REPORTDIR` directory until the time limit. When it fails to appear, the parent process continues to the next host.
-
-If you are using high-level invocation, your terminal will show the standard output of the parent process and, if there is a batch, the current child process, too. If you interrupt the process with `CTRL-c`, you will send a `SIGINT` signal to the parent process, which will handle it by sending a message to the child process telling it to terminate itself, and then the parent process will terminate by skipping the remaining hosts.
-
 ### Activation
 
 Testing to determine what happens when a control or link is activated is straightforward, except in the context of a comprehensive set of tests of a single page. There, activating a control or link can change the page or navigate away from it, interfering with the remaining planned tests of the page.
@@ -672,7 +651,7 @@ The Playwright “Receives Events” actionability check does **not** check whet
 
 Test packages sometimes do redundant testing, in that two or more packages test for the same issues, although such duplications are not necessarily perfect. This fact creates three problems:
 - One cannot be confident in excluding some tests of some packages on the assumption that they perfectly duplicate tests of other packages.
-- The Testaro report from a script documents each package’s results separately, so a single difect may be documented in multiple locations within the report, making the consumption of the report inefficient.
+- The Testaro report from a script documents each package’s results separately, so a single defect may be documented in multiple locations within the report, making the consumption of the report inefficient.
 - An effort to aggregate the results into a single score may distort the scores by inflating the weights of defects that happen to be discovered by multiple packages.
 
 The tests provided with Testaro do not exclude any apparently duplicative tests from packages.
@@ -691,6 +670,7 @@ The files in the `temp` directory are presumed ephemeral and are not tracked by 
 ## Related packages
 
 [Testilo](https://www.npmjs.com/package/testilo) is an application that:
+- merges batches of hosts into scripts to produce multiple scripts
 - produces scores and adds them to the JSON report files of Testaro
 - produces human-oriented HTML digests from scored reports
 - produces human-oriented HTML reports comparing the scores of hosts

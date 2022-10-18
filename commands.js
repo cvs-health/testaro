@@ -72,7 +72,7 @@ exports.commands = {
         which: [false, 'array', 'areStrings', 'substrings any of which matches element text'],
         text: [false, 'string', 'hasLength', 'text to enter after reaching element'],
         action: [false, 'string', 'hasLength', 'name of key to press, after text entry if any'],
-        withItems: [true, 'boolean']
+        withItems: [true, 'boolean', '', 'itemize']
       }
     ],
     radio: [
@@ -170,13 +170,13 @@ exports.commands = {
     embAc: [
       'Perform an embAc test',
       {
-        withItems: [true, 'boolean']
+        withItems: [true, 'boolean', '', 'itemize']
       }
     ],
     filter: [
       'Perform a filter test',
       {
-        withItems: [true, 'boolean']
+        withItems: [true, 'boolean', '', 'itemize']
       }
     ],
     focInd: [
@@ -184,32 +184,32 @@ exports.commands = {
       {
         revealAll: [true, 'boolean', '', 'whether to make all elements visible first'],
         allowedDelay: [true, 'number', '', 'milliseconds to wait for an outline'],
-        withItems: [true, 'boolean']
+        withItems: [true, 'boolean', '', 'itemize']
       }
     ],
     focOp: [
       'Perform a focOp test',
       {
-        withItems: [true, 'boolean']
+        withItems: [true, 'boolean', '', 'itemize']
       }
     ],
     focVis: [
       'Perform a focVis test',
       {
-        withItems: [true, 'boolean']
+        withItems: [true, 'boolean', '', 'itemize']
       }
     ],
     hover: [
       'Perform a hover test',
       {
         sampleSize: [false, 'number', '', 'limit on sample size of triggers, if any'],
-        withItems: [true, 'boolean']
+        withItems: [true, 'boolean', '', 'itemize']
       }
     ],
     ibm: [
       'Perform an IBM Equal Access test',
       {
-        withItems: [true, 'boolean'],
+        withItems: [true, 'boolean', '', 'itemize'],
         withNewContent: [
           false, 'boolean', '', 'true: use a URL; false: use page content; omitted: both'
         ]
@@ -218,31 +218,31 @@ exports.commands = {
     labClash: [
       'Perform a labClash test',
       {
-        withItems: [true, 'boolean']
+        withItems: [true, 'boolean', '', 'itemize']
       }
     ],
     linkTo: [
       'Perform a linkTo test',
       {
-        withItems: [true, 'boolean']
+        withItems: [true, 'boolean', '', 'itemize']
       }
     ],
     linkUl: [
       'Perform a linkUl test',
       {
-        withItems: [true, 'boolean']
+        withItems: [true, 'boolean', '', 'itemize']
       }
     ],
     menuNav: [
       'Perform a menuNav test',
       {
-        withItems: [true, 'boolean']
+        withItems: [true, 'boolean', '', 'itemize']
       }
     ],
     miniText: [
       'Perform a miniText test',
       {
-        withItems: [true, 'boolean']
+        withItems: [true, 'boolean', '', 'itemize']
       }
     ],
     motion: [
@@ -256,25 +256,25 @@ exports.commands = {
     nonTable: [
       'Perform a nonTable test',
       {
-        withItems: [true, 'boolean']
+        withItems: [true, 'boolean', '', 'itemize']
       }
     ],
     radioSet: [
       'Perform a radioSet test',
       {
-        withItems: [true, 'boolean']
+        withItems: [true, 'boolean', '', 'itemize']
       }
     ],
     styleDiff: [
       'Perform a styleDiff test',
       {
-        withItems: [true, 'boolean']
+        withItems: [true, 'boolean', '', 'itemize']
       }
     ],
     tabNav: [
       'Perform a tabNav test',
       {
-        withItems: [true, 'boolean']
+        withItems: [true, 'boolean', '', 'itemize']
       }
     ],
     tenon: [
@@ -293,7 +293,7 @@ exports.commands = {
     titledEl: [
       'Perform a titledEl test',
       {
-        withItems: [true, 'boolean']
+        withItems: [true, 'boolean', '', 'itemize']
       }
     ],
     wave: [
@@ -305,7 +305,7 @@ exports.commands = {
     zIndex: [
       'Perform a zIndex test',
       {
-        withItems: [true, 'boolean']
+        withItems: [true, 'boolean', '', 'itemize']
       }
     ]
   }

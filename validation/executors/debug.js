@@ -2,7 +2,7 @@
 // Validator for Testaro tests.
 
 const fs = require('fs').promises;
-const {handleRequest} = require(`${__dirname}/../../run`);
+const {doJob} = require(`${__dirname}/../../run`);
 const validateTests = async () => {
   const totals = {
     attempts: 0,
@@ -18,7 +18,7 @@ const validateTests = async () => {
     const report = {script};
     report.log = [];
     report.acts = [];
-    await handleRequest(report);
+    await doJob(report);
     const {log, acts} = report;
     if (log.length === 2 && log[1].event === 'endTime' && /^\d{4}-.+$/.test(log[1].value)) {
       console.log('Success: Log has been correctly populated');
