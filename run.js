@@ -113,14 +113,6 @@ const errorWords = [
 // ########## VARIABLES
 
 // Facts about the current session.
-let logCount = 0;
-let logSize = 0;
-let errorLogCount = 0;
-let errorLogSize = 0;
-let prohibitedCount = 0;
-let visitTimeoutCount = 0;
-let visitRejectionCount = 0;
-let visitLatency = 0;
 let actCount = 0;
 // Facts about the current browser.
 let browser;
@@ -276,6 +268,8 @@ const isValidReport = async report => {
 
 // ########## OTHER FUNCTIONS
 
+// Returns a string representing the date and time.
+const nowString = () => (new Date()).toISOString().slice(0, 19);
 // Closes the current browser.
 const browserClose = async () => {
   if (browser) {
@@ -343,15 +337,15 @@ const launch = async typeName => {
           console.log(`\n${indentedMsg}`);
           const msgTextLC = msgText.toLowerCase();
           const msgLength = msgText.length;
-          logCount++;
-          logSize += msgLength;
+          report.logCount++;
+          report.logSize += msgLength;
           if (errorWords.some(word => msgTextLC.includes(word))) {
-            errorLogCount++;
-            errorLogSize += msgLength;
+            report.errorLogCount++;
+            report.errorLogSize += msgLength;
           }
           const msgLC = msgText.toLowerCase();
           if (msgText.includes('403') && (msgLC.includes('status') || msgLC.includes('prohibited'))) {
-            prohibitedCount++;
+            report.prohibitedCount++;
           }
         });
       });
@@ -460,7 +454,7 @@ const textOf = async (page, element) => {
 // Returns a string with any final slash removed.
 const deSlash = string => string.endsWith('/') ? string.slice(0, -1) : string;
 // Tries to visit a URL.
-const goto = async (page, url, timeout, waitUntil, isStrict) => {
+const goTo = async (report, page, url, timeout, waitUntil, isStrict) => {
   if (url.startsWith('file://.')) {
     url = url.replace('file://', `file://${__dirname}/`);
   }
@@ -472,10 +466,10 @@ const goto = async (page, url, timeout, waitUntil, isStrict) => {
   })
   .catch(error => {
     console.log(`ERROR: Visit to ${url} timed out before ${waitUntil} (${errorStart(error)})`);
-    visitTimeoutCount++;
+    report.visitTimeoutCount++;
     return 'error';
   });
-  visitLatency += Math.round((Date.now() - startTime) / 1000);
+  report.visitLatency += Math.round((Date.now() - startTime) / 1000);
   // If the visit succeeded:
   if (typeof response !== 'string') {
     const httpStatus = response.status();
@@ -500,7 +494,7 @@ const goto = async (page, url, timeout, waitUntil, isStrict) => {
     else {
       // Return an error.
       console.log(`ERROR: Visit to ${url} got status ${httpStatus}`);
-      visitRejectionCount++;
+      report.visitRejectionCount++;
       return 'error';
     }
   }
@@ -508,63 +502,6 @@ const goto = async (page, url, timeout, waitUntil, isStrict) => {
   else {
     // Return an error.
     return 'error';
-  }
-};
-// Visits the URL that is the value of the “which” property of an act.
-const visit = async (act, page, isStrict) => {
-  // Identify the URL.
-  const resolved = act.which.replace('__dirname', __dirname);
-  requestedURL = resolved;
-  // Visit it and wait until the network is idle.
-  let response = await goto(page, requestedURL, 15000, 'networkidle', isStrict);
-  // If the visit fails:
-  if (response === 'error') {
-    // Try again until the DOM is loaded.
-    response = await goto(page, requestedURL, 10000, 'domcontentloaded', isStrict);
-    // If the visit fails:
-    if (response === 'error') {
-      // Launch another browser type.
-      const newBrowserName = Object.keys(browserTypeNames)
-      .find(name => name !== browserTypeName);
-      console.log(`>> Launching ${newBrowserName} instead`);
-      await launch(newBrowserName);
-      // Identify its only page as current.
-      page = browserContext.pages()[0];
-      // Try again until the network is idle.
-      response = await goto(page, requestedURL, 10000, 'networkidle', isStrict);
-      // If the visit fails:
-      if (response === 'error') {
-        // Try again until the DOM is loaded.
-        response = await goto(page, requestedURL, 5000, 'domcontentloaded', isStrict);
-        // If the visit fails:
-        if (response === 'error') {
-          // Try again or until a load.
-          response = await goto(page, requestedURL, 5000, 'load', isStrict);
-          // If the visit fails:
-          if (response === 'error') {
-            // Give up.
-            const errorMsg = `ERROR: Attempts to visit ${requestedURL} failed`;
-            console.log(errorMsg);
-            act.result = errorMsg;
-            await page.goto('about:blank')
-            .catch(error => {
-              console.log(`ERROR: Navigation to blank page failed (${error.message})`);
-            });
-            return null;
-          }
-        }
-      }
-    }
-  }
-  // If one of the visits succeeded:
-  if (response) {
-    // Add the resulting URL to the act.
-    if (isStrict && response === 'redirection') {
-      act.error = 'ERROR: Navigation redirected';
-    }
-    act.result = page.url();
-    // Return the page.
-    return page;
   }
 };
 // Returns a property value and whether it satisfies an expectation.
@@ -708,6 +645,61 @@ const doActs = async (report, actIndex, page) => {
       else if (page) {
         // If the command is a url:
         if (act.type === 'url') {
+        // Identify the URL.
+        const resolved = act.which.replace('__dirname', __dirname);
+        requestedURL = resolved;
+        // Visit it and wait until the network is idle.
+        let response = await goTo(report, page, requestedURL, 15000, 'networkidle', isStrict);
+        // If the visit fails:
+        if (response === 'error') {
+          // Try again until the DOM is loaded.
+          response = await goTo(report, page, requestedURL, 10000, 'domcontentloaded', isStrict);
+          // If the visit fails:
+          if (response === 'error') {
+            // Launch another browser type.
+            const newBrowserName = Object.keys(browserTypeNames)
+            .find(name => name !== browserTypeName);
+            console.log(`>> Launching ${newBrowserName} instead`);
+            await launch(newBrowserName);
+            // Identify its only page as current.
+            page = browserContext.pages()[0];
+            // Try again until the network is idle.
+            response = await goTo(report, page, requestedURL, 10000, 'networkidle', isStrict);
+            // If the visit fails:
+            if (response === 'error') {
+              // Try again until the DOM is loaded.
+              response = await goTo(report, page, requestedURL, 5000, 'domcontentloaded', isStrict);
+              // If the visit fails:
+              if (response === 'error') {
+                // Try again or until a load.
+                response = await goTo(report, page, requestedURL, 5000, 'load', isStrict);
+                // If the visit fails:
+                if (response === 'error') {
+                  // Give up.
+                  const errorMsg = `ERROR: Attempts to visit ${requestedURL} failed`;
+                  console.log(errorMsg);
+                  act.result = errorMsg;
+                  await page.goto('about:blank')
+                  .catch(error => {
+                    console.log(`ERROR: Navigation to blank page failed (${error.message})`);
+                  });
+                  return null;
+                }
+              }
+            }
+          }
+        }
+        // If one of the visits succeeded:
+        if (response) {
+          // Add the resulting URL to the act.
+          if (isStrict && response === 'redirection') {
+            act.error = 'ERROR: Navigation redirected';
+          }
+          act.result = page.url();
+          // Return the page.
+          return page;
+        }
+      };
           // Visit it and wait until it is stable.
           page = await visit(act, page, report.isStrict);
         }
@@ -1463,44 +1455,6 @@ const doActs = async (report, actIndex, page) => {
     await browserClose();
   }
 };
-// Performs the commands in a script.
-const doScript = async (report) => {
-  // Reinitialize the log statistics.
-  logCount = 0;
-  logSize = 0;
-  errorLogCount = 0;
-  errorLogSize = 0;
-  prohibitedCount = 0;
-  visitTimeoutCount = 0;
-  visitRejectionCount = 0;
-  // Add the start time to the report.
-  const startTime = new Date();
-  report.startTime = startTime.toISOString().slice(0, 19);
-  // Add initialized properties to the report.
-  report.presses = 0;
-  report.amountRead = 0;
-  report.testTimes = [];
-  // Perform the specified acts.
-  await doActs(report, 0, null);
-  // Add the log statistics to the report.
-  report.logCount = logCount;
-  report.logSize = logSize;
-  report.errorLogCount = errorLogCount;
-  report.errorLogSize = errorLogSize;
-  report.prohibitedCount = prohibitedCount;
-  report.visitTimeoutCount = visitTimeoutCount;
-  report.visitRejectionCount = visitRejectionCount;
-  report.visitLatency = visitLatency;
-  // Add the end time and duration to the report.
-  const endTime = new Date();
-  report.endTime = endTime.toISOString().slice(0, 19);
-  report.elapsedSeconds =  Math.floor((endTime - startTime) / 1000);
-  // Add an end time to the log.
-  report.log.push({
-    event: 'endTime',
-    value: ((new Date()).toISOString().slice(0, 19))
-  });
-};
 // Injects launch and url acts into a report where necessary to undo DOM changes.
 const injectLaunches = acts => {
   let injectMore = true;
@@ -1552,17 +1506,9 @@ const injectLaunches = acts => {
 exports.doJob = async report => {
   // If the report object is valid:
   if(isValidReport(report)) {
-    // Add a start time to the log.
-    report.log.push(
-      {
-        event: 'startTime',
-        value: ((new Date()).toISOString().slice(0, 19))
-      }
-    );
-    // Add a time stamp to the report.
-    report.timeStamp = Math.floor((Date.now() - Date.UTC(2022, 1)) / 2000).toString(36);
     // Add an ID to the report.
-    report.id = `${report.timeStamp}-${report.script.id}`;
+    const timeStamp = Math.floor((Date.now() - Date.UTC(2022, 1)) / 2000).toString(36);
+    report.id = `${timeStamp}-${report.script.id}`;
     // Add the script commands to the report as its initial acts.
     report.acts = JSON.parse(JSON.stringify(report.script.commands));
     /*
@@ -1572,6 +1518,31 @@ exports.doJob = async report => {
     if (urlInject === 'yes') {
       injectLaunches(report.acts);
     }
+    // Add initialized log data to the report.
+    report.logCount = 0;
+    report.logSize = 0;
+    report.errorLogCount = 0;
+    report.errorLogSize = 0;
+    report.prohibitedCount = 0;
+    report.visitTimeoutCount = 0;
+    report.visitRejectionCount = 0;
+    // Add the start time to the report.
+    const startTime = new Date();
+    report.startTime = nowString();
+    // Add other initialized properties to the report.
+    report.presses = 0;
+    report.amountRead = 0;
+    report.testTimes = [];
+    // Recursively perform the specified acts.
+    await doActs(report, 0, null);
+    // Add the log statistics to the report.
+    report.visitLatency = visitLatency;
+    // Add the end time and duration to the report.
+    const endTime = new Date();
+    report.endTime = nowString();
+    report.elapsedSeconds =  Math.floor((endTime - startTime) / 1000);
+    // Add an end time to the log.
+  };
     // Perform the acts, asynchronously adding to the log and report.
     await doScript(report);
   }

@@ -96,7 +96,7 @@ const writeDirReport = async report => {
   if (scriptID) {
     try {
       const reportJSON = JSON.stringify(report, null, 2);
-      const reportName = `${report.timeStamp}-${scriptID}.json`;
+      const reportName = `${report.script.timeStamp}-${scriptID}.json`;
       await fs.writeFile(`${reportDir}/${reportName}`, reportJSON);
       console.log(`Report ${reportName} saved`);
       return true;
@@ -149,22 +149,22 @@ const wait = ms => {
     }, ms);
   });
 };
-// Runs a script, time-stamps it, and returns a report.
+// Runs a job, time-stamps it, and returns a report.
 const runJob = async script => {
   const {id} = script;
   if (id) {
     try {
-      // Identify the start time and a time stamp.
-      const timeStamp = Math.floor((Date.now() - Date.UTC(2022, 1)) / 2000).toString(36);
-      script.timeStamp = timeStamp;
       // Initialize a report.
       const report = {
         log: [],
         script,
         acts: []
       };
+      // Run the job, adding to the report.
       await doJob(report);
+      // If the watch type is directory:
       if (watchType === 'dir') {
+        // Save the report.
         return await writeDirReport(report);
       }
       else {
