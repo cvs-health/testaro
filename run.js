@@ -453,57 +453,6 @@ const textOf = async (page, element) => {
 };
 // Returns a string with any final slash removed.
 const deSlash = string => string.endsWith('/') ? string.slice(0, -1) : string;
-// Tries to visit a URL.
-const goTo = async (report, page, url, timeout, waitUntil, isStrict) => {
-  if (url.startsWith('file://.')) {
-    url = url.replace('file://', `file://${__dirname}/`);
-  }
-  // Visit the URL.
-  const startTime = Date.now();
-  const response = await page.goto(url, {
-    timeout,
-    waitUntil
-  })
-  .catch(error => {
-    console.log(`ERROR: Visit to ${url} timed out before ${waitUntil} (${errorStart(error)})`);
-    report.visitTimeoutCount++;
-    return 'error';
-  });
-  report.visitLatency += Math.round((Date.now() - startTime) / 1000);
-  // If the visit succeeded:
-  if (typeof response !== 'string') {
-    const httpStatus = response.status();
-    // If the response status was normal:
-    if ([200, 304].includes(httpStatus) || url.startsWith('file:')) {
-      // If the browser was redirected in violation of a strictness requirement.
-      const actualURL = page.url();
-      if (isStrict && deSlash(actualURL) !== deSlash(url)) {
-        // Return an error.
-        console.log(`ERROR: Visit to ${url} redirected to ${actualURL}`);
-        return 'redirection';
-      }
-      // Otherwise, i.e. if no prohibited redirection occurred:
-      else {
-        // Press the Escape key to dismiss any modal dialog.
-        await page.keyboard.press('Escape');
-        // Return the response.
-        return response;
-      }
-    }
-    // Otherwise, i.e. if the response status was abnormal:
-    else {
-      // Return an error.
-      console.log(`ERROR: Visit to ${url} got status ${httpStatus}`);
-      report.visitRejectionCount++;
-      return 'error';
-    }
-  }
-  // Otherwise, i.e. if the visit failed:
-  else {
-    // Return an error.
-    return 'error';
-  }
-};
 // Returns a property value and whether it satisfies an expectation.
 const isTrue = (object, specs) => {
   const property = specs[0];
@@ -578,6 +527,65 @@ const addError = (act, error, message) => {
     act.result.prevented = true;
   }
 };
+// Visits a URL and returns the response of the server.
+const goTo = async (report, page, url, timeout, waitUntil, isStrict) => {
+  if (url.startsWith('file://')) {
+    url = url.replace('file://', `file://${__dirname}/`);
+  }
+  // Visit the URL.
+  const startTime = Date.now();
+  const response = await page.goto(url, {
+    timeout,
+    waitUntil
+  })
+  .catch(error => {
+    console.log(`ERROR: Visit to ${url} timed out before ${waitUntil} (${errorStart(error)})`);
+    report.visitTimeoutCount++;
+    return {
+      error: 'timeout'
+    };
+  });
+  report.visitLatency += Math.round((Date.now() - startTime) / 1000);
+  // If the visit succeeded:
+  const httpStatus = response.status();
+  if (httpStatus) {
+    // If the response status was normal:
+    if ([200, 304].includes(httpStatus) || url.startsWith('file:')) {
+      // If the browser was redirected in violation of a strictness requirement:
+      const actualURL = page.url();
+      if (isStrict && deSlash(actualURL) !== deSlash(url)) {
+        // Return an error.
+        console.log(`ERROR: Visit to ${url} redirected to ${actualURL}`);
+        return {
+          error: 'redirection'
+        };
+      }
+      // Otherwise, i.e. if no prohibited redirection occurred:
+      else {
+        // Press the Escape key to dismiss any modal dialog.
+        await page.keyboard.press('Escape');
+        // Return the response.
+        return response;
+      }
+    }
+    // Otherwise, i.e. if the response status was abnormal:
+    else {
+      // Return an error.
+      console.log(`ERROR: Visit to ${url} got status ${httpStatus}`);
+      report.visitRejectionCount++;
+      return {
+        error: 'badStatus'
+      };
+    }
+  }
+  // Otherwise, i.e. if the visit failed:
+  else {
+    // Return an error.
+    return {
+      error: 'noStatus'
+    };
+  }
+};
 // Recursively performs the acts in a report.
 const doActs = async (report, actIndex, page) => {
   process.on('message', message => {
@@ -645,63 +653,59 @@ const doActs = async (report, actIndex, page) => {
       else if (page) {
         // If the command is a url:
         if (act.type === 'url') {
-        // Identify the URL.
-        const resolved = act.which.replace('__dirname', __dirname);
-        requestedURL = resolved;
-        // Visit it and wait until the network is idle.
-        let response = await goTo(report, page, requestedURL, 15000, 'networkidle', isStrict);
-        // If the visit fails:
-        if (response === 'error') {
-          // Try again until the DOM is loaded.
-          response = await goTo(report, page, requestedURL, 10000, 'domcontentloaded', isStrict);
+          // Identify the URL.
+          const resolved = act.which.replace('__dirname', __dirname);
+          requestedURL = resolved;
+          // Visit it and wait until the network is idle.
+          let response = await goTo(report, page, requestedURL, 15000, 'networkidle', isStrict);
           // If the visit fails:
-          if (response === 'error') {
-            // Launch another browser type.
-            const newBrowserName = Object.keys(browserTypeNames)
-            .find(name => name !== browserTypeName);
-            console.log(`>> Launching ${newBrowserName} instead`);
-            await launch(newBrowserName);
-            // Identify its only page as current.
-            page = browserContext.pages()[0];
-            // Try again until the network is idle.
-            response = await goTo(report, page, requestedURL, 10000, 'networkidle', isStrict);
+          if (response.error) {
+            // Try again until the DOM is loaded.
+            response = await goTo(report, page, requestedURL, 10000, 'domcontentloaded', isStrict);
             // If the visit fails:
-            if (response === 'error') {
-              // Try again until the DOM is loaded.
-              response = await goTo(report, page, requestedURL, 5000, 'domcontentloaded', isStrict);
+            if (response.error) {
+              // Launch another browser type.
+              const newBrowserName = Object.keys(browserTypeNames)
+              .find(name => name !== browserTypeName);
+              console.log(`>> Launching ${newBrowserName} instead`);
+              await launch(newBrowserName);
+              // Identify its only page as current.
+              page = browserContext.pages()[0];
+              // Try again until the network is idle.
+              response = await goTo(report, page, requestedURL, 10000, 'networkidle', isStrict);
               // If the visit fails:
-              if (response === 'error') {
-                // Try again or until a load.
-                response = await goTo(report, page, requestedURL, 5000, 'load', isStrict);
+              if (response.error) {
+                // Try again until the DOM is loaded.
+                response = await goTo(report, page, requestedURL, 5000, 'domcontentloaded', isStrict);
                 // If the visit fails:
-                if (response === 'error') {
-                  // Give up.
-                  const errorMsg = `ERROR: Attempts to visit ${requestedURL} failed`;
-                  console.log(errorMsg);
-                  act.result = errorMsg;
-                  await page.goto('about:blank')
-                  .catch(error => {
-                    console.log(`ERROR: Navigation to blank page failed (${error.message})`);
-                  });
-                  return null;
+                if (response.error) {
+                  // Try again or until a load.
+                  response = await goTo(report, page, requestedURL, 5000, 'load', isStrict);
+                  // If the visit fails:
+                  if (response.error) {
+                    // Give up.
+                    const errorMsg = `ERROR: Attempts to visit ${requestedURL} failed`;
+                    console.log(errorMsg);
+                    act.result = errorMsg;
+                    await page.goto('about:blank')
+                    .catch(error => {
+                      console.log(`ERROR: Navigation to blank page failed (${error.message})`);
+                    });
+                  }
                 }
               }
             }
           }
-        }
-        // If one of the visits succeeded:
-        if (response) {
-          // Add the resulting URL to the act.
-          if (isStrict && response === 'redirection') {
-            act.error = 'ERROR: Navigation redirected';
+          // If one of the visits succeeded:
+          if (response.status()) {
+            // If a prohibited redirection occurred:
+            if (isStrict && response.error === 'redirection') {
+              // Add this to the act.
+              addError(act, 'redirection', 'ERROR: Navigation redirected');
+            }
+            // Add the resulting URL to the act.
+            act.result = page.url();
           }
-          act.result = page.url();
-          // Return the page.
-          return page;
-        }
-      };
-          // Visit it and wait until it is stable.
-          page = await visit(act, page, report.isStrict);
         }
         // Otherwise, if the act is a wait for text:
         else if (act.type === 'wait') {
@@ -774,10 +778,7 @@ const doActs = async (report, actIndex, page) => {
           )
           .catch(error => {
             console.log(`ERROR waiting for page to be ${act.which} (${error.message})`);
-            act.result = {
-              success: false,
-              error: `ERROR waiting for page to be ${act.which}`
-            };
+            addError(act, 'timeout', `ERROR waiting for page to be ${act.which}`);
             actIndex = -2;
           });
           if (actIndex > -2) {
@@ -1405,21 +1406,13 @@ const doActs = async (report, actIndex, page) => {
             // Otherwise, i.e. if the act type is unknown:
             else {
               // Add the error result to the act.
-              act.result = {
-                success: false,
-                error: 'badType',
-                message: 'ERROR: invalid command type'
-              };
+              addError(act, 'badType', 'ERROR: Invalid command type');
             }
           }
           // Otherwise, i.e. if redirection is prohibited but occurred:
           else {
             // Add an error result to the act.
-            act.result = {
-              success: false,
-              error: 'redirection',
-              message: `ERROR: Page redirected to (${url})`
-            };
+            addError(act, 'redirection', `ERROR: Page redirected to (${url})`);
           }
         }
         // Otherwise, i.e. if the required page URL does not exist:
@@ -1439,12 +1432,8 @@ const doActs = async (report, actIndex, page) => {
     else {
       // Add an error result to the act.
       const errorMsg = `ERROR: Invalid command of type ${act.type}`;
-      act.result = {
-        success: false,
-        error: 'badCommand',
-        message: errorMsg
-      };
       console.log(errorMsg);
+      addError(act, 'badCommand', errorMsg);
       // Quit.
       actIndex = -2;
     }
