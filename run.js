@@ -540,8 +540,8 @@ const goTo = async (report, page, url, timeout, waitUntil, isStrict) => {
   });
   report.jobData.visitLatency += Math.round((Date.now() - startTime) / 1000);
   // If the visit succeeded:
-  const httpStatus = response.status();
-  if (httpStatus) {
+  if (! response.error) {
+    const httpStatus = response.status();
     // If the response status was normal:
     if ([200, 304].includes(httpStatus) || url.startsWith('file:')) {
       // If the browser was redirected in violation of a strictness requirement:
@@ -691,7 +691,7 @@ const doActs = async (report, actIndex, page) => {
             }
           }
           // If one of the visits succeeded:
-          if (response.status()) {
+          if (! response.error || response.error === 'redirection') {
             // If a prohibited redirection occurred:
             if (strict && response.error === 'redirection') {
               // Add this to the act.
