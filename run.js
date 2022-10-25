@@ -233,22 +233,6 @@ const isValidCommand = command => {
     return false;
   }
 };
-// Validates a script.
-const isValidScript = script => {
-  // Get the script data.
-  const {what, strict, commands} = script;
-  // Return whether the script is valid:
-  return what
-    && typeof strict === 'boolean'
-    && commands
-    && typeof what === 'string'
-    && Array.isArray(commands)
-    && commands[0].type === 'launch'
-    && commands.length > 1
-    && commands[1].type === 'url'
-    && isURL(commands[1].which)
-    && commands.every(command => isValidCommand(command));
-};
 // Validates a report object.
 const isValidReport = report => {
   if (report) {
@@ -666,11 +650,12 @@ const doActs = async (report, actIndex, page) => {
           const resolved = act.which.replace('__dirname', __dirname);
           requestedURL = resolved;
           // Visit it and wait until the network is idle.
-          let response = await goTo(report, page, requestedURL, 15000, 'networkidle', isStrict);
+          const {strict} = report.script;
+          let response = await goTo(report, page, requestedURL, 15000, 'networkidle', strict);
           // If the visit fails:
           if (response.error) {
             // Try again until the DOM is loaded.
-            response = await goTo(report, page, requestedURL, 10000, 'domcontentloaded', isStrict);
+            response = await goTo(report, page, requestedURL, 10000, 'domcontentloaded', strict);
             // If the visit fails:
             if (response.error) {
               // Launch another browser type.
@@ -681,15 +666,15 @@ const doActs = async (report, actIndex, page) => {
               // Identify its only page as current.
               page = browserContext.pages()[0];
               // Try again until the network is idle.
-              response = await goTo(report, page, requestedURL, 10000, 'networkidle', isStrict);
+              response = await goTo(report, page, requestedURL, 10000, 'networkidle', strict);
               // If the visit fails:
               if (response.error) {
                 // Try again until the DOM is loaded.
-                response = await goTo(report, page, requestedURL, 5000, 'domcontentloaded', isStrict);
+                response = await goTo(report, page, requestedURL, 5000, 'domcontentloaded', strict);
                 // If the visit fails:
                 if (response.error) {
                   // Try again or until a load.
-                  response = await goTo(report, page, requestedURL, 5000, 'load', isStrict);
+                  response = await goTo(report, page, requestedURL, 5000, 'load', strict);
                   // If the visit fails:
                   if (response.error) {
                     // Give up.
@@ -708,7 +693,7 @@ const doActs = async (report, actIndex, page) => {
           // If one of the visits succeeded:
           if (response.status()) {
             // If a prohibited redirection occurred:
-            if (isStrict && response.error === 'redirection') {
+            if (strict && response.error === 'redirection') {
               // Add this to the act.
               addError(act, 'redirection', 'ERROR: Navigation redirected');
             }
