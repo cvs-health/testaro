@@ -249,17 +249,26 @@ const isValidScript = script => {
     && isURL(commands[1].which)
     && commands.every(command => isValidCommand(command));
 };
-// Validates an initialized reports array.
-const isValidActs = acts => Array.isArray(acts) && ! acts.length;
-// Validates an initialized log array.
-const isValidLog = log => Array.isArray(log) && ! log.length;
 // Validates a report object.
-const isValidReport = async report => {
+const isValidReport = report => {
   if (report) {
+    // Return whether the report is valid.
     const {script, log, acts} = report;
-    return isValidScript(script)
-    && isValidLog(log)
-    && isValidActs(acts);
+    const {what, strict, commands} = script;
+    return what
+      && typeof strict === 'boolean'
+      && commands
+      && typeof what === 'string'
+      && Array.isArray(commands)
+      && commands[0].type === 'launch'
+      && commands.length > 1
+      && commands[1].type === 'url'
+      && isURL(commands[1].which)
+      && commands.every(command => isValidCommand(command))
+      && Array.isArray(log)
+      && ! log.length
+      && Array.isArray(acts)
+      && ! acts.length;
   }
   else {
     return false;
@@ -283,7 +292,7 @@ const browserClose = async () => {
 // Returns the first line of an error message.
 const errorStart = error => error.message.replace(/\n.+/s, '');
 // Launches a browser.
-const launch = async typeName => {
+const launch = async (report, typeName) => {
   const browserType = require('playwright')[typeName];
   // If the specified browser type exists:
   if (browserType) {
@@ -337,15 +346,15 @@ const launch = async typeName => {
           console.log(`\n${indentedMsg}`);
           const msgTextLC = msgText.toLowerCase();
           const msgLength = msgText.length;
-          report.logCount++;
-          report.logSize += msgLength;
+          report.jobData.logCount++;
+          report.jobData.logSize += msgLength;
           if (errorWords.some(word => msgTextLC.includes(word))) {
-            report.errorLogCount++;
-            report.errorLogSize += msgLength;
+            report.jobData.errorLogCount++;
+            report.jobData.errorLogSize += msgLength;
           }
           const msgLC = msgText.toLowerCase();
           if (msgText.includes('403') && (msgLC.includes('status') || msgLC.includes('prohibited'))) {
-            report.prohibitedCount++;
+            report.jobData.prohibitedCount++;
           }
         });
       });
@@ -540,12 +549,12 @@ const goTo = async (report, page, url, timeout, waitUntil, isStrict) => {
   })
   .catch(error => {
     console.log(`ERROR: Visit to ${url} timed out before ${waitUntil} (${errorStart(error)})`);
-    report.visitTimeoutCount++;
+    report.jobData.visitTimeoutCount++;
     return {
       error: 'timeout'
     };
   });
-  report.visitLatency += Math.round((Date.now() - startTime) / 1000);
+  report.jobData.visitLatency += Math.round((Date.now() - startTime) / 1000);
   // If the visit succeeded:
   const httpStatus = response.status();
   if (httpStatus) {
@@ -572,7 +581,7 @@ const goTo = async (report, page, url, timeout, waitUntil, isStrict) => {
     else {
       // Return an error.
       console.log(`ERROR: Visit to ${url} got status ${httpStatus}`);
-      report.visitRejectionCount++;
+      report.jobData.visitRejectionCount++;
       return {
         error: 'badStatus'
       };
@@ -645,7 +654,7 @@ const doActs = async (report, actIndex, page) => {
       // Otherwise, if the command is a launch:
       else if (act.type === 'launch') {
         // Launch the specified browser, creating a browser context and a page in it.
-        await launch(act.which);
+        await launch(report, act.which);
         // Identify its only page as current.
         page = browserContext.pages()[0];
       }
@@ -969,8 +978,8 @@ const doActs = async (report, actIndex, page) => {
                 testReport.result.failureCount = failureCount;
               }
               testReport.result.success = true;
-              report.testTimes.push([act.which, Math.round((Date.now() - startTime) / 1000)]);
-              report.testTimes.sort((a, b) => b[1] - a[1]);
+              report.jobData.testTimes.push([act.which, Math.round((Date.now() - startTime) / 1000)]);
+              report.jobData.testTimes.sort((a, b) => b[1] - a[1]);
               // Add the result object (possibly an array) to the act.
               const resultCount = Object.keys(testReport.result).length;
               act.result = resultCount ? testReport.result : {success: false};
@@ -1213,7 +1222,7 @@ const doActs = async (report, actIndex, page) => {
                   }
                   // Enter the text.
                   await selection.type(act.what);
-                  report.presses += act.what.length;
+                  report.jobData.presses += act.what.length;
                   act.result.success = true;
                   act.result.move = 'entered';
                   // If the input is a search input:
@@ -1245,7 +1254,7 @@ const doActs = async (report, actIndex, page) => {
             else if (act.type === 'press') {
               // Identify the number of times to press the key.
               let times = 1 + (act.again || 0);
-              report.presses += times;
+              report.jobData.presses += times;
               const key = act.which;
               // Press the key.
               while (times--) {
@@ -1400,8 +1409,8 @@ const doActs = async (report, actIndex, page) => {
                 act.result.items = items;
               }
               // Add the totals to the report.
-              report.presses += presses;
-              report.amountRead += amountRead;
+              report.jobData.presses += presses;
+              report.jobData.amountRead += amountRead;
             }
             // Otherwise, i.e. if the act type is unknown:
             else {
@@ -1415,7 +1424,7 @@ const doActs = async (report, actIndex, page) => {
             addError(act, 'redirection', `ERROR: Page redirected to (${url})`);
           }
         }
-        // Otherwise, i.e. if the required page URL does not exist:
+        // Otherwise, a page URL is required but does not exist, so:
         else {
           // Add an error result to the act.
           addError(act, 'noURL', 'ERROR: Page has no URL');
@@ -1437,7 +1446,7 @@ const doActs = async (report, actIndex, page) => {
       // Quit.
       actIndex = -2;
     }
-    // Perform the remaining acts.
+    // Perform the remaining acts unless the performance of acts has been aborted.
     await doActs(report, actIndex + 1, page);
   }
   else {
@@ -1507,35 +1516,29 @@ exports.doJob = async report => {
     if (urlInject === 'yes') {
       injectLaunches(report.acts);
     }
-    // Add initialized log data to the report.
-    report.logCount = 0;
-    report.logSize = 0;
-    report.errorLogCount = 0;
-    report.errorLogSize = 0;
-    report.prohibitedCount = 0;
-    report.visitTimeoutCount = 0;
-    report.visitRejectionCount = 0;
-    // Add the start time to the report.
+    // Add initialized job data to the report.
     const startTime = new Date();
-    report.startTime = nowString();
-    // Add other initialized properties to the report.
-    report.presses = 0;
-    report.amountRead = 0;
-    report.testTimes = [];
+    report.jobData = {
+      startTime: nowString(),
+      endTime: '',
+      elapsedSeconds: 0,
+      visitLatency: 0,
+      logCount: 0,
+      logSize: 0,
+      errorLogCount: 0,
+      errorLogSize: 0,
+      prohibitedCount: 0,
+      visitTimeoutCount: 0,
+      visitRejectionCount: 0,
+      presses: 0,
+      amountRead: 0,
+      testTimes: []
+    };
     // Recursively perform the specified acts.
     await doActs(report, 0, null);
-    // Add the log statistics to the report.
-    report.visitLatency = visitLatency;
     // Add the end time and duration to the report.
     const endTime = new Date();
-    report.endTime = nowString();
-    report.elapsedSeconds =  Math.floor((endTime - startTime) / 1000);
-    // Add an end time to the log.
-  };
-    // Perform the acts, asynchronously adding to the log and report.
-    await doScript(report);
-  }
-  else {
-    console.log('ERROR: options missing or invalid');
+    report.jobData.endTime = nowString();
+    report.jobData.elapsedSeconds =  Math.floor((endTime - startTime) / 1000);
   }
 };
