@@ -513,6 +513,9 @@ const wait = ms => {
 };
 // Adds an error result to an act.
 const addError = (act, error, message) => {
+  if (! act.result) {
+    act.result = {};
+  }
   act.result.success = false;
   act.result.error = error;
   act.result.message = message;
@@ -677,10 +680,7 @@ const doActs = async (report, actIndex, page) => {
                   response = await goTo(report, page, requestedURL, 5000, 'load', strict);
                   // If the visit fails:
                   if (response.error) {
-                    // Give up.
-                    const errorMsg = `ERROR: Attempts to visit ${requestedURL} failed`;
-                    console.log(errorMsg);
-                    act.result = errorMsg;
+                    // Navigate to a blank page instead.
                     await page.goto('about:blank')
                     .catch(error => {
                       console.log(`ERROR: Navigation to blank page failed (${error.message})`);
@@ -690,12 +690,23 @@ const doActs = async (report, actIndex, page) => {
               }
             }
           }
-          // If one of the visits succeeded:
-          if (! response.error) {
+          // If none of the visits succeeded:
+          if (response.error) {
+            // Report this.
+            report.jobData.aborted = true;
+            report.jobData.abortedAct = actIndex;
+            addError(act, 'failure', 'ERROR: Visits failed');
+            // Quit.
+            actIndex = -2;
+          }
+          // Otherwise, i.e. if the last visit attempt succeeded:
+          else {
             // If a prohibited redirection occurred:
             if (response.exception === 'badRedirection') {
               // Add this to the act.
-              addError(act, 'redirection', 'ERROR: Navigation redirected');
+              addError(act, 'badRedirection', 'ERROR: Navigation illicitly redirected');
+              // Quit.
+              actIndex = -2;
             }
             // Add the resulting URL to the act.
             act.result = page.url();
@@ -1515,6 +1526,8 @@ exports.doJob = async report => {
       prohibitedCount: 0,
       visitTimeoutCount: 0,
       visitRejectionCount: 0,
+      aborted: false,
+      abortedAct: null,
       presses: 0,
       amountRead: 0,
       testTimes: []
