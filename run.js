@@ -703,13 +703,18 @@ const doActs = async (report, actIndex, page) => {
           else {
             // If a prohibited redirection occurred:
             if (response.exception === 'badRedirection') {
-              // Add this to the act.
+              // Report this.
+              report.jobData.aborted = true;
+              report.jobData.abortedAct = actIndex;
               addError(act, 'badRedirection', 'ERROR: Navigation illicitly redirected');
               // Quit.
               actIndex = -2;
             }
             // Add the resulting URL to the act.
-            act.result = page.url();
+            if (! act.result) {
+              act.result = {};
+            }
+            act.result.url = page.url();
           }
         }
         // Otherwise, if the act is a wait for text:
