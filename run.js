@@ -550,7 +550,7 @@ const goTo = async (report, page, url, timeout, waitUntil, isStrict) => {
         // Return an error.
         console.log(`ERROR: Visit to ${url} redirected to ${actualURL}`);
         return {
-          error: 'redirection'
+          exception: 'badRedirection'
         };
       }
       // Otherwise, i.e. if no prohibited redirection occurred:
@@ -691,9 +691,9 @@ const doActs = async (report, actIndex, page) => {
             }
           }
           // If one of the visits succeeded:
-          if (! response.error || response.error === 'redirection') {
+          if (! response.error) {
             // If a prohibited redirection occurred:
-            if (strict && response.error === 'redirection') {
+            if (response.exception === 'badRedirection') {
               // Add this to the act.
               addError(act, 'redirection', 'ERROR: Navigation redirected');
             }
