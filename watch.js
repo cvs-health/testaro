@@ -64,7 +64,7 @@ const checkDirJob = async () => {
 // Checks for a network job.
 const checkNetJob = async () => {
   const script = await new Promise(resolve => {
-    const wholeURL = `${process.env.PROTOCOL}://${jobURL}?worker=${worker}`;
+    const wholeURL = `${process.env.PROTOCOL}://${jobURL}?agent=${worker}`;
     const request = client.request(wholeURL, response => {
       const chunks = [];
       response.on('data', chunk => {
@@ -110,7 +110,7 @@ const writeDirReport = async report => {
 // Submits a network report.
 const writeNetReport = async report => {
   const ack = await new Promise(resolve => {
-    const wholeURL = `${process.env.PROTOCOL}://${reportURL}?worker=${worker}`;
+    const wholeURL = `${process.env.PROTOCOL}://${reportURL}?agent=${worker}`;
     const request = client.request(wholeURL, {method: 'POST'}, response => {
       const chunks = [];
       response.on('data', chunk => {
