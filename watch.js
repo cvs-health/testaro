@@ -131,14 +131,14 @@ const writeNetReport = async report => {
     });
     request.write(JSON.stringify(report, null, 2));
     request.end();
-    console.log(`Report ${report.timeStamp}-${report.script.id} submitted`);
+    console.log(`Report ${report.script.id} submitted`);
   });
   return ack;
 };
 // Archives a job.
 const archiveJob = async script => {
   const scriptJSON = JSON.stringify(script, null, 2);
-  await fs.writeFile(`${doneDir}/${script.timeStamp}-${script.id}.json`, scriptJSON);
+  await fs.writeFile(`${doneDir}/${script.id}.json`, scriptJSON);
   await fs.rm(`${watchDir}/${script.id}.json`);
 };
 // Waits.
@@ -217,16 +217,16 @@ const cycle = async forever => {
     }
     // If there was one:
     if (script.id) {
-      // Run it, add a timestamp to it, and save a report.
+      // Run it and save a report.
       console.log(`Running script ${script.id}`);
       statusOK = await runJob(script);
-      console.log(`Job ${script.id} finished with time stamp ${script.timeStamp}`);
+      console.log(`Job ${script.id} finished`);
       if (statusOK) {
         // If the script was in a directory:
         if (watchType === 'dir') {
           // Archive the script.
           await archiveJob(script);
-          console.log(`Script ${script.id}.json archived as ${script.timeStamp}-${script.id}.json`);
+          console.log(`Script ${script.id} archived`);
         }
         // If watching was specified for only 1 job, stop.
         statusOK = forever;
