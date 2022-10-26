@@ -1505,9 +1505,6 @@ const injectLaunches = acts => {
 exports.doJob = async report => {
   // If the report object is valid:
   if(isValidReport(report)) {
-    // Add an ID to the report.
-    const timeStamp = Math.floor((Date.now() - Date.UTC(2022, 1)) / 2000).toString(36);
-    report.id = `${timeStamp}-${report.script.id}`;
     // Add the script commands to the report as its initial acts.
     report.acts = JSON.parse(JSON.stringify(report.script.commands));
     /*

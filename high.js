@@ -35,20 +35,17 @@ const runJob = async scriptID => {
     if (! script.timeLimit) {
       script.timeLimit = timeLimit;
     }
-    // Identify the start time and a timestamp.
-    const timeStamp = Math.floor((Date.now() - Date.UTC(2022, 1)) / 2000).toString(36);
-    // Run the script and record the report with the timestamp as name base.
-    const id = `${timeStamp}-${scriptID}`;
+    // Run the script and record the report.
     const report = {
-      id,
+      id: scriptID,
       log: [],
       script,
       acts: []
     };
     await doJob(report);
     const reportJSON = JSON.stringify(report, null, 2);
-    await fs.writeFile(`${reportDir}/${id}.json`, reportJSON);
-    console.log(`Report ${timeStamp}-${scriptID}.json recorded in ${process.env.REPORTDIR}`);
+    await fs.writeFile(`${reportDir}/${scriptID}.json`, reportJSON);
+    console.log(`Report ${scriptID}.json recorded in ${process.env.REPORTDIR}`);
   }
   catch(error) {
     console.log(`ERROR running job (${error.message})\n${error.stack}`);
