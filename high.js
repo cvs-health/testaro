@@ -37,8 +37,6 @@ const runJob = async scriptID => {
     }
     // Run the script and record the report.
     const report = {
-      id: scriptID,
-      log: [],
       script,
       acts: []
     };

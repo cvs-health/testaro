@@ -237,7 +237,7 @@ const isValidCommand = command => {
 const isValidReport = report => {
   if (report) {
     // Return whether the report is valid.
-    const {script, log, acts} = report;
+    const {script, acts} = report;
     const {what, strict, commands} = script;
     return what
       && typeof strict === 'boolean'
@@ -249,8 +249,6 @@ const isValidReport = report => {
       && commands[1].type === 'url'
       && isURL(commands[1].which)
       && commands.every(command => isValidCommand(command))
-      && Array.isArray(log)
-      && ! log.length
       && Array.isArray(acts)
       && ! acts.length;
   }
