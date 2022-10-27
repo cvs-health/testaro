@@ -17,7 +17,6 @@ const {doJob} = require('./run');
 
 const scriptDir = process.env.SCRIPTDIR;
 const reportDir = process.env.REPORTDIR;
-const scriptID = process.argv[2];
 
 // ########## VARIABLES
 
@@ -27,7 +26,7 @@ let timeLimit = 300;
 // ########## FUNCTIONS
 
 // Performs a file-based job and writes a report file.
-const runJob = async scriptID => {
+exports.runJob = async scriptID => {
   try {
     const scriptJSON = await fs.readFile(`${scriptDir}/${scriptID}.json`, 'utf8');
     const script = JSON.parse(scriptJSON);
@@ -49,16 +48,3 @@ const runJob = async scriptID => {
     console.log(`ERROR running job (${error.message})\n${error.stack}`);
   }
 };
-
-// ########## OPERATION
-
-// If this module was called with a scriptID argument:
-if (scriptID) {
-  // Run the script and write a report.
-  runJob(scriptID);
-}
-// Otherwise, i.e. if it was required by another module:
-else {
-  // Export runJob so the other module can call it.
-  exports.runJob = runJob;
-}
