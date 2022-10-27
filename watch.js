@@ -1,11 +1,6 @@
 /*
   watch.js
-  Watches for a script and runs it.
-  Arguments:
-    0. Watch type: 'dir' or 'net'.
-    1. How long to watch: 'once' or 'forever'.
-    2. How often to check in seconds.
-  Usage example: node watch dir once 15
+  Module for watching for a script and running it when found.
 */
 
 // ########## IMPORTS
@@ -19,15 +14,10 @@ const {doJob} = require('./run');
 
 // ########## CONSTANTS
 
-const watchType = process.argv[2];
-const watchForever = process.argv[3] === 'forever';
-const interval = Number.parseInt(process.argv[4]);
-let client;
-if (watchType === 'net') {
-  client = require(process.env.PROTOCOL || 'https');
-}
+const protocol = process.env.PROTOCOL || 'https';
+const client = require(protocol);
 const jobURL = process.env.JOB_URL;
-const worker = process.env.WORKER;
+const agent = process.env.AGENT;
 const watchDir = process.env.WATCHDIR;
 const doneDir = process.env.DONEDIR;
 const reportURL = process.env.REPORT_URL;
@@ -64,7 +54,7 @@ const checkDirJob = async () => {
 // Checks for a network job.
 const checkNetJob = async () => {
   const script = await new Promise(resolve => {
-    const wholeURL = `${process.env.PROTOCOL}://${jobURL}?agent=${worker}`;
+    const wholeURL = `${protocol}://${jobURL}?agent=${agent}`;
     const request = client.request(wholeURL, response => {
       const chunks = [];
       response.on('data', chunk => {
@@ -110,7 +100,7 @@ const writeDirReport = async report => {
 // Submits a network report.
 const writeNetReport = async report => {
   const ack = await new Promise(resolve => {
-    const wholeURL = `${process.env.PROTOCOL}://${reportURL}?agent=${worker}`;
+    const wholeURL = `${process.env.PROTOCOL}://${reportURL}?agent=${agent}`;
     const request = client.request(wholeURL, {method: 'POST'}, response => {
       const chunks = [];
       response.on('data', chunk => {
@@ -149,8 +139,8 @@ const wait = ms => {
     }, ms);
   });
 };
-// Runs a job, time-stamps it, and returns a report.
-const runJob = async script => {
+// Runs a job and returns a report.
+exports.runJob = async (script, isDirWatch) => {
   const {id} = script;
   if (id) {
     try {
@@ -162,12 +152,14 @@ const runJob = async script => {
       };
       // Run the job, adding to the report.
       await doJob(report);
-      // If the watch type is directory:
-      if (watchType === 'dir') {
+      // If a directory was watched:
+      if (isDirWatch) {
         // Save the report.
         return await writeDirReport(report);
       }
+      // Otherwise, i.e. if the network was watched:
       else {
+        // Send the report to the server.
         const ack = await writeNetReport(report);
         if (ack.error) {
           console.log(JSON.stringify(ack, null, 2));
@@ -193,9 +185,10 @@ const runJob = async script => {
   }
 };
 // Checks for a job, performs it, and submits a report, once or repeatedly.
-const cycle = async forever => {
+exports.cycle = async (isDirWatch, isForever, interval) => {
   const intervalMS = 1000 * Number.parseInt(interval);
   let statusOK = true;
+  // Prevent a wait before the first iteration.
   let empty = false;
   console.log(`Watching started with intervals of ${interval} seconds when idle`);
   while (statusOK) {
@@ -204,32 +197,29 @@ const cycle = async forever => {
     }
     // Check for a job.
     let script;
-    if (watchType === 'dir') {
+    if (isDirWatch) {
       script = await checkDirJob();
     }
-    else if (watchType === 'net') {
-      script = await checkNetJob();
-    }
     else {
-      script = {};
-      console.log('ERROR: invalid WATCH_TYPE environment variable');
-      statusOK = false;
+      script = await checkNetJob();
     }
     // If there was one:
     if (script.id) {
       // Run it and save a report.
       console.log(`Running script ${script.id}`);
-      statusOK = await runJob(script);
+      statusOK = await exports.runJob(script, isDirWatch);
       console.log(`Job ${script.id} finished`);
       if (statusOK) {
-        // If the script was in a directory:
-        if (watchType === 'dir') {
+        // If a directory was watched:
+        if (isDirWatch) {
           // Archive the script.
           await archiveJob(script);
           console.log(`Script ${script.id} archived`);
         }
         // If watching was specified for only 1 job, stop.
-        statusOK = forever;
+        statusOK = isForever;
+        // Prevent a wait before the next iteration.
+        empty = false;
       }
     }
     else {
@@ -238,8 +228,3 @@ const cycle = async forever => {
   }
   console.log('Watching ended');
 };
-
-// ########## OPERATION
-
-// Start watching, as specified, either forever or until 1 job is run.
-cycle(watchForever);

@@ -1,6 +1,6 @@
 /*
   run.js
-  testaro main script.
+  Testaro main utility module.
 */
 
 // ########## IMPORTS
