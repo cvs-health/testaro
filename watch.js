@@ -86,7 +86,7 @@ const writeDirReport = async report => {
   if (scriptID) {
     try {
       const reportJSON = JSON.stringify(report, null, 2);
-      const reportName = `${report.script.timeStamp}-${scriptID}.json`;
+      const reportName = `${scriptID}.json`;
       await fs.writeFile(`${reportDir}/${reportName}`, reportJSON);
       console.log(`Report ${reportName} saved`);
       return true;
