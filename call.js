@@ -23,7 +23,7 @@ const {cycle} = require('./watch');
 // ########## CONSTANTS
 
 const fn = process.argv[2];
-const fnArgs = process.argv.slice(2);
+const fnArgs = process.argv.slice(3);
 const reportDir = process.env.REPORTDIR;
 
 // ########## FUNCTIONS
