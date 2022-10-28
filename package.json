@@ -4,8 +4,12 @@
   "description": "Automation of accessibility testing",
   "main": "index.js",
   "scripts": {
-    "test": "node validation/executors/tests",
-    "test1": "node validation/executors/test"
+    "tests": "node validation/executors/tests",
+    "test": "node validation/executors/test",
+    "low": "node validation/executors/low",
+    "high": "node validation/executors/high",
+    "watchDir": "node validation/executors/watchDir",
+    "watchNet": "node validation/executors/watchdNet"
   },
   "repository": {
     "type": "git",
