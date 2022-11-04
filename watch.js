@@ -31,6 +31,7 @@ const checkDirJob = async () => {
     const jobDirFileNames = await fs.readdir(watchDir);
     const jobFileNames = jobDirFileNames.filter(fileName => fileName.endsWith('.json'));
     if (jobFileNames.length) {
+      console.log('Directory job found');
       const scriptJSON = await fs.readFile(`${watchDir}/${jobFileNames[0]}`, 'utf8');
       try {
         const script = JSON.parse(scriptJSON, null, 2);
@@ -44,6 +45,7 @@ const checkDirJob = async () => {
       }
     }
     else {
+      console.log('Directory job not found');
       return {};
     }
   }
@@ -78,6 +80,7 @@ const checkNetJob = async () => {
     });
     request.end();
   });
+  console.log(`Network job ${script.id ? '' : 'not '}found`);
   return script;
 };
 // Writes a directory report.
