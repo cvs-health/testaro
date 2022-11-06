@@ -103,7 +103,7 @@ const writeDirReport = async report => {
 // Submits a network report.
 const writeNetReport = async report => {
   const ack = await new Promise(resolve => {
-    const wholeURL = `${process.env.PROTOCOL}://${reportURL}?agent=${agent}`;
+    const wholeURL = `${process.env.PROTOCOL}://${reportURL}`;
     const request = client.request(wholeURL, {method: 'POST'}, response => {
       const chunks = [];
       response.on('data', chunk => {
@@ -122,6 +122,7 @@ const writeNetReport = async report => {
         }
       });
     });
+    report.agent = agent;
     request.write(JSON.stringify(report, null, 2));
     request.end();
     console.log(`Report ${report.script.id} submitted`);
