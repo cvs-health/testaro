@@ -1,7 +1,7 @@
 /*
   high.js
   Invokes Testaro with the high-level method.
-  Usage example: node high script454
+  Usage example: node high tp25
 */
 
 // ########## IMPORTS
@@ -15,7 +15,7 @@ const {doJob} = require('./run');
 
 // ########## CONSTANTS
 
-const scriptDir = process.env.SCRIPTDIR;
+const jobDir = process.env.JOBDIR;
 const reportDir = process.env.REPORTDIR;
 
 // ########## VARIABLES
@@ -26,23 +26,25 @@ let timeLimit = 300;
 // ########## FUNCTIONS
 
 // Performs a file-based job and writes a report file.
-exports.runJob = async scriptID => {
+exports.runJob = async jobID => {
   try {
-    const scriptJSON = await fs.readFile(`${scriptDir}/${scriptID}.json`, 'utf8');
-    const script = JSON.parse(scriptJSON);
-    // Change the time limit to the script-specified one, if any.
-    if (! script.timeLimit) {
-      script.timeLimit = timeLimit;
+    // Get the job.
+    const jobJSON = await fs.readFile(`${jobDir}/${jobID}.json`, 'utf8');
+    const job = JSON.parse(jobJSON);
+    // If the job has no time limit, give it the default one.
+    if (! job.timeLimit) {
+      job.timeLimit = timeLimit;
     }
-    // Run the script and record the report.
+    // Initialize a report for the job.
     const report = {
-      script,
+      job,
       acts: []
     };
+    // Run the job, adding the results to the report.
     await doJob(report);
     const reportJSON = JSON.stringify(report, null, 2);
-    await fs.writeFile(`${reportDir}/${scriptID}.json`, reportJSON);
-    console.log(`Report ${scriptID}.json recorded in ${process.env.REPORTDIR}`);
+    await fs.writeFile(`${reportDir}/${jobID}.json`, reportJSON);
+    console.log(`Report ${jobID}.json recorded in ${process.env.REPORTDIR}`);
   }
   catch(error) {
     console.log(`ERROR running job (${error.message})\n${error.stack}`);

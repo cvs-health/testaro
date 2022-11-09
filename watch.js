@@ -18,7 +18,7 @@ const protocol = process.env.PROTOCOL || 'https';
 const client = require(protocol);
 const jobURL = process.env.JOB_URL;
 const agent = process.env.AGENT;
-const watchDir = process.env.WATCHDIR;
+const jobDir = process.env.JOBDIR;
 const doneDir = process.env.DONEDIR;
 const reportURL = process.env.REPORT_URL;
 const reportDir = process.env.REPORTDIR;
@@ -28,11 +28,11 @@ const reportDir = process.env.REPORTDIR;
 // Checks for a directory job.
 const checkDirJob = async () => {
   try {
-    const jobDirFileNames = await fs.readdir(watchDir);
+    const jobDirFileNames = await fs.readdir(jobDir);
     const jobFileNames = jobDirFileNames.filter(fileName => fileName.endsWith('.json'));
     if (jobFileNames.length) {
       console.log('Directory job found');
-      const scriptJSON = await fs.readFile(`${watchDir}/${jobFileNames[0]}`, 'utf8');
+      const scriptJSON = await fs.readFile(`${jobDir}/${jobFileNames[0]}`, 'utf8');
       try {
         const script = JSON.parse(scriptJSON, null, 2);
         return script;
@@ -133,7 +133,7 @@ const writeNetReport = async report => {
 const archiveJob = async script => {
   const scriptJSON = JSON.stringify(script, null, 2);
   await fs.writeFile(`${doneDir}/${script.id}.json`, scriptJSON);
-  await fs.rm(`${watchDir}/${script.id}.json`);
+  await fs.rm(`${jobDir}/${script.id}.json`);
 };
 // Waits.
 const wait = ms => {
@@ -200,25 +200,25 @@ exports.cycle = async (isDirWatch, isForever, interval) => {
       await wait(intervalMS);
     }
     // Check for a job.
-    let script;
+    let job;
     if (isDirWatch) {
-      script = await checkDirJob();
+      job = await checkDirJob();
     }
     else {
-      script = await checkNetJob();
+      job = await checkNetJob();
     }
     // If there was one:
-    if (script.id) {
+    if (job.id) {
       // Run it and save a report.
-      console.log(`Running script ${script.id}`);
-      statusOK = await exports.runJob(script, isDirWatch);
-      console.log(`Job ${script.id} finished`);
+      console.log(`Running job ${job.id}`);
+      statusOK = await exports.runJob(job, isDirWatch);
+      console.log(`Job ${job.id} finished`);
       if (statusOK) {
         // If a directory was watched:
         if (isDirWatch) {
-          // Archive the script.
-          await archiveJob(script);
-          console.log(`Script ${script.id} archived`);
+          // Archive the job.
+          await archiveJob(job);
+          console.log(`Script ${job.id} archived`);
         }
         // If watching was specified for only 1 job, stop.
         statusOK = isForever;

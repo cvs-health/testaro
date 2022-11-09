@@ -1,6 +1,6 @@
 {
   "name": "testaro",
-  "version": "8.0.7",
+  "version": "8.1.0",
   "description": "Automation of accessibility testing",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "low": "node validation/executors/low",
     "high": "node validation/executors/high",
     "watchDir": "node validation/executors/watchDir",
-    "watchNet": "node validation/executors/watchdNet"
+    "watchNet": "node validation/executors/watchNet"
   },
   "repository": {
     "type": "git",

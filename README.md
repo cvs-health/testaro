@@ -105,69 +105,163 @@ However, if the Playwright dependency is ever updated to a newer version, you mu
 
 All of the tests that Testaro can perform are free of cost, except those in the Tenon and WAVE packages. The owner of each of those packages gives new registrants a free allowance of credits before it becomes necessary to pay for use of the API of the package. The required environment variables for authentication and payment are described below under “Environment variables”.
 
-## Jobs
-
-A request to Testaro to do some work is a _job_.
-
-## Scripts
+## Process objects
 
 ### Introduction
 
-A file containing specifications for a job is a _script_. Thus, creating a job means asking a workstation to have Testaro run a particular script.
+A _script_ is an object containing instructions for Testaro. The instructions may be incomplete.
 
-Every script is a JSON-format file representing a JavaScript object. Its properties are:
+A _job_ is an object containing complete instructions for Testaro.
 
-```json
+A _report_ is an object containing a job and the results from Testaro running the job.
+
+### Scripts
+
+A script object is saved as a JSON file in the `process.env.SCRIPTDIR` directory, with a file name identical to its `id` value, plus a `.json` extension. Thus, the following script would be saved in a file named `tp25.json`.
+
+```javascript
 {
-  "id": "string consisting of alphanumeric ASCII characters and hyphen-minus (-)",
-  "what": "string: description of the script",
-  "strict": "boolean: whether redirections should be treated as failures",
-  "timeLimit": "number: limit in seconds on the execution of this script",
-  "commands": "array of objects: the commands to be performed"
-}
-```
-
-The `timeLimit` property is optional. If it is omitted, a default of 300 seconds (5 minutes) is set.
-
-### Processing
-
-When Testaro starts performing a job, it initializes a report. The report is a JavaScript object. It has a `script` property, which is a copy of the script, and an `acts` property, which is a copy of the `commands` property of the script. Initially, the `commands` and `acts` arrays are identical. During processing, Testaro adds content to the `acts` array. In the resulting report, the `commands` array shows what you asked Testaro to do, and the `acts` array shows what Testaro actually did and the results. Testaro also gives values to some other properties describing the job session.
-
-### Example
-
-Here is an example of a script:
-
-```json
-{
-  "id": "samplescript",
-  what: "Test example.com with alfa",
+  id: 'tp25',
+  what: 'Test host with alfa',
   strict: true,
   timeLimit: 65,
   commands: [
     {
-      type: "launch",
-      which: "chromium",
-      what: "Chromium browser"
+      type: 'launch',
+      which: 'chromium',
+      what: 'Chromium browser'
     },
     {
-      type: "url",
-      which: "https://example.com/",
-      what: "page with a few accessibility defects"
+      type: 'url',
+      which: 'https://*',
+      what: 'any organization',
+      id: 'anyID'
     },
     {
-      type: "test",
-      which: "alfa",
-      what: "Siteimprove alfa package"
+      type: 'test',
+      which: 'alfa',
+      what: 'Siteimprove alfa package'
     }
   ]
 }
 ```
 
-This script tells Testaro to open a page in the Chromium browser, navigate to `example.com`, and, if the browser is not redirected, perform the tests in the `alfa` package on that URL, within 65 seconds.
+This script tells Testaro to open a page in the Chromium browser, navigate to some URL, and, if the browser is not redirected, perform the tests in the `alfa` package on that URL, within 65 seconds.
 
-### Strictness
+Properties:
+- `id`: This is a string consisting of alphanumeric ASCII characters and hyphen-minus (-). In a script, its value simply identifies the script. In a job, it becomes a unique job identifier.
+- `what`: This is a description of the script.
+- `strict`: This is `true` or `false`, indicating whether _substantive redirections_ should be treated as failures. These are redirections that do more than add or subtract a final slash. For example, a redirection from `xyz.com` to `www.xyz.com` or `xyz.com/en` will abort a job if `strict` is true.
+- `timeLimit`: This is the number of seconds allowed for the execution of the job.
+- `commands`: This is an array of the commands to be performed. Commands are documented below.
 
-If the `strict` property is `true`, Testaro will accept redirections that add or subtract a final slash, but otherwise will treat redirections as failures. For example, a redirection from `xyz.com` to `www.xyz.com` or `xyz.com/en` will abort the job.
+The `timeLimit` property is optional. If it is omitted, a default of 300 seconds (5 minutes) is set.
+
+The `url` command in this example is incomplete. It contains a placeholder for a URL.
+
+### Jobs
+
+A job object is saved as a JSON file in the `process.env.JOBDIR` directory, with a file name identical to its `id` value, plus a `.json` extension. Thus, the following job would be saved in a file named `be76p-tp25-w3c.json`.
+
+```javascript
+{
+  id: 'be76p-tp25-w3c',
+  what: 'Test host with alfa',
+  strict: true,
+  timeLimit: 65,
+  commands: [
+    {
+      type: 'launch',
+      which: 'chromium',
+      what: 'Chromium browser'
+    },
+    {
+      type: 'url',
+      which: 'https://www.w3c.org',
+      what: 'World Wide Web Consortium',
+      id: 'w3c'
+    },
+    {
+      type: 'test',
+      which: 'alfa',
+      what: 'Siteimprove alfa package'
+    }
+  ],
+  sources: {
+    script: 'tp25',
+    host: {
+      which: 'https://www.w3c.org',
+      what: 'World Wide Web Consortium',
+      id: 'w3c'
+    },
+    requester: 'user@domain.org'
+  },
+  jobCreationTime: '2023-05-26T14:28',
+  timeStamp: 'be76p'
+}
+```
+
+This job completes the script, making it ready to be run by Testaro.
+
+Properties:
+- `id`: The original script ID has been replaced by a unique job identifier. That distinguishes multiple jobs that could be created from the same script.
+- `commands`: This array is the same as in the script, except that in this case the second command has been changed from a plateholder to a description of a real host.
+- `sources`: This object has properties describing where the job came from:
+   - `script`: This is the ID of the original script.
+   - `host`: This object describes the host that has replaced the placeholder data in `url` commands, or it is an empty object if the original `url` commands were complete.
+   - `requester`: This string is the email address to receive a notice of completion of the running of the job.
+- `jobCreationTime`: This is the time when the job was created from a script.
+- `timeStamp`: This string is a compact representation of the job creation time, for inclusion in the new ID of the job.
+
+### Reports
+
+A report object is saved as a JSON file in the `process.env.REPORTDIR_RAW` directory, with a file name identical to its `job.id` value, plus a `.json` extension. Thus, the following report would be saved in a file named `be76p-tp25-w3c.json`. Thus, a report file has the same name as the job file from which it was created, but is located in a different directory. The environment variable `REPORTDIR_RAW` is named to reflect the fact that Testaro produces _raw_ reports, containing the results of tests performed but not additional analysis that other tools (such as Testilo) can do.
+
+```javascript
+{
+  job: {
+    id: 'be76p-tp25-w3c',
+    what: 'Test host with alfa',
+    strict: true,
+    timeLimit: 65,
+    commands: [
+      {
+        type: 'launch',
+        which: 'chromium',
+        what: 'Chromium browser'
+      },
+      {
+        type: 'url',
+        which: 'https://www.w3c.org',
+        what: 'World Wide Web Consortium',
+        id: 'w3c'
+      },
+      {
+        type: 'test',
+        which: 'alfa',
+        what: 'Siteimprove alfa package'
+      }
+    ],
+    sources: {
+      script: 'tp25',
+      host: {
+        which: 'https://www.w3c.org',
+        what: 'World Wide Web Consortium',
+        id: 'w3c'
+      },
+      requester: 'user@domain.org'
+    },
+    jobCreationTime: '2023-05-26T14:28',
+    timeStamp: 'be76p'
+  },
+  acts: [],
+  jobData: {}
+}
+```
+
+This report is an object whose `job` property has a job as its value. It also has two additional properties:
+- `acts`: This is initially an empty array. Testaro copies the `job.commands` property into `acts` and then modifies the array. Testaro can add more acts to the original ones. Testaro also adds results to the acts.
+- `jobData`: Some results pertain to a job as a whole, not to any specific act. This property is an object where Testaro records such job-level results.
 
 ### Commands
 
@@ -530,18 +624,20 @@ Low-level execution is designed for a module to create a job and make Testaro ru
 
 ```javascript
 const report = {
-  script: {…},
-  log: [],
-  acts: []
+  job: {…},
+  acts: [],
+  jobData: {}
 };
 const {doJob} = require('./run');
 doJob(report)
 .then(() => …);
 ```
 
-Replace `{…}` with a script object, like the example script shown above.
+Replace `{…}` with a job object, like the example job shown above.
 
-Testaro will run the script and modify the properties of the `report` object. When Testaro finishes, the `log`, `acts`, and other properties of `report` will contain the results. The final statement can further process the `report` object as desired in the `then` callback.
+Testaro will run the script and modify the `acts` and `jobData` properties of the `report` object. When Testaro finishes, the `acts` and `jobData` properties of `report` will contain the results. The final statement can further process the `report` object as desired in the `then` callback.
+
+The Testilo package contains functions that can create jobs from scripts.
 
 #### High-level
 
@@ -551,24 +647,24 @@ Execution by a module:
 
 ```javaScript
 const {runJob} = require('./high');
-runJob('tp123');
+runJob('be76p-tp25-w3c');
 ```
 
 Execution by a user:
 
 ```bash
-node call high tp123
+node call high be76p-tp25-w3c
 ```
 
-In either case, replace `tp123` with the base of the name of a script.
+In either case, replace `be76p-tp25-w3c` with the ID of a job in the `process.env.JOBDIR` directory.
 
-Testaro will find the named script (e.g., `tp123.json`) in the `SCRIPTDIR` directory and write the report in the `REPORTDIR` directory.
+Testaro will find the named job (e.g., `be76p-tp25-w3c.json`) in the `process.env.JOBDIR` directory and write the report in the `process.env.REPORTDIR_RAW` directory.
 
 #### Watch
 
 Watch execution is designed for either modules or users.
 
-In watch mode, Testaro periodically checks for a script to be run by it. When such a script exists, Testaro runs it and provides a report. Testaro may continue watching after the first report, or may quit.
+In watch mode, Testaro periodically checks for a job to run. When such a job exists, Testaro runs it and populates its `acts` and `jobData` properties to make it a report. Testaro may continue watching after the first report, or may quit.
 
 Execution by a module:
 
@@ -584,17 +680,17 @@ node call watch true true 30
 ```
 
 The arguments passed to `cycle` by either of these invocations are:
-- whether to watch a directory (true) or the network (false)
-- whether to continue watching indefinitely after the first report (true or false)
-- how many seconds to wait before checking again (a nonnegative number)
+- whether to watch a directory (`true`) or the network (`false`)
+- whether to continue watching indefinitely after the first report (`true` or `false`)
+- how many seconds to wait after finding no job before checking again (a nonnegative number)
 
 ##### Directory watch
 
-With directory watch, Testaro checks whether the watch directory (`WATCHDIR`) in its host’s filesystem contains a script.
+With directory watch, Testaro checks whether the job directory (`process.env.JOBDIR`) in its host’s filesystem contains a job.
 
-When Testaro finds one or more scripts in the watch directory, Testaro runs the first script, writes the report into the `REPORTDIR` directory, and moves the script into the `DONEDIR` directory.
+When Testaro finds one or more jobs in the watch directory, Testaro runs the first job, writes the report into the `process.env.REPORTDIR_RAW` directory, and moves the job from the `process.env.JOBDIR` into the `process.env.DONEDIR` directory.
 
-Since Testaro runs the first script (i.e. the script whose name is first in ASCII order), whoever populates the `WATCHDIR` directory with script files has control over the order in which Testaro runs them. For example, to force a new script to be run before the already waiting scripts, one can give it a filename that comes before that of the first waiting script.
+Since Testaro runs the first job (i.e. the job whose name is first in ASCII order), whoever populates the `process.env.JOBDIR` directory with job files has control over the order in which Testaro runs them. For example, to force a new job to be run before the already waiting jobs, one can give it a filename that comes before that of the first waiting job.
 
 ##### Network watch
 
@@ -603,17 +699,15 @@ Network watching is designed for a situation in which:
 - A workstation running Testaro can contact a managing server, but the server may not be able to contact a workstation.
 - The functions of Testaro are limited to those requiring workstation features.
 
-With network watch, the initiator of an interaction is Testaro, not the server. When Testaro is available, it requests a script from a server. If the response is a JSON representation of a script, Testaro runs the script and sends the report to the server.
+With network watch, the initiator of an interaction is Testaro, not the server. When Testaro is available, it requests a job from a server. If the response is a JSON representation of a job, Testaro runs the job and sends the report to the server.
 
-If multiple workstations run Testaro and do work for the same server, each must have a different value on the `AGENT` environment variable.
+If multiple workstations run Testaro and do work for the same server, the server can assign jobs to specific agents by requiring each instance of Testaro to have a distinct value of `process.env.AGENT`.
 
 ### Environment variables
 
-Variables named above in upper-case letters are environment variables used by various modules.
+In addition to their uses described above, environment variables can be used by commands of type `text`, as documented in the `commands.js` file.
 
-The `text` command can interpolate the value of an environment variable into text that it enters on a page, as documented in the `commands.js` file.
-
-Before executing a Testaro script, you can optionally also set the environment variables `DEBUG` (to `'true'` or anything else) and/or `WAITS` (to a non-negative integer). The effects of these variables are described in the `index.js` file.
+Before executing a Testaro script, you can optionally also set `process.env.DEBUG` (to `'true'` or anything else) and/or `process.env.WAITS` (to a non-negative integer). The effects of these variables are described in the `run.js` file.
 
 You may store environment variables in an untracked `.env` file if you wish, and Testaro will recognize them.
 
@@ -626,7 +720,7 @@ Testaro and its custom tests can be validated with the _executors_ located in th
 The executors are:
 
 - `low`: validates low-level invocation
-- `high`: validates high-level invocation of a script
+- `high`: validates high-level invocation
 - `watchDir`: validates directory watching
 - `watchNet`: validates network watching
 - `test`: validates a Testaro test
@@ -634,7 +728,7 @@ The executors are:
 
 To validate any single Testaro test `xyz`, enter the statement `npm test xyz`.
 
-To execute any other executor `xyz`, call it with the statement `node run xyz`.
+To execute any other executor `xyz`, call it with the statement `npm run xyz`.
 
 The `tests` executor makes use of the scripts in the `validation/tests/scripts` directory, and they, in turn, run tests on HTML files in the `validation/tests/targets` directory.
 
@@ -683,20 +777,20 @@ The files in the `temp` directory are presumed ephemeral and are not tracked by 
 ## Related packages
 
 [Testilo](https://www.npmjs.com/package/testilo) is an application that:
-- aims a script at a host by modifying the `url` commands
-- merges batches of hosts into scripts to produce multiple scripts
-- produces scores and adds them to the JSON report files of Testaro
+- creates a job by aiming a script at a host
+- merges batches of hosts into scripts to produce multiple jobs
+- produces scores and adds them to the raw reports of Testaro
 - produces human-oriented HTML digests from scored reports
-- produces human-oriented HTML reports comparing the scores of hosts
+- produces human-oriented HTML comparisons of the scores of hosts
 
 Testilo contains procedures that reorganize report data by defect rather than test package, and that compensate for duplicative tests when computing scores.
 
-Testaro is derived from [Autotest](https://github.com/jrpool/autotest).
+Testaro is derived from [Autotest](https://github.com/jrpool/autotest). Autotest was created as a monolithic accessibility testing package, but that forced functionalities to be hosted on a workstation merely because it was impractical to host Playwright elsewhere. Testaro embodies an architectural decision to isolate workstation-dependent functionalities.
 
-Testaro omits some functionalities of Autotest, such as:
+Testaro therefore omits some functionalities of Autotest, such as:
 - tests producing results intended to be human-inspected
-- scoring (performed now by Testilo)
-- file operations for score aggregation, report revision, and HTML reports
+- scoring (now in Testilo)
+- file operations for score aggregation, report revision, and HTML reports (now in Testilo)
 - a web user interface
 
 ## Code style
