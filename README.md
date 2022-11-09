@@ -251,7 +251,7 @@ A report object is saved as a JSON file in the `process.env.REPORTDIR_RAW` direc
       },
       requester: 'user@domain.org'
     },
-    jobCreationTime: '2023-05-26T14:28',
+    jobCreationTime: '2023-05-26T14:28:22',
     timeStamp: 'be76p'
   },
   acts: [],

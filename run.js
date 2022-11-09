@@ -236,21 +236,31 @@ const isValidCommand = command => {
 // Validates a report object.
 const isValidReport = report => {
   if (report) {
-    // Return whether the report is valid.
-    const {script, acts} = report;
-    const {what, strict, commands} = script;
-    return what
-      && typeof strict === 'boolean'
-      && commands
-      && typeof what === 'string'
-      && Array.isArray(commands)
-      && commands[0].type === 'launch'
-      && commands.length > 1
-      && commands[1].type === 'url'
-      && isURL(commands[1].which)
-      && commands.every(command => isValidCommand(command))
-      && Array.isArray(acts)
-      && ! acts.length;
+    // Return whether the job is valid.
+    const {job, acts, jobData} = report;
+    const {id, what, strict, commands, sources, jobCreationTime, timeStamp} = job;
+    const isValid = job
+    && acts
+    && jobData
+    && id
+    && what
+    && typeof strict === 'boolean'
+    && commands
+    && sources
+    && jobCreationTime
+    && timeStamp
+    && Array.isArray(acts)
+    && typeof id === 'string'
+    && typeof what === 'string'
+    && Array.isArray(commands)
+    && commands[0].type === 'launch'
+    && commands.length > 1
+    && commands[1].type === 'url'
+    && isURL(commands[1].which)
+    && commands.every(command => isValidCommand(command))
+    && sources.script
+    && sources.host;
+    return isValid;
   }
   else {
     return false;
@@ -651,7 +661,7 @@ const doActs = async (report, actIndex, page) => {
           const resolved = act.which.replace('__dirname', __dirname);
           requestedURL = resolved;
           // Visit it and wait until the network is idle.
-          const {strict} = report.script;
+          const {strict} = report.job;
           let response = await goTo(report, page, requestedURL, 15000, 'networkidle', strict);
           // If the visit fails:
           if (response.error) {
@@ -1504,7 +1514,7 @@ exports.doJob = async report => {
   // If the report is valid:
   if(isValidReport(report)) {
     // Add the script commands to the report as its initial acts.
-    report.acts = JSON.parse(JSON.stringify(report.script.commands));
+    report.acts = JSON.parse(JSON.stringify(report.job.commands));
     /*
       Inject launch and url acts where necessary to undo DOM changes, if specified.
       Injection of url acts alone does not guarantee test independence.
@@ -1514,29 +1524,30 @@ exports.doJob = async report => {
     }
     // Add initialized job data to the report.
     const startTime = new Date();
-    report.jobData = {
-      startTime: nowString(),
-      endTime: '',
-      elapsedSeconds: 0,
-      visitLatency: 0,
-      logCount: 0,
-      logSize: 0,
-      errorLogCount: 0,
-      errorLogSize: 0,
-      prohibitedCount: 0,
-      visitTimeoutCount: 0,
-      visitRejectionCount: 0,
-      aborted: false,
-      abortedAct: null,
-      presses: 0,
-      amountRead: 0,
-      testTimes: []
-    };
+    report.jobData.startTime = nowString();
+    report.jobData.endTime = '';
+    report.jobData.elapsedSeconds = 0;
+    report.jobData.visitLatency = 0;
+    report.jobData.logCount = 0;
+    report.jobData.logSize = 0;
+    report.jobData.errorLogCount = 0;
+    report.jobData.errorLogSize = 0;
+    report.jobData.prohibitedCount = 0;
+    report.jobData.visitTimeoutCount = 0;
+    report.jobData.visitRejectionCount = 0;
+    report.jobData.aborted = false;
+    report.jobData.abortedAct = null;
+    report.jobData.presses = 0;
+    report.jobData.amountRead = 0;
+    report.jobData.testTimes = [];
     // Recursively perform the specified acts.
     await doActs(report, 0, null);
     // Add the end time and duration to the report.
     const endTime = new Date();
     report.jobData.endTime = nowString();
     report.jobData.elapsedSeconds =  Math.floor((endTime - startTime) / 1000);
+  }
+  else {
+    console.log('ERROR: Initialized job report invalid');
   }
 };

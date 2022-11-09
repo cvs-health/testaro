@@ -38,7 +38,8 @@ exports.runJob = async jobID => {
     // Initialize a report for the job.
     const report = {
       job,
-      acts: []
+      acts: [],
+      jobData: {}
     };
     // Run the job, adding the results to the report.
     await doJob(report);
