@@ -39,7 +39,6 @@ const callWatch = async (isDirWatch, isForever, interval) => {
     `Starting a ${isForever === 'true' ? 'repeating' : 'one-time'} ${isDirWatch === 'true' ? 'directory' : 'network'} watch`
   );
   await cycle(isDirWatch === 'true', isForever === 'true', Number.parseInt(interval, 10));
-  console.log('Watching ended');
 };
 
 // ########## OPERATION

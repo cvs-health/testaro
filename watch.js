@@ -85,11 +85,11 @@ const checkNetJob = async () => {
 };
 // Writes a directory report.
 const writeDirReport = async report => {
-  const scriptID = report && report.script && report.script.id;
-  if (scriptID) {
+  const jobID = report && report.job && report.job.id;
+  if (jobID) {
     try {
       const reportJSON = JSON.stringify(report, null, 2);
-      const reportName = `${scriptID}.json`;
+      const reportName = `${jobID}.json`;
       await fs.writeFile(`${reportDir}/${reportName}`, reportJSON);
       console.log(`Report ${reportName} saved`);
       return true;
@@ -98,6 +98,10 @@ const writeDirReport = async report => {
       console.log(`ERROR: Failed to write report (${error.message})`);
       return false;
     }
+  }
+  else {
+    console.log('ERROR: Job has no ID');
+    return false;
   }
 };
 // Submits a network report.
@@ -130,10 +134,10 @@ const writeNetReport = async report => {
   return ack;
 };
 // Archives a job.
-const archiveJob = async script => {
-  const scriptJSON = JSON.stringify(script, null, 2);
-  await fs.writeFile(`${doneDir}/${script.id}.json`, scriptJSON);
-  await fs.rm(`${jobDir}/${script.id}.json`);
+const archiveJob = async job => {
+  const jobJSON = JSON.stringify(job, null, 2);
+  await fs.writeFile(`${doneDir}/${job.id}.json`, jobJSON);
+  await fs.rm(`${jobDir}/${job.id}.json`);
 };
 // Waits.
 const wait = ms => {
@@ -144,15 +148,15 @@ const wait = ms => {
   });
 };
 // Runs a job and returns a report.
-exports.runJob = async (script, isDirWatch) => {
-  const {id} = script;
+exports.runJob = async (job, isDirWatch) => {
+  const {id} = job;
   if (id) {
     try {
       // Initialize a report.
       const report = {
-        log: [],
-        script,
-        acts: []
+        job,
+        acts: [],
+        jobData: {}
       };
       // Run the job, adding to the report.
       await doJob(report);
@@ -218,7 +222,7 @@ exports.cycle = async (isDirWatch, isForever, interval) => {
         if (isDirWatch) {
           // Archive the job.
           await archiveJob(job);
-          console.log(`Script ${job.id} archived`);
+          console.log(`Job ${job.id} archived`);
         }
         // If watching was specified for only 1 job, stop.
         statusOK = isForever;
