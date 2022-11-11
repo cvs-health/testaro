@@ -2,15 +2,12 @@
 // Validator for Testaro tests.
 
 const fs = require('fs').promises;
-const {doJob} = require(`${__dirname}/../../run`);
-const validateTests = async () => {
-  const totals = {
-    attempts: 0,
-    successes: 0
-  };
-  const scriptFileNames = await fs.readdir(`${__dirname}/../tests/scripts`);
-  for (const scriptFileName of scriptFileNames) {
-    const rawScriptJSON = await fs
+const {validateTest} = require('')
+const validateAllTests = async () => {
+  const jobFileNames = await fs.readdir(`${__dirname}/../tests/jobs`);
+  for (const jobFileName of jobFileNames) {
+
+    const rawJobJSON = await fs
     .readFile(`${__dirname}/../tests/scripts/${scriptFileName}`, 'utf8');
     const scriptJSON = rawScriptJSON
     .replace(/__targets__/g, `file://${__dirname}/../tests/targets`);
