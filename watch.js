@@ -78,6 +78,10 @@ const checkNetJob = async () => {
         }
       });
     });
+    request.on('error', error => {
+      console.log(`ERROR checking for a network job (${error.message})`);
+      resolve({});
+    });
     request.end();
   });
   console.log(`Network job ${script.id ? '' : 'not '}found`);
@@ -127,9 +131,13 @@ const writeNetReport = async report => {
       });
     });
     report.agent = agent;
+    request.on('error', error => {
+      console.log(`ERROR submitting job report (${error.message})`);
+      resolve({});
+    });
     request.write(JSON.stringify(report, null, 2));
     request.end();
-    console.log(`Report ${report.script.id} submitted`);
+    console.log(`Report ${report.job.id} submitted`);
   });
   return ack;
 };
