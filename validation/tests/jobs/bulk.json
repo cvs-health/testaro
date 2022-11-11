@@ -1,4 +1,5 @@
 {
+  "id": "bulkVal",
   "what": "validation of bulk test",
   "strict": true,
   "commands": [
@@ -35,5 +36,12 @@
         ["visibleElements", "<", 40]
       ]
     }
-  ]
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "jobCreationTime": "",
+  "timeStamp": ""
 }

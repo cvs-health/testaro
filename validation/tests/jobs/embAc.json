@@ -1,4 +1,5 @@
 {
+  "id": "embAcVal",
   "what": "validation of embAc test",
   "strict": true,
   "commands": [
@@ -41,5 +42,12 @@
         ["totals.selects", "=", 1]
       ]
     }
-  ]
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "jobCreationTime": "",
+  "timeStamp": ""
 }

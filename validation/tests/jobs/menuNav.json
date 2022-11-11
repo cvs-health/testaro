@@ -1,4 +1,5 @@
 {
+  "id": "menuNavVal",
   "what": "validation of menuNav test",
   "strict": true,
   "commands": [
@@ -93,5 +94,12 @@
         ["totals.menus.incorrect", "=", 2]
       ]
     }
-  ]
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "jobCreationTime": "",
+  "timeStamp": ""
 }

@@ -1,4 +1,5 @@
 {
+  "id": "motionVal",
   "what": "validation of motion test",
   "strict": true,
   "commands": [
@@ -49,5 +50,12 @@
         ["changeFrequency", ">", 0]
       ]
     }
-  ]
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "jobCreationTime": "",
+  "timeStamp": ""
 }

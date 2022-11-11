@@ -1,4 +1,5 @@
 {
+  "id": "labClashVal",
   "what": "validation of labClash test",
   "strict": true,
   "commands": [
@@ -39,5 +40,12 @@
         ["totals.wellLabeled", "=", 0]
       ]
     }
-  ]
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "jobCreationTime": "",
+  "timeStamp": ""
 }

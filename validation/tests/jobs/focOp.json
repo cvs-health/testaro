@@ -1,4 +1,5 @@
 {
+  "id": "focOpVal",
   "what": "validation of focOp test",
   "strict": true,
   "commands": [
@@ -49,5 +50,12 @@
         ["totals.types.focusableAndOperable.tagNames.INPUT", "=", 1]
       ]
     }
-  ]
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "jobCreationTime": "",
+  "timeStamp": ""
 }

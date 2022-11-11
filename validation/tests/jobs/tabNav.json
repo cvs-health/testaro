@@ -1,4 +1,5 @@
 {
+  "id": "tabNavVal",
   "what": "validation of tabNav test",
   "strict": true,
   "commands": [
@@ -93,5 +94,12 @@
         ["totals.tabLists.incorrect", "=", 1]
       ]
     }
-  ]
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "jobCreationTime": "",
+  "timeStamp": ""
 }

@@ -6,18 +6,18 @@ const fs = require('fs').promises;
 const {doJob} = require(`${__dirname}/../../run`);
 const test = process.argv[2];
 const validateTests = async () => {
-  const scriptFileNames = await fs.readdir(`${__dirname}/../tests/scripts`);
-  for (const scriptFileName of scriptFileNames.filter(fileName => fileName === `${test}.json`)) {
+  const jobFileNames = await fs.readdir(`${__dirname}/../tests/jobs`);
+  for (const jobFileName of jobFileNames.filter(fileName => fileName === `${test}.json`)) {
     const rawScriptJSON = await fs
-    .readFile(`${__dirname}/../tests/scripts/${scriptFileName}`, 'utf8');
-    const scriptJSON = rawScriptJSON
+    .readFile(`${__dirname}/../tests/jobs/${jobFileName}`, 'utf8');
+    const jobJSON = rawJobJSON
     .replace(/__targets__/g, `file://${__dirname}/../tests/targets`);
-    const script = JSON.parse(scriptJSON);
-    const report = {script};
-    report.log = [];
+    const job = JSON.parse(jobJSON);
+    const report = {job};
     report.acts = [];
+    report.jobData = {};
     await doJob(report);
-    const {log, acts} = report;
+    const {acts, jobData} = report;
     if (log.length === 2 && log[1].event === 'endTime' && /^\d{4}-.+$/.test(log[1].value)) {
       console.log('Success: Log has been correctly populated');
     }

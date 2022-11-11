@@ -109,59 +109,13 @@ All of the tests that Testaro can perform are free of cost, except those in the 
 
 ### Introduction
 
-A _script_ is an object containing instructions for Testaro. The instructions may be incomplete.
-
-A _job_ is an object containing complete instructions for Testaro.
+A _job_ is an object containing instructions for Testaro.
 
 A _report_ is an object containing a job and the results from Testaro running the job.
 
-### Scripts
-
-A script object is saved as a JSON file in the `process.env.SCRIPTDIR` directory, with a file name identical to its `id` value, plus a `.json` extension. Thus, the following script would be saved in a file named `tp25.json`.
-
-```javascript
-{
-  id: 'tp25',
-  what: 'Test host with alfa',
-  strict: true,
-  timeLimit: 65,
-  commands: [
-    {
-      type: 'launch',
-      which: 'chromium',
-      what: 'Chromium browser'
-    },
-    {
-      type: 'url',
-      which: 'https://*',
-      what: 'any organization',
-      id: 'anyID'
-    },
-    {
-      type: 'test',
-      which: 'alfa',
-      what: 'Siteimprove alfa package'
-    }
-  ]
-}
-```
-
-This script tells Testaro to open a page in the Chromium browser, navigate to some URL, and, if the browser is not redirected, perform the tests in the `alfa` package on that URL, within 65 seconds.
-
-Properties:
-- `id`: This is a string consisting of alphanumeric ASCII characters and hyphen-minus (-). In a script, its value simply identifies the script. In a job, it becomes a unique job identifier.
-- `what`: This is a description of the script.
-- `strict`: This is `true` or `false`, indicating whether _substantive redirections_ should be treated as failures. These are redirections that do more than add or subtract a final slash. For example, a redirection from `xyz.com` to `www.xyz.com` or `xyz.com/en` will abort a job if `strict` is true.
-- `timeLimit`: This is the number of seconds allowed for the execution of the job.
-- `commands`: This is an array of the commands to be performed. Commands are documented below.
-
-The `timeLimit` property is optional. If it is omitted, a default of 300 seconds (5 minutes) is set.
-
-The `url` command in this example is incomplete. It contains a placeholder for a URL.
-
 ### Jobs
 
-A job object is saved as a JSON file in the `process.env.JOBDIR` directory, with a file name identical to its `id` value, plus a `.json` extension. Thus, the following job would be saved in a file named `be76p-tp25-w3c.json`.
+Here is an example of a job:
 
 ```javascript
 {
@@ -201,21 +155,27 @@ A job object is saved as a JSON file in the `process.env.JOBDIR` directory, with
 }
 ```
 
-This job completes the script, making it ready to be run by Testaro.
+This job contains three `commands`, telling Testaro to:
+1. open a page in the Chromium browser
+1. navigate to some URL
+1. perform the tests in the `alfa` package on that URL
 
-Properties:
-- `id`: The original script ID has been replaced by a unique job identifier. That distinguishes multiple jobs that could be created from the same script.
-- `commands`: This array is the same as in the script, except that in this case the second command has been changed from a plateholder to a description of a real host.
+Job properties:
+- `id`: This is a string consisting of alphanumeric ASCII characters and hyphen-minus (-), intended to be unique. When this job is saved as a JSON file, the file name is `be76p-sp25-w3c.json`. Typically, a job is created from a _script_, and the job ID adds a timestamp prefix and a host suffix to the script ID. Here the script ID would have been `sp25`.
+- `what`: This is a description of the script.
+- `strict`: This is `true` or `false`, indicating whether _substantive redirections_ should be treated as failures. These are redirections that do more than add or subtract a final slash. For example, if `strict` is true, a redirection from `xyz.com` to `www.xyz.com` or to `xyz.com/en` will abort the job.
+- `timeLimit`: This optional property is the number of seconds allowed for the execution of the job. If omitted, Testaro sets a time limit of 300 seconds (5 minutes);
+- `commands`: This is an array of the commands to be performed. Commands are documented below.
 - `sources`: This object has properties describing where the job came from:
-   - `script`: This is the ID of the original script.
-   - `host`: This object describes the host that has replaced the placeholder data in `url` commands, or it is an empty object if the original `url` commands were complete.
+   - `script`: This is the ID of the script from which the job was made. Other applications, such as Testilo, can make jobs from scripts. A script object that has the same `id`, `what`, `strict`, `timeLimit`, and `commands` properties as a job, except that a `url` command in a script can have a placeholder value. Examples of scripts can be found in the Testilo package.
+   - `host`: If the job was made from a script whose `url` commands have placeholder values, this property describes the host that has replaced the placeholder data. Otherwise it is an empty object. The `id` property of the host also typically becomes the third segment of the job ID.
    - `requester`: This string is the email address to receive a notice of completion of the running of the job.
 - `jobCreationTime`: This is the time when the job was created from a script.
-- `timeStamp`: This string is a compact representation of the job creation time, for inclusion in the new ID of the job.
+- `timeStamp`: This string is a compact representation of the job creation time, for inclusion in the ID of the job.
 
 ### Reports
 
-A report object is saved as a JSON file in the `process.env.REPORTDIR_RAW` directory, with a file name identical to its `job.id` value, plus a `.json` extension. Thus, the following report would be saved in a file named `be76p-tp25-w3c.json`. Thus, a report file has the same name as the job file from which it was created, but is located in a different directory. The environment variable `REPORTDIR_RAW` is named to reflect the fact that Testaro produces _raw_ reports, containing the results of tests performed but not additional analysis that other tools (such as Testilo) can do.
+Here is an example of a newly initialized _report_.
 
 ```javascript
 {
@@ -259,21 +219,21 @@ A report object is saved as a JSON file in the `process.env.REPORTDIR_RAW` direc
 }
 ```
 
-This report is an object whose `job` property has a job as its value. It also has two additional properties:
-- `acts`: This is initially an empty array. Testaro copies the `job.commands` property into `acts` and then modifies the array. Testaro can add more acts to the original ones. Testaro also adds results to the acts.
-- `jobData`: Some results pertain to a job as a whole, not to any specific act. This property is an object where Testaro records such job-level results.
+This report is an object produced by Testaro when it is about to run a job. The `job` property has the job as its value. The report also has two additional properties:
+- `acts`: This is an empty array. Testaro will copy the `job.commands` property into `acts` and then modify the array. Testaro can add more acts to the original ones. Testaro will also adds results to the acts.
+- `jobData`: Some results pertain to a job as a whole, not to any specific act. This property is an object where Testaro will record such job-level results.
 
 ### Commands
 
 #### Introduction
 
-The `commands` property’s value is an array of commands (command objects).
+The `commands` property was introduced above. This section provides more detail.
 
-Each command has a `type` property and optionally has a `name` property (used in branching, described below). It must or may have other properties, depending on the value of `type`.
+Each command object has a `type` property and optionally has a `name` property (used in branching, described below). It must or may have other properties, depending on the value of `type`.
 
 #### Command sequence
 
-The first two commands in any script have the types `launch` and `url`, respectively, as shown in the example above. They launch a browser and then use it to visit a URL.
+The first two commands in any job have the types `launch` and `url`, respectively, as shown in the example above. They launch a browser and then use it to visit a URL.
 
 #### Command types
 
@@ -307,7 +267,7 @@ When the texts of multiple elements of the same type will contain the `which` va
 
 An example of a **navigation** is the command of type `url` above.
 
-Once you have included a `url` command in a script, you do not need to add more `url` commands unless you want the browser to visit a different URL.
+Once you have included a `url` command in a job, you do not need to add more `url` commands unless you want the browser to visit a different URL.
 
 However, some tests modify web pages. In those cases, Testaro inserts additional `launch` and `url` act pairs into the `acts` array, after those tests, to ensure that changes made by one test do not affect subsequent acts, if the environment variable `URL_INJECT` has the value `yes`.
 
@@ -432,15 +392,15 @@ The reason for this is that the Tenon API operates asynchronously. You ask it to
 
 Tenon says that tests are typically completed in 3 to 6 seconds but that the latency can be longer, depending on demand.
 
-Therefore, you can include a `tenonRequest` command early in your script, and a `tenon` test command late in your script. Tenon will move your request through its queue while Testaro is processing your script. When Testaro reaches your `tenon` test command, Tenon will most likely have completed your test. If not, the `tenon` test will wait and then make a second request before giving up.
+Therefore, you can include a `tenonRequest` command early in your job, and a `tenon` test command late in your job. Tenon will move your request through its queue while Testaro is processing your job. When Testaro reaches your `tenon` test command, Tenon will most likely have completed your test. If not, the `tenon` test will wait and then make a second request before giving up.
 
 Thus, a `tenon` test actually does not perform any test; it merely collects the result. The page that was active when the `tenonRequest` command was performed is the one that Tenon tests.
 
-In case you want to perform more than one `tenon` test with the same script, you can do so. Just give each pair of commands a distinct `id` property, so each `tenon` test command will request the correct result.
+In case you want to perform more than one `tenon` test with the same job, you can do so. Just give each pair of commands a distinct `id` property, so each `tenon` test command will request the correct result.
 
 Tenon recommends giving it a public URL rather than giving it the content of a page, if possible. So, it is best to give the `withNewContent` property of the `tenonRequest` command the value `true`, unless the page is not public.
 
-If a `tenon` test is included in a script, environment variables named `TENON_USER` and `TENON_PASSWORD` must exist, with your Tenon username and password, respectively, as their values. You can obtain those from [Tenon](https://tenon.io/documentation/overview).
+If a `tenon` test is included in a job, environment variables named `TENON_USER` and `TENON_PASSWORD` must exist, with your Tenon username and password, respectively, as their values. You can obtain those from [Tenon](https://tenon.io/documentation/overview).
 
 ###### Continuum
 
@@ -482,7 +442,7 @@ The changes in `htmlcs/HTMLCS.js` are:
 
 ###### WAVE
 
-If a `wave` test is included in the script, an environment variable named `WAVE_KEY` must exist, with your WAVE API key as its value. You can get it from [WebAIM](https://wave.webaim.org/api/).
+If a `wave` test is included in the job, an environment variable named `WAVE_KEY` must exist, with your WAVE API key as its value. You can get it from [WebAIM](https://wave.webaim.org/api/).
 
 The `wave` API does not accept a transmitted document for testing. WAVE must be given only a URL, which it then visits to perform its tests. Therefore, you cannot manipulate a page and then have WAVE test it, or ask WAVE to test a page that cannot be reached directly with a URL.
 
@@ -587,11 +547,7 @@ The second item in each array, if there are 3 items in the array, is an operator
 
 The third item in each array, if there are 3 items in the array, is the criterion with which the value of the first property is compared.
 
-A typical use for an `expect` property is checking the correctness of a Testaro test. Thus, the validation scripts in the `validation/tests/scripts` directory all contain `test` commands with `expect` properties. See the “Validation” section below.
-
-## Samples
-
-The `samples` directory contains examples of scripts. If you wish to use any of them, you can give `SCRIPTDIR` the value `'samples'`.
+A typical use for an `expect` property is checking the correctness of a Testaro test. Thus, the validation jobs in the `validation/tests/jobs` directory all contain `test` commands with `expect` properties. See the “Validation” section below.
 
 ## Execution
 
@@ -635,7 +591,7 @@ doJob(report)
 
 Replace `{…}` with a job object, like the example job shown above.
 
-Testaro will run the script and modify the `acts` and `jobData` properties of the `report` object. When Testaro finishes, the `acts` and `jobData` properties of `report` will contain the results. The final statement can further process the `report` object as desired in the `then` callback.
+Testaro will run the job and modify the `report` object. When Testaro finishes, the `acts` and `jobData` properties of `report` will contain the results. The final statement can further process the `report` object as desired in the `then` callback.
 
 The Testilo package contains functions that can create jobs from scripts.
 
@@ -656,15 +612,15 @@ Execution by a user:
 node call high be76p-tp25-w3c
 ```
 
-In either case, replace `be76p-tp25-w3c` with the ID of a job in the `process.env.JOBDIR` directory.
+In either case, replace `be76p-tp25-w3c` with the ID of a job file in the `process.env.JOBDIR` directory.
 
-Testaro will find the named job (e.g., `be76p-tp25-w3c.json`) in the `process.env.JOBDIR` directory and write the report in the `process.env.REPORTDIR_RAW` directory.
+Testaro will find the named job file (e.g., `be76p-tp25-w3c.json`) in the `process.env.JOBDIR` directory and write the report in the `process.env.REPORTDIR_RAW` directory. That environment variable is based on the fact that _raw_ reports, produced by Testaro, can subsequently be enhanced by other applications. For example, Testilo can score and digest reports.
 
 #### Watch
 
 Watch execution is designed for either modules or users.
 
-In watch mode, Testaro periodically checks for a job to run. When such a job exists, Testaro runs it and populates its `acts` and `jobData` properties to make it a report. Testaro may continue watching after the first report, or may quit.
+In watch mode, Testaro periodically checks for a job to run. When such a job exists, Testaro runs it and produces a report. Testaro may continue watching after the first report, or may quit.
 
 Execution by a module:
 
@@ -688,7 +644,7 @@ The arguments passed to `cycle` by either of these invocations are:
 
 With directory watch, Testaro checks whether the job directory (`process.env.JOBDIR`) in its host’s filesystem contains a job.
 
-When Testaro finds one or more jobs in the watch directory, Testaro runs the first job, writes the report into the `process.env.REPORTDIR_RAW` directory, and moves the job from the `process.env.JOBDIR` into the `process.env.DONEDIR` directory.
+When Testaro finds one or more jobs in the job directory, Testaro runs the first job, writes the report into the `process.env.REPORTDIR_RAW` directory, and moves the job from the `process.env.JOBDIR` into the `process.env.DONEDIR` directory.
 
 Since Testaro runs the first job (i.e. the job whose name is first in ASCII order), whoever populates the `process.env.JOBDIR` directory with job files has control over the order in which Testaro runs them. For example, to force a new job to be run before the already waiting jobs, one can give it a filename that comes before that of the first waiting job.
 
@@ -697,7 +653,6 @@ Since Testaro runs the first job (i.e. the job whose name is first in ASCII orde
 Network watching is designed for a situation in which:
 - A managing server may be able to give work to multiple workstations that run Testaro.
 - A workstation running Testaro can contact a managing server, but the server may not be able to contact a workstation.
-- The functions of Testaro are limited to those requiring workstation features.
 
 With network watch, the initiator of an interaction is Testaro, not the server. When Testaro is available, it requests a job from a server. If the response is a JSON representation of a job, Testaro runs the job and sends the report to the server.
 
@@ -746,7 +701,7 @@ To validate any single Testaro test `xyz`, enter the statement `npm test xyz`.
 
 To execute any other executor `xyz`, call it with the statement `npm run xyz`.
 
-The `tests` executor makes use of the scripts in the `validation/tests/scripts` directory, and they, in turn, run tests on HTML files in the `validation/tests/targets` directory.
+The `tests` executor makes use of the jobs in the `validation/tests/jobs` directory, and they, in turn, run tests on HTML files in the `validation/tests/targets` directory.
 
 ## Contribution
 
@@ -774,7 +729,7 @@ The Playwright “Receives Events” actionability check does **not** check whet
 
 Test packages sometimes do redundant testing, in that two or more packages test for the same issues, although such duplications are not necessarily perfect. This fact creates three problems:
 - One cannot be confident in excluding some tests of some packages on the assumption that they perfectly duplicate tests of other packages.
-- The Testaro report from a script documents each package’s results separately, so a single defect may be documented in multiple locations within the report, making the direct consumption of the report inefficient.
+- The Testaro report from a job documents each package’s results separately, so a single defect may be documented in multiple locations within the report, making the direct consumption of the report inefficient.
 - An effort to aggregate the results into a single score may distort the scores by inflating the weights of defects that happen to be discovered by multiple packages.
 
 The tests provided with Testaro do not exclude any apparently duplicative tests from packages.

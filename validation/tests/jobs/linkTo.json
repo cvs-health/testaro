@@ -1,4 +1,5 @@
 {
+  "id": "linkToVal",
   "what": "validation of linkTo test",
   "strict": true,
   "commands": [
@@ -22,5 +23,12 @@
         ["items.0", "=", "nothing at all"]
       ]
     }
-  ]
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "jobCreationTime": "",
+  "timeStamp": ""
 }

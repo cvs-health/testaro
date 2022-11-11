@@ -1,4 +1,5 @@
 {
+  "id": "focIndVal",
   "what": "validation of focInd test",
   "strict": true,
   "commands": [
@@ -56,5 +57,12 @@
         ["totals.types.outlinePresent.tagNames.INPUT", "=", 1]
       ]
     }
-  ]
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "jobCreationTime": "",
+  "timeStamp": ""
 }

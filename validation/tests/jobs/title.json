@@ -1,4 +1,5 @@
 {
+  "id": "titleVal",
   "what": "validation of title test",
   "strict": true,
   "commands": [
@@ -33,5 +34,12 @@
         ["title", "=", ""]
       ]
     }
-  ]
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "jobCreationTime": "",
+  "timeStamp": ""
 }

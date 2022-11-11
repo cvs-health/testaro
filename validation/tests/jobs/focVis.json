@@ -1,4 +1,5 @@
 {
+  "id": "focVisVal",
   "what": "validation of focVis test",
   "strict": true,
   "commands": [
@@ -22,5 +23,12 @@
         ["items.0", "=", "Basque information"]
       ]
     }
-  ]
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "jobCreationTime": "",
+  "timeStamp": ""
 }

@@ -1,4 +1,5 @@
 {
+  "id": "titledElVal",
   "what": "validation of titledEl test",
   "strict": true,
   "commands": [
@@ -24,5 +25,12 @@
         ["items.0.title", "=", "invalid title"]
       ]
     }
-  ]
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "jobCreationTime": "",
+  "timeStamp": ""
 }

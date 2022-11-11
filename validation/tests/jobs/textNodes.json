@@ -1,4 +1,5 @@
 {
+  "id": "elementsVal",
   "what": "validation of elements test",
   "strict": true,
   "commands": [
@@ -85,5 +86,12 @@
         ["items.0.ancestors.1.children.2.attributes.1.name", "=", "hidden"]
       ]
     }
-  ]
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "jobCreationTime": "",
+  "timeStamp": ""
 }

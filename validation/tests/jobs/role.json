@@ -1,4 +1,5 @@
 {
+  "id": "roleVal",
   "what": "validation of role test",
   "strict": true,
   "commands": [
@@ -47,5 +48,12 @@
         ["tagNames.INPUT.combobox.bad", "=", 1]
       ]
     }
-  ]
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "jobCreationTime": "",
+  "timeStamp": ""
 }

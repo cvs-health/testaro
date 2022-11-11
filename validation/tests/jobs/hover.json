@@ -1,4 +1,5 @@
 {
+  "id": "hoverVal",
   "what": "validation of hover test",
   "strict": true,
   "commands": [
@@ -105,5 +106,12 @@
         ["items.badIndicators.0.id", "=", "li2"]
       ]
     }
-  ]
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "jobCreationTime": "",
+  "timeStamp": ""
 }

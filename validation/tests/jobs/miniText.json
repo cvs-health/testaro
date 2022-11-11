@@ -1,4 +1,5 @@
 {
+  "id": "miniTextVal",
   "what": "validation of miniText test",
   "strict": true,
   "commands": [
@@ -23,5 +24,12 @@
         ["items.2", "i", "named"]
       ]
     }
-  ]
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "jobCreationTime": "",
+  "timeStamp": ""
 }

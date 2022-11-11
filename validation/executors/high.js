@@ -10,11 +10,10 @@ const fs = require('fs/promises');
 const projectRoot = `${__dirname}/../..`;
 process.env.REPORTDIR = `${projectRoot}/temp`;
 const reportDir = process.env.REPORTDIR;
-process.env.SCRIPTDIR = `${projectRoot}/samples`;
 
 // ########## OPERATION
 
-// Run the simple script and write a report.
+// Run the simple job and write a report.
 const {runJob} = require(`${projectRoot}/high`);
 runJob('simple')
 .then(

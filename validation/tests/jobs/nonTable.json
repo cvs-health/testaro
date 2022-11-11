@@ -1,4 +1,5 @@
 {
+  "id": "nonTableVal",
   "what": "validation of nonTable test",
   "strict": true,
   "commands": [
@@ -24,5 +25,12 @@
         ["items.2", "i", "Chime"]
       ]
     }
-  ]
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "jobCreationTime": "",
+  "timeStamp": ""
 }

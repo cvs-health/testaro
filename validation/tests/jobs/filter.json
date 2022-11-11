@@ -1,4 +1,5 @@
 {
+  "id": "filterVal",
   "what": "validation of filter test",
   "strict": true,
   "commands": [
@@ -42,5 +43,12 @@
         ["items.1.impact", "=", 2]
       ]
     }
-  ]
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "jobCreationTime": "",
+  "timeStamp": ""
 }

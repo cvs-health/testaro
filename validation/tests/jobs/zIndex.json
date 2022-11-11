@@ -1,4 +1,5 @@
 {
+  "id": "zIndexVal",
   "what": "validation of zIndex test",
   "strict": true,
   "commands": [
@@ -36,5 +37,12 @@
         ["totals.tagNames.BUTTON", "=", 2]
       ]
     }
-  ]
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "jobCreationTime": "",
+  "timeStamp": ""
 }

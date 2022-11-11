@@ -1,4 +1,5 @@
 {
+  "id": "docTypeVal",
   "what": "validation of docType test",
   "strict": true,
   "commands": [
@@ -33,5 +34,12 @@
         ["docHasType", "=", false]
       ]
     }
-  ]
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "jobCreationTime": "",
+  "timeStamp": ""
 }
