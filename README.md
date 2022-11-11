@@ -709,7 +709,23 @@ In addition to their uses described above, environment variables can be used by 
 
 Before executing a Testaro script, you can optionally also set `process.env.DEBUG` (to `'true'` or anything else) and/or `process.env.WAITS` (to a non-negative integer). The effects of these variables are described in the `run.js` file.
 
-You may store environment variables in an untracked `.env` file if you wish, and Testaro will recognize them.
+You may store environment variables in an untracked `.env` file if you wish, and Testaro will recognize them. Here is a template for a `.env` file:
+
+```conf
+URL_INJECT=yes
+TENON_USER=you@yourdomain.tld
+TENON_PASSWORD=yourTenonPassword
+WAVE_KEY=yourwavekey
+PROTOCOL=https
+JOB_URL=yourserver.tld/job
+REPORT_URL=yourserver.tld/report
+SCRIPTDIR=../testing/scripts
+REPORTDIR=../testing/reports/raw
+JOBDIR=../testing/watch/ThisWorkstation
+DONEDIR=../testing/done
+AGENT=ThisWorkstation
+DEBUG=false
+```
 
 ## Validation
 
