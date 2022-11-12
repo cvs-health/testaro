@@ -17,6 +17,6 @@ fs.readdir(`${__dirname}/../tests/jobs`)
     // Get the test ID from it by disregarding its .json extension.
     const testID = fileName.slice(0, -5);
     // Validate the test.
-    validateTest(testID);
+    await validateTest(testID);
   }
 });
