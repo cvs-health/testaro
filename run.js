@@ -236,31 +236,40 @@ const isValidCommand = command => {
 // Validates a report object.
 const isValidReport = report => {
   if (report) {
-    // Return whether the job is valid.
+    // Return whether the report is valid.
     const {job, acts, jobData} = report;
     const {id, what, strict, commands, sources, jobCreationTime, timeStamp} = job;
-    const isValid = job
-    && acts
-    && jobData
-    && id
-    && what
-    && typeof strict === 'boolean'
-    && commands
-    && sources
-    && jobCreationTime
-    && timeStamp
-    && Array.isArray(acts)
-    && typeof id === 'string'
-    && typeof what === 'string'
-    && Array.isArray(commands)
-    && commands[0].type === 'launch'
-    && commands.length > 1
-    && commands[1].type === 'url'
-    && isURL(commands[1].which)
-    && commands.every(command => isValidCommand(command))
-    && sources.script
-    && sources.host;
-    return isValid;
+    const criteria = [
+      [job, 'report has job property'],
+      [acts, 'report has acts property'],
+      [jobData, 'report has jobData property'],
+      [id, 'job has id property'],
+      [what, 'job has what property'],
+      [typeof strict === 'boolean', 'job has true or false strict property'],
+      [commands, 'job has commands property'],
+      [sources, 'job has sources property'],
+      [jobCreationTime, 'job has jobCreationTime property'],
+      [timeStamp, 'job has timeStamp property'],
+      [Array.isArray(acts), 'acts has array value'],
+      [typeof id === 'string', 'id has string value'],
+      [typeof what === 'string', 'what has string value'],
+      [Array.isArray(commands), 'commands has array value'],
+      [commands[0].type, 'first command has type property'],
+      [commands[0].type === 'launch', 'first command has launch type'],
+      [commands.length > 1, 'command count greater than 1'],
+      [commands[1].type, 'second command has type property'],
+      [commands[1].type === 'url', 'second command has url type'],
+      [commands[1].which, 'second command has which property'],
+      [isURL(commands[1].which), 'second command which property has URL value'],
+      [commands.every(command => isValidCommand(command)), 'every command is valid'],
+      [typeof sources.script === 'string', 'sources has script property with string value'],
+      [sources.host, 'sources has host property']
+    ];
+    const invalidityIndex = criteria.findIndex(criterion => ! criterion[0]);
+    if (invalidityIndex > -1) {
+      console.log(`ERROR: report fails “${criteria[invalidityIndex][1]}” requirement`);
+    }
+    return invalidityIndex === -1;
   }
   else {
     return false;
