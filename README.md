@@ -119,7 +119,7 @@ Here is an example of a job:
 
 ```javascript
 {
-  id: 'be76p-tp25-w3c',
+  id: 'be76p-ts25-w3c',
   what: 'Test host with alfa',
   strict: true,
   timeLimit: 65,
@@ -161,7 +161,7 @@ This job contains three `commands`, telling Testaro to:
 1. perform the tests in the `alfa` package on that URL
 
 Job properties:
-- `id`: This is a string consisting of alphanumeric ASCII characters and hyphen-minus (-), intended to be unique. When this job is saved as a JSON file, the file name is `be76p-sp25-w3c.json`. Typically, a job is created from a _script_, and the job ID adds a timestamp prefix and a host suffix to the script ID. Here the script ID would have been `sp25`.
+- `id`: This is a string consisting of alphanumeric ASCII characters and hyphen-minus (-), intended to be unique. When this job is saved as a JSON file, the file name is `be76p-sp25-w3c.json`. Typically, a job is created from a _script_, and the job ID adds a timestamp prefix and a host suffix to the script ID. Here the script ID would have been `ts25`.
 - `what`: This is a description of the script.
 - `strict`: This is `true` or `false`, indicating whether _substantive redirections_ should be treated as failures. These are redirections that do more than add or subtract a final slash. For example, if `strict` is true, a redirection from `xyz.com` to `www.xyz.com` or to `xyz.com/en` will abort the job.
 - `timeLimit`: This optional property is the number of seconds allowed for the execution of the job. If omitted, Testaro sets a time limit of 300 seconds (5 minutes);
@@ -220,7 +220,7 @@ Here is an example of a newly initialized _report_.
 ```
 
 This report is an object produced by Testaro when it is about to run a job. The `job` property has the job as its value. The report also has two additional properties:
-- `acts`: This is an empty array. Testaro will copy the `job.commands` property into `acts` and then modify the array. Testaro can add more acts to the original ones. Testaro will also adds results to the acts.
+- `acts`: This is an empty array. Testaro will copy the `job.commands` property into `acts` and then modify the array. Testaro can add more acts to the original ones. Testaro will also add results to the acts.
 - `jobData`: Some results pertain to a job as a whole, not to any specific act. This property is an object where Testaro will record such job-level results.
 
 ### Commands
