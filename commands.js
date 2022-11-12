@@ -138,7 +138,7 @@ exports.commands = {
     url: [
       'Navigate to a new URL',
       {
-        which: [true, 'string', 'isURL', 'URL'],
+        which: [true, 'string', 'isURL', 'URL (if file://, path relative to main project directory'],
         what: [false, 'string', 'hasLength', 'comment'],
         id: [false, 'string', 'hasLength', 'ID of the host']
       }
