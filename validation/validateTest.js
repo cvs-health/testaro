@@ -11,9 +11,11 @@ exports.validateTest = async testID => {
     const jobJSON = rawJobJSON
     .replace(/__targets__/g, `file://${__dirname}/../tests/targets`);
     const job = JSON.parse(jobJSON);
-    const report = {job};
-    report.acts = [];
-    report.jobData = {};
+    const report = {
+      job,
+      acts: [],
+      jobData: {}
+    };
     await doJob(report);
     const {acts, jobData} = report;
     if (jobData.endTime && /^\d{4}-.+$/.test(jobData.endTime)) {
