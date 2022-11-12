@@ -2,7 +2,7 @@
 // Validator for one Testaro test.
 
 const fs = require('fs').promises;
-const {doJob} = require(`${__dirname}/../../run`);
+const {doJob} = require(`${__dirname}/../run`);
 exports.validateTest = async testID => {
   const jobFileNames = await fs.readdir(`${__dirname}/tests/jobs`);
   for (const jobFileName of jobFileNames.filter(fileName => fileName === `${testID}.json`)) {
