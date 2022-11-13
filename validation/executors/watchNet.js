@@ -1,23 +1,31 @@
 // watchNet.js
 // Validator for network watching.
 
+// IMPORTS
+
 const fs = require('fs/promises');
-process.env.WATCH_TYPE = 'net';
-process.env.INTERVAL = 5;
-process.env.WATCH_FOREVER = false;
+
+// CONSTANTS
+
+// Override cycle environment variables with validation-specific ones.
 process.env.PROTOCOL = 'http';
+const jobDir = `${__dirname}/../jobs`;
 process.env.JOB_URL = 'localhost:3007/job';
 process.env.REPORT_URL = 'localhost:3007/report';
-process.env.AUTH_CODE = 'testarauth';
-process.env.PROTOCOL = 'http';
-const http = require('http');
+process.env.AGENT = 'testarauth';
+const {cycle} = require(`${__dirname}/../../watch`);
+const client = require(process.env.PROTOCOL);
+const jobID = '00000-simple-example';
+
+// OPERATION
+
 // Start a timer.
 const startTime = Date.now();
 // Initialize the state.
 let jobGiven = false;
 // Start checking for jobs every 5 seconds in 5 seconds.
 setTimeout(() => {
-  require('../../watch');
+  cycle(false, false, 5);
 }, 5000);
 let server;
 // Handles Testaro requests to the server.
@@ -37,13 +45,13 @@ const requestHandler = (request, response) => {
     if (method === 'GET') {
       // If a job is validly requested:
       console.log('Server got a job request from Testaro');
-      if (requestURL === '/job?authCode=testarauth') {
+      if (requestURL === '/job?agent=testarauth') {
         // If at least 7 seconds has elapsed since timing started:
         if (Date.now() > startTime + 7000) {
           // Respond with a job.
-          const jobJSON = await fs.readFile(`${__dirname}/../protoJobs/val1.json`);
+          const jobJSON = await fs.readFile(`${jobDir}/${jobID}.json`);
           await response.end(jobJSON);
-          console.log('Server sent job val1 to Testaro');
+          console.log('Server sent job to Testaro');
           jobGiven = true;
         }
         // Otherwise, i.e. if timing started less than 7 seconds ago:
@@ -65,14 +73,14 @@ const requestHandler = (request, response) => {
       console.log('Server got report from Testaro');
       const ack = {};
       // If a report is validly submitted:
-      if (requestURL === '/report?authCode=testarauth') {
+      if (requestURL === '/api?agent=testarauth') {
         // If a job was earlier given to Testaro:
         if (jobGiven) {
           // Respond, reporting success or failure.
           try {
             const bodyJSON = bodyParts.join('');
             const body = JSON.parse(bodyJSON);
-            if (body.jobID && body.script && body.acts) {
+            if (body.job && body.acts && body.jobData) {
               ack.result = 'Success: Valid report submitted';
             }
             else {
@@ -97,10 +105,8 @@ const requestHandler = (request, response) => {
   });
 };
 // Create a server.
-server = http.createServer({}, requestHandler);
+server = client.createServer({}, requestHandler);
 // Start a server listening for Testaro requests.
 server.listen(3007, () => {
   console.log('Job and report server listening on port 3007');
 });
-// Start checking for jobs every 5 seconds.
-require('../../watch');
