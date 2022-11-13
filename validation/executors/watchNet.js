@@ -10,8 +10,8 @@ const fs = require('fs/promises');
 // Override cycle environment variables with validation-specific ones.
 process.env.PROTOCOL = 'http';
 const jobDir = `${__dirname}/../jobs`;
-process.env.JOB_URL = 'localhost:3007/job';
-process.env.REPORT_URL = 'localhost:3007/report';
+process.env.JOB_URL = 'localhost:3007/api/job';
+process.env.REPORT_URL = 'localhost:3007/api';
 process.env.AGENT = 'testarauth';
 const {cycle} = require(`${__dirname}/../../watch`);
 const client = require(process.env.PROTOCOL);
@@ -45,7 +45,7 @@ const requestHandler = (request, response) => {
     if (method === 'GET') {
       // If a job is validly requested:
       console.log('Server got a job request from Testaro');
-      if (requestURL === '/job?agent=testarauth') {
+      if (requestURL === `/api/job?agent=${process.env.AGENT}`) {
         // If at least 7 seconds has elapsed since timing started:
         if (Date.now() > startTime + 7000) {
           // Respond with a job.
@@ -73,14 +73,20 @@ const requestHandler = (request, response) => {
       console.log('Server got report from Testaro');
       const ack = {};
       // If a report is validly submitted:
-      if (requestURL === '/api?agent=testarauth') {
+      if (requestURL === '/api') {
         // If a job was earlier given to Testaro:
         if (jobGiven) {
           // Respond, reporting success or failure.
           try {
             const bodyJSON = bodyParts.join('');
             const body = JSON.parse(bodyJSON);
-            if (body.job && body.acts && body.jobData) {
+            if (
+              body.job
+              && body.acts
+              && body.jobData
+              && body.agent
+              && body.agent === process.env.AGENT
+            ) {
               ack.result = 'Success: Valid report submitted';
             }
             else {
