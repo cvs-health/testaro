@@ -1,5 +1,5 @@
 {
-  "id": "tp18",
+  "id": "00000-ts18-example",
   "what": "Alfa, Axe, Continuum, HTML CodeSniffer, IBM, Nu Html Checker, Tenon, WAVE, and 22 custom tests",
   "strict": true,
   "timeLimit": 500,
@@ -11,8 +11,9 @@
     },
     {
       "type": "url",
-      "which": "https://example.com/",
-      "what": "any page"
+      "which": "https://example.com",
+      "what": "Example.com",
+      "id": "example"
     },
     {
       "type": "tenonRequest",
@@ -35,8 +36,9 @@
     },
     {
       "type": "url",
-      "which": "https://example.com/",
-      "what": "any page"
+      "which": "https://example.com",
+      "what": "Example.com",
+      "id": "example"
     },
     {
       "type": "test",
@@ -213,5 +215,17 @@
       "id": "a",
       "what": "Tenon API version 2 result retrieval"
     }
-  ]
+  ],
+  "sources": {
+    "script": "ts18",
+    "batch": "",
+    "host": {
+      "id": "example",
+      "which": "https://example.com",
+      "what": "Example.com"
+    },
+    "requester": "user@domain.tld"
+  },
+  "jobCreationTime": "2022-11-12T22:51:45",
+  "timeStamp": "00000"
 }
