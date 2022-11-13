@@ -1,31 +1,53 @@
 // low.js
 // Validator for low-level invocation of Testaro.
 
+// ########## IMPORTS
+
 const fs = require('fs/promises');
-const getSampleScript = async scriptID => {
-  const scriptJSON = await fs.readFile(`${__dirname}/../../samples/scripts/${scriptID}.json`);
-  return JSON.parse(scriptJSON);
-};
-const validate = async () => {
-  const script = await getSampleScript('simple');
+
+// ########## CONSTANTS
+
+const projectRoot = `${__dirname}/../..`;
+const {doJob} = require(`${projectRoot}/run`);
+process.env.JOBDIR = `${projectRoot}/validation/jobs`;
+process.env.REPORTDIR = `${projectRoot}/temp`;
+const jobID = '00000-simple-example';
+
+// ########## OPERATION
+
+// Get the simple job.
+fs.readFile(`${process.env.JOBDIR}/${jobID}.json`)
+.then(async jobJSON => {
+  const job = JSON.parse(jobJSON);
   const report = {
-    script,
-    log: [],
-    acts: []
+    job,
+    acts: [],
+    jobData: {}
   };
-  const {doJob} = require('../../run');
+  // Run it.
   await doJob(report);
-  const {log, acts} = report;
-  if (log.length !== 2) {
-    console.log(`Failure: log length is ${log.length} instead of 2`);
-    console.log(JSON.stringify(log, null, 2));
+  try {
+    // Check the report against expectations.
+    const reportJSON = await fs.readFile(`${process.env.REPORTDIR}/${jobID}.json`, 'utf8');
+    const report = JSON.parse(reportJSON);
+    const {job, acts, jobData} = report;
+    if (! job) {
+      console.log('Failure: Report omits job');
+    }
+    else if (acts.length !== 3) {
+      console.log('Failure: Counts of acts is not 3');
+    }
+    else if (! jobData) {
+      console.log('Failure: Report omits jobData');
+    }
+    else if (jobData.endTime < jobData.startTime) {
+      console.log('Failure: End time precedes start time');
+    }
+    else {
+      console.log(`Success (report is in temp/${jobID}.json)`);
+    }
   }
-  else if (acts.length !== 3) {
-    console.log(`Failure: acts length is ${acts.length} instead of 3`);
-    console.log(JSON.stringify(acts, null, 2));
+  catch(error) {
+    console.log(`ERROR: ${error.message}`);
   }
-  else {
-    console.log('Success');
-  }
-};
-validate();
+});

@@ -23,7 +23,7 @@ runJob(jobID)
   async () => {
     try {
       // Check it against expectations.
-      const reportJSON = await fs.readFile(`${reportDir}/${jobID}.json`);
+      const reportJSON = await fs.readFile(`${reportDir}/${jobID}.json`, 'utf8');
       const report = JSON.parse(reportJSON);
       const {job, acts, jobData} = report;
       if (! job) {
