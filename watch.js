@@ -156,7 +156,7 @@ const wait = ms => {
   });
 };
 // Runs a job and returns a report.
-exports.runJob = async (job, isDirWatch) => {
+const runJob = async (job, isDirWatch) => {
   const {id} = job;
   if (id) {
     try {
@@ -223,7 +223,7 @@ exports.cycle = async (isDirWatch, isForever, interval) => {
     if (job.id) {
       // Run it and save a report.
       console.log(`Running job ${job.id}`);
-      statusOK = await exports.runJob(job, isDirWatch);
+      statusOK = await runJob(job, isDirWatch);
       console.log(`Job ${job.id} finished`);
       if (statusOK) {
         // If a directory was watched:
@@ -243,4 +243,5 @@ exports.cycle = async (isDirWatch, isForever, interval) => {
     }
   }
   console.log('Watching ended');
+  return '';
 };

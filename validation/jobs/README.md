@@ -1,3 +1,3 @@
 # jobs
 
-Directory watched by executor `watchDir`.
+Directory containing jobs for validation.
