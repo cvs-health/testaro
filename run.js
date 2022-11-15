@@ -1468,7 +1468,9 @@ const doActs = async (report, actIndex, page) => {
     await doActs(report, actIndex + 1, page);
   }
   else {
+    console.log('No more acts to perform; closing the browser');
     await browserClose();
+    console.log('Browser closed');
   }
 };
 // Injects launch and url acts into a report where necessary to undo DOM changes.

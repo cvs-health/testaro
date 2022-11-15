@@ -118,14 +118,16 @@ const writeNetReport = async report => {
         chunks.push(chunk);
       });
       response.on('end', () => {
+        const content = chunks.join('');
         try {
-          resolve(JSON.parse(chunks.join('')));
+          resolve(JSON.parse(content));
         }
         catch(error) {
           resolve({
             error: 'ERROR: Response was not JSON',
             message: error.message,
-            status: response.statusCode
+            status: response.statusCode,
+            content: content.slice(0, 200)
           });
         }
       });
