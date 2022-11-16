@@ -54,6 +54,7 @@ else if (fn === 'watch' && fnArgs.length === 3) {
   callWatch(... fnArgs)
   .then(() => {
     console.log('Execution completed');
+    process.exit(0);
   });
 }
 else {
