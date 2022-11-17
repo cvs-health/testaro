@@ -662,7 +662,7 @@ If multiple workstations run Testaro and do work for the same server, the server
 
 In addition to their uses described above, environment variables can be used by commands of type `text`, as documented in the `commands.js` file.
 
-Before executing a Testaro script, you can optionally also set `process.env.DEBUG` (to `'true'` or anything else) and/or `process.env.WAITS` (to a non-negative integer). The effects of these variables are described in the `run.js` file.
+Before making Testaro run a job, you can optionally also set `process.env.DEBUG` (to `'true'` or anything else) and/or `process.env.WAITS` (to a non-negative integer). The effects of these variables are described in the `run.js` file.
 
 You may store environment variables in an untracked `.env` file if you wish, and Testaro will recognize them. Here is a template for a `.env` file:
 

@@ -1524,7 +1524,7 @@ const injectLaunches = acts => {
 exports.doJob = async report => {
   // If the report is valid:
   if(isValidReport(report)) {
-    // Add the script commands to the report as its initial acts.
+    // Add the job commands to the report as its initial acts.
     report.acts = JSON.parse(JSON.stringify(report.job.commands));
     /*
       Inject launch and url acts where necessary to undo DOM changes, if specified.

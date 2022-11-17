@@ -47,6 +47,6 @@ runJob(jobID)
     }
   },
   error => {
-    console.log(`ERROR running script (${error.message})`);
+    console.log(`ERROR running job (${error.message})`);
   }
 );

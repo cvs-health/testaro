@@ -1,6 +1,6 @@
 /*
   watch.js
-  Module for watching for a script and running it when found.
+  Module for watching for a job and running it when found.
 */
 
 // ########## IMPORTS
@@ -32,14 +32,14 @@ const checkDirJob = async () => {
     const jobFileNames = jobDirFileNames.filter(fileName => fileName.endsWith('.json'));
     if (jobFileNames.length) {
       console.log('Directory job found');
-      const scriptJSON = await fs.readFile(`${jobDir}/${jobFileNames[0]}`, 'utf8');
+      const jobJSON = await fs.readFile(`${jobDir}/${jobFileNames[0]}`, 'utf8');
       try {
-        const script = JSON.parse(scriptJSON, null, 2);
-        return script;
+        const job = JSON.parse(jobJSON, null, 2);
+        return job;
       }
       catch(error) {
         return {
-          error: 'ERROR: Script was not JSON',
+          error: 'ERROR: Job was not JSON',
           message: error.message
         };
       }
@@ -55,7 +55,7 @@ const checkDirJob = async () => {
 };
 // Checks for a network job.
 const checkNetJob = async () => {
-  const script = await new Promise(resolve => {
+  const job = await new Promise(resolve => {
     const wholeURL = `${protocol}://${jobURL}?agent=${agent}`;
     const request = client.request(wholeURL, response => {
       const chunks = [];
@@ -64,10 +64,10 @@ const checkNetJob = async () => {
       });
       response.on('end', () => {
         try {
-          const scriptJSON = chunks.join('');
-          const script = JSON.parse(scriptJSON);
+          const jobJSON = chunks.join('');
+          const job = JSON.parse(jobJSON);
           // Return it.
-          resolve(script);
+          resolve(job);
         }
         catch(error) {
           resolve({
@@ -84,8 +84,8 @@ const checkNetJob = async () => {
     });
     request.end();
   });
-  console.log(`Network job ${script.id ? '' : 'not '}found`);
-  return script;
+  console.log(`Network job ${job.id || 'not'} received`);
+  return job;
 };
 // Writes a directory report.
 const writeDirReport = async report => {
@@ -196,9 +196,9 @@ const runJob = async (job, isDirWatch) => {
     }
   }
   else {
-    console.log('ERROR: script has no id');
+    console.log('ERROR: Job has no id');
     return {
-      error: 'ERROR: script has no id'
+      error: 'ERROR: Job has no id'
     };
   }
 };

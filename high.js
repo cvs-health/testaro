@@ -10,7 +10,7 @@
 require('dotenv').config();
 // Module to read and write files.
 const fs = require('fs/promises');
-// Module to run scripts and report results.
+// Module to run jobs and report results.
 const {doJob} = require('./run');
 
 // ########## CONSTANTS

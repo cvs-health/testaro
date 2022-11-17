@@ -6,9 +6,8 @@
     0. function to execute.
     1+. arguments to pass to the function.
   Usage examples:
-    node call high script454
-    node call watch dir once 30
-    node call watch net forever 60
+    node call high ts25
+    node call watch true true 30
 */
 
 // ########## IMPORTS
