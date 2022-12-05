@@ -53,8 +53,8 @@ As of this version, the counts of tests in the packages referenced above were:
 - WAVE: 110
 - Nu Html Checker: 147
 - subtotal: 1206
-- Testaro tests: 23
-- grand total: 1229
+- Testaro tests: 24
+- grand total: 1230
 
 ## Quasi-tests
 
