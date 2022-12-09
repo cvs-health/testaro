@@ -32,6 +32,7 @@ const moves = {
 const tests = {
   alfa: 'alfa',
   allHidden: 'page that is entirely or mostly hidden',
+  attVal: 'elements with attributes having illicit values',
   axe: 'Axe',
   bulk: 'count of visible elements',
   continuum: 'Level Access Continuum, community edition',

@@ -152,6 +152,14 @@ exports.commands = {
     ]
   },
   tests: {
+    attVal: [
+      'Perform an attVal test',
+      {
+        attributeName: [true, 'string', 'hasLength', 'name of attribute'],
+        licitValues: [true, 'array', 'areStrings', 'licit values'],
+        withItems: [true, 'boolean', '', 'itemize']
+      }
+    ],
     axe: [
       'Perform an Axe test',
       {
