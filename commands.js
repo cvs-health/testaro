@@ -156,7 +156,8 @@ exports.commands = {
       'Perform an attVal test',
       {
         attributeName: [true, 'string', 'hasLength', 'name of attribute'],
-        licitValues: [true, 'array', 'areStrings', 'licit values'],
+        areLicit: [true, 'boolean', '', 'whether values are licit'],
+        values: [true, 'array', 'areStrings', 'values of attribute'],
         withItems: [true, 'boolean', '', 'itemize']
       }
     ],
