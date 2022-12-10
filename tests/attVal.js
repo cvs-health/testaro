@@ -15,7 +15,7 @@ exports.reporter = async (page, attributeName, areLicit, values, withItems) => {
         text = text.trim() || element.innerHTML;
         return text.replace(/\s+/sg, ' ').replace(/<>&/g, '').slice(0, limit);
       };
-      const attributeElements = Array.from(document.body.querySelectorAll(`[${attributeName}]`));
+      const attributeElements = Array.from(document.querySelectorAll(`[${attributeName}]`));
       const badElements = attributeElements
       .filter(el => {
         const value = el.getAttribute(attributeName);
