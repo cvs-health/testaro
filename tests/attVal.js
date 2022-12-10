@@ -7,6 +7,7 @@ exports.reporter = async (page, attributeName, areLicit, values, withItems) => {
   const badAttributeData = await page.evaluate(
     args => {
       const attributeName = args[0];
+      // Whether the values are the licit or the illicit ones.
       const areLicit = args[1];
       const values = args[2];
       // Returns the text of an element.
@@ -15,15 +16,17 @@ exports.reporter = async (page, attributeName, areLicit, values, withItems) => {
         text = text.trim() || element.innerHTML;
         return text.replace(/\s+/sg, ' ').replace(/<>&/g, '').slice(0, limit);
       };
+      // Get the elements (including the html element) with the attribute.
       const attributeElements = Array.from(document.querySelectorAll(`[${attributeName}]`));
+      // Get those in which the attribute has an illicit value.
       const badElements = attributeElements
       .filter(el => {
         const value = el.getAttribute(attributeName);
         if (areLicit) {
-          return values.includes(value);
+          return ! values.includes(value);
         }
         else {
-          return ! values.includes(value);
+          return values.includes(value);
         }
       });
       const report = badElements.map(el => ({
