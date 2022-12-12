@@ -263,8 +263,8 @@ const isValidReport = report => {
       [commands[1].which, 'second command has which property'],
       [isURL(commands[1].which), 'second command which property has URL value'],
       [commands.every(command => isValidCommand(command)), 'every command is valid'],
-      [typeof sources.script === 'string', 'sources has script property with string value'],
-      [sources.host, 'sources has host property']
+      [sources && typeof sources.script === 'string', 'sources has script property with string value'],
+      [sources && sources.host, 'sources has host property']
     ];
     const invalidityIndex = criteria.findIndex(criterion => ! criterion[0]);
     if (invalidityIndex > -1) {
