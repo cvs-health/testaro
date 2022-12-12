@@ -294,7 +294,7 @@ const browserClose = async () => {
 // Returns the first line of an error message.
 const errorStart = error => error.message.replace(/\n.+/s, '');
 // Launches a browser.
-const launch = async (report, typeName) => {
+const launch = async (report, typeName, lowMotion = false) => {
   const browserType = require('playwright')[typeName];
   // If the specified browser type exists:
   if (browserType) {
@@ -316,6 +316,10 @@ const launch = async (report, typeName) => {
     });
     // If the launch succeeded:
     if (healthy) {
+      const options = {};
+      if (lowMotion) {
+        options.reducedMotion = true;
+      }
       browserContext = await browser.newContext();
       // When a page (i.e. browser tab) is added to the browser context (i.e. browser window):
       browserContext.on('page', async page => {

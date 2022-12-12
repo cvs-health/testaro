@@ -28,7 +28,8 @@ exports.commands = {
       'Launch a Playwright browser',
       {
         which: [true, 'string', 'isBrowserType', '“chromium”, “firefox”, or “webkit”'],
-        what: [false, 'string', 'hasLength', 'comment']
+        what: [false, 'string', 'hasLength', 'comment'],
+        lowMotion: [false, 'boolean', '', 'set reduced-motion option if true']
       }
     ],
     link: [
