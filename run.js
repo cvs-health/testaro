@@ -316,11 +316,12 @@ const launch = async (report, typeName, lowMotion = false) => {
     });
     // If the launch succeeded:
     if (healthy) {
+      // Open a context (i.e. browser tab), with reduced motion if specified.
       const options = {};
       if (lowMotion) {
-        options.reducedMotion = true;
+        options.reducedMotion = 'reduce';
       }
-      browserContext = await browser.newContext();
+      browserContext = await browser.newContext(options);
       // When a page (i.e. browser tab) is added to the browser context (i.e. browser window):
       browserContext.on('page', async page => {
         // Make the page current.
