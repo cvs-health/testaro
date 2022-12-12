@@ -29,8 +29,10 @@ const reportDir = process.env.REPORTDIR;
 
 // Fulfills a high-level testing request.
 const callHigh = async jobID => {
-  await runJob(jobID);
-  console.log(`Job completed and report ${jobID}.json saved in ${reportDir}`);
+  const done = await runJob(jobID);
+  if (done) {
+    console.log(`Job completed and report ${jobID}.json saved in ${reportDir}`);
+  }
 };
 // Starts a watch.
 const callWatch = async (isDirWatch, isForever, interval) => {

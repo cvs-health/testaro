@@ -1560,8 +1560,10 @@ exports.doJob = async report => {
     const endTime = new Date();
     report.jobData.endTime = nowString();
     report.jobData.elapsedSeconds =  Math.floor((endTime - startTime) / 1000);
+    return true;
   }
   else {
     console.log('ERROR: Initialized job report invalid');
+    return false;
   }
 };

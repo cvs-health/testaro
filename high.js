@@ -41,13 +41,20 @@ exports.runJob = async jobID => {
       acts: [],
       jobData: {}
     };
-    // Run the job, adding the results to the report.
-    await doJob(report);
-    const reportJSON = JSON.stringify(report, null, 2);
-    await fs.writeFile(`${reportDir}/${jobID}.json`, reportJSON);
-    console.log(`Report ${jobID}.json recorded in ${process.env.REPORTDIR}`);
+    // If the initialized report is valid, run the job, adding the results to the report.
+    const done = await doJob(report);
+    if (done) {
+      const reportJSON = JSON.stringify(report, null, 2);
+      await fs.writeFile(`${reportDir}/${jobID}.json`, reportJSON);
+      console.log(`Report ${jobID}.json recorded in ${process.env.REPORTDIR}`);
+      return true;
+    }
+    else {
+      return false;
+    }
   }
   catch(error) {
     console.log(`ERROR running job (${error.message})\n${error.stack}`);
+    return false;
   }
 };
