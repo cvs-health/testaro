@@ -317,10 +317,7 @@ const launch = async (report, typeName, lowMotion = false) => {
     // If the launch succeeded:
     if (healthy) {
       // Open a context (i.e. browser tab), with reduced motion if specified.
-      const options = {};
-      if (lowMotion) {
-        options.reducedMotion = 'reduce';
-      }
+      const options = {reduceMotion: lowMotion ? 'reduce' : 'no-preference'};
       browserContext = await browser.newContext(options);
       // When a page (i.e. browser tab) is added to the browser context (i.e. browser window):
       browserContext.on('page', async page => {
@@ -664,7 +661,7 @@ const doActs = async (report, actIndex, page) => {
       // Otherwise, if the command is a launch:
       else if (act.type === 'launch') {
         // Launch the specified browser, creating a browser context and a page in it.
-        await launch(report, act.which);
+        await launch(report, act.which, act.lowMotion ? 'reduce' : 'no-preference');
         // Identify its only page as current.
         page = browserContext.pages()[0];
       }
