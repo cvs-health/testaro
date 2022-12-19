@@ -362,9 +362,53 @@ An example of a **Testaro-defined** test is:
 
 In this case, Testaro runs the `motion` test with the specified parameters.
 
+###### Continuum
+
+The `continuum` packaged test makes use of the files in the `continuum` directory. The test inserts the contents of all three files into the page as scripts and then uses them to perform the tests of the Continuum package.
+
+Level Access on 22 August 2022 granted authorization for the copying of the `AccessEngine.community.js` file insofar as necessary for allowing Continuum community edition tests to be included in Testaro.
+
+###### IBM Equal Access
+
+The `ibm` packaged test requires the `aceconfig.js` file.
+
+If you choose to invoke this packaged test with the `withNewContent` property specified, you will choose whether the tested content is the content of the existing page or is retrieved anew with the document URL. Typically, both methods succeed and deliver similar results. However, sometimes one method succeeds and the other fails, or one method reports more violations than the other does. In those cases, most often the success, or the larger violation count, arises from the existing page (`withNewContent: false`).
+
+###### HTML CodeSniffer
+
+The `htmlcs` packaged test makes use of the`htmlcs/HTMLCS.js` file. That file was created, and can be recreated if necessary, as follows:
+
+1. Clone the (HTML CodeSniffer package)[https://github.com/squizlabs/HTML_CodeSniffer].
+1. Make that package’s directory the active directory.
+1. Install the HTML CodeSniffer dependencies by executing `npm install`.
+1. Build the HTML CodeSniffer auditor by executing `grunt build`.
+1. Copy the `build/HTMLCS.js` and `build/licence.txt` files into the `htmlcs` directory of Testaro.
+1. Edit the Testaro copy of `htmlcs/HTMLCS.js` to produce the changes shown below.
+
+The changes in `htmlcs/HTMLCS.js` are:
+
+```diff
+479a480
+>     '4_1_2_attribute': 'attribute',
+6482a6484
+>     var messageStrings = new Set();
+6496d6497
+<         console.log('done');
+6499d6499
+<         console.log('done');
+6500a6501
+>       return Array.from(messageStrings);
+6531c6532,6534
+<       console.log('[HTMLCS] ' + typeName + '|' + msg.code + '|' + nodeName + '|' + elementId + '|' + msg.msg + '|' + html);
+---
+>       messageStrings.add(
+>         typeName + '|' + msg.code + '|' + nodeName + '|' + elementId + '|' + msg.msg + '|' + html
+>       );
+```
+
 ###### Tenon
 
-Most packaged tests require only one command, but the `tenon` test requires two commands:
+Most packaged tests require only one command, but the `tenon` packaged test requires two commands:
 - A command of type `tenonRequest`.
 - A command of type `test` with `tenon` as the value of `which`.
 
@@ -403,44 +447,6 @@ In case you want to perform more than one `tenon` test with the same job, you ca
 Tenon recommends giving it a public URL rather than giving it the content of a page, if possible. So, it is best to give the `withNewContent` property of the `tenonRequest` command the value `true`, unless the page is not public.
 
 If a `tenon` test is included in a job, environment variables named `TENON_USER` and `TENON_PASSWORD` must exist, with your Tenon username and password, respectively, as their values. You can obtain those from [Tenon](https://tenon.io/documentation/overview).
-
-###### Continuum
-
-The `continuum` test makes use of the files in the `continuum` directory. The test inserts the contents of all three files into the page as scripts and then uses them to perform the tests of the Continuum package.
-
-Level Access on 22 August 2022 granted authorization for the copying of the `AccessEngine.community.js` file insofar as necessary for allowing Continuum community edition tests to be included in Testaro.
-
-###### HTML CodeSniffer
-
-The `htmlcs` test makes use of the`htmlcs/HTMLCS.js` file. That file was created, and can be recreated if necessary, as follows:
-
-1. Clone the (HTML CodeSniffer package)[https://github.com/squizlabs/HTML_CodeSniffer].
-1. Make that package’s directory the active directory.
-1. Install the HTML CodeSniffer dependencies by executing `npm install`.
-1. Build the HTML CodeSniffer auditor by executing `grunt build`.
-1. Copy the `build/HTMLCS.js` and `build/licence.txt` files into the `htmlcs` directory of Testaro.
-1. Edit the Testaro copy of `htmlcs/HTMLCS.js` to produce the changes shown below.
-
-The changes in `htmlcs/HTMLCS.js` are:
-
-```diff
-479a480
->     '4_1_2_attribute': 'attribute',
-6482a6484
->     var messageStrings = new Set();
-6496d6497
-<         console.log('done');
-6499d6499
-<         console.log('done');
-6500a6501
->       return Array.from(messageStrings);
-6531c6532,6534
-<       console.log('[HTMLCS] ' + typeName + '|' + msg.code + '|' + nodeName + '|' + elementId + '|' + msg.msg + '|' + html);
----
->       messageStrings.add(
->         typeName + '|' + msg.code + '|' + nodeName + '|' + elementId + '|' + msg.msg + '|' + html
->       );
-```
 
 ###### WAVE
 
