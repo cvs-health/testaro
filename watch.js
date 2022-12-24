@@ -96,19 +96,16 @@ const writeDirReport = async report => {
       const reportName = `${jobID}.json`;
       await fs.writeFile(`${reportDir}/${reportName}`, reportJSON);
       console.log(`Report ${reportName} saved`);
-      return true;
     }
     catch(error) {
       console.log(`ERROR: Failed to write report (${error.message})`);
-      return false;
     }
   }
   else {
     console.log('ERROR: Job has no ID');
-    return false;
   }
 };
-// Submits a network report.
+// Submits a network report to a server and returns the server response.
 const writeNetReport = async report => {
   const ack = await new Promise(resolve => {
     const wholeURL = `${process.env.PROTOCOL}://${reportURL}`;
@@ -135,12 +132,17 @@ const writeNetReport = async report => {
     report.agent = agent;
     request.on('error', error => {
       console.log(`ERROR submitting job report (${error.message})`);
-      resolve({});
+      resolve({
+        error: 'ERROR: Job report submission failed',
+        message: error.message
+      });
     });
+    // Send the report to the server.
     request.write(JSON.stringify(report, null, 2));
     request.end();
     console.log(`Report ${report.job.id} submitted`);
   });
+  // Return the server response.
   return ack;
 };
 // Archives a job.
@@ -157,8 +159,9 @@ const wait = ms => {
     }, ms);
   });
 };
-// Runs a job and returns a report.
+// Runs a job and returns the page.
 const runJob = async (job, isDirWatch) => {
+  // If the job has an ID:
   const {id} = job;
   if (id) {
     try {
@@ -173,7 +176,7 @@ const runJob = async (job, isDirWatch) => {
       // If a directory was watched:
       if (isDirWatch) {
         // Save the report.
-        return await writeDirReport(report);
+        await writeDirReport(report);
       }
       // Otherwise, i.e. if the network was watched:
       else {
@@ -181,25 +184,19 @@ const runJob = async (job, isDirWatch) => {
         const ack = await writeNetReport(report);
         if (ack.error) {
           console.log(JSON.stringify(ack, null, 2));
-          return false;
-        }
-        else {
-          return true;
         }
       }
     }
+    // If the job failed:
     catch(error) {
+      // Report this.
       console.log(`ERROR: ${error.message}\n${error.stack}`);
-      return {
-        error: `ERROR: ${error.message}\n${error.stack}`
-      };
     }
   }
+  // Otherwise, i.e. if the job has no ID:
   else {
+    // Report this.
     console.log('ERROR: Job has no id');
-    return {
-      error: 'ERROR: Job has no id'
-    };
   }
 };
 // Checks for a job, performs it, and submits a report, once or repeatedly.
@@ -225,25 +222,24 @@ exports.cycle = async (isDirWatch, isForever, interval) => {
     if (job.id) {
       // Run it and save a report.
       console.log(`Running job ${job.id}`);
-      statusOK = await runJob(job, isDirWatch);
+      await runJob(job, isDirWatch);
       console.log(`Job ${job.id} finished`);
-      if (statusOK) {
-        // If a directory was watched:
-        if (isDirWatch) {
-          // Archive the job.
-          await archiveJob(job);
-          console.log(`Job ${job.id} archived`);
-        }
-        // If watching was specified for only 1 job, stop.
-        statusOK = isForever;
-        // Prevent a wait before the next iteration.
-        empty = false;
+      // If a directory was watched:
+      if (isDirWatch) {
+        // Archive the job.
+        await archiveJob(job);
+        console.log(`Job ${job.id} archived`);
       }
+      // If watching was specified for only 1 job, quit.
+      statusOK = isForever;
+      // Prevent a wait before the next iteration.
+      empty = false;
     }
+    // Otherwise, i.e. if no job was found:
     else {
+      // Cause a wait before the next check.
       empty = true;
     }
   }
   console.log('Watching ended');
-  return '';
 };

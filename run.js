@@ -9,6 +9,8 @@
 require('dotenv').config();
 // Requirements for commands.
 const {commands} = require('./commands');
+// Playwright package.
+const playwright = require('playwright');
 
 // ########## CONSTANTS
 
@@ -295,7 +297,7 @@ const browserClose = async () => {
 const errorStart = error => error.message.replace(/\n.+/s, '');
 // Launches a browser.
 const launch = async (report, typeName, lowMotion = false) => {
-  const browserType = require('playwright')[typeName];
+  const browserType = playwright[typeName];
   // If the specified browser type exists:
   if (browserType) {
     // Close the current browser, if any.
@@ -604,6 +606,12 @@ const goTo = async (report, page, url, timeout, waitUntil, isStrict) => {
 };
 // Recursively performs the acts in a report.
 const doActs = async (report, actIndex, page) => {
+  // Quits and reports the performance being aborted.
+  const abortActs = () => {
+    report.jobData.abortTime = nowString();
+    report.jobData.abortedAct = actIndex;
+    actIndex = -2;
+  };
   process.on('message', message => {
     if (message === 'interrupt') {
       console.log('ERROR: Terminal interrupted doActs');
@@ -643,7 +651,7 @@ const doActs = async (report, actIndex, page) => {
         if (truth[1]) {
           // If the performance of commands is to stop:
           if (act.jump === 0) {
-            // Stop.
+            // Quit.
             actIndex = -2;
           }
           // Otherwise, if there is a numerical jump:
@@ -712,23 +720,17 @@ const doActs = async (report, actIndex, page) => {
           }
           // If none of the visits succeeded:
           if (response.error) {
-            // Report this.
-            report.jobData.aborted = true;
-            report.jobData.abortedAct = actIndex;
+            // Report this and quit.
             addError(act, 'failure', 'ERROR: Visits failed');
-            // Quit.
-            actIndex = -2;
+            abortActs();
           }
           // Otherwise, i.e. if the last visit attempt succeeded:
           else {
             // If a prohibited redirection occurred:
             if (response.exception === 'badRedirection') {
-              // Report this.
-              report.jobData.aborted = true;
-              report.jobData.abortedAct = actIndex;
+              // Report this and quit.
               addError(act, 'badRedirection', 'ERROR: Navigation illicitly redirected');
-              // Quit.
-              actIndex = -2;
+              abortActs();
             }
             // Add the resulting URL to the act.
             if (! act.result) {
@@ -744,20 +746,22 @@ const doActs = async (report, actIndex, page) => {
           const result = act.result = {};
           // If the text is to be the URL:
           if (what === 'url') {
-            // Wait for the URL to be the exact text and quit on failure.
+            // Wait for the URL to be the exact text.
             try {
               await page.waitForURL(which, {timeout: 15000});
               result.found = true;
               result.url = page.url();
             }
+            // If the wait times out:
             catch(error) {
-              actIndex = -2;
+              // Quit.
+              abortActs();
               waitError(page, act, error, 'text in the URL');
             }
           }
           // Otherwise, if the text is to be a substring of the page title:
           else if (what === 'title') {
-            // Wait for the page title to include the text, case-insensitively, and quit on failure.
+            // Wait for the page title to include the text, case-insensitively.
             try {
               await page.waitForFunction(
                 text => document
@@ -772,14 +776,16 @@ const doActs = async (report, actIndex, page) => {
               result.found = true;
               result.title = await page.title();
             }
+            // If the wait times out:
             catch(error) {
-              actIndex = -2;
+              // Quit.
+              abortActs();
               waitError(page, act, error, 'text in the title');
             }
           }
           // Otherwise, if the text is to be a substring of the text of the page body:
           else if (what === 'body') {
-            // Wait for the body to include the text, case-insensitively, and quit on failure.
+            // Wait for the body to include the text, case-insensitively.
             try {
               await page.waitForFunction(
                 text => document
@@ -793,25 +799,31 @@ const doActs = async (report, actIndex, page) => {
               );
               result.found = true;
             }
+            // If the wait times out:
             catch(error) {
-              actIndex = -2;
+              // Quit.
+              abortActs();
               waitError(page, act, error, 'text in the body');
             }
           }
         }
         // Otherwise, if the act is a wait for a state:
         else if (act.type === 'state') {
-          // Wait for it and quit on failure.
+          // Wait for it.
           const stateIndex = ['loaded', 'idle'].indexOf(act.which);
           await page.waitForLoadState(
             ['domcontentloaded', 'networkidle'][stateIndex], {timeout: [10000, 15000][stateIndex]}
           )
+          // If the wait times out:
           .catch(error => {
+            // Quit.
             console.log(`ERROR waiting for page to be ${act.which} (${error.message})`);
             addError(act, 'timeout', `ERROR waiting for page to be ${act.which}`);
-            actIndex = -2;
+            abortActs();
           });
+          // If the wait succeeded:
           if (actIndex > -2) {
+            // Add state data to the report.
             act.result = {
               success: true,
               state: act.which
@@ -1085,8 +1097,9 @@ const doActs = async (report, actIndex, page) => {
               // If a match was found:
               if (act.result.found) {
                 // FUNCTION DEFINITION START
-                // Perform a click or Enter keypress and wait for the network to be idle.
+                // Performs a click or Enter keypress and waits for the network to be idle.
                 const doAndWait = async isClick => {
+                  // Perform and report the move.
                   const move = isClick ? 'click' : 'Enter keypress';
                   try {
                     await isClick
@@ -1095,12 +1108,14 @@ const doActs = async (report, actIndex, page) => {
                     act.result.success = true;
                     act.result.move = move;
                   }
+                  // If the move fails:
                   catch(error) {
+                    // Quit and add failure data to the report.
                     act.result.success = false;
                     act.result.error = 'moveFailure';
                     act.result.message = `ERROR: ${move} failed`;
                     console.log(`ERROR: ${move} failed (${errorStart(error)})`);
-                    actIndex = -2;
+                    abortActs();
                   }
                   if (act.result.success) {
                     try {
@@ -1186,15 +1201,16 @@ const doActs = async (report, actIndex, page) => {
                     }
                     // If the click or load failed:
                     catch(error) {
-                      // Quit and report the failure.
+                      // Quit and add failure data to the report.
                       console.log(`ERROR clicking link (${errorStart(error)})`);
                       act.result.success = false;
                       act.result.error = 'unclickable';
                       act.result.message = 'ERROR: click or load timed out';
-                      actIndex = -2;
+                      abortActs();
                     }
                     // If the link click succeeded:
                     if (! act.result.error) {
+                      // Add success data to the report.
                       act.result.success = true;
                       act.result.move = 'clicked';
                     }
@@ -1263,12 +1279,12 @@ const doActs = async (report, actIndex, page) => {
               }
               // Otherwise, i.e. if no match was found:
               else {
-                // Stop.
+                // Quit and add failure data to the report.
                 act.result.success = false;
                 act.result.error = 'absent';
                 act.result.message = 'ERROR: specified element not found';
                 console.log('ERROR: Specified element not found');
-                actIndex = -2;
+                abortActs();
               }
             }
             // Otherwise, if the act is a keypress:
@@ -1460,18 +1476,26 @@ const doActs = async (report, actIndex, page) => {
     }
     // Otherwise, i.e. if the command is invalid:
     else {
-      // Add an error result to the act.
+      // Quit and add error data to the report.
       const errorMsg = `ERROR: Invalid command of type ${act.type}`;
       console.log(errorMsg);
       addError(act, 'badCommand', errorMsg);
-      // Quit.
-      actIndex = -2;
+      abortActs();
     }
-    // Perform the remaining acts unless the performance of acts has been aborted.
+    // Perform any remaining acts if not aborted.
     await doActs(report, actIndex + 1, page);
   }
+  // Otherwise, if the job was aborted:
+  else if (report.jobData.abortTime) {
+    // Report this.
+    console.log('ERROR: Job aborted');
+    // Save the page in the report.
+    const pageContent = await page.content();
+    report.jobData.abortPage = pageContent;
+  }
+  // Otherwise, i.e. if the job succeeded:
   else {
-    console.log('No more acts to perform; closing the browser');
+    console.log('Commands completed');
     await browserClose();
     console.log('Browser closed');
   }
@@ -1523,7 +1547,10 @@ const injectLaunches = acts => {
     }
   }
 };
-// Runs a job and adds the results to the report of the job.
+/*
+  Returns whether an initialized job report is valid and, if so, runs the job and adds the results
+  to the report.
+*/
 exports.doJob = async report => {
   // If the report is valid:
   if(isValidReport(report)) {
@@ -1554,16 +1581,14 @@ exports.doJob = async report => {
     report.jobData.presses = 0;
     report.jobData.amountRead = 0;
     report.jobData.testTimes = [];
-    // Recursively perform the specified acts.
+    // Recursively perform the acts and get any page if debugging is on and a job was aborted.
     await doActs(report, 0, null);
     // Add the end time and duration to the report.
     const endTime = new Date();
     report.jobData.endTime = nowString();
     report.jobData.elapsedSeconds =  Math.floor((endTime - startTime) / 1000);
-    return true;
   }
   else {
     console.log('ERROR: Initialized job report invalid');
-    return false;
   }
 };
