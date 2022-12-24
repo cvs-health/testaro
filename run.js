@@ -607,10 +607,14 @@ const goTo = async (report, page, url, timeout, waitUntil, isStrict) => {
 // Recursively performs the acts in a report.
 const doActs = async (report, actIndex, page) => {
   // Quits and reports the performance being aborted.
-  const abortActs = () => {
+  const abortActs = async () => {
+    // Add data on the aborted command to the report.
     report.jobData.abortTime = nowString();
     report.jobData.abortedAct = actIndex;
+    // Prevent performance of additional commands.
     actIndex = -2;
+    // Stop the action until the user resumes it.
+    await page.pause();
   };
   process.on('message', message => {
     if (message === 'interrupt') {
@@ -722,7 +726,7 @@ const doActs = async (report, actIndex, page) => {
           if (response.error) {
             // Report this and quit.
             addError(act, 'failure', 'ERROR: Visits failed');
-            abortActs();
+            await abortActs();
           }
           // Otherwise, i.e. if the last visit attempt succeeded:
           else {
@@ -730,7 +734,7 @@ const doActs = async (report, actIndex, page) => {
             if (response.exception === 'badRedirection') {
               // Report this and quit.
               addError(act, 'badRedirection', 'ERROR: Navigation illicitly redirected');
-              abortActs();
+              await abortActs();
             }
             // Add the resulting URL to the act.
             if (! act.result) {
@@ -755,7 +759,7 @@ const doActs = async (report, actIndex, page) => {
             // If the wait times out:
             catch(error) {
               // Quit.
-              abortActs();
+              await abortActs();
               waitError(page, act, error, 'text in the URL');
             }
           }
@@ -779,7 +783,7 @@ const doActs = async (report, actIndex, page) => {
             // If the wait times out:
             catch(error) {
               // Quit.
-              abortActs();
+              await abortActs();
               waitError(page, act, error, 'text in the title');
             }
           }
@@ -802,7 +806,7 @@ const doActs = async (report, actIndex, page) => {
             // If the wait times out:
             catch(error) {
               // Quit.
-              abortActs();
+              await abortActs();
               waitError(page, act, error, 'text in the body');
             }
           }
@@ -815,11 +819,11 @@ const doActs = async (report, actIndex, page) => {
             ['domcontentloaded', 'networkidle'][stateIndex], {timeout: [10000, 15000][stateIndex]}
           )
           // If the wait times out:
-          .catch(error => {
+          .catch(async error => {
             // Quit.
             console.log(`ERROR waiting for page to be ${act.which} (${error.message})`);
             addError(act, 'timeout', `ERROR waiting for page to be ${act.which}`);
-            abortActs();
+            await abortActs();
           });
           // If the wait succeeded:
           if (actIndex > -2) {
@@ -1115,7 +1119,7 @@ const doActs = async (report, actIndex, page) => {
                     act.result.error = 'moveFailure';
                     act.result.message = `ERROR: ${move} failed`;
                     console.log(`ERROR: ${move} failed (${errorStart(error)})`);
-                    abortActs();
+                    await abortActs();
                   }
                   if (act.result.success) {
                     try {
@@ -1206,7 +1210,7 @@ const doActs = async (report, actIndex, page) => {
                       act.result.success = false;
                       act.result.error = 'unclickable';
                       act.result.message = 'ERROR: click or load timed out';
-                      abortActs();
+                      await abortActs();
                     }
                     // If the link click succeeded:
                     if (! act.result.error) {
@@ -1284,7 +1288,7 @@ const doActs = async (report, actIndex, page) => {
                 act.result.error = 'absent';
                 act.result.message = 'ERROR: specified element not found';
                 console.log('ERROR: Specified element not found');
-                abortActs();
+                await abortActs();
               }
             }
             // Otherwise, if the act is a keypress:
@@ -1480,7 +1484,7 @@ const doActs = async (report, actIndex, page) => {
       const errorMsg = `ERROR: Invalid command of type ${act.type}`;
       console.log(errorMsg);
       addError(act, 'badCommand', errorMsg);
-      abortActs();
+      await abortActs();
     }
     // Perform any remaining acts if not aborted.
     await doActs(report, actIndex + 1, page);
