@@ -613,6 +613,8 @@ const doActs = async (report, actIndex, page) => {
     report.jobData.abortedAct = actIndex;
     // Prevent performance of additional commands.
     actIndex = -2;
+    // Report this.
+    console.log('ERROR: Job aborted');
     // Stop the action until the user resumes it.
     await page.pause();
   };
@@ -1489,16 +1491,8 @@ const doActs = async (report, actIndex, page) => {
     // Perform any remaining acts if not aborted.
     await doActs(report, actIndex + 1, page);
   }
-  // Otherwise, if the job was aborted:
-  else if (report.jobData.abortTime) {
-    // Report this.
-    console.log('ERROR: Job aborted');
-    // Save the page in the report.
-    const pageContent = await page.content();
-    report.jobData.abortPage = pageContent;
-  }
-  // Otherwise, i.e. if the job succeeded:
-  else {
+  // Otherwise, if all commands have been performed and the job succeeded:
+  else if (! report.jobData.abortTime) {
     console.log('Commands completed');
     await browserClose();
     console.log('Browser closed');
