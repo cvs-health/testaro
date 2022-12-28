@@ -18,7 +18,6 @@ const playwright = require('playwright');
 const debug = process.env.DEBUG === 'true';
 // Set WAITS environment variable to a positive number to insert delays (in ms).
 const waits = Number.parseInt(process.env.WAITS) || 0;
-const urlInject = process.env.URL_INJECT || 'yes';
 // CSS selectors for targets of moves.
 const moves = {
   button: 'button, [role=button], input[type=submit]',
@@ -68,20 +67,6 @@ const tests = {
   wave: 'WAVE',
   zIndex: 'z indexes'
 };
-// Tests that may change the DOM.
-const domChangers = new Set([
-  'axe',
-  'continuum',
-  'focAll',
-  'focInd',
-  'focOp',
-  'hover',
-  'htmlcs',
-  'ibm',
-  'menuNav',
-  'textNodes',
-  'wave'
-]);
 // Browser types available in PlayWright.
 const browserTypeNames = {
   'chromium': 'Chrome',
@@ -1245,7 +1230,7 @@ const doActs = async (report, actIndex, page) => {
                   act.result.move = 'selected';
                   act.result.option = optionText;
                 }
-                // Otherwise, if it is entering text on a text- or search-input element:
+                // Otherwise, if it is entering text in an input element:
                 else if (['text', 'search'].includes(act.type)) {
                   act.result.attributes = {};
                   const {attributes} = act.result;
@@ -1498,53 +1483,6 @@ const doActs = async (report, actIndex, page) => {
     console.log('Browser closed');
   }
 };
-// Injects launch and url acts into a report where necessary to undo DOM changes.
-const injectLaunches = acts => {
-  let injectMore = true;
-  while (injectMore) {
-    const injectIndex = acts.findIndex((act, index) =>
-      index < acts.length - 1
-      && act.type === 'test'
-      && acts[index + 1].type === 'test'
-      && domChangers.has(act.which)
-    );
-    if (injectIndex === -1) {
-      injectMore = false;
-    }
-    else {
-      const lastBrowserType = acts.reduce((browserType, act, index) => {
-        if (act.type === 'launch' && index < injectIndex) {
-          return act.which;
-        }
-        else {
-          return browserType;
-        }
-      }, '');
-      const lastURL = acts.reduce((url, act, index) => {
-        if (act.type === 'url' && index < injectIndex) {
-          return act.which;
-        }
-        else {
-          return url;
-        }
-      }, '');
-      acts.splice(
-        injectIndex + 1,
-        0,
-        {
-          type: 'launch',
-          which: lastBrowserType,
-          what: `${lastBrowserType} browser`
-        },
-        {
-          type: 'url',
-          which: lastURL,
-          what: 'URL'
-        }
-      );
-    }
-  }
-};
 /*
   Returns whether an initialized job report is valid and, if so, runs the job and adds the results
   to the report.
@@ -1554,13 +1492,6 @@ exports.doJob = async report => {
   if(isValidReport(report)) {
     // Add the job commands to the report as its initial acts.
     report.acts = JSON.parse(JSON.stringify(report.job.commands));
-    /*
-      Inject launch and url acts where necessary to undo DOM changes, if specified.
-      Injection of url acts alone does not guarantee test independence.
-    */
-    if (urlInject === 'yes') {
-      injectLaunches(report.acts);
-    }
     // Add initialized job data to the report.
     const startTime = new Date();
     report.jobData.startTime = nowString();
