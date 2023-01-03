@@ -8,7 +8,7 @@
 // Module to keep secrets.
 require('dotenv').config();
 // Requirements for commands.
-const {commands} = require('./commands');
+const {actSpecs} = require('./actSpecs');
 // Playwright package.
 const playwright = require('playwright');
 
@@ -174,24 +174,24 @@ const hasSubtype = (variable, subtype) => {
     return true;
   }
 };
-// Validates a command.
-const isValidCommand = command => {
-  // Identify the type of the command.
-  const type = command.type;
+// Validates an act.
+const isValidAct = act => {
+  // Identify the type of the act.
+  const type = act.type;
   // If the type exists and is known:
-  if (type && commands.etc[type]) {
+  if (type && actSpecs.etc[type]) {
     // Copy the validator of the type for possible expansion.
-    const validator = Object.assign({}, commands.etc[type][1]);
+    const validator = Object.assign({}, actSpecs.etc[type][1]);
     // If the type is test:
     if (type === 'test') {
       // Identify the test.
-      const testName = command.which;
+      const testName = act.which;
       // If one was specified and is known:
       if (testName && tests[testName]) {
         // If it has special properties:
-        if (commands.tests[testName]) {
+        if (actSpecs.tests[testName]) {
           // Expand the validator by adding them.
-          Object.assign(validator, commands.tests[testName][1]);
+          Object.assign(validator, actSpecs.tests[testName][1]);
         }
       }
       // Otherwise, i.e. if no or an unknown test was specified:
@@ -200,17 +200,17 @@ const isValidCommand = command => {
         return false;
       }
     }
-    // Return whether the command is valid.
+    // Return whether the act is valid.
     return Object.keys(validator).every(property => {
       if (property === 'name') {
         return true;
       }
       else {
         const vP = validator[property];
-        const cP = command[property];
-        // If it is optional and omitted or present and valid:
-        const optAndNone = ! vP[0] && ! cP;
-        const isValidCommand = cP !== undefined && hasType(cP, vP[1]) && hasSubtype(cP, vP[2]);
+        const aP = act[property];
+        // If it is optional and omitted or is present and valid:
+        const optAndNone = ! vP[0] && ! aP;
+        const isValidAct = aP !== undefined && hasType(aP, vP[1]) && hasSubtype(aP, vP[2]);
         return optAndNone || isValidCommand;
       }
     });
@@ -225,42 +225,57 @@ const isValidCommand = command => {
 const isValidReport = report => {
   if (report) {
     // Return whether the report is valid.
-    const {job, acts, jobData} = report;
-    const {id, what, strict, commands, sources, jobCreationTime, timeStamp} = job;
-    const criteria = [
-      [job, 'report has job property'],
-      [acts, 'report has acts property'],
-      [jobData, 'report has jobData property'],
-      [id, 'job has id property'],
-      [what, 'job has what property'],
-      [typeof strict === 'boolean', 'job has true or false strict property'],
-      [commands, 'job has commands property'],
-      [sources, 'job has sources property'],
-      [jobCreationTime, 'job has jobCreationTime property'],
-      [timeStamp, 'job has timeStamp property'],
-      [Array.isArray(acts), 'acts has array value'],
-      [typeof id === 'string', 'id has string value'],
-      [typeof what === 'string', 'what has string value'],
-      [Array.isArray(commands), 'commands has array value'],
-      [commands[0].type, 'first command has type property'],
-      [commands[0].type === 'launch', 'first command has launch type'],
-      [commands.length > 1, 'command count greater than 1'],
-      [commands[1].type, 'second command has type property'],
-      [commands[1].type === 'url', 'second command has url type'],
-      [commands[1].which, 'second command has which property'],
-      [isURL(commands[1].which), 'second command which property has URL value'],
-      [commands.every(command => isValidCommand(command)), 'every command is valid'],
-      [sources && typeof sources.script === 'string', 'sources has script property with string value'],
-      [sources && sources.host, 'sources has host property']
-    ];
-    const invalidityIndex = criteria.findIndex(criterion => ! criterion[0]);
-    if (invalidityIndex > -1) {
-      console.log(`ERROR: report fails “${criteria[invalidityIndex][1]}” requirement`);
+    const {id, what, strict, timeLimit, acts, sources, creationTime, timeStamp} = report;
+    if (! id || typeof id !== 'string') {
+      return 'Bad report ID';
     }
-    return invalidityIndex === -1;
+    if (! what || typeof what !== 'string') {
+      return 'Bad report what';
+    }
+    if (! strict || typeof strict !== 'boolean') {
+      return 'Bad report strict';
+    }
+    if (! timeLimit || typeof timeLimit !== 'number' || timeLimit < 1) {
+      return 'Bad report time limit';
+    }
+    if (! acts && ! Array.isArray(acts) && acts.length < 2) {
+      return 'Bad report acts';
+    }
+    if (! acts.every(act => act.type && typeof act.type === 'string')) {
+      return 'Act with no type';
+    }
+    if (acts[0].type !== 'launch') {
+      return 'First act type not launch';
+    }
+    if (acts[1].type !== 'url') {
+      return 'Second act type not url';
+    }
+    if (! ['chromium', 'webkit', 'firefox'].includes(acts[0].which)) {
+      return 'Bad first act which';
+    }
+    if (! acts[1].which || typeof acts[1].which !== 'string' || ! isURL(acts[1].which)) {
+      return 'Second act which not a URL';
+    }
+    if (acts.some(act => ! isValidAct(act))) {
+      return 'Not all acts valid';
+    }
+    if (! sources || typeof sources !== 'object') {
+      return 'Bad report sources';
+    }
+    if (! sources.script || typeof sources.script !== 'string') {
+      return 'Bad sources script';
+    }
+    if (
+      ! creationTime
+      || typeof creationTime !== 'string'
+      || ! /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(creationTime)
+    ) {
+      return 'bad report ]timestamp';
+    }
+    return '';
   }
   else {
-    return false;
+    return 'no report';
   }
 };
 

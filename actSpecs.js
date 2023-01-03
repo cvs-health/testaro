@@ -1,4 +1,4 @@
-exports.commands = {
+exports.actSpecs = {
   etc: {
     button: [
       'Click a button or submit input',
