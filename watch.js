@@ -19,7 +19,6 @@ const client = require(protocol);
 const jobURL = process.env.JOB_URL;
 const agent = process.env.AGENT;
 const jobDir = process.env.JOBDIR;
-const doneDir = process.env.DONEDIR;
 const reportURL = process.env.REPORT_URL;
 const reportDir = process.env.REPORTDIR;
 
@@ -28,11 +27,11 @@ const reportDir = process.env.REPORTDIR;
 // Checks for a directory job.
 const checkDirJob = async () => {
   try {
-    const jobDirFileNames = await fs.readdir(jobDir);
-    const jobFileNames = jobDirFileNames.filter(fileName => fileName.endsWith('.json'));
+    const toDoDirFileNames = await fs.readdir(`${jobDir}/todo`);
+    const jobFileNames = toDoDirFileNames.filter(fileName => fileName.endsWith('.json'));
     if (jobFileNames.length) {
       console.log('Directory job found');
-      const jobJSON = await fs.readFile(`${jobDir}/${jobFileNames[0]}`, 'utf8');
+      const jobJSON = await fs.readFile(`${jobDir}/todo/${jobFileNames[0]}`, 'utf8');
       try {
         const job = JSON.parse(jobJSON, null, 2);
         return job;
@@ -148,8 +147,8 @@ const writeNetReport = async report => {
 // Archives a job.
 const archiveJob = async job => {
   const jobJSON = JSON.stringify(job, null, 2);
-  await fs.writeFile(`${doneDir}/${job.id}.json`, jobJSON);
-  await fs.rm(`${jobDir}/${job.id}.json`);
+  await fs.writeFile(`${jobDir}/done/${job.id}.json`, jobJSON);
+  await fs.rm(`${jobDir}/todo/${job.id}.json`);
 };
 // Waits.
 const wait = ms => {
@@ -159,7 +158,7 @@ const wait = ms => {
     }, ms);
   });
 };
-// Runs a job and returns the page.
+// Runs a job.
 const runJob = async (job, isDirWatch) => {
   // If the job has an ID:
   const {id} = job;
