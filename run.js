@@ -211,7 +211,7 @@ const isValidAct = act => {
         // If it is optional and omitted or is present and valid:
         const optAndNone = ! vP[0] && ! aP;
         const isValidAct = aP !== undefined && hasType(aP, vP[1]) && hasSubtype(aP, vP[2]);
-        return optAndNone || isValidCommand;
+        return optAndNone || isValidAct;
       }
     });
   }
@@ -270,7 +270,10 @@ const isValidReport = report => {
       || typeof creationTime !== 'string'
       || ! /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(creationTime)
     ) {
-      return 'bad report ]timestamp';
+      return 'bad job creation time';
+    }
+    if (! timeStamp || typeof timeStamp !== 'string') {
+      return 'bad report timestamp';
     }
     return '';
   }
@@ -630,7 +633,7 @@ const doActs = async (report, actIndex, page) => {
     // Identify the command to be performed.
     const act = acts[actIndex];
     // If it is valid:
-    if (isValidCommand(act)) {
+    if (isValidAct(act)) {
       const whichSuffix = act.which ? ` (${act.which})` : '';
       console.log(`>>>> ${act.type}${whichSuffix}`);
       // Increment the count of commands performed.
@@ -983,7 +986,7 @@ const doActs = async (report, actIndex, page) => {
               // Initialize the arguments.
               const args = [act.which === 'tenon' ? tenonData : page];
               // Identify the additional validator of the test.
-              const testValidator = commands.tests[act.which];
+              const testValidator = actSpecs.tests[act.which];
               // If it exists:
               if (testValidator) {
                 // Identify its argument properties.
@@ -1505,9 +1508,8 @@ const doActs = async (report, actIndex, page) => {
 exports.doJob = async report => {
   // If the report is valid:
   if(isValidReport(report)) {
-    // Add the job commands to the report as its initial acts.
-    report.acts = JSON.parse(JSON.stringify(report.job.commands));
     // Add initialized job data to the report.
+    report.jobData = {};
     const startTime = new Date();
     report.jobData.startTime = nowString();
     report.jobData.endTime = '';
