@@ -111,7 +111,7 @@ All of the tests that Testaro can perform are free of cost, except those in the 
 
 A _job_ is an object containing instructions for Testaro.
 
-A _report_ is an object containing a job and the results from Testaro running the job.
+A _report_ is an object containing a job, with added properties describing the results from Testaro running the job.
 
 ### Jobs
 
@@ -123,7 +123,7 @@ Here is an example of a job:
   what: 'Test host with alfa',
   strict: true,
   timeLimit: 65,
-  commands: [
+  acts: [
     {
       type: 'launch',
       which: 'chromium',
@@ -143,10 +143,10 @@ Here is an example of a job:
   ],
   sources: {
     script: 'tp25',
-    host: {
-      which: 'https://www.w3c.org',
-      what: 'World Wide Web Consortium',
-      id: 'w3c'
+    batch: 'weborgs',
+    target: {
+      id: 'w3c',
+      what: 'World Wide Web Consortium'
     },
     requester: 'user@domain.org'
   },
@@ -155,94 +155,51 @@ Here is an example of a job:
 }
 ```
 
-This job contains three `commands`, telling Testaro to:
+This job contains three `acts`, telling Testaro to:
 1. open a page in the Chromium browser
 1. navigate to some URL
 1. perform the tests in the `alfa` package on that URL
 
 Job properties:
-- `id`: This is a string consisting of alphanumeric ASCII characters and hyphen-minus (-), intended to be unique. When this job is saved as a JSON file, the file name is `be76p-sp25-w3c.json`. Typically, a job is created from a _script_, and the job ID adds a timestamp prefix and a host suffix to the script ID. Here the script ID would have been `ts25`.
-- `what`: This is a description of the script.
+- `id`: This is a string consisting of alphanumeric ASCII characters and hyphen-minus (-), intended to be unique. When this job is saved as a JSON file, the file name is `be76p-sp25-w3c.json`. Typically, a job is created from a _script_, and the job ID adds a timestamp prefix and a target suffix to the script ID. Here the script ID would have been `ts25`.
+- `what`: This is a description of the job.
 - `strict`: This is `true` or `false`, indicating whether _substantive redirections_ should be treated as failures. These are redirections that do more than add or subtract a final slash. For example, if `strict` is true, a redirection from `xyz.com` to `www.xyz.com` or to `xyz.com/en` will abort the job.
-- `timeLimit`: This optional property is the number of seconds allowed for the execution of the job. If omitted, Testaro sets a time limit of 300 seconds (5 minutes);
-- `commands`: This is an array of the commands to be performed. Commands are documented below.
+- `timeLimit`: This property is the number of seconds allowed for the execution of the job.
+- `acts`: This is an array of the acts to be performed. Acts are documented below.
 - `sources`: This object has properties describing where the job came from:
-   - `script`: This is the ID of the script from which the job was made. Other applications, such as Testilo, can make jobs from scripts. A script object that has the same `id`, `what`, `strict`, `timeLimit`, and `commands` properties as a job, except that a `url` command in a script can have a placeholder value. Examples of scripts can be found in the Testilo package.
-   - `host`: If the job was made from a script whose `url` commands have placeholder values, this property describes the host that has replaced the placeholder data. Otherwise it is an empty object. The `id` property of the host also typically becomes the third segment of the job ID.
+   - `script`: This is the ID of the script from which the job was made. Other applications, such as Testilo, can make jobs from scripts. When Testilo creates a job, the job inherits its `id`, `what`, `strict`, `timeLimit`, and `acts` properties from the script. However, Testilo can create multiple jobs from a single script, replacing acts of type `placeholder` with one or more target-specific acts. Examples of scripts can be found in the Testilo package.
+   - `batch`: If the job was one of a set of jobs created by a merger of a script and a batch of targets, this property’s value is the ID of the batch, or otherwise is an empty string.
+   - `target`: If the job was made from a script with placeholder acts, this property describes the target whose target-specific acts have replaced the placeholder acts. Otherwise `target` is an empty object. Testilo also makes the `id` property of the target the third segment of the job ID.
    - `requester`: This string is the email address to receive a notice of completion of the running of the job.
-- `jobCreationTime`: This is the time when the job was created from a script.
-- `timeStamp`: This string is a compact representation of the job creation time, for inclusion in the ID of the job.
+- `creationTime`: This is the time when the job was created from a script.
+- `timeStamp`: This string is a compact representation of the job creation time, suitable for inclusion in the ID of the job.
 
 ### Reports
 
-Here is an example of a newly initialized _report_.
+A _report_ is a copy of a job file. It begins as a pure copy. Testaro adds data to it as Testaro runs the job. Specifically, Testaro:
+- Adds a `jobData` property and populates it with data about the job.
+- Adds properties to the acts, describing the results of the performance of the acts.
 
-```javascript
-{
-  job: {
-    id: 'be76p-tp25-w3c',
-    what: 'Test host with alfa',
-    strict: true,
-    timeLimit: 65,
-    commands: [
-      {
-        type: 'launch',
-        which: 'chromium',
-        what: 'Chromium browser'
-      },
-      {
-        type: 'url',
-        which: 'https://www.w3c.org',
-        what: 'World Wide Web Consortium',
-        id: 'w3c'
-      },
-      {
-        type: 'test',
-        which: 'alfa',
-        what: 'Siteimprove alfa package'
-      }
-    ],
-    sources: {
-      script: 'tp25',
-      host: {
-        which: 'https://www.w3c.org',
-        what: 'World Wide Web Consortium',
-        id: 'w3c'
-      },
-      requester: 'user@domain.org'
-    },
-    jobCreationTime: '2023-05-26T14:28:22',
-    timeStamp: 'be76p'
-  },
-  acts: [],
-  jobData: {}
-}
-```
-
-This report is an object produced by Testaro when it is about to run a job. The `job` property has the job as its value. The report also has two additional properties:
-- `acts`: This is an empty array. Testaro will copy the `job.commands` property into `acts` and then modify the array. Testaro can add more acts to the original ones. Testaro will also add results to the acts.
-- `jobData`: Some results pertain to a job as a whole, not to any specific act. This property is an object where Testaro will record such job-level results.
-
-### Commands
+### Acts
 
 #### Introduction
 
-The `commands` property was introduced above. This section provides more detail.
+The `acts` array was introduced above. This section provides more detail.
 
-Each command object has a `type` property and optionally has a `name` property (used in branching, described below). It must or may have other properties, depending on the value of `type`.
+Each act object has a `type` property and optionally has a `name` property (used in branching, described below). It must or may have other properties, depending on the value of `type`.
 
-#### Command sequence
+#### Act sequence
 
-The first two commands in any job have the types `launch` and `url`, respectively, as shown in the example above. They launch a browser and then use it to visit a URL.
+The first two acts in any job have the types `launch` and `url`, respectively, as shown in the example above. They launch a browser and then use it to visit a URL.
 
-#### Command types
+#### Act types
 
-The subsequent commands can tell Testaro to perform any of:
-- moves (clicks, text inputs, hovers, etc.)
-- navigations (browser launches, visits to URLs, waits for page conditions, etc.)
-- alterations (changes to the page)
-- tests (whether in dependency packages or defined within Testaro)
-- branching (continuing from a command other than the next one)
+The subsequent acts can tell Testaro to perform any of:
+- _moves_ (clicks, text inputs, hovers, etc.)
+- _navigations_ (browser launches, visits to URLs, waits for page conditions, etc.)
+- _alterations_ (changes to the page)
+- _tests_ (whether in dependency packages or defined within Testaro)
+- _branching_ (continuing from an act other than the next one)
 
 ##### Moves
 
@@ -261,15 +218,15 @@ In this case, Testaro checks the third radio button whose text includes the stri
 
 In identifying the target element for a move, Testaro matches the `which` property with the texts of the elements of the applicable type (such as radio buttons). It defines the text of an `input` element as the concatenated texts of its implicit label or explicit labels, if any, plus, for the first input in a `fieldset` element, the text content of the `legend` element of that `fieldset` element. For any other element, Testaro defines the text as the text content of the element.
 
-When the texts of multiple elements of the same type will contain the `which` value, you can include an `index` property to specify the index of the target element, among all those that will match.
+When the texts of multiple elements of the same type will contain the same `which` value, you can include an `index` property to specify the index of the target element, among all those that will match.
 
 ##### Navigations
 
 An example of a **navigation** is the command of type `url` above.
 
-Once you have included a `url` command in a job, you do not need to add more `url` commands unless you want the browser to visit a different URL.
+Once you have included a `url` command in a job, you do not need to add more `url` commands unless you want the browser to visit a different URL or revisit the same URL.
 
-However, some tests modify web pages. In those cases, Testaro inserts additional `launch` and `url` act pairs into the `acts` array, after those tests, to ensure that changes made by one test do not affect subsequent acts, if the environment variable `URL_INJECT` has the value `yes`.
+If any act alters the page, you can restore the page to its original state for the next act by inserting new `launch` and `url` acts (and, if necessary, additional page-specific acts) between them.
 
 Another navigation example is:
 
@@ -305,8 +262,8 @@ This command causes Testaro to alter the `display` and `visibility` style proper
 A test performs operations and reports results. The results may or may not directly indicate that a page passes or fails requirements. Typically, accessibility tests report successes and failures. But a test in Testaro is defined less restrictively, so it can report any results. As one example, the Testaro `elements` test reports facts about certain elements on a page, without asserting that those facts are successes or failures.
 
 The term “test” has two meanings for Testaro:
-- A command is a test (test command) if its `type` property has the value `test`.
-- A package, such as Continuum, performs multiple tests (packaged tests).
+- An act is a test (_test command_) if its `type` property has the value `test`.
+- An act with type `test` whose `which` value is the name of a package, such as Continuum, performs multiple tests defined by that _test package_.
 
 Thus, if a command of type `test` runs Continuum, Continuum performs multiple tests and reports their results.
 
@@ -316,7 +273,7 @@ Every test in Testaro must have:
 - a property in the `tests` object defined in the `run.js` file, where the property name is the name of the test and the value is a description of the test
 - a `.js` file, defining the test, in the `tests` directory, whose name base is the name of the test
 
-The `commands.js` file (described in detail below) contains this specification for any `test` command:
+The `actSpecs.js` file (described in detail below) contains a specification for any `test` act, namely:
 
 ```json
 test: [
@@ -330,7 +287,7 @@ test: [
 
 That means that a test (i.e. a command with a `type` property having the value `'test'`) must have a string-valued `which` property naming a test and may optionally have a string-valued `what` property describing the test.
 
-If a particular test either must have or may have any other properties, those properties must be specified in the `tests` property in `commands.js`.
+If a particular test either must have or may have any other properties, those properties must be specified in the `tests` property in `actSpecs.js`.
 
 ###### Examples
 
@@ -378,7 +335,7 @@ If you choose to invoke this packaged test with the `withNewContent` property sp
 
 The `htmlcs` packaged test makes use of the`htmlcs/HTMLCS.js` file. That file was created, and can be recreated if necessary, as follows:
 
-1. Clone the (HTML CodeSniffer package)[https://github.com/squizlabs/HTML_CodeSniffer].
+1. Clone the [HTML CodeSniffer package](https://github.com/squizlabs/HTML_CodeSniffer).
 1. Make that package’s directory the active directory.
 1. Install the HTML CodeSniffer dependencies by executing `npm install`.
 1. Build the HTML CodeSniffer auditor by executing `grunt build`.
@@ -408,9 +365,9 @@ The changes in `htmlcs/HTMLCS.js` are:
 
 ###### Tenon
 
-Most packaged tests require only one command, but the `tenon` packaged test requires two commands:
-- A command of type `tenonRequest`.
-- A command of type `test` with `tenon` as the value of `which`.
+Most packaged tests require only one act, but the `tenon` packaged test requires two acts:
+- An act of type `tenonRequest`.
+- An act of type `test` with `tenon` as the value of `which`.
 
 Example:
 
@@ -438,13 +395,13 @@ The reason for this is that the Tenon API operates asynchronously. You ask it to
 
 Tenon says that tests are typically completed in 3 to 6 seconds but that the latency can be longer, depending on demand.
 
-Therefore, you can include a `tenonRequest` command early in your job, and a `tenon` test command late in your job. Tenon will move your request through its queue while Testaro is processing your job. When Testaro reaches your `tenon` test command, Tenon will most likely have completed your test. If not, the `tenon` test will wait and then make a second request before giving up.
+Therefore, you can include a `tenonRequest` act early in your job, and a `tenon` test act late in your job. Tenon will move your request through its queue while Testaro is processing your job. When Testaro reaches your `tenon` test act, Tenon will most likely have completed your test. If not, the `tenon` test will wait and then make a second request before giving up.
 
-Thus, a `tenon` test actually does not perform any test; it merely collects the result. The page that was active when the `tenonRequest` command was performed is the one that Tenon tests.
+Thus, a `tenon` test actually does not perform any test; it merely collects the result. The page that was active when the `tenonRequest` act was performed is the one that Tenon tests.
 
-In case you want to perform more than one `tenon` test with the same job, you can do so. Just give each pair of commands a distinct `id` property, so each `tenon` test command will request the correct result.
+In case you want to perform more than one `tenon` test with the same job, you can do so. Just give each pair of acts a distinct `id` property, so each `tenon` test act will request the correct result.
 
-Tenon recommends giving it a public URL rather than giving it the content of a page, if possible. So, it is best to give the `withNewContent` property of the `tenonRequest` command the value `true`, unless the page is not public.
+Tenon recommends giving it a public URL rather than giving it the content of a page, if possible. So, it is best to give the `withNewContent` property of the `tenonRequest` act the value `true`, unless the page is not public.
 
 If a `tenon` test is included in a job, environment variables named `TENON_USER` and `TENON_PASSWORD` must exist, with your Tenon username and password, respectively, as their values. You can obtain those from [Tenon](https://tenon.io/documentation/overview).
 
@@ -453,6 +410,8 @@ If a `tenon` test is included in a job, environment variables named `TENON_USER`
 If a `wave` test is included in the job, an environment variable named `WAVE_KEY` must exist, with your WAVE API key as its value. You can get it from [WebAIM](https://wave.webaim.org/api/).
 
 The `wave` API does not accept a transmitted document for testing. WAVE must be given only a URL, which it then visits to perform its tests. Therefore, you cannot manipulate a page and then have WAVE test it, or ask WAVE to test a page that cannot be reached directly with a URL.
+
+This limitation of WAVE may be overcome in a future version of Testaro by means of the invocation of the WAVE Chrome extension with Playwright.
 
 ###### BBC Accessibility Standards Checker
 
@@ -475,17 +434,17 @@ This command checks the result of the previous act to determine whether its `res
 
 A `next`-type command can use a `next` property instead of a `jump` property. The value of the `next` property is a command name. It tells Testaro to continue performing commands starting with the command having that value as the value of its `name` property.
 
-#### Commands file
+#### `actSpecs` file
 
 ##### Introduction
 
-The `commands.js` file contains rules governing commands. The rules determine whether a command is valid.
+The `actSpecs.js` file contains rules governing acts. The rules determine whether an act is valid.
 
 ##### Rule format
 
-The rules in `commands.js` are organized into two objects, `etc` and `tests`. The `etc` object contains rules for commands of all types. The `tests` object contains additional rules that apply to some commands of type `test`, depending on the values of their `which` properties, namely which tests they perform.
+The rules in `actSpecs.js` are organized into two objects, `etc` and `tests`. The `etc` object contains rules for acts of all types. The `tests` object contains additional rules that apply to some acts of type `test`, depending on the values of their `which` properties, namely which tests they perform.
 
-Here is an example of a command:
+Here is an example of an act:
 
 ```json
 {
@@ -495,7 +454,7 @@ Here is an example of a command:
 }
 ```
 
-And here is the applicable property of the `etc` object in `commmands.js`:
+And here is the applicable property of the `etc` object in `actSpecs.js`:
 
 ```js
 link: [
@@ -507,15 +466,15 @@ link: [
 ]
 ```
 
-The rule is an array with two elements: a string ('Click a link') describing the command and an object containing requirements for any command of type `link`.
+The rule is an array with two elements: a string ('Click a link') describing the act and an object containing requirements for any act of type `link`.
 
-The requirement `which: [true, 'string', 'hasLength', 'substring of the link text']` specifies what is required for the `which` property of a `link`-type command. The requirement is an array.
+The requirement `which: [true, 'string', 'hasLength', 'substring of the link text']` specifies what is required for the `which` property of a `link`-type act. The requirement is an array.
 
 In most cases, the array has length 4:
-- 0. Is the property (here `which`) required (`true` or `false`)? The value `true` here means that every `link`-type command **must** contain a `which` property.
+- 0. Is the property (here `which`) required (`true` or `false`)? The value `true` here means that every `link`-type act **must** contain a `which` property.
 - 1. What format must the property value have (`'string'`, `'array'`, `'boolean'`, or `'number'`)?
 - 2. What other validity criterion applies (if any)? (Empty string if none.) The `hasLength` criterion means that the string must be at least 1 character long.
-- 3. Description of the property. In this example, the description says that the value of `which` must be a substring of the text content of the link that is to be clicked. Thus, a `link` command tells Testaro to find the first link whose text content has this substring and click it.
+- 3. Description of the property. In this example, the description says that the value of `which` must be a substring of the text content of the link that is to be clicked. Thus, a `link` act tells Testaro to find the first link whose text content has this substring and click it.
 
 The validity criterion named in item 2 may be any of these:
 - `'hasLength'`: is not a blank string
@@ -527,20 +486,20 @@ The validity criterion named in item 2 may be any of these:
 - `'isWaitable'`: is `'url'`, `'title'`, or `'body'`
 - `'areStrings'`: is an array of strings
 
-Any `test` command can also (in addition to the requirements in `commands.js`) contain an `expect` property. If it does, the value of that property must be an array of arrays. Each array specifies expectations about the results of the test.
+Any `test` act can also (in addition to the requirements in `actSpecs.js`) contain an `expect` property. If it does, the value of that property must be an array of arrays. Each array specifies expectations about the results of the test.
 
 For example, a `test` command might have this `expect` property:
 
-```json
-"expect": [
-  ["total.links", "=", 5],
-  ["total.links.underlined", "<", 6],
-  ["total.links.outlined"],
-  ["docLang", "!", "es-ES]
+```javaScript
+'expect': [
+  ['total.links', '=', 5],
+  ['total.links.underlined', '<', 6],
+  ['total.links.outlined'],
+  ['docLang', '!', 'es-ES']
 ]
 ```
 
-That would state the expectation that the `result` property of the `acts` item for that test in the report will have a `total.links` property with the value 5, a `total.links.underlined` property with a value less than 6, **no** `total.links.outlined` property, and a `docLang` property with a value different from `es-ES`.
+That would state the expectation that the `result` property of the act for that test in the report will have a `total.links` property with the value 5, a `total.links.underlined` property with a value less than 6, **no** `total.links.outlined` property, and a `docLang` property with a value different from `es-ES`.
 
 The first item in each array is an identifier of a property within the `result` property. The item has the format of a string with `.` delimiters. Each `.`-delimited segment its the name of the next property in the hierarchy. If the current object is an array, the next segment must be a non-negative integer, representing the index of an element of the array. For example, `items.1.attributes.0` references the first element of the array that is the `attributes` property of the object that is the second element of the array that is the `items` property of `result`. (In JavaScript, this would be written `items[1].attributes[0]`, but in the `expect` property all property names are `.`-delimited.)
 
@@ -566,8 +525,7 @@ Testaro can be called by modules and by users.
 ### Functions
 
 Testaro contains these modules that export executable functions:
-- `run.js` exports `doJob` for low-level execution.
-- `high.js` exports `runJob` for high-level execution.
+- `run.js` exports `doJob` for immediate execution.
 - `watch.js` exports `cycle` for watch-triggered execution.
 
 #### Imports
@@ -582,47 +540,33 @@ The argument of `require` is a path relative to the directory of the module in w
 
 A module in another Node.js package that has Testaro as a dependency can execute the same statements, except changing `'./m'` to `'testaro/m'`.
 
-#### Low-level
+#### Immediate
 
-Low-level execution is designed for a module to create a job and make Testaro run it, as follows:
+A job can be immediately executed as follows:
+
+##### By a module
 
 ```javascript
-const report = {
-  job: {…},
-  acts: [],
-  jobData: {}
-};
 const {doJob} = require('./run');
 doJob(report)
 .then(() => …);
 ```
 
-Replace `{…}` with a job object, like the example job shown above.
+The `report` variable here references a copy of a job to be used as a report.
 
 Testaro will run the job and modify the `report` object. When Testaro finishes, the `acts` and `jobData` properties of `report` will contain the results. The final statement can further process the `report` object as desired in the `then` callback.
 
-The Testilo package contains functions that can create jobs from scripts.
+The Testilo package contains functions that can create jobs from scripts and add scores and explanations to reports.
 
-#### High-level
-
-High-level execution is designed for either modules or users.
-
-Execution by a module:
-
-```javaScript
-const {runJob} = require('./high');
-runJob('be76p-tp25-w3c');
-```
-
-Execution by a user:
+##### By a user
 
 ```bash
-node call high be76p-tp25-w3c
+node call run be76p-tp25-w3c
 ```
 
-In either case, replace `be76p-tp25-w3c` with the ID of a job file in the `process.env.JOBDIR` directory.
+In this example, `be76p-tp25-w3c` is the ID of a job saved as a JSON file in the `todo` subdirectory of the `process.env.JOBDIR` directory.
 
-Testaro will find the named job file (e.g., `be76p-tp25-w3c.json`) in the `process.env.JOBDIR` directory and write the report in the `process.env.REPORTDIR_RAW` directory. That environment variable is based on the fact that _raw_ reports, produced by Testaro, can subsequently be enhanced by other applications. For example, Testilo can score and digest reports.
+The `call` module will find the named job file, execute the `doJob` function of the `run` module on the job, save the report in the `raw` subdirectory of the `process.env.REPORTDIR` directory, and archive the job file in the `done` subdirectory of the `process.env.JOBDIR` directory.
 
 #### Watch
 
