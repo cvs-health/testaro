@@ -561,44 +561,44 @@ The Testilo package contains functions that can create jobs from scripts and add
 ##### By a user
 
 ```bash
-node call run be76p-tp25-w3c
+node call run be76p
 ```
 
-In this example, `be76p-tp25-w3c` is the ID of a job saved as a JSON file in the `todo` subdirectory of the `process.env.JOBDIR` directory.
+In this example, `be76p` is the initial characters of the ID of a job saved as a JSON file in the `todo` subdirectory of the `process.env.JOBDIR` directory.
 
-The `call` module will find the named job file, execute the `doJob` function of the `run` module on the job, save the report in the `raw` subdirectory of the `process.env.REPORTDIR` directory, and archive the job file in the `done` subdirectory of the `process.env.JOBDIR` directory.
+The `call` module will find the first job file with a matching name, execute the `doJob` function of the `run` module on the job, save the report in the `raw` subdirectory of the `process.env.REPORTDIR` directory, and archive the job file in the `done` subdirectory of the `process.env.JOBDIR` directory.
 
 #### Watch
 
-Watch execution is designed for either modules or users.
-
 In watch mode, Testaro periodically checks for a job to run. When such a job exists, Testaro runs it and produces a report. Testaro may continue watching after the first report, or may quit.
 
-Execution by a module:
+##### By a module
 
 ```javaScript
 const {cycle} = require('./watch');
 cycle(true, true, 30);
 ```
 
-Execution by a user:
+##### By a user
 
 ```javaScript
 node call watch true true 30
 ```
 
-The arguments passed to `cycle` by either of these invocations are:
+##### Arguments
+
+The arguments passed to `cycle` by a module or to `watch` by a user are:
 - whether to watch a directory (`true`) or the network (`false`)
 - whether to continue watching indefinitely after the first report (`true` or `false`)
 - how many seconds to wait after finding no job before checking again (a nonnegative number)
 
 ##### Directory watch
 
-With directory watch, Testaro checks whether the job directory (`process.env.JOBDIR`) in its host’s filesystem contains a job.
+With directory watch, Testaro checks whether the `todo` subdirectory of the job directory (`process.env.JOBDIR`) contains a job.
 
-When Testaro finds one or more jobs in the job directory, Testaro runs the first job, writes the report into the `process.env.REPORTDIR_RAW` directory, and moves the job from the `process.env.JOBDIR` into the `process.env.DONEDIR` directory.
+When Testaro finds one or more jobs to do, the `watch` module runs the first job, saves the report in the `raw` subdirectory of the `process.env.REPORTDIR` directory, and moves the job file from the `todo` subdirectory to the `done` subdirectory of the `process.env.JOBDIR` directory.
 
-Since Testaro runs the first job (i.e. the job whose name is first in ASCII order), whoever populates the `process.env.JOBDIR` directory with job files has control over the order in which Testaro runs them. For example, to force a new job to be run before the already waiting jobs, one can give it a filename that comes before that of the first waiting job.
+Since Testaro runs the first job (i.e. the job whose file name is first in ASCII order), whoever populates the `todo` subdirectory of the `process.env.JOBDIR` directory with job files has control over the order in which Testaro runs them. For example, to force a new job to be run before the already waiting jobs, one can give it a filename that comes before that of the first waiting job.
 
 ##### Network watch
 
