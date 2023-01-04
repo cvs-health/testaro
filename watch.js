@@ -215,7 +215,7 @@ exports.cycle = async (isDirWatch, isForever, interval) => {
     if (job.id) {
       // Run it and save a report.
       console.log(`Running job ${job.id}`);
-      await runJob(JSON.stringify(JSON.parse(job)), isDirWatch);
+      await runJob(JSON.parse(JSON.stringify(job)), isDirWatch);
       console.log(`Job ${job.id} finished`);
       // If a directory was watched:
       if (isDirWatch) {
