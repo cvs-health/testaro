@@ -93,8 +93,9 @@ const writeDirReport = async report => {
     try {
       const reportJSON = JSON.stringify(report, null, 2);
       const reportName = `${jobID}.json`;
-      await fs.writeFile(`${reportDir}/${reportName}`, reportJSON);
-      console.log(`Report ${reportName} saved`);
+      const rawDir = `${reportDir}/raw`;
+      await fs.writeFile(`${rawDir}/${reportName}`, reportJSON);
+      console.log(`Report ${reportName} saved in ${rawDir}`);
     }
     catch(error) {
       console.log(`ERROR: Failed to write report (${error.message})`);
