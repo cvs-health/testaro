@@ -88,7 +88,7 @@ const checkNetJob = async () => {
 };
 // Writes a directory report.
 const writeDirReport = async report => {
-  const jobID = report && report.job && report.job.id;
+  const jobID = report && report.id;
   if (jobID) {
     try {
       const reportJSON = JSON.stringify(report, null, 2);
@@ -164,23 +164,17 @@ const runJob = async (job, isDirWatch) => {
   const {id} = job;
   if (id) {
     try {
-      // Initialize a report.
-      const report = {
-        job,
-        acts: [],
-        jobData: {}
-      };
       // Run the job, adding to the report.
-      await doJob(report);
+      await doJob(job);
       // If a directory was watched:
       if (isDirWatch) {
         // Save the report.
-        await writeDirReport(report);
+        await writeDirReport(job);
       }
       // Otherwise, i.e. if the network was watched:
       else {
         // Send the report to the server.
-        const ack = await writeNetReport(report);
+        const ack = await writeNetReport(job);
         if (ack.error) {
           console.log(JSON.stringify(ack, null, 2));
         }
@@ -221,7 +215,7 @@ exports.cycle = async (isDirWatch, isForever, interval) => {
     if (job.id) {
       // Run it and save a report.
       console.log(`Running job ${job.id}`);
-      await runJob(job, isDirWatch);
+      await runJob(JSON.stringify(JSON.parse(job)), isDirWatch);
       console.log(`Job ${job.id} finished`);
       // If a directory was watched:
       if (isDirWatch) {

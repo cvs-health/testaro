@@ -7,7 +7,7 @@
 
 // Module to keep secrets.
 require('dotenv').config();
-// Requirements for commands.
+// Requirements for acts.
 const {actSpecs} = require('./actSpecs');
 // Playwright package.
 const playwright = require('playwright');
@@ -215,7 +215,7 @@ const isValidAct = act => {
       }
     });
   }
-  // Otherwise, i.e. if the command has an unknown or no type:
+  // Otherwise, i.e. if the act has an unknown or no type:
   else {
     // Return invalidity.
     return false;
@@ -611,10 +611,10 @@ const goTo = async (report, page, url, timeout, waitUntil, isStrict) => {
 const doActs = async (report, actIndex, page) => {
   // Quits and reports the performance being aborted.
   const abortActs = async () => {
-    // Add data on the aborted command to the report.
+    // Add data on the aborted act to the report.
     report.jobData.abortTime = nowString();
     report.jobData.abortedAct = actIndex;
-    // Prevent performance of additional commands.
+    // Prevent performance of additional acts.
     actIndex = -2;
     // Report this.
     console.log('ERROR: Job aborted');
@@ -628,18 +628,18 @@ const doActs = async (report, actIndex, page) => {
     }
   });
   const {acts} = report;
-  // If any more commands are to be performed:
+  // If any more acts are to be performed:
   if (actIndex > -1 && actIndex < acts.length) {
-    // Identify the command to be performed.
+    // Identify the act to be performed.
     const act = acts[actIndex];
     // If it is valid:
     if (isValidAct(act)) {
       const whichSuffix = act.which ? ` (${act.which})` : '';
       console.log(`>>>> ${act.type}${whichSuffix}`);
-      // Increment the count of commands performed.
+      // Increment the count of acts performed.
       actCount++;
       act.startTime = Date.now();
-      // If the command is an index changer:
+      // If the act is an index changer:
       if (act.type === 'next') {
         const condition = act.if;
         const logSuffix = condition.length === 3 ? ` ${condition[1]} ${condition[2]}` : '';
@@ -658,7 +658,7 @@ const doActs = async (report, actIndex, page) => {
         };
         // If the condition is true:
         if (truth[1]) {
-          // If the performance of commands is to stop:
+          // If the performance of acts is to stop:
           if (act.jump === 0) {
             // Quit.
             actIndex = -2;
@@ -668,14 +668,14 @@ const doActs = async (report, actIndex, page) => {
             // Set the act index accordingly.
             actIndex += act.jump - 1;
           }
-          // Otherwise, if there is a named next command:
+          // Otherwise, if there is a named next act:
           else if (act.next) {
             // Set the new index accordingly, or stop if it does not exist.
             actIndex = acts.map(act => act.name).indexOf(act.next) - 1;
           }
         }
       }
-      // Otherwise, if the command is a launch:
+      // Otherwise, if the act is a launch:
       else if (act.type === 'launch') {
         // Launch the specified browser, creating a browser context and a page in it.
         await launch(report, act.which, act.lowMotion ? 'reduce' : 'no-preference');
@@ -684,13 +684,13 @@ const doActs = async (report, actIndex, page) => {
       }
       // Otherwise, if a current page exists:
       else if (page) {
-        // If the command is a url:
+        // If the act is a url:
         if (act.type === 'url') {
           // Identify the URL.
           const resolved = act.which.replace('__dirname', __dirname);
           requestedURL = resolved;
           // Visit it and wait until the network is idle.
-          const {strict} = report.job;
+          const {strict} = report;
           let response = await goTo(report, page, requestedURL, 15000, 'networkidle', strict);
           // If the visit fails:
           if (response.error) {
@@ -1461,7 +1461,7 @@ const doActs = async (report, actIndex, page) => {
             // Otherwise, i.e. if the act type is unknown:
             else {
               // Add the error result to the act.
-              addError(act, 'badType', 'ERROR: Invalid command type');
+              addError(act, 'badType', 'ERROR: Invalid act type');
             }
           }
           // Otherwise, i.e. if redirection is prohibited but occurred:
@@ -1483,20 +1483,20 @@ const doActs = async (report, actIndex, page) => {
       }
       act.endTime = Date.now();
     }
-    // Otherwise, i.e. if the command is invalid:
+    // Otherwise, i.e. if the act is invalid:
     else {
       // Quit and add error data to the report.
-      const errorMsg = `ERROR: Invalid command of type ${act.type}`;
+      const errorMsg = `ERROR: Invalid act of type ${act.type}`;
       console.log(errorMsg);
-      addError(act, 'badCommand', errorMsg);
+      addError(act, 'badAct', errorMsg);
       await abortActs();
     }
     // Perform any remaining acts if not aborted.
     await doActs(report, actIndex + 1, page);
   }
-  // Otherwise, if all commands have been performed and the job succeeded:
+  // Otherwise, if all acts have been performed and the job succeeded:
   else if (! report.jobData.abortTime) {
-    console.log('Commands completed');
+    console.log('Acts completed');
     await browserClose();
     console.log('Browser closed');
   }
