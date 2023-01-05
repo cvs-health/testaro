@@ -18,6 +18,7 @@ const jobID = '00000-simple-example';
 // Get the simple job.
 fs.readFile(`${process.env.JOBDIR}/todo/${jobID}.json`, 'utf8')
 .then(async jobJSON => {
+  console.log(jobJSON);
   const report = JSON.parse(jobJSON);
   // Run it.
   await doJob(report);
