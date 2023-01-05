@@ -16,7 +16,7 @@ const jobID = '00000-simple-example';
 // ########## OPERATION
 
 // Get the simple job.
-fs.readFile(`${process.env.JOBDIR}/toto/${jobID}.json`)
+fs.readFile(`${process.env.JOBDIR}/todo/${jobID}.json`)
 .then(async jobJSON => {
   const report = JSON.parse(jobJSON);
   // Run it.
