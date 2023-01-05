@@ -129,7 +129,7 @@ const writeNetReport = async report => {
         }
       });
     });
-    report.agent = agent;
+    report.jobData.agent = agent;
     request.on('error', error => {
       console.log(`ERROR submitting job report (${error.message})`);
       resolve({

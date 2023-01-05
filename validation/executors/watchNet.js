@@ -9,11 +9,11 @@ const fs = require('fs/promises');
 
 // Override cycle environment variables with validation-specific ones.
 process.env.PROTOCOL = 'http';
-const jobDir = `${__dirname}/../jobs`;
+const jobDir = `${__dirname}/../jobs/todo`;
 process.env.JOB_URL = 'localhost:3007/api/job';
 process.env.REPORT_URL = 'localhost:3007/api';
 process.env.AGENT = 'testarauth';
-const {cycle} = require(`${__dirname}/../../watch`);
+const {cycle} = require('../../watch');
 const client = require(process.env.PROTOCOL);
 const jobID = '00000-simple-example';
 
@@ -84,8 +84,8 @@ const requestHandler = (request, response) => {
               body.job
               && body.acts
               && body.jobData
-              && body.agent
-              && body.agent === process.env.AGENT
+              && body.jobData.agent
+              && body.jobData.agent === process.env.AGENT
             ) {
               ack.result = 'Success: Valid report submitted';
             }
