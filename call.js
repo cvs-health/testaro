@@ -61,7 +61,7 @@ const callWatch = async (isDirWatch, isForever, interval) => {
 // ########## OPERATION
 
 // Execute the requested function.
-if (fn === 'high' && fnArgs.length === 1) {
+if (fn === 'run' && fnArgs.length === 1) {
   callRun(fnArgs)
   .then(() => {
     console.log('Execution completed');
