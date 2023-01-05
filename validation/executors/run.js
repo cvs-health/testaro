@@ -1,5 +1,5 @@
-// low.js
-// Validator for low-level invocation of Testaro.
+// run.js
+// Validator for immediate job execution.
 
 // ########## IMPORTS
 
@@ -16,25 +16,15 @@ const jobID = '00000-simple-example';
 // ########## OPERATION
 
 // Get the simple job.
-fs.readFile(`${process.env.JOBDIR}/${jobID}.json`)
+fs.readFile(`${process.env.JOBDIR}/toto/${jobID}.json`)
 .then(async jobJSON => {
-  const job = JSON.parse(jobJSON);
-  const report = {
-    job,
-    acts: [],
-    jobData: {}
-  };
+  const report = JSON.parse(jobJSON);
   // Run it.
   await doJob(report);
   try {
     // Check the report against expectations.
-    const reportJSON = await fs.readFile(`${process.env.REPORTDIR}/${jobID}.json`, 'utf8');
-    const report = JSON.parse(reportJSON);
-    const {job, acts, jobData} = report;
-    if (! job) {
-      console.log('Failure: Report omits job');
-    }
-    else if (acts.length !== 3) {
+    const {acts, jobData} = report;
+    if (acts.length !== 3) {
       console.log('Failure: Counts of acts is not 3');
     }
     else if (! jobData) {
@@ -44,7 +34,7 @@ fs.readFile(`${process.env.JOBDIR}/${jobID}.json`)
       console.log('Failure: End time precedes start time');
     }
     else {
-      console.log(`Success (report is in temp/${jobID}.json)`);
+      console.log('Success');
     }
   }
   catch(error) {
