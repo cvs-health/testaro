@@ -7,16 +7,13 @@ const fs = require('fs/promises');
 
 // ########## CONSTANTS
 
-const projectRoot = `${__dirname}/../..`;
-const {doJob} = require(`${projectRoot}/run`);
-process.env.JOBDIR = `${projectRoot}/validation/jobs`;
-process.env.REPORTDIR = `${projectRoot}/temp`;
+const {doJob} = require('../../run');
 const jobID = '00000-simple-example';
 
 // ########## OPERATION
 
 // Get the simple job.
-fs.readFile(`${process.env.JOBDIR}/todo/${jobID}.json`, 'utf8')
+fs.readFile(`${__dirname}/../jobs/todo/${jobID}.json`, 'utf8')
 .then(async jobJSON => {
   const report = JSON.parse(jobJSON);
   // Run it.
