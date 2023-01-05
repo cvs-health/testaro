@@ -47,7 +47,7 @@ const callRun = async jobIDStart => {
     // Archive it.
     await fs.rename(`${toDoDir}/${jobFileName}`, `${jobDir}/done/${jobFileName}`);
     // Save the report.
-    await fs.writeFile(`${rawDir}/${jobFileName}`, JSON.stringify(report));
+    await fs.writeFile(`${rawDir}/${jobFileName}`, JSON.stringify(report, null, 2));
     console.log(`Job completed and report ${report.id}.json saved in ${rawDir}`);
   }
   // Otherwise, i.e. if the job does not exist.
