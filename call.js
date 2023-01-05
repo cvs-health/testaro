@@ -25,8 +25,10 @@ const {cycle} = require('./watch');
 
 const fn = process.argv[2];
 const fnArgs = process.argv.slice(3);
-const toDoDir = `${process.env.JOBDIR}/todo`;
+const jobDir = process.env.JOBDIR;
+const toDoDir = `${jobDir}/todo`;
 const reportDir = process.env.REPORTDIR;
+const rawDir = `${reportDir}/raw`;
 
 // ########## FUNCTIONS
 
@@ -39,10 +41,14 @@ const callRun = async jobIDStart => {
   if (jobFileName) {
     // Get it.
     const jobJSON = await fs.readFile(`${toDoDir}/${jobFileName}`, 'utf8');
-    const job = JSON.parse(jobJSON);
+    const report = JSON.parse(jobJSON);
     // Run it.
-    await doJob(job);
-    console.log(`Job completed and report ${job.id}.json saved in ${reportDir}/raw`);
+    await doJob(report);
+    // Archive it.
+    await fs.rename(`${toDoDir}/${jobFileName}`, `${jobDir}/done/${jobFileName}`);
+    // Save the report.
+    await fs.writeFile(`${rawDir}/${jobFileName}`, JSON.stringify(report));
+    console.log(`Job completed and report ${report.id}.json saved in ${rawDir}`);
   }
   // Otherwise, i.e. if the job does not exist.
   else {
