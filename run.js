@@ -1507,7 +1507,11 @@ const doActs = async (report, actIndex, page) => {
 */
 exports.doJob = async report => {
   // If the report is valid:
-  if(isValidReport(report)) {
+  const reportInvalidity = isValidReport(report);
+  if (reportInvalidity) {
+    console.log(reportInvalidity);
+  }
+  else {
     // Add initialized job data to the report.
     report.jobData = {};
     const startTime = new Date();
@@ -1533,8 +1537,5 @@ exports.doJob = async report => {
     const endTime = new Date();
     report.jobData.endTime = nowString();
     report.jobData.elapsedSeconds =  Math.floor((endTime - startTime) / 1000);
-  }
-  else {
-    console.log('ERROR: Initialized job report invalid');
   }
 };

@@ -24,9 +24,8 @@
   "sources": {
     "script": "simple",
     "batch": "",
-    "host": {
+    "target": {
       "id": "example",
-      "which": "https://example.com",
       "what": "Example"
     },
     "requester": "user@domain.tld"
