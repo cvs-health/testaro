@@ -626,10 +626,9 @@ WAVE_KEY=yourwavekey
 PROTOCOL=https
 JOB_URL=yourserver.tld/job
 REPORT_URL=yourserver.tld/report
-SCRIPTDIR=../testing/scripts
-REPORTDIR=../testing/reports/raw
-JOBDIR=../testing/watch/ThisWorkstation
-DONEDIR=../testing/done
+SPECDIR=../testing/specs
+REPORTDIR=../testing/reports
+JOBDIR=../testing/jobs/ThisWorkstation
 AGENT=ThisWorkstation
 DEBUG=false
 ```
@@ -642,8 +641,7 @@ Testaro and its custom tests can be validated with the _executors_ located in th
 
 The executors are:
 
-- `low`: validates low-level invocation
-- `high`: validates high-level invocation
+- `run`: validates low-level invocation
 - `watchDir`: validates directory watching
 - `watchNet`: validates network watching
 - `test`: validates a Testaro test
@@ -677,7 +675,7 @@ Testing to determine what happens when a control or link is activated is straigh
 
 The Playwright “Receives Events” actionability check does **not** check whether an event is dispatched on an element. It checks only whether a click on the location of the element makes the element the target of that click, rather than some other element occupying the same location.
 
-### Test-package duplication
+### Test-package duplicativity
 
 Test packages sometimes do redundant testing, in that two or more packages test for the same issues, although such duplications are not necessarily perfect. This fact creates three problems:
 - One cannot be confident in excluding some tests of some packages on the assumption that they perfectly duplicate tests of other packages.
@@ -700,11 +698,10 @@ The files in the `temp` directory are presumed ephemeral and are not tracked by 
 ## Related packages
 
 [Testilo](https://www.npmjs.com/package/testilo) is an application that:
-- creates a job by aiming a script at a host
-- merges batches of hosts into scripts to produce multiple jobs
+- merges batches of targets and scripts to produce jobs
 - produces scores and adds them to the raw reports of Testaro
 - produces human-oriented HTML digests from scored reports
-- produces human-oriented HTML comparisons of the scores of hosts
+- produces human-oriented HTML comparisons of the scores of targets
 
 Testilo contains procedures that reorganize report data by defect rather than test package, and that compensate for duplicative tests when computing scores.
 
