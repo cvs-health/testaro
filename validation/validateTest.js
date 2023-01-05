@@ -19,7 +19,7 @@ exports.validateTest = async testID => {
     }
     const testActs = acts.filter(act => act.type && act.type === 'test');
     if (
-      testActs.length === report.commands.filter(cmd => cmd.type === 'test').length
+      testActs.length === report.acts.filter(act => act.type === 'test').length
       && testActs.every(testAct => testAct.result && testAct.result.failureCount !== undefined)
     ) {
       console.log('Success: Reports have been correctly populated');
