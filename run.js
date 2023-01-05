@@ -854,8 +854,10 @@ const doActs = async (report, actIndex, page) => {
         // Otherwise, if the page has a URL:
         else if (page.url() && page.url() !== 'about:blank') {
           const url = page.url();
-          // If redirection is permitted or did not occur:
-          if (! report.strict || deSlash(url) === deSlash(requestedURL)) {
+          // If redirection is inapplicable, is permitted, or did not occur:
+          if (
+            url.startsWith('file:') || ! report.strict || deSlash(url) === deSlash(requestedURL)
+          ) {
             // Add the URL to the act.
             act.url = url;
             // If the act is a revelation:
