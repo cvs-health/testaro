@@ -140,7 +140,7 @@ const writeNetReport = async report => {
     // Send the report to the server.
     request.write(JSON.stringify(report, null, 2));
     request.end();
-    console.log(`Report ${report.job.id} submitted`);
+    console.log(`Report ${report.id} submitted`);
   });
   // Return the server response.
   return ack;

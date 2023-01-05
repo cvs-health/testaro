@@ -81,8 +81,7 @@ const requestHandler = (request, response) => {
             const bodyJSON = bodyParts.join('');
             const body = JSON.parse(bodyJSON);
             if (
-              body.job
-              && body.acts
+              body.acts
               && body.jobData
               && body.jobData.agent
               && body.jobData.agent === process.env.AGENT
