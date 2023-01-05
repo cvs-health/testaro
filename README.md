@@ -626,9 +626,8 @@ WAVE_KEY=yourwavekey
 PROTOCOL=https
 JOB_URL=yourserver.tld/job
 REPORT_URL=yourserver.tld/report
-SPECDIR=../testing/specs
-REPORTDIR=../testing/reports
 JOBDIR=../testing/jobs/ThisWorkstation
+REPORTDIR=../testing/reports
 AGENT=ThisWorkstation
 DEBUG=false
 ```
