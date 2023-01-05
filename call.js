@@ -6,7 +6,7 @@
     0. function to execute.
     1+. arguments to pass to the function.
   Usage examples:
-    node call high ts25
+    node call run ts25
     node call watch true true 30
 */
 
@@ -14,8 +14,10 @@
 
 // Module to keep secrets.
 require('dotenv').config();
-// Function to process a high-level testing request.
-const {runJob} = require('./high');
+// Module to process files.
+const fs = require('fs/promises');
+// Function to process a testing request.
+const {doJob} = require('./run');
 // Function to watch for jobs.
 const {cycle} = require('./watch');
 
@@ -23,15 +25,24 @@ const {cycle} = require('./watch');
 
 const fn = process.argv[2];
 const fnArgs = process.argv.slice(3);
+const toDoDir = `${process.env.JOBDIR}/todo`;
 const reportDir = process.env.REPORTDIR;
 
 // ########## FUNCTIONS
 
-// Fulfills a high-level testing request.
-const callHigh = async jobID => {
-  const done = await runJob(jobID);
-  if (done) {
-    console.log(`Job completed and report ${jobID}.json saved in ${reportDir}`);
+// Fulfills a testing request.
+const callRun = async jobIDStart => {
+  // Get the job.
+  const jobDirFileNames = await fs.readdir(toDoDir);
+  const jobFileName = jobDirFileNames.find(fileName => fileName.startsWith(jobIDStart));
+  if (jobFileName) {
+    const jobJSON = await fs.readFile(`${toDoDir}/${jobFileName}`, 'utf8');
+    const job = JSON.parse(jobJSON);
+    await doJob(job);
+    console.log(`Job completed and report ${job.id}.json saved in ${reportDir}/raw`);
+  }
+  else {
+    console.log(`ERROR: No to-do job ID starts with ${jobIDStart}`);
   }
 };
 // Starts a watch.
@@ -46,7 +57,7 @@ const callWatch = async (isDirWatch, isForever, interval) => {
 
 // Execute the requested function.
 if (fn === 'high' && fnArgs.length === 1) {
-  callHigh(fnArgs)
+  callRun(fnArgs)
   .then(() => {
     console.log('Execution completed');
   });
