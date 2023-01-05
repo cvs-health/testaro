@@ -6,8 +6,7 @@
   "scripts": {
     "tests": "node validation/executors/tests",
     "test": "node validation/executors/test",
-    "low": "node validation/executors/low",
-    "high": "node validation/executors/high",
+    "run": "node validation/executors/run",
     "watchDir": "node validation/executors/watchDir",
     "watchNet": "node validation/executors/watchNet"
   },
