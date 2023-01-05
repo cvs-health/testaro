@@ -2,18 +2,13 @@
 // Validator for one Testaro test.
 
 const fs = require('fs').promises;
-const {doJob} = require(`${__dirname}/../run`);
+const {doJob} = require('../run');
 exports.validateTest = async testID => {
   const jobFileNames = await fs.readdir(`${__dirname}/tests/jobs`);
   for (const jobFileName of jobFileNames.filter(fileName => fileName === `${testID}.json`)) {
     const rawJobJSON = await fs.readFile(`${__dirname}/tests/jobs/${jobFileName}`, 'utf8');
     const jobJSON = rawJobJSON.replace(/__targets__/g, 'file://validation/tests/targets');
-    const job = JSON.parse(jobJSON);
-    const report = {
-      job,
-      acts: [],
-      jobData: {}
-    };
+    const report = JSON.parse(jobJSON);
     await doJob(report);
     const {acts, jobData} = report;
     if (jobData.endTime && /^\d{4}-.+$/.test(jobData.endTime)) {
@@ -24,7 +19,7 @@ exports.validateTest = async testID => {
     }
     const testActs = acts.filter(act => act.type && act.type === 'test');
     if (
-      testActs.length === job.commands.filter(cmd => cmd.type === 'test').length
+      testActs.length === report.commands.filter(cmd => cmd.type === 'test').length
       && testActs.every(testAct => testAct.result && testAct.result.failureCount !== undefined)
     ) {
       console.log('Success: Reports have been correctly populated');

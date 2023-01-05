@@ -262,7 +262,7 @@ const isValidReport = report => {
     if (! sources || typeof sources !== 'object') {
       return 'Bad report sources';
     }
-    if (! sources.script || typeof sources.script !== 'string') {
+    if (typeof sources.script !== 'string') {
       return 'Bad sources script';
     }
     if (

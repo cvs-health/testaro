@@ -2,7 +2,8 @@
   "id": "titledElVal",
   "what": "validation of titledEl test",
   "strict": true,
-  "commands": [
+  "timeLimit": 20,
+  "acts": [
     {
       "type": "launch",
       "which": "chromium",
@@ -31,6 +32,6 @@
     "host": {},
     "requester": ""
   },
-  "jobCreationTime": "2002-11-12T09:31:00",
+  "creationTime": "2002-11-12T09:31:00",
   "timeStamp": "00000"
 }
