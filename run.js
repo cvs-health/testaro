@@ -238,7 +238,7 @@ const isValidReport = report => {
     if (! timeLimit || typeof timeLimit !== 'number' || timeLimit < 1) {
       return 'Bad report time limit';
     }
-    if (! acts && ! Array.isArray(acts) && acts.length < 2) {
+    if (! acts || ! Array.isArray(acts) || acts.length < 2) {
       return 'Bad report acts';
     }
     if (! acts.every(act => act.type && typeof act.type === 'string')) {
