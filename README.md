@@ -111,7 +111,7 @@ All of the tests that Testaro can perform are free of cost, except those in the 
 
 A _job_ is an object containing instructions for Testaro.
 
-A _report_ is an object containing a job, with added properties describing the results from Testaro running the job.
+A _report_ is a job with added properties describing the results from Testaro running the job.
 
 ### Jobs
 
