@@ -232,10 +232,10 @@ const isValidReport = report => {
     if (! what || typeof what !== 'string') {
       return 'Bad report what';
     }
-    if (! strict || typeof strict !== 'boolean') {
+    if (typeof strict !== 'boolean') {
       return 'Bad report strict';
     }
-    if (! timeLimit || typeof timeLimit !== 'number' || timeLimit < 1) {
+    if (typeof timeLimit !== 'number' || timeLimit < 1) {
       return 'Bad report time limit';
     }
     if (! acts || ! Array.isArray(acts) || acts.length < 2) {
