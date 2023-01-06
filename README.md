@@ -638,17 +638,16 @@ DEBUG=false
 
 Testaro and its custom tests can be validated with the _executors_ located in the `validation/executors` directory.
 
-The executors are:
+The executor for a single test is `test`. To execute it for any test `xyz`, call it with the statement `npm test xyz`.
+
+The other executors are:
 
 - `run`: validates low-level invocation
 - `watchDir`: validates directory watching
 - `watchNet`: validates network watching
-- `test`: validates a Testaro test
 - `tests`: validates all the Testaro tests
 
-To validate any single Testaro test `xyz`, enter the statement `npm test xyz`.
-
-To execute any other executor `xyz`, call it with the statement `npm run xyz`.
+To execute any executor `xyz` among these, call it with the statement `npm run xyz`.
 
 The `tests` executor makes use of the jobs in the `validation/tests/jobs` directory, and they, in turn, run tests on HTML files in the `validation/tests/targets` directory.
 
