@@ -11,7 +11,7 @@
     },
     {
       "type": "url",
-      "which": "https://example.com",
+      "which": "https://example.edu",
       "what": "Example.com",
       "id": "example"
     },
@@ -36,7 +36,7 @@
     },
     {
       "type": "url",
-      "which": "https://example.com",
+      "which": "https://example.edu",
       "what": "Example.com",
       "id": "example"
     },
@@ -221,7 +221,7 @@
     "batch": "",
     "host": {
       "id": "example",
-      "which": "https://example.com",
+      "which": "https://example.edu",
       "what": "Example.com"
     },
     "requester": "user@domain.tld"

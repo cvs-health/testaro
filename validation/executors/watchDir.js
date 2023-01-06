@@ -17,7 +17,7 @@ const {cycle} = require('../../watch');
 // Start checking for jobs every 5 seconds.
 cycle(true, false, 5)
 .then(() => {
-  console.log('Watch validation ended');
+  console.log('Success: Watch validation ended');
 });
 // Make a job available after 7 seconds.
 setTimeout(() => {

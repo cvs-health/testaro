@@ -642,7 +642,7 @@ The executor for a single test is `test`. To execute it for any test `xyz`, call
 
 The other executors are:
 
-- `run`: validates low-level invocation
+- `run`: validates immediate test execution
 - `watchDir`: validates directory watching
 - `watchNet`: validates network watching
 - `tests`: validates all the Testaro tests
