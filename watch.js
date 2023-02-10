@@ -25,13 +25,14 @@ const reportDir = process.env.REPORTDIR;
 // ########## FUNCTIONS
 
 // Checks for a directory job.
-const checkDirJob = async () => {
+const checkDirJob = async watchee => {
   try {
-    const toDoDirFileNames = await fs.readdir(`${jobDir}/todo`);
+    const watchJobDir = watchee || jobDir;
+    const toDoDirFileNames = await fs.readdir(`${watchJobDir}/todo`);
     const jobFileNames = toDoDirFileNames.filter(fileName => fileName.endsWith('.json'));
     if (jobFileNames.length) {
       console.log('Directory job found');
-      const jobJSON = await fs.readFile(`${jobDir}/todo/${jobFileNames[0]}`, 'utf8');
+      const jobJSON = await fs.readFile(`${watchJobDir}/todo/${jobFileNames[0]}`, 'utf8');
       try {
         const job = JSON.parse(jobJSON, null, 2);
         return job;
@@ -53,9 +54,10 @@ const checkDirJob = async () => {
   }
 };
 // Checks for and returns a network job.
-const checkNetJob = async () => {
+const checkNetJob = async watchee => {
+  const watchJobURL = watchee || jobURL;
   const job = await new Promise(resolve => {
-    const wholeURL = `${protocol}://${jobURL}?agent=${agent}`;
+    const wholeURL = `${protocol}://${watchJobURL}?agent=${agent}`;
     const request = client.request(wholeURL, response => {
       const chunks = [];
       response.on('data', chunk => {
@@ -108,10 +110,11 @@ const writeDirReport = async report => {
 // Submits a network report to a server and returns the server response.
 const writeNetReport = async report => {
   const ack = await new Promise(resolve => {
-    // If the report specifies a report destination:
     if (report.sources) {
+      // Get the report destination from the report or the environment.
       const destination = report.sources.sendReportTo;
       const wholeURL = destination || `${process.env.PROTOCOL}://${reportURL}`;
+      // Contact the server.
       const request = client.request(wholeURL, {method: 'POST'}, response => {
         const chunks = [];
         response.on('data', chunk => {
@@ -153,10 +156,11 @@ const writeNetReport = async report => {
   return ack;
 };
 // Archives a job.
-const archiveJob = async job => {
+const archiveJob = async (job, watchee) => {
   const jobJSON = JSON.stringify(job, null, 2);
-  await fs.writeFile(`${jobDir}/done/${job.id}.json`, jobJSON);
-  await fs.rm(`${jobDir}/todo/${job.id}.json`);
+  const watchJobDir = watchee || jobDir;
+  await fs.writeFile(`${watchJobDir}/done/${job.id}.json`, jobJSON);
+  await fs.rm(`${watchJobDir}/todo/${job.id}.json`);
 };
 // Waits.
 const wait = ms => {
@@ -201,7 +205,7 @@ const runJob = async (job, isDirWatch) => {
   }
 };
 // Checks for a job, performs it, and submits a report, once or repeatedly.
-exports.cycle = async (isDirWatch, isForever, interval) => {
+exports.cycle = async (isDirWatch, isForever, interval, watchee = null) => {
   const intervalMS = 1000 * Number.parseInt(interval);
   let statusOK = true;
   // Prevent a wait before the first iteration.
@@ -214,21 +218,21 @@ exports.cycle = async (isDirWatch, isForever, interval) => {
     // Check for a job.
     let job;
     if (isDirWatch) {
-      job = await checkDirJob();
+      job = await checkDirJob(watchee);
     }
     else {
-      job = await checkNetJob();
+      job = await checkNetJob(watchee);
     }
     // If there was one:
     if (job.id) {
-      // Run it and save a report.
+      // Run it, save a report, and if applicable send the report to the job source.
       console.log(`Running job ${job.id}`);
       await runJob(JSON.parse(JSON.stringify(job)), isDirWatch);
       console.log(`Job ${job.id} finished`);
       // If a directory was watched:
       if (isDirWatch) {
         // Archive the job.
-        await archiveJob(job);
+        await archiveJob(job, watchee);
         console.log(`Job ${job.id} archived`);
       }
       // If watching was specified for only 1 job, quit.

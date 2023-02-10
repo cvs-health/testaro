@@ -57,11 +57,11 @@ const callRun = async jobIDStart => {
   }
 };
 // Starts a watch.
-const callWatch = async (isDirWatch, isForever, interval) => {
+const callWatch = async (isDirWatch, isForever, interval, watchee = null) => {
   const whenType = isForever === 'true' ? 'repeating' : 'one-time';
   const whereType = isDirWatch === 'true' ? 'directory' : 'network';
   console.log(`Starting ${whenType} ${whereType} watch`);
-  await cycle(isDirWatch === 'true', isForever === 'true', Number.parseInt(interval, 10));
+  await cycle(isDirWatch === 'true', isForever === 'true', Number.parseInt(interval, 10), watchee);
 };
 
 // ########## OPERATION
