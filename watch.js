@@ -52,7 +52,7 @@ const checkDirJob = async () => {
     return {};
   }
 };
-// Checks for a network job.
+// Checks for and returns a network job.
 const checkNetJob = async () => {
   const job = await new Promise(resolve => {
     const wholeURL = `${protocol}://${jobURL}?agent=${agent}`;
@@ -108,39 +108,46 @@ const writeDirReport = async report => {
 // Submits a network report to a server and returns the server response.
 const writeNetReport = async report => {
   const ack = await new Promise(resolve => {
-    const wholeURL = `${process.env.PROTOCOL}://${reportURL}`;
-    const request = client.request(wholeURL, {method: 'POST'}, response => {
-      const chunks = [];
-      response.on('data', chunk => {
-        chunks.push(chunk);
+    // If the report specifies a report destination:
+    if (report.sources) {
+      const destination = report.sources.sendReportTo;
+      const wholeURL = destination || `${process.env.PROTOCOL}://${reportURL}`;
+      const request = client.request(wholeURL, {method: 'POST'}, response => {
+        const chunks = [];
+        response.on('data', chunk => {
+          chunks.push(chunk);
+        });
+        response.on('end', () => {
+          const content = chunks.join('');
+          try {
+            resolve(JSON.parse(content));
+          }
+          catch(error) {
+            resolve({
+              error: 'ERROR: Response was not JSON',
+              message: error.message,
+              status: response.statusCode,
+              content: content.slice(0, 200)
+            });
+          }
+        });
       });
-      response.on('end', () => {
-        const content = chunks.join('');
-        try {
-          resolve(JSON.parse(content));
-        }
-        catch(error) {
-          resolve({
-            error: 'ERROR: Response was not JSON',
-            message: error.message,
-            status: response.statusCode,
-            content: content.slice(0, 200)
-          });
-        }
+      report.jobData.agent = agent;
+      request.on('error', error => {
+        console.log(`ERROR submitting job report (${error.message})`);
+        resolve({
+          error: 'ERROR: Job report submission failed',
+          message: error.message
+        });
       });
-    });
-    report.jobData.agent = agent;
-    request.on('error', error => {
-      console.log(`ERROR submitting job report (${error.message})`);
-      resolve({
-        error: 'ERROR: Job report submission failed',
-        message: error.message
-      });
-    });
-    // Send the report to the server.
-    request.write(JSON.stringify(report, null, 2));
-    request.end();
-    console.log(`Report ${report.id} submitted`);
+      // Send the report to the server.
+      request.write(JSON.stringify(report, null, 2));
+      request.end();
+      console.log(`Report ${report.id} submitted`);
+    }
+    else {
+      console.log('ERROR: Report has no sources property');
+    }
   });
   // Return the server response.
   return ack;
