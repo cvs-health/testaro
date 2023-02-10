@@ -591,14 +591,15 @@ The arguments passed to `cycle` by a module or to `watch` by a user are:
 - whether to watch a directory (`true`) or the network (`false`)
 - whether to continue watching indefinitely after the first report (`true` or `false`)
 - how many seconds to wait after finding no job before checking again (a nonnegative number)
+- optionally, where the watched jobs are located
 
 ##### Directory watch
 
-With directory watch, Testaro checks whether the `todo` subdirectory of the job directory (`process.env.JOBDIR`) contains a job.
+With directory watch, Testaro checks whether the `todo` subdirectory of the job directory contains a job. The job directory is given by the fourth passed argument, if present, or, if not, then by `process.env.JOBDIR`.
 
-When Testaro finds one or more jobs to do, the `watch` module runs the first job, saves the report in the `raw` subdirectory of the `process.env.REPORTDIR` directory, and moves the job file from the `todo` subdirectory to the `done` subdirectory of the `process.env.JOBDIR` directory.
+When Testaro finds one or more jobs to do, the `watch` module runs the first job, saves the report in the `raw` subdirectory of the report directory. The report directory is given by `process.env.REPORTDIR`. Testaro also moves the job file from the `todo` subdirectory to the `done` subdirectory of the job directory.
 
-Since Testaro runs the first job (i.e. the job whose file name is first in ASCII order), whoever populates the `todo` subdirectory of the `process.env.JOBDIR` directory with job files has control over the order in which Testaro runs them. For example, to force a new job to be run before the already waiting jobs, one can give it a filename that comes before that of the first waiting job.
+Since Testaro runs the first job (i.e. the job whose file name is first in ASCII order), whoever populates the `todo` subdirectory of the job directory with job files has control over the order in which Testaro runs them. For example, to force a new job to be run before the already waiting jobs, one can give it a filename that comes before that of the first waiting job.
 
 ##### Network watch
 
@@ -609,6 +610,10 @@ Network watching is designed for a situation in which:
 With network watch, the initiator of an interaction is Testaro, not the server. When Testaro is available, it requests a job from a server. If the response is a JSON representation of a job, Testaro runs the job and sends the report to the server.
 
 If multiple workstations run Testaro and do work for the same server, the server can assign jobs to specific agents by requiring each instance of Testaro to have a distinct value of `process.env.AGENT`.
+
+The URL from which Testaro requests jobs is given by the fourth passed argument, if present, or, if not, then by `process.env.JOB_URL`.
+
+The URL to which Testaro sends reports is given by the `sources.sendReportTo` property of each job, if the property exists, or, if not, by `process.env.REPORT_URL`.
 
 ### Environment variables
 
