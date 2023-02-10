@@ -31,7 +31,6 @@ const checkDirJob = async watchee => {
     const toDoDirFileNames = await fs.readdir(`${watchJobDir}/todo`);
     const jobFileNames = toDoDirFileNames.filter(fileName => fileName.endsWith('.json'));
     if (jobFileNames.length) {
-      console.log('Directory job found');
       const jobJSON = await fs.readFile(`${watchJobDir}/todo/${jobFileNames[0]}`, 'utf8');
       try {
         const job = JSON.parse(jobJSON, null, 2);
@@ -45,7 +44,7 @@ const checkDirJob = async watchee => {
       }
     }
     else {
-      console.log('Directory job not found');
+      console.log('No job to do');
       return {};
     }
   }
@@ -242,6 +241,7 @@ exports.cycle = async (isDirWatch, isForever, interval, watchee = null) => {
     }
     // Otherwise, i.e. if no job was found:
     else {
+      console.log('No job to do');
       // Cause a wait before the next check.
       empty = true;
     }
