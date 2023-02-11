@@ -5,7 +5,7 @@
 
 // FUNCTIONS
 // Runs HTML CodeSniffer on the page.
-exports.reporter = async page => {
+exports.reporter = async (page, rules) => {
   const result = {};
   await page.addScriptTag({
     path: `${__dirname}/../htmlcs/HTMLCS.js`
@@ -18,7 +18,12 @@ exports.reporter = async page => {
   if (! result.prevented) {
     let messageStrings = [];
     for (const standard of ['WCAG2AAA']) {
-      const nextIssues = await page.evaluate(standard => {
+      const nextIssues = await page.evaluate(args => {
+        const standard = args[0];
+        const rules = args[1];
+        if (rules && Array.isArray(rules) && rules.length) {
+          window._global.HTMLCS_WCAG2AAA.sniffs = rules;
+        }
         let issues = null;
         try {
           issues = window.HTMLCS_RUNNER.run(standard);
@@ -27,7 +32,7 @@ exports.reporter = async page => {
           console.log(`ERROR executing HTMLCS_RUNNER on ${document.URL} (${error.message})`);
         }
         return issues;
-      }, standard);
+      }, [standard, rules]);
       if (nextIssues && nextIssues.every(issue => typeof issue === 'string')) {
         messageStrings.push(... nextIssues);
       }
