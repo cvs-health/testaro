@@ -17,11 +17,11 @@ exports.reporter = async page => {
   });
   if (! result.prevented) {
     let messageStrings = [];
-    for (const standard of ['WCAG2AA']) {
+    for (const standard of ['WCAG2AAA']) {
       const nextIssues = await page.evaluate(standard => {
         let issues = null;
         try {
-          issues = window['HTMLCS_RUNNER'].run(standard);
+          issues = window.HTMLCS_RUNNER.run(standard);
         }
         catch(error) {
           console.log(`ERROR executing HTMLCS_RUNNER on ${document.URL} (${error.message})`);
