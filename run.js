@@ -119,6 +119,8 @@ const isState = string => ['loaded', 'idle'].includes(string);
 const isURL = string => /^(?:https?|file):\/\/[^\s]+$/.test(string);
 // Validates a focusable tag name.
 const isFocusable = string => ['a', 'button', 'input', 'select'].includes(string);
+// Returns whether all elements of an array are numbers.
+const areNumbers = array => array.every(element => typeof element === 'number');
 // Returns whether all elements of an array are strings.
 const areStrings = array => array.every(element => typeof element === 'string');
 // Returns whether a variable has a specified type.
@@ -159,6 +161,9 @@ const hasSubtype = (variable, subtype) => {
     }
     else if (subtype === 'isWaitable') {
       return waitables.includes(variable);
+    }
+    else if (subtype === 'areNumbers') {
+      return areNumbers(variable);
     }
     else if (subtype === 'areStrings') {
       return areStrings(variable);

@@ -175,6 +175,12 @@ exports.actSpecs = {
         rules: [true, 'array', 'areStrings', 'rule names, or empty if all']
       }
     ],
+    continuum: [
+      'Perform a continuum test',
+      {
+        rules: [false, 'array', 'areNumbers', 'rule numbers (e.g., 25), if not all']
+      }
+    ],
     elements: [
       'Perform an elements test',
       {
