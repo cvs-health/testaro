@@ -229,6 +229,17 @@ exports.actSpecs = {
         withItems: [true, 'boolean', '', 'itemize']
       }
     ],
+    htmlcs: [
+      'Perform an htmlcs test',
+      {
+        rules: [
+          false,
+          'array',
+          'areStrings',
+          'rule names (e.g., Principle1.Guideline1_4.1_4_9), if not all'
+        ]
+      }
+    ],
     ibm: [
       'Perform an IBM Equal Access test',
       {
