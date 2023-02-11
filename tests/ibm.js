@@ -41,15 +41,34 @@ const run = async (content, timeLimit) => {
   clearTimeout(timeoutID);
   return result;
 };
+// Revises report totals by limiting them to specified rules.
+const limitRuleTotals = (report, rules) => {
+  const totals = report.report.summary.counts;
+  const items = report.report.results;
+  totals.violations = totals.recommendations = 0;
+  items.forEach(item => {
+    if (rules.includes(item.ruleId)) {
+      totals[item.level === 'violation' ? 'violations' : 'recommendations']++;
+    }
+  });
+};
 // Trims an IBM report.
-const trimReport = (report, withItems) => {
+const trimReport = (report, withItems, rules) => {
   const data = {};
   if (report && report.report && report.report.summary) {
+    if (rules && Array.isArray(rules) && rules.length) {
+      limitRuleTotals(report, rules);
+    }
     const totals = report.report.summary.counts;
     if (totals) {
       data.totals = totals;
       if (withItems) {
-        data.items = report.report.results;
+        if (rules && Array.isArray(rules) && rules.length) {
+          data.items = report.report.results.filter(item => rules.includes(item.ruleId));
+        }
+        else {
+          data.items = report.report.results;
+        }
         data.items.forEach(item => {
           delete item.apiArgs;
           delete item.category;
@@ -72,7 +91,7 @@ const trimReport = (report, withItems) => {
   }
   return data;
 };
-// Performs an IBM test and return the result.
+// Performs an IBM test and returns the result.
 const doTest = async (content, withItems, timeLimit) => {
   // Conduct the test and get the result.
   const report = await run(content, timeLimit);
@@ -100,7 +119,7 @@ const doTest = async (content, withItems, timeLimit) => {
   }
 };
 // Returns results of one or two IBM tests.
-exports.reporter = async (page, withItems, withNewContent) => {
+exports.reporter = async (page, withItems, withNewContent, rules) => {
   // If a test with existing content is to be performed:
   const result = {};
   if (! withNewContent) {
@@ -110,6 +129,9 @@ exports.reporter = async (page, withItems, withNewContent) => {
     if (result.content.prevented) {
       result.prevented = true;
       console.log(`ERROR: Getting ibm test report from page timed out at ${timeLimit} seconds`);
+    }
+    else {
+
     }
   }
   // If a test with new content is to be performed:
