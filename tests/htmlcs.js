@@ -7,6 +7,7 @@
 // Runs HTML CodeSniffer on the page.
 exports.reporter = async (page, rules) => {
   const result = {};
+  // Add the HTMLCS script to the page.
   await page.addScriptTag({
     path: `${__dirname}/../htmlcs/HTMLCS.js`
   })
@@ -17,13 +18,17 @@ exports.reporter = async (page, rules) => {
   });
   if (! result.prevented) {
     let messageStrings = [];
+    // Define the rules to be employed as those of WCAG 2 level AAA.
     for (const standard of ['WCAG2AAA']) {
       const nextIssues = await page.evaluate(args => {
         const standard = args[0];
         const rules = args[1];
+        // If only some rules are to be employed:
         if (rules && Array.isArray(rules) && rules.length) {
-          window._global.HTMLCS_WCAG2AAA.sniffs = rules;
+          // Redefine WCAG 2 AAA as including only them.
+          window.HTMLCS_WCAG2AAA.sniffs = rules;
         }
+        // Run the tests.
         let issues = null;
         try {
           issues = window.HTMLCS_RUNNER.run(standard);
