@@ -49,6 +49,7 @@ exports.reporter = async (page, rules) => {
       });
       await rulePage.close();
     }
+    // Initialize the result.
     const data = {
       totals: {
         failures: 0,
@@ -57,15 +58,19 @@ exports.reporter = async (page, rules) => {
       items: []
     };
     await Scraper.with(async scraper => {
+      // Get the page content.
       for (const input of await scraper.scrape(page.url())) {
+        // Test it with the specified rules.
         const audit = Audit.of(input, alfaRules);
         const outcomes = Array.from(await audit.evaluate());
+        // For each failure or warning:
         outcomes.forEach((outcome, index) => {
           const {target} = outcome;
           if (target && ! target._members) {
             const outcomeJ = outcome.toJSON();
             const verdict = outcomeJ.outcome;
             if (verdict !== 'passed') {
+              // Add to the result.
               const {rule} = outcomeJ;
               const {tags, uri, requirements} = rule;
               const ruleID = uri.replace(/^.+-/, '');
