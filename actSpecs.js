@@ -153,6 +153,12 @@ exports.actSpecs = {
     ]
   },
   tests: {
+    alfa: [
+      'Perform an alfa test',
+      {
+        rules: [false, 'array', 'areStrings', 'rule names (e.g., r25), if not all']
+      }
+    ],
     attVal: [
       'Perform an attVal test',
       {

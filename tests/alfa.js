@@ -7,12 +7,17 @@
 
 const {Audit} = require('@siteimprove/alfa-act');
 const {Scraper} = require('@siteimprove/alfa-scraper');
-const alfaRules = require('@siteimprove/alfa-rules');
+let alfaRules = require('@siteimprove/alfa-rules').default;
 
 // FUNCTIONS
 
 // Conducts and reports an alfa test.
-exports.reporter = async page => {
+exports.reporter = async (page, rules) => {
+  // If only some rules are to be employed:
+  if (rules && rules.length) {
+    // Remove the other rules.
+    alfaRules = alfaRules.filter(rule => rules.includes(rule.uri.replace(/^.+-/, '')));
+  }
   // Get the document containing the summaries of the alfa rules.
   const context = page.context();
   const rulePage = await context.newPage();
@@ -53,7 +58,7 @@ exports.reporter = async page => {
     };
     await Scraper.with(async scraper => {
       for (const input of await scraper.scrape(page.url())) {
-        const audit = Audit.of(input, alfaRules.default);
+        const audit = Audit.of(input, alfaRules);
         const outcomes = Array.from(await audit.evaluate());
         outcomes.forEach((outcome, index) => {
           const {target} = outcome;
