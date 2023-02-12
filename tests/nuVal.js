@@ -8,7 +8,7 @@
   erratic, no better solution is known.
 */
 const https = require('https');
-exports.reporter = async page => {
+exports.reporter = async (page, messages) => {
   const pageContent = await page.content();
   // Get the data from a Nu validation.
   const dataPromise = new Promise(resolve => {
@@ -78,6 +78,17 @@ exports.reporter = async page => {
       clearTimeout(timeoutID);
     }, 1000 * timeLimit);
   });
+  // Get the result, or an error report if nuVal timed out after 12 seconds.
   const data = await Promise.race([dataPromise, timeoutPromise]);
+  // If there is a report and restrictions on the report messages were specified:
+  if (! data.error && messages && Array.isArray(messages) && messages.length) {
+    // Remove all messages except those specified.
+    const messageSpecs = messages.map(messageSpec => messageSpec.split(':', 2));
+    data.messages = data.messages.filter(message => {
+      messageSpecs.some(messageSpec => {
+        return message.type === messageSpec[0] && message.message.startsWith(messageSpec[1]);
+      });
+    });
+  }
   return {result: data};
 };

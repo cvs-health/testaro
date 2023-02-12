@@ -294,6 +294,17 @@ exports.actSpecs = {
         withItems: [true, 'boolean', '', 'itemize']
       }
     ],
+    nuVal: [
+      'Perform a nuVal test',
+      {
+        messages: [
+          false,
+          'array',
+          'areStrings',
+          'message specifications (e.g., error:Bad value), if not all'
+        ]
+      }
+    ],
     radioSet: [
       'Perform a radioSet test',
       {
