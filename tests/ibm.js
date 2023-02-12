@@ -46,10 +46,10 @@ const limitRuleTotals = (report, rules) => {
   if (rules && Array.isArray(rules) && rules.length) {
     const totals = report.report.summary.counts;
     const items = report.report.results;
-    totals.violations = totals.recommendations = 0;
+    totals.violation = totals.recommendation = 0;
     items.forEach(item => {
       if (rules.includes(item.ruleId)) {
-        totals[item.level === 'violation' ? 'violations' : 'recommendations']++;
+        totals[item.level]++;
       }
     });
   }
