@@ -41,24 +41,24 @@ const run = async (content, timeLimit) => {
   clearTimeout(timeoutID);
   return result;
 };
-// Revises report totals by limiting them to specified rules.
+// Revises report totals for any rule limitation.
 const limitRuleTotals = (report, rules) => {
-  const totals = report.report.summary.counts;
-  const items = report.report.results;
-  totals.violations = totals.recommendations = 0;
-  items.forEach(item => {
-    if (rules.includes(item.ruleId)) {
-      totals[item.level === 'violation' ? 'violations' : 'recommendations']++;
-    }
-  });
+  if (rules && Array.isArray(rules) && rules.length) {
+    const totals = report.report.summary.counts;
+    const items = report.report.results;
+    totals.violations = totals.recommendations = 0;
+    items.forEach(item => {
+      if (rules.includes(item.ruleId)) {
+        totals[item.level === 'violation' ? 'violations' : 'recommendations']++;
+      }
+    });
+  }
 };
 // Trims an IBM report.
 const trimReport = (report, withItems, rules) => {
   const data = {};
   if (report && report.report && report.report.summary) {
-    if (rules && Array.isArray(rules) && rules.length) {
-      limitRuleTotals(report, rules);
-    }
+    limitRuleTotals(report, rules);
     const totals = report.report.summary.counts;
     if (totals) {
       data.totals = totals;
@@ -92,7 +92,7 @@ const trimReport = (report, withItems, rules) => {
   return data;
 };
 // Performs an IBM test and returns the result.
-const doTest = async (content, withItems, timeLimit) => {
+const doTest = async (content, withItems, timeLimit, rules) => {
   // Conduct the test and get the result.
   const report = await run(content, timeLimit);
   // If the test did not time out:
@@ -108,7 +108,7 @@ const doTest = async (content, withItems, timeLimit) => {
       console.log('ibm test created no result files.');
     }
     // Return the result.
-    const typeReport = trimReport(report, withItems);
+    const typeReport = trimReport(report, withItems, rules);
     return typeReport;
   }
   else {
@@ -125,20 +125,17 @@ exports.reporter = async (page, withItems, withNewContent, rules) => {
   if (! withNewContent) {
     const timeLimit = 20;
     const typeContent = await page.content();
-    result.content = await doTest(typeContent, withItems, timeLimit);
+    result.content = await doTest(typeContent, withItems, timeLimit, rules);
     if (result.content.prevented) {
       result.prevented = true;
       console.log(`ERROR: Getting ibm test report from page timed out at ${timeLimit} seconds`);
-    }
-    else {
-
     }
   }
   // If a test with new content is to be performed:
   if ([true, undefined].includes(withNewContent)) {
     const timeLimit = 20;
     const typeContent = page.url();
-    result.url = await doTest(typeContent, withItems, timeLimit);
+    result.url = await doTest(typeContent, withItems, timeLimit, rules);
     if (result.url.prevented) {
       result.prevented = true;
       console.log(`ERROR: Getting ibm test report from URL timed out at ${timeLimit} seconds`);
