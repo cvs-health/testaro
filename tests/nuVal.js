@@ -84,11 +84,9 @@ exports.reporter = async (page, messages) => {
   if (! data.error && messages && Array.isArray(messages) && messages.length) {
     // Remove all messages except those specified.
     const messageSpecs = messages.map(messageSpec => messageSpec.split(':', 2));
-    data.messages = data.messages.filter(message => {
-      messageSpecs.some(messageSpec => {
-        return message.type === messageSpec[0] && message.message.startsWith(messageSpec[1]);
-      });
-    });
+    data.messages = data.messages.filter(message => messageSpecs.some(
+      messageSpec => message.type === messageSpec[0] && message.message.startsWith(messageSpec[1])
+    ));
   }
   return {result: data};
 };
