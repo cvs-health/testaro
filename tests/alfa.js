@@ -97,7 +97,7 @@ exports.reporter = async (page, rules) => {
                   type: targetJ.type,
                   tagName: targetJ.name || '',
                   path: target.path(),
-                  codeLines: codeLines.map(line => line.length > 99 ? `${line.slice(0, 99)}...` : line)
+                  codeLines: codeLines.map(line => line.length > 300 ? `${line.slice(0, 300)}...` : line)
                 }
               };
               const etcTags = [];
