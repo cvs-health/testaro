@@ -38,7 +38,7 @@ const checkDirJob = async watchee => {
       }
       catch(error) {
         return {
-          error: 'ERROR: Job was not JSON',
+          error: `ERROR parsing job as JSON (${error.message})`,
           message: error.message
         };
       }
@@ -48,7 +48,8 @@ const checkDirJob = async watchee => {
       return {};
     }
   }
-  catch {
+  catch(error) {
+    console.log(`Directory watching failed (${error.message})`);
     return {};
   }
 };
@@ -243,7 +244,6 @@ exports.cycle = async (isDirWatch, isForever, interval, watchee = null) => {
     }
     // Otherwise, i.e. if no job was found:
     else {
-      console.log('No job to do');
       // Cause a wait before the next check.
       empty = true;
     }
