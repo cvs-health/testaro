@@ -88,6 +88,9 @@ const checkNetJob = async watchee => {
   if (job.id) {
     console.log(`Network job ${job.id} received`);
   }
+  else {
+    console.log('No network job available');
+  }
   return job;
 };
 // Writes a directory report.
