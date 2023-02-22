@@ -192,9 +192,7 @@ const runJob = async (job, isDirWatch) => {
       else {
         // Send the report to the server.
         const ack = await writeNetReport(job);
-        if (ack.error) {
-          console.log(JSON.stringify(ack, null, 2));
-        }
+        console.log(JSON.stringify(ack, null, 2));
       }
     }
     // If the job failed:
