@@ -94,8 +94,15 @@ const trimReport = (report, withItems, rules) => {
 // Performs an IBM test and returns the result.
 const doTest = async (content, withItems, timeLimit, rules) => {
   // Conduct the test and get the result.
-  const report = await run(content, timeLimit);
-  // If the test did not time out:
+  let report;
+  try {
+    report = await run(content, timeLimit);
+  }
+  catch(error) {
+    console.log(`ibm test failed ${error.message.slice(0, 100)}...`);
+    report = null;
+  }
+  // If the test did not crash or time out:
   if (report) {
     // Delete any report files.
     try {
@@ -114,7 +121,7 @@ const doTest = async (content, withItems, timeLimit, rules) => {
   else {
     return {
       prevented: true,
-      error: 'ERROR: getting ibm test report took too long'
+      error: 'ERROR: ibm test failed or timed out'
     };
   }
 };
