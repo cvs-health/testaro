@@ -23,7 +23,7 @@ Testaro is designed to be a workstation-based agent. Testaro can be installed on
 - Sending notifications
 - Publishing reports
 
-One software product that performs some such functions is [Testilo](https://www.npmjs.com/package/testilo).
+One product that performs some such functions is [Testilo](https://www.npmjs.com/package/testilo).
 
 ## Dependencies
 
