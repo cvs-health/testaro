@@ -329,6 +329,25 @@ Level Access on 22 August 2022 granted authorization for the copying of the `Acc
 
 The `ibm` packaged test requires the `aceconfig.js` file.
 
+As of 2 March 2023 (version 3.1.45 of `accessibility-checker`), the `ibm` packaged test threw errors when hosted under the Windows operating system. To prevent these errors, it was possible to edit two files in the package as follows:
+
+In `node_modules/accessibility-checker/lib/ACEngineManager.js`, remove or comment out these lines starting on line 169:
+
+```javaScript
+if (nodePath.charAt(0) !== '/') {
+    nodePath = "../../" + nodePath;
+}
+```
+
+In `node_modules/accessibility-checker/lib/reporters/ACReporterJSON.js`, add these lines starting on line 106, immediately before the line `var resultsFileName = pathLib.join(resultDir, results.label + '.json');`:
+
+```javaScript
+// Replace the colons in the label with hyphen-minuses.
+results.label = results.label.replace(/:/g, '-');
+```
+
+These changes were proposed as pull requests 1333 and 1334 (https://github.com/IBMa/equal-access/pulls).
+
 If you choose to invoke this packaged test with the `withNewContent` property specified, you will choose whether the tested content is the content of the existing page or is retrieved anew with the document URL. Typically, both methods succeed and deliver similar results. However, sometimes one method succeeds and the other fails, or one method reports more violations than the other does. In those cases, most often the success, or the larger violation count, arises from the existing page (`withNewContent: false`).
 
 ###### HTML CodeSniffer

@@ -3,7 +3,7 @@ node_modules/
 
 # Temporary files
 temp/
-results/
+ibmOutput/
 
 # Secrets
 .env
