@@ -5,17 +5,10 @@
   given the URL of the page to be tested (true), should be given the page content
   (false), or should test in both ways (omitted).
 
-  Before using this test, you must:
-    0. Create a file named aceconfig.js.
-    1. Locate that file in the directory in which you call Testaro.
-    2. Populate that file with this content:
+  This test depends on aceconfig.js.
 
-      module.exports = {
-        reportLevels: [
-          'violation',
-          'recommendation'
-        ]
-      };
+  This test is compatible with Windows only if the accessibility-checker package
+  is revised. See README.md for details.
 */
 // Import required modules.
 const fs = require('fs').promises;
