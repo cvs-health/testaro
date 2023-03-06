@@ -7,7 +7,7 @@ const {QualWeb, generateEARLReport} = require('@qualweb/core');
 // CONSTANTS
 const qualweb = new QualWeb({});
 const clusterOptions = {
-  timeout: 20
+  timeout: 25 * 1000
 };
 // FUNCTIONS
 // Conducts and reports a QualWeb test.
@@ -26,36 +26,41 @@ exports.reporter = async (page, rules = null) => {
     crawlOptions: {
       maxDepth: 0,
       maxUrls: 1,
-      timeout: 20,
+      timeout: 25 * 1000,
       maxParallelCrawls: 1,
       logging: true
     },
     execute: {
-      wappalyzer: true,
+      wappalyzer: ! rules,
       act: true,
-      wcag: true,
-      bp: true,
-      counter: true
+      wcag: ! rules,
+      bp: ! rules,
+      counter: ! rules
     },
     'act-rules': {
-      exclude: [],
-      levels: ['A', 'AA', 'AAA'],
-      principles: ['Perceivable', 'Operable', 'Understandable', 'Robust']
-    },
-    'wcag-techniques': {
-      exclude: [],
-      levels: ['A', 'AA', 'AAA'],
-      principles: ['Perceivable', 'Operable', 'Understandable', 'Robust']
-    },
-    'best-practices': {
       exclude: []
     }
   };
   if (rules) {
     qualwebOptions['act-rules'].rules = rules;
   }
+  else {
+    qualwebOptions['act-rules'].levels = ['A', 'AA', 'AAA'];
+    qualwebOptions['act-rules'].principles = [
+      'Perceivable', 'Operable', 'Understandable', 'Robust'
+    ];
+  }
   // Get the report.
   const reports = await qualweb.evaluate(qualwebOptions);
+  // Trim it.
+  delete reports.customHtml.system.page.dom;
+  const {assertions} = reports.customHtml.modules['act-rules'];
+  const ruleIDs = Object.keys(assertions);
+  ruleIDs.forEach(ruleID => {
+    assertions[ruleID].results = assertions[ruleID]
+    .results
+    .filter(result => result.verdict !== 'passed');
+  });
   // Stop the QualWeb core engine.
   await qualweb.stop();
   // Specify the EARL options.
