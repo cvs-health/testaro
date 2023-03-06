@@ -11,7 +11,7 @@ const clusterOptions = {
 };
 // FUNCTIONS
 // Conducts and reports a QualWeb test.
-exports.reporter = async page => {
+exports.reporter = async (page, rules = null) => {
   // Initialize the report.
   let data = {};
   // Start the QualWeb core engine.
@@ -51,6 +51,9 @@ exports.reporter = async page => {
       exclude: []
     }
   };
+  if (rules) {
+    qualwebOptions['act-rules'].rules = rules;
+  }
   // Get the report.
   const reports = await qualweb.evaluate(qualwebOptions);
   // Stop the QualWeb core engine.

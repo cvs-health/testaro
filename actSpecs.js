@@ -305,6 +305,12 @@ exports.actSpecs = {
         ]
       }
     ],
+    qualWeb: [
+      'Perform a qualWeb test',
+      {
+        rules: [false, 'array', 'areStrings', 'QualWeb or ACT IDs of ACT rules to include, if not all']
+      }
+    ],
     radioSet: [
       'Perform a radioSet test',
       {
