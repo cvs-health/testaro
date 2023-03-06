@@ -56,6 +56,7 @@ const tests = {
   motion: 'motion',
   nonTable: 'table elements used for layout',
   nuVal: 'failures to pass the Nu Html Checker',
+  qualWeb: 'QualWeb',
   radioSet: 'fieldset grouping of radio buttons',
   role: 'roles',
   styleDiff: 'style inconsistencies',

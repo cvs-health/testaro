@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/jrpool/testaro#readme",
   "dependencies": {
+    "@qualweb/core": "*",
     "@siteimprove/alfa-act": "*",
     "@siteimprove/alfa-playwright": "*",
     "@siteimprove/alfa-rules": "*",
