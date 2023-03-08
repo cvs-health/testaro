@@ -88,8 +88,11 @@ const checkNetJob = async watchee => {
   if (job.id) {
     console.log(`Network job ${job.id} received`);
   }
+  else if (job.message) {
+    console.log(job.message);
+  }
   else {
-    console.log(`No network job available:\n${JSON.stringify(job, null, 2)}`);
+    console.log(job);
   }
   return job;
 };
