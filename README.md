@@ -4,9 +4,9 @@ Federated accessibility test automation
 
 ## Summary
 
-Testaro is a collection of collections of web accessibility tests.
+Testaro is a collection of web accessibility testing tools.
 
-The purpose of Testaro is to provide programmatic access to accessibility tests defined in several test packages, including Testaro itself.
+The purpose of Testaro is to provide programmatic access to accessibility tests defined by several tools, including Testaro itself.
 
 Testaro launches and controls web browsers, performing operations, conducting tests, and recording results.
 
@@ -31,30 +31,32 @@ Testaro uses:
 - [Playwright](https://playwright.dev/) to launch browsers, perform user actions in them, and perform tests
 - [pixelmatch](https://www.npmjs.com/package/pixelmatch) to measure motion
 
-Testaro includes some of its own accessibility tests. In addition, it performs the tests in:
+Testaro includes some of its own accessibility tests. In addition, it performs the tests of these tools:
 - [accessibility-checker](https://www.npmjs.com/package/accessibility-checker) (the IBM Equal Access Accessibility Checker)
 - [alfa](https://alfa.siteimprove.com/) (Siteimprove alfa)
+- [axe-playwright](https://www.npmjs.com/package/axe-playwright) (Deque Axe-core)
 - [Continuum Community Edition](https://www.webaccessibility.com/tools/)
 - [HTML CodeSniffer](https://www.npmjs.com/package/html_codesniffer) (Squiz HTML CodeSniffer)
-- [axe-playwright](https://www.npmjs.com/package/axe-playwright) (Deque Axe-core)
+- [Nu Html Checker](https://github.com/validator/validator)
+- [QualWeb core](https://www.npmjs.com/package/@qualweb/core)
 - [Tenon](https://tenon.io/documentation/what-tenon-tests.php) (Level Access)
 - [WAVE API](https://wave.webaim.org/api/) (WebAIM WAVE)
-- [Nu Html Checker](https://github.com/validator/validator)
 
 Some of the Testaro tests are derived from tests performed by the [BBC Accessibility Standards Checker](https://github.com/bbc/bbc-a11y).
 
-As of this version, the counts of tests in the packages referenced above were:
+As of this version, the counts of tests of the tools referenced above were:
 - Alfa: 103
 - Axe-core: 138
 - Continuum Community Edition: 267
 - Equal Access: 163
 - HTML CodeSniffer: 98
+- Nu Html Checker: 147
+- QualWeb core: 121
 - Tenon: 180
 - WAVE: 110
-- Nu Html Checker: 147
-- subtotal: 1206
+- subtotal: 1327
 - Testaro tests: 24
-- grand total: 1230
+- grand total: 1351
 
 ## Quasi-tests
 
@@ -103,7 +105,7 @@ However, if the Playwright dependency is ever updated to a newer version, you mu
 
 ## Payment
 
-All of the tests that Testaro can perform are free of cost, except those in the Tenon and WAVE packages. The owner of each of those packages gives new registrants a free allowance of credits before it becomes necessary to pay for use of the API of the package. The required environment variables for authentication and payment are described below under “Environment variables”.
+All of the tests that Testaro can perform are free of cost, except those performed by the Tenon and WAVE tools. The owner of each of those tools gives new registrants a free allowance of credits before it becomes necessary to pay for use of the API of the tool. The required environment variables for authentication and payment are described below under “Environment variables”.
 
 ## Process objects
 
@@ -111,7 +113,7 @@ All of the tests that Testaro can perform are free of cost, except those in the 
 
 A _job_ is an object containing instructions for Testaro.
 
-A _report_ is a job with added properties describing the results from Testaro running the job.
+A _report_ is a job with properties added by Testaro, describing the results.
 
 ### Jobs
 
@@ -138,7 +140,7 @@ Here is an example of a job:
     {
       type: 'test',
       which: 'alfa',
-      what: 'Siteimprove alfa package'
+      what: 'Siteimprove alfa tool'
     }
   ],
   sources: {
@@ -157,21 +159,21 @@ Here is an example of a job:
 
 This job contains three `acts`, telling Testaro to:
 1. open a page in the Chromium browser
-1. navigate to some URL
-1. perform the tests in the `alfa` package on that URL
+1. navigate to a specified URL
+1. perform the tests of the `alfa` tool on that URL
 
 Job properties:
-- `id`: This is a string consisting of alphanumeric ASCII characters and hyphen-minus (-), intended to be unique. When this job is saved as a JSON file, the file name is `be76p-sp25-w3c.json`. Typically, a job is created from a _script_, and the job ID adds a timestamp prefix and a target suffix to the script ID. Here the script ID would have been `ts25`.
+- `id`: This is a string consisting of alphanumeric ASCII characters and hyphen-minus (-), intended to be unique. When the above example job is saved as a JSON file, the file name is `be76p-ts25-w3c.json`. Typically, a job is created from a _script_, and the job ID adds a timestamp prefix and a target suffix to the script ID. Here the script ID would have been `ts25`.
 - `what`: This is a description of the job.
 - `strict`: This is `true` or `false`, indicating whether _substantive redirections_ should be treated as failures. These are redirections that do more than add or subtract a final slash. For example, if `strict` is true, a redirection from `xyz.com` to `www.xyz.com` or to `xyz.com/en` will abort the job.
 - `timeLimit`: This property is the number of seconds allowed for the execution of the job.
 - `acts`: This is an array of the acts to be performed. Acts are documented below.
 - `sources`: This object has properties describing where the job came from:
-   - `script`: This is the ID of the script from which the job was made. Other applications, such as Testilo, can make jobs from scripts. When Testilo creates a job, the job inherits its `id`, `what`, `strict`, `timeLimit`, and `acts` properties from the script. However, Testilo can create multiple jobs from a single script, replacing acts of type `placeholder` with one or more target-specific acts. Examples of scripts can be found in the Testilo package.
+   - `script`: This is the ID of the script from which the job was made, if it was made from a script, or is otherwise an empty string. Other applications, such as Testilo, can make jobs from scripts. When Testilo creates a job, the job inherits its `id`, `what`, `strict`, `timeLimit`, and `acts` properties from the script. However, Testilo can create multiple jobs from a single script, replacing acts of type `placeholder` with one or more target-specific acts. Examples of scripts can be found in the Testilo package.
    - `batch`: If the job was one of a set of jobs created by a merger of a script and a batch of targets, this property’s value is the ID of the batch, or otherwise is an empty string.
-   - `target`: If the job was made from a script with placeholder acts, this property describes the target whose target-specific acts have replaced the placeholder acts. Otherwise `target` is an empty object. Testilo also makes the `id` property of the target the third segment of the job ID.
+   - `target`: If the job was made from a script with placeholder acts, this property describes the target whose target-specific acts have replaced the placeholder acts. Otherwise `target` is an empty object. Testilo also uses the `id` property of the target as the third segment of the job ID.
    - `requester`: This string is the email address to receive a notice of completion of the running of the job.
-- `creationTime`: This is the time when the job was created from a script.
+- `creationTime`: This is the time when the job was created.
 - `timeStamp`: This string is a compact representation of the job creation time, suitable for inclusion in the ID of the job.
 
 ### Reports
@@ -198,7 +200,7 @@ The subsequent acts can tell Testaro to perform any of:
 - _moves_ (clicks, text inputs, hovers, etc.)
 - _navigations_ (browser launches, visits to URLs, waits for page conditions, etc.)
 - _alterations_ (changes to the page)
-- _tests_ (whether in dependency packages or defined within Testaro)
+- _tests_ (whether in dependency tools or defined within Testaro)
 - _branching_ (continuing from an act other than the next one)
 
 ##### Moves
@@ -222,9 +224,9 @@ When the texts of multiple elements of the same type will contain the same `whic
 
 ##### Navigations
 
-An example of a **navigation** is the command of type `url` above.
+An example of a **navigation** is the act of type `url` above.
 
-Once you have included a `url` command in a job, you do not need to add more `url` commands unless you want the browser to visit a different URL or revisit the same URL.
+Once you have included a `url` act in a job, you do not need to add more `url` acts unless you want the browser to visit a different URL or revisit the same URL.
 
 If any act alters the page, you can restore the page to its original state for the next act by inserting new `launch` and `url` acts (and, if necessary, additional page-specific acts) between them.
 
@@ -240,7 +242,7 @@ Another navigation example is:
 
 In this case, Testaro waits until the page title contains the string “travel” (case-insensitively).
 
-The `launch` navigation command allows you to specify a “lowMotion” property as `true`. If you do, then the browser creates tabs with the `reduce-motion` option set to `reduce` instead of `no-preference`. This makes the browser act as if the user has chosen a [motion-reduction option in the settings of the operating system or browser](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion#user_preferences). However, there are often motions on web pages that this option fails to suppress, such as those on the [Inditex](https://www.inditex.com/itxcomweb/en/home) and [Rescuing Leftover Cuisine](https://www.rescuingleftovercuisine.org) home pages. Carousel motion is also not suppressed.
+The `launch` navigation act allows you to specify a “lowMotion” property as `true`. If you do, then the browser creates tabs with the `reduce-motion` option set to `reduce` instead of `no-preference`. This makes the browser act as if the user has chosen a [motion-reduction option in the settings of the operating system or browser](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion#user_preferences). However, there are often motions on web pages that this option fails to suppress, such as those on the [Inditex](https://www.inditex.com/itxcomweb/en/home) and [Rescuing Leftover Cuisine](https://www.rescuingleftovercuisine.org) home pages. Carousel motion is also not suppressed.
 
 ##### Alterations
 
@@ -253,19 +255,15 @@ An example of an **alteration** is:
 }
 ```
 
-This command causes Testaro to alter the `display` and `visibility` style properties of all elements, where necessary, so those properties do not make any element invisible.
+This act causes Testaro to alter the `display` and `visibility` style properties of all elements, where necessary, so those properties do not make any element invisible.
 
 ##### Tests
 
 ###### Introduction
 
-A test performs operations and reports results. The results may or may not directly indicate that a page passes or fails requirements. Typically, accessibility tests report successes and failures. But a test in Testaro is defined less restrictively, so it can report any results. As one example, the Testaro `elements` test reports facts about certain elements on a page, without asserting that those facts are successes or failures.
+An act of type `test` performs operations and reports a result. The result may indicate that a page passes or fails requirements. Typically, accessibility tests report successes and failures. But a test in Testaro is defined less restrictively, so it can report any result. As one example, the Testaro `elements` test reports facts about certain elements on a page, without asserting that those facts are successes or failures.
 
-The term “test” has two meanings for Testaro:
-- An act is a test (_test command_) if its `type` property has the value `test`.
-- An act with type `test` whose `which` value is the name of a package, such as Continuum, performs multiple tests defined by that _test package_.
-
-Thus, if a command of type `test` runs Continuum, Continuum performs multiple tests and reports their results.
+The `which` property of a `test` act identifies the operations to perform. If the value of `which` is the name of one of the tools, such as `alfa`, then the operations are some or all of the tests of that tool. If the value is the name of a Testaro test, then the operations are those of that single Testaro test. Thus, a single `test` act may specify performing anything from a single test to hundreds of tests.
 
 ###### Configuration
 
@@ -285,13 +283,13 @@ test: [
 ],
 ```
 
-That means that a test (i.e. a command with a `type` property having the value `'test'`) must have a string-valued `which` property naming a test and may optionally have a string-valued `what` property describing the test.
+That means that a test (i.e. an act with a `type` property having the value `'test'`) must have a string-valued `which` property naming a test and may optionally have a string-valued `what` property describing the test.
 
 If a particular test either must have or may have any other properties, those properties must be specified in the `tests` property in `actSpecs.js`.
 
 ###### Examples
 
-An example of a **packaged test** is:
+An example of a `test` act invoking a **tool** is:
 
 ```json
 {
@@ -304,7 +302,7 @@ An example of a **packaged test** is:
 
 In this case, Testaro runs the WAVE test with report type 1.
 
-An example of a **Testaro-defined** test is:
+An example of a `test` act invoking a **Testaro** test is:
 
 ```json
 {
@@ -321,15 +319,15 @@ In this case, Testaro runs the `motion` test with the specified parameters.
 
 ###### Continuum
 
-The `continuum` packaged test makes use of the files in the `continuum` directory. The test inserts the contents of all three files into the page as scripts and then uses them to perform the tests of the Continuum package.
+The `continuum` tests makes use of the files in the `continuum` directory. The test inserts the contents of all three files into the page as scripts and then uses them to perform the tests of the Continuum tool.
 
 Level Access on 22 August 2022 granted authorization for the copying of the `AccessEngine.community.js` file insofar as necessary for allowing Continuum community edition tests to be included in Testaro.
 
 ###### IBM Equal Access
 
-The `ibm` packaged test requires the `aceconfig.js` file.
+The `ibm` tests require the `aceconfig.js` file.
 
-As of 2 March 2023 (version 3.1.45 of `accessibility-checker`), the `ibm` packaged test threw errors when hosted under the Windows operating system. To prevent these errors, it was possible to edit two files in the package as follows:
+As of 2 March 2023 (version 3.1.45 of `accessibility-checker`), the `ibm` tool threw errors when hosted under the Windows operating system. To prevent these errors, it was possible to edit two files in the `accessibility-checker` package as follows:
 
 In `node_modules/accessibility-checker/lib/ACEngineManager.js`, remove or comment out these lines starting on line 169:
 
@@ -348,11 +346,11 @@ results.label = results.label.replace(/:/g, '-');
 
 These changes were proposed as pull requests 1333 and 1334 (https://github.com/IBMa/equal-access/pulls).
 
-If you choose to invoke this packaged test with the `withNewContent` property specified, you will choose whether the tested content is the content of the existing page or is retrieved anew with the document URL. Typically, both methods succeed and deliver similar results. However, sometimes one method succeeds and the other fails, or one method reports more violations than the other does. In those cases, most often the success, or the larger violation count, arises from the existing page (`withNewContent: false`).
+If you choose to invoke the `ibm` tests with the `withNewContent` property specified, you will choose whether the tested content is the content of the existing page or is retrieved anew with the document URL. Typically, both methods succeed and deliver similar results. However, sometimes one method succeeds and the other fails, or one method reports more violations than the other does. In those cases, most often the success, or the larger violation count, arises from the existing page (`withNewContent: false`).
 
 ###### HTML CodeSniffer
 
-The `htmlcs` packaged test makes use of the`htmlcs/HTMLCS.js` file. That file was created, and can be recreated if necessary, as follows:
+The `htmlcs` tests make use of the `htmlcs/HTMLCS.js` file. That file was created, and can be recreated if necessary, as follows:
 
 1. Clone the [HTML CodeSniffer package](https://github.com/squizlabs/HTML_CodeSniffer).
 1. Make that package’s directory the active directory.
@@ -384,7 +382,7 @@ The changes in `htmlcs/HTMLCS.js` are:
 
 ###### Tenon
 
-Most packaged tests require only one act, but the `tenon` packaged test requires two acts:
+Most tools require only one act, but the `tenon` tool requires two acts:
 - An act of type `tenonRequest`.
 - An act of type `test` with `tenon` as the value of `which`.
 
@@ -410,23 +408,23 @@ Example:
   }
 ```
 
-The reason for this is that the Tenon API operates asynchronously. You ask it to perform a test, and it puts your request into a queue. To learn whether Tenon has completed your test, you make a status request. You can continue making status requests until Tenon replies that your test has been completed. Then you submit a request for the test result, and Tenon replies with the result. (As of May 2022, however, status requests were observed to misreport still-running tests as completed. The `tenon` test works around that by requesting only the result and using the response to determine whether the tests have been completed.)
+The reason for this is that the Tenon API operates asynchronously. You ask it to perform a test, and it puts your request into a queue. To learn whether Tenon has completed your test, you make a status request. You can continue making status requests until Tenon replies that your test has been completed. Then you submit a request for the test result, and Tenon replies with the result. (As of May 2022, however, status requests were observed to misreport still-running tests as completed. The `tenon` test act works around that by requesting only the result and using the response to determine whether the tests have been completed.)
 
 Tenon says that tests are typically completed in 3 to 6 seconds but that the latency can be longer, depending on demand.
 
 Therefore, you can include a `tenonRequest` act early in your job, and a `tenon` test act late in your job. Tenon will move your request through its queue while Testaro is processing your job. When Testaro reaches your `tenon` test act, Tenon will most likely have completed your test. If not, the `tenon` test will wait and then make a second request before giving up.
 
-Thus, a `tenon` test actually does not perform any test; it merely collects the result. The page that was active when the `tenonRequest` act was performed is the one that Tenon tests.
+Thus, a `tenon` test act actually does not perform any test; it merely collects the result. The page that was active when the `tenonRequest` act was performed is the one that Tenon tests.
 
-In case you want to perform more than one `tenon` test with the same job, you can do so. Just give each pair of acts a distinct `id` property, so each `tenon` test act will request the correct result.
+In case you want to perform the Tenon tests more than once in the same job, you can do so. Just give each pair of acts a distinct `id` property, so each `tenon` test act will request the correct result.
 
 Tenon recommends giving it a public URL rather than giving it the content of a page, if possible. So, it is best to give the `withNewContent` property of the `tenonRequest` act the value `true`, unless the page is not public.
 
-If a `tenon` test is included in a job, environment variables named `TENON_USER` and `TENON_PASSWORD` must exist, with your Tenon username and password, respectively, as their values. You can obtain those from [Tenon](https://tenon.io/documentation/overview).
+If a `tenon` test act is included in a job, environment variables named `TENON_USER` and `TENON_PASSWORD` must exist, with your Tenon username and password, respectively, as their values. These could be obtained from [Tenon](https://tenon.io/documentation/overview) until Tenon was closed to new subscribers in or about October 2022.
 
 ###### WAVE
 
-If a `wave` test is included in the job, an environment variable named `WAVE_KEY` must exist, with your WAVE API key as its value. You can get it from [WebAIM](https://wave.webaim.org/api/).
+If a `wave` test act is included in the job, an environment variable named `WAVE_KEY` must exist, with your WAVE API key as its value. You can get it from [WebAIM](https://wave.webaim.org/api/).
 
 The `wave` API does not accept a transmitted document for testing. WAVE must be given only a URL, which it then visits to perform its tests. Therefore, you cannot manipulate a page and then have WAVE test it, or ask WAVE to test a page that cannot be reached directly with a URL.
 
@@ -438,7 +436,7 @@ The BBC Accessibility Standards Checker has obsolete dependencies with security 
 
 ##### Branching
 
-An example of a **branching** command is:
+An example of a **branching** act is:
 
 ```json
 {
@@ -449,9 +447,9 @@ An example of a **branching** command is:
 }
 ```
 
-This command checks the result of the previous act to determine whether its `result.totals.invalid` property has a positive value. If so, it changes the next command to be performed, specifying the command 4 commands before this one.
+This act checks the result of the previous act to determine whether its `result.totals.invalid` property has a positive value. If so, it changes the next act to be performed, specifying the act 4 acts before this one.
 
-A `next`-type command can use a `next` property instead of a `jump` property. The value of the `next` property is a command name. It tells Testaro to continue performing commands starting with the command having that value as the value of its `name` property.
+A `next` act can use a `next` property instead of a `jump` property. The value of the `next` property is an act name. It tells Testaro to continue performing acts starting with the act having that value as the value of its `name` property.
 
 #### `actSpecs` file
 
@@ -507,7 +505,7 @@ The validity criterion named in item 2 may be any of these:
 
 Any `test` act can also (in addition to the requirements in `actSpecs.js`) contain an `expect` property. If it does, the value of that property must be an array of arrays. Each array specifies expectations about the results of the test.
 
-For example, a `test` command might have this `expect` property:
+For example, a `test` act might have this `expect` property:
 
 ```javaScript
 'expect': [
@@ -533,7 +531,7 @@ The second item in each array, if there are 3 items in the array, is an operator
 
 The third item in each array, if there are 3 items in the array, is the criterion with which the value of the first property is compared.
 
-A typical use for an `expect` property is checking the correctness of a Testaro test. Thus, the validation jobs in the `validation/tests/jobs` directory all contain `test` commands with `expect` properties. See the “Validation” section below.
+A typical use for an `expect` property is checking the correctness of a Testaro test. Thus, the validation jobs in the `validation/tests/jobs` directory all contain `test` acts with `expect` properties. See the “Validation” section below.
 
 ## Execution
 
@@ -636,7 +634,7 @@ The URL to which Testaro sends reports is given by the `sources.sendReportTo` pr
 
 ### Environment variables
 
-In addition to their uses described above, environment variables can be used by commands of type `text`, as documented in the `commands.js` file.
+In addition to their uses described above, environment variables can be used by acts of type `text`, as documented in the `actSpecs.js` file.
 
 Before making Testaro run a job, you can optionally also set `process.env.DEBUG` (to `'true'` or anything else) and/or `process.env.WAITS` (to a non-negative integer). The effects of these variables are described in the `run.js` file.
 
@@ -677,13 +675,13 @@ The `tests` executor makes use of the jobs in the `validation/tests/jobs` direct
 
 ## Contribution
 
-You can define additional Testaro commands and functionality. Contributions are welcome.
+You can define additional Testaro acts and functionality. Contributions are welcome.
 
 Please report any issues, including feature requests, at the [repository](https://github.com/jrpool/testaro/issues).
 
 ## Accessibility principles
 
-The rationales motivating the Testaro-defined tests can be found in comments within the files of those tests, in the `tests` directory. Unavoidably, each test is opinionated. Testaro itself, however, can accommodate other tests representing different opinions. Testaro is intended to be neutral with respect to questions such as the criteria for accessibility, the severities of accessibility issues, whether accessibility is binary or graded, and the distinction between usability and accessibility.
+The rationales motivating the Testaro-defined tests can be found in comments within the files of those tests, in the `tests` directory. Unavoidably, each test is opinionated. Testaro itself, however, can accommodate other tests representing different opinions. Testaro is intended to be neutral with respect to questions such as the criteria for accessibility, the severities of accessibility defects, whether accessibility is binary or graded, and the distinction between usability and accessibility.
 
 ## Testing challenges
 
@@ -697,18 +695,16 @@ Testing to determine what happens when a control or link is activated is straigh
 
 The Playwright “Receives Events” actionability check does **not** check whether an event is dispatched on an element. It checks only whether a click on the location of the element makes the element the target of that click, rather than some other element occupying the same location.
 
-### Test-package duplicativity
+### Tool duplicativity
 
-Test packages sometimes do redundant testing, in that two or more packages test for the same issues, although such duplications are not necessarily perfect. This fact creates three problems:
-- One cannot be confident in excluding some tests of some packages on the assumption that they perfectly duplicate tests of other packages.
-- The Testaro report from a job documents each package’s results separately, so a single defect may be documented in multiple locations within the report, making the direct consumption of the report inefficient.
-- An effort to aggregate the results into a single score may distort the scores by inflating the weights of defects that happen to be discovered by multiple packages.
-
-The tests provided with Testaro do not exclude any apparently duplicative tests from packages.
+Tools sometimes do redundant testing, in that two or more tools test for the same defects, although such duplications are not necessarily perfect. This fact creates three problems:
+- One cannot be confident in excluding some tests of some tools on the assumption that they perfectly duplicate tests of other tools.
+- The Testaro report from a job documents each tool’s results separately, so a single defect may be documented in multiple locations within the report, making the direct consumption of the report inefficient.
+- An effort to aggregate the results into a single score may distort the scores by inflating the weights of defects that happen to be discovered by multiple tools.
 
 To deal with the above problems, you can:
-- revise package `test` commands to exclude tests that you consider duplicative
-- create derivative reports that organize results by defect types rather than by package
+- configure `test` acts for tools to exclude tests that you consider duplicative
+- create derivative reports that organize results by defect types rather than by tool
 - take duplication into account when defining scoring rules
 
 Some measures of these kinds are included in the scoring and reporting features of the Testilo package.
@@ -725,7 +721,7 @@ The files in the `temp` directory are presumed ephemeral and are not tracked by 
 - produces human-oriented HTML digests from scored reports
 - produces human-oriented HTML comparisons of the scores of targets
 
-Testilo contains procedures that reorganize report data by defect rather than test package, and that compensate for duplicative tests when computing scores.
+Testilo contains procedures that reorganize report data by defect rather than tool, and that compensate for duplicative tests when computing scores.
 
 Testaro is derived from [Autotest](https://github.com/jrpool/autotest). Autotest was created as a monolithic accessibility testing package, but that forced functionalities to be hosted on a workstation merely because it was impractical to host Playwright elsewhere. Testaro embodies an architectural decision to isolate workstation-dependent functionalities.
 
