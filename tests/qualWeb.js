@@ -3,7 +3,7 @@
   This test implements the QualWeb ruleset for accessibility.
 */
 // IMPORTS
-const {QualWeb, generateEARLReport} = require('@qualweb/core');
+const {QualWeb} = require('@qualweb/core');
 // CONSTANTS
 const qualweb = new QualWeb({});
 const clusterOptions = {
@@ -52,24 +52,43 @@ exports.reporter = async (page, rules = null) => {
   }
   // Get the report.
   const reports = await qualweb.evaluate(qualwebOptions);
-  // Trim it.
+  // Prepare to trim its ACT rules and WCAG Techniques section.
   delete reports.customHtml.system.page.dom;
-  const {assertions} = reports.customHtml.modules['act-rules'];
-  const ruleIDs = Object.keys(assertions);
-  ruleIDs.forEach(ruleID => {
-    assertions[ruleID].results = assertions[ruleID]
-    .results
-    .filter(result => result.verdict !== 'passed');
+  ['act-rules', 'wcag-techniques', 'best-practices'].forEach(module => {
+    const {assertions} = reports.customHtml.modules[module];
+    const ruleIDs = Object.keys(assertions);
+    ruleIDs.forEach(ruleID => {
+      // Remove passing customHtml results.
+      const ruleAssertions = assertions[ruleID];
+      const {metadata} = ruleAssertions;
+      if (metadata) {
+        if (metadata.warning === 0 && metadata.failed === 0) {
+          delete assertions[ruleID];
+        }
+        else {
+          if (ruleAssertions.results) {
+            ruleAssertions.results = ruleAssertions.results.filter(
+              result => result.verdict !== 'passed'
+            );
+          }
+        }
+      }
+      // Shorten long HTML codes of elements.
+      const {results} = ruleAssertions;
+      results.forEach(result => {
+        const {elements} = result;
+        if (elements && elements.length) {
+          elements.forEach(element => {
+            if (element.htmlCode && element.htmlCode.length > 700) {
+              element.htmlCode = `${element.htmlCode.slice(0, 700)} …`;
+            }
+          });
+        }
+      });
+    });
   });
   // Stop the QualWeb core engine.
   await qualweb.stop();
-  // Specify the EARL options.
-  const earlOptions = {};
-  // Get the EARL report.
-  const earlReports = generateEARLReport(reports, earlOptions);
-  // Add the reports to the data.
-  data.reports = reports;
-  data.earlReports = earlReports;
   // Return the result.
   try {
     JSON.stringify(data);
@@ -81,5 +100,5 @@ exports.reporter = async (page, rules = null) => {
       error: `ERROR: qualWeb result cannot be made JSON (${error.message})`
     };
   }
-  return {result: data};
+  return {result: reports};
 };
