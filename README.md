@@ -380,6 +380,10 @@ The changes in `htmlcs/HTMLCS.js` are:
 >       );
 ```
 
+###### QualWeb
+
+A `qualWeb` test act performs the ACT rules, WCAG Techniques, and best-practices tests of QualWeb. Only failures and warnings are included in the report. The EARL report of QualWeb is not generated, because it is equivalent to the report of the ACT rules tests.
+
 ###### Tenon
 
 Most tools require only one act, but the `tenon` tool requires two acts:
