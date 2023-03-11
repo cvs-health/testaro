@@ -5,21 +5,18 @@
 // IMPORTS
 const {QualWeb} = require('@qualweb/core');
 // CONSTANTS
-const qualweb = new QualWeb({});
+const qualWeb = new QualWeb({});
 const clusterOptions = {
   timeout: 25 * 1000
 };
 // FUNCTIONS
 // Conducts and reports a QualWeb test.
-exports.reporter = async (page, rules = null) => {
+exports.reporter = async (page, withNewContent, rules = null) => {
   // Initialize the report.
-  let data = {};
   // Start the QualWeb core engine.
-  await qualweb.start(clusterOptions);
+  await qualWeb.start(clusterOptions);
   // Specify the page.
-  const html = await page.content();
-  const qualwebOptions = {
-    html,
+  const qualWebOptions = {
     log: {
       console: true
     },
@@ -41,24 +38,33 @@ exports.reporter = async (page, rules = null) => {
       exclude: []
     }
   };
-  if (rules) {
-    qualwebOptions['act-rules'].rules = rules;
+  if (withNewContent) {
+    qualWebOptions.url = page.url();
   }
   else {
-    qualwebOptions['act-rules'].levels = ['A', 'AA', 'AAA'];
-    qualwebOptions['act-rules'].principles = [
+    qualWebOptions.html = await page.content();
+  }
+  if (rules) {
+    qualWebOptions['act-rules'].rules = rules;
+  }
+  else {
+    qualWebOptions['act-rules'].levels = ['A', 'AA', 'AAA'];
+    qualWebOptions['act-rules'].principles = [
       'Perceivable', 'Operable', 'Understandable', 'Robust'
     ];
   }
   // Get the report.
-  const reports = await qualweb.evaluate(qualwebOptions);
-  // Prepare to trim its ACT rules and WCAG Techniques section.
-  delete reports.customHtml.system.page.dom;
+  let reports = await qualWeb.evaluate(qualWebOptions);
+  // Remove the copy of the DOM from it.
+  let report = reports[withNewContent ? qualWebOptions.url : 'customHtml'];
+  delete report.system.page.dom;
+  // For each section of the report:
   ['act-rules', 'wcag-techniques', 'best-practices'].forEach(module => {
-    const {assertions} = reports.customHtml.modules[module];
+    // For each test:
+    const {assertions} = report.modules[module];
     const ruleIDs = Object.keys(assertions);
     ruleIDs.forEach(ruleID => {
-      // Remove passing customHtml results.
+      // Remove passing results.
       const ruleAssertions = assertions[ruleID];
       const {metadata} = ruleAssertions;
       if (metadata) {
@@ -88,17 +94,17 @@ exports.reporter = async (page, rules = null) => {
     });
   });
   // Stop the QualWeb core engine.
-  await qualweb.stop();
+  await qualWeb.stop();
   // Return the result.
   try {
-    JSON.stringify(data);
+    JSON.stringify(reports);
   }
   catch(error) {
     console.log(`ERROR: qualWeb result cannot be made JSON (${error.message})`);
-    data = {
+    report = {
       prevented: true,
       error: `ERROR: qualWeb result cannot be made JSON (${error.message})`
     };
   }
-  return {result: reports};
+  return {result: report};
 };

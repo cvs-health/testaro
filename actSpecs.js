@@ -308,6 +308,7 @@ exports.actSpecs = {
     qualWeb: [
       'Perform a qualWeb test',
       {
+        withNewContent: [true, 'boolean', '', 'whether to use a URL instead of page content'],
         rules: [false, 'array', 'areStrings', 'QualWeb or ACT IDs of ACT rules to include, if not all']
       }
     ],
