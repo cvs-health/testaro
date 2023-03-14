@@ -55,7 +55,7 @@ const tests = {
   miniText: 'text smaller than 11 pixels',
   motion: 'motion',
   nonTable: 'table elements used for layout',
-  nuVal: 'failures to pass the Nu Html Checker',
+  nuVal: 'Nu Html Checker',
   qualWeb: 'QualWeb',
   radioSet: 'fieldset grouping of radio buttons',
   role: 'roles',
