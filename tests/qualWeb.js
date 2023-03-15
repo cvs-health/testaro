@@ -57,42 +57,55 @@ exports.reporter = async (page, withNewContent, rules = null) => {
   let reports = await qualWeb.evaluate(qualWebOptions);
   // Remove the copy of the DOM from it.
   let report = reports[withNewContent ? qualWebOptions.url : 'customHtml'];
-  if (report && report.system && report.system.page && report.system.page.dom){
+  if (report && report.system && report.system.page && report.system.page.dom) {
     delete report.system.page.dom;
     // For each section of the report:
     ['act-rules', 'wcag-techniques', 'best-practices'].forEach(module => {
       // For each test:
-      const {assertions} = report.modules[module];
-      const ruleIDs = Object.keys(assertions);
-      ruleIDs.forEach(ruleID => {
-        // Remove passing results.
-        const ruleAssertions = assertions[ruleID];
-        const {metadata} = ruleAssertions;
-        if (metadata) {
-          if (metadata.warning === 0 && metadata.failed === 0) {
-            delete assertions[ruleID];
-          }
-          else {
-            if (ruleAssertions.results) {
-              ruleAssertions.results = ruleAssertions.results.filter(
-                result => result.verdict !== 'passed'
-              );
+      const {modules} = report;
+      if (modules && modules[module]) {
+        const {assertions} = modules[module];
+        if (assertions) {
+          const ruleIDs = Object.keys(assertions);
+          ruleIDs.forEach(ruleID => {
+            // Remove passing results.
+            const ruleAssertions = assertions[ruleID];
+            const {metadata} = ruleAssertions;
+            if (metadata) {
+              if (metadata.warning === 0 && metadata.failed === 0) {
+                delete assertions[ruleID];
+              }
+              else {
+                if (ruleAssertions.results) {
+                  ruleAssertions.results = ruleAssertions.results.filter(
+                    result => result.verdict !== 'passed'
+                  );
+                }
+              }
             }
-          }
-        }
-        // Shorten long HTML codes of elements.
-        const {results} = ruleAssertions;
-        results.forEach(result => {
-          const {elements} = result;
-          if (elements && elements.length) {
-            elements.forEach(element => {
-              if (element.htmlCode && element.htmlCode.length > 700) {
-                element.htmlCode = `${element.htmlCode.slice(0, 700)} …`;
+            // Shorten long HTML codes of elements.
+            const {results} = ruleAssertions;
+            results.forEach(result => {
+              const {elements} = result;
+              if (elements && elements.length) {
+                elements.forEach(element => {
+                  if (element.htmlCode && element.htmlCode.length > 700) {
+                    element.htmlCode = `${element.htmlCode.slice(0, 700)} …`;
+                  }
+                });
               }
             });
-          }
-        });
-      });
+          });
+        }
+        else {
+          report.prevented = true;
+          report.error = 'ERROR: No assertions';
+        }
+      }
+      else {
+        report.prevented = true;
+        report.error = `ERROR: No ${module} module`;
+      }
     });
     // Stop the QualWeb core engine.
     await qualWeb.stop();
