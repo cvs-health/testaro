@@ -60,11 +60,15 @@ exports.reporter = async (page, withNewContent, rules = null) => {
   if (report && report.system && report.system.page && report.system.page.dom) {
     delete report.system.page.dom;
     // For each section of the report:
-    ['act-rules', 'wcag-techniques', 'best-practices'].forEach(module => {
+    const sections = ['act-rules'];
+    if (! rules) {
+      sections.push('wcag-techniques', 'best-practices');
+    }
+    sections.forEach(section => {
       // For each test:
       const {modules} = report;
-      if (modules && modules[module]) {
-        const {assertions} = modules[module];
+      if (modules && modules[section]) {
+        const {assertions} = modules[section];
         if (assertions) {
           const ruleIDs = Object.keys(assertions);
           ruleIDs.forEach(ruleID => {
@@ -104,7 +108,7 @@ exports.reporter = async (page, withNewContent, rules = null) => {
       }
       else {
         report.prevented = true;
-        report.error = `ERROR: No ${module} module`;
+        report.error = `ERROR: No ${section} section`;
       }
     });
     // Stop the QualWeb core engine.
