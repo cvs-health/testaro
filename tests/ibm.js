@@ -124,21 +124,33 @@ exports.reporter = async (page, withItems, withNewContent, rules) => {
   const result = {};
   if (! withNewContent) {
     const timeLimit = 20;
-    const typeContent = await page.content();
-    result.content = await doTest(typeContent, withItems, timeLimit, rules);
-    if (result.content.prevented) {
+    try {
+      const typeContent = await page.content();
+      result.content = await doTest(typeContent, withItems, timeLimit, rules);
+      if (result.content.prevented) {
+        result.prevented = true;
+        console.log(`ERROR: Getting ibm test report from page timed out at ${timeLimit} seconds`);
+      }
+    }
+    catch(error) {
       result.prevented = true;
-      console.log(`ERROR: Getting ibm test report from page timed out at ${timeLimit} seconds`);
+      console.log(`ERROR: ibm test on page crashed with error ${error.message.slice(0, 200)}`);
     }
   }
   // If a test with new content is to be performed:
   if ([true, undefined].includes(withNewContent)) {
     const timeLimit = 20;
-    const typeContent = page.url();
-    result.url = await doTest(typeContent, withItems, timeLimit, rules);
-    if (result.url.prevented) {
+    try {
+      const typeContent = page.url();
+      result.url = await doTest(typeContent, withItems, timeLimit, rules);
+      if (result.url.prevented) {
+        result.prevented = true;
+        console.log(`ERROR: Getting ibm test report from URL timed out at ${timeLimit} seconds`);
+      }
+    }
+    catch(error) {
       result.prevented = true;
-      console.log(`ERROR: Getting ibm test report from URL timed out at ${timeLimit} seconds`);
+      console.log(`ERROR: ibm test on URL crashed with error ${error.message.slice(0, 200)}`);
     }
   }
   // Return the result. Execution of close() crashed the Node process.
