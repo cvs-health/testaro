@@ -152,7 +152,8 @@ const writeNetReport = async report => {
         });
       });
       // Send the report to the server.
-      request.write(JSON.stringify(report, null, 2));
+      const reportJSON = JSON.stringify(report, null, 2);
+      request.write(reportJSON);
       request.end();
       console.log(`Report ${report.id} submitted`);
     }
