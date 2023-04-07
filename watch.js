@@ -92,7 +92,7 @@ const checkNetJob = async watchee => {
     console.log(job.message);
   }
   else {
-    console.log(job);
+    console.log('No network job to do');
   }
   return job;
 };
@@ -138,7 +138,7 @@ const writeNetReport = async report => {
               error: 'ERROR: Response was not JSON',
               message: error.message,
               status: response.statusCode,
-              content: content.slice(0, 200)
+              content: content.slice(0, 3000)
             });
           }
         });

@@ -120,11 +120,20 @@ const doTest = async (content, withItems, timeLimit, rules) => {
 };
 // Returns results of one or two IBM tests.
 exports.reporter = async (page, withItems, withNewContent, rules) => {
+  let contentType = 'both';
+  if (withNewContent) {
+    contentType = 'new';
+  }
+  else if (withNewContent === false) {
+    contentType = 'existing';
+  }
+  console.log(`>>>>>> Content type: ${contentType}`);
   // If a test with existing content is to be performed:
   const result = {};
-  if (! withNewContent) {
-    const timeLimit = 20;
+  const timeLimit = 20;
+  if (['existing', 'both'].includes(contentType)) {
     try {
+      console.log('>>>>>> With existing content');
       const typeContent = await page.content();
       result.content = await doTest(typeContent, withItems, timeLimit, rules);
       if (result.content.prevented) {
@@ -138,9 +147,9 @@ exports.reporter = async (page, withItems, withNewContent, rules) => {
     }
   }
   // If a test with new content is to be performed:
-  if ([true, undefined].includes(withNewContent)) {
-    const timeLimit = 20;
+  if (['new', 'both'].includes(contentType)) {
     try {
+      console.log('>>>>>> With new content');
       const typeContent = page.url();
       result.url = await doTest(typeContent, withItems, timeLimit, rules);
       if (result.url.prevented) {
