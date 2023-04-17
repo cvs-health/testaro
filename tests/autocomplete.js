@@ -11,7 +11,7 @@ const {allText} = require('../procs/allText');
 // ########## FUNCTIONS
 
 // Adds a failure, if any, to the data.
-const addFailure = (input, inputText, autocomplete, data) => {
+const addFailure = (withItems, input, inputText, autocomplete, data) => {
   // If it does not have the required autocomplete attribute:
   if (input.getAttribute('autocomplete') !== autocomplete) {
     // Add this to the total.
@@ -36,7 +36,7 @@ exports.reporter = async (page, withItems) => {
     // For each one:
     for (const input of inputs) {
       // If it is a text input:
-      const inputType = input.getAttribute('type');
+      const inputType = await input.getAttribute('type');
       if (inputType === 'text' || ! inputType) {
         const inputText = await allText(page, input);
         const inputTextLC = inputText.toLowerCase();
@@ -46,7 +46,7 @@ exports.reporter = async (page, withItems) => {
           || ['first name', 'given name'].some(phrase => inputTextLC.includes(phrase))
         ) {
           // Add any failure to the data.
-          addFailure(input, inputText, 'given-name', data);
+          addFailure(withItems, input, inputText, 'given-name', data);
         }
         // Otherwise, if it requests a family name:
         else if (
@@ -54,18 +54,18 @@ exports.reporter = async (page, withItems) => {
           || ['last name', 'family name'].some(phrase => inputTextLC.includes(phrase))
         ) {
           // Add any failure to the data.
-          addFailure(input, inputText, 'family-name', data);
+          addFailure(withItems, input, inputText, 'family-name', data);
         }
         // Otherwise, if it requests an email address:
         else if (inputTextLC.includes('email')) {
           // Add any failure to the data.
-          addFailure(input, inputText, 'email', data);
+          addFailure(withItems, input, inputText, 'email', data);
         }
       }
       // Otherwise, if it an email input:
       else if (inputType === 'email') {
         // Add any failure to the data.
-        addFailure(input, inputText, 'email', data);
+        addFailure(withItems, input, inputText, 'email', data);
       }
     }
   }
