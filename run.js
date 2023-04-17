@@ -34,6 +34,7 @@ const tests = {
   alfa: 'alfa',
   allHidden: 'page that is entirely or mostly hidden',
   attVal: 'elements with attributes having illicit values',
+  autocomplete: 'name and email inputs without autocomplete attributes',
   axe: 'Axe',
   bulk: 'count of visible elements',
   continuum: 'Level Access Continuum, community edition',
@@ -264,8 +265,9 @@ const isValidReport = report => {
     if (! acts[1].which || typeof acts[1].which !== 'string' || ! isURL(acts[1].which)) {
       return 'Second act which not a URL';
     }
-    if (acts.some(act => ! isValidAct(act))) {
-      return 'Not all acts valid';
+    const invalidAct = acts.find(act => ! isValidAct(act));
+    if (invalidAct) {
+      return `Invalid act:\n${JSON.stringify(invalidAct, null, 2)}`;
     }
     if (! sources || typeof sources !== 'object') {
       return 'Bad report sources';

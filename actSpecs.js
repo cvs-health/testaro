@@ -168,6 +168,12 @@ exports.actSpecs = {
         withItems: [true, 'boolean', '', 'itemize']
       }
     ],
+    autocomplete: [
+      'Perform an autocomplete test',
+      {
+        withItems: [true, 'boolean', '', 'itemize']
+      }
+    ],
     axe: [
       'Perform an Axe test',
       {
