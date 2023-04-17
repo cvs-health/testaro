@@ -35,6 +35,7 @@
     "accessibility-checker": "*",
     "axe-playwright": "*",
     "dotenv": "*",
+    "node-fetch": "*",
     "pixelmatch": "*",
     "playwright": "*"
   },
