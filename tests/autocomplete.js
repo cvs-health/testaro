@@ -11,9 +11,10 @@ const {allText} = require('../procs/allText');
 // ########## FUNCTIONS
 
 // Adds a failure, if any, to the data.
-const addFailure = (withItems, input, inputText, autocomplete, data) => {
+const addFailure = async (withItems, input, inputText, autocomplete, data) => {
   // If it does not have the required autocomplete attribute:
-  if (input.getAttribute('autocomplete') !== autocomplete) {
+  const autoValue = await input.getAttribute('autocomplete');
+  if (autoValue !== autocomplete) {
     // Add this to the total.
     data.total++;
     // If itemization is required:
@@ -35,10 +36,10 @@ exports.reporter = async (page, withItems) => {
   if (inputs.length) {
     // For each one:
     for (const input of inputs) {
+      const inputText = await allText(page, input);
       // If it is a text input:
       const inputType = await input.getAttribute('type');
       if (inputType === 'text' || ! inputType) {
-        const inputText = await allText(page, input);
         const inputTextLC = inputText.toLowerCase();
         // If it requests a given name:
         if (
@@ -46,7 +47,7 @@ exports.reporter = async (page, withItems) => {
           || ['first name', 'given name'].some(phrase => inputTextLC.includes(phrase))
         ) {
           // Add any failure to the data.
-          addFailure(withItems, input, inputText, 'given-name', data);
+          await addFailure(withItems, input, inputText, 'given-name', data);
         }
         // Otherwise, if it requests a family name:
         else if (
@@ -54,18 +55,18 @@ exports.reporter = async (page, withItems) => {
           || ['last name', 'family name'].some(phrase => inputTextLC.includes(phrase))
         ) {
           // Add any failure to the data.
-          addFailure(withItems, input, inputText, 'family-name', data);
+          await addFailure(withItems, input, inputText, 'family-name', data);
         }
         // Otherwise, if it requests an email address:
         else if (inputTextLC.includes('email')) {
           // Add any failure to the data.
-          addFailure(withItems, input, inputText, 'email', data);
+          await addFailure(withItems, input, inputText, 'email', data);
         }
       }
-      // Otherwise, if it an email input:
+      // Otherwise, if it is an email input:
       else if (inputType === 'email') {
         // Add any failure to the data.
-        addFailure(withItems, input, inputText, 'email', data);
+        await addFailure(withItems, input, inputText, 'email', data);
       }
     }
   }
