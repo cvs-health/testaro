@@ -1,0 +1,51 @@
+{
+  "id": "autocompleteVal",
+  "what": "validation of autocomplete test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/autocomplete/good.html",
+      "what": "page with correct autocomplete attributes"
+    },
+    {
+      "type": "test",
+      "which": "autocomplete",
+      "what": "autocomplete attributes for name and email",
+      "withItems": true,
+      "expect": [
+        ["totals", "=", 0],
+        ["items.1"]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/autocomplete/bad.html",
+      "what": "page with incorrect autocomplete attributes"
+    },
+    {
+      "type": "test",
+      "which": "autocomplete",
+      "what": "autocomplete attributes for name and email",
+      "withItems": true,
+      "expect": [
+        ["totals", "=", 4],
+        ["items.1.0", "=", "family-name"],
+        ["items.2.1", "=", "Your email address"]
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2003-04-16T21:06:00",
+  "timeStamp": "00000"
+}
