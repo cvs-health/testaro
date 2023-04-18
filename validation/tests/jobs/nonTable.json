@@ -1,5 +1,5 @@
 {
-  "id": "nonTableVal",
+  "id": "nonTable",
   "what": "validation of nonTable test",
   "strict": true,
   "timeLimit": 20,

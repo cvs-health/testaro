@@ -1,5 +1,5 @@
 {
-  "id": "titleVal",
+  "id": "title",
   "what": "validation of title test",
   "strict": true,
   "timeLimit": 20,

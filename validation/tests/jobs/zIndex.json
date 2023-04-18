@@ -1,5 +1,5 @@
 {
-  "id": "zIndexVal",
+  "id": "zIndex",
   "what": "validation of zIndex test",
   "strict": true,
   "timeLimit": 20,

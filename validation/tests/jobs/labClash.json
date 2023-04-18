@@ -1,5 +1,5 @@
 {
-  "id": "labClashVal",
+  "id": "labClash",
   "what": "validation of labClash test",
   "strict": true,
   "timeLimit": 20,

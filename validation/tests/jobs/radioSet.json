@@ -1,5 +1,5 @@
 {
-  "id": "radioSetVal",
+  "id": "radioSet",
   "what": "validation of radioSet test",
   "strict": true,
   "timeLimit": 20,

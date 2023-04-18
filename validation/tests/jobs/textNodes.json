@@ -1,5 +1,5 @@
 {
-  "id": "elementsVal",
+  "id": "elements",
   "what": "validation of elements test",
   "strict": true,
   "timeLimit": 20,

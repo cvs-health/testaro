@@ -1,5 +1,5 @@
 {
-  "id": "bulkVal",
+  "id": "bulk",
   "what": "validation of bulk test",
   "strict": true,
   "timeLimit": 20,

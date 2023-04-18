@@ -1,5 +1,5 @@
 {
-  "id": "linkToVal",
+  "id": "linkTo",
   "what": "validation of linkTo test",
   "strict": true,
   "timeLimit": 20,

@@ -1,5 +1,5 @@
 {
-  "id": "motionVal",
+  "id": "motion",
   "what": "validation of motion test",
   "strict": true,
   "timeLimit": 20,

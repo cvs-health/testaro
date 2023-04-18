@@ -1,5 +1,5 @@
 {
-  "id": "tabNavVal",
+  "id": "tabNav",
   "what": "validation of tabNav test",
   "strict": true,
   "timeLimit": 20,

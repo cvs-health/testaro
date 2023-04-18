@@ -1,5 +1,5 @@
 {
-  "id": "docTypeVal",
+  "id": "docType",
   "what": "validation of docType test",
   "strict": true,
   "timeLimit": 20,

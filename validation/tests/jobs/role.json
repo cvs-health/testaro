@@ -1,5 +1,5 @@
 {
-  "id": "roleVal",
+  "id": "role",
   "what": "validation of role test",
   "strict": true,
   "timeLimit": 20,

@@ -187,6 +187,12 @@ exports.actSpecs = {
         rules: [false, 'array', 'areNumbers', 'rule numbers (e.g., 25), if not all']
       }
     ],
+    dupAtt: [
+      'Perform a dupAtt test',
+      {
+        withItems: [true, 'boolean', '', 'itemize']
+      }
+    ],
     elements: [
       'Perform an elements test',
       {

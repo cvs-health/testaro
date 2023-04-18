@@ -1,5 +1,5 @@
 {
-  "id": "menuNavVal",
+  "id": "menuNav",
   "what": "validation of menuNav test",
   "strict": true,
   "timeLimit": 20,

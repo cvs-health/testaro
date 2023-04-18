@@ -1,5 +1,5 @@
 {
-  "id": "styleDiffVal",
+  "id": "styleDiff",
   "what": "validation of styleDiff test",
   "strict": true,
   "timeLimit": 20,

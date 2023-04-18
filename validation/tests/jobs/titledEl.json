@@ -1,5 +1,5 @@
 {
-  "id": "titledElVal",
+  "id": "titledEl",
   "what": "validation of titledEl test",
   "strict": true,
   "timeLimit": 20,

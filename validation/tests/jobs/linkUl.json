@@ -1,5 +1,5 @@
 {
-  "id": "linkUlVal",
+  "id": "linkUl",
   "what": "validation of linkUl test",
   "strict": true,
   "timeLimit": 20,

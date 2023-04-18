@@ -39,6 +39,7 @@ const tests = {
   bulk: 'count of visible elements',
   continuum: 'Level Access Continuum, community edition',
   docType: 'document without a doctype property',
+  dupAtt: 'elements with duplicate attributes',
   elements: 'data on specified elements',
   embAc: 'active elements embedded in links or buttons',
   filter: 'filter styles on elements',

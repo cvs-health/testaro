@@ -1,5 +1,5 @@
 {
-  "id": "focVisVal",
+  "id": "focVis",
   "what": "validation of focVis test",
   "strict": true,
   "timeLimit": 20,

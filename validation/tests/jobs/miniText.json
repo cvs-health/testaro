@@ -1,5 +1,5 @@
 {
-  "id": "miniTextVal",
+  "id": "miniText",
   "what": "validation of miniText test",
   "strict": true,
   "timeLimit": 20,

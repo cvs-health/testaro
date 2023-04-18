@@ -1,5 +1,5 @@
 {
-  "id": "embAcVal",
+  "id": "embAc",
   "what": "validation of embAc test",
   "strict": true,
   "timeLimit": 20,

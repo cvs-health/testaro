@@ -1,5 +1,5 @@
 {
-  "id": "autocompleteVal",
+  "id": "autocomplete",
   "what": "validation of autocomplete test",
   "strict": true,
   "timeLimit": 20,

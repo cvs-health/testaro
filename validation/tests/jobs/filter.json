@@ -1,5 +1,5 @@
 {
-  "id": "filterVal",
+  "id": "filter",
   "what": "validation of filter test",
   "strict": true,
   "timeLimit": 20,

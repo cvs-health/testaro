@@ -1,5 +1,5 @@
 {
-  "id": "hoverVal",
+  "id": "hover",
   "what": "validation of hover test",
   "strict": true,
   "timeLimit": 20,
