@@ -31,7 +31,9 @@ Testaro uses:
 - [Playwright](https://playwright.dev/) to launch browsers, perform user actions in them, and perform tests
 - [pixelmatch](https://www.npmjs.com/package/pixelmatch) to measure motion
 
-Testaro includes some of its own accessibility tests. In addition, it performs the tests of these tools:
+Testaro includes some of its own accessibility tests. Some of them are derived from tests performed by the [BBC Accessibility Standards Checker](https://github.com/bbc/bbc-a11y).
+
+In addition, Testaro performs tests of these tools:
 - [accessibility-checker](https://www.npmjs.com/package/accessibility-checker) (the IBM Equal Access Accessibility Checker)
 - [alfa](https://alfa.siteimprove.com/) (Siteimprove alfa)
 - [axe-playwright](https://www.npmjs.com/package/axe-playwright) (Deque Axe-core)
@@ -41,8 +43,6 @@ Testaro includes some of its own accessibility tests. In addition, it performs t
 - [QualWeb core](https://www.npmjs.com/package/@qualweb/core)
 - [Tenon](https://tenon.io/documentation/what-tenon-tests.php) (Level Access)
 - [WAVE API](https://wave.webaim.org/api/) (WebAIM WAVE)
-
-Some of the Testaro tests are derived from tests performed by the [BBC Accessibility Standards Checker](https://github.com/bbc/bbc-a11y).
 
 As of this version, the counts of tests of the tools referenced above were:
 - Alfa: 103
@@ -54,9 +54,8 @@ As of this version, the counts of tests of the tools referenced above were:
 - QualWeb core: 121
 - Tenon: 180
 - WAVE: 110
-- subtotal: 1327
-- Testaro tests: 24
-- grand total: 1351
+- Testaro: 29
+- total: 1356
 
 ## Quasi-tests
 
