@@ -5,13 +5,13 @@
 exports.reporter = async (page, attributeName, areLicit, values, withItems) => {
   // Identify the elements that have the specified attribute with illicit values.
   const badAttributeData = await page.evaluate(
-    args => {
+    async args => {
       const attributeName = args[0];
       // Whether the values are the licit or the illicit ones.
       const areLicit = args[1];
       const values = args[2];
       // Returns the text of an element.
-      const textOf = async (element, limit) => {
+      const textOf = (element, limit) => {
         let text = element.textContent;
         text = text.trim() || element.innerHTML;
         return text.replace(/\s+/sg, ' ').replace(/<>&/g, '').slice(0, limit);

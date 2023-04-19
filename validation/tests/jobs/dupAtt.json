@@ -36,7 +36,7 @@
       "withItems": true,
       "expect": [
         ["total", "=", 2],
-        ["items.0", "=", "<p class=\"narrow\" id=\"daParagraph\" class=\"wide\">"],
+        ["items.0", "=", "p class=\"narrow\" id=\"daParagraph\" class=\"wide\""],
         ["items.1", "i", "large"]
       ]
     }
@@ -46,6 +46,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2003-04-18T11:02:00",
+  "creationTime": "2023-04-18T11:02:00",
   "timeStamp": "00000"
 }

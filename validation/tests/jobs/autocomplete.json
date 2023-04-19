@@ -20,7 +20,7 @@
       "what": "autocomplete attributes for name and email",
       "withItems": true,
       "expect": [
-        ["totals", "=", 0],
+        ["total", "=", 0],
         ["items.1"]
       ]
     },
@@ -35,7 +35,7 @@
       "what": "autocomplete attributes for name and email",
       "withItems": true,
       "expect": [
-        ["totals", "=", 4],
+        ["total", "=", 4],
         ["items.1.0", "=", "family-name"],
         ["items.2.1", "=", "Your email address"]
       ]
@@ -46,6 +46,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2003-04-16T21:06:00",
+  "creationTime": "2023-04-16T21:06:00",
   "timeStamp": "00000"
 }

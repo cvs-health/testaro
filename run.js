@@ -499,7 +499,7 @@ const isTrue = (object, specs) => {
   }
   // Otherwise, i.e. if the expectation is of a property value:
   else if (specs.length === 3) {
-    // Determine whether the expectation was fulfilled.
+    // Return whether the expectation was fulfilled.
     const relation = specs[1];
     const criterion = specs[2];
     let satisfied;
@@ -519,16 +519,17 @@ const isTrue = (object, specs) => {
       satisfied = actual !== criterion;
     }
     else if (relation === 'i') {
-      satisfied = actual.includes(criterion);
+      satisfied = typeof actual === 'string' && actual.includes(criterion);
     }
     else if (relation === '!i') {
-      satisfied = ! actual.includes(criterion);
+      satisfied = typeof actual === 'string' && ! actual.includes(criterion);
     }
     return [actual, satisfied];
   }
   // Otherwise, i.e. if the specifications are invalid:
   else {
-    //
+    // Return this.
+    return [null, false];
   }
 };
 // Adds a wait error result to an act.
