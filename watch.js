@@ -24,6 +24,8 @@ const reportDir = process.env.REPORTDIR;
 
 // ########## FUNCTIONS
 
+// Returns a string representing the date and time.
+const nowString = () => (new Date()).toISOString().slice(0, 19);
 // Checks for a directory job.
 const checkDirJob = async watchee => {
   try {
@@ -44,12 +46,12 @@ const checkDirJob = async watchee => {
       }
     }
     else {
-      console.log('No job to do');
+      console.log(`No job to do (${nowString()})`);
       return {};
     }
   }
   catch(error) {
-    console.log(`Directory watching failed (${error.message})`);
+    console.log('ERROR: Directory watching failed');
     return {};
   }
 };
@@ -86,13 +88,13 @@ const checkNetJob = async watchee => {
     request.end();
   });
   if (job.id) {
-    console.log(`Network job ${job.id} received`);
+    console.log(`Network job ${job.id} received (${nowString()})`);
   }
   else if (job.message) {
     console.log(job.message);
   }
   else {
-    console.log('No network job to do');
+    console.log(`No network job to do (${nowString()})`);
   }
   return job;
 };
@@ -155,7 +157,7 @@ const writeNetReport = async report => {
       const reportJSON = JSON.stringify(report, null, 2);
       request.write(reportJSON);
       request.end();
-      console.log(`Report ${report.id} submitted`);
+      console.log(`Report ${report.id} submitted (${nowString()})`);
     }
     else {
       console.log('ERROR: Report has no sources property');
@@ -217,7 +219,9 @@ exports.cycle = async (isDirWatch, isForever, interval, watchee = null) => {
   let statusOK = true;
   // Prevent a wait before the first iteration.
   let empty = false;
-  console.log(`Watching started with intervals of ${interval} seconds when idle`);
+  console.log(
+    `Watching started with intervals of ${interval} seconds when idle (${nowString()})`
+  );
   while (statusOK) {
     if (empty) {
       await wait(intervalMS);
@@ -233,14 +237,14 @@ exports.cycle = async (isDirWatch, isForever, interval, watchee = null) => {
     // If there was one:
     if (job.id) {
       // Run it, save a report, and if applicable send the report to the job source.
-      console.log(`Running job ${job.id}`);
+      console.log(`Running job ${job.id} (${nowString()})`);
       await runJob(JSON.parse(JSON.stringify(job)), isDirWatch);
-      console.log(`Job ${job.id} finished`);
+      console.log(`Job ${job.id} finished (${nowString()})`);
       // If a directory was watched:
       if (isDirWatch) {
         // Archive the job.
         await archiveJob(job, watchee);
-        console.log(`Job ${job.id} archived`);
+        console.log(`Job ${job.id} archived (${nowString()})`);
       }
       // If watching was specified for only 1 job, quit.
       statusOK = isForever;
@@ -253,5 +257,5 @@ exports.cycle = async (isDirWatch, isForever, interval, watchee = null) => {
       empty = true;
     }
   }
-  console.log('Watching ended');
+  console.log(`Watching ended (${nowString()})`);
 };
