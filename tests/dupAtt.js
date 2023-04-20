@@ -28,7 +28,15 @@ exports.reporter = async (page, withItems) => {
     rawPage = await fs.readFile(filePath, 'utf8');
   }
   else {
-    rawPage = await fetch(url);
+    try {
+      const rawPageResponse = await fetch(url);
+      rawPage = await rawPageResponse.text();
+    }
+    catch(error) {
+      console.log(`ERROR getting page for dupAtt test (${error.message})`);
+      data.prevented = true;
+      return {result: data};
+    }
   }
   // Extract its elements, in a uniform format.
   const elements = rawPage
