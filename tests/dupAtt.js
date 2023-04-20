@@ -38,15 +38,16 @@ exports.reporter = async (page, withItems) => {
       return {result: data};
     }
   }
-  // Extract its elements, in a uniform format.
-  const elements = rawPage
-  .match(/<[^/<>]+>/g)
-  .map(element => element.slice(1, -1).trim().replace(/\s*=\s*/g, '='))
-  .map(element => element.replace(/\s+/g, ' '));
+  // Extract the opening tags of its elements.
+  let elements = rawPage.match(/<[^/<>]+>/g);
+  // Delete their enclosing angle brackets and the values of any attributes in them.
+  elements = elements.map(el => el.replace(/^<\s*|\s*=\s*"[^"]*"|=\s*[^\s]+|\s*>$/g, ''));
+  // Change any spacing character sequences in them to single spaces.
+  elements = elements.map(el => el.replace(/\s+/g, ' '));
   // For each element:
   elements.forEach(element => {
     // Identify its attributes.
-    const attributes = element.split(' ').slice(1).map(attVal => attVal.replace(/=.+/, ''));
+    const attributes = element.split(' ').slice(1);
     // If any is duplicated:
     const attSet = new Set(attributes);
     if (attSet.size < attributes.length) {
