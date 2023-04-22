@@ -54,20 +54,20 @@ exports.reporter = async (page, messages) => {
   const nuURL = 'https://validator.w3.org/nu/?parser=html&out=json';
   const data = {};
   // For each page type:
-  for (const page of [pageContent, rawPage]) {
+  for (const page of [['pageContent', pageContent], ['rawPage', rawPage]]) {
     try {
       // Get a Nu Html Checker report on it.
-      fetchOptions.body = page;
+      fetchOptions.body = page[1];
       const nuResult = await fetch(nuURL, fetchOptions);
       const nuData = await nuResult.json();
       const nuDataClean = JSON.parse(JSON.stringify(nuData).replace(/[\u{fffd}“”]/ug, ''));
       // Delete left and right quotation marks and their erratic invalid replacements.
-      data[page] = nuDataClean;
+      data[page[0]] = nuDataClean;
       // If there is a report and restrictions on the report messages were specified:
-      if (! data[page].error && messages && Array.isArray(messages) && messages.length) {
+      if (! data[page[0]].error && messages && Array.isArray(messages) && messages.length) {
         // Remove all messages except those specified.
         const messageSpecs = messages.map(messageSpec => messageSpec.split(':', 2));
-        data[page].messages = data[page].messages.filter(message => messageSpecs.some(
+        data[page[0]].messages = data[page[0]].messages.filter(message => messageSpecs.some(
           messageSpec => message.type === messageSpec[0]
           && message.message.startsWith(messageSpec[1])
         ));
