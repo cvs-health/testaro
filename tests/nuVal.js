@@ -54,13 +54,13 @@ exports.reporter = async (page, messages) => {
   const nuURL = 'https://validator.w3.org/nu/?parser=html&out=json';
   const data = {};
   for (const page of [pageContent, rawPage]) {
-    fetchOptions.body = page;
-    const nuResult = await fetch(nuURL, fetchOptions);
-    const nuReport = await nuResult.json();
     try {
+      fetchOptions.body = page;
+      const nuResult = await fetch(nuURL, fetchOptions);
+      const nuResultClean = nuResult.replace(/[\u{fffd}“”]/ug, '');
+      const nuReport = await nuResultClean.json();
       // Delete left and right quotation marks and their erratic invalid replacements.
-      const nuReportClean = nuReport.replace(/[\u{fffd}“”]/ug, '');
-      data[page] = nuReportClean;
+      data[page] = nuReport;
       // If there is a report and restrictions on the report messages were specified:
       if (! data[page].error && messages && Array.isArray(messages) && messages.length) {
         // Remove all messages except those specified.
