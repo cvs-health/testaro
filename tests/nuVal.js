@@ -1,92 +1,83 @@
 /*
   nuVal
-  This test subjects a page to the Nu Html Checker.
-  That API erratically replaces left and right double quotation marks with invalid UTF-8, which
+  This test subjects a page and its source to the Nu Html Checker, thereby testing scripted
+  content found only in the loaded page and erroneous content before the browser corrects it.
+  The API erratically replaces left and right double quotation marks with invalid UTF-8, which
   appears as 2 or 3 successive instances of the replacement character (U+fffd). Therefore, this
   test removes all such quotation marks and the replacement character. That causes
   'Bad value “” for' to become 'Bad value  for'. Since the corruption of quotation marks is
   erratic, no better solution is known.
 */
-const https = require('https');
+
+// ########## IMPORTS
+
+// Module to make HTTP requests.
+const fetch = require('node-fetch');
+// Module to process files.
+const fs = require('fs/promises');
+
+// ########## FUNCTIONS
+
 exports.reporter = async (page, messages) => {
+  // Get the browser-parsed page.
   const pageContent = await page.content();
-  // Get the data from a Nu validation.
-  const dataPromise = new Promise(resolve => {
+  // Get the page source.
+  const url = page.url();
+  const scheme = url.replace(/:.+/, '');
+  let rawPage;
+  if (scheme === 'file') {
+    const filePath = url.slice(7);
+    rawPage = await fs.readFile(filePath, 'utf8');
+  }
+  else {
     try {
-      const request = https.request(
-        {
-          /*
-            Alternatives (more timeout-prone): host=validator.nu; path=/?parser=html@out=json
-            That host crashes instead of ending with a fatal error.
-          */
-          host: 'validator.w3.org',
-          path: '/nu/?parser=html&out=json',
-          method: 'POST',
-          headers: {
-            'User-Agent': 'Mozilla/5.0',
-            'Content-Type': 'text/html; charset=utf-8'
-          }
-        },
-        response => {
-          let report = '';
-          response.on('data', chunk => {
-            report += chunk;
-          });
-          // When the data arrive:
-          response.on('end', async () => {
-            try {
-              // Delete left and right quotation marks and their erratic invalid replacements.
-              const result = JSON.parse(report.replace(/[\u{fffd}“”]/ug, ''));
-              return resolve(result);
-            }
-            catch (error) {
-              console.log(`ERROR: Validation failed (${error.message})`);
-              return resolve({
-                prevented: true,
-                error: error.message,
-                report
-              });
-            }
-          });
-        }
-      );
-      request.write(pageContent);
-      request.end();
-      request.on('error', error => {
-        console.log(error.message);
-        return resolve({
-          prevented: true,
-          error: error.message
-        });
-      });
+      const rawPageResponse = await fetch(url);
+      rawPage = await rawPageResponse.text();
     }
     catch(error) {
-      console.log(error.message);
-      return resolve({
+      console.log(`ERROR getting page for nuVal test (${error.message})`);
+      return {result: {
         prevented: true,
-        error: error.message
-      });
+        error: 'ERROR getting page for nuVal test'
+      }};
     }
-  });
-  const timeoutPromise = new Promise(resolve => {
-    const timeLimit = 12;
-    const timeoutID = setTimeout(() => {
-      resolve({
+  }
+  // Get the data from Nu validations.
+  const fetchOptions = {
+    method: 'post',
+    headers: {
+      'User-Agent': 'Mozilla/5.0',
+      'Content-Type': 'text/html; charset=utf-8'
+    }
+  };
+  // More reliable service than validator.nu.
+  const nuURL = 'https://validator.w3.org/nu/?parser=html&out=json';
+  const data = {};
+  for (const page of [pageContent, rawPage]) {
+    fetchOptions.body = page;
+    const nuResult = await fetch(nuURL, fetchOptions);
+    const nuReport = await nuResult.json();
+    try {
+      // Delete left and right quotation marks and their erratic invalid replacements.
+      const nuReportClean = nuReport.replace(/[\u{fffd}“”]/ug, '');
+      data[page] = nuReportClean;
+      // If there is a report and restrictions on the report messages were specified:
+      if (! data[page].error && messages && Array.isArray(messages) && messages.length) {
+        // Remove all messages except those specified.
+        const messageSpecs = messages.map(messageSpec => messageSpec.split(':', 2));
+        data[page].messages = data[page].messages.filter(message => messageSpecs.some(
+          messageSpec => message.type === messageSpec[0]
+          && message.message.startsWith(messageSpec[1])
+        ));
+      }
+    }
+    catch (error) {
+      console.log(`ERROR: nuVal report validation failed (${error.message})`);
+      return {result: {
         prevented: true,
-        error: `ERROR: Validation timed out at ${timeLimit} seconds`
-      });
-      clearTimeout(timeoutID);
-    }, 1000 * timeLimit);
-  });
-  // Get the result, or an error report if nuVal timed out after 12 seconds.
-  const data = await Promise.race([dataPromise, timeoutPromise]);
-  // If there is a report and restrictions on the report messages were specified:
-  if (! data.error && messages && Array.isArray(messages) && messages.length) {
-    // Remove all messages except those specified.
-    const messageSpecs = messages.map(messageSpec => messageSpec.split(':', 2));
-    data.messages = data.messages.filter(message => messageSpecs.some(
-      messageSpec => message.type === messageSpec[0] && message.message.startsWith(messageSpec[1])
-    ));
+        error: 'nuVal report validation failed',
+      }};
+    }
   }
   return {result: data};
 };
