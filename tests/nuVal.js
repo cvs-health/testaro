@@ -42,7 +42,7 @@ exports.reporter = async (page, messages) => {
       }};
     }
   }
-  // Get the data from Nu validations.
+  // Get the data from validator.w3.org, a more reliable service than validator.nu.
   const fetchOptions = {
     method: 'post',
     headers: {
@@ -50,7 +50,6 @@ exports.reporter = async (page, messages) => {
       'Content-Type': 'text/html; charset=utf-8'
     }
   };
-  // More reliable service than validator.nu.
   const nuURL = 'https://validator.w3.org/nu/?parser=html&out=json';
   const data = {};
   // For each page type:

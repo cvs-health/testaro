@@ -57,6 +57,8 @@ As of this version, the counts of tests of the tools referenced above were:
 - Testaro: 29
 - total: 1356
 
+Of the 29 Testaro tests, 26 are evaluative (they discover accessibility issues), and the other 3 (`elements`, `textNodes`, and `title`) are informative (they report conditions specified by the user).
+
 ## Quasi-tests
 
 Reports produced by Testaro contain data in addition to the results of these tests. Such data can be used like tests. In particular, the data include:
