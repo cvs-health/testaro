@@ -83,7 +83,7 @@ const tenonData = {
   accessToken: '',
   requestIDs: {}
 };
-// Keywords in log messages indicating errors.
+// Strings in log messages indicating errors.
 const errorWords = [
   'but not used',
   'content security policy',
@@ -95,8 +95,10 @@ const errorWords = [
   'invalid',
   'missing',
   'non-standard',
+  'not supported',
   'refused',
   'requires',
+  'sorry',
   'suspicious',
   'unrecognized',
   'violates',
