@@ -341,14 +341,13 @@ const launch = async (report, typeName, lowMotion = false) => {
       browserContext.on('page', async page => {
         // Make the page current.
         currentPage = page;
-        // Make its console messages get reported in the Playwright console.
+        // If it emits a message:
         page.on('console', msg => {
           const msgText = msg.text();
           let indentedMsg = '';
+          // If debugging is on:
           if (debug) {
-            indentedMsg = `    | ${msg.text()}`;
-          }
-          else {
+            // Log a summary of the message on the console.
             const parts = [msgText.slice(0, 75)];
             if (msgText.length > 75) {
               parts.push(msgText.slice(75, 150));
@@ -364,8 +363,9 @@ const launch = async (report, typeName, lowMotion = false) => {
               }
             }
             indentedMsg = parts.map(part => `    | ${part}`).join('\n');
+            console.log(`\n${indentedMsg}`);
           }
-          console.log(`\n${indentedMsg}`);
+          // Add statistics on the message to the report.
           const msgTextLC = msgText.toLowerCase();
           const msgLength = msgText.length;
           report.jobData.logCount++;
@@ -569,20 +569,12 @@ const goTo = async (report, page, url, timeout, waitUntil, isStrict) => {
   }
   // Visit the URL.
   const startTime = Date.now();
-  const response = await page.goto(url, {
-    timeout,
-    waitUntil
-  })
-  .catch(error => {
-    console.log(`ERROR: Visit to ${url} timed out before ${waitUntil} (${errorStart(error)})`);
-    report.jobData.visitTimeoutCount++;
-    return {
-      error: 'timeout'
-    };
-  });
-  report.jobData.visitLatency += Math.round((Date.now() - startTime) / 1000);
-  // If the visit succeeded:
-  if (! response.error) {
+  try {
+    const response = await page.goto(url, {
+      timeout,
+      waitUntil
+    });
+    report.jobData.visitLatency += Math.round((Date.now() - startTime) / 1000);
     const httpStatus = response.status();
     // If the response status was normal:
     if ([200, 304].includes(httpStatus) || url.startsWith('file:')) {
@@ -613,11 +605,10 @@ const goTo = async (report, page, url, timeout, waitUntil, isStrict) => {
       };
     }
   }
-  // Otherwise, i.e. if the visit failed:
-  else {
-    // Return an error.
+  catch(error) {
+    console.log(`ERROR visiting ${url} (${error.message.slice(0, 200)})`);
     return {
-      error: 'noStatus'
+      error: 'noVisit'
     };
   }
 };

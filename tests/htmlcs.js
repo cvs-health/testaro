@@ -26,6 +26,7 @@ exports.reporter = async (page, rules) => {
         // If only some rules are to be employed:
         if (rules && Array.isArray(rules) && rules.length) {
           // Redefine WCAG 2 AAA as including only them.
+          window.HTMLCS_WCAG2AAA ??= {};
           window.HTMLCS_WCAG2AAA.sniffs = rules;
         }
         // Run the tests.

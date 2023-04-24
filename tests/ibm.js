@@ -25,14 +25,18 @@ const run = async (content, timeLimit) => {
     }, 1000 * timeLimit);
   });
   // Return the result of the test, or null if it timed out.
-  const ibmReport = getCompliance(content, nowLabel)
-  .catch(error => {
-    console.log(`ERROR: getCompliance failed (${error.message.replace(/\n+/s, '')}).`);
+  try {
+    const ibmReport = await getCompliance(content, nowLabel);
+    const result = await Promise.race([ibmReport, timeout]);
+    clearTimeout(timeoutID);
+    return result;
+  }
+  catch(error) {
+    console.log(
+      `ERROR: getCompliance failed (${error.message.replace(/\s+/g, ' ').slice(0, 200)}).`
+    );
     return null;
-  });
-  const result = await Promise.race([ibmReport, timeout]);
-  clearTimeout(timeoutID);
-  return result;
+  }
 };
 // Revises report totals for any rule limitation.
 const limitRuleTotals = (report, rules) => {
