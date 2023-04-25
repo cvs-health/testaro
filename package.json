@@ -1,6 +1,6 @@
 {
   "name": "testaro",
-  "version": "12.7.0",
+  "version": "12.7.1",
   "description": "Automation of accessibility testing",
   "main": "index.js",
   "scripts": {
@@ -35,7 +35,7 @@
     "accessibility-checker": "*",
     "axe-playwright": "*",
     "dotenv": "*",
-    "node-fetch@2": "*",
+    "node-fetch": "<3.0.0",
     "pixelmatch": "*",
     "playwright": "*"
   },
