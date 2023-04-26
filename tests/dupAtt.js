@@ -50,14 +50,12 @@ exports.reporter = async (page, withItems) => {
   rawPage = rawPage.replace(/<(script [^<>]+)>.*?<\/script>/g, '$1');
   // Remove any comments from it.
   rawPage = rawPage.replace(/<!--.*?-->/g, '');
-  console.log(rawPage);
   // Extract the opening tags of its elements.
   let elements = rawPage.match(/<[a-zA-Z][^<>]+>/g);
   // Delete their enclosing angle brackets and the values of any attributes in them.
   elements = elements.map(el => el.replace(/^< *|=[^ ]*| *>$/g, ''));
   // For each element:
   elements.forEach(element => {
-    console.log(element);
     // Identify its tag name and attributes.
     const terms = element.split(' ');
     // If it has 2 or more attributes:
