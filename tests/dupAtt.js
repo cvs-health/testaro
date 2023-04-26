@@ -40,20 +40,24 @@ exports.reporter = async (page, withItems) => {
   }
   // Change any spacing character sequences in it to single spaces.
   rawPage = rawPage.replace(/\s+/g, ' ');
+  // Delete any spaces adjacent to equal symbols in it.
+  rawPage = rawPage.replace(/ = | =|= /g, '=');
   // Remove any escaped quotation marks from it.
   rawPage = rawPage.replace(/\\"|\\'/g, '');
   // Remove any quoted text from it.
-  rawPage = rawPage.replace(/"[^<>\r\n"]*"|'[^<>\r\n']*'/g, '');
+  rawPage = rawPage.replace(/"[^"]*"|'[^']*'/g, '');
   // Remove any script code from it.
   rawPage = rawPage.replace(/<(script [^<>]+)>.*?<\/script>/g, '$1');
   // Remove any comments from it.
   rawPage = rawPage.replace(/<!--.*?-->/g, '');
+  console.log(rawPage);
   // Extract the opening tags of its elements.
   let elements = rawPage.match(/<[a-zA-Z][^<>]+>/g);
   // Delete their enclosing angle brackets and the values of any attributes in them.
-  elements = elements.map(el => el.replace(/^< *| *= *"[^"]*"|= *[^ ]+| *>$/g, ''));
+  elements = elements.map(el => el.replace(/^< *|=[^ ]*| *>$/g, ''));
   // For each element:
   elements.forEach(element => {
+    console.log(element);
     // Identify its tag name and attributes.
     const terms = element.split(' ');
     // If it has 2 or more attributes:
