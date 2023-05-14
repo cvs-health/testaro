@@ -302,11 +302,15 @@ const nowString = () => (new Date()).toISOString().slice(0, 19);
 // Closes the current browser.
 const browserClose = async () => {
   if (browser) {
-    const contexts = browser.contexts();
+    const browserType = browser.browserType().name();
+    let contexts = browser.contexts();
     for (const context of contexts) {
       await context.close();
+      contexts = browser.contexts();
     }
     await browser.close();
+    browser = null;
+    console.log(`${browserType} browser closed`);
   }
 };
 // Returns the first line of an error message.
@@ -319,7 +323,12 @@ const launch = async (report, typeName, lowMotion = false) => {
     // Close the current browser, if any.
     await browserClose();
     // Launch a browser of that type.
-    const browserOptions = {};
+    const browserOptions = {
+      logger: {
+        isEnabled: (name, severity) => false,
+        log: (name, severity, message, args) => console.log(message.slice(0, 100))
+      }
+    };
     if (debug) {
       browserOptions.headless = false;
     }
@@ -375,7 +384,10 @@ const launch = async (report, typeName, lowMotion = false) => {
             report.jobData.errorLogSize += msgLength;
           }
           const msgLC = msgText.toLowerCase();
-          if (msgText.includes('403') && (msgLC.includes('status') || msgLC.includes('prohibited'))) {
+          if (
+            msgText.includes('403') && (msgLC.includes('status')
+            || msgLC.includes('prohibited'))
+          ) {
             report.jobData.prohibitedCount++;
           }
         });
@@ -694,41 +706,31 @@ const doActs = async (report, actIndex, page) => {
           // Identify the URL.
           const resolved = act.which.replace('__dirname', __dirname);
           requestedURL = resolved;
-          // Visit it and wait until the network is idle.
           const {strict} = report;
-          let response = await goTo(report, page, requestedURL, 15000, 'networkidle', strict);
+          // Visit it and wait until the DOM is loaded.
+          response = await goTo(report, page, requestedURL, 15000, 'domcontentloaded', strict);
           // If the visit fails:
           if (response.error) {
-            // Try again until the DOM is loaded.
+            // Launch another browser type.
+            const newBrowserName = Object.keys(browserTypeNames)
+            .find(name => name !== browserTypeName);
+            console.log(`>> Launching ${newBrowserName} instead`);
+            await launch(newBrowserName);
+            // Identify its only page as current.
+            page = browserContext.pages()[0];
+            // Visit the URL and wait until the DOM is loaded.
             response = await goTo(report, page, requestedURL, 10000, 'domcontentloaded', strict);
             // If the visit fails:
             if (response.error) {
-              // Launch another browser type.
-              const newBrowserName = Object.keys(browserTypeNames)
-              .find(name => name !== browserTypeName);
-              console.log(`>> Launching ${newBrowserName} instead`);
-              await launch(newBrowserName);
-              // Identify its only page as current.
-              page = browserContext.pages()[0];
-              // Try again until the network is idle.
-              response = await goTo(report, page, requestedURL, 10000, 'networkidle', strict);
+              // Try again and wait until a load.
+              response = await goTo(report, page, requestedURL, 5000, 'load', strict);
               // If the visit fails:
               if (response.error) {
-                // Try again until the DOM is loaded.
-                response = await goTo(report, page, requestedURL, 5000, 'domcontentloaded', strict);
-                // If the visit fails:
-                if (response.error) {
-                  // Try again or until a load.
-                  response = await goTo(report, page, requestedURL, 5000, 'load', strict);
-                  // If the visit fails:
-                  if (response.error) {
-                    // Navigate to a blank page instead.
-                    await page.goto('about:blank')
-                    .catch(error => {
-                      console.log(`ERROR: Navigation to blank page failed (${error.message})`);
-                    });
-                  }
-                }
+                // Navigate to a blank page instead.
+                await page.goto('about:blank')
+                .catch(error => {
+                  console.log(`ERROR: Navigation to blank page failed (${error.message})`);
+                });
               }
             }
           }
@@ -1505,7 +1507,6 @@ const doActs = async (report, actIndex, page) => {
   else if (! report.jobData.abortTime) {
     console.log('Acts completed');
     await browserClose();
-    console.log('Browser closed');
   }
 };
 /*
