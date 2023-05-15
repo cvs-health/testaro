@@ -34,15 +34,15 @@ Testaro uses:
 Testaro includes some of its own accessibility tests. Some of them are derived from tests performed by the [BBC Accessibility Standards Checker](https://github.com/bbc/bbc-a11y).
 
 In addition, Testaro performs tests of these tools:
-- [accessibility-checker](https://www.npmjs.com/package/accessibility-checker) (the IBM Equal Access Accessibility Checker)
-- [alfa](https://alfa.siteimprove.com/) (Siteimprove alfa)
-- [axe-playwright](https://www.npmjs.com/package/axe-playwright) (Deque Axe-core)
-- [Continuum Community Edition](https://www.webaccessibility.com/tools/)
-- [HTML CodeSniffer](https://www.npmjs.com/package/html_codesniffer) (Squiz HTML CodeSniffer)
-- [Nu Html Checker](https://github.com/validator/validator)
-- [QualWeb core](https://www.npmjs.com/package/@qualweb/core)
-- [Tenon](https://tenon.io/documentation/what-tenon-tests.php) (Level Access)
-- [WAVE API](https://wave.webaim.org/api/) (WebAIM WAVE)
+- [accessibility-checker](https://www.npmjs.com/package/accessibility-checker) (IBM)
+- [alfa](https://alfa.siteimprove.com/) (Siteimprove)
+- [axe-playwright](https://www.npmjs.com/package/axe-playwright) (Deque)
+- [Continuum Community Edition](https://www.webaccessibility.com/tools/) (Level Access)
+- [HTML CodeSniffer](https://www.npmjs.com/package/html_codesniffer) (Squiz Labs)
+- [Nu Html Checker](https://github.com/validator/validator) (World Wide Web Consortium)
+- [QualWeb core](https://www.npmjs.com/package/@qualweb/core) (University of Lisbon)
+- [Tenon](https://tenon.io/documentation/what-tenon-tests.php) (Tenon)
+- [WAVE API](https://wave.webaim.org/api/) (WebAIM)
 
 As of this version, the counts of tests of the tools referenced above were:
 - Alfa: 103
