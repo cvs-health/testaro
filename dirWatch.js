@@ -10,7 +10,7 @@ const {spawn} = require('node:child_process');
 
 // ########## CONSTANTS
 
-const interval = process.argv(2);
+const interval = process.argv[2];
 
 // ########## FUNCTIONS
 
@@ -25,7 +25,12 @@ const reWatch = () => {
   });
   watcher.on('close', async code => {
     if (error) {
-      console.log(`ERROR: ${error.slice(0, 100)}`);
+      if (error.startsWith('Navigation timeout of 30000 ms exceeded')) {
+        console.log('ERROR: Playwright claims 30-second timeout exceeded');
+      }
+      else {
+        console.log(`ERROR: ${error.slice(0, 200)}`);
+      }
     }
     if (code === 0) {
       console.log('Watcher exited successfully');

@@ -216,6 +216,8 @@ const runJob = async (job, isDirWatch) => {
 // Checks for a job, performs it, and submits a report, once or repeatedly.
 exports.cycle = async (isDirWatch, isForever, interval = 300, watchee = null) => {
   let statusOK = true;
+  // Prevent a wait before the first iteration.
+  let empty = false;
   const intervalMS = 1000 * Number.parseInt(interval);
   const intervalSpec = isForever ? `with intervals of ${interval} seconds when idle ` : '';
   console.log(`Watching started ${intervalSpec}(${nowString()})`);

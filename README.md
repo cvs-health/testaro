@@ -639,6 +639,14 @@ The URL from which Testaro requests jobs is given by the fourth passed argument,
 
 The URL to which Testaro sends reports is given by the `sources.sendReportTo` property of each job, if the property exists, or, if not, by `process.env.REPORT_URL`.
 
+##### Job isolation
+
+If you execute a repeating watch and the watch process becomes corrupted, the corruption can damage an indefinite subsequent sequence of job performances. Under some conditions, for example, Playwright has been observed to throw errors with a message starting with “Navigation timeout of 30000 ms exceeded” and ending with the entire HTML content of the web page, even when page navigation has been subjected to shorter time limits. Thereafter, Playwright issues that error message again about every 15 seconds, even if the browser has been closed.
+
+To counteract such corruption, you can perform repeating directory watches with job isolation. To do this, use the statement `node dirWatch n`, where `n` is the number of seconds Testaro should wait after finding no job before looking again. The `dirWatch` module spawns a new process for each job, and also shrinks Playwright error messages before they are logged on the console.
+
+You can stop a repeating directory watch of this kind by entering `CTRL-c`.
+
 ### Environment variables
 
 In addition to their uses described above, environment variables can be used by acts of type `text`, as documented in the `actSpecs.js` file.
