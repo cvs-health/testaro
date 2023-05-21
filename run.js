@@ -9,6 +9,8 @@
 require('dotenv').config();
 // Requirements for acts.
 const {actSpecs} = require('./actSpecs');
+// Module to standardize report formats.
+const {standardize} = require('./standardize');
 // Playwright package.
 const playwright = require('playwright');
 
@@ -325,8 +327,8 @@ const launch = async (report, typeName, lowMotion = false) => {
     // Launch a browser of that type.
     const browserOptions = {
       logger: {
-        isEnabled: (name, severity) => false,
-        log: (name, severity, message, args) => console.log(message.slice(0, 100))
+        isEnabled: () => false,
+        log: (name, severity, message) => console.log(message.slice(0, 100))
       }
     };
     if (debug) {
@@ -708,7 +710,7 @@ const doActs = async (report, actIndex, page) => {
           requestedURL = resolved;
           const {strict} = report;
           // Visit it and wait until the DOM is loaded.
-          response = await goTo(report, page, requestedURL, 15000, 'domcontentloaded', strict);
+          let response = await goTo(report, page, requestedURL, 15000, 'domcontentloaded', strict);
           // If the visit fails:
           if (response.error) {
             // Launch another browser type.
@@ -1034,6 +1036,17 @@ const doActs = async (report, actIndex, page) => {
               // Add the result object (possibly an array) to the act.
               const resultCount = Object.keys(testReport.result).length;
               act.result = resultCount ? testReport.result : {success: false};
+              // If a standard-format result is to be included in the report:
+              const standard = process.env.STANDARD;
+              if (['also', 'only'].includes(standard)) {
+                // Initialize it.
+                act.standardResult = {
+                  totals: [],
+                  instances: []
+                };
+                // Populate it.
+                standardize(act);
+              }
             }
             // Otherwise, if the act is a move:
             else if (moves[act.type]) {

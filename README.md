@@ -104,6 +104,8 @@ Once you have done that, you can install Testaro as you would install any `npm` 
 
 However, if the Playwright dependency is ever updated to a newer version, you must also reinstall its browsers by executing the statement `npx playwright install`.
 
+To run Testaro after installation, provide the environment variables described below under “Environment variables”.
+
 ## Payment
 
 All of the tests that Testaro can perform are free of cost, except those performed by the Tenon and WAVE tools. The owner of each of those tools gives new registrants a free allowance of credits before it becomes necessary to pay for use of the API of the tool. The required environment variables for authentication and payment are described below under “Environment variables”.
@@ -179,9 +181,67 @@ Job properties:
 
 ### Reports
 
-A _report_ is a copy of a job file. It begins as a pure copy. Testaro adds data to it as Testaro runs the job. Specifically, Testaro:
+#### Introduction
+
+A _report_ is an enhanced copy of a job file. It begins as a pure copy. Testaro adds data to it as Testaro runs the job. Specifically, Testaro:
 - Adds a `jobData` property and populates it with data about the job.
 - Adds properties to the acts, describing the results of the performance of the acts.
+
+#### Formats
+
+The format of the data that Testaro adds to a test act is determined by the tool to which the test belongs. The various tools (alfa, axe, continuum, etc.) have diverse reporting formats.
+
+In order to simplify the consumption of Testaro reports, Testaro can standardize the most important data. If the `STANDARD` environment variable has the value `also` (which it has by default) or `only`, Testaro converts some data in each test result to a standard Testaro format. That permits you to ignore the format idiosyncrasies of the tools. If `STANDARD` has the value `also`, the report includes both formats. If the value is `only`, the report includes only the standard format. If the value is `no`, the report includes only the original format of each tool.
+
+The standard format has a structure shown by this example:
+
+``` javascript
+standardResult: {
+  totals: [2, 0, 1],
+  instances: [
+    {
+      issueID: 'rule01',
+      what: 'button type invalid',
+      ordinalSeverity: 0,
+      location: {
+        type: 'line',
+        spec: 32
+      },
+      excerpt: '<button type="link"></button>'
+    },
+    {
+      issueID: 'rule01',
+      what: 'button type invalid',
+      ordinalSeverity: 1,
+      location: {
+        type: 'line',
+        spec: 145
+      },
+      excerpt: '<button type="important">Submit</button>'
+    },
+    {
+      issueID: 'rule02',
+      what: 'link href empty',
+      ordinalSeverity: 3,
+      location: {
+        type: 'selector',
+        spec: '#helplink'
+      },
+      excerpt: '<a id="helplink" href>help</a>'
+    }
+  ]
+}
+```
+
+The value of an `ordinalSeverity` property is an integer describing the ordinal rank of the reported severity of the instance of the issue, within the severity classification used by the tool, where 0 describes the lowest level of severity.
+
+The `totals` value is an array of the counts of instances by their ordinal severities.
+
+In the `instances` array, each instance has potentially 5 properties. The `ruleID` property is the identifier of the issue, if the tool assigns such an identifier. Not all tools do so. The `what` property is a description of the instance, which for some tools is identical for all instances of a particular issue.
+
+The possible values of `location.type` are `line` for line number, `selector` for CSS selector, and `xpath` for XPath expression.
+
+If a tool has the option to be used without itemization and is being so used, the `instances` array will be empty.
 
 ### Acts
 
