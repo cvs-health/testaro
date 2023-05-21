@@ -22,7 +22,7 @@ exports.reporter = async (page, rules) => {
     }
   }
   if (! result.prevented) {
-    // Run the Continuum ruleset and get the result, failing if none within 20 seconds.
+    // Run the Continuum ruleset and get the result, failing if none within 30 seconds.
     result = await page.evaluate(async rules => {
       continuum.setUp(null, null, window);
       // If a set of rules to be employed was specified:
@@ -36,11 +36,11 @@ exports.reporter = async (page, rules) => {
         // Run all the tests.
         bigResultPromise = continuum.runAllTests();
       }
-      // Allow 20 seconds for the result compilation.
+      // Allow 30 seconds for the result compilation.
       const deadlinePromise = new Promise(resolve => {
         setTimeout(() => {
           resolve('timeout');
-        }, 20000);
+        }, 30000);
       });
       const bigResult = await Promise.race([bigResultPromise, deadlinePromise]);
       if (Array.isArray(bigResult)) {
@@ -56,7 +56,7 @@ exports.reporter = async (page, rules) => {
       else if (bigResult === 'timeout') {
         return {
           prevented: true,
-          error: 'ERROR: Running all tests timed out'
+          error: 'ERROR: Running tests timed out'
         };
       }
       else {
