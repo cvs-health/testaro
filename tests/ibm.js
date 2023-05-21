@@ -26,7 +26,7 @@ const run = async (content, timeLimit) => {
   });
   // Return the result of the test, or null if it timed out.
   try {
-    const ibmReport = await getCompliance(content, nowLabel);
+    const ibmReport = getCompliance(content, nowLabel);
     const result = await Promise.race([ibmReport, timeout]);
     clearTimeout(timeoutID);
     return result;

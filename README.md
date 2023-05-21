@@ -34,15 +34,15 @@ Testaro uses:
 Testaro includes some of its own accessibility tests. Some of them are derived from tests performed by the [BBC Accessibility Standards Checker](https://github.com/bbc/bbc-a11y).
 
 In addition, Testaro performs tests of these tools:
-- [accessibility-checker](https://www.npmjs.com/package/accessibility-checker) (the IBM Equal Access Accessibility Checker)
-- [alfa](https://alfa.siteimprove.com/) (Siteimprove alfa)
-- [axe-playwright](https://www.npmjs.com/package/axe-playwright) (Deque Axe-core)
-- [Continuum Community Edition](https://www.webaccessibility.com/tools/)
-- [HTML CodeSniffer](https://www.npmjs.com/package/html_codesniffer) (Squiz HTML CodeSniffer)
-- [Nu Html Checker](https://github.com/validator/validator)
-- [QualWeb core](https://www.npmjs.com/package/@qualweb/core)
-- [Tenon](https://tenon.io/documentation/what-tenon-tests.php) (Level Access)
-- [WAVE API](https://wave.webaim.org/api/) (WebAIM WAVE)
+- [accessibility-checker](https://www.npmjs.com/package/accessibility-checker) (IBM)
+- [alfa](https://alfa.siteimprove.com/) (Siteimprove)
+- [axe-playwright](https://www.npmjs.com/package/axe-playwright) (Deque)
+- [Continuum Community Edition](https://www.webaccessibility.com/tools/) (Level Access)
+- [HTML CodeSniffer](https://www.npmjs.com/package/html_codesniffer) (Squiz Labs)
+- [Nu Html Checker](https://github.com/validator/validator) (World Wide Web Consortium)
+- [QualWeb core](https://www.npmjs.com/package/@qualweb/core) (University of Lisbon)
+- [Tenon](https://tenon.io/documentation/what-tenon-tests.php) (Tenon)
+- [WAVE API](https://wave.webaim.org/api/) (WebAIM)
 
 As of this version, the counts of tests of the tools referenced above were:
 - Alfa: 103
@@ -638,6 +638,14 @@ If multiple workstations run Testaro and do work for the same server, the server
 The URL from which Testaro requests jobs is given by the fourth passed argument, if present, or, if not, then by `process.env.JOB_URL`.
 
 The URL to which Testaro sends reports is given by the `sources.sendReportTo` property of each job, if the property exists, or, if not, by `process.env.REPORT_URL`.
+
+##### Job isolation
+
+If you execute a repeating watch and the watch process becomes corrupted, the corruption can damage an indefinite subsequent sequence of job performances. Under some conditions, for example, Playwright has been observed to throw errors with a message starting with “Navigation timeout of 30000 ms exceeded” and ending with the entire HTML content of the web page, even when page navigation has been subjected to shorter time limits. Thereafter, Playwright issues that error message again about every 15 seconds, even if the browser has been closed.
+
+To counteract such corruption, you can perform repeating directory watches with job isolation. To do this, use the statement `node dirWatch n`, where `n` is the number of seconds Testaro should wait after finding no job before looking again. The `dirWatch` module spawns a new process for each job, and also shrinks Playwright error messages before they are logged on the console.
+
+You can stop a repeating directory watch of this kind by entering `CTRL-c`.
 
 ### Environment variables
 
