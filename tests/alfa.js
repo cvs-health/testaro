@@ -18,7 +18,6 @@ exports.reporter = async (page, rules) => {
     // Remove the other rules.
     alfaRules = alfaRules.filter(rule => rules.includes(rule.uri.replace(/^.+-/, '')));
   }
-  console.log(`alfa rules are ${JSON.stringify(alfaRules, null, 2)}`);
   // Get the document containing the summaries of the alfa rules.
   const context = page.context();
   const rulePage = await context.newPage();
@@ -50,28 +49,31 @@ exports.reporter = async (page, rules) => {
       });
       await rulePage.close();
     }
+    let data;
     await Scraper.with(async scraper => {
       // Request the page content.
       const scrapes = await scraper.scrape(page.url());
       // If the request failed:
-      if (scrapes && typeof scrapes === 'object' && scrapes.type === 'err') {
-        console.log('ERROR: Failed to get page content for alfa');
-        return {result: {
-          prevented: true,
-          error: scrapes.error
-        }};
+      const scrapesObj = JSON.parse(JSON.stringify(scrapes));
+      if (scrapes && typeof scrapes === 'object' && scrapesObj.type === 'err') {
+        console.log(`ERROR: Failed to get page content for alfa (${scrapesObj.error})`);
+        data = {
+          result: {
+            prevented: true,
+            error: scrapesObj.error
+          }
+        };
       }
       // Otherwise, i.e. if the request succeeded:
       else {
         // Initialize the result.
-        const data = {
+        data = {
           totals: {
             failures: 0,
             warnings: 0
           },
           items: []
         };
-        console.log(`scrapes length is ${scrapes.length}`);
         // Test the page content with the specified rules.
         for (const input of scrapes) {
           const audit = Audit.of(input, alfaRules);
@@ -136,9 +138,9 @@ exports.reporter = async (page, rules) => {
             }
           });
         }
-        return {result: data};
       }
     });
+    return {result: data};
   }
   catch(error) {
     console.log(`ERROR: navigation to URL timed out (${error})`);
