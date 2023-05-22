@@ -5,13 +5,53 @@
 
 // ########## CONSTANTS
 
-const convertibles = ['alfa'];
+const convertibles = ['alfa', 'axe'];
 
 // ########## FUNCTIONS
 
-// Converts an alfa report.
+// Limits the length of a string.
+const cap = string => {
+  if (string && string.length > 400) {
+    return `${string.slice(0, 200)} ... ${string.slice(-200)}`;
+  }
+  else if (string) {
+    return string;
+  }
+  else {
+    return '';
+  }
+};
+// Converts nodes of an axe rule.
+const doAxeRule = (result, standardResult, certainty) => {
+  if (result.details && result.details[certainty]) {
+    result.details[certainty].forEach(rule => {
+      rule.nodes.forEach(node => {
+        const whatSet = new Set([
+          rule.help,
+          ... node.any.map(anyItem => anyItem.message),
+          ... node.all.map(allItem => allItem.message)
+        ]);
+        const initialSeverity = ['minor', 'moderate', 'serious', 'critical'].indexOf(node.impact);
+        const moreSeverity = certainty === 'violations' ? 4 : 0;
+        const instance = {
+          issueID: rule.id,
+          what: whatSet.values().join('; '),
+          ordinalSeverity: initialSeverity + moreSeverity,
+          location: {
+            type: 'selector',
+            spec: node.target && node.target.length ? node.target[0] : '',
+          },
+          excerpt: cap(node.html)
+        };
+        standardResult.instances.push(instance);
+      });
+    });
+  }
+};
+// Converts a report.
 const convert = (testName, result, standardResult) => {
-  if (testName === 'alfa') {
+  // alfa
+  if (testName === 'alfa' && result.totals) {
     standardResult.totals = [result.totals.warnings, result.totals.failures];
     result.items.forEach(item => {
       const instance = {
@@ -22,10 +62,23 @@ const convert = (testName, result, standardResult) => {
           type: 'xpath',
           spec: item.target.path,
         },
-        excerpt: item.target.codeLines
+        excerpt: cap(item.target.codeLines)
       };
       standardResult.instances.push(instance);
     });
+  }
+  // axe
+  else if (
+    testName === 'axe'
+    && result.totals
+    && (result.totals.rulesWarned || result.totals.rulesViolated)
+  ) {
+    standardResult.totals = [
+      result.totals.warnings.values.reduce((sum, current) => sum + current),
+      result.totals.failures.values.reduce((sum, current) => sum + current)
+    ];
+    doAxeRule(result, standardResult, 'incomplete');
+    doAxeRule(result, standardResult, 'violations');
   }
 };
 // Converts the convertible reports.

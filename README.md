@@ -193,7 +193,14 @@ The format of the data that Testaro adds to a test act is determined by the tool
 
 In order to simplify the consumption of Testaro reports, Testaro can standardize the most important data. If the `STANDARD` environment variable has the value `also` (which it has by default) or `only`, Testaro converts some data in each test result to a standard Testaro format. That permits you to ignore the format idiosyncrasies of the tools. If `STANDARD` has the value `also`, the report includes both formats. If the value is `only`, the report includes only the standard format. If the value is `no`, the report includes only the original format of each tool.
 
-The standard format has a structure shown by this example:
+As long as the tool permits, the standard format tells you, for each instance of an issue:
+- the ID of the issue
+- a description of the issue
+- how serious the tool considers the instance to be
+- where the instance occurs
+- some of the code that created the issue
+
+The original result of a test act is recorded as the value of a `result` property of the act. The standard-format result is recorded as the value of the `standardResult` property of the act. Its format is shown by this example:
 
 ``` javascript
 standardResult: {
