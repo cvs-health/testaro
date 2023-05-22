@@ -5,7 +5,7 @@
 
 // ########## CONSTANTS
 
-const convertibles = ['alfa', 'axe'];
+const convertibles = ['alfa', 'axe', 'continuum'];
 
 // ########## FUNCTIONS
 
@@ -88,7 +88,7 @@ const convert = (testName, result, standardResult) => {
     doAxeRule(result, standardResult, 'violations');
   }
   // continuum
-  if (testName === 'continuum' && Array.isArray(result) && result.length) {
+  else if (testName === 'continuum' && Array.isArray(result) && result.length) {
     standardResult.totals = [result.length];
     result.forEach(item => {
       const instance = {

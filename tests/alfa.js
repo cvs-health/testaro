@@ -18,6 +18,7 @@ exports.reporter = async (page, rules) => {
     // Remove the other rules.
     alfaRules = alfaRules.filter(rule => rules.includes(rule.uri.replace(/^.+-/, '')));
   }
+  console.log(`alfa rules are ${JSON.stringify(alfaRules, null, 2)}`);
   // Get the document containing the summaries of the alfa rules.
   const context = page.context();
   const rulePage = await context.newPage();
@@ -49,82 +50,95 @@ exports.reporter = async (page, rules) => {
       });
       await rulePage.close();
     }
-    // Initialize the result.
-    const data = {
-      totals: {
-        failures: 0,
-        warnings: 0
-      },
-      items: []
-    };
     await Scraper.with(async scraper => {
-      // Get the page content.
-      for (const input of await scraper.scrape(page.url())) {
-        // Test it with the specified rules.
-        const audit = Audit.of(input, alfaRules);
-        const outcomes = Array.from(await audit.evaluate());
-        // For each failure or warning:
-        outcomes.forEach((outcome, index) => {
-          const {target} = outcome;
-          if (target && ! target._members) {
-            const outcomeJ = outcome.toJSON();
-            const verdict = outcomeJ.outcome;
-            if (verdict !== 'passed') {
-              // Add to the result.
-              const {rule} = outcomeJ;
-              const {tags, uri, requirements} = rule;
-              const ruleID = uri.replace(/^.+-/, '');
-              const ruleSummary = ruleData[ruleID] || '';
-              const targetJ = outcomeJ.target;
-              const codeLines = target.toString().split('\n');
-              if (codeLines[0] === '#document') {
-                codeLines.splice(2, codeLines.length - 3, '...');
-              }
-              else if (codeLines[0].startsWith('<html')) {
-                codeLines.splice(1, codeLines.length - 2, '...');
-              }
-              const outcomeData = {
-                index,
-                verdict,
-                rule: {
-                  ruleID,
-                  ruleSummary,
-                  scope: '',
-                  uri,
-                  requirements
-                },
-                target: {
-                  type: targetJ.type,
-                  tagName: targetJ.name || '',
-                  path: target.path(),
-                  codeLines: codeLines.map(line => line.length > 300 ? `${line.slice(0, 300)}...` : line)
+      // Request the page content.
+      const scrapes = await scraper.scrape(page.url());
+      // If the request failed:
+      if (scrapes && typeof scrapes === 'object' && scrapes.type === 'err') {
+        console.log('ERROR: Failed to get page content for alfa');
+        return {result: {
+          prevented: true,
+          error: scrapes.error
+        }};
+      }
+      // Otherwise, i.e. if the request succeeded:
+      else {
+        // Initialize the result.
+        const data = {
+          totals: {
+            failures: 0,
+            warnings: 0
+          },
+          items: []
+        };
+        console.log(`scrapes length is ${scrapes.length}`);
+        // Test the page content with the specified rules.
+        for (const input of scrapes) {
+          const audit = Audit.of(input, alfaRules);
+          const outcomes = Array.from(await audit.evaluate());
+          // For each failure or warning:
+          outcomes.forEach((outcome, index) => {
+            const {target} = outcome;
+            if (target && ! target._members) {
+              const outcomeJ = outcome.toJSON();
+              const verdict = outcomeJ.outcome;
+              if (verdict !== 'passed') {
+                // Add to the result.
+                const {rule} = outcomeJ;
+                const {tags, uri, requirements} = rule;
+                const ruleID = uri.replace(/^.+-/, '');
+                const ruleSummary = ruleData[ruleID] || '';
+                const targetJ = outcomeJ.target;
+                const codeLines = target.toString().split('\n');
+                if (codeLines[0] === '#document') {
+                  codeLines.splice(2, codeLines.length - 3, '...');
                 }
-              };
-              const etcTags = [];
-              tags.forEach(tag => {
-                if (tag.type === 'scope') {
-                  outcomeData.rule.scope = tag.scope;
+                else if (codeLines[0].startsWith('<html')) {
+                  codeLines.splice(1, codeLines.length - 2, '...');
                 }
-                else {
-                  etcTags.push(tag);
+                const outcomeData = {
+                  index,
+                  verdict,
+                  rule: {
+                    ruleID,
+                    ruleSummary,
+                    scope: '',
+                    uri,
+                    requirements
+                  },
+                  target: {
+                    type: targetJ.type,
+                    tagName: targetJ.name || '',
+                    path: target.path(),
+                    codeLines: codeLines.map(line => line.length > 300 ? `${line.slice(0, 300)}...` : line)
+                  }
+                };
+                const etcTags = [];
+                tags.forEach(tag => {
+                  if (tag.type === 'scope') {
+                    outcomeData.rule.scope = tag.scope;
+                  }
+                  else {
+                    etcTags.push(tag);
+                  }
+                });
+                if (etcTags.length) {
+                  outcomeData.etcTags = etcTags;
                 }
-              });
-              if (etcTags.length) {
-                outcomeData.etcTags = etcTags;
+                if (outcomeData.verdict === 'failed') {
+                  data.totals.failures++;
+                }
+                else if (outcomeData.verdict === 'cantTell') {
+                  data.totals.warnings++;
+                }
+                data.items.push(outcomeData);
               }
-              if (outcomeData.verdict === 'failed') {
-                data.totals.failures++;
-              }
-              else if (outcomeData.verdict === 'cantTell') {
-                data.totals.warnings++;
-              }
-              data.items.push(outcomeData);
             }
-          }
-        });
+          });
+        }
+        return {result: data};
       }
     });
-    return {result: data};
   }
   catch(error) {
     console.log(`ERROR: navigation to URL timed out (${error})`);
