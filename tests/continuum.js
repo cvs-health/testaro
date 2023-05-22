@@ -43,12 +43,16 @@ exports.reporter = async (page, rules) => {
         }, 30000);
       });
       const bigResult = await Promise.race([bigResultPromise, deadlinePromise]);
+      // If the result compilation succeeded:
       if (Array.isArray(bigResult)) {
+        // Return a compact version of it, removing useless and invariant properties.
         return bigResult.map(bigItem => {
           const item = bigItem._rawEngineJsonObject;
+          delete item.testResult;
+          delete item.fixType;
           delete item.fingerprint.encoding;
-          if (item.element.length > 200) {
-            item.element = `${item.element.slice(0, 100)} ... ${item.element.slice(-100)}`;
+          if (item.element.length > 240) {
+            item.element = `${item.element.slice(0, 200)} ... ${item.element.slice(-200)}`;
           }
           return item;
         });

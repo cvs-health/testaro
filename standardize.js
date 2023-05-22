@@ -87,6 +87,23 @@ const convert = (testName, result, standardResult) => {
     doAxeRule(result, standardResult, 'incomplete');
     doAxeRule(result, standardResult, 'violations');
   }
+  // continuum
+  if (testName === 'continuum' && Array.isArray(result) && result.length) {
+    standardResult.totals = [result.length];
+    result.forEach(item => {
+      const instance = {
+        issueID: item.engineTestId.toString(),
+        what: item.attributeDetail,
+        ordinalSeverity: 0,
+        location: {
+          type: 'selector',
+          spec: item.path,
+        },
+        excerpt: item.element
+      };
+      standardResult.instances.push(instance);
+    });
+  }
 };
 // Converts the convertible reports.
 exports.standardize = act => {
