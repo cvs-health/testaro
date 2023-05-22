@@ -35,7 +35,7 @@ const doAxeRule = (result, standardResult, certainty) => {
         const moreSeverity = certainty === 'violations' ? 4 : 0;
         const instance = {
           issueID: rule.id,
-          what: whatSet.values().join('; '),
+          what: Array.from(whatSet.values()).join('; '), 
           ordinalSeverity: initialSeverity + moreSeverity,
           location: {
             type: 'selector',
@@ -73,9 +73,16 @@ const convert = (testName, result, standardResult) => {
     && result.totals
     && (result.totals.rulesWarned || result.totals.rulesViolated)
   ) {
+    const {totals} = result;
     standardResult.totals = [
-      result.totals.warnings.values.reduce((sum, current) => sum + current),
-      result.totals.failures.values.reduce((sum, current) => sum + current)
+      totals.warnings.minor,
+      totals.warnings.moderate,
+      totals.warnings.serious,
+      totals.warnings.critical,
+      totals.violations.minor,
+      totals.violations.moderate,
+      totals.violations.serious,
+      totals.violations.critical
     ];
     doAxeRule(result, standardResult, 'incomplete');
     doAxeRule(result, standardResult, 'violations');
