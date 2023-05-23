@@ -101,7 +101,7 @@ const doNuVal = (result, standardResult, docType) => {
 // Converts instances of a qualWeb rule class.
 const doQualWeb = (result, standardResult, ruleClassName) => {
   if (result.modules && result.modules[ruleClassName]) {
-    const {ruleClass} = result.modules;
+    const ruleClass = result.modules[ruleClassName];
     let classSeverity = 0;
     if (ruleClass.metadata) {
       classSeverity = 2 * [
@@ -111,12 +111,12 @@ const doQualWeb = (result, standardResult, ruleClassName) => {
       standardResult.totals[classSeverity + 1] += ruleClass.metadata.failed;
     }
     Object.keys(ruleClass.assertions).forEach(rule => {
-      ruleClass[rule].results.forEach(item => {
+      ruleClass.assertions[rule].results.forEach(item => {
         item.elements.forEach(element => {
           const instance = {
-            issueID: rule.name,
-            what: rule.description,
-            ordinalSeverity: classSeverity + item.verdict === 'failed' ? 1 : 0,
+            issueID: ruleClass.assertions[rule].name,
+            what: ruleClass.assertions[rule].description,
+            ordinalSeverity: classSeverity + (item.verdict === 'failed' ? 1 : 0),
             location: {
               doc: 'dom',
               type: 'selector',
