@@ -18,8 +18,8 @@ const cap = rawString => {
     return '';
   }
 };
-// Converts nodes of an axe rule.
-const doAxeRule = (result, standardResult, certainty) => {
+// Converts issue instances at an axe certainty level.
+const doAxe = (result, standardResult, certainty) => {
   if (result.details && result.details[certainty]) {
     result.details[certainty].forEach(rule => {
       rule.nodes.forEach(node => {
@@ -46,8 +46,8 @@ const doAxeRule = (result, standardResult, certainty) => {
     });
   }
 };
-// Converts instances of an htmlcs rule.
-const doHTMLCSRule = (result, standardResult, severity) => {
+// Converts issue instances at an htmlcs severity level.
+const doHTMLCS = (result, standardResult, severity) => {
   if (result[severity]) {
     Object.keys(result[severity]).forEach(ruleID => {
       const ruleData = result[severity][ruleID];
@@ -71,8 +71,8 @@ const doHTMLCSRule = (result, standardResult, severity) => {
     });
   }
 };
-// Converts instances of a nuVal rule.
-const doNuValRule = (result, standardResult, docType) => {
+// Converts issue instances from a nuVal document type.
+const doNuVal = (result, standardResult, docType) => {
   const items = result[docType] && result[docType].messages;
   if (items && items.length) {
     items.forEach(item => {
@@ -81,7 +81,7 @@ const doNuValRule = (result, standardResult, docType) => {
         what: item.message,
         ordinalSeverity: -1,
         location: {
-          doc: docType,
+          doc: docType === 'pageContent' ? 'dom' : 'source',
           type: 'line',
           spec: item.lastLine.toString()
         },
@@ -95,6 +95,38 @@ const doNuValRule = (result, standardResult, docType) => {
         instance.ordinalSeverity = subType === 'fatal' ? 2 : 1;
       }
       standardResult.instances.push(instance);
+    });
+  }
+};
+// Converts instances of a qualWeb rule class.
+const doQualWeb = (result, standardResult, ruleClassName) => {
+  if (result.modules && result.modules[ruleClassName]) {
+    const {ruleClass} = result.modules;
+    let classSeverity = 0;
+    if (ruleClass.metadata) {
+      classSeverity = 2 * [
+        'best-practices', 'wcag-techniques', 'act-rules'
+      ].indexOf(ruleClassName);
+      standardResult.totals[classSeverity] += ruleClass.metadata.warning;
+      standardResult.totals[classSeverity + 1] += ruleClass.metadata.failed;
+    }
+    Object.keys(ruleClass.assertions).forEach(rule => {
+      ruleClass[rule].results.forEach(item => {
+        item.elements.forEach(element => {
+          const instance = {
+            issueID: rule.name,
+            what: rule.description,
+            ordinalSeverity: classSeverity + item.verdict === 'failed' ? 1 : 0,
+            location: {
+              doc: 'dom',
+              type: 'selector',
+              spec: element.pointer
+            },
+            excerpt: cap(element.htmlCode)
+          };
+          standardResult.instances.push(instance);
+        });
+      });
     });
   }
 };
@@ -135,8 +167,8 @@ const convert = (testName, result, standardResult) => {
       totals.violations.serious,
       totals.violations.critical
     ];
-    doAxeRule(result, standardResult, 'incomplete');
-    doAxeRule(result, standardResult, 'violations');
+    doAxe(result, standardResult, 'incomplete');
+    doAxe(result, standardResult, 'violations');
   }
   // continuum
   else if (testName === 'continuum' && Array.isArray(result) && result.length) {
@@ -158,8 +190,8 @@ const convert = (testName, result, standardResult) => {
   }
   // htmlcs
   else if (testName === 'htmlcs' && result) {
-    doHTMLCSRule(result, standardResult, 'Warning');
-    doHTMLCSRule(result, standardResult, 'Error');
+    doHTMLCS(result, standardResult, 'Warning');
+    doHTMLCS(result, standardResult, 'Error');
     const {instances} = standardResult;
     standardResult.totals = [
       instances.filter(instance => instance.ordinalSeverity === 0).length,
@@ -187,10 +219,10 @@ const convert = (testName, result, standardResult) => {
   // nuVal
   else if (testName === 'nuVal' && (result.pageContent || result.rawPage)) {
     if (result.pageContent) {
-      doNuValRule(result, standardResult, 'pageContent');
+      doNuVal(result, standardResult, 'pageContent');
     }
     if (result.rawPage) {
-      doNuValRule(result, standardResult, 'rawPage');
+      doNuVal(result, standardResult, 'rawPage');
     }
     const {instances} = standardResult;
     standardResult.totals = [
@@ -198,6 +230,27 @@ const convert = (testName, result, standardResult) => {
       instances.filter(instance => instance.ordinalSeverity === 1).length,
       instances.filter(instance => instance.ordinalSeverity === 2).length
     ];
+  }
+  // qualWeb
+  else if (
+    testName === 'qualWeb'
+    && result.modules
+    && (
+      result.modules['act-rules']
+      || result.modules['wcag-techniques']
+      || result.modules['best-practices']
+    )
+  ) {
+    standardResult.totals = [0, 0, 0, 0, 0, 0];
+    if (result.modules['act-rules']) {
+      doQualWeb(result, standardResult, 'act-rules');
+    }
+    if (result.modules['wcag-techniques']) {
+      doQualWeb(result, standardResult, 'wcag-techniques');
+    }
+    if (result.modules['best-practices']) {
+      doQualWeb(result, standardResult, 'best-practices');
+    }
   }
 };
 // Converts the convertible reports.
