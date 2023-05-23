@@ -49,8 +49,9 @@ const doAxeRule = (result, standardResult, certainty) => {
 const doHTMLCSRule = (result, standardResult, severity) => {
   if (result[severity]) {
     Object.keys(result[severity]).forEach(ruleID => {
-      Object.keys(ruleID).forEach(what => {
-        result[severity][ruleID][what].forEach(item => {
+      const ruleData = result[severity][ruleID];
+      Object.keys(ruleData).forEach(what => {
+        ruleData[what].forEach(item => {
           const {tagName, code} = item;
           const instance = {
             issueID: ruleID,
