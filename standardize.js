@@ -35,8 +35,9 @@ const doAxeRule = (result, standardResult, certainty) => {
           what: Array.from(whatSet.values()).join('; '), 
           ordinalSeverity: initialSeverity + moreSeverity,
           location: {
+            doc: 'dom',
             type: 'selector',
-            spec: node.target && node.target.length ? node.target[0] : '',
+            spec: node.target && node.target.length ? node.target[0] : ''
           },
           excerpt: cap(node.html)
         };
@@ -55,17 +56,45 @@ const doHTMLCSRule = (result, standardResult, severity) => {
           const {tagName, code} = item;
           const instance = {
             issueID: ruleID,
-            what, 
+            what,
             ordinalSeverity: ['Warning', 'Error'].indexOf(severity),
             location: {
+              doc: 'dom',
               type: '',
-              spec: '',
+              spec: ''
             },
             excerpt: cap(`${tagName ? tagName + ': ' : ''}${code || ''}`)
           };
           standardResult.instances.push(instance);
         });
       });
+    });
+  }
+};
+// Converts instances of a nuVal rule.
+const doNuValRule = (result, standardResult, docType) => {
+  const items = result[docType] && result[docType].messages;
+  if (items && items.length) {
+    items.forEach(item => {
+      const instance = {
+        issueID: item.message,
+        what: item.message,
+        ordinalSeverity: -1,
+        location: {
+          doc: docType,
+          type: 'line',
+          spec: item.lastLine.toString()
+        },
+        excerpt: cap(item.extract)
+      };
+      const {type, subType} = item;
+      if (type === 'info' && subType === 'warning') {
+        instance.ordinalSeverity = 0;
+      }
+      else if (type === 'error') {
+        instance.ordinalSeverity = subType === 'fatal' ? 2 : 1;
+      }
+      standardResult.instances.push(instance);
     });
   }
 };
@@ -80,8 +109,9 @@ const convert = (testName, result, standardResult) => {
         what: item.rule.ruleSummary,
         ordinalSeverity: ['cantTell', 'failed'].indexOf(item.verdict),
         location: {
+          doc: 'dom',
           type: 'xpath',
-          spec: item.target.path,
+          spec: item.target.path
         },
         excerpt: cap(item.target.codeLines.join(' '))
       };
@@ -117,8 +147,9 @@ const convert = (testName, result, standardResult) => {
         what: item.attributeDetail,
         ordinalSeverity: 0,
         location: {
+          doc: 'dom',
           type: 'selector',
-          spec: item.path,
+          spec: item.path
         },
         excerpt: item.element
       };
@@ -132,7 +163,7 @@ const convert = (testName, result, standardResult) => {
     const {instances} = standardResult;
     standardResult.totals = [
       instances.filter(instance => instance.ordinalSeverity === 0).length,
-      instances.filter(instance => instance.ordinalSeverity === 1).length,
+      instances.filter(instance => instance.ordinalSeverity === 1).length
     ];
   }
   // ibm
@@ -144,13 +175,29 @@ const convert = (testName, result, standardResult) => {
         what: item.message,
         ordinalSeverity: ['recommendation', 'violation'].indexOf(item.level),
         location: {
+          doc: 'dom',
           type: 'xpath',
-          spec: item.path.dom,
+          spec: item.path.dom
         },
         excerpt: cap(item.snippet)
       };
       standardResult.instances.push(instance);
     });
+  }
+  // nuVal
+  else if (testName === 'nuVal' && (result.pageContent || result.rawPage)) {
+    if (result.pageContent) {
+      doNuValRule(result, standardResult, 'pageContent');
+    }
+    if (result.rawPage) {
+      doNuValRule(result, standardResult, 'rawPage');
+    }
+    const {instances} = standardResult;
+    standardResult.totals = [
+      instances.filter(instance => instance.ordinalSeverity === 0).length,
+      instances.filter(instance => instance.ordinalSeverity === 1).length,
+      instances.filter(instance => instance.ordinalSeverity === 2).length
+    ];
   }
 };
 // Converts the convertible reports.

@@ -125,9 +125,8 @@ const doTest = async (content, withItems, timeLimit, rules) => {
 exports.reporter = async (page, withItems, withNewContent, rules) => {
   const contentType = withNewContent ? 'new' : 'existing';
   console.log(`>>>>>> Content type: ${contentType}`);
-  // If a test with existing content is to be performed:
   let result;
-  const timeLimit = 20;
+  const timeLimit = 30;
   const typeContent = contentType === 'existing' ? await page.content() : await page.url();
   try {
     result = await doTest(typeContent, withItems, timeLimit, rules);
