@@ -3,10 +3,6 @@
   Converts test reports to the standard format.
 */
 
-// ########## CONSTANTS
-
-const convertibles = ['alfa', 'axe', 'continuum'];
-
 // ########## FUNCTIONS
 
 // Limits the length of and unilinearizes a string.
@@ -143,7 +139,5 @@ const convert = (testName, result, standardResult) => {
 exports.standardize = act => {
   const {which} = act;
   const {result, standardResult} = act;
-  if (convertibles.includes(which)) {
-    convert(which, result, standardResult);
-  }
+  convert(which, result, standardResult);
 };
