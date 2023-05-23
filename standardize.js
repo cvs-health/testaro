@@ -49,6 +49,29 @@ const doAxeRule = (result, standardResult, certainty) => {
     });
   }
 };
+// Converts instances of an htmlcs rule.
+const doHTMLCSRule = (result, standardResult, severity) => {
+  if (result[severity]) {
+    Object.keys(result[severity]).forEach(ruleID => {
+      Object.keys(ruleID).forEach(what => {
+        result[severity][ruleID][what].forEach(item => {
+          const {tagName, code} = item;
+          const instance = {
+            issueID: ruleID,
+            what, 
+            ordinalSeverity: ['Warning', 'Error'].indexOf(severity),
+            location: {
+              type: '',
+              spec: '',
+            },
+            excerpt: cap(`${tagName ? tagName + ': ' : ''}${code || ''}`)
+          };
+          standardResult.instances.push(instance);
+        });
+      });
+    });
+  }
+};
 // Converts a report.
 const convert = (testName, result, standardResult) => {
   // alfa
@@ -104,6 +127,16 @@ const convert = (testName, result, standardResult) => {
       };
       standardResult.instances.push(instance);
     });
+  }
+  // htmlcs
+  else if (testName === 'htmlcs' && result) {
+    doHTMLCSRule(result, standardResult, 'Warning');
+    doHTMLCSRule(result, standardResult, 'Error');
+    const {instances} = standardResult;
+    standardResult.totals = [
+      instances.filter(instance => instance.ordinalSeverity === 0).length,
+      instances.filter(instance => instance.ordinalSeverity === 1).length,
+    ];
   }
 };
 // Converts the convertible reports.
