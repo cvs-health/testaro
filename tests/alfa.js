@@ -6,7 +6,7 @@
 // IMPORTS
 
 const {Audit} = require('@siteimprove/alfa-act');
-const {Scraper} = require('@siteimprove/alfa-scraper');
+const {Playwright} = require('@siteimprove/alfa-playwright');
 let alfaRules = require('@siteimprove/alfa-rules').default;
 
 // FUNCTIONS
@@ -25,8 +25,16 @@ exports.reporter = async (page, rules) => {
     const msgText = msg.text();
     console.log(msgText);
   });
+  // Initialize the result.
+  let data = {
+    totals: {
+      failures: 0,
+      warnings: 0
+    },
+    items: []
+  };
   try {
-    const response = await rulePage.goto('https://alfa.siteimprove.com/rules', {timeout: 10000});
+    const response = await rulePage.goto('https://alfa.siteimprove.com/rules', {timeout: 15000});
     let ruleData = {};
     if (response.status() === 200) {
       // Compile data on the rule IDs and summaries.
@@ -49,106 +57,79 @@ exports.reporter = async (page, rules) => {
       });
       await rulePage.close();
     }
-    let data;
-    await Scraper.with(async scraper => {
-      // Request the page content.
-      const scrapes = await scraper.scrape(page.url());
-      // If the request failed:
-      const scrapesObj = JSON.parse(JSON.stringify(scrapes));
-      if (scrapes && typeof scrapes === 'object' && scrapesObj.type === 'err') {
-        console.log(`ERROR: Failed to get page content for alfa (${scrapesObj.error})`);
-        data = {
-          result: {
-            prevented: true,
-            error: scrapesObj.error
+    // Test the page content with the specified rules.
+    const doc = await page.evaluateHandle('document');
+    const alfaPage = await Playwright.toPage(doc);
+    const audit = Audit.of(alfaPage, alfaRules);
+    const outcomes = Array.from(await audit.evaluate());
+    // For each failure or warning:
+    outcomes.forEach((outcome, index) => {
+      const {target} = outcome;
+      if (target && ! target._members) {
+        const outcomeJ = outcome.toJSON();
+        const verdict = outcomeJ.outcome;
+        if (verdict !== 'passed') {
+          // Add to the result.
+          const {rule} = outcomeJ;
+          const {tags, uri, requirements} = rule;
+          const ruleID = uri.replace(/^.+-/, '');
+          const ruleSummary = ruleData[ruleID] || '';
+          const targetJ = outcomeJ.target;
+          const codeLines = target.toString().split('\n');
+          if (codeLines[0] === '#document') {
+            codeLines.splice(2, codeLines.length - 3, '...');
           }
-        };
-      }
-      // Otherwise, i.e. if the request succeeded:
-      else {
-        // Initialize the result.
-        data = {
-          totals: {
-            failures: 0,
-            warnings: 0
-          },
-          items: []
-        };
-        // Test the page content with the specified rules.
-        for (const input of scrapes) {
-          const audit = Audit.of(input, alfaRules);
-          const outcomes = Array.from(await audit.evaluate());
-          // For each failure or warning:
-          outcomes.forEach((outcome, index) => {
-            const {target} = outcome;
-            if (target && ! target._members) {
-              const outcomeJ = outcome.toJSON();
-              const verdict = outcomeJ.outcome;
-              if (verdict !== 'passed') {
-                // Add to the result.
-                const {rule} = outcomeJ;
-                const {tags, uri, requirements} = rule;
-                const ruleID = uri.replace(/^.+-/, '');
-                const ruleSummary = ruleData[ruleID] || '';
-                const targetJ = outcomeJ.target;
-                const codeLines = target.toString().split('\n');
-                if (codeLines[0] === '#document') {
-                  codeLines.splice(2, codeLines.length - 3, '...');
-                }
-                else if (codeLines[0].startsWith('<html')) {
-                  codeLines.splice(1, codeLines.length - 2, '...');
-                }
-                const outcomeData = {
-                  index,
-                  verdict,
-                  rule: {
-                    ruleID,
-                    ruleSummary,
-                    scope: '',
-                    uri,
-                    requirements
-                  },
-                  target: {
-                    type: targetJ.type,
-                    tagName: targetJ.name || '',
-                    path: target.path(),
-                    codeLines: codeLines.map(line => line.length > 300 ? `${line.slice(0, 300)}...` : line)
-                  }
-                };
-                const etcTags = [];
-                tags.forEach(tag => {
-                  if (tag.type === 'scope') {
-                    outcomeData.rule.scope = tag.scope;
-                  }
-                  else {
-                    etcTags.push(tag);
-                  }
-                });
-                if (etcTags.length) {
-                  outcomeData.etcTags = etcTags;
-                }
-                if (outcomeData.verdict === 'failed') {
-                  data.totals.failures++;
-                }
-                else if (outcomeData.verdict === 'cantTell') {
-                  data.totals.warnings++;
-                }
-                data.items.push(outcomeData);
-              }
+          else if (codeLines[0].startsWith('<html')) {
+            codeLines.splice(1, codeLines.length - 2, '...');
+          }
+          const outcomeData = {
+            index,
+            verdict,
+            rule: {
+              ruleID,
+              ruleSummary,
+              scope: '',
+              uri,
+              requirements
+            },
+            target: {
+              type: targetJ.type,
+              tagName: targetJ.name || '',
+              path: target.path(),
+              codeLines: codeLines.map(line => line.length > 300 ? `${line.slice(0, 300)}...` : line)
+            }
+          };
+          const etcTags = [];
+          tags.forEach(tag => {
+            if (tag.type === 'scope') {
+              outcomeData.rule.scope = tag.scope;
+            }
+            else {
+              etcTags.push(tag);
             }
           });
+          if (etcTags.length) {
+            outcomeData.etcTags = etcTags;
+          }
+          if (outcomeData.verdict === 'failed') {
+            data.totals.failures++;
+          }
+          else if (outcomeData.verdict === 'cantTell') {
+            data.totals.warnings++;
+          }
+          data.items.push(outcomeData);
         }
       }
     });
-    return {result: data};
   }
   catch(error) {
     console.log(`ERROR: navigation to URL timed out (${error})`);
-    return {
+    data = {
       result: {
         prevented: true,
         error: 'ERROR: navigation to URL timed out'
       }
     };
   }
+  return {result: data};
 };

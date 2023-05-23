@@ -9,8 +9,9 @@ const convertibles = ['alfa', 'axe', 'continuum'];
 
 // ########## FUNCTIONS
 
-// Limits the length of a string.
-const cap = string => {
+// Limits the length of and unilinearizes a string.
+const cap = rawString => {
+  const string = rawString.replace(/\s+/g, ' ');
   if (string && string.length > 400) {
     return `${string.slice(0, 200)} ... ${string.slice(-200)}`;
   }
@@ -62,7 +63,7 @@ const convert = (testName, result, standardResult) => {
           type: 'xpath',
           spec: item.target.path,
         },
-        excerpt: cap(item.target.codeLines)
+        excerpt: cap(item.target.codeLines.join(' '))
       };
       standardResult.instances.push(instance);
     });
