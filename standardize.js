@@ -135,6 +135,23 @@ const convert = (testName, result, standardResult) => {
       instances.filter(instance => instance.ordinalSeverity === 1).length,
     ];
   }
+  // ibm
+  else if (testName === 'ibm' && result.totals) {
+    standardResult.totals = [result.totals.recommendation, result.totals.violation];
+    result.items.forEach(item => {
+      const instance = {
+        issueID: item.ruleId,
+        what: item.message,
+        ordinalSeverity: ['recommendation', 'violation'].indexOf(item.level),
+        location: {
+          type: 'xpath',
+          spec: item.path.dom,
+        },
+        excerpt: cap(item.snippet)
+      };
+      standardResult.instances.push(instance);
+    });
+  }
 };
 // Converts the convertible reports.
 exports.standardize = act => {

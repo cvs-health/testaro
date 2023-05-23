@@ -2,9 +2,8 @@
   ibm
   This test implements the IBM Equal Access ruleset for accessibility.
   The 'withNewContent' argument determines whether the test package should be
-  given the URL of the page to be tested (true), should be given the page content
-  (false), or should test in both ways (omitted).
-
+  given the URL of the page to be tested (true) or the page content (false).
+  
   This test depends on aceconfig.js.
 
   This test is compatible with Windows only if the accessibility-checker package
@@ -122,49 +121,23 @@ const doTest = async (content, withItems, timeLimit, rules) => {
     };
   }
 };
-// Returns results of one or two IBM tests.
+// Returns results of an IBM test.
 exports.reporter = async (page, withItems, withNewContent, rules) => {
-  let contentType = 'both';
-  if (withNewContent) {
-    contentType = 'new';
-  }
-  else if (withNewContent === false) {
-    contentType = 'existing';
-  }
+  const contentType = withNewContent ? 'new' : 'existing';
   console.log(`>>>>>> Content type: ${contentType}`);
   // If a test with existing content is to be performed:
-  const result = {};
+  let result;
   const timeLimit = 20;
-  if (['existing', 'both'].includes(contentType)) {
-    try {
-      console.log('>>>>>> With existing content');
-      const typeContent = await page.content();
-      result.content = await doTest(typeContent, withItems, timeLimit, rules);
-      if (result.content.prevented) {
-        result.prevented = true;
-        console.log(`ERROR: Getting ibm test report from page timed out at ${timeLimit} seconds`);
-      }
-    }
-    catch(error) {
-      result.prevented = true;
-      console.log(`ERROR: ibm test on page crashed with error ${error.message.slice(0, 200)}`);
+  const typeContent = contentType === 'existing' ? await page.content() : await page.url();
+  try {
+    result = await doTest(typeContent, withItems, timeLimit, rules);
+    if (result.prevented) {
+      console.log(`ERROR: Getting ibm test report timed out at ${timeLimit} seconds`);
     }
   }
-  // If a test with new content is to be performed:
-  if (['new', 'both'].includes(contentType)) {
-    try {
-      console.log('>>>>>> With new content');
-      const typeContent = page.url();
-      result.url = await doTest(typeContent, withItems, timeLimit, rules);
-      if (result.url.prevented) {
-        result.prevented = true;
-        console.log(`ERROR: Getting ibm test report from URL timed out at ${timeLimit} seconds`);
-      }
-    }
-    catch(error) {
-      result.prevented = true;
-      console.log(`ERROR: ibm test on URL crashed with error ${error.message.slice(0, 200)}`);
-    }
+  catch(error) {
+    result.prevented = true;
+    console.log(`ERROR: ibm test crashed with error ${error.message.slice(0, 200)}`);
   }
   // Return the result. Execution of close() crashed the Node process.
   return {result};

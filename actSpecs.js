@@ -257,7 +257,7 @@ exports.actSpecs = {
       {
         withItems: [true, 'boolean', '', 'itemize'],
         withNewContent: [
-          false, 'boolean', '', 'true: use a URL; false: use page content; omitted: both'
+          true, 'boolean', '', 'true: use a URL; false: use page content'
         ],
         rules: [false, 'array', 'areStrings', 'rule names (e.g., RPT_Elem_UniqueId), if not all']
       }
