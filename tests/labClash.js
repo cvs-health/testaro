@@ -146,7 +146,40 @@ exports.reporter = async (page, withItems) => {
         }
       }
     });
-    return {result: data};
+    const totals = [data.totals.mislabeled, data.totals.unlabeled];
+    const standardInstances = [];
+    if (data.items) {
+      ['mislabeled', 'unlabeled'].forEach(issue => {
+        let diagnosis;
+        let excerptTail;
+        data.items[issue].forEach(item => {
+          if (issue === 'mislabeled') {
+            diagnosis = `has clashing labels of types: ${item.labelTypes.join(', ')}`;
+            excerptTail = item.texts.content || '';
+          }
+          else {
+            diagnosis = 'is unlabeled';
+            excerptTail = item.content || '';
+          }
+          standardInstances.push({
+            issueID: `labClash-${issue}`,
+            what: `Element ${item.tagName} ${diagnosis}`,
+            ordinalSeverity: issue === 'mislabeled' ? 0 : 1,
+            location: {
+              doc: '',
+              type: '',
+              spec: ''
+            },
+            excerpt: `${item.tagName}: ${excerptTail}`
+          });
+        });
+      });
+    }
+    return {
+      data,
+      totals,
+      standardInstances
+    };
   }, withItems)
   .catch(error => {
     console.log(`ERROR: labClash failed (${error.message})`);
@@ -156,8 +189,8 @@ exports.reporter = async (page, withItems) => {
     };
     return {
       data,
-      totals,
-      standardInstances
+      totals: [],
+      standardInstances: []
     };
   });
 };
