@@ -154,6 +154,10 @@ exports.reporter = async (page, withItems) => {
       prevented: true,
       error: 'ERROR: labClash failed'
     };
-    return {result: data};
+    return {
+      data,
+      totals,
+      standardInstances
+    };
   });
 };

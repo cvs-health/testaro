@@ -163,5 +163,31 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
     }
     return data;
   }, [allowedDelay, withItems]);
-  return {result: data};
+  const {types} = data.totals;
+  const totals = [types.nonOutlinePresent.total, types.indicatorMissing.total];
+  const standardInstances = [];
+  if (data.items) {
+    const issueNames = ['nonOutlinePresent', 'indicatorMissing'];
+    issueNames.forEach(issueName => {
+      data.items[issueName].forEach(item => {
+        const qualifier = issueName === 'nonOutlinePresent' ? 'a non-outline' : 'no';
+        standardInstances.push({
+          issueID: `focInd-${issueName}`,
+          what: `Element ${item.tagName} has ${qualifier} focus indicator`,
+          ordinalSeverity: issueName === 'nonOutlinePresent' ? 0 : 1,
+          location: {
+            doc: '',
+            type: '',
+            spec: ''
+          },
+          excerpt: item.text
+        });
+      });
+    });
+  }
+  return {
+    data,
+    totals,
+    standardInstances
+  };
 };

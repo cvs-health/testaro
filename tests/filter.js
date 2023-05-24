@@ -43,5 +43,26 @@ exports.reporter = async (page, withItems) => {
     }
     return data;
   }, withItems);
-  return {result: data};
+  const totals = [data.totals.impactedElements, data.totals.styledElements];
+  const standardInstances = [];
+  if (data.items) {
+    data.items.forEach(item => {
+      standardInstances.push({
+        issueID: 'filterStyle',
+        what: `Element ${item.tagName} has a filter style that impacts ${item.impact} elements`,
+        ordinalSeverity: 1,
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: `${item.tagName}: ${item.text}`
+      });
+    });
+  }
+  return {
+    data,
+    totals,
+    standardInstances
+  };
 };

@@ -41,8 +41,28 @@ exports.reporter = async (page, attributeName, areLicit, values, withItems) => {
   const data = {
     total: badAttributeData.length
   };
+  const standardInstances = [];
   if (withItems) {
     data.items = badAttributeData;
+    badAttributeData.forEach(item => {
+      standardInstances.push({
+        issueID: `attVal-${item.tagName}-${attributeName}`,
+        what:
+          `${item.tagName} element has attribute ${attributeName} with illicit value ${item.attributeValue}`,
+        ordinalSeverity: 0,
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: item.textStart
+      });
+    });
   }
-  return {result: data};
+  const totals = [data.total];
+  return {
+    data,
+    totals,
+    standardInstances
+  };
 };

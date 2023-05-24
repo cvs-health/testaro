@@ -10,5 +10,9 @@ exports.reporter = async page => {
     const docHasType = !! docType && docType.name && docType.name.toLowerCase() === 'html';
     return docHasType;
   });
-  return {result: {docHasType}};
+  return {
+    data: {docHasType},
+    totals: [docHasType ? 0 : 1],
+    standardInstances: []
+  };
 };

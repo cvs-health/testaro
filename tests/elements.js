@@ -155,5 +155,9 @@ exports.reporter = async (page, detailLevel, tagName, onlyVisible, attribute) =>
     };
   }
   // Return the result.
-  return {result: data};
+  return {
+    data,
+    totals: [],
+    standardInstances: []
+  };
 };

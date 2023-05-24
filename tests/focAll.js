@@ -48,10 +48,15 @@ exports.reporter = async page => {
       refocused++;
     }
   }
-  // Return the result.
-  return {result: {
+  const data = {
     tabFocusables,
     tabFocused,
     discrepancy: tabFocused - tabFocusables
+  };
+  // Return the result.
+  return {result: {
+    data,
+    totals: [Math.abs(data.discrepancy)],
+    standardInstances: []
   }};
 };

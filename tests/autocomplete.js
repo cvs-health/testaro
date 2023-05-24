@@ -70,6 +70,26 @@ exports.reporter = async (page, withItems) => {
       }
     }
   }
+  const standardInstances = [];
+  if (data.items) {
+    data.items.forEach(item => {
+      standardInstances.push({
+        issueID: `autocomplete-${item[0]}`,
+        what: `Input is missing the required autocomplete attribute with value ${item[0]}`,
+        ordinalSeverity: 0,
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: item[1]
+      });
+    });
+  }
   // Return the data.
-  return {result: data};
+  return {
+    data,
+    totals: [data.total],
+    standardInstances
+  };
 };

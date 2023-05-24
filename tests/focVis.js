@@ -25,5 +25,26 @@ exports.reporter = async (page, withItems) => {
   if (withItems) {
     data.items = badLinks;
   }
-  return {result: data};
+  const totals = [data.total];
+  const standardInstances = [];
+  if (data.items) {
+    data.items.forEach(item => {
+      standardInstances.push({
+        issueID: 'focVis',
+        what: 'Visible link is above or to the left of the display',
+        ordinalSeverity: 0,
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: item
+      });
+    });
+  }
+  return {
+    data,
+    totals,
+    standardInstances
+  };
 };

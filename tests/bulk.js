@@ -18,5 +18,9 @@ exports.reporter = async page => {
   });
   const visibleElements = await page.$$('body :visible');
   data.visibleElements = visibleElements.length;
-  return {result: data};
+  return {
+    data,
+    totals: [Math.round(data.visibleElements / 200)],
+    standardInstances: []
+  };
 };

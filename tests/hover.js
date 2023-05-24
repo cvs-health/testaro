@@ -181,7 +181,7 @@ const find = async (data, withItems, page, sample) => {
         const itemData = {
           tagName,
           id: (await firstTrigger[0].getAttribute('id')) || '',
-          text: await textOf(firstTrigger[0], 50)
+          text: await textOf(firstTrigger[0], 100)
         };
         try {
           // Hover over the trigger.
@@ -269,7 +269,7 @@ const find = async (data, withItems, page, sample) => {
                 // Add them to the data.
                 data.items.impactTriggers.push({
                   tagName,
-                  text: await textOf(firstTrigger[0], 50),
+                  text: await textOf(firstTrigger[0], 100),
                   additions,
                   removals,
                   opacityChanges,
@@ -376,6 +376,53 @@ exports.reporter = async (page, sampleSize = -1, withItems) => {
       data.totals[key] = Math.round(data.totals[key]);
     });
   }
+  const severity = {
+    impactTriggers: 4,
+    additions: 2,
+    removals: 3,
+    opacityChanges: 1,
+    opacityImpact: 0,
+    unhoverables: 3,
+    noCursors: 5,
+    badCursors: 4,
+    noIndicators: 3,
+    badIndicators: 3
+  };
+  const what = {
+    impactTriggers: 'Hovering over element has unexpected effects',
+    unhoverables: 'Operable element cannot be hovered over',
+    noCursors: 'Hoverable element hides the mouse cursor',
+    badCursors: 'Link or button makes the hovering mouse cursor nonstandard',
+    noIndicators: 'Button shows no indication of being hovered over',
+    badIndicators: 'List item changes when hovered over'
+  };
+  const totals = [0, 0, 0, 0, 0, 0];
+  Object.keys(data.totals).forEach(issue => {
+    totals[severity[issue]] += data.totals[issue];
+  });
+  const standardInstances = [];
+  if (data.items) {
+    Object.keys(data.items).forEach(issue => {
+      data.items[issue].forEach(item => {
+        const itemID = item.id ? ` (ID ${item.id})` : '';
+        standardInstances.push({
+          issueID: `hover-${issue}`,
+          what: what[issue],
+          ordinalSeverity: severity[issue],
+          location: {
+            doc: '',
+            type: '',
+            spec: ''
+          },
+          excerpt: `${itemID}: ${item.text}`
+        });
+      });
+    });
+  }
   // Return the result.
-  return {result: data};
+  return {
+    data,
+    totals,
+    standardInstances
+  };
 };

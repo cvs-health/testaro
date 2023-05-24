@@ -76,6 +76,26 @@ exports.reporter = async (page, withItems) => {
       }
     }
   });
+  const standardInstances = [];
+  if (data.items) {
+    data.items.forEach(item => {
+      standardInstances.push({
+        issueID: 'dupAtt',
+        what: `Element ${item.tagName} has 2 attributes with the same name`,
+        ordinalSeverity: 0,
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: item.attributes.join(' ... ')
+      });
+    });
+  }
   // Return the data.
-  return {result: data};
+  return {
+    data,
+    totals: data.total,
+    standardInstances
+  };
 };

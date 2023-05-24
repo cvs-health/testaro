@@ -23,14 +23,36 @@ exports.reporter = async (page, withItems) => await page.$$eval(
     bads.forEach(bad => {
       totals[Object.keys(totals)[['A', 'BUTTON', 'INPUT', 'SELECT'].indexOf(bad.tagName)]]++;
       if (withItems) {
-        items.push(compact(bad.outerHTML));
+        items.push({
+          embeddedPair: bad,
+          excerpt: compact(bad.outerHTML)
+        });
       }
     });
     // Return the result.
     const data = {totals};
+    const standardInstances = [];
     if (withItems) {
       data.items = items;
+      items.forEach(item => {
+        const pair = item.embeddedPair.split(' ');
+        standardInstances.push({
+          issueID: `embAc-${pair[0]}-${pair[1]}`,
+          what: `Element ${pair[0]} contains element ${pair[1]}`,
+          ordinalSeverity: 0,
+          location: {
+            doc: '',
+            type: '',
+            spec: ''
+          },
+          excerpt: item.excerpt
+        });
+      });
     }
-    return {result: data};
+    return {
+      data,
+      totals: Object.values(data.totals).reduce((sum, current) => sum + current),
+      standardInstances
+    };
   }, withItems
 );

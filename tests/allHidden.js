@@ -45,5 +45,40 @@ exports.reporter = async page => {
     });
     return data;
   });
-  return {result: data};
+  const standardInstances = [];
+  const reportables = {
+    hidden: [0, 'hidden'],
+    reallyHidden: [1, 'effectively hidden'],
+    visHidden: [0, 'visually hidden'],
+    ariaHidden: [1, 'hidden by ARIA'],
+    document: [1, 'Document', 'document.documentElemnt'],
+    body: [1, 'Document body', 'document.body'],
+    main: [0, 'main region', 'main, [role="main"]']
+  };
+  ['document', 'body', 'main'].forEach(region => {
+    ['hidden', 'reallyHidden', 'visHidden', 'ariaHidden'].forEach(hider => {
+      if (data[hider][region]) {
+        standardInstances.push({
+          issueID: `allHidden-${hider}-${region}`,
+          what: `${reportables[region][1]} ${reportables[hider][1]}`,
+          ordinalSeverity: reportables[region][0] + reportables[hider][0] || 0,
+          location: {
+            doc: 'dom',
+            type: 'selector',
+            spec: reportables[region][2]
+          },
+          excerpt: ''
+        });
+      }
+    });
+  });
+  const totals = [0, 0, 0];
+  standardInstances.forEach(instance => {
+    totals[instance.ordinalSeverity]++;
+  });
+  return {
+    data,
+    totals,
+    standardInstances
+  };
 };

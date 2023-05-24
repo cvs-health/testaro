@@ -85,7 +85,7 @@ exports.reporter = async (page, withItems) => {
           id: id || '',
           text: (element.textContent.trim() || element.outerHTML.trim())
           .replace(/\s{2,}/sg, ' ')
-          .slice(0, 80)
+          .slice(0, 100)
         };
         if (status !== 'f') {
           elementData.byTag = byTag;
@@ -134,5 +134,44 @@ exports.reporter = async (page, withItems) => {
     console.log(`ERROR getting focOp data (${error.message})`);
     data.prevented = true;
   });
-  return {result: data};
+  const totals = [];
+  if (
+    data.totals
+    && data.totals.types
+    && typeof data.totals.types.onlyFocusable === 'number'
+    && typeof data.totals.types.onlyOperable === 'number'
+  ) {
+    totals.push(data.totals.types.onlyFocusable.total);
+    totals.push(data.totals.types.onlyOperable.total);
+  }
+  const standardInstances = [];
+  if (data.items && data.items.onlyFocusable && data.items.onlyOperable) {
+    ['onlyFocusable', 'onlyOperable'].forEach(issue => {
+      const issueID = issue === 'onlyFocusable' ? 'focusable-inoperable' : 'operable-nonfocusable';
+      const gripe = issue === 'onlyFocusable'
+        ? 'is focusable but not operable'
+        : 'is operable but not focusable';
+      const ordinalSeverity = issue === 'onlyFocusable' ? 0 : 1;
+      data.items[issue].forEach(item => {
+        const itemID = item.id ? ` (ID ${item.id})` : '';
+        const which = `${item.tagName}${itemID}`;
+        standardInstances.push({
+          issueID,
+          what: `Element ${which} ${gripe}`,
+          ordinalSeverity,
+          location: {
+            doc: '',
+            type: '',
+            spec: ''
+          },
+          excerpt: item.text
+        });
+      });
+    });
+  }
+  return {
+    data,
+    totals,
+    standardInstances
+  };
 };
