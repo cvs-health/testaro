@@ -1046,6 +1046,11 @@ const doActs = async (report, actIndex, page) => {
                 };
                 // Populate it.
                 standardize(act);
+                // If the original-format result is not to be included in the report:
+                if (standard === 'only') {
+                  // Remove it.
+                  delete act.result;
+                }
               }
             }
             // Otherwise, if the act is a move:

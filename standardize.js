@@ -153,7 +153,7 @@ const doWAVE = (result, standardResult, categoryName) => {
     });
   }
 };
-// Converts a report.
+// Converts a result.
 const convert = (testName, result, standardResult) => {
   // alfa
   if (testName === 'alfa' && result.totals) {
