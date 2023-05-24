@@ -252,6 +252,29 @@ const convert = (testName, result, standardResult) => {
       doQualWeb(result, standardResult, 'best-practices');
     }
   }
+  // tenon
+  else if (testName === 'tenon' && result.data && result.data.resultSet) {
+    result.data.resultSet.forEach(item => {
+      const instance = {
+        issueID: item.tID ? item.tID.toString() : '',
+        what: item.errorTitle || '',
+        ordinalSeverity: Math.min(
+          5, Math.max(0, Math.round((item.certainty || 0) * (item.priority || 0) / 2000))
+        ),
+        location: {
+          doc: 'dom',
+          type: 'xpath',
+          spec: item.xpath || ''
+        },
+        excerpt: cap(item.errorSnippet || '')
+      };
+      standardResult.instances.push(instance);
+    });
+    standardResult.totals = [0, 0, 0, 0, 0, 0];
+    standardResult.instances.forEach(instance => {
+      standardResult.totals[instance.ordinalSeverity]++;
+    });
+  }
 };
 // Converts the convertible reports.
 exports.standardize = act => {
