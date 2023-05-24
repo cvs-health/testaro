@@ -1,6 +1,6 @@
 /*
   standardize.js
-  Converts test reports to the standard format.
+  Converts test results to the standard format.
 */
 
 // ########## FUNCTIONS
@@ -126,6 +126,29 @@ const doQualWeb = (result, standardResult, ruleClassName) => {
           };
           standardResult.instances.push(instance);
         });
+      });
+    });
+  }
+};
+// Converts instances of a wave rule category.
+const doWAVE = (result, standardResult, categoryName) => {
+  if (result.categories && result.categories[categoryName]) {
+    const category = result.categories[categoryName];
+    const ordinalSeverity = categoryName === 'alert' ? 0 : 1;
+    Object.keys(category.items).forEach(rule => {
+      category.items[rule].selectors.forEach(selector => {
+        const instance = {
+          issueID: rule,
+          what: category.items[rule].description,
+          ordinalSeverity,
+          location: {
+            doc: 'dom',
+            type: 'selector',
+            spec: selector
+          },
+          excerpt: ''
+        };
+        standardResult.instances.push(instance);
       });
     });
   }
@@ -275,8 +298,26 @@ const convert = (testName, result, standardResult) => {
       standardResult.totals[instance.ordinalSeverity]++;
     });
   }
+  // wave
+  else if (
+    testName === 'wave'
+    && result.categories
+    && (
+      result.categories.error
+      || result.categories.contrast
+      || result.categories.alert
+    )
+  ) {
+    const {categories} = result;
+    standardResult.totals = [
+      categories.alert.count || 0, (categories.error.count || 0) + (categories.contrast.count || 0)
+    ];
+    ['error', 'contrast', 'alert'].forEach(categoryName => {
+      doWAVE(result, standardResult, categoryName);
+    });
+  }
 };
-// Converts the convertible reports.
+// Converts the results.
 exports.standardize = act => {
   const {which} = act;
   const {result, standardResult} = act;
