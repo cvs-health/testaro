@@ -45,8 +45,8 @@ exports.reporter = async (page, withItems) => {
     });
     // Get the percentage of underlined links among all inline links.
     const underlinedPercent = adjacentLinkCount
-    ? Math.floor(100 * underlined / adjacentLinkCount)
-    : 'N/A';
+      ? Math.floor(100 * underlined / adjacentLinkCount)
+      : 'N/A';
     const data = {
       totals: {
         links: adjacentLinks.length + linkTypes.list.length,
@@ -63,6 +63,28 @@ exports.reporter = async (page, withItems) => {
         notUnderlined: nulAdjacentLinkTexts
       };
     }
-    return {result: data};
+    const {adjacent} = data.totals;
+    const totals = [adjacent.total - adjacent.underlined];
+    const standardInstances = [];
+    if (data.items && data.items.notUnderlined) {
+      data.items.notUnderlined.foreach(item => {
+        standardInstances.push({
+          issueID: 'linkUl',
+          what: 'Element a is inline but has no underline',
+          ordinalSeverity: 0,
+          location: {
+            doc: '',
+            type: '',
+            spec: ''
+          },
+          excerpt: item
+        });
+      });
+    }
+    return {
+      data,
+      totals,
+      standardInstances
+    };
   }, [withItems, linkTypes]);
 };

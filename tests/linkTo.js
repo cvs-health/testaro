@@ -21,5 +21,24 @@ exports.reporter = async (page, withItems) => {
   if (withItems) {
     data.items = badLinkTexts;
   }
-  return {result: data};
+  const totals = [data.total];
+  const standardInstances = [];
+  data.items.forEach(item => {
+    standardInstances.push({
+      issueID: 'linkTo',
+      what: 'Element a has no href attribute',
+      ordinalSeverity: 0,
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: item
+    });
+  });
+  return {
+    data,
+    totals,
+    standardInstances
+  };
 };

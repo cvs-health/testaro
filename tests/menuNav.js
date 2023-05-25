@@ -260,5 +260,30 @@ exports.reporter = async (page, withItems) => {
     // FUNCTION DEFINITIONS END
     await testMenus(menus);
   }
-  return {result: data};
+  const totals = data.totals ? [
+    data.totals.navigations.all.incorrect,
+    data.totals.menuItems.incorrect,
+    data.totals.menus.incorrect
+  ] : [];
+  const standardInstances = [];
+  if (data.menuItems && data.menuItems.incorrect) {
+    data.menuItems.incorrect.foreach(item => {
+      standardInstances.push({
+        issueID: 'menuNav',
+        what: 'Element ${item.tagName} is a menu item but has nonstandard navigation',
+        ordinalSeverity: 0,
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: `${item.tagName}: ${item.text}`
+      });
+    });
+  }
+  return {
+    data,
+    totals,
+    standardInstances
+  };
 };
