@@ -45,5 +45,27 @@ exports.reporter = async (page, withItems) => {
     });
     return data;
   }, withItems);
-  return {result: data};
+  const standardInstances = [];
+  if (data.items) {
+    data.items.forEach(item => {
+      const itemID = item.id ? ` (ID ${item.id})` : '';
+      const which = `${item.tagName}${itemID}`;
+      standardInstances.push({
+        issueID: 'zIndex',
+        what: `Element ${item.tagName} has a non-default Z index`,
+        ordinalSeverity: 0,
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: `${which}: ${item.text}`
+      });
+    });
+  }
+  return {
+    data,
+    totals: data.totals.total,
+    standardInstances
+  };
 };

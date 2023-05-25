@@ -116,6 +116,7 @@ exports.reporter = async (page, withItems) => {
               if (! styleProps[typeName][styleName][style[styleName]]) {
                 styleProps[typeName][styleName][style[styleName]] = [];
               }
+              // Add the element text to the style details.
               styleProps[typeName][styleName][style[styleName]].push(elementText);
             });
           }
@@ -148,6 +149,41 @@ exports.reporter = async (page, withItems) => {
     headingNames.forEach(headingName => {
       tallyStyles(headingName, elements.headings[headingName], headingStyles, withItems);
     });
-    return {result: data};
+    const totals = [
+      data.totals.adjacentLink.subtotals.length - 1,
+      data.totals.listLink.subtotals.length -1,
+      data.totals.button.subtotals.length -1,
+      Object.keys(elements.headings).reduce((sum, current) => sum + data.totals[current].subtotals.length, 0) - 6
+    ];
+    const elementData = {
+      adjacentLink: [0, 'In-line links'],
+      listLink: [1, 'Links in columns'],
+      button: [2, 'Buttons'],
+      h1: [3, 'Level-1 headings'],
+      h2: [3, 'Level-2 headings'],
+      h3: [3, 'Level-3 headings'],
+      h4: [3, 'Level-4 headings'],
+      h5: [3, 'Level-5 headings'],
+      h6: [3, 'Level-6 headings'],
+    };
+    const standardInstances = Object
+    .keys(elementData)
+    .filter(code => data.totals[code].subtotals)
+    .map(code => ({
+      issueID: 'styleDiff',
+      what: `${elementData[code][1]} have ${data.totals[code].subtotals.length} different styles`,
+      ordinalSeverity: elementData[code][0],
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: ''
+    }));
+    return {
+      data,
+      totals,
+      standardInstances
+    };
   }, [linkTypes, withItems]);
 };

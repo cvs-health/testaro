@@ -67,7 +67,7 @@ exports.reporter = async (page, withItems) => {
     const totals = [adjacent.total - adjacent.underlined];
     const standardInstances = [];
     if (data.items && data.items.notUnderlined) {
-      data.items.notUnderlined.foreach(item => {
+      data.items.notUnderlined.forEach(item => {
         standardInstances.push({
           issueID: 'linkUl',
           what: 'Element a is inline but has no underline',

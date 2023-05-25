@@ -478,6 +478,43 @@ exports.reporter = async page => await page.$eval('body', body => {
       }
     }
   });
+  const standardInstances = [];
+  Object.keys(data.tagNames).forEach(tagName => {
+    Object.keys(data.tagNames[tagName]).forEach(role => {
+      let count = data.tagNames[tagName][role].redundant;
+      if (count) {
+        standardInstances.push({
+          issueID: 'role',
+          what: `Element ${tagName} has redundant explicit role ${role} (count: ${count})`,
+          ordinalSeverity: 0,
+          location: {
+            doc: '',
+            type: '',
+            spec: ''
+          },
+          excerpt: ''
+        });
+      }
+      count = data.tagNames[tagName][role].bad;
+      if (count) {
+        standardInstances.push({
+          issueID: 'role',
+          what: `Element ${tagName} has invalid or native-replaceable explicit role ${role} (count: ${count})`,
+          ordinalSeverity: 1,
+          location: {
+            doc: '',
+            type: '',
+            spec: ''
+          },
+          excerpt: ''
+        });
+      }
+    });
+  });
   // Return the result.
-  return {result: data};
+  return {
+    data,
+    totals: [data.redundantRoleElements, data.badRoleElements],
+    standardInstances
+  };
 });

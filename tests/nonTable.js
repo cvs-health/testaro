@@ -60,8 +60,26 @@ exports.reporter = async (page, withItems) => {
   const data = {
     total: badTableTexts.length
   };
+  const standardInstances = [];
   if (withItems) {
     data.items = badTableTexts;
+    data.items.forEach(text => {
+      standardInstances.push({
+        issueID: 'nonTable',
+        what: 'Table is misused to arrange content',
+        ordinalSeverity: 0,
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: text
+      });
+    });
   }
-  return {result: data};
+  return {
+    data,
+    totals: [data.total],
+    standardInstances
+  };
 };

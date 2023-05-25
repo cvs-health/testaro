@@ -267,10 +267,10 @@ exports.reporter = async (page, withItems) => {
   ] : [];
   const standardInstances = [];
   if (data.menuItems && data.menuItems.incorrect) {
-    data.menuItems.incorrect.foreach(item => {
+    data.menuItems.incorrect.forEach(item => {
       standardInstances.push({
         issueID: 'menuNav',
-        what: 'Element ${item.tagName} is a menu item but has nonstandard navigation',
+        what: `Element ${item.tagName} is a menu item but has nonstandard navigation`,
         ordinalSeverity: 0,
         location: {
           doc: '',

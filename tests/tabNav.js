@@ -324,5 +324,30 @@ exports.reporter = async (page, withItems) => {
     // FUNCTION DEFINITIONS END
     await testTabLists(tabLists);
   }
-  return {result: data};
+  const totals = data.totals ? [
+    data.totals.navigations.all.incorrect,
+    data.totals.tabElements.incorrect,
+    data.totals.tabLists.incorrect
+  ] : [];
+  const standardInstances = [];
+  if (data.tabElements && data.tabElements.incorrect) {
+    data.tabElements.incorrect.forEach(item => {
+      standardInstances.push({
+        issueID: 'tabNav',
+        what: `Element ${item.tagName} has a tab role but has nonstandard navigation`,
+        ordinalSeverity: 0,
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: `${item.tagName}: ${item.text}`
+      });
+    });
+  }
+  return {
+    data,
+    totals,
+    standardInstances
+  };
 };

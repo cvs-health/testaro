@@ -99,7 +99,7 @@ exports.reporter = async (page, delay, interval, count) => {
     );
     // Return the result.
     return {
-      result: {
+      data: {
         bytes,
         localRatios,
         meanLocalRatio,
@@ -109,14 +109,34 @@ exports.reporter = async (page, delay, interval, count) => {
         meanPixelChange,
         maxPixelChange,
         changeFrequency
-      }
+      },
+      totals: [
+        2 * (meanLocalRatio - 1)
+        + maxLocalRatio - 1
+        + globalRatio - 1
+        + meanPixelChange / 10000
+        + maxPixelChange / 25000
+        + 3 * changeFrequency
+        || 0
+      ],
+      standardInstances: [{
+        issueID: 'motion',
+        what: 'Content moves or changes without user request',
+        ordinalSeverity: 0,
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: ''
+      }]
     };
   }
   // Otherwise, i.e. if the shooting failed:
   else {
     // Return failure.
     return {
-      result: {
+      data: {
         prevented: true,
         error: 'ERROR: screenshots failed'
       }

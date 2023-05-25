@@ -75,18 +75,36 @@ exports.reporter = async (page, withItems) => {
       totals.inSet = setRadios.length;
       totals.percent = totals.total ? Math.floor(100 * totals.inSet / totals.total) : 'N.A.';
       // If itemization is required:
+      const standardInstances = [];
       if (withItems) {
         // Add it to the results.
         const nonSetRadios = allRadios.filter(radio => ! setRadios.includes(radio));
         const items = data.items;
         items.inSet = setRadios.map(radio => textOf(radio));
         items.notInSet = nonSetRadios.map(radio => textOf(radio));
+        items.notInSet.forEach(text => {
+          standardInstances.push({
+            issueID: 'radioSet',
+            what: 'Radio button and others with its name are not grouped in their own fieldset with a legend',
+            ordinalSeverity: 0,
+            location: {
+              doc: '',
+              type: '',
+              spec: ''
+            },
+            excerpt: text
+          });
+        });
       }
-      return {result: data};
+      return {
+        data,
+        totals: [totals.total - totals.inSet],
+        standardInstances
+      };
     }
     else {
       return {
-        result: {
+        data: {
           prevented: true,
           error: 'ERROR identifying homogeneous field sets'
         }

@@ -24,8 +24,26 @@ exports.reporter = async (page, withItems) => {
   const data = {
     total: badTitleElements.length
   };
+  const standardInstances = [];
   if (withItems) {
     data.items = badTitleElements;
+    badTitleElements.forEach(element => {
+      standardInstances.push({
+        issueID: 'titledEl',
+        what: `Element ${element.tagName} has a title attribute`,
+        ordinalSeverity: 0,
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: `${element.tagName} (${element.text}): ${element.title}`
+      });
+    });
   }
-  return {result: data};
+  return {
+    data,
+    totals: [data.total],
+    standardInstances
+  };
 };
