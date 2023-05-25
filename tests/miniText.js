@@ -41,8 +41,26 @@ exports.reporter = async (page, withItems) => {
   const data = {
     total: miniTexts.length
   };
+  const standardInstances = [];
   if (withItems) {
     data.items = miniTexts;
+    miniTexts.forEach(text => {
+      standardInstances.push({
+        issueID: 'miniText',
+        what: 'Text font is smaller than 11 pixels',
+        ordinalSeverity: 0,
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: text
+      });
+    });
   }
-  return {result: data};
+  return {
+    data,
+    totals: [data.total],
+    standardInstances
+  };
 };
