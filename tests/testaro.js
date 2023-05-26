@@ -51,7 +51,7 @@ exports.reporter = async (
     // Initialize an argument array.
     const ruleArgs = [page, withItems];
     // If the rule has extra arguments:
-    if (argRules.includes(rule)) {
+    if (argRules && argRules.includes(rule)) {
       // Add them to the argument array.
       ruleArgs.push(... args[rule]);
     }
