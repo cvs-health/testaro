@@ -56,7 +56,7 @@ exports.reporter = async (
       ruleArgs.push(... args[rule]);
     }
     // Test the page.
-    data[rule] = await require(`../testaro/${rule}`).reporter(... args);
+    data[rule] = await require(`../testaro/${rule}`).reporter(... ruleArgs);
     const what = evalRules[rule];
     data[rule].what = what;
     console.log(`>>>> ${rule} (${what})`);
