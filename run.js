@@ -146,6 +146,9 @@ const hasType = (variable, type) => {
   else if (type === 'number') {
     return typeof variable === 'number';
   }
+  else if (type === 'object') {
+    return typeof variable === 'object' && ! Array.isArray(variable);
+  }
   else {
     return false;
   }

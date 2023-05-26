@@ -298,6 +298,18 @@ const convert = (testName, result, standardResult) => {
       standardResult.totals[instance.ordinalSeverity]++;
     });
   }
+  // testaro
+  else if (testName === 'testaro') {
+    const rules = Object.keys(result);
+    standardResult.totals = [0, 0, 0, 0];
+    rules.forEach(rule => {
+      const ruleResult = result[rule];
+      standardResult.totals.forEach((total, index) => {
+        standardResult.totals[index] += ruleResult.totals[index];
+      });
+      standardResult.instances.push(... ruleResult.standardInstances);
+    });
+  }
   // wave
   else if (
     testName === 'wave'

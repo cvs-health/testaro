@@ -295,6 +295,8 @@ exports.reporter = async (page, withItems) => {
       excerpt: ''
     });
   }
+  // Reload the page.
+  await page.reload({timeout: 15000});
   return {
     data,
     totals,

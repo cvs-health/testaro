@@ -352,7 +352,8 @@ exports.actSpecs = {
       'Perform a Testaro test',
       {
         withItems: [true, 'boolean', '', 'itemize'],
-        rules: [false, 'array', 'areStrings', 'IDs of rules to include, if not all evaluative rules']
+        rules: [false, 'array', 'areStrings', 'IDs of rules to include if array starts with y or exclude if with n, if not all evaluative rules'],
+        args: [false, 'object', '', 'extra args (object with rule properties and arrays of argument values as values ({focInd: [false, 250], hover: [-1], motion: [2500, 2500, 5]} by default'],
       }
     ],
     textNodes: [

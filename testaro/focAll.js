@@ -53,6 +53,8 @@ exports.reporter = async page => {
     tabFocused,
     discrepancy: tabFocused - tabFocusables
   };
+  // Reload the page.
+  await page.reload({timeout: 15000});
   // Return the result.
   return {result: {
     data,

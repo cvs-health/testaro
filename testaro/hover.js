@@ -309,7 +309,7 @@ const find = async (data, withItems, page, sample) => {
   }
 };
 // Performs the hover test and reports results.
-exports.reporter = async (page, sampleSize = -1, withItems) => {
+exports.reporter = async (page, withItems, sampleSize = -1) => {
   // Initialize the result.
   let data = {
     totals: {
@@ -432,6 +432,8 @@ exports.reporter = async (page, sampleSize = -1, withItems) => {
       excerpt: ''
     });
   }
+  // Reload the page.
+  await page.reload({timeout: 15000});
   // Return the result.
   return {
     data,

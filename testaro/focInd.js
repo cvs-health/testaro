@@ -13,7 +13,7 @@
 
   WARNING: This test fails to recognize outlines when run with firefox.
 */
-exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
+exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250) => {
   // If required, make all elements visible.
   if (revealAll) {
     await require('../procs/allVis').allVis(page);
@@ -198,6 +198,8 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
       excerpt: ''
     });
   }
+  // Reload the page.
+  await page.reload({timeout: 15000});
   return {
     data,
     totals,

@@ -63,7 +63,7 @@ const shootAll = async (page, delay, interval, count, toDo, buffers) => {
 // Returns a number rounded to 2 decimal digits.
 const round = (num, precision) => Number.parseFloat(num.toPrecision(precision));
 // Reports motion in a page.
-exports.reporter = async (page, delay, interval, count) => {
+exports.reporter = async (page, withItems, delay = 2500, interval = 2500, count = 5) => {
   // Make screenshots and get their image buffers.
   const shots = await shootAll(page, delay, interval, count, count, []);
   // If the shooting succeeded:
