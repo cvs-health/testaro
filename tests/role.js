@@ -486,7 +486,7 @@ exports.reporter = async page => await page.$eval('body', body => {
         standardInstances.push({
           issueID: 'role',
           what: `Element ${tagName} has redundant explicit role ${role} (count: ${count})`,
-          ordinalSeverity: 0,
+          ordinalSeverity: 1,
           location: {
             doc: '',
             type: '',
@@ -500,7 +500,7 @@ exports.reporter = async page => await page.$eval('body', body => {
         standardInstances.push({
           issueID: 'role',
           what: `Element ${tagName} has invalid or native-replaceable explicit role ${role} (count: ${count})`,
-          ordinalSeverity: 1,
+          ordinalSeverity: 3,
           location: {
             doc: '',
             type: '',
@@ -514,7 +514,7 @@ exports.reporter = async page => await page.$eval('body', body => {
   // Return the result.
   return {
     data,
-    totals: [data.redundantRoleElements, data.badRoleElements],
+    totals: [0, data.redundantRoleElements, 0, data.badRoleElements],
     standardInstances
   };
 });

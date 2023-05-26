@@ -20,7 +20,17 @@ exports.reporter = async page => {
   data.visibleElements = visibleElements.length;
   return {
     data,
-    totals: [Math.round(data.visibleElements / 200)],
-    standardInstances: []
+    totals: [Math.round(data.visibleElements / 400), 0, 0, 0],
+    standardInstances: data.visibleElements < 200 ? [] : [{
+      issueID: 'bulk',
+      what: 'Page contains a large number of visible elements',
+      ordinalSeverity: 0,
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: ''
+    }]
   };
 };

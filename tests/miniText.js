@@ -48,7 +48,7 @@ exports.reporter = async (page, withItems) => {
       standardInstances.push({
         issueID: 'miniText',
         what: 'Text font is smaller than 11 pixels',
-        ordinalSeverity: 0,
+        ordinalSeverity: 2,
         location: {
           doc: '',
           type: '',
@@ -58,9 +58,22 @@ exports.reporter = async (page, withItems) => {
       });
     });
   }
+  else if (data.total) {
+    standardInstances.push({
+      issueID: 'miniText',
+      what: 'Texts have fonts smaller than 11 pixels',
+      ordinalSeverity: 2,
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: ''
+    });
+  }
   return {
     data,
-    totals: [data.total],
+    totals: [0, 0, data.total, 0],
     standardInstances
   };
 };

@@ -64,14 +64,14 @@ exports.reporter = async (page, withItems) => {
       };
     }
     const {adjacent} = data.totals;
-    const totals = [adjacent.total - adjacent.underlined];
+    const totals = [0, adjacent.total - adjacent.underlined, 0, 0];
     const standardInstances = [];
     if (data.items && data.items.notUnderlined) {
       data.items.notUnderlined.forEach(item => {
         standardInstances.push({
           issueID: 'linkUl',
           what: 'Element a is inline but has no underline',
-          ordinalSeverity: 0,
+          ordinalSeverity: 1,
           location: {
             doc: '',
             type: '',
@@ -79,6 +79,19 @@ exports.reporter = async (page, withItems) => {
           },
           excerpt: item
         });
+      });
+    }
+    else if (adjacent.total - adjacent.underlined > 0) {
+      standardInstances.push({
+        issueID: 'linkUl',
+        what: 'Inline links are missing underlines',
+        ordinalSeverity: 1,
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: ''
       });
     }
     return {

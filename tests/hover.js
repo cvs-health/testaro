@@ -377,16 +377,16 @@ exports.reporter = async (page, sampleSize = -1, withItems) => {
     });
   }
   const severity = {
-    impactTriggers: 4,
-    additions: 2,
-    removals: 3,
+    impactTriggers: 3,
+    additions: 1,
+    removals: 2,
     opacityChanges: 1,
     opacityImpact: 0,
     unhoverables: 3,
-    noCursors: 5,
-    badCursors: 4,
+    noCursors: 3,
+    badCursors: 2,
     noIndicators: 3,
-    badIndicators: 3
+    badIndicators: 2
   };
   const what = {
     impactTriggers: 'Hovering over element has unexpected effects',
@@ -396,7 +396,7 @@ exports.reporter = async (page, sampleSize = -1, withItems) => {
     noIndicators: 'Button shows no indication of being hovered over',
     badIndicators: 'List item changes when hovered over'
   };
-  const totals = [0, 0, 0, 0, 0, 0];
+  const totals = [0, 0, 0, 0];
   Object.keys(data.totals).forEach(issue => {
     totals[severity[issue]] += data.totals[issue];
   });
@@ -417,6 +417,19 @@ exports.reporter = async (page, sampleSize = -1, withItems) => {
           excerpt: `${itemID}: ${item.text}`
         });
       });
+    });
+  }
+  else if (totals.some(total => total)) {
+    standardInstances.push({
+      issueID: 'hover',
+      what: 'Hovering has unexpected impacts',
+      ordinalSeverity: totals.reduce((max, current, index) => current ? index : max, 0),
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: ''
     });
   }
   // Return the result.

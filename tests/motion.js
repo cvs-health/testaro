@@ -111,18 +111,21 @@ exports.reporter = async (page, delay, interval, count) => {
         changeFrequency
       },
       totals: [
+        0,
+        0, 
         2 * (meanLocalRatio - 1)
         + maxLocalRatio - 1
         + globalRatio - 1
         + meanPixelChange / 10000
         + maxPixelChange / 25000
         + 3 * changeFrequency
-        || 0
+        || 0,
+        0
       ],
       standardInstances: [{
         issueID: 'motion',
         what: 'Content moves or changes without user request',
-        ordinalSeverity: 0,
+        ordinalSeverity: 2,
         location: {
           doc: '',
           type: '',

@@ -82,7 +82,7 @@ exports.reporter = async (page, withItems) => {
       standardInstances.push({
         issueID: 'dupAtt',
         what: `Element ${item.tagName} has 2 attributes with the same name`,
-        ordinalSeverity: 0,
+        ordinalSeverity: 2,
         location: {
           doc: '',
           type: '',
@@ -92,10 +92,23 @@ exports.reporter = async (page, withItems) => {
       });
     });
   }
+  else if (data.total) {
+    standardInstances.push({
+      issueID: 'dupAtt',
+      what: 'In some elements 2 attributes have the same name',
+      ordinalSeverity: 2,
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: ''
+    });
+  }
   // Return the data.
   return {
     data,
-    totals: data.total,
+    totals: [0, 0, data.total, 0],
     standardInstances
   };
 };

@@ -134,7 +134,8 @@ exports.reporter = async (page, withItems) => {
     console.log(`ERROR getting focOp data (${error.message})`);
     data.prevented = true;
   });
-  const totals = [];
+  // Derive the standard data.
+  const totals = [0, 0];
   if (
     data.totals
     && data.totals.types
@@ -147,11 +148,13 @@ exports.reporter = async (page, withItems) => {
   const standardInstances = [];
   if (data.items && data.items.onlyFocusable && data.items.onlyOperable) {
     ['onlyFocusable', 'onlyOperable'].forEach(issue => {
-      const issueID = issue === 'onlyFocusable' ? 'focusable-inoperable' : 'operable-nonfocusable';
+      const issueID = issue === 'onlyFocusable'
+        ? 'focOp-focusable-inoperable'
+        : 'focOp-operable-nonfocusable';
       const gripe = issue === 'onlyFocusable'
         ? 'is focusable but not operable'
         : 'is operable but not focusable';
-      const ordinalSeverity = issue === 'onlyFocusable' ? 0 : 1;
+      const ordinalSeverity = issue === 'onlyFocusable' ? 2 : 3;
       data.items[issue].forEach(item => {
         const itemID = item.id ? ` (ID ${item.id})` : '';
         const which = `${item.tagName}${itemID}`;
@@ -167,6 +170,19 @@ exports.reporter = async (page, withItems) => {
           excerpt: item.text
         });
       });
+    });
+  }
+  else if (totals[2] || totals[3]) {
+    standardInstances.push({
+      issueID: 'focOp',
+      what: 'Focusable elements are inoperable or vice versa',
+      ordinalSeverity: totals[3] ? 3 : 2,
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: ''
     });
   }
   return {

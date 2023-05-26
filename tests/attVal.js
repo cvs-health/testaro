@@ -49,7 +49,7 @@ exports.reporter = async (page, attributeName, areLicit, values, withItems) => {
         issueID: `attVal-${item.tagName}-${attributeName}`,
         what:
           `${item.tagName} element has attribute ${attributeName} with illicit value ${item.attributeValue}`,
-        ordinalSeverity: 0,
+        ordinalSeverity: 2,
         location: {
           doc: '',
           type: '',
@@ -59,7 +59,20 @@ exports.reporter = async (page, attributeName, areLicit, values, withItems) => {
       });
     });
   }
-  const totals = [data.total];
+  else if (data.total) {
+    standardInstances.push({
+      issueID: 'attVal',
+      what: 'Elements have attributes with illicit values',
+      ordinalSeverity: 2,
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: ''
+    });
+  }
+  const totals = [0, 0, data.total, 0];
   return {
     data,
     totals,

@@ -146,7 +146,7 @@ exports.reporter = async (page, withItems) => {
         }
       }
     });
-    const totals = [data.totals.mislabeled, data.totals.unlabeled];
+    const totals = [0, 0, data.totals.mislabeled, data.totals.unlabeled];
     const standardInstances = [];
     if (data.items) {
       ['mislabeled', 'unlabeled'].forEach(issue => {
@@ -164,7 +164,7 @@ exports.reporter = async (page, withItems) => {
           standardInstances.push({
             issueID: `labClash-${issue}`,
             what: `Element ${item.tagName} ${diagnosis}`,
-            ordinalSeverity: issue === 'mislabeled' ? 0 : 1,
+            ordinalSeverity: issue === 'mislabeled' ? 2 : 3,
             location: {
               doc: '',
               type: '',
@@ -173,6 +173,19 @@ exports.reporter = async (page, withItems) => {
             excerpt: `${item.tagName}: ${excerptTail}`
           });
         });
+      });
+    }
+    else if (data.totals.mislabeled || data.totals.unlabeled) {
+      standardInstances.push({
+        issueID: 'labClash',
+        what: 'Element labels are conflicting or missing',
+        ordinalSeverity: data.totals.unlabeled ? 3 : 2,
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: ''
       });
     }
     return {

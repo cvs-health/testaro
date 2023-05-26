@@ -63,9 +63,22 @@ exports.reporter = async (page, withItems) => {
       });
     });
   }
+  else if (data.totals.total) {
+    standardInstances.push({
+      issueID: 'zIndex',
+      what: 'Elements have non-default Z indexes',
+      ordinalSeverity: 0,
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: ''
+    });
+  }
   return {
     data,
-    totals: data.totals.total,
+    totals: [data.totals.total, 0, 0, 0],
     standardInstances
   };
 };

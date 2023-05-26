@@ -96,9 +96,22 @@ exports.reporter = async (page, withItems) => {
           });
         });
       }
+      else if (totals.total - totals.inSet > 0) {
+        standardInstances.push({
+          issueID: 'radioSet',
+          what: 'Radio buttons are not validly grouped in fieldsets with legends',
+          ordinalSeverity: 1,
+          location: {
+            doc: '',
+            type: '',
+            spec: ''
+          },
+          excerpt: ''
+        });
+      }
       return {
         data,
-        totals: [totals.total - totals.inSet],
+        totals: [0, totals.total - totals.inSet, 0, 0],
         standardInstances
       };
     }

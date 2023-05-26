@@ -25,14 +25,14 @@ exports.reporter = async (page, withItems) => {
   if (withItems) {
     data.items = badLinks;
   }
-  const totals = [data.total];
+  const totals = [0, 0, data.total, 0];
   const standardInstances = [];
   if (data.items) {
     data.items.forEach(item => {
       standardInstances.push({
         issueID: 'focVis',
         what: 'Visible link is above or to the left of the display',
-        ordinalSeverity: 0,
+        ordinalSeverity: 2,
         location: {
           doc: '',
           type: '',
@@ -40,6 +40,19 @@ exports.reporter = async (page, withItems) => {
         },
         excerpt: item
       });
+    });
+  }
+  else if (data.total) {
+    standardInstances.push({
+      issueID: 'focVis',
+      what: 'Visible links are above or to the left of the display',
+      ordinalSeverity: 2,
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: ''
     });
   }
   return {

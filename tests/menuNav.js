@@ -263,7 +263,8 @@ exports.reporter = async (page, withItems) => {
   const totals = data.totals ? [
     data.totals.navigations.all.incorrect,
     data.totals.menuItems.incorrect,
-    data.totals.menus.incorrect
+    data.totals.menus.incorrect,
+    0
   ] : [];
   const standardInstances = [];
   if (data.menuItems && data.menuItems.incorrect) {
@@ -271,7 +272,7 @@ exports.reporter = async (page, withItems) => {
       standardInstances.push({
         issueID: 'menuNav',
         what: `Element ${item.tagName} is a menu item but has nonstandard navigation`,
-        ordinalSeverity: 0,
+        ordinalSeverity: 1,
         location: {
           doc: '',
           type: '',
@@ -279,6 +280,19 @@ exports.reporter = async (page, withItems) => {
         },
         excerpt: `${item.tagName}: ${item.text}`
       });
+    });
+  }
+  else if (data.totals.menuItems.incorrect) {
+    standardInstances.push({
+      issueID: 'menuNav',
+      what: 'Menus and menu items have nonstandard navigation',
+      ordinalSeverity: 2,
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: ''
     });
   }
   return {

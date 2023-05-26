@@ -76,7 +76,7 @@ exports.reporter = async (page, withItems) => {
       standardInstances.push({
         issueID: `autocomplete-${item[0]}`,
         what: `Input is missing the required autocomplete attribute with value ${item[0]}`,
-        ordinalSeverity: 0,
+        ordinalSeverity: 2,
         location: {
           doc: '',
           type: '',
@@ -86,10 +86,23 @@ exports.reporter = async (page, withItems) => {
       });
     });
   }
+  else if (data.total) {
+    standardInstances.push({
+      issueID: 'autocomplete',
+      what: 'Inputs are missing required autocomplete attributes',
+      ordinalSeverity: 2,
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: ''
+    });
+  }
   // Return the data.
   return {
     data,
-    totals: [data.total],
+    totals: [0, 0, data.total, 0],
     standardInstances
   };
 };

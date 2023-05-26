@@ -43,14 +43,14 @@ exports.reporter = async (page, withItems) => {
     }
     return data;
   }, withItems);
-  const totals = [data.totals.impactedElements, data.totals.styledElements];
+  const totals = [0, data.totals.impactedElements, data.totals.styledElements, 0, 0];
   const standardInstances = [];
   if (data.items) {
     data.items.forEach(item => {
       standardInstances.push({
         issueID: 'filterStyle',
         what: `Element ${item.tagName} has a filter style that impacts ${item.impact} elements`,
-        ordinalSeverity: 1,
+        ordinalSeverity: 2,
         location: {
           doc: '',
           type: '',
@@ -58,6 +58,19 @@ exports.reporter = async (page, withItems) => {
         },
         excerpt: `${item.tagName}: ${item.text}`
       });
+    });
+  }
+  else if (data.totals.styledElements) {
+    standardInstances.push({
+      issueID: 'filterStyle',
+      what: 'Elements have filter styles impacting other elements',
+      ordinalSeverity: 2,
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: ''
     });
   }
   return {

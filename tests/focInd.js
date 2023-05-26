@@ -164,7 +164,7 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
     return data;
   }, [allowedDelay, withItems]);
   const {types} = data.totals;
-  const totals = [types.nonOutlinePresent.total, types.indicatorMissing.total];
+  const totals = [0, 0, types.nonOutlinePresent.total, types.indicatorMissing.total];
   const standardInstances = [];
   if (data.items) {
     const issueNames = ['nonOutlinePresent', 'indicatorMissing'];
@@ -174,7 +174,7 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
         standardInstances.push({
           issueID: `focInd-${issueName}`,
           what: `Element ${item.tagName} has ${qualifier} focus indicator`,
-          ordinalSeverity: issueName === 'nonOutlinePresent' ? 0 : 1,
+          ordinalSeverity: issueName === 'nonOutlinePresent' ? 2 : 3,
           location: {
             doc: '',
             type: '',
@@ -183,6 +183,19 @@ exports.reporter = async (page, revealAll, allowedDelay, withItems) => {
           excerpt: item.text
         });
       });
+    });
+  }
+  else if (types.nonOutlinePresent.total || types.indicatorMissing.total) {
+    standardInstances.push({
+      issueID: 'focInd',
+      what: 'Elements have missing or non-outline focus indicators',
+      ordinalSeverity: types.indicatorMissing.total ? 3 : 2,
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: ''
     });
   }
   return {

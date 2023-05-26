@@ -327,7 +327,8 @@ exports.reporter = async (page, withItems) => {
   const totals = data.totals ? [
     data.totals.navigations.all.incorrect,
     data.totals.tabElements.incorrect,
-    data.totals.tabLists.incorrect
+    data.totals.tabLists.incorrect,
+    0
   ] : [];
   const standardInstances = [];
   if (data.tabElements && data.tabElements.incorrect) {
@@ -335,7 +336,7 @@ exports.reporter = async (page, withItems) => {
       standardInstances.push({
         issueID: 'tabNav',
         what: `Element ${item.tagName} has a tab role but has nonstandard navigation`,
-        ordinalSeverity: 0,
+        ordinalSeverity: 1,
         location: {
           doc: '',
           type: '',
@@ -343,6 +344,19 @@ exports.reporter = async (page, withItems) => {
         },
         excerpt: `${item.tagName}: ${item.text}`
       });
+    });
+  }
+  else if (data.totals.navigations.all.incorrect) {
+    standardInstances.push({
+      issueID: 'tabNav',
+      what: 'Tablists have nonstandard navigation',
+      ordinalSeverity: 2,
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: ''
     });
   }
   return {

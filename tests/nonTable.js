@@ -77,9 +77,22 @@ exports.reporter = async (page, withItems) => {
       });
     });
   }
+  else if (data.total) {
+    standardInstances.push({
+      issueID: 'nonTable',
+      what: 'Tables are misused to arrange content',
+      ordinalSeverity: 2,
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: ''
+    });
+  }
   return {
     data,
-    totals: [data.total],
+    totals: [0, 0, data.total, 0],
     standardInstances
   };
 };

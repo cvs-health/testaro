@@ -56,7 +56,17 @@ exports.reporter = async page => {
   // Return the result.
   return {result: {
     data,
-    totals: [Math.abs(data.discrepancy)],
-    standardInstances: []
+    totals: [0, 0, Math.abs(data.discrepancy), 0],
+    standardInstances: data.discrepancy ? [{
+      issueID: 'focAll',
+      what: 'Some focusable elements are not Tab-focusable or vice versa',
+      ordinalSeverity: 2,
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: ''
+    }] : []
   }};
 };

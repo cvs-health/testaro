@@ -18,24 +18,37 @@ exports.reporter = async (page, withItems) => {
   const data = {
     total: badLinkTexts.length
   };
+  const totals = [0, 0, data.total, 0];
+  const standardInstances = [];
   if (withItems) {
     data.items = badLinkTexts;
+    data.items.forEach(item => {
+      standardInstances.push({
+        issueID: 'linkTo',
+        what: 'Element a has no href attribute',
+        ordinalSeverity: 2,
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: item
+      });
+    });
   }
-  const totals = [data.total];
-  const standardInstances = [];
-  data.items.forEach(item => {
+  else if (data.total) {
     standardInstances.push({
       issueID: 'linkTo',
-      what: 'Element a has no href attribute',
-      ordinalSeverity: 0,
+      what: 'Links are missing href attributes',
+      ordinalSeverity: 2,
       location: {
         doc: '',
         type: '',
         spec: ''
       },
-      excerpt: item
+      excerpt: ''
     });
-  });
+  }
   return {
     data,
     totals,

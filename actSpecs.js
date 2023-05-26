@@ -348,6 +348,13 @@ exports.actSpecs = {
         id: [true, 'string', 'hasLength', 'ID of the requested test instance']
       }
     ],
+    testaro: [
+      'Perform a Testaro test',
+      {
+        withItems: [true, 'boolean', '', 'itemize'],
+        rules: [false, 'array', 'areStrings', 'IDs of rules to include, if not all evaluative rules']
+      }
+    ],
     textNodes: [
       'Perform a textNodes test',
       {

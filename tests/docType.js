@@ -12,7 +12,17 @@ exports.reporter = async page => {
   });
   return {
     data: {docHasType},
-    totals: [docHasType ? 0 : 1],
-    standardInstances: []
+    totals: [0, 0, 0, docHasType ? 0 : 1],
+    standardInstances: docHasType ? [] : [{
+      issueID: 'docType',
+      what: 'Document has no standard HTML doctype preamble',
+      ordinalSeverity: 3,
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: ''
+    }]
   };
 };

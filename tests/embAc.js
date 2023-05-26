@@ -32,6 +32,7 @@ exports.reporter = async (page, withItems) => await page.$$eval(
     // Return the result.
     const data = {totals};
     const standardInstances = [];
+    const total = Object.values(data.totals).reduce((sum, current) => sum + current);
     if (withItems) {
       data.items = items;
       items.forEach(item => {
@@ -39,7 +40,7 @@ exports.reporter = async (page, withItems) => await page.$$eval(
         standardInstances.push({
           issueID: `embAc-${pair[0]}-${pair[1]}`,
           what: `Element ${pair[0]} contains element ${pair[1]}`,
-          ordinalSeverity: 0,
+          ordinalSeverity: 2,
           location: {
             doc: '',
             type: '',
@@ -49,9 +50,22 @@ exports.reporter = async (page, withItems) => await page.$$eval(
         });
       });
     }
+    else if (total) {
+      standardInstances.push({
+        issueID: 'embAc',
+        what: 'Interactive elements are contained by links or buttons',
+        ordinalSeverity: 2,
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: ''
+      });
+    }
     return {
       data,
-      totals: Object.values(data.totals).reduce((sum, current) => sum + current),
+      totals: [0, 0, total, 0],
       standardInstances
     };
   }, withItems

@@ -51,7 +51,7 @@ exports.reporter = async page => {
     reallyHidden: [1, 'effectively hidden'],
     visHidden: [0, 'visually hidden'],
     ariaHidden: [1, 'hidden by ARIA'],
-    document: [1, 'Document', 'document.documentElemnt'],
+    document: [1, 'Document', 'document.documentElement'],
     body: [1, 'Document body', 'document.body'],
     main: [0, 'main region', 'main, [role="main"]']
   };
@@ -72,7 +72,7 @@ exports.reporter = async page => {
       }
     });
   });
-  const totals = [0, 0, 0];
+  const totals = [0, 0, 0, 0];
   standardInstances.forEach(instance => {
     totals[instance.ordinalSeverity]++;
   });
