@@ -309,6 +309,7 @@ const convert = (testName, result, standardResult) => {
       });
       standardResult.instances.push(... ruleResult.standardInstances);
     });
+    standardResult.totals = standardResult.totals.map(total => Math.round(total));
   }
   // wave
   else if (
