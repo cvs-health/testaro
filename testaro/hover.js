@@ -43,7 +43,7 @@ const samProb = (index, popSize, sampleRatio) =>
 const getSample = (population, sampleSize) => {
   const popSize = population.length;
   // If the sample is at least as large as the population:
-  if (sampleSize >= popSize) {
+  if (sampleSize >= popSize || sampleSize < 0) {
     // Return the population as the sample.
     return population.map(trigger => [trigger, 1]);
   }
