@@ -8,7 +8,7 @@
 exports.reporter = async (page, withItems) => {
   return await page.$eval('body', (body, withItems) => {
     // FUNCTION DEFINITION START
-    const debloat = text => text.replace(/\s+/g, ' ').trim();
+    const debloat = text => text.replace(/\s+/g, ' ').trim().slice(0, 100);
     // FUNCTION DEFINITION END
     // Initialize a report.
     const data = {
@@ -125,7 +125,7 @@ exports.reporter = async (page, withItems) => {
             labelee.tagName === 'BUTTON'
             || (labelee.tagName === 'INPUT' && labelee.type === 'submit')
           ) {
-            item.content = texts.content || `{${debloat(labelee.outerHTML)}}`;
+            item.content = debloat(texts.content) || debloat(labelee.outerHTML);
           }
           data.items.unlabeled.push(item);
         }
@@ -155,7 +155,7 @@ exports.reporter = async (page, withItems) => {
         data.items[issue].forEach(item => {
           if (issue === 'mislabeled') {
             diagnosis = `has clashing labels of types: ${item.labelTypes.join(', ')}`;
-            excerptTail = item.texts.content || '';
+            excerptTail = debloat(Object.values(item.texts).join(' '));
           }
           else {
             diagnosis = 'is unlabeled';
