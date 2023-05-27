@@ -67,7 +67,8 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
       if (withItems) {
         const elementData = {
           tagName,
-          text: element.textContent.trim().replace(/\s{2,}/g, ' ').slice(0, 100)
+          text: (element.textContent.trim() || element.outerHTML.trim()).replace(/\s+/g, ' ')
+          .slice(0, 100)
         };
         if (status === 'outlinePresent') {
           elementData.delay = delay;

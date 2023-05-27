@@ -41,7 +41,9 @@ exports.reporter = async (
   page, withItems, rules = ['y', ... Object.keys(evalRules)], args = null
 ) => {
   // Initialize the data.
-  const data = {};
+  const data = {
+    rules: {}
+  };
   // For each rule invoked:
   const argRules = args && Object.keys(args);
   const realRules = rules[0] === 'y'
@@ -56,10 +58,10 @@ exports.reporter = async (
       ruleArgs.push(... args[rule]);
     }
     // Test the page.
-    data[rule] = await require(`../testaro/${rule}`).reporter(... ruleArgs);
+    data.rules[rule] = await require(`../testaro/${rule}`).reporter(... ruleArgs);
     const what = evalRules[rule];
-    data[rule].what = what;
-    console.log(`>>>> ${rule} (${what})`);
+    data.rules[rule].what = what;
+    console.log(`>>>>>> ${rule} (${what})`);
   }
   return {result: data};
 };

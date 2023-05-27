@@ -56,7 +56,7 @@ exports.reporter = async page => {
   // Reload the page.
   await page.reload({timeout: 15000});
   // Return the result.
-  return {result: {
+  return {
     data,
     totals: [0, 0, Math.abs(data.discrepancy), 0],
     standardInstances: data.discrepancy ? [{
@@ -70,5 +70,5 @@ exports.reporter = async page => {
       },
       excerpt: ''
     }] : []
-  }};
+  };
 };

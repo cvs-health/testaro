@@ -300,10 +300,10 @@ const convert = (testName, result, standardResult) => {
   }
   // testaro
   else if (testName === 'testaro') {
-    const rules = Object.keys(result);
+    const rules = Object.keys(result.rules);
     standardResult.totals = [0, 0, 0, 0];
     rules.forEach(rule => {
-      const ruleResult = result[rule];
+      const ruleResult = result.rules[rule];
       standardResult.totals.forEach((total, index) => {
         standardResult.totals[index] += ruleResult.totals[index];
       });

@@ -135,15 +135,17 @@ exports.reporter = async (page, withItems) => {
     data.prevented = true;
   });
   // Derive the standard data.
-  const totals = [0, 0];
+  const totals = [0, 0, 0, 0];
   if (
     data.totals
     && data.totals.types
-    && typeof data.totals.types.onlyFocusable === 'number'
-    && typeof data.totals.types.onlyOperable === 'number'
+    && data.totals.types.onlyFocusable
+    && data.totals.types.onlyOperable
+    && typeof data.totals.types.onlyFocusable.total === 'number'
+    && typeof data.totals.types.onlyOperable.total === 'number'
   ) {
-    totals.push(data.totals.types.onlyFocusable.total);
-    totals.push(data.totals.types.onlyOperable.total);
+    totals[2] = data.totals.types.onlyFocusable.total;
+    totals[3] = data.totals.types.onlyOperable.total;
   }
   const standardInstances = [];
   if (data.items && data.items.onlyFocusable && data.items.onlyOperable) {
