@@ -16,7 +16,10 @@ exports.reporter = async (page, withItems) => {
     const linkTypes = args[1];
     // FUNCTION DEFINITION START
     // Returns a space-minimized copy of a string.
-    const compact = string => string.replace(/[\t\n]/g, '').replace(/\s{2,}/g, ' ').trim();
+    const compact = string => string
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 100);
     // FUNCTION DEFINITION END
     // Identify the adjacent links.
     const adjacentLinks = linkTypes.adjacent;
@@ -27,7 +30,7 @@ exports.reporter = async (page, withItems) => {
     // For each of them:
     adjacentLinks.forEach(link => {
       // Identify the text of the link if itemization is required.
-      const text = withItems ? compact(link.textContent) : '';
+      const text = withItems ? compact(link.textContent) || compact(link.outerHTML) : '';
       // If it is underlined:
       if (window.getComputedStyle(link).textDecorationLine === 'underline') {
         // Increment the count of underlined inline links.
