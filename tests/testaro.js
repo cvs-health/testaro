@@ -33,6 +33,12 @@ const evalRules = {
   titledEl: 'title attributes on inappropriate elements',
   zIndex: 'non-default Z indexes'
 };
+const etcRules = {
+  attVal: 'elements with attributes having illicit values',
+  elements: 'data on specified elements',
+  textNodes: 'data on specified text nodes',
+  title: 'page title',
+};
 
 // FUNCTIONS
 
@@ -59,7 +65,7 @@ exports.reporter = async (
     }
     // Test the page.
     data.rules[rule] = await require(`../testaro/${rule}`).reporter(... ruleArgs);
-    const what = evalRules[rule];
+    const what = evalRules[rule] || etcRules[rule];
     data.rules[rule].what = what;
     console.log(`>>>>>> ${rule} (${what})`);
   }

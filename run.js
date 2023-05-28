@@ -34,7 +34,6 @@ const moves = {
 // Names and descriptions of tests.
 const tests = {
   alfa: 'alfa',
-  attVal: 'elements with attributes having illicit values',
   axe: 'Axe',
   continuum: 'Level Access Continuum, community edition',
   elements: 'data on specified elements',

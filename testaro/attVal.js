@@ -2,7 +2,8 @@
   attVal
   This test reports attributes with illicit values.
 */
-exports.reporter = async (page, attributeName, areLicit, values, withItems) => {
+exports.reporter = async (page, withItems, attributeName, areLicit, values) => {
+  console.log('Starting reporter');
   // Identify the elements that have the specified attribute with illicit values.
   const badAttributeData = await page.evaluate(
     async args => {

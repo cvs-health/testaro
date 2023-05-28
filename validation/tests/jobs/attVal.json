@@ -17,12 +17,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "attributeName": "lang",
-      "areLicit": true,
-      "values": [
-        "en-US",
-        "de-CH"
-      ],
       "what": "attribute values",
       "withItems": true,
       "expect": [
@@ -38,7 +32,10 @@
       "rules": [
         "y",
         "attVal"
-      ]
+      ],
+      "args": {
+        "attVal": ["lang", true, ["en-US", "de-CH"]]
+      }
     },
     {
       "type": "url",
@@ -48,12 +45,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "attributeName": "lang",
-      "areLicit": false,
-      "values": [
-        "en",
-        "de"
-      ],
       "what": "attribute values",
       "withItems": true,
       "expect": [
@@ -91,7 +82,10 @@
       "rules": [
         "y",
         "attVal"
-      ]
+      ],
+      "args": {
+        "attVal": ["lang", true, ["en-US", "de-CH"]]
+      }
     }
   ],
   "sources": {
