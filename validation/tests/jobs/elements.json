@@ -18,7 +18,6 @@
       "type": "test",
       "which": "testaro",
       "what": "elements",
-      "detailLevel": 0,
       "expect": [
         [
           "result.rules.elements.data.total",
@@ -30,14 +29,15 @@
       "rules": [
         "y",
         "elements"
-      ]
+      ],
+      "args": {
+        "elements": [0, null, false, null]
+      }
     },
     {
       "type": "test",
       "which": "testaro",
       "what": "elements",
-      "detailLevel": 0,
-      "tagName": "P",
       "expect": [
         [
           "result.rules.elements.data.total",
@@ -49,15 +49,15 @@
       "rules": [
         "y",
         "elements"
-      ]
+      ],
+      "args": {
+        "elements": [0, "P", true, null]
+      }
     },
     {
       "type": "test",
       "which": "testaro",
       "what": "elements",
-      "detailLevel": 0,
-      "tagName": "LI",
-      "onlyVisible": true,
       "expect": [
         [
           "result.rules.elements.data.total",
@@ -69,15 +69,15 @@
       "rules": [
         "y",
         "elements"
-      ]
+      ],
+      "args": {
+        "elements": [0, "LI", true, null]
+      }
     },
     {
       "type": "test",
       "which": "testaro",
       "what": "elements",
-      "detailLevel": 0,
-      "tagName": "P",
-      "attribute": "class",
       "expect": [
         [
           "result.rules.elements.data.total",
@@ -89,15 +89,15 @@
       "rules": [
         "y",
         "elements"
-      ]
+      ],
+      "args": {
+        "elements": [0, "P", false, "class"]
+      }
     },
     {
       "type": "test",
       "which": "testaro",
       "what": "elements",
-      "detailLevel": 1,
-      "tagName": "LI",
-      "attribute": "class=first",
       "expect": [
         [
           "result.rules.elements.data.total",
@@ -139,14 +139,15 @@
       "rules": [
         "y",
         "elements"
-      ]
+      ],
+      "args": {
+        "elements": [1, "LI", false, "class=first"]
+      }
     },
     {
       "type": "test",
       "which": "testaro",
       "what": "elements",
-      "detailLevel": 1,
-      "tagName": "INPUT",
       "expect": [
         [
           "result.rules.elements.data.total",
@@ -168,15 +169,15 @@
       "rules": [
         "y",
         "elements"
-      ]
+      ],
+      "args": {
+        "elements": [1, "INPUT", false, null]
+      }
     },
     {
       "type": "test",
       "which": "testaro",
       "what": "elements",
-      "detailLevel": 2,
-      "tagName": "LI",
-      "attribute": "class=first",
       "expect": [
         [
           "result.rules.elements.data.items.0.textContent",
@@ -193,15 +194,15 @@
       "rules": [
         "y",
         "elements"
-      ]
+      ],
+      "args": {
+        "elements": [2, "LI", false, "class=first"]
+      }
     },
     {
       "type": "test",
       "which": "testaro",
       "what": "elements",
-      "detailLevel": 2,
-      "tagName": "LI",
-      "onlyVisible": true,
       "attribute": "class",
       "expect": [
         [
@@ -224,15 +225,15 @@
       "rules": [
         "y",
         "elements"
-      ]
+      ],
+      "args": {
+        "elements": [2, "LI", true, "class"]
+      }
     },
     {
       "type": "test",
       "which": "testaro",
       "what": "elements",
-      "detailLevel": 3,
-      "tagName": "P",
-      "attribute": "class=first",
       "expect": [
         [
           "result.rules.elements.data.items.0.textContent",
@@ -284,7 +285,10 @@
       "rules": [
         "y",
         "elements"
-      ]
+      ],
+      "args": {
+        "elements": [3, "P", false, "class=first"]
+      }
     }
   ],
   "sources": {

@@ -518,6 +518,10 @@ const isTrue = (object, specs) => {
     else if (relation === '!i') {
       satisfied = typeof actual === 'string' && ! actual.includes(criterion);
     }
+    else if (relation === 'e') {
+      satisfied = typeof actual === 'object'
+      && JSON.stringify(actual) === JSON.stringify(criterion);
+    }
     return [actual, satisfied];
   }
   // Otherwise, i.e. if the specifications are invalid:

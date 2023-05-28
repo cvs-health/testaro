@@ -600,6 +600,7 @@ The second item in each array, if there are 3 items in the array, is an operator
 - `>`: greater than
 - `!`: unequal to
 - `i`: includes
+- `e`: equivalent to (parsed identically as JSON)
 
 The third item in each array, if there are 3 items in the array, is the criterion with which the value of the first property is compared.
 

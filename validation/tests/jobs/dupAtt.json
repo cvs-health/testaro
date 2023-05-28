@@ -52,13 +52,26 @@
         ],
         [
           "result.rules.dupAtt.data.items.0",
-          "=",
-          "p class=\"narrow\" id=\"daParagraph\" class=\"wide\""
+          "e",
+          {
+            "tagName": "P",
+            "attributes": [
+              "class",
+              "id",
+              "class"
+            ]
+          }
         ],
         [
           "result.rules.dupAtt.data.items.1",
-          "i",
-          "large"
+          "e",
+          {
+            "tagName": "BUTTON",
+            "attributes": [
+              "aria-label",
+              "aria-label"
+            ]
+          }
         ]
       ],
       "rules": [
