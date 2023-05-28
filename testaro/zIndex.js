@@ -33,7 +33,10 @@ exports.reporter = async (page, withItems) => {
         data.items.push({
           tagName,
           id: element.id || '',
-          text: element.textContent.trim().replace(/\s{2,}/g, ' ').slice(0, 100)
+          text:
+          (element.textContent.trim() || element.outerHTML.trim())
+          .replace(/\s+/g, ' ')
+          .slice(0, 100)
         });
       }
     };
