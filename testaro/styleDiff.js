@@ -107,7 +107,9 @@ exports.reporter = async (page, withItems) => {
             if (! styleProps[typeName]) {
               styleProps[typeName] = {};
             }
-            const elementText = element.textContent.trim().replace(/\s/g, ' ');
+            const elementText = (element.textContent.trim() || element.outerHTML.trim())
+            .replace(/\s+/g, ' ')
+            .slice(0, 100);
             // For each style property being compared:
             styles.forEach(styleName => {
               if (! styleProps[typeName][styleName]) {
