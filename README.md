@@ -1,27 +1,32 @@
 # testaro
 
-Federated accessibility test automation
+Ensemble testing for web accessibility
 
 ## Summary
 
 Testaro is a collection of web accessibility testing tools.
 
-The purpose of Testaro is to provide programmatic access to accessibility tests defined by several tools, including Testaro itself.
+The purpose of Testaro is to provide programmatic access to accessibility tests defined by several tools.
 
 Testaro launches and controls web browsers, performing operations, conducting tests, and recording results.
 
-Testaro is designed to be a workstation-based agent. Testaro can be installed on a workstation running under OS X or Windows, or potentially Ubuntu Linux. Software that uses Testaro can be installed on the same workstation or any other workstation or server. Such other software can perform functions that do not require workstation features, such as:
-- Test scheduling
-- Monitoring
+Testaro is designed to be a workstation-based agent, because many of the tests performed by Testaro simulate the use of a web browser on a workstation. Testaro can be installed under MacOS, Windows, or potentially Ubuntu Linux.
+
+Testaro accepts _jobs_, performs them, and returns _reports_.
+
+Other software, located on any server or on the same workstation, can make use of Testaro, performing functions such as:
+- Job preparation
+- Converting user specifications into jobs
+- Job scheduling
+- Monitoring of the health of Testaro
 - Management of clusters of workstations sharing workloads
 - Allocation of responsibilities among workstations
-- Receiving and fulfilling requests from users for testing
-- Converting user specifications into instructions for workstations
+- Receiving and fulfilling requests from users for jobs
 - Allocating testing responsibilities to human testers
 - Combining reports from workstations and human testers
 - Analyzing and summarizing (e.g., computing scores on the basis of) test results
 - Sending notifications
-- Publishing reports
+- Revising, combining, and publishing reports
 
 One software product that performs some such functions is [Testilo](https://www.npmjs.com/package/testilo).
 
@@ -31,9 +36,7 @@ Testaro uses:
 - [Playwright](https://playwright.dev/) to launch browsers, perform user actions in them, and perform tests
 - [pixelmatch](https://www.npmjs.com/package/pixelmatch) to measure motion
 
-Testaro includes some of its own accessibility tests. Some of them are derived from tests performed by the [BBC Accessibility Standards Checker](https://github.com/bbc/bbc-a11y).
-
-In addition, Testaro performs tests of these tools:
+Testaro performs tests of these tools:
 - [accessibility-checker](https://www.npmjs.com/package/accessibility-checker) (IBM)
 - [alfa](https://alfa.siteimprove.com/) (Siteimprove)
 - [axe-playwright](https://www.npmjs.com/package/axe-playwright) (Deque)
@@ -42,7 +45,10 @@ In addition, Testaro performs tests of these tools:
 - [Nu Html Checker](https://github.com/validator/validator) (World Wide Web Consortium)
 - [QualWeb core](https://www.npmjs.com/package/@qualweb/core) (University of Lisbon)
 - [Tenon](https://tenon.io/documentation/what-tenon-tests.php) (Tenon)
+- [Testaro](https://www.npmjs.com/package/testaro) (Testaro)
 - [WAVE API](https://wave.webaim.org/api/) (WebAIM)
+
+The [BBC Accessibility Standards Checker](https://github.com/bbc/bbc-a11y) is not a formal dependency, but some of the tests in the Testaro tool are adaptations of tests of that tool.
 
 As of this version, the counts of tests of the tools referenced above were:
 - Alfa: 103
@@ -62,8 +68,8 @@ Of the 29 Testaro tests, 26 are evaluative (they discover accessibility issues),
 ## Quasi-tests
 
 Reports produced by Testaro contain data in addition to the results of these tests. Such data can be used like tests. In particular, the data include:
-- Latency (how long a time each test takes)
-- Test prevention (the failure of tests to run on particular targets)
+- Latency (how long a time each tool takes to run its tests)
+- Test prevention (the failure of tools to run on particular targets)
 - Logging (browser messaging, including about document errors, during testing)
 
 ## Code organization
@@ -72,7 +78,7 @@ The main directories containing code files are:
 - package root: main code files
 - `tests`: files containing the code defining particular tests
 - `procs`: shared procedures
-- `validation`: code and artifacts for the validation of Testaro
+- `validation`: code and artifacts for the validation of the Testaro tool
 
 ## System requirements
 
@@ -112,12 +118,6 @@ All of the tests that Testaro can perform are free of cost, except those perform
 
 ## Process objects
 
-### Introduction
-
-A _job_ is an object containing instructions for Testaro.
-
-A _report_ is a job with properties added by Testaro, describing the results.
-
 ### Jobs
 
 Here is an example of a job:
@@ -125,7 +125,7 @@ Here is an example of a job:
 ```javascript
 {
   id: 'be76p-ts25-w3c',
-  what: 'Test host with alfa',
+  what: 'Test W3C with 2 alfa rules',
   strict: true,
   timeLimit: 65,
   acts: [
@@ -143,7 +143,8 @@ Here is an example of a job:
     {
       type: 'test',
       which: 'alfa',
-      what: 'Siteimprove alfa tool'
+      what: 'Siteimprove alfa tool',
+      rules: ['r25', 'r71']
     }
   ],
   sources: {
@@ -160,45 +161,58 @@ Here is an example of a job:
 }
 ```
 
-This job contains three `acts`, telling Testaro to:
+This job contains three _acts_, telling Testaro to:
 1. open a page in the Chromium browser
 1. navigate to a specified URL
-1. perform the tests of the `alfa` tool on that URL
+1. perform two of the tests of the `alfa` tool on that URL
 
 Job properties:
-- `id`: This is a string consisting of alphanumeric ASCII characters and hyphen-minus (-), intended to be unique. When the above example job is saved as a JSON file, the file name is `be76p-ts25-w3c.json`. Typically, a job is created from a _script_, and the job ID adds a timestamp prefix and a target suffix to the script ID. Here the script ID would have been `ts25`.
-- `what`: This is a description of the job.
-- `strict`: This is `true` or `false`, indicating whether _substantive redirections_ should be treated as failures. These are redirections that do more than add or subtract a final slash. For example, if `strict` is true, a redirection from `xyz.com` to `www.xyz.com` or to `xyz.com/en` will abort the job.
-- `timeLimit`: This property is the number of seconds allowed for the execution of the job.
-- `acts`: This is an array of the acts to be performed. Acts are documented below.
-- `sources`: This object has properties describing where the job came from:
-   - `script`: This is the ID of the script from which the job was made, if it was made from a script, or is otherwise an empty string. Other applications, such as Testilo, can make jobs from scripts. When Testilo creates a job, the job inherits its `id`, `what`, `strict`, `timeLimit`, and `acts` properties from the script. However, Testilo can create multiple jobs from a single script, replacing acts of type `placeholder` with one or more target-specific acts. Examples of scripts can be found in the Testilo package.
-   - `batch`: If the job was one of a set of jobs created by a merger of a script and a batch of targets, this property’s value is the ID of the batch, or otherwise is an empty string.
-   - `target`: If the job was made from a script with placeholder acts, this property describes the target whose target-specific acts have replaced the placeholder acts. Otherwise `target` is an empty object. Testilo also uses the `id` property of the target as the third segment of the job ID.
-   - `requester`: This string is the email address to receive a notice of completion of the running of the job.
-- `creationTime`: This is the time when the job was created.
-- `timeStamp`: This string is a compact representation of the job creation time, suitable for inclusion in the ID of the job.
+- `id`: a string uniquely identifying the job.
+- `what`: a description of the job.
+- `strict`: `true` or `false`, indicating whether _substantive redirections_ should be treated as failures. These are redirections that do more than add or subtract a final slash.
+- `timeLimit`: the number of seconds allowed for the execution of the job.
+- `acts`: an array of the acts to be performed (documented below).
+- `sources`: an object describing where the job came from:
+   - `script` (optional): the ID of the script from which the job was made.
+   - `batch` (optional): a set of targets (URLs) from which the target of this job was drawn.
+   - `target` (optional): an object describing the target being tested by this job.
+   - `requester` (optional): the email address that should receive a notice of completion of the job.
+- `creationTime`: the time when the job was created.
+- `timeStamp`: a string unique to this job.
 
 ### Reports
 
 #### Introduction
 
-A _report_ is an enhanced copy of a job file. It begins as a pure copy. Testaro adds data to it as Testaro runs the job. Specifically, Testaro:
-- Adds a `jobData` property and populates it with data about the job.
-- Adds properties to the acts, describing the results of the performance of the acts.
+While each tool produces a _tool report_ of the results of its tests, Testaro also produces a _job report_, combining all of the tool reports of a job.
+- Tools append their reports to their acts in a job. For example, if one act in a job specifies some Continuum tests to be run, Continuum appends its report to that act. In that way, the act now describes not only the Continuum tests that were run, but also the results of those tests.
+- Testaro further elaborates a job by reporting comprehensive results there. Testaro can add more facts to each of the tool reports and also adds whole-job facts, in a `jobData` property, to the job. Testaro thereby converts the job to a job report.
 
 #### Formats
 
-The format of the data that Testaro adds to a test act is determined by the tool to which the test belongs. The various tools (alfa, axe, continuum, etc.) have diverse reporting formats.
+##### Tool formats
 
-In order to simplify the consumption of Testaro reports, Testaro can standardize the most important data. If the `STANDARD` environment variable has the value `also` (which it has by default) or `only`, Testaro converts some data in each test result to a standard Testaro format. That permits you to ignore the format idiosyncrasies of the tools. If `STANDARD` has the value `also`, the report includes both formats. If the value is `only`, the report includes only the standard format. If the value is `no`, the report includes only the original format of each tool.
+The tools listed above as dependencies write their tool reports in various formats. They differ in how they organize multiple instances of the same issue, how they classify issue severity and certainty, how they point to the locations of issue instances, how they name issues, etc.
 
-As long as the tool permits, the standard format tells you, for each instance of an issue:
-- the ID of the issue
-- a description of the issue
-- how serious the tool considers the instance to be
-- where the instance occurs
-- some of the code that created the issue
+Integrating reports from 10 different tools is a complex task, as analyzed in [“Accessibility Metatesting”](https://arxiv.org/abs/2304.07591). The diversity of their reporting formats makes the task more complex than it would otherwise be.
+
+##### Standard format
+
+Testaro helps overcome this format diversity by offering to represent the main facts in the report of each tool in a single standardized format.
+
+If the `STANDARD` environment variable has the value `also` (which it has by default) or `only`, Testaro converts some data in each tool report to a standard format. That permits you to ignore the format idiosyncrasies of the tools. If `STANDARD` has the value `also`, the job report includes both formats. If the value is `only`, the job report includes only the standard format. If the value is `no`, the job report includes only the original format of each tool.
+
+The standard format of each tool report has two properties:
+- `totals`: an array of 4 integers, representing the counts of issue instances classified by the tool into 4 ordinal degrees of severity. For example, `[2, 13, 0, 5]` would mean that the tool reported 2 instances at the lowest severity, 13 at the next-lowest, none at the third-lowest, and 5 at the highest.
+- `instances`: an array of objects describing facts about issue instances reported by the tool. Insofar as each tool permits, this object has these properties:
+    - `issueID`: a code identifying the issue
+    - `what`: a description of the issue
+    - `ordinalSeverity`: how the tool ranks the severity of the instance, on a 4-point ordinal scale
+    - `location`: an object with three properties:
+        - `doc`: whether the source (`source`) or the browser rendition (`dom`) was tested
+        - `type`: the type of location information provided by the tool (`line`, `selector`, or `xpath`)
+        - `spec`: the location information
+    - `excerpt`: some or all of the code
 
 The original result of a test act is recorded as the value of a `result` property of the act. The standard-format result is recorded as the value of the `standardResult` property of the act. Its format is shown by this example:
 
@@ -211,6 +225,7 @@ standardResult: {
       what: 'button type invalid',
       ordinalSeverity: 0,
       location: {
+        doc: 'dom',
         type: 'line',
         spec: 32
       },
@@ -221,6 +236,7 @@ standardResult: {
       what: 'button type invalid',
       ordinalSeverity: 1,
       location: {
+        doc: 'dom',
         type: 'line',
         spec: 145
       },
@@ -231,6 +247,7 @@ standardResult: {
       what: 'link href empty',
       ordinalSeverity: 3,
       location: {
+        doc: 'dom',
         type: 'selector',
         spec: '#helplink'
       },
@@ -239,14 +256,6 @@ standardResult: {
   ]
 }
 ```
-
-The value of an `ordinalSeverity` property is an integer describing the ordinal rank of the reported severity of the instance of the issue, within the severity classification used by the tool, where 0 describes the lowest level of severity.
-
-The `totals` value is an array of the counts of instances by their ordinal severities.
-
-In the `instances` array, each instance has potentially 5 properties. The `ruleID` property is the identifier of the issue, if the tool assigns such an identifier. Not all tools do so. The `what` property is a description of the instance, which for some tools is identical for all instances of a particular issue.
-
-The possible values of `location.type` are `line` for line number, `selector` for CSS selector, and `xpath` for XPath expression.
 
 If a tool has the option to be used without itemization and is being so used, the `instances` array will be empty.
 
@@ -331,13 +340,13 @@ This act causes Testaro to alter the `display` and `visibility` style properties
 
 An act of type `test` performs operations and reports a result. The result may indicate that a page passes or fails requirements. Typically, accessibility tests report successes and failures. But a test in Testaro is defined less restrictively, so it can report any result. As one example, the Testaro `elements` test reports facts about certain elements on a page, without asserting that those facts are successes or failures.
 
-The `which` property of a `test` act identifies the operations to perform. If the value of `which` is the name of one of the tools, such as `alfa`, then the operations are some or all of the tests of that tool. If the value is the name of a Testaro test, then the operations are those of that single Testaro test. Thus, a single `test` act may specify performing anything from a single test to hundreds of tests.
+The `which` property of a `test` act identifies the operations to perform. The value of `which` is the name of one of the tools, such as `alfa`.
 
 ###### Configuration
 
 Every test in Testaro must have:
 - a property in the `tests` object defined in the `run.js` file, where the property name is the name of the test and the value is a description of the test
-- a `.js` file, defining the test, in the `tests` directory, whose name base is the name of the test
+- a `.js` file, defining the operation of the tool, in the `tests` directory, whose name base is the name of the tool
 
 The `actSpecs.js` file (described in detail below) contains a specification for any `test` act, namely:
 
@@ -351,13 +360,13 @@ test: [
 ],
 ```
 
-That means that a test (i.e. an act with a `type` property having the value `'test'`) must have a string-valued `which` property naming a test and may optionally have a string-valued `what` property describing the test.
+That means that a test act (i.e. an act with a `type` property having the value `'test'`) must have a string-valued `which` property naming a tool and may optionally have a string-valued `what` property describing the tool.
 
-If a particular test either must have or may have any other properties, those properties must be specified in the `tests` property in `actSpecs.js`.
+If a particular test act either must have or may have any other properties, those properties are specified in the `tests` property in `actSpecs.js`.
 
 ###### Examples
 
-An example of a `test` act invoking a **tool** is:
+An example of a `test` act is:
 
 ```json
 {
@@ -368,22 +377,23 @@ An example of a `test` act invoking a **tool** is:
 }
 ```
 
-In this case, Testaro runs the WAVE test with report type 1.
+Most tools allow you to decide which of their _rules_ to apply. In effect, this means deciding which of their tests to run, since each test is considered a test of some rule. The act example given above,
 
-An example of a `test` act invoking a **Testaro** test is:
-
-```json
+```javaScript
 {
-  "type": "test",
-  "which": "motion",
-  "delay": 1500,
-  "interval": 2000,
-  "count": 5,
-  "what": "test for motion on the page"
+  type: 'test',
+  which: 'alfa',
+  what: 'Siteimprove alfa tool',
+  rules: ['r25', 'r71']
 }
 ```
 
-In this case, Testaro runs the `motion` test with the specified parameters.
+is an act specifying rules of such a tool.
+
+One of the tools that allows rule selection, Testaro, has some rules that take 
+In this case, Testaro runs the WAVE test with report type 1.
+
+Test acts that specify Testaro tests can include an `args` property
 
 ###### Continuum
 

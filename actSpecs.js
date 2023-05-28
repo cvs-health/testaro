@@ -154,95 +154,26 @@ exports.actSpecs = {
   },
   tests: {
     alfa: [
-      'Perform an alfa test',
+      'Perform alfa tests',
       {
         rules: [false, 'array', 'areStrings', 'rule names (e.g., r25), if not all']
       }
     ],
-    attVal: [
-      'Perform an attVal test',
-      {
-        attributeName: [true, 'string', 'hasLength', 'name of attribute'],
-        areLicit: [true, 'boolean', '', 'whether values are licit'],
-        values: [true, 'array', 'areStrings', 'values of attribute'],
-        withItems: [true, 'boolean', '', 'itemize']
-      }
-    ],
-    autocomplete: [
-      'Perform an autocomplete test',
-      {
-        withItems: [true, 'boolean', '', 'itemize']
-      }
-    ],
     axe: [
-      'Perform an Axe test',
+      'Perform Axe tests',
       {
         detailLevel: [true, 'number', '', '0 = least, 4 = most'],
         rules: [true, 'array', 'areStrings', 'rule names, or empty if all']
       }
     ],
     continuum: [
-      'Perform a continuum test',
+      'Perform Continuum tests',
       {
         rules: [false, 'array', 'areNumbers', 'rule numbers (e.g., 25), if not all']
       }
     ],
-    dupAtt: [
-      'Perform a dupAtt test',
-      {
-        withItems: [true, 'boolean', '', 'itemize']
-      }
-    ],
-    elements: [
-      'Perform an elements test',
-      {
-        detailLevel: [true, 'number', '', '0 to 3, to specify the level of detail'],
-        tagName: [false, 'string', 'hasLength', 'tag name (upper-case) of elements'],
-        onlyVisible: [false, 'boolean', '', 'whether to exclude invisible elements'],
-        attribute: [false, 'string', 'hasLength', 'required attribute selector']
-      }
-    ],
-    embAc: [
-      'Perform an embAc test',
-      {
-        withItems: [true, 'boolean', '', 'itemize']
-      }
-    ],
-    filter: [
-      'Perform a filter test',
-      {
-        withItems: [true, 'boolean', '', 'itemize']
-      }
-    ],
-    focInd: [
-      'Perform a focInd test',
-      {
-        revealAll: [true, 'boolean', '', 'whether to make all elements visible first'],
-        allowedDelay: [true, 'number', '', 'milliseconds to wait for an outline'],
-        withItems: [true, 'boolean', '', 'itemize']
-      }
-    ],
-    focOp: [
-      'Perform a focOp test',
-      {
-        withItems: [true, 'boolean', '', 'itemize']
-      }
-    ],
-    focVis: [
-      'Perform a focVis test',
-      {
-        withItems: [true, 'boolean', '', 'itemize']
-      }
-    ],
-    hover: [
-      'Perform a hover test',
-      {
-        sampleSize: [false, 'number', '', 'limit on sample size of triggers, if any'],
-        withItems: [true, 'boolean', '', 'itemize']
-      }
-    ],
     htmlcs: [
-      'Perform an htmlcs test',
+      'Perform HTML CodeSniffer tests',
       {
         rules: [
           false,
@@ -253,7 +184,7 @@ exports.actSpecs = {
       }
     ],
     ibm: [
-      'Perform an IBM Equal Access test',
+      'Perform IBM Equal Access tests',
       {
         withItems: [true, 'boolean', '', 'itemize'],
         withNewContent: [
@@ -262,52 +193,8 @@ exports.actSpecs = {
         rules: [false, 'array', 'areStrings', 'rule names (e.g., RPT_Elem_UniqueId), if not all']
       }
     ],
-    labClash: [
-      'Perform a labClash test',
-      {
-        withItems: [true, 'boolean', '', 'itemize']
-      }
-    ],
-    linkTo: [
-      'Perform a linkTo test',
-      {
-        withItems: [true, 'boolean', '', 'itemize']
-      }
-    ],
-    linkUl: [
-      'Perform a linkUl test',
-      {
-        withItems: [true, 'boolean', '', 'itemize']
-      }
-    ],
-    menuNav: [
-      'Perform a menuNav test',
-      {
-        withItems: [true, 'boolean', '', 'itemize']
-      }
-    ],
-    miniText: [
-      'Perform a miniText test',
-      {
-        withItems: [true, 'boolean', '', 'itemize']
-      }
-    ],
-    motion: [
-      'Perform a motion test',
-      {
-        delay: [true, 'number', '', 'ms to wait before first screen shot'],
-        interval: [true, 'number', '', 'ms between screen shots'],
-        count: [true, 'number', '', 'count of screen shots to make']
-      }
-    ],
-    nonTable: [
-      'Perform a nonTable test',
-      {
-        withItems: [true, 'boolean', '', 'itemize']
-      }
-    ],
     nuVal: [
-      'Perform a nuVal test',
+      'Perform Nu Html Checker tests',
       {
         messages: [
           false,
@@ -318,67 +205,31 @@ exports.actSpecs = {
       }
     ],
     qualWeb: [
-      'Perform a qualWeb test',
+      'Perform QualWeb tests',
       {
         withNewContent: [true, 'boolean', '', 'whether to use a URL instead of page content'],
         rules: [false, 'array', 'areStrings', 'QualWeb or ACT IDs of ACT rules to include, if not all']
       }
     ],
-    radioSet: [
-      'Perform a radioSet test',
-      {
-        withItems: [true, 'boolean', '', 'itemize']
-      }
-    ],
-    styleDiff: [
-      'Perform a styleDiff test',
-      {
-        withItems: [true, 'boolean', '', 'itemize']
-      }
-    ],
-    tabNav: [
-      'Perform a tabNav test',
-      {
-        withItems: [true, 'boolean', '', 'itemize']
-      }
-    ],
     tenon: [
-      'Perform a Tenon test',
+      'Perform Tenon tests',
       {
+        tenonData: [true, 'object', '', 'object with accessToken and requestIDs properties'],
         id: [true, 'string', 'hasLength', 'ID of the requested test instance']
       }
     ],
     testaro: [
-      'Perform a Testaro test',
+      'Perform Testaro tests',
       {
         withItems: [true, 'boolean', '', 'itemize'],
         rules: [false, 'array', 'areStrings', 'IDs of rules to include if array starts with y or exclude if with n, if not all evaluative rules'],
         args: [false, 'object', '', 'extra args (object with rule properties and arrays of argument values as values ({focInd: [false, 250], hover: [-1], motion: [2500, 2500, 5]} by default'],
       }
     ],
-    textNodes: [
-      'Perform a textNodes test',
-      {
-        detailLevel: [true, 'number', '', '0 to 3, to specify the level of detail'],
-        text: [false, 'string', 'hasLength', 'case-insensitive substring of the text node']
-      }
-    ],
-    titledEl: [
-      'Perform a titledEl test',
-      {
-        withItems: [true, 'boolean', '', 'itemize']
-      }
-    ],
     wave: [
-      'Perform a WebAIM WAVE test',
+      'Perform WAVE tests',
       {
         reportType: [true, 'number', '', 'WAVE report type']
-      }
-    ],
-    zIndex: [
-      'Perform a zIndex test',
-      {
-        withItems: [true, 'boolean', '', 'itemize']
       }
     ]
   }
