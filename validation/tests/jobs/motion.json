@@ -18,9 +18,6 @@
       "type": "test",
       "which": "testaro",
       "what": "spontaneous change of content",
-      "delay": 2400,
-      "interval": 2600,
-      "count": 5,
       "expect": [
         [
           "result.rules.motion.data.meanLocalRatio",
@@ -57,7 +54,10 @@
       "rules": [
         "y",
         "motion"
-      ]
+      ],
+      "args": {
+        "motion": [2400, 2600, 5]
+      }
     },
     {
       "type": "url",
@@ -68,9 +68,6 @@
       "type": "test",
       "which": "testaro",
       "what": "spontaneous change of content",
-      "delay": 2400,
-      "interval": 2600,
-      "count": 5,
       "expect": [
         [
           "result.rules.motion.data.meanLocalRatio",
@@ -107,7 +104,10 @@
       "rules": [
         "y",
         "motion"
-      ]
+      ],
+      "args": {
+        "motion": [2400, 2600, 5]
+      }
     }
   ],
   "sources": {

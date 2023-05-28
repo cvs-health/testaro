@@ -17,7 +17,7 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "visible element count",
+      "what": "embedded active elements",
       "withItems": true,
       "expect": [
         [
@@ -39,6 +39,11 @@
           "result.rules.embAc.data.totals.selects",
           "=",
           0
+        ],
+        [
+          "result.rules.embAc.data.items.length",
+          "=",
+          0
         ]
       ],
       "rules": [
@@ -54,7 +59,7 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "visible element count",
+      "what": "embedded active elements",
       "withItems": true,
       "expect": [
         [
@@ -76,6 +81,16 @@
           "result.rules.embAc.data.totals.selects",
           "=",
           1
+        ],
+        [
+          "result.rules.embAc.data.items.0.embeddedElement",
+          "=",
+          "BUTTON"
+        ],
+        [
+          "result.rules.embAc.data.items.1.excerpt",
+          "i",
+          "about checkboxes"
         ]
       ],
       "rules": [

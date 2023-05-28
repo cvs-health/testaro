@@ -22,10 +22,17 @@ exports.reporter = async (page, withItems) => await page.$$eval(
     // Total and, if requested, itemize the faulty elements.
     bads.forEach(bad => {
       totals[Object.keys(totals)[['A', 'BUTTON', 'INPUT', 'SELECT'].indexOf(bad.tagName)]]++;
+      let container;
       if (withItems) {
+        if (['A', 'BUTTON'].includes(bad.parentElement.tagName)) {
+          container = bad.parentElement;
+        }
+        else {
+          container = bad.parentElement.parentElement;
+        }
         items.push({
-          embeddedPair: bad,
-          excerpt: compact(bad.outerHTML)
+          embeddedElement: bad.tagName,
+          excerpt: compact(container.outerHTML)
         });
       }
     });
@@ -36,10 +43,9 @@ exports.reporter = async (page, withItems) => await page.$$eval(
     if (withItems) {
       data.items = items;
       items.forEach(item => {
-        const pair = item.embeddedPair.split(' ');
         standardInstances.push({
-          issueID: `embAc-${pair[0]}-${pair[1]}`,
-          what: `Element ${pair[0]} contains element ${pair[1]}`,
+          issueID: `embAc-${item.embeddedElement}`,
+          what: `Element ${item.embeddedElement} is embedded in a link or button`,
           ordinalSeverity: 2,
           location: {
             doc: '',

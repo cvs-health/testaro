@@ -18,7 +18,6 @@
       "type": "test",
       "which": "testaro",
       "what": "hover",
-      "sampleSize": 5,
       "withItems": true,
       "expect": [
         [
@@ -63,7 +62,10 @@
       "rules": [
         "y",
         "hover"
-      ]
+      ],
+      "args": {
+        "hover": [5]
+      }
     },
     {
       "type": "url",
@@ -74,7 +76,6 @@
       "type": "test",
       "which": "testaro",
       "what": "hover",
-      "sampleSize": 8,
       "withItems": true,
       "expect": [
         [
@@ -176,7 +177,10 @@
       "rules": [
         "y",
         "hover"
-      ]
+      ],
+      "args": {
+        "hover": [8]
+      }
     },
     {
       "type": "url",
@@ -187,7 +191,6 @@
       "type": "test",
       "which": "testaro",
       "what": "hover",
-      "sampleSize": 10,
       "withItems": true,
       "expect": [
         [
@@ -239,7 +242,10 @@
       "rules": [
         "y",
         "hover"
-      ]
+      ],
+      "args": {
+        "hover": [10]
+      }
     },
     {
       "type": "url",
@@ -250,7 +256,6 @@
       "type": "test",
       "which": "testaro",
       "what": "hover",
-      "sampleSize": 5,
       "withItems": true,
       "expect": [
         [
@@ -287,7 +292,10 @@
       "rules": [
         "y",
         "hover"
-      ]
+      ],
+      "args": {
+        "hover": [5]
+      }
     }
   ],
   "sources": {

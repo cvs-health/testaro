@@ -6,7 +6,7 @@
     1-3. Count of ancestry levels to provide data on (1 = text node, 2 = also parent,
       3 = also grandparent)
 */
-exports.reporter = async (page, detailLevel, text = '') => {
+exports.reporter = async (page, withItems, detailLevel, text = '') => {
   let data = {};
   // Get the data on the text nodes.
   try {
@@ -136,5 +136,9 @@ exports.reporter = async (page, detailLevel, text = '') => {
     };
   }
   // Return the result.
-  return {result: data};
+  return {
+    data,
+    totals: [],
+    standardInstances: []
+  };
 };
