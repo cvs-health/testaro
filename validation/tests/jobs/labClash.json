@@ -16,13 +16,29 @@
     },
     {
       "type": "test",
-      "which": "labClash",
+      "which": "testaro",
       "what": "Labeling",
-      "withItems": false,
+      "withItems": true,
       "expect": [
-        ["totals.mislabeled", "=", 0],
-        ["totals.unlabeled", "=", 0],
-        ["totals.wellLabeled", "=", 7]
+        [
+          "result.rules.labClash.data.totals.mislabeled",
+          "=",
+          0
+        ],
+        [
+          "result.rules.labClash.data.totals.unlabeled",
+          "=",
+          0
+        ],
+        [
+          "result.rules.labClash.data.totals.wellLabeled",
+          "=",
+          7
+        ]
+      ],
+      "rules": [
+        "y",
+        "labClash"
       ]
     },
     {
@@ -32,13 +48,29 @@
     },
     {
       "type": "test",
-      "which": "labClash",
+      "which": "testaro",
       "what": "Labeling",
-      "withItems": false,
+      "withItems": true,
       "expect": [
-        ["totals.mislabeled", "=", 3],
-        ["totals.unlabeled", "=", 3],
-        ["totals.wellLabeled", "=", 0]
+        [
+          "result.rules.labClash.data.totals.mislabeled",
+          "=",
+          3
+        ],
+        [
+          "result.rules.labClash.data.totals.unlabeled",
+          "=",
+          3
+        ],
+        [
+          "result.rules.labClash.data.totals.wellLabeled",
+          "=",
+          0
+        ]
+      ],
+      "rules": [
+        "y",
+        "labClash"
       ]
     }
   ],
@@ -47,6 +79,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2002-11-12T09:31:00",
+  "creationTime": "2013-05-28T12:00:00",
   "timeStamp": "00000"
 }

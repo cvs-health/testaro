@@ -16,22 +16,12 @@
     },
     {
       "type": "test",
-      "which": "testaro",
+      "which": "dupAtt",
       "what": "elements with duplicate attributes",
       "withItems": true,
       "expect": [
-        [
-          "result.rules.dupAtt.data.total",
-          "=",
-          0
-        ],
-        [
-          "result.rules.dupAtt.data.items.1"
-        ]
-      ],
-      "rules": [
-        "y",
-        "dupAtt"
+        ["total", "=", 0],
+        ["items.1"]
       ]
     },
     {
@@ -41,29 +31,13 @@
     },
     {
       "type": "test",
-      "which": "testaro",
+      "which": "dupAtt",
       "what": "elements with duplicate attributes",
       "withItems": true,
       "expect": [
-        [
-          "result.rules.dupAtt.data.total",
-          "=",
-          2
-        ],
-        [
-          "result.rules.dupAtt.data.items.0",
-          "=",
-          "p class=\"narrow\" id=\"daParagraph\" class=\"wide\""
-        ],
-        [
-          "result.rules.dupAtt.data.items.1",
-          "i",
-          "large"
-        ]
-      ],
-      "rules": [
-        "y",
-        "dupAtt"
+        ["total", "=", 2],
+        ["items.0", "=", "p class=\"narrow\" id=\"daParagraph\" class=\"wide\""],
+        ["items.1", "i", "large"]
       ]
     }
   ],
@@ -72,6 +46,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2013-05-28T12:00:00",
+  "creationTime": "2023-04-18T11:02:00",
   "timeStamp": "00000"
 }

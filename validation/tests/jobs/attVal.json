@@ -16,15 +16,28 @@
     },
     {
       "type": "test",
-      "which": "attVal",
+      "which": "testaro",
       "attributeName": "lang",
       "areLicit": true,
-      "values": ["en-US", "de-CH"],
+      "values": [
+        "en-US",
+        "de-CH"
+      ],
       "what": "attribute values",
       "withItems": true,
       "expect": [
-        ["total", "=", 0],
-        ["items.1"]
+        [
+          "result.rules.attVal.data.total",
+          "=",
+          0
+        ],
+        [
+          "result.rules.attVal.data.items.1"
+        ]
+      ],
+      "rules": [
+        "y",
+        "attVal"
       ]
     },
     {
@@ -34,19 +47,50 @@
     },
     {
       "type": "test",
-      "which": "attVal",
+      "which": "testaro",
       "attributeName": "lang",
       "areLicit": false,
-      "values": ["en", "de"],
+      "values": [
+        "en",
+        "de"
+      ],
       "what": "attribute values",
       "withItems": true,
       "expect": [
-        ["total", "=", 2],
-        ["items.0.tagName", "=", "HTML"],
-        ["items.0.attributeValue", "=", "en"],
-        ["items.1.tagName", "=", "SPAN"],
-        ["items.1.attributeValue", "=", "de"],
-        ["items.1.textStart", "i", "Veloparkieren"]
+        [
+          "result.rules.attVal.data.total",
+          "=",
+          2
+        ],
+        [
+          "result.rules.attVal.data.items.0.tagName",
+          "=",
+          "HTML"
+        ],
+        [
+          "result.rules.attVal.data.items.0.attributeValue",
+          "=",
+          "en"
+        ],
+        [
+          "result.rules.attVal.data.items.1.tagName",
+          "=",
+          "SPAN"
+        ],
+        [
+          "result.rules.attVal.data.items.1.attributeValue",
+          "=",
+          "de"
+        ],
+        [
+          "result.rules.attVal.data.items.1.textStart",
+          "i",
+          "Veloparkieren"
+        ]
+      ],
+      "rules": [
+        "y",
+        "attVal"
       ]
     }
   ],
@@ -55,6 +99,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2023-04-19T12:34:00",
+  "creationTime": "2013-05-28T12:00:00",
   "timeStamp": "00000"
 }

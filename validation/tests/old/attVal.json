@@ -1,0 +1,60 @@
+{
+  "id": "attVal",
+  "what": "validation of attVal test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/attVal/good.html",
+      "what": "page with permitted attribute values"
+    },
+    {
+      "type": "test",
+      "which": "attVal",
+      "attributeName": "lang",
+      "areLicit": true,
+      "values": ["en-US", "de-CH"],
+      "what": "attribute values",
+      "withItems": true,
+      "expect": [
+        ["total", "=", 0],
+        ["items.1"]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/attVal/bad.html",
+      "what": "page with permitted attribute values"
+    },
+    {
+      "type": "test",
+      "which": "attVal",
+      "attributeName": "lang",
+      "areLicit": false,
+      "values": ["en", "de"],
+      "what": "attribute values",
+      "withItems": true,
+      "expect": [
+        ["total", "=", 2],
+        ["items.0.tagName", "=", "HTML"],
+        ["items.0.attributeValue", "=", "en"],
+        ["items.1.tagName", "=", "SPAN"],
+        ["items.1.attributeValue", "=", "de"],
+        ["items.1.textStart", "i", "Veloparkieren"]
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2023-04-19T12:34:00",
+  "timeStamp": "00000"
+}

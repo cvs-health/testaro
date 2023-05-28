@@ -16,14 +16,34 @@
     },
     {
       "type": "test",
-      "which": "linkUl",
+      "which": "testaro",
       "what": "adjacent-link underlining",
-      "withItems": false,
+      "withItems": true,
       "expect": [
-        ["totals.links", "=", 6],
-        ["totals.adjacent.total", "=", 2],
-        ["totals.adjacent.underlined", "=", 2],
-        ["totals.adjacent.underlinedPercent", "=", 100]
+        [
+          "result.rules.linkUl.data.totals.links",
+          "=",
+          6
+        ],
+        [
+          "result.rules.linkUl.data.totals.adjacent.total",
+          "=",
+          2
+        ],
+        [
+          "result.rules.linkUl.data.totals.adjacent.underlined",
+          "=",
+          2
+        ],
+        [
+          "result.rules.linkUl.data.totals.adjacent.underlinedPercent",
+          "=",
+          100
+        ]
+      ],
+      "rules": [
+        "y",
+        "linkUl"
       ]
     },
     {
@@ -33,14 +53,34 @@
     },
     {
       "type": "test",
-      "which": "linkUl",
+      "which": "testaro",
       "what": "adjacent-link underlining",
-      "withItems": false,
+      "withItems": true,
       "expect": [
-        ["totals.links", "=", 6],
-        ["totals.adjacent.total", "=", 6],
-        ["totals.adjacent.underlined", "=", 0],
-        ["totals.adjacent.underlinedPercent", "=", 0]
+        [
+          "result.rules.linkUl.data.totals.links",
+          "=",
+          6
+        ],
+        [
+          "result.rules.linkUl.data.totals.adjacent.total",
+          "=",
+          6
+        ],
+        [
+          "result.rules.linkUl.data.totals.adjacent.underlined",
+          "=",
+          0
+        ],
+        [
+          "result.rules.linkUl.data.totals.adjacent.underlinedPercent",
+          "=",
+          0
+        ]
+      ],
+      "rules": [
+        "y",
+        "linkUl"
       ]
     },
     {
@@ -50,14 +90,34 @@
     },
     {
       "type": "test",
-      "which": "linkUl",
+      "which": "testaro",
       "what": "adjacent-link underlining",
-      "withItems": false,
+      "withItems": true,
       "expect": [
-        ["totals.links", "=", 2],
-        ["totals.adjacent.total", "=", 0],
-        ["totals.adjacent.underlined", "=", 0],
-        ["totals.adjacent.underlinedPercent", "=", "N/A"]
+        [
+          "result.rules.linkUl.data.totals.links",
+          "=",
+          2
+        ],
+        [
+          "result.rules.linkUl.data.totals.adjacent.total",
+          "=",
+          0
+        ],
+        [
+          "result.rules.linkUl.data.totals.adjacent.underlined",
+          "=",
+          0
+        ],
+        [
+          "result.rules.linkUl.data.totals.adjacent.underlinedPercent",
+          "=",
+          "N/A"
+        ]
+      ],
+      "rules": [
+        "y",
+        "linkUl"
       ]
     }
   ],
@@ -66,6 +126,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2002-11-12T09:31:00",
+  "creationTime": "2013-05-28T12:00:00",
   "timeStamp": "00000"
 }

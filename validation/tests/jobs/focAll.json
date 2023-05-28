@@ -16,13 +16,29 @@
     },
     {
       "type": "test",
-      "which": "focAll",
+      "which": "testaro",
       "what": "Tab-focusability",
-      "withItems": false,
+      "withItems": true,
       "expect": [
-        ["tabFocusables", "=", 3],
-        ["tabFocused", "=", 3],
-        ["discrepancy", "=", 0]
+        [
+          "result.rules.focAll.data.tabFocusables",
+          "=",
+          3
+        ],
+        [
+          "result.rules.focAll.data.tabFocused",
+          "=",
+          3
+        ],
+        [
+          "result.rules.focAll.data.discrepancy",
+          "=",
+          0
+        ]
+      ],
+      "rules": [
+        "y",
+        "focAll"
       ]
     },
     {
@@ -32,13 +48,29 @@
     },
     {
       "type": "test",
-      "which": "focAll",
+      "which": "testaro",
       "what": "Tab-focusability",
-      "withItems": false,
+      "withItems": true,
       "expect": [
-        ["tabFocusables", "=", 3],
-        ["tabFocused", "=", 2],
-        ["discrepancy", "=", -1]
+        [
+          "result.rules.focAll.data.tabFocusables",
+          "=",
+          3
+        ],
+        [
+          "result.rules.focAll.data.tabFocused",
+          "=",
+          2
+        ],
+        [
+          "result.rules.focAll.data.discrepancy",
+          "=",
+          -1
+        ]
+      ],
+      "rules": [
+        "y",
+        "focAll"
       ]
     },
     {
@@ -48,13 +80,29 @@
     },
     {
       "type": "test",
-      "which": "focAll",
+      "which": "testaro",
       "what": "Tab-focusability",
-      "withItems": false,
+      "withItems": true,
       "expect": [
-        ["tabFocusables", "=", 3],
-        ["tabFocused", "=", 5],
-        ["discrepancy", "=", 2]
+        [
+          "result.rules.focAll.data.tabFocusables",
+          "=",
+          3
+        ],
+        [
+          "result.rules.focAll.data.tabFocused",
+          "=",
+          5
+        ],
+        [
+          "result.rules.focAll.data.discrepancy",
+          "=",
+          2
+        ]
+      ],
+      "rules": [
+        "y",
+        "focAll"
       ]
     }
   ],
@@ -63,6 +111,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2002-11-12T09:31:00",
+  "creationTime": "2013-05-28T12:00:00",
   "timeStamp": "00000"
 }

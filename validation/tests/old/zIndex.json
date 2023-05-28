@@ -16,19 +16,11 @@
     },
     {
       "type": "test",
-      "which": "testaro",
+      "which": "zIndex",
       "what": "zIndex",
-      "withItems": true,
+      "withItems": false,
       "expect": [
-        [
-          "result.rules.zIndex.data.totals.total",
-          "=",
-          0
-        ]
-      ],
-      "rules": [
-        "y",
-        "zIndex"
+        ["totals.total", "=", 0]
       ]
     },
     {
@@ -38,24 +30,12 @@
     },
     {
       "type": "test",
-      "which": "testaro",
+      "which": "zIndex",
       "what": "zIndex",
-      "withItems": true,
+      "withItems": false,
       "expect": [
-        [
-          "result.rules.zIndex.data.totals.total",
-          "=",
-          2
-        ],
-        [
-          "result.rules.zIndex.data.totals.tagNames.BUTTON",
-          "=",
-          2
-        ]
-      ],
-      "rules": [
-        "y",
-        "zIndex"
+        ["totals.total", "=", 2],
+        ["totals.tagNames.BUTTON", "=", 2]
       ]
     }
   ],
@@ -64,6 +44,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2013-05-28T12:00:00",
+  "creationTime": "2002-11-12T09:31:00",
   "timeStamp": "00000"
 }

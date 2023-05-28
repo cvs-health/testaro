@@ -16,12 +16,29 @@
     },
     {
       "type": "test",
-      "which": "role",
+      "which": "testaro",
       "what": "role",
       "expect": [
-        ["roleElements", "=", 1],
-        ["badRoleElements", "=", 0],
-        ["redundantRoleElements", "=", 0]
+        [
+          "result.rules.role.data.roleElements",
+          "=",
+          1
+        ],
+        [
+          "result.rules.role.data.badRoleElements",
+          "=",
+          0
+        ],
+        [
+          "result.rules.role.data.redundantRoleElements",
+          "=",
+          0
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "role"
       ]
     },
     {
@@ -31,22 +48,79 @@
     },
     {
       "type": "test",
-      "which": "role",
+      "which": "testaro",
       "what": "role",
       "expect": [
-        ["roleElements", "=", 9],
-        ["badRoleElements", "=", 6],
-        ["redundantRoleElements", "=", 3],
-        ["tagNames.SECTION.main.bad", "=", 1],
-        ["tagNames.SECTION.section.bad", "=", 1],
-        ["tagNames.H2.heading.bad", "=", 0],
-        ["tagNames.H2.heading.redundant", "=", 1],
-        ["tagNames.H3.heading.bad", "=", 2],
-        ["tagNames.H3.heading.redundant", "=", 1],
-        ["tagNames.INPUT.spinbutton.redundant", "=", 1],
-        ["tagNames.INPUT.textbox.bad", "=", 1],
-        ["tagNames.INPUT.textbox.redundant", "=", 0],
-        ["tagNames.INPUT.combobox.bad", "=", 1]
+        [
+          "result.rules.role.data.roleElements",
+          "=",
+          9
+        ],
+        [
+          "result.rules.role.data.badRoleElements",
+          "=",
+          6
+        ],
+        [
+          "result.rules.role.data.redundantRoleElements",
+          "=",
+          3
+        ],
+        [
+          "result.rules.role.data.tagNames.SECTION.main.bad",
+          "=",
+          1
+        ],
+        [
+          "result.rules.role.data.tagNames.SECTION.section.bad",
+          "=",
+          1
+        ],
+        [
+          "result.rules.role.data.tagNames.H2.heading.bad",
+          "=",
+          0
+        ],
+        [
+          "result.rules.role.data.tagNames.H2.heading.redundant",
+          "=",
+          1
+        ],
+        [
+          "result.rules.role.data.tagNames.H3.heading.bad",
+          "=",
+          2
+        ],
+        [
+          "result.rules.role.data.tagNames.H3.heading.redundant",
+          "=",
+          1
+        ],
+        [
+          "result.rules.role.data.tagNames.INPUT.spinbutton.redundant",
+          "=",
+          1
+        ],
+        [
+          "result.rules.role.data.tagNames.INPUT.textbox.bad",
+          "=",
+          1
+        ],
+        [
+          "result.rules.role.data.tagNames.INPUT.textbox.redundant",
+          "=",
+          0
+        ],
+        [
+          "result.rules.role.data.tagNames.INPUT.combobox.bad",
+          "=",
+          1
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "role"
       ]
     }
   ],
@@ -55,6 +129,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2002-11-12T09:31:00",
+  "creationTime": "2013-05-28T12:00:00",
   "timeStamp": "00000"
 }

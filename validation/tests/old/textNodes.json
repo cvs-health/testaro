@@ -1,0 +1,98 @@
+{
+  "id": "elements",
+  "what": "validation of elements test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/textNodes/index.html",
+      "what": "page with a shadow root"
+    },
+    {
+      "type": "test",
+      "which": "textNodes",
+      "what": "text nodes",
+      "detailLevel": 0,
+      "expect": [
+        ["nodeCount", "=", 35]
+      ]
+    },
+    {
+      "type": "test",
+      "which": "textNodes",
+      "what": "text nodes",
+      "detailLevel": 0,
+      "text": "alia",
+      "expect": [
+        ["nodeCount", "=", 2]
+      ]
+    },
+    {
+      "type": "test",
+      "which": "textNodes",
+      "what": "text nodes",
+      "detailLevel": 1,
+      "text": "alia",
+      "expect": [
+        ["nodeCount", "=", 2],
+        ["items.0.text", "=", "Io alia"]
+      ]
+    },
+    {
+      "type": "test",
+      "which": "textNodes",
+      "what": "text nodes",
+      "detailLevel": 2,
+      "text": "This is the",
+      "expect": [
+        ["nodeCount", "=", 2],
+        ["items.0.text", "=", "This is the first button"],
+        ["items.1.text", "=", "This is the second button"],
+        ["items.0.ancestors.0.tagName", "=", "BUTTON"],
+        ["items.1.ancestors.0.tagName", "=", "BUTTON"],
+        ["items.0.ancestors.0.attributes.0.name", "=", "id"],
+        ["items.0.ancestors.0.attributes.0.value", "=", "button0"],
+        ["items.1.ancestors.0.attributes.1.name", "=", "aria-labelledby"],
+        ["items.1.ancestors.0.attributes.1.value", "=", "button1Label"],
+        ["items.0.ancestors.0.refLabels"],
+        ["items.1.ancestors.0.refLabels.0", "=", "Click the second button."],
+        ["items.0.ancestors.0.labels.0", "=", "Click the first button."],
+        ["items.0.ancestors.0.labels.1", "=", "Did you click it?"],
+        ["items.1.ancestors.0.labels"],
+        ["items.0.ancestors.0.children"]
+      ]
+    },
+    {
+      "type": "test",
+      "which": "textNodes",
+      "what": "text nodes",
+      "detailLevel": 3,
+      "text": "tute alia",
+      "expect": [
+        ["nodeCount", "=", 1],
+        ["items.0.text", "=", "Io tute alia"],
+        ["items.0.ancestors.0.tagName", "=", "LI"],
+        ["items.0.ancestors.1.tagName", "=", "UL"],
+        ["items.0.ancestors.0.attributes.0.name", "=", "class"],
+        ["items.0.ancestors.0.attributes.0.value", "=", "last"],
+        ["items.0.ancestors.1.attributes.0.name", "=", "lang"],
+        ["items.0.ancestors.1.attributes.0.value", "=", "eo"],
+        ["items.0.ancestors.1.children.1.tagName", "=", "LI"],
+        ["items.0.ancestors.1.children.2.attributes.1.name", "=", "hidden"]
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2002-11-12T09:31:00",
+  "timeStamp": "00000"
+}

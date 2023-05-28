@@ -1,0 +1,60 @@
+{
+  "id": "role",
+  "what": "validation of role test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/role/good.html",
+      "what": "page with standard roles"
+    },
+    {
+      "type": "test",
+      "which": "role",
+      "what": "role",
+      "expect": [
+        ["roleElements", "=", 1],
+        ["badRoleElements", "=", 0],
+        ["redundantRoleElements", "=", 0]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/role/bad.html",
+      "what": "page with deviant roles"
+    },
+    {
+      "type": "test",
+      "which": "role",
+      "what": "role",
+      "expect": [
+        ["roleElements", "=", 9],
+        ["badRoleElements", "=", 6],
+        ["redundantRoleElements", "=", 3],
+        ["tagNames.SECTION.main.bad", "=", 1],
+        ["tagNames.SECTION.section.bad", "=", 1],
+        ["tagNames.H2.heading.bad", "=", 0],
+        ["tagNames.H2.heading.redundant", "=", 1],
+        ["tagNames.H3.heading.bad", "=", 2],
+        ["tagNames.H3.heading.redundant", "=", 1],
+        ["tagNames.INPUT.spinbutton.redundant", "=", 1],
+        ["tagNames.INPUT.textbox.bad", "=", 1],
+        ["tagNames.INPUT.textbox.redundant", "=", 0],
+        ["tagNames.INPUT.combobox.bad", "=", 1]
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2002-11-12T09:31:00",
+  "timeStamp": "00000"
+}

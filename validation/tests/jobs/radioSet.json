@@ -16,13 +16,29 @@
     },
     {
       "type": "test",
-      "which": "radioSet",
+      "which": "testaro",
       "what": "radioSet",
-      "withItems": false,
+      "withItems": true,
       "expect": [
-        ["totals.total", "=", 4],
-        ["totals.inSet", "=", 4],
-        ["totals.percent", "=", 100]
+        [
+          "result.rules.radioSet.data.totals.total",
+          "=",
+          4
+        ],
+        [
+          "result.rules.radioSet.data.totals.inSet",
+          "=",
+          4
+        ],
+        [
+          "result.rules.radioSet.data.totals.percent",
+          "=",
+          100
+        ]
+      ],
+      "rules": [
+        "y",
+        "radioSet"
       ]
     },
     {
@@ -32,13 +48,29 @@
     },
     {
       "type": "test",
-      "which": "radioSet",
+      "which": "testaro",
       "what": "radioSet",
-      "withItems": false,
+      "withItems": true,
       "expect": [
-        ["totals.total", "=", 8],
-        ["totals.inSet", "=", 0],
-        ["totals.percent", "=", 0]
+        [
+          "result.rules.radioSet.data.totals.total",
+          "=",
+          8
+        ],
+        [
+          "result.rules.radioSet.data.totals.inSet",
+          "=",
+          0
+        ],
+        [
+          "result.rules.radioSet.data.totals.percent",
+          "=",
+          0
+        ]
+      ],
+      "rules": [
+        "y",
+        "radioSet"
       ]
     }
   ],
@@ -47,6 +79,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2002-11-12T09:31:00",
+  "creationTime": "2013-05-28T12:00:00",
   "timeStamp": "00000"
 }

@@ -1,0 +1,118 @@
+{
+  "id": "hover",
+  "what": "validation of hover test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/hover/good.html",
+      "what": "page with standard hover behavior"
+    },
+    {
+      "type": "test",
+      "which": "hover",
+      "what": "hover",
+      "sampleSize": 5,
+      "withItems": true,
+      "expect": [
+        ["totals.triggers", "=", 4],
+        ["totals.impactTriggers", "=", 0],
+        ["totals.additions", "=", 0],
+        ["totals.removals", "=", 0],
+        ["totals.opacityChanges", "=", 0],
+        ["totals.opacityImpact", "=", 0],
+        ["totals.unhoverables", "=", 0],
+        ["items.impactTriggers.0"]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/hover/bad.html",
+      "what": "page with deviant hover behavior"
+    },
+    {
+      "type": "test",
+      "which": "hover",
+      "what": "hover",
+      "sampleSize": 8,
+      "withItems": true,
+      "expect": [
+        ["totals.triggers", "=", 6],
+        ["totals.impactTriggers", "=", 3],
+        ["totals.additions", "=", 3],
+        ["totals.removals", "=", 1],
+        ["totals.opacityChanges", "=", 1],
+        ["totals.opacityImpact", "=", 1],
+        ["totals.unhoverables", "=", 1],
+        ["items.impactTriggers.0.tagName", "=", "A"],
+        ["items.impactTriggers.1.tagName", "=", "BUTTON"],
+        ["items.impactTriggers.2.tagName", "=", "LI"],
+        ["items.impactTriggers.0.text", "=", "information"],
+        ["items.impactTriggers.0.additions", "=", 0],
+        ["items.impactTriggers.1.additions", "=", 3],
+        ["items.impactTriggers.2.removals", "=", 1],
+        ["items.impactTriggers.0.opacityChanges", "=", 1],
+        ["items.impactTriggers.1.opacityImpact", "=", 0],
+        ["items.unhoverables.0.tagName", "=", "BUTTON"],
+        ["items.unhoverables.0.id", "=", "smallButton"],
+        ["items.unhoverables.0.text", "=", "button"]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/hover/large.html",
+      "what": "page with deviant hover behavior"
+    },
+    {
+      "type": "test",
+      "which": "hover",
+      "what": "hover",
+      "sampleSize": 10,
+      "withItems": false,
+      "expect": [
+        ["totals.triggers", "=", 20],
+        ["totals.impactTriggers", ">", -1],
+        ["totals.impactTriggers", "<", 6],
+        ["totals.additions", ">", -1],
+        ["totals.additions", "<", 6],
+        ["totals.removals", "=", 0],
+        ["totals.opacityChanges", "=", 0],
+        ["totals.opacityImpact", "=", 0],
+        ["totals.unhoverables", "=", 0]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/hover/styleBad.html",
+      "what": "page with deviant trigger styles"
+    },
+    {
+      "type": "test",
+      "which": "hover",
+      "what": "hover",
+      "sampleSize": 5,
+      "withItems": true,
+      "expect": [
+        ["totals.noIndicators", "=", 1],
+        ["totals.noCursors", "=", 1],
+        ["totals.badIndicators", "=", 1],
+        ["items.noIndicators.0.text", "=", "button"],
+        ["items.noCursors.0.tagName", "=", "LI"],
+        ["items.badIndicators.0.id", "=", "li2"]
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2002-11-12T09:31:00",
+  "timeStamp": "00000"
+}

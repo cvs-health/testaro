@@ -16,24 +16,12 @@
     },
     {
       "type": "test",
-      "which": "testaro",
+      "which": "linkTo",
       "what": "links without destinations",
       "withItems": true,
       "expect": [
-        [
-          "result.rules.linkTo.data.total",
-          "=",
-          1
-        ],
-        [
-          "result.rules.linkTo.data.items.0",
-          "=",
-          "nothing at all"
-        ]
-      ],
-      "rules": [
-        "y",
-        "linkTo"
+        ["total", "=", 1],
+        ["items.0", "=", "nothing at all"]
       ]
     }
   ],
@@ -42,6 +30,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2013-05-28T12:00:00",
+  "creationTime": "2002-11-12T09:31:00",
   "timeStamp": "00000"
 }

@@ -995,7 +995,7 @@ const doActs = async (report, actIndex, page) => {
                 let failureCount = 0;
                 // For each expectation:
                 expectations.forEach(spec => {
-                  const truth = isTrue(testReport.result, spec);
+                  const truth = isTrue(testReport, spec);
                   testReport.result.expectations.push({
                     property: spec[0],
                     relation: spec[1],

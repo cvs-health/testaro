@@ -16,19 +16,10 @@
     },
     {
       "type": "test",
-      "which": "testaro",
+      "which": "docType",
       "what": "doctype",
       "expect": [
-        [
-          "result.rules.docType.data.docHasType",
-          "=",
-          true
-        ]
-      ],
-      "withItems": true,
-      "rules": [
-        "y",
-        "docType"
+        ["docHasType", "=", true]
       ]
     },
     {
@@ -38,19 +29,10 @@
     },
     {
       "type": "test",
-      "which": "testaro",
+      "which": "docType",
       "what": "doctype",
       "expect": [
-        [
-          "result.rules.docType.data.docHasType",
-          "=",
-          false
-        ]
-      ],
-      "withItems": true,
-      "rules": [
-        "y",
-        "docType"
+        ["docHasType", "=", false]
       ]
     }
   ],
@@ -59,6 +41,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2013-05-28T12:00:00",
+  "creationTime": "2002-11-12T09:31:00",
   "timeStamp": "00000"
 }

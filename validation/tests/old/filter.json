@@ -1,0 +1,55 @@
+{
+  "id": "filter",
+  "what": "validation of filter test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/filter/good.html",
+      "what": "page with no filter styles"
+    },
+    {
+      "type": "test",
+      "which": "filter",
+      "what": "filter",
+      "withItems": true,
+      "expect": [
+        ["totals.styledElements", "=", 0],
+        ["totals.impactedElements", "=", 0]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/filter/bad.html",
+      "what": "page with filter styles"
+    },
+    {
+      "type": "test",
+      "which": "filter",
+      "what": "filter",
+      "withItems": true,
+      "expect": [
+        ["totals.styledElements", "=", 2],
+        ["totals.impactedElements", "=", 7],
+        ["items.0.tagName", "=", "MAIN"],
+        ["items.1.tagName", "=", "UL"],
+        ["items.1.text", "i", "Item"],
+        ["items.0.impact", "=", 5],
+        ["items.1.impact", "=", 2]
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2002-11-12T09:31:00",
+  "timeStamp": "00000"
+}

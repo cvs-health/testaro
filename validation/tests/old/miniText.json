@@ -16,29 +16,13 @@
     },
     {
       "type": "test",
-      "which": "testaro",
+      "which": "miniText",
       "what": "small text",
       "withItems": true,
       "expect": [
-        [
-          "result.rules.miniText.data.total",
-          "=",
-          3
-        ],
-        [
-          "result.rules.miniText.data.items.0",
-          "i",
-          "rem"
-        ],
-        [
-          "result.rules.miniText.data.items.2",
-          "i",
-          "named"
-        ]
-      ],
-      "rules": [
-        "y",
-        "miniText"
+        ["total", "=", 3],
+        ["items.0", "i", "rem"],
+        ["items.2", "i", "named"]
       ]
     }
   ],
@@ -47,6 +31,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2013-05-28T12:00:00",
+  "creationTime": "2002-11-12T09:31:00",
   "timeStamp": "00000"
 }

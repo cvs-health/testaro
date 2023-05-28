@@ -16,117 +16,274 @@
     },
     {
       "type": "test",
-      "which": "elements",
+      "which": "testaro",
       "what": "elements",
       "detailLevel": 0,
       "expect": [
-        ["total", "=", 21]
+        [
+          "result.rules.elements.data.total",
+          "=",
+          21
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "elements"
       ]
     },
     {
       "type": "test",
-      "which": "elements",
+      "which": "testaro",
       "what": "elements",
       "detailLevel": 0,
       "tagName": "P",
       "expect": [
-        ["total", "=", 5]
+        [
+          "result.rules.elements.data.total",
+          "=",
+          5
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "elements"
       ]
     },
     {
       "type": "test",
-      "which": "elements",
+      "which": "testaro",
       "what": "elements",
       "detailLevel": 0,
       "tagName": "LI",
       "onlyVisible": true,
       "expect": [
-        ["total", "=", 2]
+        [
+          "result.rules.elements.data.total",
+          "=",
+          2
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "elements"
       ]
     },
     {
       "type": "test",
-      "which": "elements",
+      "which": "testaro",
       "what": "elements",
       "detailLevel": 0,
       "tagName": "P",
       "attribute": "class",
       "expect": [
-        ["total", "=", 2]
+        [
+          "result.rules.elements.data.total",
+          "=",
+          2
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "elements"
       ]
     },
     {
       "type": "test",
-      "which": "elements",
+      "which": "testaro",
       "what": "elements",
       "detailLevel": 1,
       "tagName": "LI",
       "attribute": "class=first",
       "expect": [
-        ["total", "=", 1],
-        ["items.0.tagName", "=", "LI"],
-        ["items.0.parentTagName", "=", "UL"],
-        ["items.0.code", "i", "first"],
-        ["items.0.attributes.0.name", "=", "class"],
-        ["items.0.attributes.0.value", "=", "first"],
-        ["items.0.textContent", "=", "Io"]
+        [
+          "result.rules.elements.data.total",
+          "=",
+          1
+        ],
+        [
+          "result.rules.elements.data.items.0.tagName",
+          "=",
+          "LI"
+        ],
+        [
+          "result.rules.elements.data.items.0.parentTagName",
+          "=",
+          "UL"
+        ],
+        [
+          "result.rules.elements.data.items.0.code",
+          "i",
+          "first"
+        ],
+        [
+          "result.rules.elements.data.items.0.attributes.0.name",
+          "=",
+          "class"
+        ],
+        [
+          "result.rules.elements.data.items.0.attributes.0.value",
+          "=",
+          "first"
+        ],
+        [
+          "result.rules.elements.data.items.0.textContent",
+          "=",
+          "Io"
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "elements"
       ]
     },
     {
       "type": "test",
-      "which": "elements",
+      "which": "testaro",
       "what": "elements",
       "detailLevel": 1,
       "tagName": "INPUT",
       "expect": [
-        ["total", "=", 2],
-        ["items.0.labels.1", "i", "anything"],
-        ["items.1.labelers.0", "i", "something else"]
+        [
+          "result.rules.elements.data.total",
+          "=",
+          2
+        ],
+        [
+          "result.rules.elements.data.items.0.labels.1",
+          "i",
+          "anything"
+        ],
+        [
+          "result.rules.elements.data.items.1.labelers.0",
+          "i",
+          "something else"
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "elements"
       ]
     },
     {
       "type": "test",
-      "which": "elements",
+      "which": "testaro",
       "what": "elements",
       "detailLevel": 2,
       "tagName": "LI",
       "attribute": "class=first",
       "expect": [
-        ["items.0.textContent", "=", "Io"],
-        ["items.0.parentTextContent", "i", "tute"]
+        [
+          "result.rules.elements.data.items.0.textContent",
+          "=",
+          "Io"
+        ],
+        [
+          "result.rules.elements.data.items.0.parentTextContent",
+          "i",
+          "tute"
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "elements"
       ]
     },
     {
       "type": "test",
-      "which": "elements",
+      "which": "testaro",
       "what": "elements",
       "detailLevel": 2,
       "tagName": "LI",
       "onlyVisible": true,
       "attribute": "class",
       "expect": [
-        ["total", "=", 1],
-        ["items.0.parentTextContent", "i", "alia"],
-        ["items.0.parentTextContent", "i", "tute"]
+        [
+          "result.rules.elements.data.total",
+          "=",
+          1
+        ],
+        [
+          "result.rules.elements.data.items.0.parentTextContent",
+          "i",
+          "alia"
+        ],
+        [
+          "result.rules.elements.data.items.0.parentTextContent",
+          "i",
+          "tute"
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "elements"
       ]
     },
     {
       "type": "test",
-      "which": "elements",
+      "which": "testaro",
       "what": "elements",
       "detailLevel": 3,
       "tagName": "P",
       "attribute": "class=first",
       "expect": [
-        ["items.0.textContent", "=", "This is a paragraph."],
-        ["items.0.parentTagName", "=", "MAIN"],
-        ["items.0.parentTextContent", "i", "something."],
-        ["items.0.siblings.before.0.type", "=", 3],
-        ["items.0.siblings.before.1.type", "=", 1],
-        ["items.0.siblings.before.1.tagName", "=", "H1"],
-        ["items.0.siblings.after.12.type", "=", 1],
-        ["items.0.siblings.after.12.tagName", "=", "LABEL"],
-        ["items.0.siblings.after.12.attributes.0.name", "=", "for"]
+        [
+          "result.rules.elements.data.items.0.textContent",
+          "=",
+          "This is a paragraph."
+        ],
+        [
+          "result.rules.elements.data.items.0.parentTagName",
+          "=",
+          "MAIN"
+        ],
+        [
+          "result.rules.elements.data.items.0.parentTextContent",
+          "i",
+          "something."
+        ],
+        [
+          "result.rules.elements.data.items.0.siblings.before.0.type",
+          "=",
+          3
+        ],
+        [
+          "result.rules.elements.data.items.0.siblings.before.1.type",
+          "=",
+          1
+        ],
+        [
+          "result.rules.elements.data.items.0.siblings.before.1.tagName",
+          "=",
+          "H1"
+        ],
+        [
+          "result.rules.elements.data.items.0.siblings.after.12.type",
+          "=",
+          1
+        ],
+        [
+          "result.rules.elements.data.items.0.siblings.after.12.tagName",
+          "=",
+          "LABEL"
+        ],
+        [
+          "result.rules.elements.data.items.0.siblings.after.12.attributes.0.name",
+          "=",
+          "for"
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "elements"
       ]
     }
   ],
@@ -135,6 +292,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2002-11-12T09:31:00",
+  "creationTime": "2013-05-28T12:00:00",
   "timeStamp": "00000"
 }

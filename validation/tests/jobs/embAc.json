@@ -16,14 +16,34 @@
     },
     {
       "type": "test",
-      "which": "embAc",
+      "which": "testaro",
       "what": "visible element count",
-      "withItems": false,
+      "withItems": true,
       "expect": [
-        ["totals.links", "=", 0],
-        ["totals.buttons", "=", 0],
-        ["totals.inputs", "=", 0],
-        ["totals.selects", "=", 0]
+        [
+          "result.rules.embAc.data.totals.links",
+          "=",
+          0
+        ],
+        [
+          "result.rules.embAc.data.totals.buttons",
+          "=",
+          0
+        ],
+        [
+          "result.rules.embAc.data.totals.inputs",
+          "=",
+          0
+        ],
+        [
+          "result.rules.embAc.data.totals.selects",
+          "=",
+          0
+        ]
+      ],
+      "rules": [
+        "y",
+        "embAc"
       ]
     },
     {
@@ -33,14 +53,34 @@
     },
     {
       "type": "test",
-      "which": "embAc",
+      "which": "testaro",
       "what": "visible element count",
-      "withItems": false,
+      "withItems": true,
       "expect": [
-        ["totals.links", "=", 2],
-        ["totals.buttons", "=", 2],
-        ["totals.inputs", "=", 3],
-        ["totals.selects", "=", 1]
+        [
+          "result.rules.embAc.data.totals.links",
+          "=",
+          2
+        ],
+        [
+          "result.rules.embAc.data.totals.buttons",
+          "=",
+          2
+        ],
+        [
+          "result.rules.embAc.data.totals.inputs",
+          "=",
+          3
+        ],
+        [
+          "result.rules.embAc.data.totals.selects",
+          "=",
+          1
+        ]
+      ],
+      "rules": [
+        "y",
+        "embAc"
       ]
     }
   ],
@@ -49,6 +89,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2002-11-12T09:31:00",
+  "creationTime": "2013-05-28T12:00:00",
   "timeStamp": "00000"
 }

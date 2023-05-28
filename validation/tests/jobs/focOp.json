@@ -16,17 +16,49 @@
     },
     {
       "type": "test",
-      "which": "focOp",
+      "which": "testaro",
       "what": "focusability and operability",
-      "withItems": false,
+      "withItems": true,
       "expect": [
-        ["totals.total", "=", 3],
-        ["totals.types.onlyFocusable.total", "=", 0],
-        ["totals.types.onlyOperable.total", "=", 0],
-        ["totals.types.focusableAndOperable.total", "=", 3],
-        ["totals.types.focusableAndOperable.tagNames.A", "=", 1],
-        ["totals.types.focusableAndOperable.tagNames.BUTTON", "=", 1],
-        ["totals.types.focusableAndOperable.tagNames.INPUT", "=", 1]
+        [
+          "result.rules.focOp.data.totals.total",
+          "=",
+          3
+        ],
+        [
+          "result.rules.focOp.data.totals.types.onlyFocusable.total",
+          "=",
+          0
+        ],
+        [
+          "result.rules.focOp.data.totals.types.onlyOperable.total",
+          "=",
+          0
+        ],
+        [
+          "result.rules.focOp.data.totals.types.focusableAndOperable.total",
+          "=",
+          3
+        ],
+        [
+          "result.rules.focOp.data.totals.types.focusableAndOperable.tagNames.A",
+          "=",
+          1
+        ],
+        [
+          "result.rules.focOp.data.totals.types.focusableAndOperable.tagNames.BUTTON",
+          "=",
+          1
+        ],
+        [
+          "result.rules.focOp.data.totals.types.focusableAndOperable.tagNames.INPUT",
+          "=",
+          1
+        ]
+      ],
+      "rules": [
+        "y",
+        "focOp"
       ]
     },
     {
@@ -36,19 +68,59 @@
     },
     {
       "type": "test",
-      "which": "focOp",
+      "which": "testaro",
       "what": "focusability and operability",
-      "withItems": false,
+      "withItems": true,
       "expect": [
-        ["totals.total", "=", 6],
-        ["totals.types.onlyFocusable.total", "=", 1],
-        ["totals.types.onlyFocusable.tagNames.SPAN", "=", 1],
-        ["totals.types.onlyOperable.total", "=", 3],
-        ["totals.types.onlyOperable.tagNames.BUTTON", "=", 1],
-        ["totals.types.onlyOperable.tagNames.SPAN", "=", 2],
-        ["totals.types.focusableAndOperable.total", "=", 2],
-        ["totals.types.focusableAndOperable.tagNames.A", "=", 1],
-        ["totals.types.focusableAndOperable.tagNames.INPUT", "=", 1]
+        [
+          "result.rules.focOp.data.totals.total",
+          "=",
+          6
+        ],
+        [
+          "result.rules.focOp.data.totals.types.onlyFocusable.total",
+          "=",
+          1
+        ],
+        [
+          "result.rules.focOp.data.totals.types.onlyFocusable.tagNames.SPAN",
+          "=",
+          1
+        ],
+        [
+          "result.rules.focOp.data.totals.types.onlyOperable.total",
+          "=",
+          3
+        ],
+        [
+          "result.rules.focOp.data.totals.types.onlyOperable.tagNames.BUTTON",
+          "=",
+          1
+        ],
+        [
+          "result.rules.focOp.data.totals.types.onlyOperable.tagNames.SPAN",
+          "=",
+          2
+        ],
+        [
+          "result.rules.focOp.data.totals.types.focusableAndOperable.total",
+          "=",
+          2
+        ],
+        [
+          "result.rules.focOp.data.totals.types.focusableAndOperable.tagNames.A",
+          "=",
+          1
+        ],
+        [
+          "result.rules.focOp.data.totals.types.focusableAndOperable.tagNames.INPUT",
+          "=",
+          1
+        ]
+      ],
+      "rules": [
+        "y",
+        "focOp"
       ]
     }
   ],
@@ -57,6 +129,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2002-11-12T09:31:00",
+  "creationTime": "2013-05-28T12:00:00",
   "timeStamp": "00000"
 }

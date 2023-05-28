@@ -16,18 +16,47 @@
     },
     {
       "type": "test",
-      "which": "motion",
+      "which": "testaro",
       "what": "spontaneous change of content",
       "delay": 2400,
       "interval": 2600,
       "count": 5,
       "expect": [
-        ["meanLocalRatio", "=", 1],
-        ["maxLocalRatio", "=", 1],
-        ["globalRatio", "=", 1],
-        ["meanPixelChange", "=", 0],
-        ["maxPixelChange", "=", 0],
-        ["changeFrequency", "=", 0]
+        [
+          "result.rules.motion.data.meanLocalRatio",
+          "=",
+          1
+        ],
+        [
+          "result.rules.motion.data.maxLocalRatio",
+          "=",
+          1
+        ],
+        [
+          "result.rules.motion.data.globalRatio",
+          "=",
+          1
+        ],
+        [
+          "result.rules.motion.data.meanPixelChange",
+          "=",
+          0
+        ],
+        [
+          "result.rules.motion.data.maxPixelChange",
+          "=",
+          0
+        ],
+        [
+          "result.rules.motion.data.changeFrequency",
+          "=",
+          0
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "motion"
       ]
     },
     {
@@ -37,18 +66,47 @@
     },
     {
       "type": "test",
-      "which": "motion",
+      "which": "testaro",
       "what": "spontaneous change of content",
       "delay": 2400,
       "interval": 2600,
       "count": 5,
       "expect": [
-        ["meanLocalRatio", ">", 1],
-        ["maxLocalRatio", ">", 1],
-        ["globalRatio", ">", 1],
-        ["meanPixelChange", ">", 0],
-        ["maxPixelChange", ">", 0],
-        ["changeFrequency", ">", 0]
+        [
+          "result.rules.motion.data.meanLocalRatio",
+          ">",
+          1
+        ],
+        [
+          "result.rules.motion.data.maxLocalRatio",
+          ">",
+          1
+        ],
+        [
+          "result.rules.motion.data.globalRatio",
+          ">",
+          1
+        ],
+        [
+          "result.rules.motion.data.meanPixelChange",
+          ">",
+          0
+        ],
+        [
+          "result.rules.motion.data.maxPixelChange",
+          ">",
+          0
+        ],
+        [
+          "result.rules.motion.data.changeFrequency",
+          ">",
+          0
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "motion"
       ]
     }
   ],
@@ -57,6 +115,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2002-11-12T09:31:00",
+  "creationTime": "2013-05-28T12:00:00",
   "timeStamp": "00000"
 }

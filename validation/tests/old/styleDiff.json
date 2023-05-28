@@ -1,0 +1,71 @@
+{
+  "id": "styleDiff",
+  "what": "validation of styleDiff test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/styleDiff/good.html",
+      "what": "page with consistent styles"
+    },
+    {
+      "type": "test",
+      "which": "styleDiff",
+      "withItems": true,
+      "what": "styleDiff",
+      "expect": [
+        ["totals.adjacentLink.total", "=", 2],
+        ["totals.listLink.total", "=", 2],
+        ["totals.button.total", "=", 2],
+        ["totals.h1.total", "=", 1],
+        ["totals.h2.total", "=", 4],
+        ["totals.adjacentLink.subtotals"],
+        ["totals.listLink.subtotals"],
+        ["totals.button.subtotals"],
+        ["totals.h1.subtotals"],
+        ["totals.h2.subtotals"]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/styleDiff/bad.html",
+      "what": "page with consistent styles"
+    },
+    {
+      "type": "test",
+      "which": "styleDiff",
+      "withItems": true,
+      "what": "styleDiff",
+      "expect": [
+        ["totals.adjacentLink.total", "=", 2],
+        ["totals.listLink.total", "=", 2],
+        ["totals.button.total", "=", 2],
+        ["totals.h1.total", "=", 1],
+        ["totals.h2.total", "=", 4],
+        ["totals.adjacentLink.subtotals.0", "=", 1],
+        ["totals.adjacentLink.subtotals.1", "=", 1],
+        ["totals.listLink.subtotals.0", "=", 1],
+        ["totals.listLink.subtotals.1", "=", 1],
+        ["totals.button.subtotals.0", "=", 1],
+        ["totals.button.subtotals.1", "=", 1],
+        ["totals.h1.subtotals"],
+        ["totals.h2.subtotals.0", "=", 3],
+        ["totals.h2.subtotals.1", "=", 1],
+        ["items.adjacentLink.textDecorationStyle.double.0", "=", "French information"]
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2002-11-12T09:31:00",
+  "timeStamp": "00000"
+}

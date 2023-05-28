@@ -16,22 +16,12 @@
     },
     {
       "type": "test",
-      "which": "testaro",
+      "which": "autocomplete",
       "what": "autocomplete attributes for name and email",
       "withItems": true,
       "expect": [
-        [
-          "result.rules.autocomplete.data.total",
-          "=",
-          0
-        ],
-        [
-          "result.rules.autocomplete.data.items.1"
-        ]
-      ],
-      "rules": [
-        "y",
-        "autocomplete"
+        ["total", "=", 0],
+        ["items.1"]
       ]
     },
     {
@@ -41,29 +31,13 @@
     },
     {
       "type": "test",
-      "which": "testaro",
+      "which": "autocomplete",
       "what": "autocomplete attributes for name and email",
       "withItems": true,
       "expect": [
-        [
-          "result.rules.autocomplete.data.total",
-          "=",
-          4
-        ],
-        [
-          "result.rules.autocomplete.data.items.1.0",
-          "=",
-          "family-name"
-        ],
-        [
-          "result.rules.autocomplete.data.items.2.1",
-          "=",
-          "Your email address"
-        ]
-      ],
-      "rules": [
-        "y",
-        "autocomplete"
+        ["total", "=", 4],
+        ["items.1.0", "=", "family-name"],
+        ["items.2.1", "=", "Your email address"]
       ]
     }
   ],
@@ -72,6 +46,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2013-05-28T12:00:00",
+  "creationTime": "2023-04-16T21:06:00",
   "timeStamp": "00000"
 }

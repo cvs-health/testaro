@@ -16,12 +16,24 @@
     },
     {
       "type": "test",
-      "which": "filter",
+      "which": "testaro",
       "what": "filter",
       "withItems": true,
       "expect": [
-        ["totals.styledElements", "=", 0],
-        ["totals.impactedElements", "=", 0]
+        [
+          "result.rules.filter.data.totals.styledElements",
+          "=",
+          0
+        ],
+        [
+          "result.rules.filter.data.totals.impactedElements",
+          "=",
+          0
+        ]
+      ],
+      "rules": [
+        "y",
+        "filter"
       ]
     },
     {
@@ -31,17 +43,49 @@
     },
     {
       "type": "test",
-      "which": "filter",
+      "which": "testaro",
       "what": "filter",
       "withItems": true,
       "expect": [
-        ["totals.styledElements", "=", 2],
-        ["totals.impactedElements", "=", 7],
-        ["items.0.tagName", "=", "MAIN"],
-        ["items.1.tagName", "=", "UL"],
-        ["items.1.text", "i", "Item"],
-        ["items.0.impact", "=", 5],
-        ["items.1.impact", "=", 2]
+        [
+          "result.rules.filter.data.totals.styledElements",
+          "=",
+          2
+        ],
+        [
+          "result.rules.filter.data.totals.impactedElements",
+          "=",
+          7
+        ],
+        [
+          "result.rules.filter.data.items.0.tagName",
+          "=",
+          "MAIN"
+        ],
+        [
+          "result.rules.filter.data.items.1.tagName",
+          "=",
+          "UL"
+        ],
+        [
+          "result.rules.filter.data.items.1.text",
+          "i",
+          "Item"
+        ],
+        [
+          "result.rules.filter.data.items.0.impact",
+          "=",
+          5
+        ],
+        [
+          "result.rules.filter.data.items.1.impact",
+          "=",
+          2
+        ]
+      ],
+      "rules": [
+        "y",
+        "filter"
       ]
     }
   ],
@@ -50,6 +94,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2002-11-12T09:31:00",
+  "creationTime": "2013-05-28T12:00:00",
   "timeStamp": "00000"
 }

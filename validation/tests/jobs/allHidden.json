@@ -16,24 +16,89 @@
     },
     {
       "type": "test",
-      "which": "allHidden",
+      "which": "testaro",
       "what": "entirely or mainly hidden page",
       "expect": [
-        ["hidden.document", "=", false],
-        ["hidden.body", "=", false],
-        ["hidden.main", "=", false],
-        ["reallyHidden.document", "=", false],
-        ["reallyHidden.body", "=", false],
-        ["reallyHidden.main", "=", false],
-        ["display.document", "=", "block"],
-        ["display.body", "=", "block"],
-        ["display.main", "=", "block"],
-        ["visHidden.document", "=", false],
-        ["visHidden.body", "=", false],
-        ["visHidden.main", "=", false],
-        ["ariaHidden.document", "=", false],
-        ["ariaHidden.body", "=", false],
-        ["ariaHidden.main", "=", false]
+        [
+          "result.rules.allHidden.data.hidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.hidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.hidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.display.document",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.display.body",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.display.main",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.main",
+          "=",
+          false
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "allHidden"
       ]
     },
     {
@@ -43,22 +108,79 @@
     },
     {
       "type": "test",
-      "which": "allHidden",
+      "which": "testaro",
       "what": "entirely or mainly hidden page",
       "expect": [
-        ["hidden.document", "=", false],
-        ["hidden.body", "=", false],
-        ["hidden.main", "=", false],
-        ["reallyHidden.document", "=", false],
-        ["reallyHidden.body", "=", false],
-        ["reallyHidden.main", "=", false],
-        ["display.document", "=", "block"],
-        ["visHidden.document", "=", false],
-        ["visHidden.body", "=", false],
-        ["visHidden.main", "=", false],
-        ["ariaHidden.document", "=", false],
-        ["ariaHidden.body", "=", false],
-        ["ariaHidden.main", "=", false]
+        [
+          "result.rules.allHidden.data.hidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.hidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.hidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.display.document",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.main",
+          "=",
+          false
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "allHidden"
       ]
     },
     {
@@ -68,23 +190,84 @@
     },
     {
       "type": "test",
-      "which": "allHidden",
+      "which": "testaro",
       "what": "entirely or mainly hidden page",
       "expect": [
-        ["hidden.document", "=", false],
-        ["hidden.body", "=", false],
-        ["hidden.main", "=", false],
-        ["reallyHidden.document", "=", false],
-        ["reallyHidden.body", "=", false],
-        ["reallyHidden.main", "=", false],
-        ["display.document", "=", "block"],
-        ["display.body", "=", "block"],
-        ["visHidden.document", "=", false],
-        ["visHidden.body", "=", false],
-        ["visHidden.main", "=", false],
-        ["ariaHidden.document", "=", false],
-        ["ariaHidden.body", "=", false],
-        ["ariaHidden.main", "=", false]
+        [
+          "result.rules.allHidden.data.hidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.hidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.hidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.display.document",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.display.body",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.main",
+          "=",
+          false
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "allHidden"
       ]
     },
     {
@@ -94,24 +277,89 @@
     },
     {
       "type": "test",
-      "which": "allHidden",
+      "which": "testaro",
       "what": "entirely or mainly hidden page",
       "expect": [
-        ["hidden.document", "=", false],
-        ["hidden.body", "=", false],
-        ["hidden.main", "=", true],
-        ["reallyHidden.document", "=", false],
-        ["reallyHidden.body", "=", false],
-        ["reallyHidden.main", "=", true],
-        ["display.document", "=", "block"],
-        ["display.body", "=", "block"],
-        ["display.main", "=", "none"],
-        ["visHidden.document", "=", false],
-        ["visHidden.body", "=", false],
-        ["visHidden.main", "=", false],
-        ["ariaHidden.document", "=", false],
-        ["ariaHidden.body", "=", false],
-        ["ariaHidden.main", "=", false]
+        [
+          "result.rules.allHidden.data.hidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.hidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.hidden.main",
+          "=",
+          true
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.main",
+          "=",
+          true
+        ],
+        [
+          "result.rules.allHidden.data.display.document",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.display.body",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.display.main",
+          "=",
+          "none"
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.main",
+          "=",
+          false
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "allHidden"
       ]
     },
     {
@@ -121,24 +369,89 @@
     },
     {
       "type": "test",
-      "which": "allHidden",
+      "which": "testaro",
       "what": "entirely or mainly hidden page",
       "expect": [
-        ["hidden.document", "=", false],
-        ["hidden.body", "=", false],
-        ["hidden.main", "=", false],
-        ["reallyHidden.document", "=", false],
-        ["reallyHidden.body", "=", false],
-        ["reallyHidden.main", "=", false],
-        ["display.document", "=", "block"],
-        ["display.body", "=", "block"],
-        ["display.main", "=", "block"],
-        ["visHidden.document", "=", false],
-        ["visHidden.body", "=", false],
-        ["visHidden.main", "=", true],
-        ["ariaHidden.document", "=", false],
-        ["ariaHidden.body", "=", false],
-        ["ariaHidden.main", "=", false]
+        [
+          "result.rules.allHidden.data.hidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.hidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.hidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.display.document",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.display.body",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.display.main",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.main",
+          "=",
+          true
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.main",
+          "=",
+          false
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "allHidden"
       ]
     },
     {
@@ -148,24 +461,89 @@
     },
     {
       "type": "test",
-      "which": "allHidden",
+      "which": "testaro",
       "what": "entirely or mainly hidden page",
       "expect": [
-        ["hidden.document", "=", false],
-        ["hidden.body", "=", false],
-        ["hidden.main", "=", false],
-        ["reallyHidden.document", "=", false],
-        ["reallyHidden.body", "=", false],
-        ["reallyHidden.main", "=", false],
-        ["display.document", "=", "block"],
-        ["display.body", "=", "block"],
-        ["display.main", "=", "block"],
-        ["visHidden.document", "=", false],
-        ["visHidden.body", "=", false],
-        ["visHidden.main", "=", false],
-        ["ariaHidden.document", "=", false],
-        ["ariaHidden.body", "=", false],
-        ["ariaHidden.main", "=", true]
+        [
+          "result.rules.allHidden.data.hidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.hidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.hidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.display.document",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.display.body",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.display.main",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.main",
+          "=",
+          true
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "allHidden"
       ]
     },
     {
@@ -175,24 +553,89 @@
     },
     {
       "type": "test",
-      "which": "allHidden",
+      "which": "testaro",
       "what": "entirely or mainly hidden page",
       "expect": [
-        ["hidden.document", "=", false],
-        ["hidden.body", "=", false],
-        ["hidden.main", "=", true],
-        ["reallyHidden.document", "=", false],
-        ["reallyHidden.body", "=", false],
-        ["reallyHidden.main", "=", true],
-        ["display.document", "=", "block"],
-        ["display.body", "=", "block"],
-        ["display.main", "=", "none"],
-        ["visHidden.document", "=", false],
-        ["visHidden.body", "=", true],
-        ["visHidden.main", "=", true],
-        ["ariaHidden.document", "=", true],
-        ["ariaHidden.body", "=", false],
-        ["ariaHidden.main", "=", false]
+        [
+          "result.rules.allHidden.data.hidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.hidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.hidden.main",
+          "=",
+          true
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.main",
+          "=",
+          true
+        ],
+        [
+          "result.rules.allHidden.data.display.document",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.display.body",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.display.main",
+          "=",
+          "none"
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.body",
+          "=",
+          true
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.main",
+          "=",
+          true
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.document",
+          "=",
+          true
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.main",
+          "=",
+          false
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "allHidden"
       ]
     },
     {
@@ -202,24 +645,89 @@
     },
     {
       "type": "test",
-      "which": "allHidden",
+      "which": "testaro",
       "what": "entirely or mainly hidden page",
       "expect": [
-        ["hidden.document", "=", true],
-        ["hidden.body", "=", false],
-        ["hidden.main", "=", false],
-        ["reallyHidden.document", "=", true],
-        ["reallyHidden.body", "=", false],
-        ["reallyHidden.main", "=", false],
-        ["display.document", "=", "none"],
-        ["display.body", "=", "block"],
-        ["display.main", "=", "block"],
-        ["visHidden.document", "=", false],
-        ["visHidden.body", "=", true],
-        ["visHidden.main", "=", true],
-        ["ariaHidden.document", "=", false],
-        ["ariaHidden.body", "=", false],
-        ["ariaHidden.main", "=", true]
+        [
+          "result.rules.allHidden.data.hidden.document",
+          "=",
+          true
+        ],
+        [
+          "result.rules.allHidden.data.hidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.hidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.document",
+          "=",
+          true
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.display.document",
+          "=",
+          "none"
+        ],
+        [
+          "result.rules.allHidden.data.display.body",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.display.main",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.body",
+          "=",
+          true
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.main",
+          "=",
+          true
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.main",
+          "=",
+          true
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "allHidden"
       ]
     },
     {
@@ -229,24 +737,89 @@
     },
     {
       "type": "test",
-      "which": "allHidden",
+      "which": "testaro",
       "what": "entirely or mainly hidden page",
       "expect": [
-        ["hidden.document", "=", false],
-        ["hidden.body", "=", false],
-        ["hidden.main", "=", true],
-        ["reallyHidden.document", "=", false],
-        ["reallyHidden.body", "=", false],
-        ["reallyHidden.main", "=", false],
-        ["display.document", "=", "block"],
-        ["display.body", "=", "block"],
-        ["display.main", "=", "block"],
-        ["visHidden.document", "=", false],
-        ["visHidden.body", "=", false],
-        ["visHidden.main", "=", false],
-        ["ariaHidden.document", "=", false],
-        ["ariaHidden.body", "=", false],
-        ["ariaHidden.main", "=", false]
+        [
+          "result.rules.allHidden.data.hidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.hidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.hidden.main",
+          "=",
+          true
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.display.document",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.display.body",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.display.main",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.main",
+          "=",
+          false
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "allHidden"
       ]
     },
     {
@@ -256,24 +829,89 @@
     },
     {
       "type": "test",
-      "which": "allHidden",
+      "which": "testaro",
       "what": "entirely or mainly hidden page",
       "expect": [
-        ["hidden.document", "=", false],
-        ["hidden.body", "=", false],
-        ["hidden.main", "=", false],
-        ["reallyHidden.document", "=", false],
-        ["reallyHidden.body", "=", false],
-        ["reallyHidden.main", "=", false],
-        ["display.document", "=", "none"],
-        ["display.body", "=", "block"],
-        ["display.main", "=", "block"],
-        ["visHidden.document", "=", false],
-        ["visHidden.body", "=", false],
-        ["visHidden.main", "=", false],
-        ["ariaHidden.document", "=", false],
-        ["ariaHidden.body", "=", false],
-        ["ariaHidden.main", "=", false]
+        [
+          "result.rules.allHidden.data.hidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.hidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.hidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.display.document",
+          "=",
+          "none"
+        ],
+        [
+          "result.rules.allHidden.data.display.body",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.display.main",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.main",
+          "=",
+          false
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "allHidden"
       ]
     },
     {
@@ -283,24 +921,89 @@
     },
     {
       "type": "test",
-      "which": "allHidden",
+      "which": "testaro",
       "what": "entirely or mainly hidden page",
       "expect": [
-        ["hidden.document", "=", false],
-        ["hidden.body", "=", false],
-        ["hidden.main", "=", false],
-        ["reallyHidden.document", "=", false],
-        ["reallyHidden.body", "=", false],
-        ["reallyHidden.main", "=", false],
-        ["display.document", "=", "block"],
-        ["display.body", "=", "block"],
-        ["display.main", "=", "none"],
-        ["visHidden.document", "=", false],
-        ["visHidden.body", "=", false],
-        ["visHidden.main", "=", false],
-        ["ariaHidden.document", "=", false],
-        ["ariaHidden.body", "=", false],
-        ["ariaHidden.main", "=", false]
+        [
+          "result.rules.allHidden.data.hidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.hidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.hidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.reallyHidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.display.document",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.display.body",
+          "=",
+          "block"
+        ],
+        [
+          "result.rules.allHidden.data.display.main",
+          "=",
+          "none"
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.visHidden.main",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.document",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.body",
+          "=",
+          false
+        ],
+        [
+          "result.rules.allHidden.data.ariaHidden.main",
+          "=",
+          false
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "allHidden"
       ]
     }
   ],
@@ -309,6 +1012,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2002-11-12T09:31:00",
+  "creationTime": "2013-05-28T12:00:00",
   "timeStamp": "00000"
 }

@@ -16,75 +16,210 @@
     },
     {
       "type": "test",
-      "which": "textNodes",
+      "which": "testaro",
       "what": "text nodes",
       "detailLevel": 0,
       "expect": [
-        ["nodeCount", "=", 35]
+        [
+          "result.rules.textNodes.data.nodeCount",
+          "=",
+          35
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "textNodes"
       ]
     },
     {
       "type": "test",
-      "which": "textNodes",
+      "which": "testaro",
       "what": "text nodes",
       "detailLevel": 0,
       "text": "alia",
       "expect": [
-        ["nodeCount", "=", 2]
+        [
+          "result.rules.textNodes.data.nodeCount",
+          "=",
+          2
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "textNodes"
       ]
     },
     {
       "type": "test",
-      "which": "textNodes",
+      "which": "testaro",
       "what": "text nodes",
       "detailLevel": 1,
       "text": "alia",
       "expect": [
-        ["nodeCount", "=", 2],
-        ["items.0.text", "=", "Io alia"]
+        [
+          "result.rules.textNodes.data.nodeCount",
+          "=",
+          2
+        ],
+        [
+          "result.rules.textNodes.data.items.0.text",
+          "=",
+          "Io alia"
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "textNodes"
       ]
     },
     {
       "type": "test",
-      "which": "textNodes",
+      "which": "testaro",
       "what": "text nodes",
       "detailLevel": 2,
       "text": "This is the",
       "expect": [
-        ["nodeCount", "=", 2],
-        ["items.0.text", "=", "This is the first button"],
-        ["items.1.text", "=", "This is the second button"],
-        ["items.0.ancestors.0.tagName", "=", "BUTTON"],
-        ["items.1.ancestors.0.tagName", "=", "BUTTON"],
-        ["items.0.ancestors.0.attributes.0.name", "=", "id"],
-        ["items.0.ancestors.0.attributes.0.value", "=", "button0"],
-        ["items.1.ancestors.0.attributes.1.name", "=", "aria-labelledby"],
-        ["items.1.ancestors.0.attributes.1.value", "=", "button1Label"],
-        ["items.0.ancestors.0.refLabels"],
-        ["items.1.ancestors.0.refLabels.0", "=", "Click the second button."],
-        ["items.0.ancestors.0.labels.0", "=", "Click the first button."],
-        ["items.0.ancestors.0.labels.1", "=", "Did you click it?"],
-        ["items.1.ancestors.0.labels"],
-        ["items.0.ancestors.0.children"]
+        [
+          "result.rules.textNodes.data.nodeCount",
+          "=",
+          2
+        ],
+        [
+          "result.rules.textNodes.data.items.0.text",
+          "=",
+          "This is the first button"
+        ],
+        [
+          "result.rules.textNodes.data.items.1.text",
+          "=",
+          "This is the second button"
+        ],
+        [
+          "result.rules.textNodes.data.items.0.ancestors.0.tagName",
+          "=",
+          "BUTTON"
+        ],
+        [
+          "result.rules.textNodes.data.items.1.ancestors.0.tagName",
+          "=",
+          "BUTTON"
+        ],
+        [
+          "result.rules.textNodes.data.items.0.ancestors.0.attributes.0.name",
+          "=",
+          "id"
+        ],
+        [
+          "result.rules.textNodes.data.items.0.ancestors.0.attributes.0.value",
+          "=",
+          "button0"
+        ],
+        [
+          "result.rules.textNodes.data.items.1.ancestors.0.attributes.1.name",
+          "=",
+          "aria-labelledby"
+        ],
+        [
+          "result.rules.textNodes.data.items.1.ancestors.0.attributes.1.value",
+          "=",
+          "button1Label"
+        ],
+        [
+          "result.rules.textNodes.data.items.0.ancestors.0.refLabels"
+        ],
+        [
+          "result.rules.textNodes.data.items.1.ancestors.0.refLabels.0",
+          "=",
+          "Click the second button."
+        ],
+        [
+          "result.rules.textNodes.data.items.0.ancestors.0.labels.0",
+          "=",
+          "Click the first button."
+        ],
+        [
+          "result.rules.textNodes.data.items.0.ancestors.0.labels.1",
+          "=",
+          "Did you click it?"
+        ],
+        [
+          "result.rules.textNodes.data.items.1.ancestors.0.labels"
+        ],
+        [
+          "result.rules.textNodes.data.items.0.ancestors.0.children"
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "textNodes"
       ]
     },
     {
       "type": "test",
-      "which": "textNodes",
+      "which": "testaro",
       "what": "text nodes",
       "detailLevel": 3,
       "text": "tute alia",
       "expect": [
-        ["nodeCount", "=", 1],
-        ["items.0.text", "=", "Io tute alia"],
-        ["items.0.ancestors.0.tagName", "=", "LI"],
-        ["items.0.ancestors.1.tagName", "=", "UL"],
-        ["items.0.ancestors.0.attributes.0.name", "=", "class"],
-        ["items.0.ancestors.0.attributes.0.value", "=", "last"],
-        ["items.0.ancestors.1.attributes.0.name", "=", "lang"],
-        ["items.0.ancestors.1.attributes.0.value", "=", "eo"],
-        ["items.0.ancestors.1.children.1.tagName", "=", "LI"],
-        ["items.0.ancestors.1.children.2.attributes.1.name", "=", "hidden"]
+        [
+          "result.rules.textNodes.data.nodeCount",
+          "=",
+          1
+        ],
+        [
+          "result.rules.textNodes.data.items.0.text",
+          "=",
+          "Io tute alia"
+        ],
+        [
+          "result.rules.textNodes.data.items.0.ancestors.0.tagName",
+          "=",
+          "LI"
+        ],
+        [
+          "result.rules.textNodes.data.items.0.ancestors.1.tagName",
+          "=",
+          "UL"
+        ],
+        [
+          "result.rules.textNodes.data.items.0.ancestors.0.attributes.0.name",
+          "=",
+          "class"
+        ],
+        [
+          "result.rules.textNodes.data.items.0.ancestors.0.attributes.0.value",
+          "=",
+          "last"
+        ],
+        [
+          "result.rules.textNodes.data.items.0.ancestors.1.attributes.0.name",
+          "=",
+          "lang"
+        ],
+        [
+          "result.rules.textNodes.data.items.0.ancestors.1.attributes.0.value",
+          "=",
+          "eo"
+        ],
+        [
+          "result.rules.textNodes.data.items.0.ancestors.1.children.1.tagName",
+          "=",
+          "LI"
+        ],
+        [
+          "result.rules.textNodes.data.items.0.ancestors.1.children.2.attributes.1.name",
+          "=",
+          "hidden"
+        ]
+      ],
+      "withItems": true,
+      "rules": [
+        "y",
+        "textNodes"
       ]
     }
   ],
@@ -93,6 +228,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2002-11-12T09:31:00",
+  "creationTime": "2013-05-28T12:00:00",
   "timeStamp": "00000"
 }

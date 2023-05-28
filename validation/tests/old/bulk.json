@@ -16,24 +16,11 @@
     },
     {
       "type": "test",
-      "which": "testaro",
+      "which": "bulk",
       "what": "visible element count",
       "expect": [
-        [
-          "result.rules.bulk.data.visibleElements",
-          ">",
-          1
-        ],
-        [
-          "result.rules.bulk.data.visibleElements",
-          "<",
-          5
-        ]
-      ],
-      "withItems": true,
-      "rules": [
-        "y",
-        "bulk"
+        ["visibleElements", ">", 1],
+        ["visibleElements", "<", 5]
       ]
     },
     {
@@ -43,24 +30,11 @@
     },
     {
       "type": "test",
-      "which": "testaro",
+      "which": "bulk",
       "what": "visible element count",
       "expect": [
-        [
-          "result.rules.bulk.data.visibleElements",
-          ">",
-          30
-        ],
-        [
-          "result.rules.bulk.data.visibleElements",
-          "<",
-          40
-        ]
-      ],
-      "withItems": true,
-      "rules": [
-        "y",
-        "bulk"
+        ["visibleElements", ">", 30],
+        ["visibleElements", "<", 40]
       ]
     }
   ],
@@ -69,6 +43,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2013-05-28T12:00:00",
+  "creationTime": "2002-11-12T09:31:00",
   "timeStamp": "00000"
 }

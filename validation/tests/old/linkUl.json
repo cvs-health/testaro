@@ -1,0 +1,71 @@
+{
+  "id": "linkUl",
+  "what": "validation of linkUl test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/linkUl/good.html",
+      "what": "page with underlined adjacent links"
+    },
+    {
+      "type": "test",
+      "which": "linkUl",
+      "what": "adjacent-link underlining",
+      "withItems": false,
+      "expect": [
+        ["totals.links", "=", 6],
+        ["totals.adjacent.total", "=", 2],
+        ["totals.adjacent.underlined", "=", 2],
+        ["totals.adjacent.underlinedPercent", "=", 100]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/linkUl/bad.html",
+      "what": "page with nonunderlined adjacent links"
+    },
+    {
+      "type": "test",
+      "which": "linkUl",
+      "what": "adjacent-link underlining",
+      "withItems": false,
+      "expect": [
+        ["totals.links", "=", 6],
+        ["totals.adjacent.total", "=", 6],
+        ["totals.adjacent.underlined", "=", 0],
+        ["totals.adjacent.underlinedPercent", "=", 0]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/linkUl/na.html",
+      "what": "page without adjacent links"
+    },
+    {
+      "type": "test",
+      "which": "linkUl",
+      "what": "adjacent-link underlining",
+      "withItems": false,
+      "expect": [
+        ["totals.links", "=", 2],
+        ["totals.adjacent.total", "=", 0],
+        ["totals.adjacent.underlined", "=", 0],
+        ["totals.adjacent.underlinedPercent", "=", "N/A"]
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2002-11-12T09:31:00",
+  "timeStamp": "00000"
+}

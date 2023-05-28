@@ -1,0 +1,52 @@
+{
+  "id": "radioSet",
+  "what": "validation of radioSet test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/radioSet/good.html",
+      "what": "page with standard radio-button grouping"
+    },
+    {
+      "type": "test",
+      "which": "radioSet",
+      "what": "radioSet",
+      "withItems": false,
+      "expect": [
+        ["totals.total", "=", 4],
+        ["totals.inSet", "=", 4],
+        ["totals.percent", "=", 100]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/radioSet/bad.html",
+      "what": "page with deviant radio-button grouping"
+    },
+    {
+      "type": "test",
+      "which": "radioSet",
+      "what": "radioSet",
+      "withItems": false,
+      "expect": [
+        ["totals.total", "=", 8],
+        ["totals.inSet", "=", 0],
+        ["totals.percent", "=", 0]
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2002-11-12T09:31:00",
+  "timeStamp": "00000"
+}

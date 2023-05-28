@@ -1,0 +1,106 @@
+{
+  "id": "tabNav",
+  "what": "validation of tabNav test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/tabNav/good.html",
+      "what": "page with standard menu navigation"
+    },
+    {
+      "type": "test",
+      "which": "tabNav",
+      "what": "tab-list navigation",
+      "withItems": false,
+      "expect": [
+        ["totals.navigations.all.total", "=", 21],
+        ["totals.navigations.all.correct", "=", 21],
+        ["totals.navigations.all.incorrect", "=", 0],
+        ["totals.navigations.specific.tab.total", "=", 3],
+        ["totals.navigations.specific.tab.correct", "=", 3],
+        ["totals.navigations.specific.tab.incorrect", "=", 0],
+        ["totals.navigations.specific.left.total", "=", 3],
+        ["totals.navigations.specific.left.correct", "=", 3],
+        ["totals.navigations.specific.left.incorrect", "=", 0],
+        ["totals.navigations.specific.right.total", "=", 3],
+        ["totals.navigations.specific.right.correct", "=", 3],
+        ["totals.navigations.specific.right.incorrect", "=", 0],
+        ["totals.navigations.specific.up.total", "=", 3],
+        ["totals.navigations.specific.up.correct", "=", 3],
+        ["totals.navigations.specific.up.incorrect", "=", 0],
+        ["totals.navigations.specific.down.total", "=", 3],
+        ["totals.navigations.specific.down.correct", "=", 3],
+        ["totals.navigations.specific.down.incorrect", "=", 0],
+        ["totals.navigations.specific.home.total", "=", 3],
+        ["totals.navigations.specific.home.correct", "=", 3],
+        ["totals.navigations.specific.home.incorrect", "=", 0],
+        ["totals.navigations.specific.end.total", "=", 3],
+        ["totals.navigations.specific.end.correct", "=", 3],
+        ["totals.navigations.specific.end.incorrect", "=", 0],
+        ["totals.tabElements.total", "=", 3],
+        ["totals.tabElements.correct", "=", 3],
+        ["totals.tabElements.incorrect", "=", 0],
+        ["totals.tabLists.total", "=", 1],
+        ["totals.tabLists.correct", "=", 1],
+        ["totals.tabLists.incorrect", "=", 0]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/tabNav/bad.html",
+      "what": "page with deviant menu navigation"
+    },
+    {
+      "type": "test",
+      "which": "tabNav",
+      "what": "tab-list navigation",
+      "withItems": false,
+      "expect": [
+        ["totals.navigations.all.total", "=", 21],
+        ["totals.navigations.all.correct", "=", 9],
+        ["totals.navigations.all.incorrect", "=", 12],
+        ["totals.navigations.specific.tab.total", "=", 3],
+        ["totals.navigations.specific.tab.correct", "=", 1],
+        ["totals.navigations.specific.tab.incorrect", "=", 2],
+        ["totals.navigations.specific.left.total", "=", 3],
+        ["totals.navigations.specific.left.correct", "=", 0],
+        ["totals.navigations.specific.left.incorrect", "=", 3],
+        ["totals.navigations.specific.right.total", "=", 3],
+        ["totals.navigations.specific.right.correct", "=", 0],
+        ["totals.navigations.specific.right.incorrect", "=", 3],
+        ["totals.navigations.specific.up.total", "=", 3],
+        ["totals.navigations.specific.up.correct", "=", 3],
+        ["totals.navigations.specific.up.incorrect", "=", 0],
+        ["totals.navigations.specific.down.total", "=", 3],
+        ["totals.navigations.specific.down.correct", "=", 3],
+        ["totals.navigations.specific.down.incorrect", "=", 0],
+        ["totals.navigations.specific.home.total", "=", 3],
+        ["totals.navigations.specific.home.correct", "=", 1],
+        ["totals.navigations.specific.home.incorrect", "=", 2],
+        ["totals.navigations.specific.end.total", "=", 3],
+        ["totals.navigations.specific.end.correct", "=", 1],
+        ["totals.navigations.specific.end.incorrect", "=", 2],
+        ["totals.tabElements.total", "=", 3],
+        ["totals.tabElements.correct", "=", 0],
+        ["totals.tabElements.incorrect", "=", 3],
+        ["totals.tabLists.total", "=", 1],
+        ["totals.tabLists.correct", "=", 0],
+        ["totals.tabLists.incorrect", "=", 1]
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2002-11-12T09:31:00",
+  "timeStamp": "00000"
+}

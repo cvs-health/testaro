@@ -16,19 +16,53 @@
     },
     {
       "type": "test",
-      "which": "hover",
+      "which": "testaro",
       "what": "hover",
       "sampleSize": 5,
       "withItems": true,
       "expect": [
-        ["totals.triggers", "=", 4],
-        ["totals.impactTriggers", "=", 0],
-        ["totals.additions", "=", 0],
-        ["totals.removals", "=", 0],
-        ["totals.opacityChanges", "=", 0],
-        ["totals.opacityImpact", "=", 0],
-        ["totals.unhoverables", "=", 0],
-        ["items.impactTriggers.0"]
+        [
+          "result.rules.hover.data.totals.triggers",
+          "=",
+          4
+        ],
+        [
+          "result.rules.hover.data.totals.impactTriggers",
+          "=",
+          0
+        ],
+        [
+          "result.rules.hover.data.totals.additions",
+          "=",
+          0
+        ],
+        [
+          "result.rules.hover.data.totals.removals",
+          "=",
+          0
+        ],
+        [
+          "result.rules.hover.data.totals.opacityChanges",
+          "=",
+          0
+        ],
+        [
+          "result.rules.hover.data.totals.opacityImpact",
+          "=",
+          0
+        ],
+        [
+          "result.rules.hover.data.totals.unhoverables",
+          "=",
+          0
+        ],
+        [
+          "result.rules.hover.data.items.impactTriggers.0"
+        ]
+      ],
+      "rules": [
+        "y",
+        "hover"
       ]
     },
     {
@@ -38,30 +72,110 @@
     },
     {
       "type": "test",
-      "which": "hover",
+      "which": "testaro",
       "what": "hover",
       "sampleSize": 8,
       "withItems": true,
       "expect": [
-        ["totals.triggers", "=", 6],
-        ["totals.impactTriggers", "=", 3],
-        ["totals.additions", "=", 3],
-        ["totals.removals", "=", 1],
-        ["totals.opacityChanges", "=", 1],
-        ["totals.opacityImpact", "=", 1],
-        ["totals.unhoverables", "=", 1],
-        ["items.impactTriggers.0.tagName", "=", "A"],
-        ["items.impactTriggers.1.tagName", "=", "BUTTON"],
-        ["items.impactTriggers.2.tagName", "=", "LI"],
-        ["items.impactTriggers.0.text", "=", "information"],
-        ["items.impactTriggers.0.additions", "=", 0],
-        ["items.impactTriggers.1.additions", "=", 3],
-        ["items.impactTriggers.2.removals", "=", 1],
-        ["items.impactTriggers.0.opacityChanges", "=", 1],
-        ["items.impactTriggers.1.opacityImpact", "=", 0],
-        ["items.unhoverables.0.tagName", "=", "BUTTON"],
-        ["items.unhoverables.0.id", "=", "smallButton"],
-        ["items.unhoverables.0.text", "=", "button"]
+        [
+          "result.rules.hover.data.totals.triggers",
+          "=",
+          6
+        ],
+        [
+          "result.rules.hover.data.totals.impactTriggers",
+          "=",
+          3
+        ],
+        [
+          "result.rules.hover.data.totals.additions",
+          "=",
+          3
+        ],
+        [
+          "result.rules.hover.data.totals.removals",
+          "=",
+          1
+        ],
+        [
+          "result.rules.hover.data.totals.opacityChanges",
+          "=",
+          1
+        ],
+        [
+          "result.rules.hover.data.totals.opacityImpact",
+          "=",
+          1
+        ],
+        [
+          "result.rules.hover.data.totals.unhoverables",
+          "=",
+          1
+        ],
+        [
+          "result.rules.hover.data.items.impactTriggers.0.tagName",
+          "=",
+          "A"
+        ],
+        [
+          "result.rules.hover.data.items.impactTriggers.1.tagName",
+          "=",
+          "BUTTON"
+        ],
+        [
+          "result.rules.hover.data.items.impactTriggers.2.tagName",
+          "=",
+          "LI"
+        ],
+        [
+          "result.rules.hover.data.items.impactTriggers.0.text",
+          "=",
+          "information"
+        ],
+        [
+          "result.rules.hover.data.items.impactTriggers.0.additions",
+          "=",
+          0
+        ],
+        [
+          "result.rules.hover.data.items.impactTriggers.1.additions",
+          "=",
+          3
+        ],
+        [
+          "result.rules.hover.data.items.impactTriggers.2.removals",
+          "=",
+          1
+        ],
+        [
+          "result.rules.hover.data.items.impactTriggers.0.opacityChanges",
+          "=",
+          1
+        ],
+        [
+          "result.rules.hover.data.items.impactTriggers.1.opacityImpact",
+          "=",
+          0
+        ],
+        [
+          "result.rules.hover.data.items.unhoverables.0.tagName",
+          "=",
+          "BUTTON"
+        ],
+        [
+          "result.rules.hover.data.items.unhoverables.0.id",
+          "=",
+          "smallButton"
+        ],
+        [
+          "result.rules.hover.data.items.unhoverables.0.text",
+          "=",
+          "button"
+        ]
+      ],
+      "rules": [
+        "y",
+        "hover"
       ]
     },
     {
@@ -71,20 +185,60 @@
     },
     {
       "type": "test",
-      "which": "hover",
+      "which": "testaro",
       "what": "hover",
       "sampleSize": 10,
-      "withItems": false,
+      "withItems": true,
       "expect": [
-        ["totals.triggers", "=", 20],
-        ["totals.impactTriggers", ">", -1],
-        ["totals.impactTriggers", "<", 6],
-        ["totals.additions", ">", -1],
-        ["totals.additions", "<", 6],
-        ["totals.removals", "=", 0],
-        ["totals.opacityChanges", "=", 0],
-        ["totals.opacityImpact", "=", 0],
-        ["totals.unhoverables", "=", 0]
+        [
+          "result.rules.hover.data.totals.triggers",
+          "=",
+          20
+        ],
+        [
+          "result.rules.hover.data.totals.impactTriggers",
+          ">",
+          -1
+        ],
+        [
+          "result.rules.hover.data.totals.impactTriggers",
+          "<",
+          6
+        ],
+        [
+          "result.rules.hover.data.totals.additions",
+          ">",
+          -1
+        ],
+        [
+          "result.rules.hover.data.totals.additions",
+          "<",
+          6
+        ],
+        [
+          "result.rules.hover.data.totals.removals",
+          "=",
+          0
+        ],
+        [
+          "result.rules.hover.data.totals.opacityChanges",
+          "=",
+          0
+        ],
+        [
+          "result.rules.hover.data.totals.opacityImpact",
+          "=",
+          0
+        ],
+        [
+          "result.rules.hover.data.totals.unhoverables",
+          "=",
+          0
+        ]
+      ],
+      "rules": [
+        "y",
+        "hover"
       ]
     },
     {
@@ -94,17 +248,45 @@
     },
     {
       "type": "test",
-      "which": "hover",
+      "which": "testaro",
       "what": "hover",
       "sampleSize": 5,
       "withItems": true,
       "expect": [
-        ["totals.noIndicators", "=", 1],
-        ["totals.noCursors", "=", 1],
-        ["totals.badIndicators", "=", 1],
-        ["items.noIndicators.0.text", "=", "button"],
-        ["items.noCursors.0.tagName", "=", "LI"],
-        ["items.badIndicators.0.id", "=", "li2"]
+        [
+          "result.rules.hover.data.totals.noIndicators",
+          "=",
+          1
+        ],
+        [
+          "result.rules.hover.data.totals.noCursors",
+          "=",
+          1
+        ],
+        [
+          "result.rules.hover.data.totals.badIndicators",
+          "=",
+          1
+        ],
+        [
+          "result.rules.hover.data.items.noIndicators.0.text",
+          "=",
+          "button"
+        ],
+        [
+          "result.rules.hover.data.items.noCursors.0.tagName",
+          "=",
+          "LI"
+        ],
+        [
+          "result.rules.hover.data.items.badIndicators.0.id",
+          "=",
+          "li2"
+        ]
+      ],
+      "rules": [
+        "y",
+        "hover"
       ]
     }
   ],
@@ -113,6 +295,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2002-11-12T09:31:00",
+  "creationTime": "2013-05-28T12:00:00",
   "timeStamp": "00000"
 }

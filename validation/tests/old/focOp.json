@@ -1,0 +1,62 @@
+{
+  "id": "focOp",
+  "what": "validation of focOp test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/focOp/good.html",
+      "what": "page with standard focusability and operability"
+    },
+    {
+      "type": "test",
+      "which": "focOp",
+      "what": "focusability and operability",
+      "withItems": false,
+      "expect": [
+        ["totals.total", "=", 3],
+        ["totals.types.onlyFocusable.total", "=", 0],
+        ["totals.types.onlyOperable.total", "=", 0],
+        ["totals.types.focusableAndOperable.total", "=", 3],
+        ["totals.types.focusableAndOperable.tagNames.A", "=", 1],
+        ["totals.types.focusableAndOperable.tagNames.BUTTON", "=", 1],
+        ["totals.types.focusableAndOperable.tagNames.INPUT", "=", 1]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/focOp/bad.html",
+      "what": "page with deviant focusability and operability"
+    },
+    {
+      "type": "test",
+      "which": "focOp",
+      "what": "focusability and operability",
+      "withItems": false,
+      "expect": [
+        ["totals.total", "=", 6],
+        ["totals.types.onlyFocusable.total", "=", 1],
+        ["totals.types.onlyFocusable.tagNames.SPAN", "=", 1],
+        ["totals.types.onlyOperable.total", "=", 3],
+        ["totals.types.onlyOperable.tagNames.BUTTON", "=", 1],
+        ["totals.types.onlyOperable.tagNames.SPAN", "=", 2],
+        ["totals.types.focusableAndOperable.total", "=", 2],
+        ["totals.types.focusableAndOperable.tagNames.A", "=", 1],
+        ["totals.types.focusableAndOperable.tagNames.INPUT", "=", 1]
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2002-11-12T09:31:00",
+  "timeStamp": "00000"
+}

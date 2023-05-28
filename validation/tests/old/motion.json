@@ -1,0 +1,62 @@
+{
+  "id": "motion",
+  "what": "validation of motion test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "webkit",
+      "what": "used for tests on which chromium fails on some URLs"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/motion/good.html",
+      "what": "page without motion"
+    },
+    {
+      "type": "test",
+      "which": "motion",
+      "what": "spontaneous change of content",
+      "delay": 2400,
+      "interval": 2600,
+      "count": 5,
+      "expect": [
+        ["meanLocalRatio", "=", 1],
+        ["maxLocalRatio", "=", 1],
+        ["globalRatio", "=", 1],
+        ["meanPixelChange", "=", 0],
+        ["maxPixelChange", "=", 0],
+        ["changeFrequency", "=", 0]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/motion/bad.html",
+      "what": "page with motion"
+    },
+    {
+      "type": "test",
+      "which": "motion",
+      "what": "spontaneous change of content",
+      "delay": 2400,
+      "interval": 2600,
+      "count": 5,
+      "expect": [
+        ["meanLocalRatio", ">", 1],
+        ["maxLocalRatio", ">", 1],
+        ["globalRatio", ">", 1],
+        ["meanPixelChange", ">", 0],
+        ["maxPixelChange", ">", 0],
+        ["changeFrequency", ">", 0]
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2002-11-12T09:31:00",
+  "timeStamp": "00000"
+}

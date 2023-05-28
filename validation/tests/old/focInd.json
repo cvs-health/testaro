@@ -1,0 +1,69 @@
+{
+  "id": "focInd",
+  "what": "validation of focInd test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/focInd/good.html",
+      "what": "page with outline focus indication"
+    },
+    {
+      "type": "test",
+      "which": "focInd",
+      "revealAll": false,
+      "allowedDelay": 0,
+      "withItems": false,
+      "what": "focus indication",
+      "expect": [
+        ["totals.total", "=", 4],
+        ["totals.types.indicatorMissing.total", "=", 0],
+        ["totals.types.nonOutlinePresent.total", "=", 0],
+        ["totals.types.outlinePresent.total", "=", 4],
+        ["totals.types.outlinePresent.tagNames.A", "=", 1],
+        ["totals.types.outlinePresent.tagNames.BUTTON", "=", 1],
+        ["totals.types.outlinePresent.tagNames.INPUT", "=", 2]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/focInd/bad.html",
+      "what": "page with mixed focus indication"
+    },
+    {
+      "type": "test",
+      "which": "focInd",
+      "revealAll": false,
+      "allowedDelay": 150,
+      "withItems": true,
+      "what": "focus indication",
+      "expect": [
+        ["totals.total", "=", 9],
+        ["totals.types.indicatorMissing.total", "=", 3],
+        ["totals.types.indicatorMissing.tagNames.A", "=", 1],
+        ["totals.types.indicatorMissing.tagNames.INPUT", "=", 2],
+        ["totals.types.nonOutlinePresent.total", "=", 3],
+        ["totals.types.nonOutlinePresent.tagNames.A", "=", 1],
+        ["totals.types.nonOutlinePresent.tagNames.BUTTON", "=", 1],
+        ["totals.types.nonOutlinePresent.tagNames.INPUT", "=", 1],
+        ["totals.types.outlinePresent.total", "=", 3],
+        ["totals.types.outlinePresent.tagNames.A", "=", 1],
+        ["totals.types.outlinePresent.tagNames.BUTTON", "=", 1],
+        ["totals.types.outlinePresent.tagNames.INPUT", "=", 1]
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2002-11-12T09:31:00",
+  "timeStamp": "00000"
+}

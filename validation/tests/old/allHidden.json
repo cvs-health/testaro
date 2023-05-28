@@ -1,0 +1,314 @@
+{
+  "id": "allHidden",
+  "what": "validation of allHidden test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/allHidden/good.html",
+      "what": "page with nothing hidden"
+    },
+    {
+      "type": "test",
+      "which": "allHidden",
+      "what": "entirely or mainly hidden page",
+      "expect": [
+        ["hidden.document", "=", false],
+        ["hidden.body", "=", false],
+        ["hidden.main", "=", false],
+        ["reallyHidden.document", "=", false],
+        ["reallyHidden.body", "=", false],
+        ["reallyHidden.main", "=", false],
+        ["display.document", "=", "block"],
+        ["display.body", "=", "block"],
+        ["display.main", "=", "block"],
+        ["visHidden.document", "=", false],
+        ["visHidden.body", "=", false],
+        ["visHidden.main", "=", false],
+        ["ariaHidden.document", "=", false],
+        ["ariaHidden.body", "=", false],
+        ["ariaHidden.main", "=", false]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/allHidden/noBody.html",
+      "what": "page with no body"
+    },
+    {
+      "type": "test",
+      "which": "allHidden",
+      "what": "entirely or mainly hidden page",
+      "expect": [
+        ["hidden.document", "=", false],
+        ["hidden.body", "=", false],
+        ["hidden.main", "=", false],
+        ["reallyHidden.document", "=", false],
+        ["reallyHidden.body", "=", false],
+        ["reallyHidden.main", "=", false],
+        ["display.document", "=", "block"],
+        ["visHidden.document", "=", false],
+        ["visHidden.body", "=", false],
+        ["visHidden.main", "=", false],
+        ["ariaHidden.document", "=", false],
+        ["ariaHidden.body", "=", false],
+        ["ariaHidden.main", "=", false]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/allHidden/noMain.html",
+      "what": "page with no main landmark"
+    },
+    {
+      "type": "test",
+      "which": "allHidden",
+      "what": "entirely or mainly hidden page",
+      "expect": [
+        ["hidden.document", "=", false],
+        ["hidden.body", "=", false],
+        ["hidden.main", "=", false],
+        ["reallyHidden.document", "=", false],
+        ["reallyHidden.body", "=", false],
+        ["reallyHidden.main", "=", false],
+        ["display.document", "=", "block"],
+        ["display.body", "=", "block"],
+        ["visHidden.document", "=", false],
+        ["visHidden.body", "=", false],
+        ["visHidden.main", "=", false],
+        ["ariaHidden.document", "=", false],
+        ["ariaHidden.body", "=", false],
+        ["ariaHidden.main", "=", false]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/allHidden/hiddenMain.html",
+      "what": "page with a hidden main landmark"
+    },
+    {
+      "type": "test",
+      "which": "allHidden",
+      "what": "entirely or mainly hidden page",
+      "expect": [
+        ["hidden.document", "=", false],
+        ["hidden.body", "=", false],
+        ["hidden.main", "=", true],
+        ["reallyHidden.document", "=", false],
+        ["reallyHidden.body", "=", false],
+        ["reallyHidden.main", "=", true],
+        ["display.document", "=", "block"],
+        ["display.body", "=", "block"],
+        ["display.main", "=", "none"],
+        ["visHidden.document", "=", false],
+        ["visHidden.body", "=", false],
+        ["visHidden.main", "=", false],
+        ["ariaHidden.document", "=", false],
+        ["ariaHidden.body", "=", false],
+        ["ariaHidden.main", "=", false]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/allHidden/visHiddenMain.html",
+      "what": "page with a visually hidden main landmark"
+    },
+    {
+      "type": "test",
+      "which": "allHidden",
+      "what": "entirely or mainly hidden page",
+      "expect": [
+        ["hidden.document", "=", false],
+        ["hidden.body", "=", false],
+        ["hidden.main", "=", false],
+        ["reallyHidden.document", "=", false],
+        ["reallyHidden.body", "=", false],
+        ["reallyHidden.main", "=", false],
+        ["display.document", "=", "block"],
+        ["display.body", "=", "block"],
+        ["display.main", "=", "block"],
+        ["visHidden.document", "=", false],
+        ["visHidden.body", "=", false],
+        ["visHidden.main", "=", true],
+        ["ariaHidden.document", "=", false],
+        ["ariaHidden.body", "=", false],
+        ["ariaHidden.main", "=", false]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/allHidden/ariaHiddenMain.html",
+      "what": "page with an ARIA-hidden main landmark"
+    },
+    {
+      "type": "test",
+      "which": "allHidden",
+      "what": "entirely or mainly hidden page",
+      "expect": [
+        ["hidden.document", "=", false],
+        ["hidden.body", "=", false],
+        ["hidden.main", "=", false],
+        ["reallyHidden.document", "=", false],
+        ["reallyHidden.body", "=", false],
+        ["reallyHidden.main", "=", false],
+        ["display.document", "=", "block"],
+        ["display.body", "=", "block"],
+        ["display.main", "=", "block"],
+        ["visHidden.document", "=", false],
+        ["visHidden.body", "=", false],
+        ["visHidden.main", "=", false],
+        ["ariaHidden.document", "=", false],
+        ["ariaHidden.body", "=", false],
+        ["ariaHidden.main", "=", true]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/allHidden/mixedHidden0.html",
+      "what": "page with mixed hidden states"
+    },
+    {
+      "type": "test",
+      "which": "allHidden",
+      "what": "entirely or mainly hidden page",
+      "expect": [
+        ["hidden.document", "=", false],
+        ["hidden.body", "=", false],
+        ["hidden.main", "=", true],
+        ["reallyHidden.document", "=", false],
+        ["reallyHidden.body", "=", false],
+        ["reallyHidden.main", "=", true],
+        ["display.document", "=", "block"],
+        ["display.body", "=", "block"],
+        ["display.main", "=", "none"],
+        ["visHidden.document", "=", false],
+        ["visHidden.body", "=", true],
+        ["visHidden.main", "=", true],
+        ["ariaHidden.document", "=", true],
+        ["ariaHidden.body", "=", false],
+        ["ariaHidden.main", "=", false]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/allHidden/mixedHidden1.html",
+      "what": "page with mixed hidden states"
+    },
+    {
+      "type": "test",
+      "which": "allHidden",
+      "what": "entirely or mainly hidden page",
+      "expect": [
+        ["hidden.document", "=", true],
+        ["hidden.body", "=", false],
+        ["hidden.main", "=", false],
+        ["reallyHidden.document", "=", true],
+        ["reallyHidden.body", "=", false],
+        ["reallyHidden.main", "=", false],
+        ["display.document", "=", "none"],
+        ["display.body", "=", "block"],
+        ["display.main", "=", "block"],
+        ["visHidden.document", "=", false],
+        ["visHidden.body", "=", true],
+        ["visHidden.main", "=", true],
+        ["ariaHidden.document", "=", false],
+        ["ariaHidden.body", "=", false],
+        ["ariaHidden.main", "=", true]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/allHidden/semiHidden.html",
+      "what": "page with mixed hidden states"
+    },
+    {
+      "type": "test",
+      "which": "allHidden",
+      "what": "entirely or mainly hidden page",
+      "expect": [
+        ["hidden.document", "=", false],
+        ["hidden.body", "=", false],
+        ["hidden.main", "=", true],
+        ["reallyHidden.document", "=", false],
+        ["reallyHidden.body", "=", false],
+        ["reallyHidden.main", "=", false],
+        ["display.document", "=", "block"],
+        ["display.body", "=", "block"],
+        ["display.main", "=", "block"],
+        ["visHidden.document", "=", false],
+        ["visHidden.body", "=", false],
+        ["visHidden.main", "=", false],
+        ["ariaHidden.document", "=", false],
+        ["ariaHidden.body", "=", false],
+        ["ariaHidden.main", "=", false]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/allHidden/noneDoc.html",
+      "what": "page with mixed hidden states"
+    },
+    {
+      "type": "test",
+      "which": "allHidden",
+      "what": "entirely or mainly hidden page",
+      "expect": [
+        ["hidden.document", "=", false],
+        ["hidden.body", "=", false],
+        ["hidden.main", "=", false],
+        ["reallyHidden.document", "=", false],
+        ["reallyHidden.body", "=", false],
+        ["reallyHidden.main", "=", false],
+        ["display.document", "=", "none"],
+        ["display.body", "=", "block"],
+        ["display.main", "=", "block"],
+        ["visHidden.document", "=", false],
+        ["visHidden.body", "=", false],
+        ["visHidden.main", "=", false],
+        ["ariaHidden.document", "=", false],
+        ["ariaHidden.body", "=", false],
+        ["ariaHidden.main", "=", false]
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/allHidden/noneMain.html",
+      "what": "page with mixed hidden states"
+    },
+    {
+      "type": "test",
+      "which": "allHidden",
+      "what": "entirely or mainly hidden page",
+      "expect": [
+        ["hidden.document", "=", false],
+        ["hidden.body", "=", false],
+        ["hidden.main", "=", false],
+        ["reallyHidden.document", "=", false],
+        ["reallyHidden.body", "=", false],
+        ["reallyHidden.main", "=", false],
+        ["display.document", "=", "block"],
+        ["display.body", "=", "block"],
+        ["display.main", "=", "none"],
+        ["visHidden.document", "=", false],
+        ["visHidden.body", "=", false],
+        ["visHidden.main", "=", false],
+        ["ariaHidden.document", "=", false],
+        ["ariaHidden.body", "=", false],
+        ["ariaHidden.main", "=", false]
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2002-11-12T09:31:00",
+  "timeStamp": "00000"
+}

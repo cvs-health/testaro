@@ -16,20 +16,54 @@
     },
     {
       "type": "test",
-      "which": "styleDiff",
+      "which": "testaro",
       "withItems": true,
       "what": "styleDiff",
       "expect": [
-        ["totals.adjacentLink.total", "=", 2],
-        ["totals.listLink.total", "=", 2],
-        ["totals.button.total", "=", 2],
-        ["totals.h1.total", "=", 1],
-        ["totals.h2.total", "=", 4],
-        ["totals.adjacentLink.subtotals"],
-        ["totals.listLink.subtotals"],
-        ["totals.button.subtotals"],
-        ["totals.h1.subtotals"],
-        ["totals.h2.subtotals"]
+        [
+          "result.rules.styleDiff.data.totals.adjacentLink.total",
+          "=",
+          2
+        ],
+        [
+          "result.rules.styleDiff.data.totals.listLink.total",
+          "=",
+          2
+        ],
+        [
+          "result.rules.styleDiff.data.totals.button.total",
+          "=",
+          2
+        ],
+        [
+          "result.rules.styleDiff.data.totals.h1.total",
+          "=",
+          1
+        ],
+        [
+          "result.rules.styleDiff.data.totals.h2.total",
+          "=",
+          4
+        ],
+        [
+          "result.rules.styleDiff.data.totals.adjacentLink.subtotals"
+        ],
+        [
+          "result.rules.styleDiff.data.totals.listLink.subtotals"
+        ],
+        [
+          "result.rules.styleDiff.data.totals.button.subtotals"
+        ],
+        [
+          "result.rules.styleDiff.data.totals.h1.subtotals"
+        ],
+        [
+          "result.rules.styleDiff.data.totals.h2.subtotals"
+        ]
+      ],
+      "rules": [
+        "y",
+        "styleDiff"
       ]
     },
     {
@@ -39,25 +73,87 @@
     },
     {
       "type": "test",
-      "which": "styleDiff",
+      "which": "testaro",
       "withItems": true,
       "what": "styleDiff",
       "expect": [
-        ["totals.adjacentLink.total", "=", 2],
-        ["totals.listLink.total", "=", 2],
-        ["totals.button.total", "=", 2],
-        ["totals.h1.total", "=", 1],
-        ["totals.h2.total", "=", 4],
-        ["totals.adjacentLink.subtotals.0", "=", 1],
-        ["totals.adjacentLink.subtotals.1", "=", 1],
-        ["totals.listLink.subtotals.0", "=", 1],
-        ["totals.listLink.subtotals.1", "=", 1],
-        ["totals.button.subtotals.0", "=", 1],
-        ["totals.button.subtotals.1", "=", 1],
-        ["totals.h1.subtotals"],
-        ["totals.h2.subtotals.0", "=", 3],
-        ["totals.h2.subtotals.1", "=", 1],
-        ["items.adjacentLink.textDecorationStyle.double.0", "=", "French information"]
+        [
+          "result.rules.styleDiff.data.totals.adjacentLink.total",
+          "=",
+          2
+        ],
+        [
+          "result.rules.styleDiff.data.totals.listLink.total",
+          "=",
+          2
+        ],
+        [
+          "result.rules.styleDiff.data.totals.button.total",
+          "=",
+          2
+        ],
+        [
+          "result.rules.styleDiff.data.totals.h1.total",
+          "=",
+          1
+        ],
+        [
+          "result.rules.styleDiff.data.totals.h2.total",
+          "=",
+          4
+        ],
+        [
+          "result.rules.styleDiff.data.totals.adjacentLink.subtotals.0",
+          "=",
+          1
+        ],
+        [
+          "result.rules.styleDiff.data.totals.adjacentLink.subtotals.1",
+          "=",
+          1
+        ],
+        [
+          "result.rules.styleDiff.data.totals.listLink.subtotals.0",
+          "=",
+          1
+        ],
+        [
+          "result.rules.styleDiff.data.totals.listLink.subtotals.1",
+          "=",
+          1
+        ],
+        [
+          "result.rules.styleDiff.data.totals.button.subtotals.0",
+          "=",
+          1
+        ],
+        [
+          "result.rules.styleDiff.data.totals.button.subtotals.1",
+          "=",
+          1
+        ],
+        [
+          "result.rules.styleDiff.data.totals.h1.subtotals"
+        ],
+        [
+          "result.rules.styleDiff.data.totals.h2.subtotals.0",
+          "=",
+          3
+        ],
+        [
+          "result.rules.styleDiff.data.totals.h2.subtotals.1",
+          "=",
+          1
+        ],
+        [
+          "result.rules.styleDiff.data.items.adjacentLink.textDecorationStyle.double.0",
+          "=",
+          "French information"
+        ]
+      ],
+      "rules": [
+        "y",
+        "styleDiff"
       ]
     }
   ],
@@ -66,6 +162,6 @@
     "host": {},
     "requester": ""
   },
-  "creationTime": "2002-11-12T09:31:00",
+  "creationTime": "2013-05-28T12:00:00",
   "timeStamp": "00000"
 }
