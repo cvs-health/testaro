@@ -149,12 +149,9 @@ exports.reporter = async (page, withItems) => {
     headingNames.forEach(headingName => {
       tallyStyles(headingName, elements.headings[headingName], headingStyles, withItems);
     });
-    const totals = [
-      data.totals.adjacentLink.subtotals.length - 1,
-      data.totals.listLink.subtotals.length -1,
-      data.totals.button.subtotals.length -1,
-      Object.keys(elements.headings).reduce((sum, current) => sum + data.totals[current].subtotals.length, 0) - 6
-    ];
+    // Report the standandardized data.
+    const totals = [0, 0, 0, 0];
+    const standardInstances = [];
     const elementData = {
       adjacentLink: [0, 'In-line links'],
       listLink: [1, 'Links in columns'],
@@ -166,20 +163,26 @@ exports.reporter = async (page, withItems) => {
       h5: [3, 'Level-5 headings'],
       h6: [3, 'Level-6 headings'],
     };
-    const standardInstances = Object
-    .keys(elementData)
-    .filter(code => data.totals[code].subtotals)
-    .map(code => ({
-      issueID: 'styleDiff',
-      what: `${elementData[code][1]} have ${data.totals[code].subtotals.length} different styles`,
-      ordinalSeverity: elementData[code][0],
-      location: {
-        doc: '',
-        type: '',
-        spec: ''
-      },
-      excerpt: ''
-    }));
+    Object.keys(elementData).forEach(elementName => {
+      const elementTotal = data.totals[elementName];
+      if (elementTotal && elementTotal.subtotals) {
+        const currentData = elementData[elementName];
+        const severity = currentData[0];
+        const elementSubtotals = elementTotal.subtotals;
+        totals[severity] += elementSubtotals.length - 1;
+        standardInstances.push({
+          issueID: 'styleDiff',
+          what: `${currentData[1]} have ${elementSubtotals.length} different styles`,
+          ordinalSeverity: severity,
+          location: {
+            doc: '',
+            type: '',
+            spec: ''
+          },
+          excerpt: ''
+        });
+      }
+    });
     return {
       data,
       totals,
