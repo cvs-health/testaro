@@ -122,7 +122,7 @@ exports.actSpecs = {
       }
     ],
     test: [
-      'Perform a test',
+      'Perform test of a tool',
       {
         which: [true, 'string', 'isTest', 'test name'],
         what: [false, 'string', 'hasLength', 'comment']

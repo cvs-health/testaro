@@ -144,7 +144,7 @@ Here is an example of a job:
       type: 'test',
       which: 'alfa',
       what: 'Siteimprove alfa tool',
-      rules: ['r25', 'r71']
+      rules: ['y', 'r25', 'r71']
     }
   ],
   sources: {
@@ -164,7 +164,7 @@ Here is an example of a job:
 This job contains three _acts_, telling Testaro to:
 1. open a page in the Chromium browser
 1. navigate to a specified URL
-1. perform two of the tests of the `alfa` tool on that URL
+1. perform two of the tests of the `alfa` tool (the tests for rules `r25` and `r71`) on that URL
 
 Job properties:
 - `id`: a string uniquely identifying the job.
@@ -384,20 +384,73 @@ Most tools allow you to decide which of their _rules_ to apply. In effect, this 
   type: 'test',
   which: 'alfa',
   what: 'Siteimprove alfa tool',
-  rules: ['r25', 'r71']
+  rules: ['y', 'r25', 'r71']
 }
 ```
 
-is an act specifying rules of such a tool.
+specifies that the tests for rules `r25` and `r71` of the `alfa` tool are to be run. If the `'y'` in the `rules` array were e`'n'` instead, the act would specify that all the tests of the `alfa` tool **except** those for rules `r25` and `r71` are to be run.
 
-One of the tools that allows rule selection, Testaro, has some rules that take 
-In this case, Testaro runs the WAVE test with report type 1.
+One of the tools that allows rule selection, Testaro, has some rules that take additional arguments. As prescribed in `actSpecs.js`, you can pass such additional arguments to the `reporter` functions of those Testaro tests with an `args` property. Example:
 
-Test acts that specify Testaro tests can include an `args` property
+```javaScript
+{
+  type: 'test',
+  which: 'testaro',
+  what: 'Testaro tool',
+  rules: ['y', 'hover', 'focInd'],
+  args: {
+    hover: [20],
+    focInd: [false, 300]
+  }
+}
+```
+
+This act specifies that the Testaro tests `hover` is to be run with the additional argument `20`, and `focInd` with the additional arguments `false` and `300`.
+
+###### Expectations
+
+Any `test` act can contain an `expect` property. If it does, the value of that property must be an array of arrays. Each array specifies expectations about the results of the operation of the tool.
+
+For example, a `test` act might have this `expect` property:
+
+```javaScript
+'expect': [
+  ['total.links', '=', 5],
+  ['total.links.underlined', '<', 6],
+  ['total.links.outlined'],
+  ['docLang', '!', 'es-ES'],
+  ['items.3.tagName', '=', 'BUTTON']
+]
+```
+
+That would state the expectations that the `result` property of the act will have:
+- a `total.links` property with the value 5
+- a `total.links.underlined` property with a value less than 6
+- **no** `total.links.outlined` property
+- a `docLang` property with a value different from `es-ES`
+- an `items[3].tagName` property with the value `'BUTTON'`
+
+The first item in each array is an identifier of a property within the `result` object. The item has the format of a string with `.` delimiters. Each `.`-delimited segment its the name of the next property in the hierarchy. If the current object is an array, the next segment must be a non-negative integer, representing the index of an element of the array.
+
+If there is only 1 item in an array, it states the expectation that the specified property does not exist. Otherwise, there are 3 items in the array.
+
+The second item in each array, if there are 3 items, is an operator, drawn from:
+- `<`: less than
+- `=`: equal to
+- `>`: greater than
+- `!`: unequal to
+- `i`: includes
+- `e`: equivalent to (parsed identically as JSON)
+
+The third item in each array, if there are 3 items in the array, is the criterion with which the value of the first property is compared.
+
+A typical use for an `expect` property is checking the correctness of a Testaro test. Thus, the validation jobs in the `validation/tests/jobs` directory all contain `test` acts with `expect` properties. See the “Validation” section below.
+
+When a `test` act has an `expect` property, the result for that act has an `expectations` property reporting whether the expectations were satisfied. The value of `expectations` is an array of objects, one object per expectation. Each object includes a `property` property identifying the expectation, and a `passed` property with `true` or `false` value reporting whether the expectation was satisfied. If applicable, it also has other properties identifying what was expected and what was actually reported.
 
 ###### Continuum
 
-The `continuum` tests makes use of the files in the `continuum` directory. The test inserts the contents of all three files into the page as scripts and then uses them to perform the tests of the Continuum tool.
+The `continuum` tests makes use of the files in the `continuum` directory. The tool inserts the contents of all three files into the page as scripts and then uses them to perform the tests.
 
 Level Access on 22 August 2022 granted authorization for the copying of the `AccessEngine.community.js` file insofar as necessary for allowing Continuum community edition tests to be included in Testaro.
 
@@ -424,11 +477,9 @@ results.label = results.label.replace(/:/g, '-');
 
 These changes were proposed as pull requests 1333 and 1334 (https://github.com/IBMa/equal-access/pulls).
 
-If you choose to invoke the `ibm` tests with the `withNewContent` property specified, you will choose whether the tested content is the content of the existing page or is retrieved anew with the document URL. Typically, both methods succeed and deliver similar results. However, sometimes one method succeeds and the other fails, or one method reports more violations than the other does. In those cases, most often the success, or the larger violation count, arises from the existing page (`withNewContent: false`).
-
 ###### HTML CodeSniffer
 
-The `htmlcs` tests make use of the `htmlcs/HTMLCS.js` file. That file was created, and can be recreated if necessary, as follows:
+The `htmlcs` tool makes use of the `htmlcs/HTMLCS.js` file. That file was created, and can be recreated if necessary, as follows:
 
 1. Clone the [HTML CodeSniffer package](https://github.com/squizlabs/HTML_CodeSniffer).
 1. Make that package’s directory the active directory.
@@ -460,7 +511,7 @@ The changes in `htmlcs/HTMLCS.js` are:
 
 ###### QualWeb
 
-A `qualWeb` test act performs the ACT rules, WCAG Techniques, and best-practices tests of QualWeb. Only failures and warnings are included in the report. The EARL report of QualWeb is not generated, because it is equivalent to the report of the ACT rules tests.
+The `qualWeb` tool performs the ACT rules, WCAG Techniques, and best-practices tests of QualWeb. Only failures and warnings are included in the report. The EARL report of QualWeb is not generated, because it is equivalent to the report of the ACT rules tests.
 
 ###### Tenon
 
@@ -490,7 +541,7 @@ Example:
   }
 ```
 
-The reason for this is that the Tenon API operates asynchronously. You ask it to perform a test, and it puts your request into a queue. To learn whether Tenon has completed your test, you make a status request. You can continue making status requests until Tenon replies that your test has been completed. Then you submit a request for the test result, and Tenon replies with the result. (As of May 2022, however, status requests were observed to misreport still-running tests as completed. The `tenon` test act works around that by requesting only the result and using the response to determine whether the tests have been completed.)
+The reason is that the Tenon API operates asynchronously. You ask it to perform a test, and it puts your request into a queue. To learn whether Tenon has completed your test, you make a status request. You can continue making status requests until Tenon replies that your test has been completed. Then you submit a request for the test result, and Tenon replies with the result. (As of May 2022, however, status requests were observed to misreport still-running tests as completed. The `tenon` test act works around that by requesting only the result and using the response to determine whether the tests have been completed.)
 
 Tenon says that tests are typically completed in 3 to 6 seconds but that the latency can be longer, depending on demand.
 
@@ -571,7 +622,7 @@ The requirement `which: [true, 'string', 'hasLength', 'substring of the link tex
 
 In most cases, the array has length 4:
 - 0. Is the property (here `which`) required (`true` or `false`)? The value `true` here means that every `link`-type act **must** contain a `which` property.
-- 1. What format must the property value have (`'string'`, `'array'`, `'boolean'`, or `'number'`)?
+- 1. What format must the property value have (`'string'`, `'array'`, `'boolean'`, `'number'`, or `'object'`)?
 - 2. What other validity criterion applies (if any)? (Empty string if none.) The `hasLength` criterion means that the string must be at least 1 character long.
 - 3. Description of the property. In this example, the description says that the value of `which` must be a substring of the text content of the link that is to be clicked. Thus, a `link` act tells Testaro to find the first link whose text content has this substring and click it.
 
@@ -584,39 +635,6 @@ The validity criterion named in item 2 may be any of these:
 - `'isTest'`: is the name of a test
 - `'isWaitable'`: is `'url'`, `'title'`, or `'body'`
 - `'areStrings'`: is an array of strings
-
-Any `test` act can also (in addition to the requirements in `actSpecs.js`) contain an `expect` property. If it does, the value of that property must be an array of arrays. Each array specifies expectations about the results of the test.
-
-For example, a `test` act might have this `expect` property:
-
-```javaScript
-'expect': [
-  ['total.links', '=', 5],
-  ['total.links.underlined', '<', 6],
-  ['total.links.outlined'],
-  ['docLang', '!', 'es-ES']
-]
-```
-
-That would state the expectation that the `result` property of the act for that test in the report will have a `total.links` property with the value 5, a `total.links.underlined` property with a value less than 6, **no** `total.links.outlined` property, and a `docLang` property with a value different from `es-ES`.
-
-The first item in each array is an identifier of a property within the `result` property. The item has the format of a string with `.` delimiters. Each `.`-delimited segment its the name of the next property in the hierarchy. If the current object is an array, the next segment must be a non-negative integer, representing the index of an element of the array. For example, `items.1.attributes.0` references the first element of the array that is the `attributes` property of the object that is the second element of the array that is the `items` property of `result`. (In JavaScript, this would be written `items[1].attributes[0]`, but in the `expect` property all property names are `.`-delimited.)
-
-If there is only 1 item in an array, it states the expectation that the specified property does not exist. Otherwise, there are 3 items in the array.
-
-The second item in each array, if there are 3 items in the array, is an operator, drawn from:
-- `<`: less than
-- `=`: equal to
-- `>`: greater than
-- `!`: unequal to
-- `i`: includes
-- `e`: equivalent to (parsed identically as JSON)
-
-The third item in each array, if there are 3 items in the array, is the criterion with which the value of the first property is compared.
-
-A typical use for an `expect` property is checking the correctness of a Testaro test. Thus, the validation jobs in the `validation/tests/jobs` directory all contain `test` acts with `expect` properties. See the “Validation” section below.
-
-When a `test` act has an `expect` property, the result for that act has an `expectations` property reporting whether the expectations were satisfied. The value of `expectations` is an array of objects, one object per expectation. Each object includes a `property` property identifying the expectation, and a `passed` property with `true` or `false` value reporting whether the expectation was satisfied. If applicable, it also has other properties identifying what was expected and what was actually reported.
 
 ## Execution
 
@@ -751,7 +769,7 @@ DEBUG=false
 
 ### Validators
 
-Testaro and its custom tests can be validated with the _executors_ located in the `validation/executors` directory.
+Testaro and the tests of the Testaro tool can be validated with the _executors_ located in the `validation/executors` directory.
 
 The executor for a single test is `test`. To execute it for any test `xyz`, call it with the statement `npm test xyz`.
 
