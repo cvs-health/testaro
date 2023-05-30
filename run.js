@@ -29,7 +29,7 @@ const moves = {
   radio: 'input[type=radio]',
   search: 'input[type=search], input[aria-label*=search i], input[placeholder*=search i]',
   select: 'select',
-  text: 'input[type=text], input:not([type])'
+  text: 'input'
 };
 // Names and descriptions of tests.
 const tests = {
