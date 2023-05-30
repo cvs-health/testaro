@@ -147,7 +147,7 @@ exports.actSpecs = {
     wait: [
       'Wait until something appears',
       {
-        what: [true, 'string', 'isWaitable', 'waitable item type'],
+        what: [true, 'string', 'isWaitable', 'waitable item type (url, title, or body)'],
         which: [true, 'string', 'hasLength', 'substring of waitable-item text']
       }
     ]
