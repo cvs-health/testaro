@@ -1532,7 +1532,6 @@ exports.doJob = async report => {
     report.jobData.errorLogCount = 0;
     report.jobData.errorLogSize = 0;
     report.jobData.prohibitedCount = 0;
-    report.jobData.visitTimeoutCount = 0;
     report.jobData.visitRejectionCount = 0;
     report.jobData.aborted = false;
     report.jobData.abortedAct = null;
