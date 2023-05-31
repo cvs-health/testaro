@@ -28,12 +28,17 @@ const doAxe = (result, standardResult, certainty) => {
           ... node.any.map(anyItem => anyItem.message),
           ... node.all.map(allItem => allItem.message)
         ]);
-        const initialSeverity = ['minor', 'moderate', 'serious', 'critical'].indexOf(node.impact);
-        const moreSeverity = certainty === 'violations' ? 4 : 0;
+        const severityWeights = {
+          minor: 0,
+          moderate: 0,
+          serious: 1,
+          critical: 1
+        };
+        const ordinalSeverity = severityWeights[node.impact] + (certainty === 'violations' ? 2 : 0);
         const instance = {
           issueID: rule.id,
           what: Array.from(whatSet.values()).join('; '), 
-          ordinalSeverity: initialSeverity + moreSeverity,
+          ordinalSeverity,
           location: {
             doc: 'dom',
             type: 'selector',
@@ -57,7 +62,7 @@ const doHTMLCS = (result, standardResult, severity) => {
           const instance = {
             issueID: ruleID,
             what,
-            ordinalSeverity: ['Warning', 'Error'].indexOf(severity),
+            ordinalSeverity: ['Warning', '', '', 'Error'].indexOf(severity),
             location: {
               doc: 'dom',
               type: '',
@@ -92,7 +97,7 @@ const doNuVal = (result, standardResult, docType) => {
         instance.ordinalSeverity = 0;
       }
       else if (type === 'error') {
-        instance.ordinalSeverity = subType === 'fatal' ? 2 : 1;
+        instance.ordinalSeverity = subType === 'fatal' ? 3 : 2;
       }
       standardResult.instances.push(instance);
     });
@@ -102,21 +107,40 @@ const doNuVal = (result, standardResult, docType) => {
 const doQualWeb = (result, standardResult, ruleClassName) => {
   if (result.modules && result.modules[ruleClassName]) {
     const ruleClass = result.modules[ruleClassName];
-    let classSeverity = 0;
-    if (ruleClass.metadata) {
-      classSeverity = 2 * [
-        'best-practices', 'wcag-techniques', 'act-rules'
-      ].indexOf(ruleClassName);
-      standardResult.totals[classSeverity] += ruleClass.metadata.warning;
-      standardResult.totals[classSeverity + 1] += ruleClass.metadata.failed;
+    if (ruleClass.metadata && ruleClass.modules) {
+      const {modules} = ruleClass;
+      const ruleTotals = modules['act-rules'] && modules['act-rules'].metadata;
+      const techniqueTotals = modules['wcag-techniques'] && modules['wcag-techniques'].metadata;
+      const practiceTotals = modules['best-practices'] && modules['best-practices'].metadata;
+      standardResult.totals = [
+        practiceTotals.warning + techniqueTotals.warning,
+        practiceTotals.failed + ruleTotals.warning,
+        techniqueTotals.failed,
+        ruleTotals.failed
+      ];
     }
+    const severities = {
+      'best-practices': {
+        warning: 0,
+        failed: 1
+      },
+      'wcag-techniques': {
+        warning: 0,
+        failed: 2
+      },
+      'act-rules': {
+        warning: 1,
+        failed: 3
+      }
+    };
     Object.keys(ruleClass.assertions).forEach(rule => {
-      ruleClass.assertions[rule].results.forEach(item => {
+      const ruleResult = ruleClass.assertions[rule];
+      ruleResult.results.forEach(item => {
         item.elements.forEach(element => {
           const instance = {
-            issueID: ruleClass.assertions[rule].name,
-            what: ruleClass.assertions[rule].description,
-            ordinalSeverity: classSeverity + (item.verdict === 'failed' ? 1 : 0),
+            issueID: rule,
+            what: ruleResult.description,
+            ordinalSeverity: severities[ruleClass][item.verdict],
             location: {
               doc: 'dom',
               type: 'selector',
@@ -181,21 +205,17 @@ const convert = (testName, result, standardResult) => {
   ) {
     const {totals} = result;
     standardResult.totals = [
-      totals.warnings.minor,
-      totals.warnings.moderate,
-      totals.warnings.serious,
-      totals.warnings.critical,
-      totals.violations.minor,
-      totals.violations.moderate,
-      totals.violations.serious,
-      totals.violations.critical
+      totals.warnings.minor + totals.warnings.moderate,
+      totals.warnings.serious + totals.warnings.critical,
+      totals.violations.minor + totals.violations.moderate,
+      totals.violations.serious + totals.violations.critical
     ];
     doAxe(result, standardResult, 'incomplete');
     doAxe(result, standardResult, 'violations');
   }
   // continuum
   else if (testName === 'continuum' && Array.isArray(result) && result.length) {
-    standardResult.totals = [result.length];
+    standardResult.totals = [0, 0, 0, result.length];
     result.forEach(item => {
       const instance = {
         issueID: item.engineTestId.toString(),
@@ -223,7 +243,7 @@ const convert = (testName, result, standardResult) => {
   }
   // ibm
   else if (testName === 'ibm' && result.totals) {
-    standardResult.totals = [result.totals.recommendation, result.totals.violation];
+    standardResult.totals = [0, result.totals.recommendation, 0, result.totals.violation];
     result.items.forEach(item => {
       const instance = {
         issueID: item.ruleId,
@@ -282,7 +302,7 @@ const convert = (testName, result, standardResult) => {
         issueID: item.tID ? item.tID.toString() : '',
         what: item.errorTitle || '',
         ordinalSeverity: Math.min(
-          5, Math.max(0, Math.round((item.certainty || 0) * (item.priority || 0) / 2000))
+          3, Math.max(0, Math.round((item.certainty || 0) * (item.priority || 0) / 3333))
         ),
         location: {
           doc: 'dom',
@@ -293,7 +313,7 @@ const convert = (testName, result, standardResult) => {
       };
       standardResult.instances.push(instance);
     });
-    standardResult.totals = [0, 0, 0, 0, 0, 0];
+    standardResult.totals = [0, 0, 0, 0];
     standardResult.instances.forEach(instance => {
       standardResult.totals[instance.ordinalSeverity]++;
     });

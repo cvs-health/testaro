@@ -218,7 +218,7 @@ The original result of a test act is recorded as the value of a `result` propert
 
 ``` javascript
 standardResult: {
-  totals: [2, 0, 1],
+  totals: [2, 0, 1, 0],
   instances: [
     {
       issueID: 'rule01',
