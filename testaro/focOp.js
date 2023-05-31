@@ -188,7 +188,12 @@ exports.reporter = async (page, withItems) => {
     });
   }
   // Reload the page.
-  await page.reload({timeout: 15000});
+  try {
+    await page.reload({timeout: 15000});
+  }
+  catch(error) {
+    console.log('ERROR: page reload timed out');
+  }
   return {
     data,
     totals,

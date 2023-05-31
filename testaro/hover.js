@@ -433,7 +433,12 @@ exports.reporter = async (page, withItems, sampleSize = -1) => {
     });
   }
   // Reload the page.
-  await page.reload({timeout: 15000});
+  try {
+    await page.reload({timeout: 15000});
+  }
+  catch(error) {
+    console.log('ERROR: page reload timed out');
+  }
   // Return the result.
   return {
     data,
