@@ -86,7 +86,7 @@ exports.reporter = async (page, withItems) => {
           standardInstances.push({
             issueID: 'radioSet',
             what: 'Radio button and others with its name are not grouped in their own fieldset with a legend',
-            ordinalSeverity: 0,
+            ordinalSeverity: 2,
             location: {
               doc: '',
               type: '',
@@ -100,7 +100,7 @@ exports.reporter = async (page, withItems) => {
         standardInstances.push({
           issueID: 'radioSet',
           what: 'Radio buttons are not validly grouped in fieldsets with legends',
-          ordinalSeverity: 1,
+          ordinalSeverity: 2,
           location: {
             doc: '',
             type: '',
@@ -111,7 +111,7 @@ exports.reporter = async (page, withItems) => {
       }
       return {
         data,
-        totals: [0, totals.total - totals.inSet, 0, 0],
+        totals: [0, 0, totals.total - totals.inSet, 0],
         standardInstances
       };
     }

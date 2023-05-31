@@ -107,6 +107,8 @@ const isFocusable = string => ['a', 'button', 'input', 'select'].includes(string
 const areNumbers = array => array.every(element => typeof element === 'number');
 // Returns whether all elements of an array are strings.
 const areStrings = array => array.every(element => typeof element === 'string');
+// Returns whether all properties of an object have array values.
+const areArrays = object => Object.values(object).every(value => Array.isArray(value));
 // Returns whether a variable has a specified type.
 const hasType = (variable, type) => {
   if (type === 'string') {
@@ -154,6 +156,9 @@ const hasSubtype = (variable, subtype) => {
     }
     else if (subtype === 'areStrings') {
       return areStrings(variable);
+    }
+    else if (subtype === 'areArrays') {
+      return areArrays(variable);
     }
     else if (subtype === 'isState') {
       return isState(variable);

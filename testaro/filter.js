@@ -43,7 +43,7 @@ exports.reporter = async (page, withItems) => {
     }
     return data;
   }, withItems);
-  const totals = [0, data.totals.impactedElements, data.totals.styledElements, 0, 0];
+  const totals = [0, data.totals.impactedElements, data.totals.styledElements, 0];
   const standardInstances = [];
   if (data.items) {
     data.items.forEach(item => {

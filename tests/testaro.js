@@ -29,7 +29,6 @@ const evalRules = {
   role: 'invalid, inadvised, and redundant explicit roles',
   styleDiff: 'style inconsistencies',
   tabNav: 'nonstandard keyboard navigation between elements with the tab role',
-  title: 'missing page title',
   titledEl: 'title attributes on inappropriate elements',
   zIndex: 'non-default Z indexes'
 };

@@ -147,7 +147,7 @@ const doQualWeb = (result, standardResult, ruleClassName) => {
 const doWAVE = (result, standardResult, categoryName) => {
   if (result.categories && result.categories[categoryName]) {
     const category = result.categories[categoryName];
-    const ordinalSeverity = categoryName === 'alert' ? 0 : 1;
+    const ordinalSeverity = categoryName === 'alert' ? 0 : 3;
     Object.keys(category.items).forEach(rule => {
       category.items[rule].selectors.forEach(selector => {
         const instance = {
@@ -170,12 +170,12 @@ const doWAVE = (result, standardResult, categoryName) => {
 const convert = (testName, result, standardResult) => {
   // alfa
   if (testName === 'alfa' && result.totals) {
-    standardResult.totals = [result.totals.warnings, result.totals.failures];
+    standardResult.totals = [result.totals.warnings, 0, 0, result.totals.failures];
     result.items.forEach(item => {
       const instance = {
         issueID: item.rule.ruleID,
         what: item.rule.ruleSummary,
-        ordinalSeverity: ['cantTell', 'failed'].indexOf(item.verdict),
+        ordinalSeverity: ['cantTell', '', '', 'failed'].indexOf(item.verdict),
         location: {
           doc: 'dom',
           type: 'xpath',
@@ -227,7 +227,9 @@ const convert = (testName, result, standardResult) => {
     const {instances} = standardResult;
     standardResult.totals = [
       instances.filter(instance => instance.ordinalSeverity === 0).length,
-      instances.filter(instance => instance.ordinalSeverity === 1).length
+      0,
+      0,
+      instances.filter(instance => instance.ordinalSeverity === 3).length
     ];
   }
   // ibm
@@ -237,7 +239,7 @@ const convert = (testName, result, standardResult) => {
       const instance = {
         issueID: item.ruleId,
         what: item.message,
-        ordinalSeverity: ['recommendation', 'violation'].indexOf(item.level),
+        ordinalSeverity: ['', 'recommendation', '', 'violation'].indexOf(item.level),
         location: {
           doc: 'dom',
           type: 'xpath',
@@ -259,8 +261,9 @@ const convert = (testName, result, standardResult) => {
     const {instances} = standardResult;
     standardResult.totals = [
       instances.filter(instance => instance.ordinalSeverity === 0).length,
-      instances.filter(instance => instance.ordinalSeverity === 1).length,
-      instances.filter(instance => instance.ordinalSeverity === 2).length
+      0,
+      instances.filter(instance => instance.ordinalSeverity === 2).length,
+      instances.filter(instance => instance.ordinalSeverity === 3).length,
     ];
   }
   // qualWeb
@@ -314,7 +317,7 @@ const convert = (testName, result, standardResult) => {
     rules.forEach(rule => {
       const ruleResult = result.rules[rule];
       standardResult.totals.forEach((total, index) => {
-        standardResult.totals[index] += ruleResult.totals[index];
+        standardResult.totals[index] += ruleResult.totals[index] || 0;
       });
       standardResult.instances.push(... ruleResult.standardInstances);
     });
@@ -332,7 +335,10 @@ const convert = (testName, result, standardResult) => {
   ) {
     const {categories} = result;
     standardResult.totals = [
-      categories.alert.count || 0, (categories.error.count || 0) + (categories.contrast.count || 0)
+      categories.alert.count || 0,
+      0,
+      0,
+      (categories.error.count || 0) + (categories.contrast.count || 0)
     ];
     ['error', 'contrast', 'alert'].forEach(categoryName => {
       doWAVE(result, standardResult, categoryName);
