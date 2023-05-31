@@ -107,18 +107,6 @@ const doNuVal = (result, standardResult, docType) => {
 const doQualWeb = (result, standardResult, ruleClassName) => {
   if (result.modules && result.modules[ruleClassName]) {
     const ruleClass = result.modules[ruleClassName];
-    if (ruleClass.metadata && ruleClass.modules) {
-      const {modules} = ruleClass;
-      const ruleTotals = modules['act-rules'] && modules['act-rules'].metadata;
-      const techniqueTotals = modules['wcag-techniques'] && modules['wcag-techniques'].metadata;
-      const practiceTotals = modules['best-practices'] && modules['best-practices'].metadata;
-      standardResult.totals = [
-        practiceTotals.warning + techniqueTotals.warning,
-        practiceTotals.failed + ruleTotals.warning,
-        techniqueTotals.failed,
-        ruleTotals.failed
-      ];
-    }
     const severities = {
       'best-practices': {
         warning: 0,
@@ -140,7 +128,7 @@ const doQualWeb = (result, standardResult, ruleClassName) => {
           const instance = {
             issueID: rule,
             what: ruleResult.description,
-            ordinalSeverity: severities[ruleClass][item.verdict],
+            ordinalSeverity: severities[ruleClassName][item.verdict],
             location: {
               doc: 'dom',
               type: 'selector',
@@ -149,6 +137,7 @@ const doQualWeb = (result, standardResult, ruleClassName) => {
             excerpt: cap(element.htmlCode)
           };
           standardResult.instances.push(instance);
+          standardResult.totals[instance.ordinalSeverity]++;
         });
       });
     });
@@ -284,7 +273,7 @@ const convert = (testName, result, standardResult) => {
       || result.modules['best-practices']
     )
   ) {
-    standardResult.totals = [0, 0, 0, 0, 0, 0];
+    standardResult.totals = [0, 0, 0, 0];
     if (result.modules['act-rules']) {
       doQualWeb(result, standardResult, 'act-rules');
     }
