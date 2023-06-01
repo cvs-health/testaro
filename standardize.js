@@ -321,7 +321,12 @@ const convert = (testName, result, standardResult) => {
           ? ruleResult.totals[index] || 0
           : 0;
       });
-      standardResult.instances.push(... ruleResult.standardInstances);
+      if (ruleResult.standardInstances) {
+        standardResult.instances.push(... ruleResult.standardInstances);
+      }
+      else {
+        console.log(`ERROR: Testaro rule ${rule} result has no standardInstances property`);
+      }
     });
     standardResult.totals = standardResult.totals.map(total => Math.round(total));
   }
