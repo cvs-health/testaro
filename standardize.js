@@ -312,12 +312,14 @@ const convert = (testName, result, standardResult) => {
   }
   // testaro
   else if (testName === 'testaro') {
-    const rules = Object.keys(result.rules);
+    const rules = result.rules ? Object.keys(result.rules) : [];
     standardResult.totals = [0, 0, 0, 0];
     rules.forEach(rule => {
       const ruleResult = result.rules[rule];
       standardResult.totals.forEach((total, index) => {
-        standardResult.totals[index] += ruleResult.totals[index] || 0;
+        standardResult.totals[index] += ruleResult && ruleResult.totals
+          ? ruleResult.totals[index] || 0
+          : 0;
       });
       standardResult.instances.push(... ruleResult.standardInstances);
     });
@@ -349,5 +351,10 @@ const convert = (testName, result, standardResult) => {
 exports.standardize = act => {
   const {which} = act;
   const {result, standardResult} = act;
-  convert(which, result, standardResult);
+  if (which && result && standardResult) {
+    convert(which, result, standardResult);
+  }
+  else {
+    console.log('ERROR: Result of incomplete act cannot be standardized');
+  }
 };

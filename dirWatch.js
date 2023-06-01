@@ -1,6 +1,6 @@
 /*
   dirWatch.js
-  Module for launching a one-time directory watch.
+  Module for launching a repeated one-time directory watch.
 */
 
 // ########## IMPORTS

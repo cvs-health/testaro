@@ -7,10 +7,10 @@ ibmOutput/
 
 # Secrets
 .env
+.npmrc
 
 # System files
 .DS_Store
 
 # Development configurations
 .vscode/
-.npmrc
