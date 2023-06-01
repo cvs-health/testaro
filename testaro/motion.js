@@ -122,7 +122,7 @@ exports.reporter = async (page, withItems, delay = 2500, interval = 2500, count 
         || 0,
         0
       ],
-      standardInstances: [{
+      standardInstances: globalRatio > 1 ? [{
         issueID: 'motion',
         what: 'Content moves or changes without user request',
         ordinalSeverity: 2,
@@ -132,7 +132,7 @@ exports.reporter = async (page, withItems, delay = 2500, interval = 2500, count 
           spec: ''
         },
         excerpt: ''
-      }]
+      }] : []
     };
   }
   // Otherwise, i.e. if the shooting failed:

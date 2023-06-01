@@ -10,7 +10,11 @@ exports.reporter = async (page, withItems) => {
   // Identify the elements with filter style properties.
   const data = await page.evaluate(withItems => {
     // Returns a space-minimized copy of a string.
-    const compact = string => string.replace(/[\t\n]/g, '').replace(/\s{2,}/g, ' ').trim();
+    const compact = string => string
+    .replace(/[\t\n]/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim()
+    .slice(0, 100);
     // Get all elements in the body.
     const elements = Array.from(document.body.querySelectorAll('*'));
     // Get those that have filter styles.
@@ -36,7 +40,7 @@ exports.reporter = async (page, withItems) => {
       filterData.forEach(filterDatum => {
         data.items.push({
           tagName: filterDatum.element.tagName,
-          text: compact(filterDatum.element.textContent),
+          text: compact(filterDatum.element.textContent) || compact(filterDatum.element.outerHTML),
           impact: filterDatum.impact
         });
       });

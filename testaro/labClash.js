@@ -119,7 +119,8 @@ exports.reporter = async (page, withItems) => {
           const item = {
             index,
             tagName: labelee.tagName,
-            type: labelee.type
+            type: labelee.type,
+            texts
           };
           if (
             labelee.tagName === 'BUTTON'
