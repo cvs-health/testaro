@@ -40,6 +40,7 @@ exports.reporter = async (page, withItems) => {
     standardInstances.push({
       issueID: 'linkTo',
       what: 'Links are missing href attributes',
+      count: data.total,
       ordinalSeverity: 2,
       location: {
         doc: '',

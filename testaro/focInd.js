@@ -186,18 +186,35 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
       });
     });
   }
-  else if (types.nonOutlinePresent.total || types.indicatorMissing.total) {
-    standardInstances.push({
-      issueID: 'focInd',
-      what: 'Elements have missing or non-outline focus indicators',
-      ordinalSeverity: types.indicatorMissing.total ? 3 : 2,
-      location: {
-        doc: '',
-        type: '',
-        spec: ''
-      },
-      excerpt: ''
-    });
+  else {
+    if (types.indicatorMissing.total) {
+      standardInstances.push({
+        issueID: 'focInd-missing',
+        what: 'Elements have missing focus indicators',
+        count: types.indicatorMissing.total,
+        ordinalSeverity: 3,
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: ''
+      });
+    }
+    if (types.nonOutlinePresent.total) {
+      standardInstances.push({
+        issueID: 'focInd-nonoutline',
+        what: 'Elements have non-outline focus indicators',
+        count: types.nonOutlinePresent.total,
+        ordinalSeverity: 2,
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: ''
+      });
+    }
   }
   // Reload the page.
   try {

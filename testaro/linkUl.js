@@ -88,6 +88,7 @@ exports.reporter = async (page, withItems) => {
       standardInstances.push({
         issueID: 'linkUl',
         what: 'Inline links are missing underlines',
+        count: adjacent.total - adjacent.underlined,
         ordinalSeverity: 1,
         location: {
           doc: '',

@@ -408,6 +408,7 @@ exports.reporter = async (page, withItems, sampleSize = -1) => {
         standardInstances.push({
           issueID: `hover-${issue}`,
           what: what[issue],
+          count: data.totals[issue],
           ordinalSeverity: severity[issue],
           location: {
             doc: '',
@@ -423,6 +424,7 @@ exports.reporter = async (page, withItems, sampleSize = -1) => {
     standardInstances.push({
       issueID: 'hover',
       what: 'Hovering has unexpected impacts',
+      count: Object.values(data.totals).reduce((total, current) => total + current),
       ordinalSeverity: totals.reduce((max, current, index) => current ? index : max, 0),
       location: {
         doc: '',

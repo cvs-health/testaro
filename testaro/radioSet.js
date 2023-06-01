@@ -74,6 +74,7 @@ exports.reporter = async (page, withItems) => {
       totals.total = allRadios.length;
       totals.inSet = setRadios.length;
       totals.percent = totals.total ? Math.floor(100 * totals.inSet / totals.total) : 'N.A.';
+      const loneRadios = totals.total - totals.inSet;
       // If itemization is required:
       const standardInstances = [];
       if (withItems) {
@@ -85,7 +86,7 @@ exports.reporter = async (page, withItems) => {
         items.notInSet.forEach(text => {
           standardInstances.push({
             issueID: 'radioSet',
-            what: 'Radio button and others with its name are not grouped in their own fieldset with a legend',
+            what: 'Radio button and its peers are not in a fieldset with a legend',
             ordinalSeverity: 2,
             location: {
               doc: '',
@@ -96,10 +97,11 @@ exports.reporter = async (page, withItems) => {
           });
         });
       }
-      else if (totals.total - totals.inSet > 0) {
+      else if (loneRadios > 0) {
         standardInstances.push({
           issueID: 'radioSet',
           what: 'Radio buttons are not validly grouped in fieldsets with legends',
+          count: loneRadios,
           ordinalSeverity: 2,
           location: {
             doc: '',
@@ -111,7 +113,7 @@ exports.reporter = async (page, withItems) => {
       }
       return {
         data,
-        totals: [0, 0, totals.total - totals.inSet, 0],
+        totals: [0, 0, loneRadios, 0],
         standardInstances
       };
     }

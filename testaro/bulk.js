@@ -18,12 +18,14 @@ exports.reporter = async page => {
   });
   const visibleElements = await page.$$('body :visible');
   data.visibleElements = visibleElements.length;
+  const count = Math.round(data.visibleElements / 400);
   return {
     data,
-    totals: [Math.round(data.visibleElements / 400), 0, 0, 0],
+    totals: [count, 0, 0, 0],
     standardInstances: data.visibleElements < 200 ? [] : [{
       issueID: 'bulk',
       what: 'Page contains a large number of visible elements',
+      count,
       ordinalSeverity: 0,
       location: {
         doc: '',

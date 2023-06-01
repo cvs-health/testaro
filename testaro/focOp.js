@@ -174,18 +174,35 @@ exports.reporter = async (page, withItems) => {
       });
     });
   }
-  else if (totals[2] || totals[3]) {
-    standardInstances.push({
-      issueID: 'focOp',
-      what: 'Focusable elements are inoperable or vice versa',
-      ordinalSeverity: totals[3] ? 3 : 2,
-      location: {
-        doc: '',
-        type: '',
-        spec: ''
-      },
-      excerpt: ''
-    });
+  else {
+    if (totals[2]) {
+      standardInstances.push({
+        issueID: 'focOp-onlyFocusable',
+        what: 'Focusable elements are inoperable',
+        count: totals[2],
+        ordinalSeverity: 2,
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: ''
+      });
+    }
+    if (totals[3]) {
+      standardInstances.push({
+        issueID: 'focOp-onlyOperable',
+        what: 'Operable elements are nonfocusable',
+        count: totals[3],
+        ordinalSeverity: 3,
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: ''
+      });
+    }
   }
   // Reload the page.
   try {

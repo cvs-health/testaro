@@ -3,14 +3,17 @@
   This test reports a page that is entirely or mainly hidden.
 */
 exports.reporter = async page => {
+  // Gets the hiddennesses of the document, body, and main region.
   const data = await page.evaluate(() => {
+    // Identify the styles of the document, its body, and its main region.     
     const {body} = document;
-    const main = body && body.querySelector('main');
+    const main = body && body.querySelector('main, [role=main]');
     const styles = {
       doc: window.getComputedStyle(document.documentElement),
       body: body && window.getComputedStyle(body),
       main: main && window.getComputedStyle(main)
     };
+    // Get the hiddennesses of the regions.
     const data = {
       hidden: {
         document: document.documentElement.hidden,
@@ -38,6 +41,7 @@ exports.reporter = async page => {
         main: main ? main.ariaHidden === 'true' : false
       }
     };
+    // Identify whether each region is really hidden.
     ['document', 'body', 'main'].forEach(element => {
       if (data.hidden[element] && ! ['block', 'flex'].includes(data.display[element])) {
         data.reallyHidden[element] = true;
@@ -45,10 +49,11 @@ exports.reporter = async page => {
     });
     return data;
   });
+  // For each combination of region and hiddenness:
   const standardInstances = [];
   const reportables = {
-    hidden: [0, 'hidden'],
-    reallyHidden: [1, 'effectively hidden'],
+    hidden: [1, 'hidden'],
+    reallyHidden: [2, 'effectively hidden'],
     visHidden: [0, 'visually hidden'],
     ariaHidden: [1, 'hidden by ARIA'],
     document: [1, 'Document', 'document.documentElement'],
@@ -57,7 +62,9 @@ exports.reporter = async page => {
   };
   ['document', 'body', 'main'].forEach(region => {
     ['hidden', 'reallyHidden', 'visHidden', 'ariaHidden'].forEach(hider => {
+      // If the region has that hiddenness:
       if (data[hider][region]) {
+        // Add a standard instance for that combination.
         standardInstances.push({
           issueID: `allHidden-${hider}-${region}`,
           what: `${reportables[region][1]} ${reportables[hider][1]}`,
@@ -72,6 +79,7 @@ exports.reporter = async page => {
       }
     });
   });
+  // Get the severity totals.
   const totals = [0, 0, 0, 0];
   standardInstances.forEach(instance => {
     totals[instance.ordinalSeverity]++;

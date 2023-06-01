@@ -60,6 +60,7 @@ exports.reporter = async (page, withItems) => await page.$$eval(
       standardInstances.push({
         issueID: 'embAc',
         what: 'Interactive elements are contained by links or buttons',
+        count: total,
         ordinalSeverity: 2,
         location: {
           doc: '',

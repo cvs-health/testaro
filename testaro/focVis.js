@@ -46,6 +46,7 @@ exports.reporter = async (page, withItems) => {
     standardInstances.push({
       issueID: 'focVis',
       what: 'Visible links are above or to the left of the display',
+      count: data.total,
       ordinalSeverity: 2,
       location: {
         doc: '',

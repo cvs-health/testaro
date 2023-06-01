@@ -98,6 +98,13 @@ exports.reporter = async (page, withItems, delay = 2500, interval = 2500, count 
       pixelChanges.reduce((count, change) => count + (change ? 1 : 0), 0) / pixelChanges.length, 2
     );
     // Return the result.
+    const count = 2 * (meanLocalRatio - 1)
+    + maxLocalRatio - 1
+    + globalRatio - 1
+    + meanPixelChange / 10000
+    + maxPixelChange / 25000
+    + 3 * changeFrequency
+    || 0;
     return {
       data: {
         bytes,
@@ -112,19 +119,14 @@ exports.reporter = async (page, withItems, delay = 2500, interval = 2500, count 
       },
       totals: [
         0,
-        0, 
-        2 * (meanLocalRatio - 1)
-        + maxLocalRatio - 1
-        + globalRatio - 1
-        + meanPixelChange / 10000
-        + maxPixelChange / 25000
-        + 3 * changeFrequency
-        || 0,
+        0,
+        count,
         0
       ],
-      standardInstances: globalRatio > 1 ? [{
+      standardInstances: count ? [{
         issueID: 'motion',
         what: 'Content moves or changes without user request',
+        count,
         ordinalSeverity: 2,
         location: {
           doc: '',

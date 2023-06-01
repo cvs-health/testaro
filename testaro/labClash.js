@@ -176,18 +176,35 @@ exports.reporter = async (page, withItems) => {
         });
       });
     }
-    else if (data.totals.mislabeled || data.totals.unlabeled) {
-      standardInstances.push({
-        issueID: 'labClash',
-        what: 'Element labels are conflicting or missing',
-        ordinalSeverity: data.totals.unlabeled ? 3 : 2,
-        location: {
-          doc: '',
-          type: '',
-          spec: ''
-        },
-        excerpt: ''
-      });
+    else {
+      if (data.totals.unlabeled) {
+        standardInstances.push({
+          issueID: 'labClash-unlabeled',
+          what: 'Element labels are missing',
+          count: data.totals.unlabeled,
+          ordinalSeverity: 3,
+          location: {
+            doc: '',
+            type: '',
+            spec: ''
+          },
+          excerpt: ''
+        });
+      }
+      if (data.totals.mislabeled) {
+        standardInstances.push({
+          issueID: 'labClash-mislabeled',
+          what: 'Element labels are conflicting',
+          count: data.totals.mislabeled,
+          ordinalSeverity: 2,
+          location: {
+            doc: '',
+            type: '',
+            spec: ''
+          },
+          excerpt: ''
+        });
+      }
     }
     return {
       data,

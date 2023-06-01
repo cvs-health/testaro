@@ -67,6 +67,7 @@ exports.reporter = async page => {
     standardInstances: data.discrepancy ? [{
       issueID: 'focAll',
       what: 'Some focusable elements are not Tab-focusable or vice versa',
+      count: Math.abs(data.discrepancy),
       ordinalSeverity: 2,
       location: {
         doc: '',

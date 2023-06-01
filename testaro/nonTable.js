@@ -81,7 +81,8 @@ exports.reporter = async (page, withItems) => {
     standardInstances.push({
       issueID: 'nonTable',
       what: 'Tables are misused to arrange content',
-      ordinalSeverity: 2,
+      count: data.total,
+      ordinalSeverity: 0,
       location: {
         doc: '',
         type: '',

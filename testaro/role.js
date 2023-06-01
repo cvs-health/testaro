@@ -481,11 +481,13 @@ exports.reporter = async page => await page.$eval('body', body => {
   const standardInstances = [];
   Object.keys(data.tagNames).forEach(tagName => {
     Object.keys(data.tagNames[tagName]).forEach(role => {
-      let count = data.tagNames[tagName][role].redundant;
-      if (count) {
+      const pairTotals = data.tagNames[tagName][role];
+      const redCount = pairTotals.redundant;
+      if (redCount) {
         standardInstances.push({
-          issueID: 'role',
-          what: `Elements ${tagName} have redundant explicit role ${role} (count: ${count})`,
+          issueID: 'role-redundant',
+          what: `${tagName} elements have redundant explicit role ${role} (count: ${redCount})`,
+          count: redCount,
           ordinalSeverity: 1,
           location: {
             doc: '',
@@ -495,11 +497,13 @@ exports.reporter = async page => await page.$eval('body', body => {
           excerpt: ''
         });
       }
-      count = data.tagNames[tagName][role].bad;
-      if (count) {
+      const badCount = pairTotals.bad;
+      if (badCount) {
         standardInstances.push({
-          issueID: 'role',
-          what: `Elements ${tagName} have invalid or native-replaceable explicit role ${role} (count: ${count})`,
+          issueID: 'role-bad',
+          what:
+          `Elements ${tagName} have invalid or native-replaceable explicit role ${role} (count: ${badCount})`,
+          count: badCount,
           ordinalSeverity: 3,
           location: {
             doc: '',

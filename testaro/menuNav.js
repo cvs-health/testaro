@@ -203,14 +203,14 @@ exports.reporter = async (page, withItems) => {
         isCorrect = await testKey(
           menu, menuItems, currentItem, 'End', 'end', itemCount - 1, isCorrect, itemData
         );
-        // Update the menu-item status (Node 14 does not support the ES 2021 &&= operator).
+        // Update the menu status (Node 14 does not support the ES 2021 &&= operator).
         menuIsCorrect = menuIsCorrect && isCorrect;
         // Increment the data.
         data.totals.menuItems[isCorrect ? 'correct' : 'incorrect']++;
         if (withItems) {
           data.menuItems[isCorrect ? 'correct' : 'incorrect'].push(itemData);
         }
-        // Process the next tab element.
+        // Process the next menu item.
         return await testMenuItems(menu, menuItems, index + 1, orientation, menuIsCorrect);
       }
       // Otherwise, i.e. if all menu items have been tested:
@@ -271,7 +271,9 @@ exports.reporter = async (page, withItems) => {
     data.menuItems.incorrect.forEach(item => {
       standardInstances.push({
         issueID: 'menuNav',
-        what: `Element ${item.tagName} is a menu item but has nonstandard navigation`,
+        what:
+        `Menu item ${item.tagName} responds nonstandardly to ${item.navigationErrors.join(', ')}`,
+        count: item.navigationErrors.length,
         ordinalSeverity: 1,
         location: {
           doc: '',
@@ -286,7 +288,8 @@ exports.reporter = async (page, withItems) => {
     standardInstances.push({
       issueID: 'menuNav',
       what: 'Menus and menu items have nonstandard navigation',
-      ordinalSeverity: 2,
+      count: data.totals.navigations.all.incorrect,
+      ordinalSeverity: 1,
       location: {
         doc: '',
         type: '',

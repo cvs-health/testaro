@@ -171,10 +171,12 @@ exports.reporter = async (page, withItems) => {
         const currentData = elementData[elementName];
         const severity = currentData[0];
         const elementSubtotals = elementTotal.subtotals;
-        totals[severity] += elementSubtotals.length - 1;
+        const extraCount = elementSubtotals.length - 1;
+        totals[severity] += extraCount;
         standardInstances.push({
           issueID: 'styleDiff',
           what: `${currentData[1]} have ${elementSubtotals.length} different styles`,
+          count: extraCount,
           ordinalSeverity: severity,
           location: {
             doc: '',

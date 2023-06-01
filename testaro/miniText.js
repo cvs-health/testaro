@@ -62,6 +62,7 @@ exports.reporter = async (page, withItems) => {
     standardInstances.push({
       issueID: 'miniText',
       what: 'Texts have fonts smaller than 11 pixels',
+      count: data.total,
       ordinalSeverity: 2,
       location: {
         doc: '',
