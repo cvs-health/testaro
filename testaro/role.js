@@ -502,7 +502,7 @@ exports.reporter = async page => await page.$eval('body', body => {
         standardInstances.push({
           issueID: 'role-bad',
           what:
-          `Elements ${tagName} have invalid or native-replaceable explicit role ${role} (count: ${badCount})`,
+          `${tagName} elements have invalid or native-replaceable explicit role ${role} (count: ${badCount})`,
           count: badCount,
           ordinalSeverity: 3,
           location: {

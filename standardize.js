@@ -167,9 +167,9 @@ const doWAVE = (result, standardResult, categoryName) => {
   }
 };
 // Converts a result.
-const convert = (testName, result, standardResult) => {
+const convert = (toolName, result, standardResult) => {
   // alfa
-  if (testName === 'alfa' && result.totals) {
+  if (toolName === 'alfa' && result.totals) {
     standardResult.totals = [result.totals.warnings, 0, 0, result.totals.failures];
     result.items.forEach(item => {
       const instance = {
@@ -188,7 +188,7 @@ const convert = (testName, result, standardResult) => {
   }
   // axe
   else if (
-    testName === 'axe'
+    toolName === 'axe'
     && result.totals
     && (result.totals.rulesWarned || result.totals.rulesViolated)
   ) {
@@ -203,7 +203,7 @@ const convert = (testName, result, standardResult) => {
     doAxe(result, standardResult, 'violations');
   }
   // continuum
-  else if (testName === 'continuum' && Array.isArray(result) && result.length) {
+  else if (toolName === 'continuum' && Array.isArray(result) && result.length) {
     standardResult.totals = [0, 0, 0, result.length];
     result.forEach(item => {
       const instance = {
@@ -221,7 +221,7 @@ const convert = (testName, result, standardResult) => {
     });
   }
   // htmlcs
-  else if (testName === 'htmlcs' && result) {
+  else if (toolName === 'htmlcs' && result) {
     doHTMLCS(result, standardResult, 'Warning');
     doHTMLCS(result, standardResult, 'Error');
     const {instances} = standardResult;
@@ -233,7 +233,7 @@ const convert = (testName, result, standardResult) => {
     ];
   }
   // ibm
-  else if (testName === 'ibm' && result.totals) {
+  else if (toolName === 'ibm' && result.totals) {
     standardResult.totals = [0, result.totals.recommendation, 0, result.totals.violation];
     result.items.forEach(item => {
       const instance = {
@@ -251,7 +251,7 @@ const convert = (testName, result, standardResult) => {
     });
   }
   // nuVal
-  else if (testName === 'nuVal' && (result.pageContent || result.rawPage)) {
+  else if (toolName === 'nuVal' && (result.pageContent || result.rawPage)) {
     if (result.pageContent) {
       doNuVal(result, standardResult, 'pageContent');
     }
@@ -268,7 +268,7 @@ const convert = (testName, result, standardResult) => {
   }
   // qualWeb
   else if (
-    testName === 'qualWeb'
+    toolName === 'qualWeb'
     && result.modules
     && (
       result.modules['act-rules']
@@ -288,7 +288,7 @@ const convert = (testName, result, standardResult) => {
     }
   }
   // tenon
-  else if (testName === 'tenon' && result.data && result.data.resultSet) {
+  else if (toolName === 'tenon' && result.data && result.data.resultSet) {
     result.data.resultSet.forEach(item => {
       const instance = {
         issueID: item.tID ? item.tID.toString() : '',
@@ -311,7 +311,7 @@ const convert = (testName, result, standardResult) => {
     });
   }
   // testaro
-  else if (testName === 'testaro') {
+  else if (toolName === 'testaro') {
     const rules = result.rules ? Object.keys(result.rules) : [];
     standardResult.totals = [0, 0, 0, 0];
     rules.forEach(rule => {
@@ -332,7 +332,7 @@ const convert = (testName, result, standardResult) => {
   }
   // wave
   else if (
-    testName === 'wave'
+    toolName === 'wave'
     && result.categories
     && (
       result.categories.error
