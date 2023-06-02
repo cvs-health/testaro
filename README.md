@@ -207,6 +207,7 @@ The standard format of each tool report has two properties:
 - `instances`: an array of objects describing facts about issue instances reported by the tool. Insofar as each tool permits, this object has these properties:
     - `issueID`: a code identifying the issue
     - `what`: a description of the issue
+    - `count` (optional): the count of instances if this instance represents multiple instances
     - `ordinalSeverity`: how the tool ranks the severity of the instance, on a 4-point ordinal scale
     - `location`: an object with three properties:
         - `doc`: whether the source (`source`) or the browser rendition (`dom`) was tested
@@ -218,11 +219,11 @@ The original result of a test act is recorded as the value of a `result` propert
 
 ``` javascript
 standardResult: {
-  totals: [2, 0, 1, 0],
+  totals: [2, 0, 17, 0],
   instances: [
     {
       issueID: 'rule01',
-      what: 'button type invalid',
+      what: 'Button type invalid',
       ordinalSeverity: 0,
       location: {
         doc: 'dom',
@@ -233,7 +234,7 @@ standardResult: {
     },
     {
       issueID: 'rule01',
-      what: 'button type invalid',
+      what: 'Button type invalid',
       ordinalSeverity: 1,
       location: {
         doc: 'dom',
@@ -244,20 +245,21 @@ standardResult: {
     },
     {
       issueID: 'rule02',
-      what: 'link href empty',
+      what: 'Links have empty href attributes',
+      count: 17,
       ordinalSeverity: 3,
       location: {
-        doc: 'dom',
-        type: 'selector',
-        spec: '#helplink'
+        doc: '',
+        type: '',
+        spec: ''
       },
-      excerpt: '<a id="helplink" href>help</a>'
+      excerpt: ''
     }
   ]
 }
 ```
 
-If a tool has the option to be used without itemization and is being so used, the `instances` array will be empty.
+If a tool has the option to be used without itemization and is being so used, the `instances` array may be empty.
 
 ### Acts
 
@@ -454,29 +456,6 @@ The `continuum` tests makes use of the files in the `continuum` directory. The t
 
 Level Access on 22 August 2022 granted authorization for the copying of the `AccessEngine.community.js` file insofar as necessary for allowing Continuum community edition tests to be included in Testaro.
 
-###### IBM Equal Access
-
-The `ibm` tests require the `aceconfig.js` file.
-
-As of 2 March 2023 (version 3.1.45 of `accessibility-checker`), the `ibm` tool threw errors when hosted under the Windows operating system. To prevent these errors, it was possible to edit two files in the `accessibility-checker` package as follows:
-
-In `node_modules/accessibility-checker/lib/ACEngineManager.js`, remove or comment out these lines starting on line 169:
-
-```javaScript
-if (nodePath.charAt(0) !== '/') {
-    nodePath = "../../" + nodePath;
-}
-```
-
-In `node_modules/accessibility-checker/lib/reporters/ACReporterJSON.js`, add these lines starting on line 106, immediately before the line `var resultsFileName = pathLib.join(resultDir, results.label + '.json');`:
-
-```javaScript
-// Replace the colons in the label with hyphen-minuses.
-results.label = results.label.replace(/:/g, '-');
-```
-
-These changes were proposed as pull requests 1333 and 1334 (https://github.com/IBMa/equal-access/pulls).
-
 ###### HTML CodeSniffer
 
 The `htmlcs` tool makes use of the `htmlcs/HTMLCS.js` file. That file was created, and can be recreated if necessary, as follows:
@@ -508,6 +487,31 @@ The changes in `htmlcs/HTMLCS.js` are:
 >         typeName + '|' + msg.code + '|' + nodeName + '|' + elementId + '|' + msg.msg + '|' + html
 >       );
 ```
+
+###### IBM Equal Access
+
+The `ibm` tests require the `aceconfig.js` file.
+
+As of 2 March 2023 (version 3.1.45 of `accessibility-checker`), the `ibm` tool threw errors when hosted under the Windows operating system. To prevent these errors, it was possible to edit two files in the `accessibility-checker` package as follows:
+
+In `node_modules/accessibility-checker/lib/ACEngineManager.js`, remove or comment out these lines starting on line 169:
+
+```javaScript
+if (nodePath.charAt(0) !== '/') {
+    nodePath = "../../" + nodePath;
+}
+```
+
+In `node_modules/accessibility-checker/lib/reporters/ACReporterJSON.js`, add these lines starting on line 106, immediately before the line `var resultsFileName = pathLib.join(resultDir, results.label + '.json');`:
+
+```javaScript
+// Replace the colons in the label with hyphen-minuses.
+results.label = results.label.replace(/:/g, '-');
+```
+
+These changes were proposed as pull requests 1333 and 1334 (https://github.com/IBMa/equal-access/pulls).
+
+The `ibm` tool is one of two tools (`testaro` is the other) with a `withItems` property. If you set `withItems` to `false`, the result includes the counts of “violations” and “recommendations”, but no information about the rules that gave rise to them.
 
 ###### QualWeb
 
@@ -554,6 +558,14 @@ In case you want to perform the Tenon tests more than once in the same job, you 
 Tenon recommends giving it a public URL rather than giving it the content of a page, if possible. So, it is best to give the `withNewContent` property of the `tenonRequest` act the value `true`, unless the page is not public.
 
 If a `tenon` test act is included in a job, environment variables named `TENON_USER` and `TENON_PASSWORD` must exist, with your Tenon username and password, respectively, as their values. These could be obtained from [Tenon](https://tenon.io/documentation/overview) until Tenon was closed to new subscribers in or about October 2022.
+
+###### Testaro
+
+If you do not specify rules when using the `testaro` tool, Testaro will test for the rules listed in the `evalRules` object of the `tests/testaro.js` file.
+
+It has been found that the `motion` test of the `testaro` tool measures motion only when the `webkit` browser type is in use. If you want to use `testaro` with different browser types for different tests, you can include 2 or 3 `testaro` test acts in your job, specifying different browser types and different rules.
+
+The `testaro` tool (like the `ibm` tool) has a `withItems` property. If you set it to `false`, the `standardResult` object of `testaro` will contain an `instances` property with summaries that identify issues and instance counts. If you set it to `true`, some of the instances will be itemized.
 
 ###### WAVE
 

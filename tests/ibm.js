@@ -87,7 +87,7 @@ const trimReport = (report, withItems, rules) => {
   }
   return data;
 };
-// Performs an IBM test and returns the result.
+// Performs the IBM tests and returns the result.
 const doTest = async (content, withItems, timeLimit, rules) => {
   // Conduct the test and get the result.
   let report;
