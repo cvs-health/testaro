@@ -45,6 +45,7 @@ exports.reporter = async (page, withItems) => {
     standardInstances.push({
       issueID: 'titledEl',
       what: 'Ineligible elements have title attributes',
+      count: data.total,
       ordinalSeverity: 2,
       location: {
         doc: '',

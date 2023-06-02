@@ -55,7 +55,7 @@ exports.reporter = async (page, withItems) => {
       const which = `${item.tagName}${itemID}`;
       standardInstances.push({
         issueID: 'zIndex',
-        what: `Element ${item.tagName} has a non-default Z index`,
+        what: `${item.tagName} element has a non-default Z index`,
         ordinalSeverity: 0,
         location: {
           doc: '',
@@ -70,6 +70,7 @@ exports.reporter = async (page, withItems) => {
     standardInstances.push({
       issueID: 'zIndex',
       what: 'Elements have non-default Z indexes',
+      count: data.totals.total,
       ordinalSeverity: 0,
       location: {
         doc: '',

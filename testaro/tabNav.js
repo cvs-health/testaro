@@ -335,7 +335,9 @@ exports.reporter = async (page, withItems) => {
     data.tabElements.incorrect.forEach(item => {
       standardInstances.push({
         issueID: 'tabNav',
-        what: `Element ${item.tagName} has a tab role but has nonstandard navigation`,
+        what:
+        `${item.tagName} element responds nonstandardly to ${item.navigationErrors.join(', ')}`,
+        count: item.navigationErrors.length,
         ordinalSeverity: 1,
         location: {
           doc: '',
@@ -350,7 +352,8 @@ exports.reporter = async (page, withItems) => {
     standardInstances.push({
       issueID: 'tabNav',
       what: 'Tablists have nonstandard navigation',
-      ordinalSeverity: 2,
+      count: data.totals.navigations.all.incorrect,
+      ordinalSeverity: 1,
       location: {
         doc: '',
         type: '',
