@@ -81,6 +81,7 @@ const doNuVal = (result, standardResult, docType) => {
   const items = result[docType] && result[docType].messages;
   if (items && items.length) {
     items.forEach(item => {
+      // Include the message twice, because it is usually replaced by a pattern.
       const instance = {
         issueID: item.message,
         what: item.message,
