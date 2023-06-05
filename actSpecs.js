@@ -200,7 +200,7 @@ exports.actSpecs = {
           false,
           'array',
           'areStrings',
-          'message specifications (e.g., error:Bad value), if not all'
+          'message specifications (type and start of message, e.g., error:Bad value), if not all'
         ]
       }
     ],
