@@ -35,10 +35,16 @@ const doAxe = (result, standardResult, certainty) => {
           critical: 1
         };
         const ordinalSeverity = severityWeights[node.impact] + (certainty === 'violations' ? 2 : 0);
+        const tagName = node.html && node.html.replace(/^&lt;| .+$/sg, '').toUpperCase();
+        const id = rule.id.startsWith('duplicate-id') && node.any && node.any.length
+          ? node.any[0].data
+          : '';
         const instance = {
           issueID: rule.id,
           what: Array.from(whatSet.values()).join('; '), 
           ordinalSeverity,
+          tagName,
+          id,
           location: {
             doc: 'dom',
             type: 'selector',
@@ -58,17 +64,19 @@ const doHTMLCS = (result, standardResult, severity) => {
       const ruleData = result[severity][ruleID];
       Object.keys(ruleData).forEach(what => {
         ruleData[what].forEach(item => {
-          const {tagName, code} = item;
+          const {tagName, id, code} = item;
           const instance = {
             issueID: ruleID,
             what,
             ordinalSeverity: ['Warning', '', '', 'Error'].indexOf(severity),
+            tagName,
+            id,
             location: {
               doc: 'dom',
               type: '',
               spec: ''
             },
-            excerpt: cap(`${tagName ? tagName + ': ' : ''}${code || ''}`)
+            excerpt: cap(code)
           };
           standardResult.instances.push(instance);
         });
@@ -81,11 +89,20 @@ const doNuVal = (result, standardResult, docType) => {
   const items = result[docType] && result[docType].messages;
   if (items && items.length) {
     items.forEach(item => {
+      let id = '';
+      if (item.extract) {
+        const idArray = item.extract.match(/^.+\sid="([^"]+)"/);
+        if (idArray && idArray.length === 2) {
+          id = idArray[1];
+        }
+      }
       // Include the message twice, because in scoring it is likely to be replaced by a pattern.
       const instance = {
         issueID: item.message,
         what: item.message,
         ordinalSeverity: -1,
+        tagName: '',
+        id,
         location: {
           doc: docType === 'pageContent' ? 'dom' : 'source',
           type: 'line',
@@ -126,16 +143,27 @@ const doQualWeb = (result, standardResult, ruleClassName) => {
       const ruleResult = ruleClass.assertions[rule];
       ruleResult.results.forEach(item => {
         item.elements.forEach(element => {
+          const {htmlCode} = element;
+          let tagName = '';
+          let id = '';
+          if (htmlCode) {
+            const tagNameArray = htmlCode.match(/^&lt;([^\s]+)/);
+            if (tagNameArray && tagNameArray.length === 2) {
+              tagName = tagNameArray[1];
+            }
+          }
           const instance = {
             issueID: rule,
             what: ruleResult.description,
             ordinalSeverity: severities[ruleClassName][item.verdict],
+            tagName,
+            id,
             location: {
               doc: 'dom',
               type: 'selector',
               spec: element.pointer
             },
-            excerpt: cap(element.htmlCode)
+            excerpt: cap(htmlCode)
           };
           standardResult.instances.push(instance);
           standardResult.totals[instance.ordinalSeverity]++;
@@ -151,10 +179,23 @@ const doWAVE = (result, standardResult, categoryName) => {
     const ordinalSeverity = categoryName === 'alert' ? 0 : 3;
     Object.keys(category.items).forEach(rule => {
       category.items[rule].selectors.forEach(selector => {
+        let tagName = '';
+        let id = '';
+        const finalTerm = selector.replace(/^.+\s/, '');
+        if (finalTerm.includes('#')) {
+          const finalArray = finalTerm.split('#');
+          tagName = finalArray[0];
+          id = finalArray[1];
+        }
+        else {
+          tagName = finalTerm;
+        }
         const instance = {
           issueID: rule,
           what: category.items[rule].description,
           ordinalSeverity,
+          tagName,
+          id,
           location: {
             doc: 'dom',
             type: 'selector',
@@ -173,16 +214,27 @@ const convert = (toolName, result, standardResult) => {
   if (toolName === 'alfa' && result.totals) {
     standardResult.totals = [result.totals.warnings, 0, 0, result.totals.failures];
     result.items.forEach(item => {
+      const {codeLines} = item.target;
+      let id = '';
+      if (codeLines && codeLines.length) {
+        const code = codeLines[0];
+        const idMatchArray = code.match(/\sid="([^"]+)"/);
+        if (idMatchArray && idMatchArray.length === 2) {
+          id = idMatchArray[1];
+        }
+      }
       const instance = {
         issueID: item.rule.ruleID,
         what: item.rule.ruleSummary,
         ordinalSeverity: ['cantTell', '', '', 'failed'].indexOf(item.verdict),
+        tagName: item.target.tagName.toUpperCase(),
+        id,
         location: {
           doc: 'dom',
           type: 'xpath',
           spec: item.target.path
         },
-        excerpt: cap(item.target.codeLines.join(' '))
+        excerpt: Array.isArray(codeLines) ? cap(codeLines.join(' ')) : ''
       };
       standardResult.instances.push(instance);
     });
@@ -207,10 +259,22 @@ const convert = (toolName, result, standardResult) => {
   else if (toolName === 'continuum' && Array.isArray(result) && result.length) {
     standardResult.totals = [0, 0, 0, result.length];
     result.forEach(item => {
+      let tagName = '';
+      let id = '';
+      if (item.fingerprint && item.fingerprint.css) {
+        const {css} = item.fingerprint;
+        tagName = css.replace(/[^a-z].*$/, '').toUpperCase();
+        const idArray = css.match(/\[id="([^"]+)"\]/);
+        if (idArray && idArray.length) {
+          id = idArray[1];
+        }
+      }
       const instance = {
         issueID: item.engineTestId.toString(),
         what: item.attributeDetail,
         ordinalSeverity: 0,
+        tagName,
+        id,
         location: {
           doc: 'dom',
           type: 'selector',
@@ -237,10 +301,26 @@ const convert = (toolName, result, standardResult) => {
   else if (toolName === 'ibm' && result.totals) {
     standardResult.totals = [0, result.totals.recommendation, 0, result.totals.violation];
     result.items.forEach(item => {
+      let tagName = '';
+      let id = '';
+      if (item.path && item.path.dom) {
+        const tagNameArray = item.path.dom.match(/^.+\/([^/[]+)/s);
+        if (tagNameArray && tagNameArray.length === 2) {
+          tagName = tagNameArray[1];
+        }
+        if (item.snippet) {
+          const idArray = item.snippet.match(/^.+\sid="([^"]+)"/s);
+          if (idArray && idArray.length === 2) {
+            id = idArray[1];
+          }
+        }
+      }
       const instance = {
         issueID: item.ruleId,
         what: item.message,
         ordinalSeverity: ['', 'recommendation', '', 'violation'].indexOf(item.level),
+        tagName,
+        id,
         location: {
           doc: 'dom',
           type: 'xpath',
@@ -291,12 +371,28 @@ const convert = (toolName, result, standardResult) => {
   // tenon
   else if (toolName === 'tenon' && result.data && result.data.resultSet) {
     result.data.resultSet.forEach(item => {
+      let tagName = '';
+      if (item.xpath) {
+        const tagNameArray = item.xpath.match(/^.+\/([^/[]+)"/);
+        if (tagNameArray && tagNameArray.length === 2) {
+          tagName = tagNameArray[1];
+        }
+      }
+      let id = '';
+      if (item.errorSnippet) {
+        const idArray = item.errorSnippet.match(/^.+\sid="([^\s]+)"/);
+        if (idArray && idArray.length === 2) {
+          id = idArray[2];
+        }
+      }
       const instance = {
         issueID: item.tID ? item.tID.toString() : '',
         what: item.errorTitle || '',
         ordinalSeverity: Math.min(
           3, Math.max(0, Math.round((item.certainty || 0) * (item.priority || 0) / 3333))
         ),
+        tagName,
+        id,
         location: {
           doc: 'dom',
           type: 'xpath',
