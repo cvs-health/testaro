@@ -48,7 +48,7 @@ exports.reporter = async page => {
       id: {
         document: document.id,
         body: body.id,
-        main: main.id
+        main: main ? main.id : ''
       }
     };
     // Identify whether each region is really hidden.

@@ -1026,7 +1026,7 @@ const doActs = async (report, actIndex, page) => {
                 testReport.result.success = true;
               }
               catch(error) {
-                console.log(`ERROR: Test act ${act.which} failed (${error.message.slice(0, 200)})`);
+                console.log(`ERROR: Test act ${act.which} failed (${error.message.slice(0, 400)})`);
               }
               report.jobData.testTimes.push(
                 [act.which, Math.round((Date.now() - startTime) / 1000)]
