@@ -43,7 +43,7 @@ exports.reporter = async page => {
       tagName: {
         document: 'HTML',
         body: 'BODY',
-        main: main.tagName
+        main: main ? main.tagName : ''
       },
       id: {
         document: document.id,
