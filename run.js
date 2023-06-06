@@ -994,31 +994,43 @@ const doActs = async (report, actIndex, page) => {
               }
               // Conduct, report, and time the test.
               const startTime = Date.now();
-              const testReport = await require(`./tests/${act.which}`).reporter(...args);
-              const expectations = act.expect;
-              // If the test has expectations:
-              if (expectations) {
-                // Initialize whether they were fulfilled.
-                testReport.result.expectations = [];
-                let failureCount = 0;
-                // For each expectation:
-                expectations.forEach(spec => {
-                  const truth = isTrue(testReport, spec);
-                  testReport.result.expectations.push({
-                    property: spec[0],
-                    relation: spec[1],
-                    criterion: spec[2],
-                    actual: truth[0],
-                    passed: truth[1]
+              let testReport = {
+                result: {
+                  success: false
+                }
+              };
+              try {
+                testReport = await require(`./tests/${act.which}`).reporter(...args);
+                const expectations = act.expect;
+                // If the test has expectations:
+                if (expectations) {
+                  // Initialize whether they were fulfilled.
+                  testReport.result.expectations = [];
+                  let failureCount = 0;
+                  // For each expectation:
+                  expectations.forEach(spec => {
+                    const truth = isTrue(testReport, spec);
+                    testReport.result.expectations.push({
+                      property: spec[0],
+                      relation: spec[1],
+                      criterion: spec[2],
+                      actual: truth[0],
+                      passed: truth[1]
+                    });
+                    if (! truth[1]) {
+                      failureCount++;
+                    }
                   });
-                  if (! truth[1]) {
-                    failureCount++;
-                  }
-                });
-                testReport.result.failureCount = failureCount;
+                  testReport.result.failureCount = failureCount;
+                }
+                testReport.result.success = true;
               }
-              testReport.result.success = true;
-              report.jobData.testTimes.push([act.which, Math.round((Date.now() - startTime) / 1000)]);
+              catch(error) {
+                console.log(`ERROR: Test act ${act.which} failed (${error.message.slice(0, 200)})`);
+              }
+              report.jobData.testTimes.push(
+                [act.which, Math.round((Date.now() - startTime) / 1000)]
+              );
               report.jobData.testTimes.sort((a, b) => b[1] - a[1]);
               // Add the result object (possibly an array) to the act.
               const resultCount = Object.keys(testReport.result).length;
