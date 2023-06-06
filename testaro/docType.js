@@ -17,6 +17,8 @@ exports.reporter = async page => {
       issueID: 'docType',
       what: 'Document has no standard HTML doctype preamble',
       ordinalSeverity: 3,
+      tagName: 'HTML',
+      id: '',
       location: {
         doc: '',
         type: '',

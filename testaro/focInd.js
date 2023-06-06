@@ -67,6 +67,7 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
       if (withItems) {
         const elementData = {
           tagName,
+          id: element.id,
           text: (element.textContent.trim() || element.outerHTML.trim()).replace(/\s+/g, ' ')
           .slice(0, 100)
         };
@@ -174,8 +175,10 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
         const qualifier = issueName === 'nonOutlinePresent' ? 'a non-outline' : 'no';
         standardInstances.push({
           issueID: `focInd-${issueName}`,
-          what: `Element ${item.tagName} has ${qualifier} focus indicator`,
+          what: `${item.tagName} element has ${qualifier} focus indicator`,
           ordinalSeverity: issueName === 'nonOutlinePresent' ? 2 : 3,
+          tagName: item.tagName,
+          id: item.id,
           location: {
             doc: '',
             type: '',
@@ -193,6 +196,8 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
         what: 'Elements have missing focus indicators',
         count: types.indicatorMissing.total,
         ordinalSeverity: 3,
+        tagName: '',
+        id: '',
         location: {
           doc: '',
           type: '',
@@ -207,6 +212,8 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
         what: 'Elements have non-outline focus indicators',
         count: types.nonOutlinePresent.total,
         ordinalSeverity: 2,
+        tagName: '',
+        id: '',
         location: {
           doc: '',
           type: '',

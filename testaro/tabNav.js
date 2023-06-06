@@ -220,7 +220,10 @@ exports.reporter = async (page, withItems) => {
         if (withItems) {
           let found = true;
           // Initialize a report on the element.
-          itemData.tagName = await page.evaluate(element => element.tagName, currentTab)
+          const moreItemData = await page.evaluate(element => ({
+            tagName: element.tagName,
+            id: element.id
+          }), currentTab)
           .catch(error => {
             console.log(`ERROR: could not get tag name (${error.message})`);
             found = false;
@@ -228,6 +231,8 @@ exports.reporter = async (page, withItems) => {
             return 'ERROR: not found';
           });
           if (found) {
+            itemData.tagName = moreItemData.tagName;
+            itemData.id = moreItemData.id;
             itemData.text = await allText(page, currentTab);
             itemData.navigationErrors = [];
           }
@@ -339,12 +344,14 @@ exports.reporter = async (page, withItems) => {
         `${item.tagName} element responds nonstandardly to ${item.navigationErrors.join(', ')}`,
         count: item.navigationErrors.length,
         ordinalSeverity: 1,
+        tagName: item.tagName,
+        id: item.id,
         location: {
           doc: '',
           type: '',
           spec: ''
         },
-        excerpt: `${item.tagName}: ${item.text}`
+        excerpt: item.text
       });
     });
   }
@@ -354,6 +361,8 @@ exports.reporter = async (page, withItems) => {
       what: 'Tablists have nonstandard navigation',
       count: data.totals.navigations.all.incorrect,
       ordinalSeverity: 1,
+      tagName: '',
+      id: '',
       location: {
         doc: '',
         type: '',

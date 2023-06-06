@@ -82,18 +82,23 @@ exports.reporter = async (page, withItems) => {
         const nonSetRadios = allRadios.filter(radio => ! setRadios.includes(radio));
         const items = data.items;
         items.inSet = setRadios.map(radio => textOf(radio));
-        items.notInSet = nonSetRadios.map(radio => textOf(radio));
-        items.notInSet.forEach(text => {
+        items.notInSet = nonSetRadios.map(radio => ({
+          id: radio.id,
+          text: textOf(radio)
+        }));
+        items.notInSet.forEach(item => {
           standardInstances.push({
             issueID: 'radioSet',
             what: 'Radio button and its peers are not in a fieldset with a legend',
             ordinalSeverity: 2,
+            tagName: 'INPUT',
+            id: item.id,
             location: {
               doc: '',
               type: '',
               spec: ''
             },
-            excerpt: text
+            excerpt: item.text
           });
         });
       }
@@ -103,6 +108,8 @@ exports.reporter = async (page, withItems) => {
           what: 'Radio buttons are not validly grouped in fieldsets with legends',
           count: loneRadios,
           ordinalSeverity: 2,
+          tagName: 'INPUT',
+          id: '',
           location: {
             doc: '',
             type: '',

@@ -20,7 +20,7 @@ const addFailure = async (withItems, input, inputText, autocomplete, data) => {
     // If itemization is required:
     if (withItems) {
       // Add the item to the data.
-      data.items.push([autocomplete, inputText.slice(0, 100)]);
+      data.items.push([autocomplete, input.id, inputText.slice(0, 100)]);
     }
   }
 };
@@ -77,12 +77,14 @@ exports.reporter = async (page, withItems) => {
         issueID: `autocomplete-${item[0]}`,
         what: `Input is missing the required autocomplete attribute with value ${item[0]}`,
         ordinalSeverity: 2,
+        tagName: 'INPUT',
+        id: item[1],
         location: {
           doc: '',
           type: '',
           spec: ''
         },
-        excerpt: item[1]
+        excerpt: item[2]
       });
     });
   }
@@ -91,6 +93,8 @@ exports.reporter = async (page, withItems) => {
       issueID: 'autocomplete',
       what: 'Inputs are missing required autocomplete attributes',
       ordinalSeverity: 2,
+      tagName: '',
+      id: '',
       location: {
         doc: '',
         type: '',

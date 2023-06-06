@@ -32,6 +32,7 @@ exports.reporter = async (page, withItems, attributeName, areLicit, values) => {
       });
       const report = badElements.map(el => ({
         tagName: el.tagName,
+        id: el.id,
         textStart: textOf(el, 70),
         attributeValue: el.getAttribute(attributeName)
       }));
@@ -51,6 +52,8 @@ exports.reporter = async (page, withItems, attributeName, areLicit, values) => {
         what:
           `${item.tagName} element has attribute ${attributeName} with illicit value ${item.attributeValue}`,
         ordinalSeverity: 2,
+        tagName: item.tagName,
+        id: item.id,
         location: {
           doc: '',
           type: '',
@@ -64,7 +67,10 @@ exports.reporter = async (page, withItems, attributeName, areLicit, values) => {
     standardInstances.push({
       issueID: 'attVal',
       what: 'Elements have attributes with illicit values',
+      count: data.total,
       ordinalSeverity: 2,
+      tagName: '',
+      id: '',
       location: {
         doc: '',
         type: '',

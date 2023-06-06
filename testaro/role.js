@@ -489,6 +489,8 @@ exports.reporter = async page => await page.$eval('body', body => {
           what: `${tagName} elements have redundant explicit role ${role} (count: ${redCount})`,
           count: redCount,
           ordinalSeverity: 1,
+          tagName,
+          id: '',
           location: {
             doc: '',
             type: '',
@@ -505,6 +507,8 @@ exports.reporter = async page => await page.$eval('body', body => {
           `${tagName} elements have invalid or native-replaceable explicit role ${role} (count: ${badCount})`,
           count: badCount,
           ordinalSeverity: 3,
+          tagName,
+          id: '',
           location: {
             doc: '',
             type: '',

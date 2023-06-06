@@ -166,7 +166,12 @@ exports.reporter = async (page, withItems) => {
         // If itemization is required:
         if (withItems) {
           // Initialize a report on the menu item.
-          itemData.tagName = await page.evaluate(element => element.tagName, currentItem);
+          const identifiers = await page.evaluate(element => ({
+            tagName: element.tagName,
+            id: element.id
+          }), currentItem);
+          itemData.tagName = identifiers.tagName;
+          itemData.id = identifiers.id;
           itemData.text = await allText(page, currentItem);
           itemData.navigationErrors = [];
         }
@@ -272,9 +277,11 @@ exports.reporter = async (page, withItems) => {
       standardInstances.push({
         issueID: 'menuNav',
         what:
-        `Menu item ${item.tagName} responds nonstandardly to ${item.navigationErrors.join(', ')}`,
+        `${item.tagName} menu item responds nonstandardly to ${item.navigationErrors.join(', ')}`,
         count: item.navigationErrors.length,
         ordinalSeverity: 1,
+        tagName: item.tagName,
+        id: item.id,
         location: {
           doc: '',
           type: '',
@@ -290,6 +297,8 @@ exports.reporter = async (page, withItems) => {
       what: 'Menus and menu items have nonstandard navigation',
       count: data.totals.navigations.all.incorrect,
       ordinalSeverity: 1,
+      tagName: '',
+      id: '',
       location: {
         doc: '',
         type: '',

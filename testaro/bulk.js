@@ -27,6 +27,8 @@ exports.reporter = async page => {
       what: 'Page contains a large number of visible elements',
       count,
       ordinalSeverity: 0,
+      tagName: 'HTML',
+      id: '',
       location: {
         doc: '',
         type: '',

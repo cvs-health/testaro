@@ -30,7 +30,11 @@ exports.reporter = async (page, withItems) => {
         if (pixels < 11) {
           textParent.childNodes.forEach(node => {
             if (node.nodeType === 3 && compact(node.textContent)) {
-              miniTexts.push(compact(node.textContent));
+              miniTexts.push({
+                tagName: node.tagName,
+                id: node.id,
+                text: compact(node.textContent)
+              });
             }
           });
         }
@@ -49,12 +53,14 @@ exports.reporter = async (page, withItems) => {
         issueID: 'miniText',
         what: 'Text font is smaller than 11 pixels',
         ordinalSeverity: 2,
+        tagName: text.tagName,
+        id: text.id,
         location: {
           doc: '',
           type: '',
           spec: ''
         },
-        excerpt: text
+        excerpt: text.text
       });
     });
   }
@@ -64,6 +70,8 @@ exports.reporter = async (page, withItems) => {
       what: 'Texts have fonts smaller than 11 pixels',
       count: data.total,
       ordinalSeverity: 2,
+      tagName: '',
+      id: '',
       location: {
         doc: '',
         type: '',

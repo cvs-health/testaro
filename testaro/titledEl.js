@@ -16,6 +16,7 @@ exports.reporter = async (page, withItems) => {
       // FUNCTION DEFINITION END
       return badTitleElements.map(element => ({
         tagName: element.tagName,
+        id: element.id,
         text: compact(element.textContent),
         title: compact(element.title)
       }));
@@ -30,8 +31,10 @@ exports.reporter = async (page, withItems) => {
     badTitleElements.forEach(element => {
       standardInstances.push({
         issueID: 'titledEl',
-        what: `Element ${element.tagName} has a title attribute`,
+        what: `${element.tagName} element has a title attribute`,
         ordinalSeverity: 2,
+        tagName: element.tagName,
+        id: element.id,
         location: {
           doc: '',
           type: '',
@@ -47,6 +50,8 @@ exports.reporter = async (page, withItems) => {
       what: 'Ineligible elements have title attributes',
       count: data.total,
       ordinalSeverity: 2,
+      tagName: '',
+      id: '',
       location: {
         doc: '',
         type: '',

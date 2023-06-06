@@ -140,6 +140,7 @@ exports.reporter = async (page, withItems) => {
           data.items.mislabeled.push({
             index,
             tagName: labelee.tagName,
+            id: labelee.id,
             type: labelee.type,
             labelTypes,
             texts
@@ -166,6 +167,8 @@ exports.reporter = async (page, withItems) => {
             issueID: `labClash-${issue}`,
             what: `Element ${item.tagName} ${diagnosis}`,
             ordinalSeverity: issue === 'mislabeled' ? 2 : 3,
+            tagName: item.tagName,
+            id: item.id,
             location: {
               doc: '',
               type: '',
@@ -183,6 +186,8 @@ exports.reporter = async (page, withItems) => {
           what: 'Element labels are missing',
           count: data.totals.unlabeled,
           ordinalSeverity: 3,
+          tagName: '',
+          id: '',
           location: {
             doc: '',
             type: '',
@@ -197,6 +202,8 @@ exports.reporter = async (page, withItems) => {
           what: 'Element labels are conflicting',
           count: data.totals.mislabeled,
           ordinalSeverity: 2,
+          tagName: '',
+          id: '',
           location: {
             doc: '',
             type: '',

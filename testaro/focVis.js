@@ -14,7 +14,10 @@ exports.reporter = async (page, withItems) => {
     links.forEach(link => {
       link.focus();
       if (link.offsetTop + link.offsetHeight <= 0 || link.offsetLeft + link.offsetWidth <= 0) {
-        badLinks.push(compact(link.textContent));
+        badLinks.push({
+          id: link.id,
+          text: compact(link.textContent)
+        });
       }
     });
     return badLinks;
@@ -33,12 +36,14 @@ exports.reporter = async (page, withItems) => {
         issueID: 'focVis',
         what: 'Visible link is above or to the left of the display',
         ordinalSeverity: 2,
+        tagName: 'A',
+        id: item.id,
         location: {
           doc: '',
           type: '',
           spec: ''
         },
-        excerpt: item
+        excerpt: item.text
       });
     });
   }
@@ -48,6 +53,8 @@ exports.reporter = async (page, withItems) => {
       what: 'Visible links are above or to the left of the display',
       count: data.total,
       ordinalSeverity: 2,
+      tagName: 'A',
+      id: '',
       location: {
         doc: '',
         type: '',

@@ -39,6 +39,16 @@ exports.reporter = async page => {
         document: document.documentElement.ariaHidden === 'true',
         body: body ? body.ariaHidden === 'true' : false,
         main: main ? main.ariaHidden === 'true' : false
+      },
+      tagName: {
+        document: 'HTML',
+        body: 'BODY',
+        main: main.tagName
+      },
+      id: {
+        document: document.id,
+        body: body.id,
+        main: main.id
       }
     };
     // Identify whether each region is really hidden.
@@ -69,6 +79,8 @@ exports.reporter = async page => {
           issueID: `allHidden-${hider}-${region}`,
           what: `${reportables[region][1]} ${reportables[hider][1]}`,
           ordinalSeverity: reportables[region][0] + reportables[hider][0] || 0,
+          tagName: region.tagName,
+          id: region.id,
           location: {
             doc: 'dom',
             type: 'selector',

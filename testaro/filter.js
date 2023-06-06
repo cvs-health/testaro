@@ -40,6 +40,7 @@ exports.reporter = async (page, withItems) => {
       filterData.forEach(filterDatum => {
         data.items.push({
           tagName: filterDatum.element.tagName,
+          id: filterDatum.element.id,
           text: compact(filterDatum.element.textContent) || compact(filterDatum.element.outerHTML),
           impact: filterDatum.impact
         });
@@ -53,8 +54,10 @@ exports.reporter = async (page, withItems) => {
     data.items.forEach(item => {
       standardInstances.push({
         issueID: 'filterStyle',
-        what: `Element ${item.tagName} has a filter style that impacts ${item.impact} elements`,
+        what: `${item.tagName} element has a filter style that impacts ${item.impact} elements`,
         ordinalSeverity: 2,
+        tagName: item.tagName,
+        id: item.id,
         location: {
           doc: '',
           type: '',
@@ -69,6 +72,8 @@ exports.reporter = async (page, withItems) => {
       issueID: 'filterStyle',
       what: 'Elements have filter styles impacting other elements',
       ordinalSeverity: 2,
+      tagName: '',
+      id: '',
       location: {
         doc: '',
         type: '',

@@ -32,6 +32,7 @@ exports.reporter = async (page, withItems) => await page.$$eval(
         }
         items.push({
           embeddedElement: bad.tagName,
+          embeddedID: bad.id,
           excerpt: compact(container.outerHTML)
         });
       }
@@ -45,8 +46,10 @@ exports.reporter = async (page, withItems) => await page.$$eval(
       items.forEach(item => {
         standardInstances.push({
           issueID: `embAc-${item.embeddedElement}`,
-          what: `Element ${item.embeddedElement} is embedded in a link or button`,
+          what: `${item.embeddedElement} element is embedded in a link or button`,
           ordinalSeverity: 2,
+          tagName: item.embeddedElement,
+          id: item.id,
           location: {
             doc: '',
             type: '',
@@ -62,6 +65,8 @@ exports.reporter = async (page, withItems) => await page.$$eval(
         what: 'Interactive elements are contained by links or buttons',
         count: total,
         ordinalSeverity: 2,
+        tagName: '',
+        id: '',
         location: {
           doc: '',
           type: '',

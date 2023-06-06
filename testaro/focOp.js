@@ -158,12 +158,12 @@ exports.reporter = async (page, withItems) => {
         : 'is operable but not focusable';
       const ordinalSeverity = issue === 'onlyFocusable' ? 2 : 3;
       data.items[issue].forEach(item => {
-        const itemID = item.id ? ` (ID ${item.id})` : '';
-        const which = `${item.tagName}${itemID}`;
         standardInstances.push({
           issueID,
-          what: `Element ${which} ${gripe}`,
+          what: `${item.tagName} element ${gripe}`,
           ordinalSeverity,
+          tagName: item.tagName,
+          id: item.id,
           location: {
             doc: '',
             type: '',
@@ -181,6 +181,8 @@ exports.reporter = async (page, withItems) => {
         what: 'Focusable elements are inoperable',
         count: totals[2],
         ordinalSeverity: 2,
+        tagName: '',
+        id: '',
         location: {
           doc: '',
           type: '',
@@ -195,6 +197,8 @@ exports.reporter = async (page, withItems) => {
         what: 'Operable elements are nonfocusable',
         count: totals[3],
         ordinalSeverity: 3,
+        tagName: '',
+        id: '',
         location: {
           doc: '',
           type: '',

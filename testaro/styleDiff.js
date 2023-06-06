@@ -178,6 +178,8 @@ exports.reporter = async (page, withItems) => {
           what: `${currentData[1]} have ${elementSubtotals.length} different styles`,
           count: extraCount,
           ordinalSeverity: severity,
+          tagName: elementName.toUpperCase(),
+          id: '',
           location: {
             doc: '',
             type: '',

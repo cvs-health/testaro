@@ -51,18 +51,18 @@ exports.reporter = async (page, withItems) => {
   const standardInstances = [];
   if (data.items) {
     data.items.forEach(item => {
-      const itemID = item.id ? ` (ID ${item.id})` : '';
-      const which = `${item.tagName}${itemID}`;
       standardInstances.push({
         issueID: 'zIndex',
         what: `${item.tagName} element has a non-default Z index`,
         ordinalSeverity: 0,
+        tagName: item.tagName,
+        id: item.id,
         location: {
           doc: '',
           type: '',
           spec: ''
         },
-        excerpt: `${which}: ${item.text}`
+        excerpt: item.text
       });
     });
   }
@@ -72,6 +72,8 @@ exports.reporter = async (page, withItems) => {
       what: 'Elements have non-default Z indexes',
       count: data.totals.total,
       ordinalSeverity: 0,
+      tagName: '',
+      id: '',
       location: {
         doc: '',
         type: '',

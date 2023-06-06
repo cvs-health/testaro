@@ -404,18 +404,19 @@ exports.reporter = async (page, withItems, sampleSize = -1) => {
   if (data.items) {
     Object.keys(data.items).forEach(issue => {
       data.items[issue].forEach(item => {
-        const itemID = item.id ? ` (ID ${item.id})` : '';
         standardInstances.push({
           issueID: `hover-${issue}`,
           what: what[issue],
           count: data.totals[issue],
           ordinalSeverity: severity[issue],
+          tagName: item.tagName,
+          id: item.id,
           location: {
             doc: '',
             type: '',
             spec: ''
           },
-          excerpt: `${itemID}: ${item.text}`
+          excerpt: item.text
         });
       });
     });
@@ -426,6 +427,8 @@ exports.reporter = async (page, withItems, sampleSize = -1) => {
       what: 'Hovering has unexpected impacts',
       count: Object.values(data.totals).reduce((total, current) => total + current),
       ordinalSeverity: totals.reduce((max, current, index) => current ? index : max, 0),
+      tagName: '',
+      id: '',
       location: {
         doc: '',
         type: '',

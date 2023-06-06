@@ -13,7 +13,10 @@ exports.reporter = async (page, withItems) => {
     const compact = string => string.replace(/[\t\n]/g, '').replace(/\s{2,}/g, ' ').trim();
     // Adds the first 100 characters of the code of a pseudotable to the array of pseudotable texts.
     const addBad = table => {
-      badTableTexts.push(compact(table.outerHTML).slice(0, 100));
+      badTableTexts.push({
+        id: table.id,
+        text: compact(table.outerHTML).slice(0, 100)
+      });
     };
     // FUNCTION DEFINITIONS END
     // For each table on the page:
@@ -63,17 +66,19 @@ exports.reporter = async (page, withItems) => {
   const standardInstances = [];
   if (withItems) {
     data.items = badTableTexts;
-    data.items.forEach(text => {
+    data.items.forEach(item => {
       standardInstances.push({
         issueID: 'nonTable',
         what: 'Table is misused to arrange content',
         ordinalSeverity: 0,
+        tagName: 'TABLE',
+        id: item.id,
         location: {
           doc: '',
           type: '',
           spec: ''
         },
-        excerpt: text
+        excerpt: item.text
       });
     });
   }
@@ -83,6 +88,8 @@ exports.reporter = async (page, withItems) => {
       what: 'Tables are misused to arrange content',
       count: data.total,
       ordinalSeverity: 0,
+      tagName: 'TABLE',
+      id: '',
       location: {
         doc: '',
         type: '',

@@ -53,11 +53,12 @@ exports.reporter = async (page, withItems) => {
   // Extract the opening tags of its elements.
   let elements = rawPage.match(/<[a-zA-Z][^<>]+>/g);
   // Delete their enclosing angle brackets and the values of any attributes in them.
-  elements = elements.map(el => el.replace(/^< *|=[^ ]*| *>$/g, ''));
+  const elementsWithVals = elements.map(el => el.replace(/^< *| *>$/g, ''));
+  const elementsWithoutVals = elementsWithVals.map(el => el.replace(/^ *|=[^ ]*$/g, ''));
   // For each element:
-  elements.forEach(element => {
+  elementsWithoutVals.forEach((elementWithoutVals, index) => {
     // Identify its tag name and attributes.
-    const terms = element.split(' ');
+    const terms = elementWithoutVals.split(' ');
     // If it has 2 or more attributes:
     if (terms.length > 2) {
       // If any is duplicated:
@@ -65,11 +66,14 @@ exports.reporter = async (page, withItems) => {
       const attributes = terms.slice(1);
       const attSet = new Set(attributes);
       if (attSet.size < attributes.length) {
-        // Add this to the data.
+        // Add it to the data.
         data.total++;
         if (withItems) {
           data.items.push({
             tagName,
+            id: terms.includes('id')
+              ? elementsWithVals[index].replace(/^.+id=/, '').replace(/ .*$/, '')
+              : '',
             attributes
           });
         }
@@ -83,6 +87,8 @@ exports.reporter = async (page, withItems) => {
         issueID: 'dupAtt',
         what: `Element ${item.tagName} has 2 attributes with the same name`,
         ordinalSeverity: 2,
+        tagName: item.tagName,
+        id: item.id,
         location: {
           doc: '',
           type: '',

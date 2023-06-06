@@ -25,25 +25,32 @@ exports.reporter = async (page, withItems) => {
     const adjacentLinks = linkTypes.adjacent;
     const adjacentLinkCount = adjacentLinks.length;
     let underlined = 0;
-    const ulAdjacentLinkTexts = [];
-    const nulAdjacentLinkTexts = [];
+    const ulAdjacentLinkData = [];
+    const nulAdjacentLinkData = [];
     // For each of them:
     adjacentLinks.forEach(link => {
       // Identify the text of the link if itemization is required.
+      const id = link.id;
       const text = withItems ? compact(link.textContent) || compact(link.outerHTML) : '';
       // If it is underlined:
       if (window.getComputedStyle(link).textDecorationLine === 'underline') {
         // Increment the count of underlined inline links.
         underlined++;
-        // If required, add its text to the array of their texts.
+        // If required, add its data to the array of their data.
         if (withItems) {
-          ulAdjacentLinkTexts.push(text);
+          ulAdjacentLinkData.push({
+            id,
+            text
+          });
         }
       }
       // Otherwise, if it is not underlined and itemization is required:
       else if (withItems) {
         // Add its text to the array of texts of non-underlined inline links.
-        nulAdjacentLinkTexts.push(text);
+        nulAdjacentLinkData.push({
+          id,
+          text
+        });
       }
     });
     // Get the percentage of underlined links among all inline links.
@@ -62,8 +69,8 @@ exports.reporter = async (page, withItems) => {
     };
     if (withItems) {
       data.items = {
-        underlined: ulAdjacentLinkTexts,
-        notUnderlined: nulAdjacentLinkTexts
+        underlined: ulAdjacentLinkData,
+        notUnderlined: nulAdjacentLinkData
       };
     }
     const {adjacent} = data.totals;
@@ -75,12 +82,14 @@ exports.reporter = async (page, withItems) => {
           issueID: 'linkUl',
           what: 'Element a is inline but has no underline',
           ordinalSeverity: 1,
+          tagName: 'A',
+          id: item.id,
           location: {
             doc: '',
             type: '',
             spec: ''
           },
-          excerpt: item
+          excerpt: item.text
         });
       });
     }
@@ -90,6 +99,8 @@ exports.reporter = async (page, withItems) => {
         what: 'Inline links are missing underlines',
         count: adjacent.total - adjacent.underlined,
         ordinalSeverity: 1,
+        tagName: 'A',
+        id: '',
         location: {
           doc: '',
           type: '',
