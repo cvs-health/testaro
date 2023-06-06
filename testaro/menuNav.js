@@ -276,8 +276,7 @@ exports.reporter = async (page, withItems) => {
     data.menuItems.incorrect.forEach(item => {
       standardInstances.push({
         issueID: 'menuNav',
-        what:
-        `${item.tagName} menu item responds nonstandardly to ${item.navigationErrors.join(', ')}`,
+        what: `Menu item responds nonstandardly to ${item.navigationErrors.join(', ')}`,
         count: item.navigationErrors.length,
         ordinalSeverity: 1,
         tagName: item.tagName,
@@ -287,7 +286,7 @@ exports.reporter = async (page, withItems) => {
           type: '',
           spec: ''
         },
-        excerpt: `${item.tagName}: ${item.text}`
+        excerpt: item.text
       });
     });
   }

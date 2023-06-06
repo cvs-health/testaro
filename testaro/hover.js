@@ -269,6 +269,7 @@ const find = async (data, withItems, page, sample) => {
                 // Add them to the data.
                 data.items.impactTriggers.push({
                   tagName,
+                  id: itemData.id,
                   text: await textOf(firstTrigger[0], 100),
                   additions,
                   removals,

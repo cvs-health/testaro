@@ -98,13 +98,13 @@ exports.reporter = async (page, withItems, delay = 2500, interval = 2500, count 
       pixelChanges.reduce((count, change) => count + (change ? 1 : 0), 0) / pixelChanges.length, 2
     );
     // Return the result.
-    const count = 2 * (meanLocalRatio - 1)
+    const rawCount = 2 * (meanLocalRatio - 1)
     + maxLocalRatio - 1
     + globalRatio - 1
     + meanPixelChange / 10000
     + maxPixelChange / 25000
-    + 3 * changeFrequency
-    || 0;
+    + 3 * changeFrequency;
+    const count = rawCount ? Math.round(rawCount) : 0;
     return {
       data: {
         bytes,

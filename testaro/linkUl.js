@@ -80,7 +80,7 @@ exports.reporter = async (page, withItems) => {
       data.items.notUnderlined.forEach(item => {
         standardInstances.push({
           issueID: 'linkUl',
-          what: 'Element a is inline but has no underline',
+          what: 'Link is inline but has no underline',
           ordinalSeverity: 1,
           tagName: 'A',
           id: item.id,

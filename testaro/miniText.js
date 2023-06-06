@@ -49,6 +49,7 @@ exports.reporter = async (page, withItems) => {
   if (withItems) {
     data.items = miniTexts;
     miniTexts.forEach(text => {
+      console.log(JSON.stringify(text, null, 2));
       standardInstances.push({
         issueID: 'miniText',
         what: 'Text font is smaller than 11 pixels',

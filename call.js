@@ -71,6 +71,7 @@ if (fn === 'run' && fnArgs.length === 1) {
   callRun(fnArgs)
   .then(() => {
     console.log('Execution completed');
+    process.exit(0);
   });
 }
 else if (fn === 'watch' && fnArgs.length === 3) {
