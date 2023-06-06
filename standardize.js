@@ -181,14 +181,16 @@ const doWAVE = (result, standardResult, categoryName) => {
       category.items[rule].selectors.forEach(selector => {
         let tagName = '';
         let id = '';
-        const finalTerm = selector.replace(/^.+\s/, '');
-        if (finalTerm.includes('#')) {
-          const finalArray = finalTerm.split('#');
-          tagName = finalArray[0];
-          id = finalArray[1];
-        }
-        else {
-          tagName = finalTerm;
+        if (typeof selector === 'string') {
+          const finalTerm = selector.replace(/^.+\s/, '');
+          if (finalTerm.includes('#')) {
+            const finalArray = finalTerm.split('#');
+            tagName = finalArray[0];
+            id = finalArray[1];
+          }
+          else {
+            tagName = finalTerm;
+          }
         }
         const instance = {
           issueID: rule,
