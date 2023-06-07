@@ -326,7 +326,7 @@ const convert = (toolName, result, standardResult) => {
       if (item.path && item.path.dom) {
         const tagNameArray = item.path.dom.match(/^.+\/([^/[]+)/s);
         if (tagNameArray && tagNameArray.length === 2) {
-          tagName = tagNameArray[1];
+          tagName = tagNameArray[1].toUpperCase();
         }
         if (item.snippet) {
           const idArray = item.snippet.match(/^.+\sid="([^"]+)"/s);
