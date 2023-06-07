@@ -36,9 +36,16 @@ const doAxe = (result, standardResult, certainty) => {
         };
         const ordinalSeverity = severityWeights[node.impact] + (certainty === 'violations' ? 2 : 0);
         const tagName = node.html && node.html.replace(/^<|[ >].*$/sg, '').toUpperCase();
-        const id = rule.id.startsWith('duplicate-id') && node.any && node.any.length
-          ? node.any[0].data
-          : '';
+        let id = '';
+        if (node.target && node.target.length && node.target[0].startsWith('#')) {
+          id = node.target[0].slice(1);
+        }
+        else if (node.html) {
+          const idArray = node.html.match(/\sid="([^"]+)"/);
+          if (idArray && idArray.length === 2) {
+            id = idArray[1];
+          }
+        }
         const instance = {
           issueID: rule.id,
           what: Array.from(whatSet.values()).join('; '), 
@@ -70,7 +77,7 @@ const doHTMLCS = (result, standardResult, severity) => {
             what,
             ordinalSeverity: ['Warning', '', '', 'Error'].indexOf(severity),
             tagName: tagName.toUpperCase(),
-            id,
+            id: id.slice(1),
             location: {
               doc: 'dom',
               type: '',
@@ -156,7 +163,11 @@ const doQualWeb = (result, standardResult, ruleClassName) => {
           if (htmlCode) {
             const tagNameArray = htmlCode.match(/^<([^ >]+)/);
             if (tagNameArray && tagNameArray.length === 2) {
-              tagName = tagNameArray[1];
+              tagName = tagNameArray[1].toUpperCase();
+            }
+            const idArray = htmlCode.match(/\sid="([^"]+)"/);
+            if (idArray && idArray.length === 2) {
+              id = idArray[1];
             }
           }
           const instance = {
@@ -196,7 +207,7 @@ const doWAVE = (result, standardResult, categoryName) => {
             id = finalArray[1];
           }
           else {
-            tagName = finalTerm;
+            tagName = finalTerm.replace(/:.*/, '');
           }
         }
         const instance = {
@@ -382,9 +393,9 @@ const convert = (toolName, result, standardResult) => {
     result.data.resultSet.forEach(item => {
       let tagName = '';
       if (item.xpath) {
-        const tagNameArray = item.xpath.match(/^.+\/([^/[]+)"/);
+        const tagNameArray = item.xpath.match(/^.+\/([^/[]+)/);
         if (tagNameArray && tagNameArray.length === 2) {
-          tagName = tagNameArray[1];
+          tagName = tagNameArray[1].toUpperCase();
         }
       }
       let id = '';

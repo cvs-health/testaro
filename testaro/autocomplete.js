@@ -20,7 +20,7 @@ const addFailure = async (withItems, input, inputText, autocomplete, data) => {
     // If itemization is required:
     if (withItems) {
       // Add the item to the data.
-      data.items.push([autocomplete, input.id, inputText.slice(0, 100)]);
+      data.items.push([autocomplete, input.id || '', inputText.slice(0, 100)]);
     }
   }
 };
@@ -78,7 +78,7 @@ exports.reporter = async (page, withItems) => {
         what: `Input is missing the required autocomplete attribute with value ${item[0]}`,
         ordinalSeverity: 2,
         tagName: 'INPUT',
-        id: item[1],
+        id: item[1] || '',
         location: {
           doc: '',
           type: '',

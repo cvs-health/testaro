@@ -204,11 +204,13 @@ If the `STANDARD` environment variable has the value `also` (which it has by def
 
 The standard format of each tool report has two properties:
 - `totals`: an array of 4 integers, representing the counts of issue instances classified by the tool into 4 ordinal degrees of severity. For example, `[2, 13, 0, 5]` would mean that the tool reported 2 instances at the lowest severity, 13 at the next-lowest, none at the third-lowest, and 5 at the highest.
-- `instances`: an array of objects describing facts about issue instances reported by the tool. Insofar as each tool permits, this object has these properties:
+- `instances`: an array of objects describing facts about issue instances reported by the tool. This object has these properties, some of which have empty strings as values when the tool does not provide values:
     - `issueID`: a code identifying the issue
     - `what`: a description of the issue
     - `count` (optional): the count of instances if this instance represents multiple instances
     - `ordinalSeverity`: how the tool ranks the severity of the instance, on a 4-point ordinal scale
+    - `tagName`: upper-case tagName of the affected element
+    - `id`: value of the `id` property of that element
     - `location`: an object with three properties:
         - `doc`: whether the source (`source`) or the browser rendition (`dom`) was tested
         - `type`: the type of location information provided by the tool (`line`, `selector`, or `xpath`)
@@ -225,6 +227,8 @@ standardResult: {
       issueID: 'rule01',
       what: 'Button type invalid',
       ordinalSeverity: 0,
+      tagName: 'BUTTON'
+      id: '',
       location: {
         doc: 'dom',
         type: 'line',
@@ -236,6 +240,8 @@ standardResult: {
       issueID: 'rule01',
       what: 'Button type invalid',
       ordinalSeverity: 1,
+      tagName: 'BUTTON',
+      id: 'submitbutton',
       location: {
         doc: 'dom',
         type: 'line',
@@ -248,6 +254,8 @@ standardResult: {
       what: 'Links have empty href attributes',
       count: 17,
       ordinalSeverity: 3,
+      tagName: 'A',
+      id: '',
       location: {
         doc: '',
         type: '',
