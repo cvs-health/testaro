@@ -31,8 +31,8 @@ exports.reporter = async (page, withItems) => {
           textParent.childNodes.forEach(node => {
             if (node.nodeType === 3 && compact(node.textContent)) {
               miniTexts.push({
-                tagName: node.tagName,
-                id: node.id,
+                tagName: textParent.tagName,
+                id: textParent.id || '',
                 text: compact(node.textContent)
               });
             }
@@ -49,7 +49,6 @@ exports.reporter = async (page, withItems) => {
   if (withItems) {
     data.items = miniTexts;
     miniTexts.forEach(text => {
-      console.log(JSON.stringify(text, null, 2));
       standardInstances.push({
         issueID: 'miniText',
         what: 'Text font is smaller than 11 pixels',
