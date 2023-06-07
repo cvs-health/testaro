@@ -15,6 +15,7 @@ exports.reporter = async page => await page.$eval('body', body => {
 
   // CONSTANTS
 
+  // All roles implicit in HTML elements.
   const badRoles = new Set([
     'article',
     'banner',
@@ -52,7 +53,7 @@ exports.reporter = async page => await page.$eval('body', body => {
     'term',
     'textbox'
   ]);
-  // All non-abstract roles
+  // All non-abstract roles.
   const goodRoles = new Set([
     'alert',
     'alertdialog',
@@ -410,7 +411,7 @@ exports.reporter = async page => await page.$eval('body', body => {
 
   // OPERATION
 
-  // Remove the deprecated roles from the non-abstract roles.
+  // Remove the element-implicit roles from the non-abstract roles.
   goodRoles.forEach(role => {
     if (badRoles.has(role)) {
       goodRoles.delete(role);

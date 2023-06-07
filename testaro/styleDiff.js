@@ -155,15 +155,15 @@ exports.reporter = async (page, withItems) => {
     const totals = [0, 0, 0, 0];
     const standardInstances = [];
     const elementData = {
-      adjacentLink: [0, 'In-line links'],
-      listLink: [1, 'Links in columns'],
-      button: [2, 'Buttons'],
-      h1: [3, 'Level-1 headings'],
-      h2: [3, 'Level-2 headings'],
-      h3: [3, 'Level-3 headings'],
-      h4: [3, 'Level-4 headings'],
-      h5: [3, 'Level-5 headings'],
-      h6: [3, 'Level-6 headings'],
+      adjacentLink: [0, 'In-line links', 'A'],
+      listLink: [1, 'Links in columns', 'A'],
+      button: [2, 'Buttons', 'BUTTON'],
+      h1: [3, 'Level-1 headings', 'H1'],
+      h2: [3, 'Level-2 headings', 'H2'],
+      h3: [3, 'Level-3 headings', 'H3'],
+      h4: [3, 'Level-4 headings', 'H4'],
+      h5: [3, 'Level-5 headings', 'H5'],
+      h6: [3, 'Level-6 headings', 'H6'],
     };
     Object.keys(elementData).forEach(elementName => {
       const elementTotal = data.totals[elementName];
@@ -178,7 +178,7 @@ exports.reporter = async (page, withItems) => {
           what: `${currentData[1]} have ${elementSubtotals.length} different styles`,
           count: extraCount,
           ordinalSeverity: severity,
-          tagName: elementName.toUpperCase(),
+          tagName: currentData[2],
           id: '',
           location: {
             doc: '',

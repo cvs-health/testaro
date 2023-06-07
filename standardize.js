@@ -35,7 +35,7 @@ const doAxe = (result, standardResult, certainty) => {
           critical: 1
         };
         const ordinalSeverity = severityWeights[node.impact] + (certainty === 'violations' ? 2 : 0);
-        const tagName = node.html && node.html.replace(/^&lt;| .+$/sg, '').toUpperCase();
+        const tagName = node.html && node.html.replace(/^<|[ >].*$/sg, '').toUpperCase();
         const id = rule.id.startsWith('duplicate-id') && node.any && node.any.length
           ? node.any[0].data
           : '';
@@ -69,7 +69,7 @@ const doHTMLCS = (result, standardResult, severity) => {
             issueID: ruleID,
             what,
             ordinalSeverity: ['Warning', '', '', 'Error'].indexOf(severity),
-            tagName,
+            tagName: tagName.toUpperCase(),
             id,
             location: {
               doc: 'dom',
@@ -89,8 +89,15 @@ const doNuVal = (result, standardResult, docType) => {
   const items = result[docType] && result[docType].messages;
   if (items && items.length) {
     items.forEach(item => {
+      let tagName = '';
       let id = '';
       if (item.extract) {
+        const tagNameLCArray = item.extract.match(
+          /^Element ([^ ]+)|^An (img) element| (meta|script) element| element (script)| tag (script)/
+        );
+        if (tagNameLCArray && tagNameLCArray.length > 1) {
+          tagName = tagNameLCArray[1].toUpperCase();
+        }
         const idArray = item.extract.match(/^.+\sid="([^"]+)"/);
         if (idArray && idArray.length === 2) {
           id = idArray[1];
@@ -101,7 +108,7 @@ const doNuVal = (result, standardResult, docType) => {
         issueID: item.message,
         what: item.message,
         ordinalSeverity: -1,
-        tagName: '',
+        tagName,
         id,
         location: {
           doc: docType === 'pageContent' ? 'dom' : 'source',
@@ -147,7 +154,7 @@ const doQualWeb = (result, standardResult, ruleClassName) => {
           let tagName = '';
           let id = '';
           if (htmlCode) {
-            const tagNameArray = htmlCode.match(/^&lt;([^\s]+)/);
+            const tagNameArray = htmlCode.match(/^<([^ >]+)/);
             if (tagNameArray && tagNameArray.length === 2) {
               tagName = tagNameArray[1];
             }
@@ -185,7 +192,7 @@ const doWAVE = (result, standardResult, categoryName) => {
           const finalTerm = selector.replace(/^.+\s/, '');
           if (finalTerm.includes('#')) {
             const finalArray = finalTerm.split('#');
-            tagName = finalArray[0];
+            tagName = finalArray[0].replace(/:.*/, '');
             id = finalArray[1];
           }
           else {
@@ -274,7 +281,7 @@ const convert = (toolName, result, standardResult) => {
       const instance = {
         issueID: item.engineTestId.toString(),
         what: item.attributeDetail,
-        ordinalSeverity: 0,
+        ordinalSeverity: 3,
         tagName,
         id,
         location: {
@@ -382,9 +389,9 @@ const convert = (toolName, result, standardResult) => {
       }
       let id = '';
       if (item.errorSnippet) {
-        const idArray = item.errorSnippet.match(/^.+\sid="([^\s]+)"/);
+        const idArray = item.errorSnippet.match(/^.+\sid="([^"]+)"/);
         if (idArray && idArray.length === 2) {
-          id = idArray[2];
+          id = idArray[1];
         }
       }
       const instance = {
