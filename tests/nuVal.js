@@ -18,7 +18,8 @@ const fs = require('fs/promises');
 
 // ########## FUNCTIONS
 
-exports.reporter = async (page, rules) => {
+exports.reporter = async (page, options) => {
+  const {rules} = options;
   // Get the browser-parsed page.
   const pageContent = await page.content();
   // Get the page source.

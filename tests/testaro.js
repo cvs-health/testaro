@@ -42,31 +42,44 @@ const etcRules = {
 // FUNCTIONS
 
 // Conducts and reports a Testaro test.
-exports.reporter = async (
-  page, withItems, rules = ['y', ... Object.keys(evalRules)], args = null
-) => {
+exports.reporter = async (page, options) => {
+  const {withItems, args} = options;
+  const argRules = args ? Object.keys(args) : null;
+  const rules = options.rules || ['y', ... Object.keys(evalRules)];
   // Initialize the data.
   const data = {
     rules: {}
   };
-  // For each rule invoked:
-  const argRules = args && Object.keys(args);
-  const realRules = rules[0] === 'y'
-    ? rules.slice(1)
-    : Object.keys(evalRules).filter(ruleName => ! rules.slice(1).includes(ruleName));
-  for (const rule of realRules) {
-    // Initialize an argument array.
-    const ruleArgs = [page, withItems];
-    // If the rule has extra arguments:
-    if (argRules && argRules.includes(rule)) {
-      // Add them to the argument array.
-      ruleArgs.push(... args[rule]);
+  // If the rule specification is valid:
+  if (
+    rules.length > 1
+    && ['y', 'n'].includes(rules[0])
+    && rules.slice(1).every(rule => evalRules[rule] || etcRules[rule])
+  ) {
+    // For each rule invoked:
+    const realRules = rules[0] === 'y'
+      ? rules.slice(1)
+      : Object.keys(evalRules).filter(ruleID => ! rules.slice(1).includes(ruleID));
+    for (const rule of realRules) {
+      // Initialize an argument array.
+      const ruleArgs = [page, withItems];
+      // If the rule has extra arguments:
+      if (argRules && argRules.includes(rule)) {
+        // Add them to the argument array.
+        ruleArgs.push(... args[rule]);
+      }
+      // Test the page.
+      console.log(`>>>>>> ${rule} (${what})`);
+      data.rules[rule] = await require(`../testaro/${rule}`).reporter(... ruleArgs);
+      const what = evalRules[rule] || etcRules[rule];
+      data.rules[rule].what = what;
     }
-    // Test the page.
-    data.rules[rule] = await require(`../testaro/${rule}`).reporter(... ruleArgs);
-    const what = evalRules[rule] || etcRules[rule];
-    data.rules[rule].what = what;
-    console.log(`>>>>>> ${rule} (${what})`);
+  }
+  // Otherwise, i.e. if the rule specification is invalid:
+  else {
+    console.log('ERROR: Testaro rule specification invalid');
+    data.prevented = true;
+    data.error = 'ERROR: Rule specification invalid';
   }
   return {result: data};
 };

@@ -5,7 +5,8 @@
 
 // FUNCTIONS
 // Runs HTML CodeSniffer on the page.
-exports.reporter = async (page, rules) => {
+exports.reporter = async (page, options) => {
+  const {rules} = options;
   const result = {};
   // Add the HTMLCS script to the page.
   await page.addScriptTag({

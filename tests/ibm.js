@@ -122,7 +122,8 @@ const doTest = async (content, withItems, timeLimit, rules) => {
   }
 };
 // Returns results of an IBM test.
-exports.reporter = async (page, withItems, withNewContent, rules) => {
+exports.reporter = async (page, options) => {
+  const {withItems, withNewContent, rules} = options;
   const contentType = withNewContent ? 'new' : 'existing';
   console.log(`>>>>>> Content type: ${contentType}`);
   let result;

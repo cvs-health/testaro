@@ -377,6 +377,8 @@ If a particular test act either must have or may have any other properties, thos
 
 When you include a `rules` property, you limit the tests of the tool that are performed or reported. For some tools (`alfa`, `axe`, `continuum`, `htmlcs`, `qualWeb`, and `testaro`), only the specified tests are performed. Other tools (`ibm`, `nuVal`, `tenon`, and `wave`) do not allow such a limitation, so, for those tools, all tests are performed but results are reported from only the specified tests.
 
+The `nuVal` and `testaro` tools require specific formats for the `rules` property. Those formats are described below in the sections about those tools.
+
 ###### Examples
 
 An example of a `test` act is:
@@ -526,7 +528,9 @@ The `ibm` tool is one of two tools (`testaro` is the other) with a `withItems` p
 
 ###### Nu Html Checker
 
-The `nuVal` tool performs the tests of the Nu Html Checker. Its `rules` argument is **not** an array of rule IDs, but instead is an array of rule _specifications_. A rule specification for `nuVal` is a string with the format `type:substring`, where `type` is replaced with a message type (namely `info` or `error`) and `substring` is replaced with any substring of a message. This `rules` format arises from the fact that `nuVal` generates customized messages and does not accompany them with rule identifiers. Thus, by choosing a substring, you are deciding that any message of a particular type that includes that substring will be deemed a `nuVal` rule.
+The `nuVal` tool performs the tests of the Nu Html Checker.
+
+Its `rules` argument is **not** an array of rule IDs, but instead is an array of rule _specifications_. A rule specification for `nuVal` is a string with the format `type:substring`, where `type` is replaced with a message type (namely `info` or `error`) and `substring` is replaced with any substring of a message. This `rules` format arises from the fact that `nuVal` generates customized messages and does not accompany them with rule identifiers. Thus, by choosing a type and a substring, you are deciding that any message of that type that includes that substring will be deemed a `nuVal` rule.
 
 ###### QualWeb
 
@@ -577,6 +581,8 @@ If a `tenon` test act is included in a job, environment variables named `TENON_U
 ###### Testaro
 
 If you do not specify rules when using the `testaro` tool, Testaro will test for the rules listed in the `evalRules` object of the `tests/testaro.js` file.
+
+The `rules` property for `testaro` is an array whose first item is either `'y'` or `'n'` and whose remaining items are rule IDs. If `'y'`, then only the specified rules’ tests are performed. If `'n'`, then all the evaluative tests are performed, except for the specified rules.
 
 It has been found that the `motion` test of the `testaro` tool measures motion only when the `webkit` browser type is in use. If you want to use `testaro` with different browser types for different tests, you can include 2 or 3 `testaro` test acts in your job, specifying different browser types and different rules.
 

@@ -122,11 +122,10 @@ exports.actSpecs = {
       }
     ],
     test: [
-      'Perform test of a tool',
+      'Perform tests of a tool',
       {
-        which: [true, 'string', 'isTest', 'test name'],
-        rules: [false, 'array', 'areStrngs', 'rule IDs or specifications, if not all'],
-        what: [false, 'string', 'hasLength', 'comment']
+        which: [true, 'string', 'isTest', 'tool name'],
+        rules: [false, 'array', 'areStrngs', 'rule IDs or specifications, if not all']
       }
     ],
     text: [
@@ -169,22 +168,10 @@ exports.actSpecs = {
         ]
       }
     ],
-    nuVal: [
-      'Perform Nu Html Checker tests',
-      {
-        messages: [
-          false,
-          'array',
-          'areStrings',
-          'message specifications (type and start of message, e.g., error:Bad value), if not all'
-        ]
-      }
-    ],
     qualWeb: [
       'Perform QualWeb tests',
       {
-        withNewContent: [true, 'boolean', '', 'whether to use a URL instead of page content'],
-        rules: [false, 'array', 'areStrings', 'QualWeb or ACT IDs of ACT rules to include, if not all']
+        withNewContent: [true, 'boolean', '', 'whether to use a URL instead of page content']
       }
     ],
     tenon: [
@@ -197,7 +184,6 @@ exports.actSpecs = {
       'Perform Testaro tests',
       {
         withItems: [true, 'boolean', '', 'itemize'],
-        rules: [false, 'array', 'areStrings', 'IDs of rules to include if array starts with y or exclude if with n, if not all evaluative rules'],
         args: [false, 'object', 'areArrays', 'extra args (object with rule properties and arrays of argument values as values ({focInd: [false, 250], hover: [-1], motion: [2500, 2500, 5]} by default'],
       }
     ],

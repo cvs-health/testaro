@@ -36,15 +36,12 @@ const tests = {
   alfa: 'alfa',
   axe: 'Axe',
   continuum: 'Level Access Continuum, community edition',
-  elements: 'data on specified elements',
   htmlcs: 'HTML CodeSniffer WCAG 2.1 AA ruleset',
   ibm: 'IBM Accessibility Checker',
   nuVal: 'Nu Html Checker',
   qualWeb: 'QualWeb',
   tenon: 'Tenon',
   testaro: 'Testaro',
-  textNodes: 'data on specified text nodes',
-  title: 'page title',
   wave: 'WAVE',
 };
 // Browser types available in PlayWright.
@@ -977,21 +974,18 @@ const doActs = async (report, actIndex, page) => {
                 tenonData.requestIDs[id] = responseID || '';
               }
             }
-            // Otherwise, if the act is a test:
+            // Otherwise, if the act performs the tests of a tool:
             else if (act.type === 'test') {
               // Add a description of the test to the act.
               act.what = tests[act.which];
-              // Initialize the arguments.
-              const args = [act.which === 'tenon' ? tenonData : page];
-              // Identify the additional validator of the test.
-              const testValidator = actSpecs.tests[act.which];
-              // If it exists:
-              if (testValidator) {
-                // Identify its argument properties.
-                const argProperties = Object.keys(testValidator[1]);
-                // Add their values to the arguments.
-                args.push(...argProperties.map(propName => act[propName]));
-              }
+              // Initialize the options argument.
+              const options = {};
+              // Add any specified arguments to it.
+              Object.keys(act).forEach(key => {
+                if (! ['type', 'which'].includes(key)) {
+                  options[key] = act[key];
+                }
+              });
               // Conduct, report, and time the test.
               const startTime = Date.now();
               let testReport = {
@@ -1000,7 +994,8 @@ const doActs = async (report, actIndex, page) => {
                 }
               };
               try {
-                testReport = await require(`./tests/${act.which}`).reporter(...args);
+                const args = [act.which === 'tenon' ? tenonData : page, options];
+                testReport = await require(`./tests/${act.which}`).reporter(... args);
                 const expectations = act.expect;
                 // If the test has expectations:
                 if (expectations) {

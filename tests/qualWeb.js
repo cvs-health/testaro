@@ -11,7 +11,8 @@ const clusterOptions = {
 };
 // FUNCTIONS
 // Conducts and reports a QualWeb test.
-exports.reporter = async (page, withNewContent, rules = null) => {
+exports.reporter = async (page, options) => {
+  const {withNewContent, rules} = options;
   // Initialize the report.
   // Start the QualWeb core engine.
   await qualWeb.start(clusterOptions);

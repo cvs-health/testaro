@@ -22,7 +22,8 @@
 const {injectAxe, getAxeResults} = require('axe-playwright');
 // FUNCTIONS
 // Conducts and reports an Axe test.
-exports.reporter = async (page, detailLevel, rules = []) => {
+exports.reporter = async (page, options) => {
+  const {detailLevel, rules} = options;
   // Initialize the report.
   let data = {};
   // Inject axe-core into the page.

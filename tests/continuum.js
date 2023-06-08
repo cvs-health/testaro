@@ -6,7 +6,8 @@
 
 // FUNCTIONS
 // Runs Continuum on the page.
-exports.reporter = async (page, rules) => {
+exports.reporter = async (page, options) => {
+  const {rules} = options;
   let result = {};
   // Inject the continuum scripts into the page, exposing the continuum object.
   for (const fileName of ['continuum.conf', 'AccessEngine.community', 'Continuum.community']) {
