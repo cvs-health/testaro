@@ -6,7 +6,8 @@
 */
 const fs = require('fs/promises');
 const https = require('https');
-exports.reporter = async (page, reportType, rules) => {
+exports.reporter = async (page, options) => {
+  const {reportType, rules} = options;
   const waveKey = process.env.WAVE_KEY;
   // Get the data from a WAVE test.
   const data = await new Promise(resolve => {

@@ -69,10 +69,17 @@ exports.reporter = async (page, options) => {
         ruleArgs.push(... args[rule]);
       }
       // Test the page.
-      console.log(`>>>>>> ${rule} (${what})`);
-      data.rules[rule] = await require(`../testaro/${rule}`).reporter(... ruleArgs);
       const what = evalRules[rule] || etcRules[rule];
+      if (! data.rules[rule]) {
+        data.rules[rule] = {};
+      }
+      console.log('Initialized');
       data.rules[rule].what = what;
+      console.log(`>>>>>> ${rule} (${what})`);
+      const report = await require(`../testaro/${rule}`).reporter(... ruleArgs);
+      Object.keys(report).forEach(key => {
+        data.rules[rule][key] = report[key];
+      });
     }
   }
   // Otherwise, i.e. if the rule specification is invalid:

@@ -161,6 +161,7 @@ const hasSubtype = (variable, subtype) => {
       return isState(variable);
     }
     else {
+      console.log(`ERROR: ${subtype} not a known subtype`);
       return false;
     }
   }

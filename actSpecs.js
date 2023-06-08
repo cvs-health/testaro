@@ -125,7 +125,7 @@ exports.actSpecs = {
       'Perform tests of a tool',
       {
         which: [true, 'string', 'isTest', 'tool name'],
-        rules: [false, 'array', 'areStrngs', 'rule IDs or specifications, if not all']
+        rules: [false, 'array', 'areStrings', 'rule IDs or specifications, if not all']
       }
     ],
     text: [
