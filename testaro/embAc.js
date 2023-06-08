@@ -32,7 +32,7 @@ exports.reporter = async (page, withItems) => await page.$$eval(
         }
         items.push({
           embeddedElement: bad.tagName,
-          embeddedID: bad.id,
+          embeddedID: bad.id || '',
           excerpt: compact(container.outerHTML)
         });
       }
@@ -49,7 +49,7 @@ exports.reporter = async (page, withItems) => await page.$$eval(
           what: `${item.embeddedElement} element is embedded in a link or button`,
           ordinalSeverity: 2,
           tagName: item.embeddedElement,
-          id: item.id,
+          id: item.embeddedID,
           location: {
             doc: '',
             type: '',

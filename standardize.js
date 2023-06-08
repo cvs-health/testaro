@@ -18,6 +18,22 @@ const cap = rawString => {
     return '';
   }
 };
+// Returns the tag name and the value of an id attribute from a substring of HTML code.
+const getIdentifiers = code => {
+  let tagName = '';
+  let id = '';
+  if (code && typeof code === 'string' && code.length) {
+    const startTag = code.replace(/^[^<]*<|>.*/sg, '').trim();
+    if (startTag && startTag.length) {
+      tagName = startTag.replace(/\s.+$/s, '').toUpperCase();
+      const idArray = startTag.match(/\sid="([^"<>])"/);
+      if (idArray && idArray.length === 2) {
+        id = idArray[1];
+      }
+    }
+  }
+  return [tagName, id];
+};
 // Converts issue instances at an axe certainty level.
 const doAxe = (result, standardResult, certainty) => {
   if (result.details && result.details[certainty]) {
@@ -35,23 +51,13 @@ const doAxe = (result, standardResult, certainty) => {
           critical: 1
         };
         const ordinalSeverity = severityWeights[node.impact] + (certainty === 'violations' ? 2 : 0);
-        const tagName = node.html && node.html.replace(/^<|[ >].*$/sg, '').toUpperCase();
-        let id = '';
-        if (node.target && node.target.length && node.target[0].startsWith('#')) {
-          id = node.target[0].slice(1);
-        }
-        else if (node.html) {
-          const idArray = node.html.match(/\sid="([^"]+)"/);
-          if (idArray && idArray.length === 2) {
-            id = idArray[1];
-          }
-        }
+        const identifiers = getIdentifiers(node.html);
         const instance = {
           issueID: rule.id,
           what: Array.from(whatSet.values()).join('; '), 
           ordinalSeverity,
-          tagName,
-          id,
+          tagName: identifiers[0],
+          id: identifiers[1],
           location: {
             doc: 'dom',
             type: 'selector',
@@ -96,18 +102,13 @@ const doNuVal = (result, standardResult, docType) => {
   const items = result[docType] && result[docType].messages;
   if (items && items.length) {
     items.forEach(item => {
-      let tagName = '';
-      let id = '';
-      if (item.extract) {
-        const tagNameLCArray = item.extract.match(
+      const identifiers = getIdentifiers(item.extract);
+      if (! identifiers[0] && item.message) {
+        const tagNameLCArray = item.message.match(
           /^Element ([^ ]+)|^An (img) element| (meta|script) element| element (script)| tag (script)/
         );
         if (tagNameLCArray && tagNameLCArray.length > 1) {
-          tagName = tagNameLCArray[1].toUpperCase();
-        }
-        const idArray = item.extract.match(/^.+\sid="([^"]+)"/);
-        if (idArray && idArray.length === 2) {
-          id = idArray[1];
+          identifiers[0] = tagNameLCArray[1].toUpperCase();
         }
       }
       // Include the message twice, because in scoring it is likely to be replaced by a pattern.
@@ -115,8 +116,8 @@ const doNuVal = (result, standardResult, docType) => {
         issueID: item.message,
         what: item.message,
         ordinalSeverity: -1,
-        tagName,
-        id,
+        tagName: identifiers[0],
+        id: identifiers[1],
         location: {
           doc: docType === 'pageContent' ? 'dom' : 'source',
           type: 'line',
@@ -158,24 +159,13 @@ const doQualWeb = (result, standardResult, ruleClassName) => {
       ruleResult.results.forEach(item => {
         item.elements.forEach(element => {
           const {htmlCode} = element;
-          let tagName = '';
-          let id = '';
-          if (htmlCode) {
-            const tagNameArray = htmlCode.match(/^<([^ >]+)/);
-            if (tagNameArray && tagNameArray.length === 2) {
-              tagName = tagNameArray[1].toUpperCase();
-            }
-            const idArray = htmlCode.match(/\sid="([^"]+)"/);
-            if (idArray && idArray.length === 2) {
-              id = idArray[1];
-            }
-          }
+          const identifiers = getIdentifiers(htmlCode);
           const instance = {
             issueID: rule,
             what: ruleResult.description,
             ordinalSeverity: severities[ruleClassName][item.verdict],
-            tagName,
-            id,
+            tagName: identifiers[0],
+            id: identifiers[1],
             location: {
               doc: 'dom',
               type: 'selector',
@@ -235,26 +225,21 @@ const convert = (toolName, result, standardResult) => {
     standardResult.totals = [result.totals.warnings, 0, 0, result.totals.failures];
     result.items.forEach(item => {
       const {codeLines} = item.target;
-      let id = '';
-      if (codeLines && codeLines.length) {
-        const code = codeLines[0];
-        const idMatchArray = code.match(/\sid="([^"]+)"/);
-        if (idMatchArray && idMatchArray.length === 2) {
-          id = idMatchArray[1];
-        }
-      }
+      const code = Array.isArray(codeLines) ? codeLines.join(' ') : '';
+      const identifiers = getIdentifiers(code);
+      const tagName = item.target && item.target.tagName || '';
       const instance = {
         issueID: item.rule.ruleID,
         what: item.rule.ruleSummary,
         ordinalSeverity: ['cantTell', '', '', 'failed'].indexOf(item.verdict),
-        tagName: item.target.tagName.toUpperCase(),
-        id,
+        tagName: tagName.toUpperCase() || identifiers[0],
+        id: identifiers[1],
         location: {
           doc: 'dom',
           type: 'xpath',
           spec: item.target.path
         },
-        excerpt: Array.isArray(codeLines) ? cap(codeLines.join(' ')) : ''
+        excerpt: cap(code)
       };
       standardResult.instances.push(instance);
     });
@@ -321,26 +306,19 @@ const convert = (toolName, result, standardResult) => {
   else if (toolName === 'ibm' && result.totals) {
     standardResult.totals = [0, result.totals.recommendation, 0, result.totals.violation];
     result.items.forEach(item => {
-      let tagName = '';
-      let id = '';
-      if (item.path && item.path.dom) {
+      const identifiers = getIdentifiers(item.snippet);
+      if (! identifiers[0] && item.path && item.path.dom) {
         const tagNameArray = item.path.dom.match(/^.+\/([^/[]+)/s);
         if (tagNameArray && tagNameArray.length === 2) {
-          tagName = tagNameArray[1].toUpperCase();
-        }
-        if (item.snippet) {
-          const idArray = item.snippet.match(/^.+\sid="([^"]+)"/s);
-          if (idArray && idArray.length === 2) {
-            id = idArray[1];
-          }
+          identifiers[0] = tagNameArray[1].toUpperCase();
         }
       }
       const instance = {
         issueID: item.ruleId,
         what: item.message,
         ordinalSeverity: ['', 'recommendation', '', 'violation'].indexOf(item.level),
-        tagName,
-        id,
+        tagName: identifiers[0],
+        id: identifiers[1],
         location: {
           doc: 'dom',
           type: 'xpath',
@@ -391,18 +369,11 @@ const convert = (toolName, result, standardResult) => {
   // tenon
   else if (toolName === 'tenon' && result.data && result.data.resultSet) {
     result.data.resultSet.forEach(item => {
-      let tagName = '';
-      if (item.xpath) {
+      const identifiers = getIdentifiers(item.errorSnippet);
+      if (! identifiers[0] && item.xpath) {
         const tagNameArray = item.xpath.match(/^.+\/([^/[]+)/);
         if (tagNameArray && tagNameArray.length === 2) {
-          tagName = tagNameArray[1].toUpperCase();
-        }
-      }
-      let id = '';
-      if (item.errorSnippet) {
-        const idArray = item.errorSnippet.match(/^.+\sid="([^"]+)"/);
-        if (idArray && idArray.length === 2) {
-          id = idArray[1];
+          identifiers[0] = tagNameArray[1].toUpperCase();
         }
       }
       const instance = {
@@ -411,8 +382,8 @@ const convert = (toolName, result, standardResult) => {
         ordinalSeverity: Math.min(
           3, Math.max(0, Math.round((item.certainty || 0) * (item.priority || 0) / 3333))
         ),
-        tagName,
-        id,
+        tagName: identifiers[0],
+        id: identifiers[1],
         location: {
           doc: 'dom',
           type: 'xpath',
