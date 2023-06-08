@@ -5,7 +5,7 @@
 const https = require('https');
 // Wait until a time limit in seconds expires.
 const wait = timeLimit => new Promise(resolve => setTimeout(resolve, 1000 * timeLimit));
-exports.reporter = async (tenonData, id) => {
+exports.reporter = async (tenonData, id, rules) => {
   if (tenonData && tenonData.accessToken && tenonData.requestIDs && tenonData.requestIDs[id]) {
     // Shared request options.
     const requestOptions = {
@@ -59,6 +59,19 @@ exports.reporter = async (tenonData, id) => {
         });
         resultRequest.end();
       });
+      // If any rules were specified and any test results exist:
+      if (
+        rules
+        && rules.length
+        && testResult.data
+        && testResult.data.resultSet
+        && testResult.data.resultSet.length
+      ) {
+        // Delete the results of tests of rules not specified.
+        const {resultSet} = testResult.data;
+        testResult.data.resultSet = resultSet
+        .filter(result => ! rules.includes(result.tID.toString()));
+      }
       return testResult;
     };
     // Get the test status (not reliable: may say 200 instead of 202).

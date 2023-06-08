@@ -348,9 +348,9 @@ This act causes Testaro to alter the `display` and `visibility` style properties
 
 ###### Introduction
 
-An act of type `test` performs operations and reports a result. The result may indicate that a page passes or fails requirements. Typically, accessibility tests report successes and failures. But a test in Testaro is defined less restrictively, so it can report any result. As one example, the Testaro `elements` test reports facts about certain elements on a page, without asserting that those facts are successes or failures.
+An act of type `test` performs the tests of a tool and reports a result. The result may indicate that a page passes or fails requirements. Typically, accessibility tests report successes and failures. But a test in Testaro is defined less restrictively, so it can report any result. As one example, the Testaro `elements` test reports facts about certain elements on a page, without asserting that those facts are successes or failures.
 
-The `which` property of a `test` act identifies the operations to perform. The value of `which` is the name of one of the tools, such as `alfa`.
+The `which` property of a `test` act identifies a tool, such as `alfa`.
 
 ###### Configuration
 
@@ -365,14 +365,17 @@ test: [
   'Perform a test',
   {
     which: [true, 'string', 'isTest', 'test name'],
+    rules: [false, 'array', 'areStrings', 'rule IDs or specifications, if not all']
     what: [false, 'string', 'hasLength', 'comment']
   }
 ],
 ```
 
-That means that a test act (i.e. an act with a `type` property having the value `'test'`) must have a string-valued `which` property naming a tool and may optionally have a string-valued `what` property describing the tool.
+That means that a test act (i.e. an act with a `type` property having the value `'test'`) must have a string-valued `which` property naming a tool and may optionally have an array-valued `rules` property restricting the tests to be reported and/or a string-valued `what` property describing the tool and/or the tests.
 
 If a particular test act either must have or may have any other properties, those properties are specified in the `tests` property in `actSpecs.js`.
+
+When you include a `rules` property, you limit the tests of the tool that are performed or reported. For some tools (`alfa`, `axe`, `continuum`, `htmlcs`, `qualWeb`, and `testaro`), only the specified tests are performed. Other tools (`ibm`, `nuVal`, `tenon`, and `wave`) do not allow such a limitation, so, for those tools, all tests are performed but results are reported from only the specified tests.
 
 ###### Examples
 
@@ -520,6 +523,10 @@ results.label = results.label.replace(/:/g, '-');
 These changes were proposed as pull requests 1333 and 1334 (https://github.com/IBMa/equal-access/pulls).
 
 The `ibm` tool is one of two tools (`testaro` is the other) with a `withItems` property. If you set `withItems` to `false`, the result includes the counts of “violations” and “recommendations”, but no information about the rules that gave rise to them.
+
+###### Nu Html Checker
+
+The `nuVal` tool performs the tests of the Nu Html Checker. Its `rules` argument is **not** an array of rule IDs, but instead is an array of rule _specifications_. A rule specification for `nuVal` is a string with the format `type:substring`, where `type` is replaced with a message type (namely `info` or `error`) and `substring` is replaced with any substring of a message. This `rules` format arises from the fact that `nuVal` generates customized messages and does not accompany them with rule identifiers. Thus, by choosing a substring, you are deciding that any message of a particular type that includes that substring will be deemed a `nuVal` rule.
 
 ###### QualWeb
 

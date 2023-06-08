@@ -125,6 +125,7 @@ exports.actSpecs = {
       'Perform test of a tool',
       {
         which: [true, 'string', 'isTest', 'test name'],
+        rules: [false, 'array', 'areStrngs', 'rule IDs or specifications, if not all'],
         what: [false, 'string', 'hasLength', 'comment']
       }
     ],
@@ -153,34 +154,10 @@ exports.actSpecs = {
     ]
   },
   tests: {
-    alfa: [
-      'Perform alfa tests',
-      {
-        rules: [false, 'array', 'areStrings', 'rule names (e.g., r25), if not all']
-      }
-    ],
     axe: [
       'Perform Axe tests',
       {
-        detailLevel: [true, 'number', '', '0 = least, 4 = most'],
-        rules: [true, 'array', 'areStrings', 'rule names, or empty if all']
-      }
-    ],
-    continuum: [
-      'Perform Continuum tests',
-      {
-        rules: [false, 'array', 'areNumbers', 'rule numbers (e.g., 25), if not all']
-      }
-    ],
-    htmlcs: [
-      'Perform HTML CodeSniffer tests',
-      {
-        rules: [
-          false,
-          'array',
-          'areStrings',
-          'rule names (e.g., Principle1.Guideline1_4.1_4_9), if not all'
-        ]
+        detailLevel: [true, 'number', '', '0 = least, 4 = most']
       }
     ],
     ibm: [
@@ -189,8 +166,7 @@ exports.actSpecs = {
         withItems: [true, 'boolean', '', 'itemize'],
         withNewContent: [
           true, 'boolean', '', 'true: use a URL; false: use page content'
-        ],
-        rules: [false, 'array', 'areStrings', 'rule names (e.g., RPT_Elem_UniqueId), if not all']
+        ]
       }
     ],
     nuVal: [

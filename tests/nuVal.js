@@ -18,7 +18,7 @@ const fs = require('fs/promises');
 
 // ########## FUNCTIONS
 
-exports.reporter = async (page, messages) => {
+exports.reporter = async (page, rules) => {
   // Get the browser-parsed page.
   const pageContent = await page.content();
   // Get the page source.
@@ -63,12 +63,12 @@ exports.reporter = async (page, messages) => {
       // Delete left and right quotation marks and their erratic invalid replacements.
       data[page[0]] = nuDataClean;
       // If there is a report and restrictions on the report messages were specified:
-      if (! data[page[0]].error && messages && Array.isArray(messages) && messages.length) {
+      if (! data[page[0]].error && rules && Array.isArray(rules) && rules.length) {
         // Remove all messages except those specified.
-        const messageSpecs = messages.map(messageSpec => messageSpec.split(':', 2));
-        data[page[0]].messages = data[page[0]].messages.filter(message => messageSpecs.some(
-          messageSpec => message.type === messageSpec[0]
-          && message.message.startsWith(messageSpec[1])
+        const ruleSpecs = rules.map(ruleSpec => ruleSpec.split(':', 2));
+        data[page[0]].messages = data[page[0]].messages.filter(message => ruleSpecs.some(
+          ruleSpec => message.type === ruleSpec[0]
+          && message.message.includes(ruleSpec[1])
         ));
       }
     }

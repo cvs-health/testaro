@@ -6,7 +6,7 @@
 */
 const fs = require('fs/promises');
 const https = require('https');
-exports.reporter = async (page, reportType) => {
+exports.reporter = async (page, reportType, rules) => {
   const waveKey = process.env.WAVE_KEY;
   // Get the data from a WAVE test.
   const data = await new Promise(resolve => {
@@ -30,6 +30,23 @@ exports.reporter = async (page, reportType) => {
             delete categories.feature;
             delete categories.structure;
             delete categories.aria;
+            // If rules were specified:
+            if (rules && rules.length) {
+              // Delete the results of tests for other rules.
+              ['error', 'contrast', 'alert'].forEach(category => {
+                if (
+                  categories[category]
+                  && categories[category].items
+                  && categories[category].items.length
+                ) {
+                  Object.keys(categories[category].items).forEach(ruleID => {
+                    if (! rules.includes(ruleID)) {
+                      delete categories[category].items[ruleID];
+                    }
+                  });
+                }
+              });
+            }
             // Add WCAG information from the WAVE documentation.
             const waveDocJSON = await fs.readFile('procs/wavedoc.json');
             const waveDoc = JSON.parse(waveDocJSON);

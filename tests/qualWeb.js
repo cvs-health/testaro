@@ -15,7 +15,7 @@ exports.reporter = async (page, withNewContent, rules = null) => {
   // Initialize the report.
   // Start the QualWeb core engine.
   await qualWeb.start(clusterOptions);
-  // Specify the page.
+  // Specify the test options.
   const qualWebOptions = {
     log: {
       console: true
