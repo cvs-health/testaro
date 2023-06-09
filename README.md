@@ -360,7 +360,7 @@ Every test in Testaro must have:
 
 The `actSpecs.js` file (described in detail below) contains a specification for any `test` act, namely:
 
-```json
+```javascript
 test: [
   'Perform a test',
   {
