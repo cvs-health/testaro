@@ -227,7 +227,13 @@ const convert = (toolName, result, standardResult) => {
       const {codeLines} = item.target;
       const code = Array.isArray(codeLines) ? codeLines.join(' ') : '';
       const identifiers = getIdentifiers(code);
-      const tagName = item.target && item.target.tagName || '';
+      let tagName = item.target && item.target.tagName || '';
+      if (! tagName) {
+        const tagNameArray = item.target.path.match(/\/([a-z]+)\[\d+\]\/text\(\)\[\d+\]$/);
+        if (tagNameArray && tagNameArray.length === 2) {
+          tagName = tagNameArray[1];
+        }
+      }
       const instance = {
         issueID: item.rule.ruleID,
         what: item.rule.ruleSummary,
@@ -369,7 +375,9 @@ const convert = (toolName, result, standardResult) => {
   // tenon
   else if (toolName === 'tenon' && result.data && result.data.resultSet) {
     result.data.resultSet.forEach(item => {
-      const identifiers = getIdentifiers(item.errorSnippet);
+      const identifiers = getIdentifiers(
+        item.errorSnippet.replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+      );
       if (! identifiers[0] && item.xpath) {
         const tagNameArray = item.xpath.match(/^.+\/([^/[]+)/);
         if (tagNameArray && tagNameArray.length === 2) {

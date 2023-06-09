@@ -39,7 +39,7 @@ exports.reporter = async (page, options) => {
     const axeOptions = {
       resultTypes: ['violations', 'incomplete']
     };
-    if (rules.length) {
+    if (rules && rules.length) {
       axeOptions.runOnly = rules;
     }
     else {
