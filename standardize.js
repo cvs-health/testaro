@@ -26,7 +26,7 @@ const getIdentifiers = code => {
     const startTag = code.replace(/^[^<]*<|>.*/sg, '').trim();
     if (startTag && startTag.length) {
       tagName = startTag.replace(/\s.+$/s, '').toUpperCase();
-      const idArray = startTag.match(/\sid="([^"<>])"/);
+      const idArray = startTag.match(/\sid="([^"<>]+)"/);
       if (idArray && idArray.length === 2) {
         id = idArray[1];
       }

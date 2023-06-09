@@ -73,7 +73,6 @@ exports.reporter = async (page, options) => {
       if (! data.rules[rule]) {
         data.rules[rule] = {};
       }
-      console.log('Initialized');
       data.rules[rule].what = what;
       console.log(`>>>>>> ${rule} (${what})`);
       const report = await require(`../testaro/${rule}`).reporter(... ruleArgs);
