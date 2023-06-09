@@ -532,7 +532,7 @@ The `ibm` tool is one of two tools (`testaro` is the other) with a `withItems` p
 
 The `nuVal` tool performs the tests of the Nu Html Checker.
 
-Its `rules` argument is **not** an array of rule IDs, but instead is an array of rule _specifications_. A rule specification for `nuVal` is a string with the format `type:substring`, where `type` is replaced with a message type (namely `info` or `error`) and `substring` is replaced with any substring of a message. This `rules` format arises from the fact that `nuVal` generates customized messages and does not accompany them with rule identifiers. Thus, by choosing a type and a substring, you are deciding that any message of that type that includes that substring will be deemed a `nuVal` rule.
+Its `rules` argument is **not** an array of rule IDs, but instead is an array of rule _specifications_. A rule specification for `nuVal` is a string with the format `=ruleID` or `~ruleID`. The `=` prefix indicates that the rule ID is invariable. The `~` prefix indicates that the rule ID is variable, in which case the `ruleID` part of the specification is a matching regular expression, rather than the exact text of a message. This `rules` format arises from the fact that `nuVal` generates customized messages and does not accompany them with rule identifiers.
 
 ###### QualWeb
 

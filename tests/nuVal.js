@@ -60,17 +60,24 @@ exports.reporter = async (page, options) => {
       fetchOptions.body = page[1];
       const nuResult = await fetch(nuURL, fetchOptions);
       const nuData = await nuResult.json();
-      const nuDataClean = JSON.parse(JSON.stringify(nuData).replace(/[\u{fffd}“”]/ug, ''));
       // Delete left and right quotation marks and their erratic invalid replacements.
+      const nuDataClean = JSON.parse(JSON.stringify(nuData).replace(/[\u{fffd}“”]/ug, ''));
       data[page[0]] = nuDataClean;
-      // If there is a report and restrictions on the report messages were specified:
+      // If there is a report and rules were specified:
       if (! data[page[0]].error && rules && Array.isArray(rules) && rules.length) {
         // Remove all messages except those specified.
-        const ruleSpecs = rules.map(ruleSpec => ruleSpec.split(':', 2));
-        data[page[0]].messages = data[page[0]].messages.filter(message => ruleSpecs.some(
-          ruleSpec => message.type === ruleSpec[0]
-          && message.message.includes(ruleSpec[1])
-        ));
+        data[page[0]].messages = data[page[0]].messages.filter(message => rules.some(rule => {
+          if (rule[0] === '=') {
+            return message.message === rule.slice(1);
+          }
+          else if (rule[0] === '~') {
+            return new RegExp(rule.slice(1)).test(message.message);
+          }
+          else {
+            console.log(`ERROR: Invalid nuVal rule ${rule}`);
+            return false;
+          }
+        }));
       }
     }
     catch (error) {
