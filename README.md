@@ -2,11 +2,13 @@
 
 Ensemble testing for web accessibility
 
-## Summary
+## Introduction
 
 Testaro is a collection of web accessibility testing tools.
 
 The purpose of Testaro is to provide programmatic access to accessibility tests defined by several tools.
+
+Testaro aims to increase the efficiency of multi-tool integration for accessibility testing. The need for multi-tool integration, and its costs, are analyzed in [Accessibility Metatesting: Comparing Nine Testing Tools](https://arxiv.org/abs/2304.07591).
 
 Testaro launches and controls web browsers, performing operations, conducting tests, and recording results.
 
