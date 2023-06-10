@@ -271,6 +271,8 @@ standardResult: {
 
 If a tool has the option to be used without itemization and is being so used, the `instances` array may be empty.
 
+The standard format is not opinionated about issue classifications. It treats an issue ID from any tool as an identifier of what that tool considers to be the issue. Useful reporting from multi-tool testing still requires issue classification. If tool `A` identifies an issue as `alt-incomplete` and tool `B` identifies an issue as `image_alt_meaningless`, Testaro does not decide whether those are really the same issue or different issues. That decision belongs to whoever consumes Testaro reports. The standardization of tool reports by Testaro eliminates some of the drudgery in issue classification, but not any of the judgment required for issue classification.
+
 ### Acts
 
 #### Introduction
