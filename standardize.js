@@ -23,7 +23,7 @@ const getIdentifiers = code => {
   let tagName = '';
   let id = '';
   if (code && typeof code === 'string' && code.length && /<.+/s.test(code)) {
-    const startTag = code.replace(/^[^<]*<|>.*/sg, '').trim();
+    const startTag = code.replace(/^[^<]*<\/[^>]+>/, '').replace(/^[^<]*<|>.*/sg, '').trim();
     if (startTag && startTag.length) {
       tagName = startTag.replace(/\s.+$/s, '').toUpperCase();
       const idArray = startTag.match(/\sid="([^"<>]+)"/);
