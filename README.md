@@ -154,6 +154,7 @@ Here is an example of a job:
     batch: 'weborgs',
     target: {
       id: 'w3c',
+      which: 'https://www.w3c.org',
       what: 'World Wide Web Consortium'
     },
     requester: 'user@domain.org'
