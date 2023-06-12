@@ -27,15 +27,15 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
       totals: {
         total: 0,
         types: {
-          indicatorMissing: {
+          missing: {
             total: 0,
             tagNames: {}
           },
-          nonOutlinePresent: {
+          nonoutline: {
             total: 0,
             tagNames: {}
           },
-          outlinePresent: {
+          outline: {
             total: 0,
             meanDelay: 0,
             tagNames: {}
@@ -45,16 +45,16 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
     };
     if (withItems) {
       data.items = {
-        indicatorMissing: [],
-        nonOutlinePresent: [],
-        outlinePresent: []
+        missing: [],
+        nonoutline: [],
+        outline: []
       };
     }
     // Adds facts about an element to the result.
     const addElementFacts = (element, status, delay = null) => {
       const type = data.totals.types[status];
       type.total++;
-      if (status === 'outlinePresent') {
+      if (status === 'outline') {
         type.meanDelay = Math.round(((type.total - 1) * type.meanDelay + delay) / type.total);
       }
       const tagName = element.tagName;
@@ -71,7 +71,7 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
           text: (element.textContent.trim() || element.outerHTML.trim()).replace(/\s+/g, ' ')
           .slice(0, 100)
         };
-        if (status === 'outlinePresent') {
+        if (status === 'outline') {
           elementData.delay = delay;
         }
         data.items[status].push(elementData);
@@ -111,7 +111,7 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
           // If a non-transparent outline appeared immediately on focus:
           if (styleDec.outlineWidth !== '0px' && styleDec.outlineColor !== 'rgba(0, 0, 0, 0)') {
             // Add facts about the element to the result.
-            addElementFacts(element, 'outlinePresent', 0);
+            addElementFacts(element, 'outline', 0);
             hasOutline = true;
           }
           // Otherwise, if a wait for an outline is allowed:
@@ -137,7 +137,7 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
             const delay = await outlineDelay;
             if (delay) {
               // Add facts about the element to the result.
-              addElementFacts(element, 'outlinePresent', delay);
+              addElementFacts(element, 'outline', delay);
               hasOutline = true;
             }
           }
@@ -158,7 +158,7 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
           || hasDiffBorder
           || indicatorStyleNames.slice(5).reduce((any, styleName) => any || diff(styleName), false);
           // Add the determination to the result.
-          const status = hasIndicator ? 'nonOutlinePresent' : 'indicatorMissing';
+          const status = hasIndicator ? 'nonoutline' : 'missing';
           addElementFacts(element, status);
         }
       }
@@ -166,17 +166,17 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
     return data;
   }, [allowedDelay, withItems]);
   const {types} = data.totals;
-  const totals = [0, 0, types.nonOutlinePresent.total, types.indicatorMissing.total];
+  const totals = [0, 0, types.nonoutline.total, types.missing.total];
   const standardInstances = [];
   if (data.items) {
-    const issueNames = ['nonOutlinePresent', 'indicatorMissing'];
+    const issueNames = ['nonoutline', 'missing'];
     issueNames.forEach(issueName => {
       data.items[issueName].forEach(item => {
-        const qualifier = issueName === 'nonOutlinePresent' ? 'a non-outline' : 'no';
+        const qualifier = issueName === 'nonoutline' ? 'a non-outline' : 'no';
         standardInstances.push({
           issueID: `focInd-${issueName}`,
           what: `${item.tagName} element has ${qualifier} focus indicator`,
-          ordinalSeverity: issueName === 'nonOutlinePresent' ? 2 : 3,
+          ordinalSeverity: issueName === 'nonoutline' ? 2 : 3,
           tagName: item.tagName,
           id: item.id,
           location: {
@@ -190,11 +190,11 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
     });
   }
   else {
-    if (types.indicatorMissing.total) {
+    if (types.missing.total) {
       standardInstances.push({
         issueID: 'focInd-missing',
         what: 'Elements have missing focus indicators',
-        count: types.indicatorMissing.total,
+        count: types.missing.total,
         ordinalSeverity: 3,
         tagName: '',
         id: '',
@@ -206,11 +206,11 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
         excerpt: ''
       });
     }
-    if (types.nonOutlinePresent.total) {
+    if (types.nonoutline.total) {
       standardInstances.push({
         issueID: 'focInd-nonoutline',
         what: 'Elements have non-outline focus indicators',
-        count: types.nonOutlinePresent.total,
+        count: types.nonoutline.total,
         ordinalSeverity: 2,
         tagName: '',
         id: '',

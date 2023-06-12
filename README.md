@@ -65,7 +65,7 @@ As of this version, the counts of tests of the tools referenced above were:
 - Testaro: 29
 - total: 1356
 
-Of the 29 Testaro tests, 26 are evaluative (they discover accessibility issues), and the other 3 (`elements`, `textNodes`, and `title`) are informative (they report conditions specified by the user).
+Of the 29 Testaro tests, 26 are evaluative (they discover accessibility problems), and the other 3 (`elements`, `textNodes`, and `title`) are informative (they report conditions specified by the user).
 
 ## Quasi-tests
 
@@ -195,21 +195,21 @@ While each tool produces a _tool report_ of the results of its tests, Testaro al
 
 ##### Tool formats
 
-The tools listed above as dependencies write their tool reports in various formats. They differ in how they organize multiple instances of the same issue, how they classify issue severity and certainty, how they point to the locations of issue instances, how they name issues, etc.
-
-Integrating reports from 10 different tools is a complex task, as analyzed in [“Accessibility Metatesting”](https://arxiv.org/abs/2304.07591). The diversity of their reporting formats makes the task more complex than it would otherwise be.
+The tools listed above as dependencies write their tool reports in various formats. They differ in how they organize multiple instances of the same problem, how they classify severity and certainty, how they point to the locations of problems, how they name problems, etc.
 
 ##### Standard format
 
 Testaro helps overcome this format diversity by offering to represent the main facts in the report of each tool in a single standardized format.
 
+In the conceptual scheme underlying the format standardization of Testaro, each tool has its own set of _rules_, where a rule is an algorithm for evaluating a target and determining whether instances of some kind of problem exist in it. With standardization, Testaro reports, in a uniform way, the outcomes from the application of rules by tools to a target.
+
 If the `STANDARD` environment variable has the value `also` (which it has by default) or `only`, Testaro converts some data in each tool report to a standard format. That permits you to ignore the format idiosyncrasies of the tools. If `STANDARD` has the value `also`, the job report includes both formats. If the value is `only`, the job report includes only the standard format. If the value is `no`, the job report includes only the original format of each tool.
 
 The standard format of each tool report has two properties:
-- `totals`: an array of 4 integers, representing the counts of issue instances classified by the tool into 4 ordinal degrees of severity. For example, `[2, 13, 0, 5]` would mean that the tool reported 2 instances at the lowest severity, 13 at the next-lowest, none at the third-lowest, and 5 at the highest.
+- `totals`: an array of 4 integers, representing the counts of problem instances classified by the tool into 4 ordinal degrees of severity. For example, `[2, 13, 0, 5]` would mean that the tool reported 2 instances at the lowest severity, 13 at the next-lowest, none at the third-lowest, and 5 at the highest.
 - `instances`: an array of objects describing facts about issue instances reported by the tool. This object has these properties, some of which have empty strings as values when the tool does not provide values:
-    - `issueID`: a code identifying the issue
-    - `what`: a description of the issue
+    - `ruleID`: a code identifying a rule
+    - `what`: a description of the rule
     - `count` (optional): the count of instances if this instance represents multiple instances
     - `ordinalSeverity`: how the tool ranks the severity of the instance, on a 4-point ordinal scale
     - `tagName`: upper-case tagName of the affected element
@@ -227,7 +227,7 @@ standardResult: {
   totals: [2, 0, 17, 0],
   instances: [
     {
-      issueID: 'rule01',
+      ruleID: 'rule01',
       what: 'Button type invalid',
       ordinalSeverity: 0,
       tagName: 'BUTTON'
@@ -240,7 +240,7 @@ standardResult: {
       excerpt: '<button type="link"></button>'
     },
     {
-      issueID: 'rule01',
+      ruleID: 'rule01',
       what: 'Button type invalid',
       ordinalSeverity: 1,
       tagName: 'BUTTON',
@@ -253,7 +253,7 @@ standardResult: {
       excerpt: '<button type="important">Submit</button>'
     },
     {
-      issueID: 'rule02',
+      ruleID: 'rule02',
       what: 'Links have empty href attributes',
       count: 17,
       ordinalSeverity: 3,
@@ -272,7 +272,7 @@ standardResult: {
 
 If a tool has the option to be used without itemization and is being so used, the `instances` array may be empty.
 
-The standard format is not opinionated about issue classifications. It treats an issue ID from any tool as an identifier of what that tool considers to be the issue. Useful reporting from multi-tool testing still requires issue classification. If tool `A` identifies an issue as `alt-incomplete` and tool `B` identifies an issue as `image_alt_meaningless`, Testaro does not decide whether those are really the same issue or different issues. That decision belongs to whoever consumes Testaro reports. The standardization of tool reports by Testaro eliminates some of the drudgery in issue classification, but not any of the judgment required for issue classification.
+This standard format is not opinionated about issue classifications. A rule ID identifies something deemed to be an issue by a tool. Useful reporting from multi-tool testing still requires the classification of tool **rules** into **issues**. If tool `A` has `alt-incomplete` as a rule ID and tool `B` has `image_alt_stub` as a rule ID, Testaro does not decide whether those are really the same issue or different issues. That decision belongs to you. The standardization of tool reports by Testaro eliminates some of the drudgery in issue classification, but not any of the judgment required for issue classification.
 
 ### Acts
 

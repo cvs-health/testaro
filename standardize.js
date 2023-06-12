@@ -53,7 +53,7 @@ const doAxe = (result, standardResult, certainty) => {
         const ordinalSeverity = severityWeights[node.impact] + (certainty === 'violations' ? 2 : 0);
         const identifiers = getIdentifiers(node.html);
         const instance = {
-          issueID: rule.id,
+          ruleID: rule.id,
           what: Array.from(whatSet.values()).join('; '), 
           ordinalSeverity,
           tagName: identifiers[0],
@@ -79,7 +79,7 @@ const doHTMLCS = (result, standardResult, severity) => {
         ruleData[what].forEach(item => {
           const {tagName, id, code} = item;
           const instance = {
-            issueID: ruleID,
+            ruleID,
             what,
             ordinalSeverity: ['Warning', '', '', 'Error'].indexOf(severity),
             tagName: tagName.toUpperCase(),
@@ -113,7 +113,7 @@ const doNuVal = (result, standardResult, docType) => {
       }
       // Include the message twice, because in scoring it is likely to be replaced by a pattern.
       const instance = {
-        issueID: item.message,
+        ruleID: item.message,
         what: item.message,
         ordinalSeverity: -1,
         tagName: identifiers[0],
@@ -154,14 +154,14 @@ const doQualWeb = (result, standardResult, ruleClassName) => {
         failed: 3
       }
     };
-    Object.keys(ruleClass.assertions).forEach(rule => {
-      const ruleResult = ruleClass.assertions[rule];
+    Object.keys(ruleClass.assertions).forEach(ruleID => {
+      const ruleResult = ruleClass.assertions[ruleID];
       ruleResult.results.forEach(item => {
         item.elements.forEach(element => {
           const {htmlCode} = element;
           const identifiers = getIdentifiers(htmlCode);
           const instance = {
-            issueID: rule,
+            ruleID,
             what: ruleResult.description,
             ordinalSeverity: severities[ruleClassName][item.verdict],
             tagName: identifiers[0],
@@ -185,8 +185,8 @@ const doWAVE = (result, standardResult, categoryName) => {
   if (result.categories && result.categories[categoryName]) {
     const category = result.categories[categoryName];
     const ordinalSeverity = categoryName === 'alert' ? 0 : 3;
-    Object.keys(category.items).forEach(rule => {
-      category.items[rule].selectors.forEach(selector => {
+    Object.keys(category.items).forEach(ruleID => {
+      category.items[ruleID].selectors.forEach(selector => {
         let tagName = '';
         let id = '';
         if (typeof selector === 'string') {
@@ -201,8 +201,8 @@ const doWAVE = (result, standardResult, categoryName) => {
           }
         }
         const instance = {
-          issueID: rule,
-          what: category.items[rule].description,
+          ruleID,
+          what: category.items[ruleID].description,
           ordinalSeverity,
           tagName,
           id,
@@ -234,16 +234,17 @@ const convert = (toolName, result, standardResult) => {
           tagName = tagNameArray[1];
         }
       }
+      const {rule, target} = item;
       const instance = {
-        issueID: item.rule.ruleID,
-        what: item.rule.ruleSummary,
+        ruleID: rule.ruleID,
+        what: rule.ruleSummary,
         ordinalSeverity: ['cantTell', '', '', 'failed'].indexOf(item.verdict),
         tagName: tagName.toUpperCase() || identifiers[0],
         id: identifiers[1],
         location: {
           doc: 'dom',
           type: 'xpath',
-          spec: item.target.path
+          spec: target.path
         },
         excerpt: cap(code)
       };
@@ -281,7 +282,7 @@ const convert = (toolName, result, standardResult) => {
         }
       }
       const instance = {
-        issueID: item.engineTestId.toString(),
+        ruleID: item.engineTestId.toString(),
         what: item.attributeDetail,
         ordinalSeverity: 3,
         tagName,
@@ -320,7 +321,7 @@ const convert = (toolName, result, standardResult) => {
         }
       }
       const instance = {
-        issueID: item.ruleId,
+        ruleID: item.ruleId,
         what: item.message,
         ordinalSeverity: ['', 'recommendation', '', 'violation'].indexOf(item.level),
         tagName: identifiers[0],
@@ -385,7 +386,7 @@ const convert = (toolName, result, standardResult) => {
         }
       }
       const instance = {
-        issueID: item.tID ? item.tID.toString() : '',
+        ruleID: item.tID ? item.tID.toString() : '',
         what: item.errorTitle || '',
         ordinalSeverity: Math.min(
           3, Math.max(0, Math.round((item.certainty || 0) * (item.priority || 0) / 3333))
