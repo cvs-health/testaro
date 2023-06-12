@@ -22,10 +22,15 @@ const cap = rawString => {
 const getIdentifiers = code => {
   let tagName = '';
   let id = '';
+  // If the substring includes a tag of an element:
   if (code && typeof code === 'string' && code.length && /<.+/s.test(code)) {
-    const startTag = code.replace(/^[^<]*<\/[^>]+>/, '').replace(/^[^<]*<|>.*/sg, '').trim();
+    // Get the first start tag in the substring.
+    const startTag = code.replace(/^.*?<(?!\/)/s, '').replace(/>.*$/s, '').trim();
+    // If it exists:
     if (startTag && startTag.length) {
-      tagName = startTag.replace(/\s.+$/s, '').toUpperCase();
+      // Get its tag name, upper-cased.
+      tagName = startTag.replace(/\s.*$/s, '').toUpperCase();
+      // Get the value of the id attribute of the start tag, if any.
       const idArray = startTag.match(/\sid="([^"<>]+)"/);
       if (idArray && idArray.length === 2) {
         id = idArray[1];
