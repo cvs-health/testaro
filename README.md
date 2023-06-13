@@ -84,7 +84,7 @@ The main directories containing code files are:
 
 ## System requirements
 
-Version 14 or later of [Node.js](https://nodejs.org/en/).
+Version 16 or later of [Node.js](https://nodejs.org/en/).
 
 ## Installation
 
