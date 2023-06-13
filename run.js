@@ -20,6 +20,8 @@ const playwright = require('playwright');
 const debug = process.env.DEBUG === 'true';
 // Set WAITS environment variable to a positive number to insert delays (in ms).
 const waits = Number.parseInt(process.env.WAITS) || 0;
+// Set STANDARD environment variable to also if not set.
+process.env.STANDARD ??= 'also';
 // CSS selectors for targets of moves.
 const moves = {
   button: 'button, [role=button], input[type=submit]',
