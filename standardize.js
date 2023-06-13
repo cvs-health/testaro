@@ -403,7 +403,7 @@ const convert = (toolName, result, standardResult) => {
           type: 'xpath',
           spec: item.xpath || ''
         },
-        excerpt: cap(item.errorSnippet || '')
+        excerpt: cap(item.errorSnippet || '').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
       };
       standardResult.instances.push(instance);
     });
