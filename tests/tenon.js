@@ -69,9 +69,9 @@ exports.reporter = async (tenonData, options) => {
         && testResult.data.resultSet.length
       ) {
         // Delete the results of tests of rules not specified.
-        const {resultSet} = testResult.data;
-        testResult.data.resultSet = resultSet
-        .filter(result => ! rules.includes(result.tID.toString()));
+        testResult.data.resultSet = testResult.data.resultSet.filter(
+          result => rules.includes(result.tID.toString())
+        );
       }
       return testResult;
     };

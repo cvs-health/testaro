@@ -38,7 +38,7 @@ exports.reporter = async (page, options) => {
                 if (
                   categories[category]
                   && categories[category].items
-                  && categories[category].items.length
+                  && Object.keys(categories[category].items).length
                 ) {
                   Object.keys(categories[category].items).forEach(ruleID => {
                     if (! rules.includes(ruleID)) {
