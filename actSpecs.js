@@ -184,7 +184,7 @@ exports.actSpecs = {
       'Perform Testaro tests',
       {
         withItems: [true, 'boolean', '', 'itemize'],
-        args: [false, 'object', 'areArrays', 'extra args (object with rule properties and arrays of argument values as values ({focInd: [false, 250], hover: [-1], motion: [2500, 2500, 5]} by default'],
+        args: [false, 'object', 'areArrays', 'extra args (object; property names are rule IDs and values are arrays of additional argument values ({focInd: [false, 250], hover: [20], motion: [2500, 2500, 5]} by default'],
       }
     ],
     wave: [

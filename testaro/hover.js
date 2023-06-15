@@ -310,7 +310,7 @@ const find = async (data, withItems, page, sample) => {
   }
 };
 // Performs the hover test and reports results.
-exports.reporter = async (page, withItems, sampleSize = -1) => {
+exports.reporter = async (page, withItems, sampleSize = 20) => {
   // Initialize the result.
   let data = {
     totals: {
