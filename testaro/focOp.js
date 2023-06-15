@@ -157,7 +157,7 @@ exports.reporter = async (page, withItems) => {
       data.items[issue].forEach(item => {
         standardInstances.push({
           ruleID: 'focOp',
-          complaint: `${item.tagName} element ${gripe}`,
+          complaint: `${item.tagName || 'An'} element ${gripe}`,
           ordinalSeverity,
           tagName: item.tagName,
           id: item.id,
