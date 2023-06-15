@@ -406,7 +406,7 @@ exports.reporter = async (page, withItems, sampleSize = -1) => {
     Object.keys(data.items).forEach(issue => {
       data.items[issue].forEach(item => {
         standardInstances.push({
-          ruleID: `hover-${issue}`,
+          ruleID: 'hover',
           what: what[issue],
           count: data.totals[issue],
           ordinalSeverity: severity[issue],
