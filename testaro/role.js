@@ -486,7 +486,7 @@ exports.reporter = async page => await page.$eval('body', body => {
       const redCount = pairTotals.redundant;
       if (redCount) {
         standardInstances.push({
-          issueID: 'role-redundant',
+          ruleID: 'role',
           what: `${tagName} elements have redundant explicit role ${role} (count: ${redCount})`,
           count: redCount,
           ordinalSeverity: 1,
@@ -503,7 +503,7 @@ exports.reporter = async page => await page.$eval('body', body => {
       const badCount = pairTotals.bad;
       if (badCount) {
         standardInstances.push({
-          issueID: 'role-bad',
+          ruleID: 'role',
           what:
           `${tagName} elements have invalid or native-replaceable explicit role ${role} (count: ${badCount})`,
           count: badCount,

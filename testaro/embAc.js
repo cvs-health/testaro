@@ -45,7 +45,7 @@ exports.reporter = async (page, withItems) => await page.$$eval(
       data.items = items;
       items.forEach(item => {
         standardInstances.push({
-          issueID: `embAc-${item.embeddedElement}`,
+          ruleID: 'embAc',
           what: `${item.embeddedElement} element is embedded in a link or button`,
           ordinalSeverity: 2,
           tagName: item.embeddedElement,
@@ -61,7 +61,7 @@ exports.reporter = async (page, withItems) => await page.$$eval(
     }
     else if (total) {
       standardInstances.push({
-        issueID: 'embAc',
+        ruleID: 'embAc',
         what: 'Interactive elements are contained by links or buttons',
         count: total,
         ordinalSeverity: 2,

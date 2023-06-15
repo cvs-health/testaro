@@ -74,7 +74,7 @@ exports.reporter = async (page, withItems) => {
   if (data.items) {
     data.items.forEach(item => {
       standardInstances.push({
-        issueID: `autocomplete-${item[0]}`,
+        ruleID: 'autocomplete',
         what: `Input is missing the required autocomplete attribute with value ${item[0]}`,
         ordinalSeverity: 2,
         tagName: 'INPUT',
@@ -90,7 +90,7 @@ exports.reporter = async (page, withItems) => {
   }
   else if (data.total) {
     standardInstances.push({
-      issueID: 'autocomplete',
+      ruleID: 'autocomplete',
       what: 'Inputs are missing required autocomplete attributes',
       ordinalSeverity: 2,
       tagName: '',

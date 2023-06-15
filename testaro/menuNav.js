@@ -275,7 +275,7 @@ exports.reporter = async (page, withItems) => {
   if (data.menuItems && data.menuItems.incorrect) {
     data.menuItems.incorrect.forEach(item => {
       standardInstances.push({
-        issueID: 'menuNav',
+        ruleID: 'menuNav',
         what: `Menu item responds nonstandardly to ${item.navigationErrors.join(', ')}`,
         count: item.navigationErrors.length,
         ordinalSeverity: 1,
@@ -292,7 +292,7 @@ exports.reporter = async (page, withItems) => {
   }
   else if (data.totals.menuItems.incorrect) {
     standardInstances.push({
-      issueID: 'menuNav',
+      ruleID: 'menuNav',
       what: 'Menus and menu items have nonstandard navigation',
       count: data.totals.navigations.all.incorrect,
       ordinalSeverity: 1,

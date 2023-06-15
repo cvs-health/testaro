@@ -14,7 +14,7 @@ exports.reporter = async page => {
     data: {docHasType},
     totals: [0, 0, 0, docHasType ? 0 : 1],
     standardInstances: docHasType ? [] : [{
-      issueID: 'docType',
+      ruleID: 'docType',
       what: 'Document has no standard HTML doctype preamble',
       ordinalSeverity: 3,
       tagName: 'HTML',

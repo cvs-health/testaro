@@ -27,7 +27,7 @@ exports.reporter = async (page, withItems) => {
     data.items = badLinkData;
     data.items.forEach(item => {
       standardInstances.push({
-        issueID: 'linkTo',
+        ruleID: 'linkTo',
         what: 'Element a has no href attribute',
         ordinalSeverity: 2,
         tagName: 'A',
@@ -43,7 +43,7 @@ exports.reporter = async (page, withItems) => {
   }
   else if (data.total) {
     standardInstances.push({
-      issueID: 'linkTo',
+      ruleID: 'linkTo',
       what: 'Links are missing href attributes',
       count: data.total,
       ordinalSeverity: 2,

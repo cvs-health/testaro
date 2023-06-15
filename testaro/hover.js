@@ -406,7 +406,7 @@ exports.reporter = async (page, withItems, sampleSize = -1) => {
     Object.keys(data.items).forEach(issue => {
       data.items[issue].forEach(item => {
         standardInstances.push({
-          issueID: `hover-${issue}`,
+          ruleID: `hover-${issue}`,
           what: what[issue],
           count: data.totals[issue],
           ordinalSeverity: severity[issue],
@@ -424,7 +424,7 @@ exports.reporter = async (page, withItems, sampleSize = -1) => {
   }
   else if (totals.some(total => total)) {
     standardInstances.push({
-      issueID: 'hover',
+      ruleID: 'hover',
       what: 'Hovering has unexpected impacts',
       count: Object.values(data.totals).reduce((total, current) => total + current),
       ordinalSeverity: totals.reduce((max, current, index) => current ? index : max, 0),

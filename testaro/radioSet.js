@@ -88,7 +88,7 @@ exports.reporter = async (page, withItems) => {
         }));
         items.notInSet.forEach(item => {
           standardInstances.push({
-            issueID: 'radioSet',
+            ruleID: 'radioSet',
             what: 'Radio button and its peers are not in a fieldset with a legend',
             ordinalSeverity: 2,
             tagName: 'INPUT',
@@ -104,7 +104,7 @@ exports.reporter = async (page, withItems) => {
       }
       else if (loneRadios > 0) {
         standardInstances.push({
-          issueID: 'radioSet',
+          ruleID: 'radioSet',
           what: 'Radio buttons are not validly grouped in fieldsets with legends',
           count: loneRadios,
           ordinalSeverity: 2,

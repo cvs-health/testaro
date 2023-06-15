@@ -28,9 +28,9 @@ exports.reporter = async (page, options) => {
       continuum.setUp(null, null, window);
       // If a set of rules to be employed was specified:
       let bigResultPromise;
-      if (rules && Array.isArray(rules) && rules.length && rules.every(rule => typeof rule === 'number')) {
+      if (rules && Array.isArray(rules) && rules.length && rules.every(rule => typeof rule === 'string')) {
         // Run the tests for them.
-        bigResultPromise = continuum.runTests(rules);
+        bigResultPromise = continuum.runTests(rules.map(rule => Number.parseInt(rule)));
       }
       // Otherwise, i.e. if no rules were specified:
       else {

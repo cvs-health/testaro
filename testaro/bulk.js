@@ -23,7 +23,7 @@ exports.reporter = async page => {
     data,
     totals: [count, 0, 0, 0],
     standardInstances: data.visibleElements < 200 ? [] : [{
-      issueID: 'bulk',
+      ruleID: 'bulk',
       what: 'Page contains a large number of visible elements',
       count,
       ordinalSeverity: 0,

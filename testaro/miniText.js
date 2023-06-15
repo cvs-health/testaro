@@ -50,7 +50,7 @@ exports.reporter = async (page, withItems) => {
     data.items = miniTexts;
     miniTexts.forEach(text => {
       standardInstances.push({
-        issueID: 'miniText',
+        ruleID: 'miniText',
         what: 'Text font is smaller than 11 pixels',
         ordinalSeverity: 2,
         tagName: text.tagName,
@@ -66,7 +66,7 @@ exports.reporter = async (page, withItems) => {
   }
   else if (data.total) {
     standardInstances.push({
-      issueID: 'miniText',
+      ruleID: 'miniText',
       what: 'Texts have fonts smaller than 11 pixels',
       count: data.total,
       ordinalSeverity: 2,

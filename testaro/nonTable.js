@@ -68,7 +68,7 @@ exports.reporter = async (page, withItems) => {
     data.items = badTableTexts;
     data.items.forEach(item => {
       standardInstances.push({
-        issueID: 'nonTable',
+        ruleID: 'nonTable',
         what: 'Table is misused to arrange content',
         ordinalSeverity: 0,
         tagName: 'TABLE',
@@ -84,7 +84,7 @@ exports.reporter = async (page, withItems) => {
   }
   else if (data.total) {
     standardInstances.push({
-      issueID: 'nonTable',
+      ruleID: 'nonTable',
       what: 'Tables are misused to arrange content',
       count: data.total,
       ordinalSeverity: 0,

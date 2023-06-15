@@ -33,7 +33,7 @@ exports.reporter = async (page, withItems) => {
   if (data.items) {
     data.items.forEach(item => {
       standardInstances.push({
-        issueID: 'focVis',
+        ruleID: 'focVis',
         what: 'Visible link is above or to the left of the display',
         ordinalSeverity: 2,
         tagName: 'A',
@@ -49,7 +49,7 @@ exports.reporter = async (page, withItems) => {
   }
   else if (data.total) {
     standardInstances.push({
-      issueID: 'focVis',
+      ruleID: 'focVis',
       what: 'Visible links are above or to the left of the display',
       count: data.total,
       ordinalSeverity: 2,

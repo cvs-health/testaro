@@ -164,7 +164,7 @@ exports.reporter = async (page, withItems) => {
             excerptTail = item.content || '';
           }
           standardInstances.push({
-            issueID: `labClash-${issue}`,
+            ruleID: 'labClash',
             what: `Element ${item.tagName} ${diagnosis}`,
             ordinalSeverity: issue === 'mislabeled' ? 2 : 3,
             tagName: item.tagName,
@@ -182,7 +182,7 @@ exports.reporter = async (page, withItems) => {
     else {
       if (data.totals.unlabeled) {
         standardInstances.push({
-          issueID: 'labClash-unlabeled',
+          ruleID: 'labClash',
           what: 'Element labels are missing',
           count: data.totals.unlabeled,
           ordinalSeverity: 3,
@@ -198,7 +198,7 @@ exports.reporter = async (page, withItems) => {
       }
       if (data.totals.mislabeled) {
         standardInstances.push({
-          issueID: 'labClash-mislabeled',
+          ruleID: 'labClash',
           what: 'Element labels are conflicting',
           count: data.totals.mislabeled,
           ordinalSeverity: 2,

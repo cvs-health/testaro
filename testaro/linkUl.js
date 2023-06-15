@@ -79,7 +79,7 @@ exports.reporter = async (page, withItems) => {
     if (data.items && data.items.notUnderlined) {
       data.items.notUnderlined.forEach(item => {
         standardInstances.push({
-          issueID: 'linkUl',
+          ruleID: 'linkUl',
           what: 'Link is inline but has no underline',
           ordinalSeverity: 1,
           tagName: 'A',
@@ -95,7 +95,7 @@ exports.reporter = async (page, withItems) => {
     }
     else if (adjacent.total - adjacent.underlined > 0) {
       standardInstances.push({
-        issueID: 'linkUl',
+        ruleID: 'linkUl',
         what: 'Inline links are missing underlines',
         count: adjacent.total - adjacent.underlined,
         ordinalSeverity: 1,

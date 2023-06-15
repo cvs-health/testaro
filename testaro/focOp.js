@@ -150,17 +150,14 @@ exports.reporter = async (page, withItems) => {
   const standardInstances = [];
   if (data.items && data.items.onlyFocusable && data.items.onlyOperable) {
     ['onlyFocusable', 'onlyOperable'].forEach(issue => {
-      const issueID = issue === 'onlyFocusable'
-        ? 'focOp-focusable-inoperable'
-        : 'focOp-operable-nonfocusable';
       const gripe = issue === 'onlyFocusable'
         ? 'is focusable but not operable'
         : 'is operable but not focusable';
       const ordinalSeverity = issue === 'onlyFocusable' ? 2 : 3;
       data.items[issue].forEach(item => {
         standardInstances.push({
-          issueID,
-          what: `${item.tagName} element ${gripe}`,
+          ruleID: 'focOp',
+          complaint: `${item.tagName} element ${gripe}`,
           ordinalSeverity,
           tagName: item.tagName,
           id: item.id,
@@ -177,8 +174,8 @@ exports.reporter = async (page, withItems) => {
   else {
     if (totals[2]) {
       standardInstances.push({
-        issueID: 'focOp-onlyFocusable',
-        what: 'Focusable elements are inoperable',
+        ruleID: 'focOp',
+        complaint: 'Focusable elements are inoperable',
         count: totals[2],
         ordinalSeverity: 2,
         tagName: '',
@@ -193,8 +190,8 @@ exports.reporter = async (page, withItems) => {
     }
     if (totals[3]) {
       standardInstances.push({
-        issueID: 'focOp-onlyOperable',
-        what: 'Operable elements are nonfocusable',
+        ruleID: 'focOp',
+        complaint: 'Operable elements are nonfocusable',
         count: totals[3],
         ordinalSeverity: 3,
         tagName: '',

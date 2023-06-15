@@ -30,7 +30,7 @@ exports.reporter = async (page, withItems) => {
     data.items = badTitleElements;
     badTitleElements.forEach(element => {
       standardInstances.push({
-        issueID: 'titledEl',
+        ruleID: 'titledEl',
         what: `${element.tagName} element has a title attribute`,
         ordinalSeverity: 2,
         tagName: element.tagName,
@@ -46,7 +46,7 @@ exports.reporter = async (page, withItems) => {
   }
   else if (data.total) {
     standardInstances.push({
-      issueID: 'titledEl',
+      ruleID: 'titledEl',
       what: 'Ineligible elements have title attributes',
       count: data.total,
       ordinalSeverity: 2,

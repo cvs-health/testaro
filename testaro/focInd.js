@@ -174,7 +174,7 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
       data.items[issueName].forEach(item => {
         const qualifier = issueName === 'nonoutline' ? 'a non-outline' : 'no';
         standardInstances.push({
-          issueID: `focInd-${issueName}`,
+          issueID: 'focInd',
           what: `${item.tagName} element has ${qualifier} focus indicator`,
           ordinalSeverity: issueName === 'nonoutline' ? 2 : 3,
           tagName: item.tagName,
@@ -192,7 +192,7 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
   else {
     if (types.missing.total) {
       standardInstances.push({
-        issueID: 'focInd-missing',
+        issueID: 'focInd',
         what: 'Elements have missing focus indicators',
         count: types.missing.total,
         ordinalSeverity: 3,
@@ -208,7 +208,7 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
     }
     if (types.nonoutline.total) {
       standardInstances.push({
-        issueID: 'focInd-nonoutline',
+        issueID: 'focInd',
         what: 'Elements have non-outline focus indicators',
         count: types.nonoutline.total,
         ordinalSeverity: 2,

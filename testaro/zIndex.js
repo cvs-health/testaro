@@ -52,7 +52,7 @@ exports.reporter = async (page, withItems) => {
   if (data.items) {
     data.items.forEach(item => {
       standardInstances.push({
-        issueID: 'zIndex',
+        ruleID: 'zIndex',
         what: `${item.tagName} element has a non-default Z index`,
         ordinalSeverity: 0,
         tagName: item.tagName,
@@ -68,7 +68,7 @@ exports.reporter = async (page, withItems) => {
   }
   else if (data.totals.total) {
     standardInstances.push({
-      issueID: 'zIndex',
+      ruleID: 'zIndex',
       what: 'Elements have non-default Z indexes',
       count: data.totals.total,
       ordinalSeverity: 0,

@@ -48,7 +48,7 @@ exports.reporter = async (page, withItems, attributeName, areLicit, values) => {
     data.items = badAttributeData;
     badAttributeData.forEach(item => {
       standardInstances.push({
-        issueID: `attVal-${item.tagName}-${attributeName}`,
+        ruleID: 'attVal',
         what:
           `${item.tagName} element has attribute ${attributeName} with illicit value ${item.attributeValue}`,
         ordinalSeverity: 2,
@@ -65,7 +65,7 @@ exports.reporter = async (page, withItems, attributeName, areLicit, values) => {
   }
   else if (data.total) {
     standardInstances.push({
-      issueID: 'attVal',
+      ruleID: 'attVal',
       what: 'Elements have attributes with illicit values',
       count: data.total,
       ordinalSeverity: 2,

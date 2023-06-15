@@ -76,7 +76,7 @@ exports.reporter = async page => {
       if (data[hider][region]) {
         // Add a standard instance for that combination.
         standardInstances.push({
-          issueID: `allHidden-${hider}-${region}`,
+          ruleID: 'allHidden',
           what: `${reportables[region][1]} ${reportables[hider][1]}`,
           ordinalSeverity: reportables[region][0] + reportables[hider][0] || 0,
           tagName: region.tagName,

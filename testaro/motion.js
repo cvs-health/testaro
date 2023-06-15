@@ -124,7 +124,7 @@ exports.reporter = async (page, withItems, delay = 2500, interval = 2500, count 
         0
       ],
       standardInstances: count ? [{
-        issueID: 'motion',
+        ruleID: 'motion',
         what: 'Content moves or changes without user request',
         count,
         ordinalSeverity: 2,

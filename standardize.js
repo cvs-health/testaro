@@ -116,7 +116,7 @@ const doNuVal = (result, standardResult, docType) => {
           identifiers[0] = tagNameLCArray[1].toUpperCase();
         }
       }
-      // Include the message twice, because in scoring it is likely to be replaced by a pattern.
+      // Include the message twice. A scoring procedure may replace the ruleID with a pattern.
       const instance = {
         ruleID: item.message,
         what: item.message,
@@ -232,19 +232,18 @@ const convert = (toolName, result, standardResult) => {
       const {codeLines} = item.target;
       const code = Array.isArray(codeLines) ? codeLines.join(' ') : '';
       const identifiers = getIdentifiers(code);
-      let tagName = item.target && item.target.tagName || '';
-      if (! tagName) {
-        const tagNameArray = item.target.path.match(/\/([a-z]+)\[\d+\]\/text\(\)\[\d+\]$/);
-        if (tagNameArray && tagNameArray.length === 2) {
-          tagName = tagNameArray[1];
-        }
+      const tagNameArray = item.target
+      && item.target.path
+      && item.target.path.match(/^.*\/([a-z]+)\[\d+\]/);
+      if (tagNameArray && tagNameArray.length === 2) {
+        identifiers[0] = tagNameArray[1].toUpperCase();
       }
       const {rule, target} = item;
       const instance = {
         ruleID: rule.ruleID,
         what: rule.ruleSummary,
         ordinalSeverity: ['cantTell', '', '', 'failed'].indexOf(item.verdict),
-        tagName: tagName.toUpperCase() || identifiers[0],
+        tagName: identifiers[0],
         id: identifiers[1],
         location: {
           doc: 'dom',
@@ -452,6 +451,9 @@ const convert = (toolName, result, standardResult) => {
     ['error', 'contrast', 'alert'].forEach(categoryName => {
       doWAVE(result, standardResult, categoryName);
     });
+  }
+  else {
+    standardResult.totals = [0, 0, 0, 0];
   }
 };
 // Converts the results.

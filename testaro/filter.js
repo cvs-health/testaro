@@ -53,7 +53,7 @@ exports.reporter = async (page, withItems) => {
   if (data.items) {
     data.items.forEach(item => {
       standardInstances.push({
-        issueID: 'filterStyle',
+        ruleID: 'filterStyle',
         what: `${item.tagName} element has a filter style that impacts ${item.impact} elements`,
         ordinalSeverity: 2,
         tagName: item.toUpperCase(),
@@ -69,7 +69,7 @@ exports.reporter = async (page, withItems) => {
   }
   else if (data.totals.styledElements) {
     standardInstances.push({
-      issueID: 'filterStyle',
+      ruleID: 'filterStyle',
       what: 'Elements have filter styles impacting other elements',
       ordinalSeverity: 2,
       tagName: '',
