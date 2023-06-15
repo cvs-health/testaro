@@ -225,8 +225,12 @@ const doWAVE = (result, standardResult, categoryName) => {
 };
 // Converts a result.
 const convert = (toolName, result, standardResult) => {
+  // Prevention.
+  if (result.prevented) {
+    standardResult.prevented = true;
+  }
   // alfa
-  if (toolName === 'alfa' && result.totals) {
+  else if (toolName === 'alfa' && result.totals) {
     standardResult.totals = [result.totals.warnings, 0, 0, result.totals.failures];
     result.items.forEach(item => {
       const {codeLines} = item.target;
@@ -452,6 +456,7 @@ const convert = (toolName, result, standardResult) => {
       doWAVE(result, standardResult, categoryName);
     });
   }
+  // Any tool with no reported rule violations:
   else {
     standardResult.totals = [0, 0, 0, 0];
   }

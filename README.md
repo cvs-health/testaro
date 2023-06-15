@@ -6,9 +6,11 @@ Ensemble testing for web accessibility
 
 Testaro is a collection of web accessibility testing tools.
 
-The purpose of Testaro is to provide programmatic access to accessibility tests defined by several tools.
+The purposes of Testaro are to:
+- provide programmatic access to accessibility tests defined by several tools
+- facilitate the integration of the reports of the tools into a unified report
 
-Testaro aims to increase the efficiency of multi-tool integration for accessibility testing. The need for multi-tool integration, and its costs, are analyzed in [Accessibility Metatesting: Comparing Nine Testing Tools](https://arxiv.org/abs/2304.07591).
+The need for multi-tool integration, and its costs, are discussed in [Accessibility Metatesting: Comparing Nine Testing Tools](https://arxiv.org/abs/2304.07591).
 
 Testaro launches and controls web browsers, performing operations, conducting tests, and recording results.
 
@@ -52,27 +54,19 @@ Testaro performs tests of these tools:
 
 The [BBC Accessibility Standards Checker](https://github.com/bbc/bbc-a11y) is not a formal dependency, but some of the tests in the Testaro tool are adaptations of tests of that tool.
 
-As of this version, the counts of tests of the tools referenced above were:
-- Alfa: 103
-- Axe-core: 138
-- Continuum Community Edition: 267
-- Equal Access: 163
-- HTML CodeSniffer: 98
-- Nu Html Checker: 147
-- QualWeb core: 121
-- Tenon: 180
-- WAVE: 110
-- Testaro: 29
-- total: 1356
+## Rules
 
-Of the 29 Testaro tests, 26 are evaluative (they discover accessibility problems), and the other 3 (`elements`, `textNodes`, and `title`) are informative (they report conditions specified by the user).
+Each tool accessed with Testaro defines _rules_ and tests _targets_ for compliance with its rules. The counts of the rules range from about 30, for Testaro itself, to about 270, for Continuum Community Edition. In total, the ten tools define about 1350 rules. Some of the tools are under active development, and their rule counts change over time.
 
-## Quasi-tests
+## Job data
 
-Reports produced by Testaro contain data in addition to the results of these tests. Such data can be used like tests. In particular, the data include:
-- Latency (how long a time each tool takes to run its tests)
-- Test prevention (the failure of tools to run on particular targets)
-- Logging (browser messaging, including about document errors, during testing)
+A report produced by Testaro discloses:
+- raw results of tests conducted by tools
+- standardized results of tests conducted by tools
+- process data, including statistics on:
+    - latency (how long a time each tool takes to run its tests)
+    - test prevention (the failure of tools to run on particular targets)
+    - logging (browser messaging, including about document errors, during testing)
 
 ## Code organization
 
@@ -188,30 +182,31 @@ Job properties:
 #### Introduction
 
 While each tool produces a _tool report_ of the results of its tests, Testaro also produces a _job report_, combining all of the tool reports of a job.
-- Tools append their reports to their acts in a job. For example, if one act in a job specifies some Continuum tests to be run, Continuum appends its report to that act. In that way, the act now describes not only the Continuum tests that were run, but also the results of those tests.
-- Testaro further elaborates a job by reporting comprehensive results there. Testaro can add more facts to each of the tool reports and also adds whole-job facts, in a `jobData` property, to the job. Testaro thereby converts the job to a job report.
+- Tools append their reports to their acts in a job. For example, if one act in a job specifies some Continuum tests to be run, Continuum appends its report to that act. In that way, the act now describes not only the Continuum tests that were run, but also the results of those tests. Testaro does some pruning of tool reports, removing content that is judged unlikely to be useful. You can examine and modify the pruning algorithms in the modules located in the `tests` directory.
+- Testaro further elaborates a job by reporting comprehensive results in a job report. Testaro can add more facts to each of the tool reports and also adds whole-job facts, in a `jobData` property, to the job.
 
 #### Formats
 
-##### Tool formats
+##### Tool-report formats
 
 The tools listed above as dependencies write their tool reports in various formats. They differ in how they organize multiple instances of the same problem, how they classify severity and certainty, how they point to the locations of problems, how they name problems, etc.
 
 ##### Standard format
 
-Testaro helps overcome this format diversity by offering to represent the main facts in the report of each tool in a single standardized format.
+Testaro helps overcome this format diversity by offering to represent the main facts in each tool report in a single standardized format.
 
 In the conceptual scheme underlying the format standardization of Testaro, each tool has its own set of _rules_, where a rule is an algorithm for evaluating a target and determining whether instances of some kind of problem exist in it. With standardization, Testaro reports, in a uniform way, the outcomes from the application of rules by tools to a target.
 
-If the `STANDARD` environment variable has the value `also` (which it has by default) or `only`, Testaro converts some data in each tool report to a standard format. That permits you to ignore the format idiosyncrasies of the tools. If `STANDARD` has the value `also`, the job report includes both formats. If the value is `only`, the job report includes only the standard format. If the value is `no`, the job report includes only the original format of each tool.
+If the `STANDARD` environment variable has the value `also` (which it has by default) or `only`, Testaro converts some data in each tool report to a standard format. That permits you to ignore the format idiosyncrasies of the tools. If `STANDARD` has the value `also`, the job report includes both formats. If the value is `only`, the job report includes only the standard format. If the value is `no`, the job report includes only the original format of each tool report.
 
-The standard format of each tool report has two properties:
+The standard format of each tool report has these properties:
+- `prevented`: `true` if the tool failed to run on the page, or otherwise omitted.
 - `totals`: an array of 4 integers, representing the counts of problem instances classified by the tool into 4 ordinal degrees of severity. For example, `[2, 13, 0, 5]` would mean that the tool reported 2 instances at the lowest severity, 13 at the next-lowest, none at the third-lowest, and 5 at the highest.
 - `instances`: an array of objects describing facts about issue instances reported by the tool. This object has these properties, some of which have empty strings as values when the tool does not provide values:
     - `ruleID`: a code identifying a rule
     - `what`: a description of the rule
     - `count` (optional): the count of instances if this instance represents multiple instances
-    - `ordinalSeverity`: how the tool ranks the severity of the instance, on a 4-point ordinal scale
+    - `ordinalSeverity`: how the tool ranks the severity of the instance, on a 4-point ordinal scale from 0 to 3
     - `tagName`: upper-case tagName of the affected element
     - `id`: value of the `id` property of that element
     - `location`: an object with three properties:
@@ -229,7 +224,7 @@ standardResult: {
     {
       ruleID: 'rule01',
       what: 'Button type invalid',
-      ordinalSeverity: 0,
+      ordinalSeverity: 2,
       tagName: 'BUTTON'
       id: '',
       location: {
@@ -272,7 +267,13 @@ standardResult: {
 
 If a tool has the option to be used without itemization and is being so used, the `instances` array may be empty.
 
-This standard format is not opinionated about issue classifications. A rule ID identifies something deemed to be an issue by a tool. Useful reporting from multi-tool testing still requires the classification of tool **rules** into **issues**. If tool `A` has `alt-incomplete` as a rule ID and tool `B` has `image_alt_stub` as a rule ID, Testaro does not decide whether those are really the same issue or different issues. That decision belongs to you. The standardization of tool reports by Testaro eliminates some of the drudgery in issue classification, but not any of the judgment required for issue classification.
+This standard format reflects some judgments. For example:
+- The `ordinalSeverity` property of an instance may have required interpretation. Tools may report severity, certainty, both, or neither; they may classify severity or certainty ordinally or metrically; and, if they classify ordinally, their scales may have more or fewer than 4 ranks. Testaro coerces each tool’s severity and/or certainty classification into a 4-rank ordinal classification. This classification is deemed to express the most common pattern among the tools.
+- The `tagName` property of an instance may not always be obvious, because in some cases the rule being tested for requires a relationship among more than one element (e.g., “An X element may not have a Y element as its parent”).
+
+You are not dependent on the judgments incorporated into the standard format, because Testaro can give you the original reports from the tools.
+
+The standard format does not express opinions issue classifications. A rule ID identifies something deemed to be an issue by a tool. Useful reporting from multi-tool testing still requires the classification of tool **rules** into **issues**. If tool `A` has `alt-incomplete` as a rule ID and tool `B` has `image_alt_stub` as a rule ID, Testaro does not decide whether those are really the same issue or different issues. That decision belongs to you. The standardization of tool reports by Testaro eliminates some of the drudgery in issue classification, but not any of the judgment required for issue classification.
 
 ### Acts
 
