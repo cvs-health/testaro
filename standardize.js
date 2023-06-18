@@ -422,9 +422,8 @@ const convert = (toolName, result, standardResult) => {
     rules.forEach(rule => {
       const ruleResult = result.rules[rule];
       standardResult.totals.forEach((total, index) => {
-        standardResult.totals[index] += ruleResult && ruleResult.totals
-          ? ruleResult.totals[index] || 0
-          : 0;
+        standardResult.totals[index] += ruleResult
+        && ruleResult.totals ? ruleResult.totals[index] || 0 : 0;
       });
       if (ruleResult.standardInstances) {
         standardResult.instances.push(... ruleResult.standardInstances);

@@ -35,7 +35,26 @@ exports.reporter = async (page, withItems) => {
     catch(error) {
       console.log(`ERROR getting page for dupAtt test (${error.message})`);
       data.prevented = true;
-      return {result: data};
+      return {
+        data,
+        totals: [0, 0, 0, 10],
+        standardInstances: [
+          {
+            ruleID: 'dupAtt',
+            what: `Page prevented this test (treated as 10 instances)`,
+            ordinalSeverity: 3,
+            count: 10,
+            tagName: '',
+            id: '',
+            location: {
+              doc: '',
+              type: '',
+              spec: ''
+            },
+            excerpt: ''
+          }
+        ]
+      };
     }
   }
   // Change any spacing character sequences in it to single spaces.
@@ -103,6 +122,7 @@ exports.reporter = async (page, withItems) => {
       ruleID: 'dupAtt',
       what: 'In some elements 2 attributes have the same name',
       ordinalSeverity: 2,
+      count: data.total,
       location: {
         doc: '',
         type: '',
