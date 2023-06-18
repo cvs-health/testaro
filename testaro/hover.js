@@ -5,7 +5,7 @@
   The elements that are subjected to hovering (called “triggers”) are the Playwright-visible
   elements that have 'A', 'BUTTON', or 'LI' tag names or have 'onmouseenter' or 'onmouseover'
   attributes.
-  
+
   The test examines how the hover event is indicated to the user with the mouse cursor and with
   changes of the styles of the trigger.
 
@@ -408,7 +408,6 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
         standardInstances.push({
           ruleID: 'hover',
           what: what[issue],
-          count: data.totals[issue],
           ordinalSeverity: severity[issue],
           tagName: item.tagName,
           id: item.id,
