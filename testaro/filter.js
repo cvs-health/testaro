@@ -56,7 +56,7 @@ exports.reporter = async (page, withItems) => {
         ruleID: 'filterStyle',
         what: `${item.tagName} element has a filter style that impacts ${item.impact} elements`,
         ordinalSeverity: 2,
-        tagName: item.toUpperCase(),
+        tagName: item.tagName.toUpperCase(),
         id: item.id,
         location: {
           doc: '',

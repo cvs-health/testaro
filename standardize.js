@@ -7,7 +7,7 @@
 
 // Limits the length of and unilinearizes a string.
 const cap = rawString => {
-  const string = rawString.replace(/\s+/g, ' ');
+  const string = (rawString || '').replace(/[\s\u2028\u2029]+/g, ' ');
   if (string && string.length > 400) {
     return `${string.slice(0, 200)} ... ${string.slice(-200)}`;
   }
@@ -59,7 +59,7 @@ const doAxe = (result, standardResult, certainty) => {
         const identifiers = getIdentifiers(node.html);
         const instance = {
           ruleID: rule.id,
-          what: Array.from(whatSet.values()).join('; '), 
+          what: Array.from(whatSet.values()).join('; '),
           ordinalSeverity,
           tagName: identifiers[0],
           id: identifiers[1],
@@ -422,9 +422,8 @@ const convert = (toolName, result, standardResult) => {
     rules.forEach(rule => {
       const ruleResult = result.rules[rule];
       standardResult.totals.forEach((total, index) => {
-        standardResult.totals[index] += ruleResult && ruleResult.totals
-          ? ruleResult.totals[index] || 0
-          : 0;
+        standardResult.totals[index] += ruleResult
+        && ruleResult.totals ? ruleResult.totals[index] || 0 : 0;
       });
       if (ruleResult.standardInstances) {
         standardResult.instances.push(... ruleResult.standardInstances);
