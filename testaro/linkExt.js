@@ -1,7 +1,8 @@
 /*
   linkExt
   Related to Tenon rule 218, but stricter.
-  This test reports links with target attributes with _blank values
+  This test reports links with target attributes with _blank values, because forcibly external links
+  risk miscommunication of the externality and remove control from the user.
 */
 exports.reporter = async (page, withItems) => {
   // Identify the links with target=_blank attributes.

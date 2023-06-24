@@ -30,6 +30,7 @@ const evalRules = {
   role: 'invalid and native-replacing explicit roles',
   styleDiff: 'style inconsistencies',
   tabNav: 'nonstandard keyboard navigation between elements with the tab role',
+  targetSize: 'buttons, inputs, and non-inline links smaller than 44 pixels wide and high',
   titledEl: 'title attributes on inappropriate elements',
   zIndex: 'non-default Z indexes'
 };
