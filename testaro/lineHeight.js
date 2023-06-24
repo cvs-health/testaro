@@ -25,7 +25,11 @@ exports.reporter = async (page, withItems) => {
     let more = true;
     while(more) {
       if (walker.nextNode()) {
-        textNodes.push(walker.currentNode);
+        const nodeText = walker.currentNode.nodeValue;
+        const compactNodeText = compact(nodeText);
+        if (compactNodeText) {
+          textNodes.push(walker.currentNode);
+        }
       }
       else {
         more = false;
@@ -58,14 +62,17 @@ exports.reporter = async (page, withItems) => {
     });
     return data;
   });
+  // Initialize the result and standard result.
   const totals = [0, data.length, 0, 0];
   const standardInstances = [];
+  // If itemization is required:
   if (withItems) {
+    // Add it to the standard result.
     data.forEach(item => {
       standardInstances.push({
         ruleID: 'lineHeight',
         what:
-        `Text line height ${item.lineHeight} px is less than 1.5 times its font size (${item.fontSize} px`,
+        `Text line height ${item.lineHeight} px is less than 1.5 times its font size ${item.fontSize} px`,
         ordinalSeverity: 1,
         tagName: item.tagName,
         id: item.id,
@@ -78,10 +85,12 @@ exports.reporter = async (page, withItems) => {
       });
     });
   }
+  // Otherwise, i.e. if itemization is not required:
   else {
+    // Add a summary instance to the standard result.
     standardInstances.push({
       ruleID: 'lineHeight',
-      what: 'Text line heights are less than 1.5 times their font size',
+      what: 'Text line heights are less than 1.5 times their font sizes',
       ordinalSeverity: 1,
       count: data.length,
       tagName: '',
@@ -93,6 +102,8 @@ exports.reporter = async (page, withItems) => {
       },
       excerpt: ''
     });
+    // Delete the itemization from the result.
+    data.length = 0;
   }
   return {
     data,
