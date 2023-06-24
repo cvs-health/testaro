@@ -19,6 +19,7 @@ const evalRules = {
   focVis: 'links that are invisible when focused',
   hover: 'hover-caused content changes',
   labClash: 'labeling inconsistencies',
+  lineHeight: 'text with a line height less than 1.5 times its font size',
   linkExt: 'links that automatically open new windows',
   linkTo: 'links without destinations',
   linkUl: 'missing underlines on inline links',
