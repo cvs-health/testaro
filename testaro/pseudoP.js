@@ -6,7 +6,7 @@
 // Runs the test and returns the results.
 exports.reporter = async (page, withItems) => {
   // Identify the elements containing 2 or more consecutive br elements.
-  const data = await page.evaluate('br + br', br2s => {
+  const data = await page.$$eval('br + br', br2s => {
     // Returns a space-minimized copy of a string.
     const compact = string => string
     .replace(/[\t\n]/g, '')
@@ -30,6 +30,7 @@ exports.reporter = async (page, withItems) => {
         text: compact(parent.textContent)
       });
     });
+    return data;
   });
   // Initialize the standard result.
   const totals = [data.length, 0, 0, 0];
