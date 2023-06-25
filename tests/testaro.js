@@ -27,6 +27,7 @@ const evalRules = {
   miniText: 'text smaller than 11 pixels',
   motion: 'motion without user request',
   nonTable: 'table elements used for layout',
+  pseudoP: 'adjacent br elements suspected of nonsemantically simulating p elements',
   radioSet: 'radio buttons not grouped into standard field sets',
   role: 'invalid and native-replacing explicit roles',
   styleDiff: 'style inconsistencies',

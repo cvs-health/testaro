@@ -63,7 +63,7 @@ exports.reporter = async (page, withItems) => {
           type: '',
           spec: ''
         },
-        excerpt: `${item.tagName}: ${item.text}`
+        excerpt: item.text.slice(0, 200)
       });
     });
   }
