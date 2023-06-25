@@ -10,9 +10,12 @@
   operable, users are likely to be surprised that nothing happens when they try to operate such
   elements. If operable elements are not focusable, users depending on keyboard navigation are
   prevented from operating those elements. The test considers an element operable if it has a
-  non-inherited pointer cursor and is not a 'LABEL' element, or has an operable tag name ('A',
-  'BUTTON', 'IFRAME', 'INPUT', 'SELECT', 'TEXTAREA'), or has an 'onclick' attribute. The test
-  considers an element Tab-focusable if its tabIndex property has the value 0.
+  non-inherited pointer cursor and is not a 'LABEL' element, has an operable tag name ('A',
+  'BUTTON', 'IFRAME', 'INPUT', 'SELECT', 'TEXTAREA'), has an interactive explicit role (button,
+  link, checkbox, switch, input, textbox, searchbox, combobox, option, treeitem, radio, slider,
+  spinbutton, menuitem, menuitemcheckbox, composite, grid, select, listbox, menu, menubar, tree,
+  tablist, tab, gridcell, radiogroup, treegrid, widget, or scrollbar), or has an 'onclick'
+  attribute. The test considers an element Tab-focusable if its tabIndex property has the value 0.
 */
 exports.reporter = async (page, withItems) => {
   // Get data on focusability-operability-discrepant elements.
@@ -29,10 +32,6 @@ exports.reporter = async (page, withItems) => {
           onlyOperable: {
             total: 0,
             tagNames: {}
-          },
-          focusableAndOperable: {
-            total: 0,
-            tagNames: {}
           }
         }
       }
@@ -40,22 +39,59 @@ exports.reporter = async (page, withItems) => {
     if (withItems) {
       data.items = {
         onlyFocusable: [],
-        onlyOperable: [],
-        focusableAndOperable: []
+        onlyOperable: []
       };
     }
     // FUNCTION DEFINITIONS START
     // Returns data on an element’s operability and prevents it from propagating a pointer.
     const operabilityOf = element => {
+      // Identify the operable tag names.
       const opTags = new Set(['A', 'BUTTON', 'IFRAME', 'INPUT', 'SELECT', 'TEXTAREA']);
+      // Identify the operable roles.
+      const opRoles = new Set([
+        'button',
+        'checkbox',
+        'combobox',
+        'composite',
+        'grid',
+        'gridcell',
+        'input',
+        'link',
+        'listbox',
+        'menu',
+        'menubar',
+        'menuitem',
+        'menuitemcheckbox',
+        'option',
+        'radio',
+        'radiogroup',
+        'scrollbar',
+        'searchbox',
+        'select',
+        'slider',
+        'spinbutton',
+        'switch',
+        'tab',
+        'tablist',
+        'textbox',
+        'tree',
+        'treegrid',
+        'treeitem',
+        'widget',
+      ]);
+      // Identify whether the element has a pointer cursor.
       const hasPointer = window.getComputedStyle(element).cursor === 'pointer';
+      // Identify the bases for considering an element operable.
       const opBases = [
         opTags.has(element.tagName),
         element.hasAttribute('onclick'),
+        opRoles.has(element.getAttribute('role')),
         hasPointer && element.tagName !== 'LABEL'
       ];
+      // If the element is operable:
       const result = {operable: opBases.some(basis => basis)};
       if (result.operable) {
+        // Add its data to its result.
         result.byTag = opBases[0];
         result.byOnClick = opBases[1];
         result.byPointer = opBases[2];
@@ -65,14 +101,14 @@ exports.reporter = async (page, withItems) => {
         // Change it to the browser default to prevent pointer propagation.
         element.style.cursor = 'default';
       }
+      // Return the result.
       return result;
     };
     // Adds facts about an element to data.
     const addFacts = (element, status, byTag, byOnClick, byPointer) => {
       const statusNames = {
         f: 'onlyFocusable',
-        o: 'onlyOperable',
-        b: 'focusableAndOperable'
+        o: 'onlyOperable'
       };
       const statusName = statusNames[status];
       data.totals.types[statusName].total++;
@@ -100,17 +136,12 @@ exports.reporter = async (page, withItems) => {
     elements.forEach(element => {
       // If its tab index is 0, deem it focusable and:
       if (element.tabIndex === 0) {
-        // Increment the grand total.
-        data.totals.total++;
         // Determine whether and how it is operable.
-        const {operable, byTag, byOnClick, byPointer} = operabilityOf(element);
-        // If it is:
-        if (operable) {
-          // Add its data to the result.
-          addFacts(element, 'b', byTag, byOnClick, byPointer);
-        }
-        // Otherwise, i.e. if it is not operable:
-        else {
+        const {operable} = operabilityOf(element);
+        // If it is not:
+        if (! operable) {
+          // Increment the total.
+          data.totals.total++;
           // Add its data to the result.
           addFacts(element, 'f');
         }
@@ -121,7 +152,7 @@ exports.reporter = async (page, withItems) => {
         const {operable, byTag, byOnClick, byPointer} = operabilityOf(element);
         // If it is:
         if (operable) {
-          // Increment the grand total.
+          // Increment the total.
           data.totals.total++;
           // Add its data to the result.
           addFacts(element, 'o', byTag, byOnClick, byPointer);
