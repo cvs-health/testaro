@@ -1,21 +1,22 @@
 /*
-  linkExt
-  Related to Tenon rule 218, but stricter.
-  This test reports links with target attributes with _blank values, because forcibly external links
-  risk miscommunication of the externality and remove control from the user.
+  linkTitle
+  Related to Tenon rule 79.
+  This test reports links with title attributes with values contained in the link text contents.
 */
 exports.reporter = async (page, withItems) => {
   // Identify the links with target=_blank attributes.
   const badLinkData = await page.$$eval(
-    'a[target=_blank]',
-    badLinks => {
-      // FUNCTION DEFINITION START
+    'a[title]',
+    titleLinks => {
+      // FUNCTION DEFINITIONS START
       // Returns a space-minimized copy of a string.
       const compact = string => string.replace(/[\t\n]/g, ' ').replace(/\s{2,}/g, ' ').trim();
-      // FUNCTION DEFINITION END
-      return badLinks.map(link => ({
-        id: link.id,
-        text: compact(link.textContent)
+      const lcCompact = string => compact(string).toLowerCase();
+      // FUNCTION DEFINITIONS END
+      const badLinks = titleLinks.filter(link => lcCompact(link.textContent).includes(lcCompact(link.title)));
+      return badLinks.map(badLink => ({
+        id: badLink.id || '',
+        text: compact(badLink.textContent)
       }));
     }
   );
@@ -28,8 +29,8 @@ exports.reporter = async (page, withItems) => {
     data.items = badLinkData;
     data.items.forEach(item => {
       standardInstances.push({
-        ruleID: 'linkExt',
-        what: 'Element a has a target=_blank attribute',
+        ruleID: 'linkTitle',
+        what: 'Element a has a title attribute that repeats link text content',
         ordinalSeverity: 0,
         tagName: 'A',
         id: item.id,
@@ -44,8 +45,8 @@ exports.reporter = async (page, withItems) => {
   }
   else if (data.total) {
     standardInstances.push({
-      ruleID: 'linkExt',
-      what: 'Links have target=_blank attributes',
+      ruleID: 'linkTitle',
+      what: 'Links have title attributes that repeat link text contents',
       count: data.total,
       ordinalSeverity: 0,
       tagName: 'A',
