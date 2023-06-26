@@ -6,7 +6,9 @@
 // CONSTANTS
 
 const evalRules = {
+  allCaps: 'leaf elements with entirely upper-case text longer than 7 characters',
   allHidden: 'page that is entirely or mostly hidden',
+  allSlanted: 'leaf elements with entirely italic or oblique text longer than 39 characters',
   autocomplete: 'name and email inputs without autocomplete attributes',
   bulk: 'large count of visible elements',
   docType: 'document without a doctype property',
@@ -21,6 +23,7 @@ const evalRules = {
   labClash: 'labeling inconsistencies',
   lineHeight: 'text with a line height less than 1.5 times its font size',
   linkExt: 'links that automatically open new windows',
+  linkAmb: 'links with identical texts but different destinations',
   linkTo: 'links without destinations',
   linkUl: 'missing underlines on inline links',
   menuNav: 'nonstandard keyboard navigation between focusable menu items',
@@ -30,6 +33,7 @@ const evalRules = {
   pseudoP: 'adjacent br elements suspected of nonsemantically simulating p elements',
   radioSet: 'radio buttons not grouped into standard field sets',
   role: 'invalid and native-replacing explicit roles',
+  rotation: 'rotated text',
   styleDiff: 'style inconsistencies',
   tabNav: 'nonstandard keyboard navigation between elements with the tab role',
   targetSize: 'buttons, inputs, and non-inline links smaller than 44 pixels wide and high',

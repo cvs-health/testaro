@@ -72,6 +72,21 @@ exports.reporter = async (page, withItems) => {
       ruleID: 'filterStyle',
       what: 'Elements have filter styles impacting other elements',
       ordinalSeverity: 2,
+      count: totals[2],
+      tagName: '',
+      id: '',
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: ''
+    });
+    standardInstances.push({
+      ruleID: 'filterStyle',
+      what: 'Elements are impacted by elements with filter styles',
+      ordinalSeverity: 1,
+      count: totals[1],
       tagName: '',
       id: '',
       location: {
