@@ -1,5 +1,6 @@
 /*
   allSlanted
+  Related to Tenon rule 154.
   This test reports leaf elements whose text contents are at least 40 characters long and are
   entirely italic or oblique. Blocks of italic or oblique text are difficult to read.
 */

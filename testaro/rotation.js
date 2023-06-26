@@ -1,5 +1,6 @@
 /*
   rotation
+  Related to Tenon rule 271.
   This test reports elements whose transform style properties contain rotations. Rotations make
   text difficult to read.
 */

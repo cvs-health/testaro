@@ -1,5 +1,6 @@
 /*
   allCaps
+  Related to Tenon rule 153.
   This test reports leaf elements whose text contents are at least 8 characters long and are
   entirely upper-case. Blocks of upper-case text are difficult to read.
 */

@@ -1,5 +1,6 @@
 /*
   pseudoP
+  Related to Tenon rule 242.
   This test reports 2 or more sequential br elements. They may be inferior substitutes for a
   p element.
 */

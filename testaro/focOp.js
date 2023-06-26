@@ -1,5 +1,6 @@
 /*
   focOp
+  Related to Tenon rule 190.
 
   WARNING: The chromium and firefox browsers in Playwright make errors on this test by
   misclassifying the cursor property values of the computed styles of elements. Launch the

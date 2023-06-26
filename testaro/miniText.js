@@ -1,6 +1,7 @@
 /*
   miniText
   Derived from the bbc-a11y textCannotBeTooSmall test.
+  Related to Tenon rule 134.
   This test reports text nodes smaller than 11 pixels.
 */
 exports.reporter = async (page, withItems) => {
