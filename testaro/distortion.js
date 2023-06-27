@@ -1,7 +1,7 @@
 /*
-  rotation
+  distortion
   Related to Tenon rule 271.
-  This test reports elements whose transform style properties contain rotations. Rotations make
+  This test reports elements whose transform style properties distort the content. Distortion makes
   text difficult to read.
 */
 // Runs the test and returns the results.
@@ -14,25 +14,26 @@ exports.reporter = async (page, withItems) => {
     .replace(/\s{2,}/g, ' ')
     .trim()
     .slice(0, 200);
-    // Get the elements that are rotated.
-    const rotatedElements = elements.filter(element => {
+    // Get the elements that are distorted.
+    const distortedElements = elements.filter(element => {
       const elementStyleDec = window.getComputedStyle(element);
       const {transform} = elementStyleDec;
-      return transform && transform.includes('rotate');
+      return transform
+      && ['matrix', 'perspective', 'rotate', 'scale', 'skew'].some(key => transform.includes(key));
     });
     // Initialize the result.
     const data = {
-      total: rotatedElements.length
+      total: distortedElements.length
     };
     // If itemization is required:
     if (withItems) {
       // Add an itemization to the result.
       data.items = [];
-      rotatedElements.forEach(rotatedElement => {
+      distortedElements.forEach(distortedElement => {
         data.items.push({
-          tagName: rotatedElement.tagName,
-          id: rotatedElement.id || '',
-          text: compact(rotatedElement.textContent) || compact(rotatedElement.outerHTML)
+          tagName: distortedElement.tagName,
+          id: distortedElement.id || '',
+          text: compact(distortedElement.textContent) || compact(distortedElement.outerHTML)
         });
       });
     }
@@ -44,8 +45,8 @@ exports.reporter = async (page, withItems) => {
   if (data.items) {
     data.items.forEach(item => {
       standardInstances.push({
-        ruleID: 'rotation',
-        what: `${item.tagName} element rotates its text`,
+        ruleID: 'distortion',
+        what: `${item.tagName} element distorts its text`,
         ordinalSeverity: 0,
         tagName: item.tagName.toUpperCase(),
         id: item.id,
@@ -60,8 +61,8 @@ exports.reporter = async (page, withItems) => {
   }
   else {
     standardInstances.push({
-      ruleID: 'rotation',
-      what: 'Elements rotate their texts',
+      ruleID: 'distortion',
+      what: 'Elements distort their texts',
       ordinalSeverity: 0,
       count: data.total,
       tagName: '',
