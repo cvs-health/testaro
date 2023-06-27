@@ -22,7 +22,7 @@ fs.readFile(`${__dirname}/../jobs/todo/${jobID}.json`, 'utf8')
     // Check the report against expectations.
     const {acts, jobData} = report;
     if (acts.length !== 3) {
-      console.log('Failure: Counts of acts is not 3');
+      console.log('Failure: Count of acts is not 3');
     }
     else if (! jobData) {
       console.log('Failure: Report omits jobData');

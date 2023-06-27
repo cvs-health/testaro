@@ -1,0 +1,61 @@
+{
+  "id": "allCaps",
+  "what": "validation of allCaps test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/allCaps/index.html",
+      "what": "page with various letter cases"
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": true,
+      "expect": [
+        [
+          "standardResult.totals.0",
+          "=",
+          3
+        ],
+        [
+          "standardResult.totals.2",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "P"
+        ],
+        [
+          "standardResult.instances.1.tagName",
+          "=",
+          "SPAN"
+        ],
+        [
+          "standardResult.instances.2.excerpt",
+          "i",
+          "ENTIRELY"
+        ]
+      ],
+      "rules": [
+        "y",
+        "allCaps"
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2013-05-28T12:00:00",
+  "timeStamp": "00000"
+}

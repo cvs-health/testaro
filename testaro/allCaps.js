@@ -2,8 +2,8 @@
   allCaps
   Related to Tenon rule 153.
   This test reports leaf elements whose text contents contain at least one substring of upper-case
-  letters and spaces at least 8 characters long and no lower-case letters. Blocks of upper-case text
-  are difficult to read.
+  letters, hyphen-minuses, and spaces at least 8 characters long and no lower-case letters. Blocks
+  of upper-case text are difficult to read.
 */
 // Runs the test and returns the results.
 exports.reporter = async (page, withItems) => {
@@ -19,16 +19,16 @@ exports.reporter = async (page, withItems) => {
     const leafElements = elements.filter(element => ! element.children.length);
     // Get those with text contents longer than 7 characters.
     const textElements = leafElements.filter(element => compact(element.textContent).length > 7);
-    // Get those with no lower-case letters and an 8-character substring of letters and spaces.
+    // Get those that are reportable.
     const allCapElements = textElements.filter(element => {
       const {textContent} = element;
       const elementText = compact(textContent);
-      if (elementText === elementText.toUpperCase() && /[A-Z ]{8}/.test(elementText)) {
+      if (elementText === elementText.toUpperCase() && /[-A-Z ]{8}/.test(elementText)) {
         return true;
       }
       else {
         const styleDec = window.getComputedStyle(element);
-        return styleDec['text-transform'] === 'uppercase' && /[A-Za-z ]{8}/.test(elementText);
+        return styleDec['text-transform'] === 'uppercase' && /[-A-Za-z ]{8}/.test(elementText);
       }
     });
     // Initialize the result.

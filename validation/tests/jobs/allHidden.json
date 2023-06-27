@@ -20,79 +20,29 @@
       "what": "entirely or mainly hidden page",
       "expect": [
         [
-          "result.rules.allHidden.data.hidden.document",
+          "standardResult.totals.0",
           "=",
-          false
+          0
         ],
         [
-          "result.rules.allHidden.data.hidden.body",
+          "standardResult.totals.1",
           "=",
-          false
+          0
         ],
         [
-          "result.rules.allHidden.data.hidden.main",
+          "standardResult.totals.2",
           "=",
-          false
+          0
         ],
         [
-          "result.rules.allHidden.data.reallyHidden.document",
+          "standardResult.totals.3",
           "=",
-          false
+          0
         ],
         [
-          "result.rules.allHidden.data.reallyHidden.body",
+          "standardResult.instances.length",
           "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.main",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.display.document",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.display.body",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.display.main",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.main",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.main",
-          "=",
-          false
+          0
         ]
       ],
       "withItems": true,
@@ -112,69 +62,24 @@
       "what": "entirely or mainly hidden page",
       "expect": [
         [
-          "result.rules.allHidden.data.hidden.document",
+          "standardResult.totals.1",
           "=",
-          false
+          0
         ],
         [
-          "result.rules.allHidden.data.hidden.body",
+          "standardResult.totals.2",
           "=",
-          false
+          0
         ],
         [
-          "result.rules.allHidden.data.hidden.main",
+          "standardResult.totals.3",
           "=",
-          false
+          0
         ],
         [
-          "result.rules.allHidden.data.reallyHidden.document",
+          "standardResult.instances.length",
           "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.main",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.display.document",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.main",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.main",
-          "=",
-          false
+          0
         ]
       ],
       "withItems": true,
@@ -194,74 +99,24 @@
       "what": "entirely or mainly hidden page",
       "expect": [
         [
-          "result.rules.allHidden.data.hidden.document",
+          "standardResult.totals.0",
           "=",
-          false
+          0
         ],
         [
-          "result.rules.allHidden.data.hidden.body",
+          "standardResult.totals.1",
           "=",
-          false
+          0
         ],
         [
-          "result.rules.allHidden.data.hidden.main",
+          "standardResult.totals.2",
           "=",
-          false
+          0
         ],
         [
-          "result.rules.allHidden.data.reallyHidden.document",
+          "standardResult.instances.length",
           "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.main",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.display.document",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.display.body",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.main",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.main",
-          "=",
-          false
+          0
         ]
       ],
       "withItems": true,
@@ -281,79 +136,29 @@
       "what": "entirely or mainly hidden page",
       "expect": [
         [
-          "result.rules.allHidden.data.hidden.document",
+          "standardResult.totals.0",
           "=",
-          false
+          0
         ],
         [
-          "result.rules.allHidden.data.hidden.body",
+          "standardResult.totals.1",
           "=",
-          false
+          1
         ],
         [
-          "result.rules.allHidden.data.hidden.main",
+          "standardResult.totals.2",
           "=",
-          true
+          0
         ],
         [
-          "result.rules.allHidden.data.reallyHidden.document",
+          "standardResult.instances.length",
           "=",
-          false
+          1
         ],
         [
-          "result.rules.allHidden.data.reallyHidden.body",
+          "standardResult.instances.0.what",
           "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.main",
-          "=",
-          true
-        ],
-        [
-          "result.rules.allHidden.data.display.document",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.display.body",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.display.main",
-          "=",
-          "none"
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.main",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.main",
-          "=",
-          false
+          "Main region is hidden"
         ]
       ],
       "withItems": true,
@@ -373,79 +178,24 @@
       "what": "entirely or mainly hidden page",
       "expect": [
         [
-          "result.rules.allHidden.data.hidden.document",
+          "standardResult.totals.1",
           "=",
-          false
+          1
         ],
         [
-          "result.rules.allHidden.data.hidden.body",
+          "standardResult.totals.2",
           "=",
-          false
+          0
         ],
         [
-          "result.rules.allHidden.data.hidden.main",
+          "standardResult.instances.length",
           "=",
-          false
+          1
         ],
         [
-          "result.rules.allHidden.data.reallyHidden.document",
+          "standardResult.instances.0.what",
           "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.main",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.display.document",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.display.body",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.display.main",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.main",
-          "=",
-          true
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.main",
-          "=",
-          false
+          "Main region is hidden"
         ]
       ],
       "withItems": true,
@@ -456,8 +206,8 @@
     },
     {
       "type": "url",
-      "which": "__targets__/allHidden/ariaHiddenMain.html",
-      "what": "page with an ARIA-hidden main landmark"
+      "which": "__targets__/allHidden/ariaHiddenBody.html",
+      "what": "page with an ARIA-hidden body"
     },
     {
       "type": "test",
@@ -465,79 +215,19 @@
       "what": "entirely or mainly hidden page",
       "expect": [
         [
-          "result.rules.allHidden.data.hidden.document",
+          "standardResult.totals.2",
           "=",
-          false
+          1
         ],
         [
-          "result.rules.allHidden.data.hidden.body",
+          "standardResult.instances.length",
           "=",
-          false
+          1
         ],
         [
-          "result.rules.allHidden.data.hidden.main",
+          "standardResult.instances.0.what",
           "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.main",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.display.document",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.display.body",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.display.main",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.main",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.main",
-          "=",
-          true
+          "Body is hidden"
         ]
       ],
       "withItems": true,
@@ -548,7 +238,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/allHidden/mixedHidden0.html",
+      "which": "__targets__/allHidden/mixedHidden.html",
       "what": "page with mixed hidden states"
     },
     {
@@ -557,263 +247,19 @@
       "what": "entirely or mainly hidden page",
       "expect": [
         [
-          "result.rules.allHidden.data.hidden.document",
+          "standardResult.totals.3",
           "=",
-          false
+          1
         ],
         [
-          "result.rules.allHidden.data.hidden.body",
+          "standardResult.instances.length",
           "=",
-          false
+          3
         ],
         [
-          "result.rules.allHidden.data.hidden.main",
+          "standardResult.instances.0.what",
           "=",
-          true
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.main",
-          "=",
-          true
-        ],
-        [
-          "result.rules.allHidden.data.display.document",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.display.body",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.display.main",
-          "=",
-          "none"
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.body",
-          "=",
-          true
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.main",
-          "=",
-          true
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.document",
-          "=",
-          true
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.main",
-          "=",
-          false
-        ]
-      ],
-      "withItems": true,
-      "rules": [
-        "y",
-        "allHidden"
-      ]
-    },
-    {
-      "type": "url",
-      "which": "__targets__/allHidden/mixedHidden1.html",
-      "what": "page with mixed hidden states"
-    },
-    {
-      "type": "test",
-      "which": "testaro",
-      "what": "entirely or mainly hidden page",
-      "expect": [
-        [
-          "result.rules.allHidden.data.hidden.document",
-          "=",
-          true
-        ],
-        [
-          "result.rules.allHidden.data.hidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.hidden.main",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.document",
-          "=",
-          true
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.main",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.display.document",
-          "=",
-          "none"
-        ],
-        [
-          "result.rules.allHidden.data.display.body",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.display.main",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.body",
-          "=",
-          true
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.main",
-          "=",
-          true
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.main",
-          "=",
-          true
-        ]
-      ],
-      "withItems": true,
-      "rules": [
-        "y",
-        "allHidden"
-      ]
-    },
-    {
-      "type": "url",
-      "which": "__targets__/allHidden/semiHidden.html",
-      "what": "page with mixed hidden states"
-    },
-    {
-      "type": "test",
-      "which": "testaro",
-      "what": "entirely or mainly hidden page",
-      "expect": [
-        [
-          "result.rules.allHidden.data.hidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.hidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.hidden.main",
-          "=",
-          true
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.main",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.display.document",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.display.body",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.display.main",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.main",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.main",
-          "=",
-          false
+          "Document is hidden"
         ]
       ],
       "withItems": true,
@@ -825,7 +271,7 @@
     {
       "type": "url",
       "which": "__targets__/allHidden/noneDoc.html",
-      "what": "page with mixed hidden states"
+      "what": "page with none as its display property"
     },
     {
       "type": "test",
@@ -833,171 +279,19 @@
       "what": "entirely or mainly hidden page",
       "expect": [
         [
-          "result.rules.allHidden.data.hidden.document",
+          "standardResult.totals.3",
           "=",
-          false
+          1
         ],
         [
-          "result.rules.allHidden.data.hidden.body",
+          "standardResult.instances.length",
           "=",
-          false
+          1
         ],
         [
-          "result.rules.allHidden.data.hidden.main",
+          "standardResult.instances.0.what",
           "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.main",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.display.document",
-          "=",
-          "none"
-        ],
-        [
-          "result.rules.allHidden.data.display.body",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.display.main",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.main",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.main",
-          "=",
-          false
-        ]
-      ],
-      "withItems": true,
-      "rules": [
-        "y",
-        "allHidden"
-      ]
-    },
-    {
-      "type": "url",
-      "which": "__targets__/allHidden/noneMain.html",
-      "what": "page with mixed hidden states"
-    },
-    {
-      "type": "test",
-      "which": "testaro",
-      "what": "entirely or mainly hidden page",
-      "expect": [
-        [
-          "result.rules.allHidden.data.hidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.hidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.hidden.main",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.reallyHidden.main",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.display.document",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.display.body",
-          "=",
-          "block"
-        ],
-        [
-          "result.rules.allHidden.data.display.main",
-          "=",
-          "none"
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.visHidden.main",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.document",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.body",
-          "=",
-          false
-        ],
-        [
-          "result.rules.allHidden.data.ariaHidden.main",
-          "=",
-          false
+          "Document is hidden"
         ]
       ],
       "withItems": true,

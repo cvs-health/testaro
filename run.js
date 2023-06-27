@@ -999,28 +999,6 @@ const doActs = async (report, actIndex, page) => {
               try {
                 const args = [act.which === 'tenon' ? tenonData : page, options];
                 testReport = await require(`./tests/${act.which}`).reporter(... args);
-                const expectations = act.expect;
-                // If the test has expectations:
-                if (expectations) {
-                  // Initialize whether they were fulfilled.
-                  testReport.result.expectations = [];
-                  let failureCount = 0;
-                  // For each expectation:
-                  expectations.forEach(spec => {
-                    const truth = isTrue(testReport, spec);
-                    testReport.result.expectations.push({
-                      property: spec[0],
-                      relation: spec[1],
-                      criterion: spec[2],
-                      actual: truth[0],
-                      passed: truth[1]
-                    });
-                    if (! truth[1]) {
-                      failureCount++;
-                    }
-                  });
-                  testReport.result.failureCount = failureCount;
-                }
                 testReport.result.success = true;
               }
               catch(error) {
@@ -1047,6 +1025,28 @@ const doActs = async (report, actIndex, page) => {
                 if (standard === 'only') {
                   // Remove it.
                   delete act.result;
+                }
+                const expectations = act.expect;
+                // If the test has expectations:
+                if (expectations) {
+                  // Initialize whether they were fulfilled.
+                  act.expectations = [];
+                  let failureCount = 0;
+                  // For each expectation:
+                  expectations.forEach(spec => {
+                    const truth = isTrue(act, spec);
+                    act.expectations.push({
+                      property: spec[0],
+                      relation: spec[1],
+                      criterion: spec[2],
+                      actual: truth[0],
+                      passed: truth[1]
+                    });
+                    if (! truth[1]) {
+                      failureCount++;
+                    }
+                  });
+                  act.expectationFailures = failureCount;
                 }
               }
             }

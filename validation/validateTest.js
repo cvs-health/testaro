@@ -20,17 +20,17 @@ exports.validateTest = async testID => {
     const testActs = acts.filter(act => act.type && act.type === 'test');
     if (
       testActs.length === report.acts.filter(act => act.type === 'test').length
-      && testActs.every(testAct => testAct.result && testAct.result.failureCount !== undefined)
+      && testActs.every(testAct => testAct.result && testAct.expectationFailures !== undefined)
     ) {
       console.log('Success: Reports have been correctly populated');
-      if (testActs.every(testAct => testAct.result.failureCount === 0)) {
+      if (testActs.every(testAct => testAct.expectationFailures === 0)) {
         console.log('Success: No failures');
       }
       else {
         console.log('Failure: The test has at least one failure');
         console.log(
           JSON.stringify(
-            acts.filter(act => act.type === 'test' && act.result.failureCount), null, 2
+            acts.filter(act => act.type === 'test' && act.expectationFailures), null, 2
           )
         );
       }
