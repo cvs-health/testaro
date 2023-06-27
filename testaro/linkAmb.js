@@ -33,7 +33,7 @@ exports.reporter = async (page, withItems) => {
   );
   // Initialize the result and the standard result.
   const data = {
-    total: Object.values(badLinkTexts).reduce((total, current) => total + current.length - 1)
+    total: Object.values(badLinkTexts).reduce((total, current) => total + current.length - 1, 0)
   };
   const totals = [0, 0, data.total, 0];
   const standardInstances = [];
