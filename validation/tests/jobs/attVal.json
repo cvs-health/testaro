@@ -21,12 +21,14 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.attVal.data.total",
+          "standardResult.totals.2",
           "=",
           0
         ],
         [
-          "result.rules.attVal.data.items.1"
+          "standardResult.instances.length",
+          "=",
+          0
         ]
       ],
       "rules": [
