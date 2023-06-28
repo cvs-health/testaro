@@ -93,6 +93,7 @@ exports.reporter = async (page, withItems) => {
       ruleID: 'autocomplete',
       what: 'Inputs are missing required autocomplete attributes',
       ordinalSeverity: 2,
+      count: data.total,
       tagName: '',
       id: '',
       location: {

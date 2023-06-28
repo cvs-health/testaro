@@ -40,6 +40,31 @@
       }
     },
     {
+      "type": "test",
+      "which": "testaro",
+      "what": "attribute values",
+      "withItems": false,
+      "expect": [
+        [
+          "standardResult.totals.2",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          0
+        ]
+      ],
+      "rules": [
+        "y",
+        "attVal"
+      ],
+      "args": {
+        "attVal": ["lang", true, ["en-US", "de-CH"]]
+      }
+    },
+    {
       "type": "url",
       "which": "__targets__/attVal/bad.html",
       "what": "page with permitted attribute values"
@@ -51,34 +76,69 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.attVal.data.total",
+          "standardResult.totals.2",
           "=",
           2
         ],
         [
-          "result.rules.attVal.data.items.0.tagName",
+          "standardResult.instances.0.tagName",
           "=",
           "HTML"
         ],
         [
-          "result.rules.attVal.data.items.0.attributeValue",
-          "=",
-          "en"
+          "standardResult.instances.0.what",
+          "i",
+          "illicit value en"
         ],
         [
-          "result.rules.attVal.data.items.1.tagName",
+          "standardResult.instances.1.tagName",
           "=",
           "SPAN"
         ],
         [
-          "result.rules.attVal.data.items.1.attributeValue",
-          "=",
-          "de"
-        ],
-        [
-          "result.rules.attVal.data.items.1.textStart",
+          "standardResult.instances.1.excerpt",
           "i",
           "Veloparkieren"
+        ]
+      ],
+      "rules": [
+        "y",
+        "attVal"
+      ],
+      "args": {
+        "attVal": ["lang", true, ["en-US", "de-CH"]]
+      }
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "what": "attribute values",
+      "withItems": false,
+      "expect": [
+        [
+          "standardResult.totals.3",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.2",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "Elements have attributes"
         ]
       ],
       "rules": [

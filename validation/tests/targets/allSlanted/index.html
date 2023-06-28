@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Page with entirely italic or oblique text contents</title>
+    <meta name="description" content="tester">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      .italic {
+        font-style: italic;
+      }
+      .oblique {
+        font-style: oblique;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Page with entirely italic or oblique text contents</h1>
+      <p>This text is a perfectly normal paragraph without any explicit style.</p>
+      <p class="italic">This text has been transformed by its style to italic.</p>
+      <p class="oblique">This text has been transformed by its style to oblique.</p>
+      <p><em>This text has no explicit style, but is in an em element, so is made italic by the user agent.</em></p>
+      <p>This text is transformed to italic <span class="italic">only in part</span>.</p>
+    </main>
+  </body>
+</html>

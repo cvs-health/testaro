@@ -21,12 +21,36 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.autocomplete.data.total",
+          "standardResult.totals.2",
           "=",
           0
         ],
         [
-          "result.rules.autocomplete.data.items.1"
+          "standardResult.instances.length",
+          "=",
+          0
+        ]
+      ],
+      "rules": [
+        "y",
+        "autocomplete"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "what": "autocomplete attributes for name and email",
+      "withItems": false,
+      "expect": [
+        [
+          "standardResult.totals.2",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          0
         ]
       ],
       "rules": [
@@ -46,19 +70,56 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.autocomplete.data.total",
+          "standardResult.totals.2",
           "=",
           4
         ],
         [
-          "result.rules.autocomplete.data.items.1.0",
-          "=",
-          "family-name"
+          "standardResult.instances.1.what",
+          "i",
+          "value family-name"
         ],
         [
-          "result.rules.autocomplete.data.items.2.1",
+          "standardResult.instances.2.excerpt",
           "=",
           "Your email address"
+        ],
+        [
+          "standardResult.instances.2.ordinalSeverity",
+          "=",
+          2
+        ]
+      ],
+      "rules": [
+        "y",
+        "autocomplete"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "what": "autocomplete attributes for name and email",
+      "withItems": false,
+      "expect": [
+        [
+          "standardResult.totals.2",
+          "=",
+          4
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "Inputs are missing"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          4
         ]
       ],
       "rules": [

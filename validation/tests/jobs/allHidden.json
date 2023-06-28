@@ -279,6 +279,11 @@
       "what": "entirely or mainly hidden page",
       "expect": [
         [
+          "standardResult.totals.2",
+          "=",
+          0
+        ],
+        [
           "standardResult.totals.3",
           "=",
           1

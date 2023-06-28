@@ -20,14 +20,14 @@
       "what": "visible element count",
       "expect": [
         [
-          "result.rules.bulk.data.visibleElements",
-          ">",
-          1
+          "standardResult.totals.0",
+          "=",
+          0
         ],
         [
-          "result.rules.bulk.data.visibleElements",
-          "<",
-          5
+          "standardResult.instances.length",
+          "=",
+          0
         ]
       ],
       "withItems": true,
@@ -47,14 +47,39 @@
       "what": "visible element count",
       "expect": [
         [
-          "result.rules.bulk.data.visibleElements",
-          ">",
-          30
+          "standardResult.totals.0",
+          "=",
+          1
         ],
         [
-          "result.rules.bulk.data.visibleElements",
-          "<",
-          40
+          "standardResult.totals.2",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "bulk"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "large number"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          1
         ]
       ],
       "withItems": true,

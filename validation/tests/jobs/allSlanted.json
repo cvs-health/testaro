@@ -1,6 +1,6 @@
 {
-  "id": "allCaps",
-  "what": "validation of allCaps test",
+  "id": "allSlanted",
+  "what": "validation of allSlanted test",
   "strict": true,
   "timeLimit": 20,
   "acts": [
@@ -11,8 +11,8 @@
     },
     {
       "type": "url",
-      "which": "__targets__/allCaps/index.html",
-      "what": "page with various letter cases"
+      "which": "__targets__/allSlanted/index.html",
+      "what": "page with various slantednesses"
     },
     {
       "type": "test",
@@ -25,7 +25,7 @@
           3
         ],
         [
-          "standardResult.totals.2",
+          "standardResult.totals.1",
           "=",
           0
         ],
@@ -40,19 +40,24 @@
           0
         ],
         [
-          "standardResult.instances.1.tagName",
+          "standardResult.instances.0.what",
+          "i",
+          "P element has entirely"
+        ],
+        [
+          "standardResult.instances.2.tagName",
           "=",
-          "SPAN"
+          "EM"
         ],
         [
           "standardResult.instances.2.excerpt",
           "i",
-          "ENTIRELY"
+          "user agent"
         ]
       ],
       "rules": [
         "y",
-        "allCaps"
+        "allSlanted"
       ]
     },
     {
@@ -66,14 +71,14 @@
           3
         ],
         [
-          "standardResult.totals.1",
+          "standardResult.totals.3",
           "=",
           0
         ],
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "allCaps"
+          "allSlanted"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
@@ -88,7 +93,7 @@
       ],
       "rules": [
         "y",
-        "allCaps"
+        "allSlanted"
       ]
     }
   ],
