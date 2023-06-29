@@ -40,14 +40,14 @@ exports.reporter = async (page, withItems) => {
     return data;
   }, withItems);
   // Get the totals.
-  const totals = [data.total, 0, 0, 0];
+  const totals = [0, data.total, 0, 0];
   const standardInstances = [];
   if (data.items) {
     data.items.forEach(item => {
       standardInstances.push({
         ruleID: 'distortion',
         what: `${item.tagName} element distorts its text`,
-        ordinalSeverity: 0,
+        ordinalSeverity: 1,
         tagName: item.tagName.toUpperCase(),
         id: item.id,
         location: {
@@ -63,7 +63,7 @@ exports.reporter = async (page, withItems) => {
     standardInstances.push({
       ruleID: 'distortion',
       what: 'Elements distort their texts',
-      ordinalSeverity: 0,
+      ordinalSeverity: 1,
       count: data.total,
       tagName: '',
       id: '',

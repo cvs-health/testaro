@@ -6,8 +6,20 @@
     <meta name="description" content="tester">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-      .uc {
-        text-transform: uppercase;
+      .rotate {
+        transform: rotate(10deg);
+      }
+      .matrix {
+        transform: matrix(2, 2, -2, 2, 300, 80);
+      }
+      .perspective {
+        transform: perspective(2rem);
+      }
+      .scale {
+        transform: scale(2);
+      }
+      .skew {
+        transform: skew(15deg, -15deg);
       }
     </style>
   </head>
@@ -15,11 +27,11 @@
     <main>
       <h1>Page with distorted contents</h1>
       <p>This text is normal.</p>
-      <p class="uc">This text is transformed by its style to upper-case.</p>
-      <p>This text is transformed <span class="uc">only in part</span>.</p>
-      <p>This text is PARTLY UPPER-CASE.</p>
-      <p>THIS TEXT IS ENTIRELY UPPER-CASE.</p>
-      <p>SHORT</p>
+      <p class="rotate">This text is distorted by rotation.</p>
+      <p id="matrixp" class="matrix">This text is distorted by a matrix transformation.</p>
+      <p class="perspective">This text is distorted by a z-axis change.</p>
+      <p class="scale">This text is distorted by a size change.</p>
+      <p>This text is distorted <span class="skew">only in part by skewing</span>.</p>
     </main>
   </body>
 </html>
