@@ -21,17 +21,12 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.focAll.data.tabFocusables",
+          "standardResult.totals.2",
           "=",
-          3
+          0
         ],
         [
-          "result.rules.focAll.data.tabFocused",
-          "=",
-          3
-        ],
-        [
-          "result.rules.focAll.data.discrepancy",
+          "standardResult.instances.length",
           "=",
           0
         ]
@@ -53,19 +48,34 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.focAll.data.tabFocusables",
+          "standardResult.totals.2",
           "=",
-          3
+          1
         ],
         [
-          "result.rules.focAll.data.tabFocused",
+          "standardResult.totals.3",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "focAll"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "vice versa"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
           "=",
           2
         ],
         [
-          "result.rules.focAll.data.discrepancy",
+          "standardResult.instances.0.count",
           "=",
-          -1
+          1
         ]
       ],
       "rules": [
@@ -85,17 +95,32 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.focAll.data.tabFocusables",
+          "standardResult.totals.2",
           "=",
-          3
+          2
         ],
         [
-          "result.rules.focAll.data.tabFocused",
+          "standardResult.totals.0",
           "=",
-          5
+          0
         ],
         [
-          "result.rules.focAll.data.discrepancy",
+          "standardResult.instances.0.ruleID",
+          "=",
+          "focAll"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "vice versa"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.count",
           "=",
           2
         ]
