@@ -23,39 +23,19 @@
       "what": "focus indication",
       "expect": [
         [
-          "result.rules.focInd.data.totals.total",
-          "=",
-          4
-        ],
-        [
-          "result.rules.focInd.data.totals.types.indicatorMissing.total",
+          "standardResult.totals.2",
           "=",
           0
         ],
         [
-          "result.rules.focInd.data.totals.types.nonOutlinePresent.total",
+          "standardResult.totals.3",
           "=",
           0
         ],
         [
-          "result.rules.focInd.data.totals.types.outlinePresent.total",
+          "standardResult.instances.length",
           "=",
-          4
-        ],
-        [
-          "result.rules.focInd.data.totals.types.outlinePresent.tagNames.A",
-          "=",
-          1
-        ],
-        [
-          "result.rules.focInd.data.totals.types.outlinePresent.tagNames.BUTTON",
-          "=",
-          1
-        ],
-        [
-          "result.rules.focInd.data.totals.types.outlinePresent.tagNames.INPUT",
-          "=",
-          2
+          0
         ]
       ],
       "rules": [
@@ -71,70 +51,105 @@
     {
       "type": "test",
       "which": "testaro",
-      "revealAll": false,
-      "allowedDelay": 150,
       "withItems": true,
       "what": "focus indication",
       "expect": [
         [
-          "result.rules.focInd.data.totals.total",
-          "=",
-          9
-        ],
-        [
-          "result.rules.focInd.data.totals.types.indicatorMissing.total",
+          "standardResult.totals.2",
           "=",
           3
         ],
         [
-          "result.rules.focInd.data.totals.types.indicatorMissing.tagNames.A",
+          "standardResult.totals.3",
           "=",
-          1
+          3
         ],
         [
-          "result.rules.focInd.data.totals.types.indicatorMissing.tagNames.INPUT",
+          "standardResult.instances.3.ruleID",
+          "=",
+          "focInd"
+        ],
+        [
+          "standardResult.instances.3.tagName",
+          "=",
+          "INPUT"
+        ],
+        [
+          "standardResult.instances.3.id",
+          "=",
+          "textInput"
+        ],
+        [
+          "standardResult.instances.3.ordinalSeverity",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "A"
+        ],
+        [
+          "standardResult.instances.0.id",
+          "=",
+          "slowLink"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
           "=",
           2
         ],
         [
-          "result.rules.focInd.data.totals.types.nonOutlinePresent.total",
+          "standardResult.instances.0.excerpt",
+          "i",
+          "French information"
+        ]
+      ],
+      "rules": [
+        "y",
+        "focInd"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "what": "focus indication",
+      "expect": [
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.3",
           "=",
           3
         ],
         [
-          "result.rules.focInd.data.totals.types.nonOutlinePresent.tagNames.A",
+          "standardResult.instances.0.ruleID",
           "=",
-          1
+          "focInd"
         ],
         [
-          "result.rules.focInd.data.totals.types.nonOutlinePresent.tagNames.BUTTON",
-          "=",
-          1
-        ],
-        [
-          "result.rules.focInd.data.totals.types.nonOutlinePresent.tagNames.INPUT",
-          "=",
-          1
-        ],
-        [
-          "result.rules.focInd.data.totals.types.outlinePresent.total",
+          "standardResult.instances.0.ordinalSeverity",
           "=",
           3
         ],
         [
-          "result.rules.focInd.data.totals.types.outlinePresent.tagNames.A",
+          "standardResult.instances.0.count",
           "=",
-          1
+          3
         ],
         [
-          "result.rules.focInd.data.totals.types.outlinePresent.tagNames.BUTTON",
+          "standardResult.instances.1.ordinalSeverity",
           "=",
-          1
+          2
         ],
         [
-          "result.rules.focInd.data.totals.types.outlinePresent.tagNames.INPUT",
+          "standardResult.instances.1.count",
           "=",
-          1
+          3
         ]
       ],
       "rules": [

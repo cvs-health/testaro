@@ -6,7 +6,7 @@
   the standard and thus most familiar focus indicator. Other focus indicators are assumed better
   than none, but more likely to be misunderstood. For example, underlines may be mistaken for
   selection indicators. Some pages delay the appearance of focus indicators. If a wait is
-  specified, the test checks every 100 ms for an outline until the allow wait time expires,
+  specified, the test checks every 100 ms for an outline until the allowed wait time expires,
   and once more after it expires. If no outline appears by then, the test checks for other focus
   indicators. If an outline does not appear immediately but appears on a subsequent check, the test
   reports the amount of the delay.
@@ -23,83 +23,42 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
     const allowedDelay = args[0];
     const withItems = args[1];
     // Initialize the data.
-    const data = {
-      totals: {
-        total: 0,
-        types: {
-          missing: {
-            total: 0,
-            tagNames: {}
-          },
-          nonoutline: {
-            total: 0,
-            tagNames: {}
-          },
-          outline: {
-            total: 0,
-            meanDelay: 0,
-            tagNames: {}
-          }
-        }
+    const data = {};
+    const totals = [0, 0, 0, 0];
+    const standardInstances = [];
+    const indicatorStyleNames = [
+      'outlineWidth',
+      'outlineColor',
+      'outlineStyle',
+      'borderWidth',
+      'borderStyle',
+      'boxShadow',
+      'fontSize',
+      'fontStyle',
+      'textDecorationLine',
+      'textDecorationStyle',
+      'textDecorationThickness'
+    ];
+// FUNCTION DEFINITION START
+    const checkTillDeadline = async (blurredStyleDec, focusedStyleDec, deadline) => {
+      // If the element has a non-transparent outline on focus:
+      if (
+        focusedStyleDec.outlineWidth !== '0px'
+        && focusedStyleDec.outlineColor !== 'rgba(0, 0, 0, 0)'
+      ) {
+        return true;
       }
+      // Otherwise, i.e. if it has no non-transparent outline on focus:
     };
-    if (withItems) {
-      data.items = {
-        missing: [],
-        nonoutline: [],
-        outline: []
-      };
-    }
-    // Adds facts about an element to the result.
-    const addElementFacts = (element, status, delay = null) => {
-      const type = data.totals.types[status];
-      type.total++;
-      if (status === 'outline') {
-        type.meanDelay = Math.round(((type.total - 1) * type.meanDelay + delay) / type.total);
-      }
-      const tagName = element.tagName;
-      if (type.tagNames[tagName]) {
-        type.tagNames[tagName]++;
-      }
-      else {
-        type.tagNames[tagName] = 1;
-      }
-      if (withItems) {
-        const elementData = {
-          tagName,
-          id: element.id,
-          text: (element.textContent.trim() || element.outerHTML.trim()).replace(/\s+/g, ' ')
-          .slice(0, 100)
-        };
-        if (status === 'outline') {
-          elementData.delay = delay;
-        }
-        data.items[status].push(elementData);
-      }
-    };
+    // FUNCTION DEFINITION END
     // For each visible element descendant of the body:
     for(const element of elements) {
       // If it is Tab-focusable:
       if (element.tabIndex === 0) {
-        // Increment the total of focusable elements.
-        data.totals.total++;
         // Get a live style declaration of its properties.
         const styleDec = window.getComputedStyle(element);
         // Get the relevant style properties and save them as the blurred styles.
         const styleBlurred = {};
-        const indicatorStyleNames = [
-          'outlineWidth',
-          'outlineColor',
-          'outlineStyle',
-          'borderWidth',
-          'borderStyle',
-          'boxShadow',
-          'fontSize',
-          'fontStyle',
-          'textDecorationLine',
-          'textDecorationStyle',
-          'textDecorationThickness'
-        ];
         indicatorStyleNames.forEach(styleName => {
           styleBlurred[styleName] = styleDec[styleName];
         });
@@ -108,8 +67,14 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
         let hasOutline = false;
         // If it has no outline when not focused:
         if (styleBlurred.outlineWidth === '0px') {
-          // If a non-transparent outline appeared immediately on focus:
-          if (styleDec.outlineWidth !== '0px' && styleDec.outlineColor !== 'rgba(0, 0, 0, 0)') {
+          // If a non-transparent outline appears on focus within the allowed delay:
+          let getsOutline = styleDec.outlineWidth !== '0px' && styleDec.outlineColor !== 'rgba(0, 0, 0, 0)';
+          if (! getsOutline) {
+            const deadline = Date.now() + allowedDelay;
+            while (Date.now() < deadline) {
+
+            }
+          }
             // Add facts about the element to the result.
             addElementFacts(element, 'outline', 0);
             hasOutline = true;
@@ -175,7 +140,7 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
         const qualifier = issueName === 'nonoutline' ? 'a non-outline' : 'no';
         standardInstances.push({
           ruleID: 'focInd',
-          what: `${item.tagName} element has ${qualifier} focus indicator`,
+          what: `Element has ${qualifier} focus indicator`,
           ordinalSeverity: issueName === 'nonoutline' ? 2 : 3,
           tagName: item.tagName,
           id: item.id,
