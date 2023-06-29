@@ -21,27 +21,12 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.embAc.data.totals.links",
+          "standardResult.totals.2",
           "=",
           0
         ],
         [
-          "result.rules.embAc.data.totals.buttons",
-          "=",
-          0
-        ],
-        [
-          "result.rules.embAc.data.totals.inputs",
-          "=",
-          0
-        ],
-        [
-          "result.rules.embAc.data.totals.selects",
-          "=",
-          0
-        ],
-        [
-          "result.rules.embAc.data.items.length",
+          "standardResult.instances.length",
           "=",
           0
         ]
@@ -63,34 +48,76 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.embAc.data.totals.links",
+          "standardResult.totals.2",
           "=",
-          2
+          8
         ],
         [
-          "result.rules.embAc.data.totals.buttons",
+          "standardResult.instances.0.ruleID",
           "=",
-          2
+          "embAc"
         ],
         [
-          "result.rules.embAc.data.totals.inputs",
-          "=",
-          3
+          "standardResult.instances.0.what",
+          "i",
+          "is embedded"
         ],
         [
-          "result.rules.embAc.data.totals.selects",
-          "=",
-          1
-        ],
-        [
-          "result.rules.embAc.data.items.0.embeddedElement",
+          "standardResult.instances.0.tagName",
           "=",
           "BUTTON"
         ],
         [
-          "result.rules.embAc.data.items.1.excerpt",
+          "standardResult.instances.0.excerpt",
+          "i",
+          "information about"
+        ],
+        [
+          "standardResult.instances.1.excerpt",
           "i",
           "about checkboxes"
+        ],
+        [
+          "standardResult.instances.6.ordinalSeverity",
+          "=",
+          2
+        ]
+      ],
+      "rules": [
+        "y",
+        "embAc"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "what": "embedded active elements",
+      "withItems": false,
+      "expect": [
+        [
+          "standardResult.totals.2",
+          "=",
+          8
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "embAc"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "are contained"
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          8
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
         ]
       ],
       "rules": [

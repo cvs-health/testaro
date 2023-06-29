@@ -20,9 +20,14 @@
       "what": "doctype",
       "expect": [
         [
-          "result.rules.docType.data.docHasType",
+          "standardResult.totals.3",
           "=",
-          true
+          0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          0
         ]
       ],
       "withItems": true,
@@ -42,9 +47,29 @@
       "what": "doctype",
       "expect": [
         [
-          "result.rules.docType.data.docHasType",
+          "standardResult.totals.3",
           "=",
-          false
+          1
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "docType"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "preamble"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          3
         ]
       ],
       "withItems": true,

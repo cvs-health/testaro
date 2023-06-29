@@ -41,7 +41,7 @@ exports.reporter = async (page, withItems) => {
         standardInstances: [
           {
             ruleID: 'dupAtt',
-            what: `Page prevented this test (treated as 10 instances)`,
+            what: 'Page prevented this test (treated as 10 instances)',
             ordinalSeverity: 3,
             count: 10,
             tagName: '',
@@ -65,6 +65,8 @@ exports.reporter = async (page, withItems) => {
   rawPage = rawPage.replace(/\\"|\\'/g, '');
   // Remove any quoted text from it.
   rawPage = rawPage.replace(/"[^"]*"|'[^']*'/g, '');
+  // Remove any equal symbols from it.
+  rawPage = rawPage.replace(/=/g, '');
   // Remove any script code from it.
   rawPage = rawPage.replace(/<(script [^<>]+)>.*?<\/script>/g, '$1');
   // Remove any comments from it.
@@ -104,7 +106,7 @@ exports.reporter = async (page, withItems) => {
     data.items.forEach(item => {
       standardInstances.push({
         ruleID: 'dupAtt',
-        what: `Element ${item.tagName} has 2 attributes with the same name`,
+        what: 'Element has 2 attributes with the same name',
         ordinalSeverity: 2,
         tagName: item.tagName,
         id: item.id,

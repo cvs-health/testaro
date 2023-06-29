@@ -21,12 +21,14 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.dupAtt.data.total",
+          "standardResult.totals.2",
           "=",
           0
         ],
         [
-          "result.rules.dupAtt.data.items.1"
+          "standardResult.instances.length",
+          "=",
+          0
         ]
       ],
       "rules": [
@@ -46,32 +48,66 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.dupAtt.data.total",
+          "standardResult.totals.2",
           "=",
           2
         ],
         [
-          "result.rules.dupAtt.data.items.0",
-          "e",
-          {
-            "tagName": "P",
-            "attributes": [
-              "class",
-              "id",
-              "class"
-            ]
-          }
+          "standardResult.instances.0.ruleID",
+          "=",
+          "dupAtt"
         ],
         [
-          "result.rules.dupAtt.data.items.1",
-          "e",
-          {
-            "tagName": "BUTTON",
-            "attributes": [
-              "aria-label",
-              "aria-label"
-            ]
-          }
+          "standardResult.instances.0.what",
+          "i",
+          "attributes with the same name"
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "P"
+        ],
+        [
+          "standardResult.instances.1.tagName",
+          "=",
+          "BUTTON"
+        ],
+        [
+          "standardResult.instances.1.excerpt",
+          "i",
+          "aria-label"
+        ]
+      ],
+      "rules": [
+        "y",
+        "dupAtt"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "what": "elements with duplicate attributes",
+      "withItems": false,
+      "expect": [
+        [
+          "standardResult.totals.2",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "dupAtt"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "attributes have the same name"
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          2
         ]
       ],
       "rules": [

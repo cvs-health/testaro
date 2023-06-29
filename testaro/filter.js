@@ -53,8 +53,8 @@ exports.reporter = async (page, withItems) => {
   if (data.items) {
     data.items.forEach(item => {
       standardInstances.push({
-        ruleID: 'filterStyle',
-        what: `${item.tagName} element has a filter style that impacts ${item.impact} elements`,
+        ruleID: 'filter',
+        what: `Element has a filter style; impacted element count: ${item.impact}`,
         ordinalSeverity: 2,
         tagName: item.tagName.toUpperCase(),
         id: item.id,
@@ -69,7 +69,7 @@ exports.reporter = async (page, withItems) => {
   }
   else if (data.totals.styledElements) {
     standardInstances.push({
-      ruleID: 'filterStyle',
+      ruleID: 'filter',
       what: 'Elements have filter styles impacting other elements',
       ordinalSeverity: 2,
       count: totals[2],
@@ -83,7 +83,7 @@ exports.reporter = async (page, withItems) => {
       excerpt: ''
     });
     standardInstances.push({
-      ruleID: 'filterStyle',
+      ruleID: 'filter',
       what: 'Elements are impacted by elements with filter styles',
       ordinalSeverity: 1,
       count: totals[1],

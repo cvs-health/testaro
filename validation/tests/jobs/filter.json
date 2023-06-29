@@ -21,12 +21,12 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.filter.data.totals.styledElements",
+          "standardResult.totals.2",
           "=",
           0
         ],
         [
-          "result.rules.filter.data.totals.impactedElements",
+          "standardResult.instances.length",
           "=",
           0
         ]
@@ -48,39 +48,96 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.filter.data.totals.styledElements",
+          "standardResult.totals.2",
           "=",
           2
         ],
         [
-          "result.rules.filter.data.totals.impactedElements",
+          "standardResult.totals.1",
           "=",
           7
         ],
         [
-          "result.rules.filter.data.items.0.tagName",
+          "standardResult.instances.0.ruleID",
+          "=",
+          "filter"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          ": 5"
+        ],
+        [
+          "standardResult.instances.0.tagName",
           "=",
           "MAIN"
         ],
         [
-          "result.rules.filter.data.items.1.tagName",
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.1.tagName",
           "=",
           "UL"
         ],
         [
-          "result.rules.filter.data.items.1.text",
-          "i",
-          "Item"
-        ],
-        [
-          "result.rules.filter.data.items.0.impact",
-          "=",
-          5
-        ],
-        [
-          "result.rules.filter.data.items.1.impact",
+          "standardResult.instances.1.ordinalSeverity",
           "=",
           2
+        ],
+        [
+          "standardResult.instances.1.excerpt",
+          "i",
+          "Item"
+        ]
+      ],
+      "rules": [
+        "y",
+        "filter"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "what": "filter",
+      "withItems": false,
+      "expect": [
+        [
+          "standardResult.totals.2",
+          "=",
+          2
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
+          7
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "filter"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "Elements have"
+        ],
+        [
+          "standardResult.instances.1.ordinalSeverity",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.1.count",
+          "=",
+          7
         ]
       ],
       "rules": [
