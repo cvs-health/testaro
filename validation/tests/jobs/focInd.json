@@ -134,7 +134,7 @@
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          3
+          2
         ],
         [
           "standardResult.instances.0.count",
@@ -142,9 +142,14 @@
           3
         ],
         [
+          "standardResult.instances.0.what",
+          "=",
+          "Elements have non"
+        ],
+        [
           "standardResult.instances.1.ordinalSeverity",
           "=",
-          2
+          3
         ],
         [
           "standardResult.instances.1.count",
