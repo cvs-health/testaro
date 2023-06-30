@@ -1,15 +1,13 @@
 /*
   focInd
-  This test reports focusable elements without focus indicators, with non-outline focus
-  indicators, and with outline focus indicators. An outline is recognized if it has non-zero
-  line thickness and non-transparent color. The test is based on the assumption that outlines are
-  the standard and thus most familiar focus indicator. Other focus indicators are assumed better
-  than none, but more likely to be misunderstood. For example, underlines may be mistaken for
-  selection indicators. Some pages delay the appearance of focus indicators. If a wait is
-  specified, the test checks every 100 ms for an outline until the allowed wait time expires,
-  and once more after it expires. If no outline appears by then, the test checks for other focus
-  indicators. If an outline does not appear immediately but appears on a subsequent check, the test
-  reports the amount of the delay.
+  This test reports focusable elements without focus indicators and with non-outline focus
+  indicators. An outline is recognized if it has non-zero line thickness and non-transparent color.
+  The test is based on the assumption that outlines are the standard and thus most familiar focus
+  indicator. Other focus indicators are assumed better than none, but more likely to be
+  misunderstood. For example, underlines may be mistaken for selection indicators. Some pages delay
+  the appearance of focus indicators. If a wait is specified, the test checks every 100 ms for an
+  outline until the allowed wait time expires, and once more after it expires. If no outline appears
+  by then, the test checks for other focus indicators.
 
   WARNING: This test fails to recognize outlines when run with firefox.
 */
@@ -27,9 +25,6 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
     const totals = [0, 0, 0, 0];
     const standardInstances = [];
     const indicatorStyleNames = [
-      'outlineWidth',
-      'outlineColor',
-      'outlineStyle',
       'borderWidth',
       'borderStyle',
       'boxShadow',
@@ -39,18 +34,78 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
       'textDecorationStyle',
       'textDecorationThickness'
     ];
-// FUNCTION DEFINITION START
-    const checkTillDeadline = async (blurredStyleDec, focusedStyleDec, deadline) => {
-      // If the element has a non-transparent outline on focus:
+    // FUNCTION DEFINITIONS START
+    // Returns the type of focus indicator of an element.
+    const getIndicator = (blurredStyleDec, focusedStyleDec) => {
+      // If there is no outline on blur but there is on focus:
       if (
-        focusedStyleDec.outlineWidth !== '0px'
+        blurredStyleDec.outlineWidth === '0px'
+        && focusedStyleDec.outlineWidth !== '0px'
         && focusedStyleDec.outlineColor !== 'rgba(0, 0, 0, 0)'
       ) {
-        return true;
+        // Return this.
+        return 'outline';
+      }
+      // Otherwise, i.e. if there is no outline focus indicator:
+      else {
+        // If there is a non-outline focus indicator:
+        return indicatorStyleNames.some(
+          styleName => focusedStyleDec[styleName] !== blurredStyleDec[styleName]
+        ) ? 'other' : '';
+      }
+    };
+    const pollIndicator = async (blurredStyleDec, focusedStyleDec, allowedDelay) => {
+      // If there is a focus indicator:
+      const instantIndicator = getIndicator(blurredStyleDec, focusedStyleDec);
+      if (instantIndicator) {
+        // Return its type.
+        return instantIndicator;
+      }
+      // Otherwise, i.e. if there is no focus indicator:
+      else {
+        // Check for a focus indicator periodically until the deadline and return the result.
+        const deadline = Date.now() + allowedDelay + 100;
+        let indicator;
+        const poller = setInterval(() => {
+          if (Date.now() > deadline) {
+            indicator = '';
+            clearInterval(poller);
+          }
+          else {
+            indicator = getIndicator(blurredStyleDec, focusedStyleDec);
+            if (indicator) {
+              clearInterval(poller);
+            }
+          }
+        });
+          if (
+            styleDec.outlineWidth !== '0px' && styleDec.outlineColor !== 'rgba(0, 0, 0, 0)'
+          ) {
+            resolve(Date.now() - focusTime);
+            clearInterval(interval);
+          }
+          else if (Date.now() > deadline) {
+            resolve(null);
+            clearInterval(interval);
+          }
+        }, 100);
+      }
+      if (getInd
+        blurredStyleDec.outlineWidth === '0px'
+        && focusedStyleDec.outlineWidth !== '0px'
+        && focusedStyleDec.outlineColor !== 'rgba(0, 0, 0, 0)'
+      ) {
+        // Return this.
+        return 'outline';
       }
       // Otherwise, i.e. if it has no non-transparent outline on focus:
+      else {
+        const hasDiffBorder = styleDec.borderWidth !== '0px'
+        && styleDec.borderColor !== 'rgba(0, 0, 0, 0)'
+        && (diff('borderStyle') || diff('borderWidth'));
+      }
     };
-    // FUNCTION DEFINITION END
+    // FUNCTION DEFINITIONS END
     // For each visible element descendant of the body:
     for(const element of elements) {
       // If it is Tab-focusable:
