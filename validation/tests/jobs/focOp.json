@@ -6,8 +6,8 @@
   "acts": [
     {
       "type": "launch",
-      "which": "chromium",
-      "what": "usual browser"
+      "which": "webkit",
+      "what": "sole focOp-compatible browser"
     },
     {
       "type": "url",
@@ -21,39 +21,19 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.focOp.data.totals.total",
-          "=",
-          3
-        ],
-        [
-          "result.rules.focOp.data.totals.types.onlyFocusable.total",
+          "standardResult.totals.2",
           "=",
           0
         ],
         [
-          "result.rules.focOp.data.totals.types.onlyOperable.total",
+          "standardResult.totals.3",
           "=",
           0
         ],
         [
-          "result.rules.focOp.data.totals.types.focusableAndOperable.total",
+          "standardResult.instances.length",
           "=",
-          3
-        ],
-        [
-          "result.rules.focOp.data.totals.types.focusableAndOperable.tagNames.A",
-          "=",
-          1
-        ],
-        [
-          "result.rules.focOp.data.totals.types.focusableAndOperable.tagNames.BUTTON",
-          "=",
-          1
-        ],
-        [
-          "result.rules.focOp.data.totals.types.focusableAndOperable.tagNames.INPUT",
-          "=",
-          1
+          0
         ]
       ],
       "rules": [
@@ -73,49 +53,126 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.focOp.data.totals.total",
-          "=",
-          6
-        ],
-        [
-          "result.rules.focOp.data.totals.types.onlyFocusable.total",
+          "standardResult.totals.2",
           "=",
           1
         ],
         [
-          "result.rules.focOp.data.totals.types.onlyFocusable.tagNames.SPAN",
-          "=",
-          1
-        ],
-        [
-          "result.rules.focOp.data.totals.types.onlyOperable.total",
+          "standardResult.totals.3",
           "=",
           3
         ],
         [
-          "result.rules.focOp.data.totals.types.onlyOperable.tagNames.BUTTON",
-          "=",
-          1
-        ],
-        [
-          "result.rules.focOp.data.totals.types.onlyOperable.tagNames.SPAN",
+          "standardResult.instances.0.ordinalSeverity",
           "=",
           2
         ],
         [
-          "result.rules.focOp.data.totals.types.focusableAndOperable.total",
+          "standardResult.instances.0.excerpt",
+          "=",
+          "focusable part"
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "SPAN"
+        ],
+        [
+          "standardResult.instances.1.ruleID",
+          "=",
+          "focOp"
+        ],
+        [
+          "standardResult.instances.1.what",
+          "i",
+          "operable but not focusable"
+        ],
+        [
+          "standardResult.instances.1.tagName",
+          "=",
+          "BUTTON"
+        ],
+        [
+          "standardResult.instances.1.ordinalSeverity",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.1.excerpt",
+          "i",
+          "button"
+        ],
+        [
+          "standardResult.instances.1.what",
+          "i",
+          "operable but not focusable"
+        ],
+        [
+          "standardResult.instances.2.id",
+          "=",
+          "clickable"
+        ]
+      ],
+      "rules": [
+        "y",
+        "focOp"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "what": "focusability and operability",
+      "withItems": false,
+      "expect": [
+        [
+          "standardResult.totals.2",
+          "=",
+          1
+        ],
+        [
+          "standardResult.totals.3",
+          "=",
+          3
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "focOp"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "Focusable elements"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
           "=",
           2
         ],
         [
-          "result.rules.focOp.data.totals.types.focusableAndOperable.tagNames.A",
+          "standardResult.instances.0.count",
           "=",
           1
         ],
         [
-          "result.rules.focOp.data.totals.types.focusableAndOperable.tagNames.INPUT",
+          "standardResult.instances.1.ruleID",
           "=",
-          1
+          "focOp"
+        ],
+        [
+          "standardResult.instances.1.ordinalSeverity",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.1.count",
+          "=",
+          3
         ]
       ],
       "rules": [

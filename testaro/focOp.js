@@ -189,7 +189,7 @@ exports.reporter = async (page, withItems) => {
       data.items[issue].forEach(item => {
         standardInstances.push({
           ruleID: 'focOp',
-          complaint: `${item.tagName || 'An'} element ${gripe}`,
+          what: `Element ${gripe}`,
           ordinalSeverity,
           tagName: item.tagName,
           id: item.id,
@@ -207,7 +207,7 @@ exports.reporter = async (page, withItems) => {
     if (totals[2]) {
       standardInstances.push({
         ruleID: 'focOp',
-        complaint: 'Focusable elements are inoperable',
+        what: 'Focusable elements are inoperable',
         count: totals[2],
         ordinalSeverity: 2,
         tagName: '',
@@ -223,7 +223,7 @@ exports.reporter = async (page, withItems) => {
     if (totals[3]) {
       standardInstances.push({
         ruleID: 'focOp',
-        complaint: 'Operable elements are nonfocusable',
+        what: 'Operable elements are nonfocusable',
         count: totals[3],
         ordinalSeverity: 3,
         tagName: '',
