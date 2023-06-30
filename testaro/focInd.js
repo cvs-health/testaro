@@ -25,14 +25,7 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
     const data = {};
     const totals = [0, 0, 0, 0];
     const standardInstances = [];
-    const outlineStyleNames = [
-      'outlineWidth',
-      'outlineStyle',
-      'outlineColor'
-    ];
     const otherStyleNames = [
-      'borderWidth',
-      'borderStyle',
       'boxShadow',
       'fontSize',
       'fontStyle',
@@ -40,6 +33,14 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
       'textDecorationStyle',
       'textDecorationThickness'
     ];
+    const allStyleNames = otherStyleNames.concat([
+      'outlineWidth',
+      'outlineStyle',
+      'outlineColor',
+      'borderWidth',
+      'borderStyle',
+      'borderColor'
+    ]);
     const ordinalSeverities = {
       other: 2,
       none: 3
@@ -48,7 +49,6 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
       other: 'a non-outline',
       none: 'no'
     };
-    const indicatorStyleNames = outlineStyleNames.concat(otherStyleNames);
     // FUNCTION DEFINITIONS START
     // Returns a space-minimized copy of a string.
     const compact = string => string
@@ -56,6 +56,15 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
     .replace(/\s{2,}/g, ' ')
     .trim()
     .slice(0, 100);
+    // Returns whether an enclosure indicates focus.
+    const boxDiffers = (boxName, blurredStyleDec, focusedStyleDec) => {
+      const anyThick = blurredStyleDec[`${boxName}Width`] !== '0px'
+      || focusedStyleDec[`${boxName}Width`] !== '0px';
+      const anyDiff = ['Width', 'Style', 'Color'].some(
+        type => blurredStyleDec[`${boxName}${type}`] !== focusedStyleDec[`${boxName}${type}`]
+      );
+      return anyThick && anyDiff;
+    };
     // Returns the type of focus indicator of an element.
     const getIndicator = (blurredStyleDec, focusedStyleDec) => {
       // If there is no outline on blur but there is on focus:
@@ -69,16 +78,19 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
       }
       // Otherwise, i.e. if there is no outline focus indicator:
       else {
-        // If there is a non-outline focus indicator:
-        return indicatorStyleNames.some(
+        // Return whether there is another focus indicator.
+        const outlineDiffers = boxDiffers('outline', blurredStyleDec, focusedStyleDec);
+        const borderDiffers = boxDiffers('border', blurredStyleDec, focusedStyleDec);
+        const otherDiffers = otherStyleNames.some(
           styleName => focusedStyleDec[styleName] !== blurredStyleDec[styleName]
-        ) ? 'other' : 'none';
+        );
+        return (outlineDiffers || borderDiffers || otherDiffers) ? 'other' : 'none';
       }
     };
     const pollIndicator = async (blurredStyleDec, focusedStyleDec, allowedDelay) => {
       // If there is a focus indicator:
       const instantIndicator = getIndicator(blurredStyleDec, focusedStyleDec);
-      if (instantIndicator) {
+      if (instantIndicator !== 'none') {
         // Return its type.
         return instantIndicator;
       }
@@ -86,20 +98,21 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
       else {
         // Check for a focus indicator periodically until the deadline and return the result.
         const deadline = Date.now() + allowedDelay + 100;
-        let indicator = new Promise('none');
-        const poller = setInterval(() => {
-          if (Date.now() > deadline) {
-            Promise.resolve(indicator);
-            clearInterval(poller);
-          }
-          else {
-            indicator = getIndicator(blurredStyleDec, focusedStyleDec);
-            if (indicator) {
-              Promise.resolve(indicator);
+        let indicator = new Promise(resolve => {
+          const poller = setInterval(() => {
+            if (Date.now() > deadline) {
+              resolve('none');
               clearInterval(poller);
             }
-          }
-        }, 100);
+            else {
+              const trialIndicator = getIndicator(blurredStyleDec, focusedStyleDec);
+              if (trialIndicator !== 'none') {
+                resolve(trialIndicator);
+                clearInterval(poller);
+              }
+            }
+          }, 100);
+        });
         return await indicator;
       }
     };
@@ -112,13 +125,11 @@ exports.reporter = async (page, withItems, revealAll = false, allowedDelay = 250
         const styleDec = window.getComputedStyle(element);
         // Get the relevant style properties and save them as the blurred styles.
         const blurredStyleDec = {};
-        indicatorStyleNames.forEach(styleName => {
-          blurredStyleDec[styleName] = styleDec[styleName];
-        });
+        allStyleNames.forEach(styleName => blurredStyleDec[styleName] = styleDec[styleName]);
         // Focus the element, potentially changing the properties in its style declaration.
         element.focus({preventScroll: true});
         // If it has an inferior focus indicator:
-        const indicator = pollIndicator(blurredStyleDec, styleDec, allowedDelay);
+        const indicator = await pollIndicator(blurredStyleDec, styleDec, allowedDelay);
         if (indicator !== 'outline') {
           // Add this to the result.
           totals[ordinalSeverities[indicator]]++;

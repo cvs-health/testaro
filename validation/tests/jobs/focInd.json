@@ -17,8 +17,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "revealAll": false,
-      "allowedDelay": 0,
       "withItems": true,
       "what": "focus indication",
       "expect": [
@@ -57,12 +55,32 @@
         [
           "standardResult.totals.2",
           "=",
-          3
+          4
         ],
         [
           "standardResult.totals.3",
           "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "INPUT"
+        ],
+        [
+          "standardResult.instances.0.id",
+          "=",
+          "textInput"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
           3
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "i",
+          "textInput"
         ],
         [
           "standardResult.instances.3.ruleID",
@@ -72,37 +90,17 @@
         [
           "standardResult.instances.3.tagName",
           "=",
-          "INPUT"
+          "A"
         ],
         [
           "standardResult.instances.3.id",
           "=",
-          "textInput"
+          "slowLink"
         ],
         [
           "standardResult.instances.3.ordinalSeverity",
           "=",
-          3
-        ],
-        [
-          "standardResult.instances.0.tagName",
-          "=",
-          "A"
-        ],
-        [
-          "standardResult.instances.0.id",
-          "=",
-          "slowLink"
-        ],
-        [
-          "standardResult.instances.0.ordinalSeverity",
-          "=",
           2
-        ],
-        [
-          "standardResult.instances.0.excerpt",
-          "i",
-          "French information"
         ]
       ],
       "rules": [
@@ -124,7 +122,7 @@
         [
           "standardResult.totals.3",
           "=",
-          3
+          2
         ],
         [
           "standardResult.instances.0.ruleID",
@@ -139,11 +137,11 @@
         [
           "standardResult.instances.0.count",
           "=",
-          3
+          4
         ],
         [
           "standardResult.instances.0.what",
-          "=",
+          "i",
           "Elements have non"
         ],
         [
@@ -154,7 +152,7 @@
         [
           "standardResult.instances.1.count",
           "=",
-          3
+          2
         ]
       ],
       "rules": [
