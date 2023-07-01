@@ -8,18 +8,30 @@
   </head>
   <body>
     <main>
+
       <h1>Page with deviant hover behavior</h1>
-      <p>This page contains a link to <a href="https://en.wikipedia.org" onmouseover="document.getElementById('translucent').style.opacity = 1">information</a> and a <button type="button" onmouseover="document.getElementById('hiddenP').style.display = 'block'">bothersome button</button>. Both elements can be hovered over.</p>
-      <p id="hiddenP" style="display: none">The button, when hovered over, makes this paragraph, and therefore this <a href="https://en.wikipedia.org/wiki/Web_accessibility">link on web accessibility</a> and this <button type="button">new button</button>, visible.</p>
-      <p id="translucent" style="opacity: 0.4">The first link, when hovered over, changes the opacity of this paragraph from 0.4 to 1. That indirectly changes the opacity of this <span>word</span>, too.</p>
-      <p>The small button is mostly covered by a large one here, preventing the small button from receiving a hover event.</p>
-      <p style="position: relative"><button id="smallButton" style="position: absolute; left: 10rem">button</button><button style="position: absolute; left: 11rem; top: -0.5rem; font-size: x-large">bigger button</button></p>
-      <p>Hovering over the first of the following list items changes content.</p>
+
+      <p>Triggers 1 and 2. This page contains a link named <a href="https://en.wikipedia.org" onmouseover="document.getElementById('translucent').style.opacity = 1">Trigger 1</a> and a <button type="button" onmouseover="document.getElementById('hiddenP').style.display = 'block'">Trigger 2 button</button>. Both elements can be hovered over.</p>
+
+      <p id="hiddenP" style="display: none">The Trigger 2 button, when hovered over, makes this paragraph, and therefore this <a href="https://en.wikipedia.org/wiki/Web_accessibility">link on web accessibility</a> and this <button type="button">new button</button>, visible.</p>
+
+      <p id="translucent" style="opacity: 0.4">The Trigger 1 link, when hovered over, changes the opacity of this paragraph from 0.4 to 1. That indirectly changes the opacity of this <span>word</span>, too.</p>
+
+      <p>The Trigger 3 button is mostly covered by a Trigger 4 one below, preventing the Trigger 3 button from receiving a hover event.</p>
+
+      <p style="position: relative"><button id="smallButton" style="position: absolute; left: 10rem">Trigger 3</button><button style="position: absolute; left: 11rem; top: -0.5rem; font-size: x-large">Trigger 4</button></p>
+
+      <p>Hovering over Trigger 5 changes content.</p>
+
       <ul>
-        <li onmouseover="document.getElementById('listDependent').setAttribute('hidden', true)">This is a list item.</li>
-        <li>This is another list item.</li>
+        <li onmouseover="document.getElementById('listDependent').setAttribute('hidden', true)">This is a list item, Trigger 5.</li>
+        <li>This is another list item, Trigger 6.</li>
       </ul>
-      <p id="listDependent">This paragraph becomes invisible when you hover over the first list item.</p>
+
+      <p id="listDependent">This paragraph becomes invisible when you hover over Trigger 5.</p>
+
+      <p>Triggers 1, 2, and 5 have impacts. Trigger 3 is unhoverable.</p>
+
     </main>
   </body>
 </html>

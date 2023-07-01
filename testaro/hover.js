@@ -390,7 +390,7 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
     badIndicators: 2
   };
   const what = {
-    impactTriggers: 'Hovering over element has unexpected effects',
+    impactTriggers: 'Hovering over the element has unexpected effects',
     unhoverables: 'Operable element cannot be hovered over',
     noCursors: 'Hoverable element hides the mouse cursor',
     badCursors: 'Link or button makes the hovering mouse cursor nonstandard',
@@ -398,17 +398,17 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
     badIndicators: 'List item changes when hovered over'
   };
   const totals = [0, 0, 0, 0];
-  Object.keys(data.totals).forEach(issue => {
-    totals[severity[issue]] += data.totals[issue];
+  Object.keys(data.totals).forEach(category => {
+    totals[severity[category]] += data.totals[category];
   });
   const standardInstances = [];
   if (data.items) {
-    Object.keys(data.items).forEach(issue => {
-      data.items[issue].forEach(item => {
+    Object.keys(data.items).forEach(category => {
+      data.items[category].forEach(item => {
         standardInstances.push({
           ruleID: 'hover',
-          what: what[issue],
-          ordinalSeverity: severity[issue],
+          what: what[category],
+          ordinalSeverity: severity[category],
           tagName: item.tagName,
           id: item.id,
           location: {
@@ -424,9 +424,9 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
   else if (totals.some(total => total)) {
     standardInstances.push({
       ruleID: 'hover',
-      what: 'Hovering has unexpected impacts',
-      count: Object.values(data.totals).reduce((total, current) => total + current),
+      what: 'Hovering behaves unexpectedly',
       ordinalSeverity: totals.reduce((max, current, index) => current ? index : max, 0),
+      count: Object.values(data.totals).reduce((total, current) => total + current),
       tagName: '',
       id: '',
       location: {

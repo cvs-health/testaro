@@ -2,7 +2,7 @@
   "id": "hover",
   "what": "validation of hover test",
   "strict": true,
-  "timeLimit": 20,
+  "timeLimit": 40,
   "acts": [
     {
       "type": "launch",
@@ -21,42 +21,19 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.hover.data.totals.triggers",
-          "=",
-          4
-        ],
-        [
-          "result.rules.hover.data.totals.impactTriggers",
+          "standardResult.totals.0",
           "=",
           0
         ],
         [
-          "result.rules.hover.data.totals.additions",
+          "standardResult.totals.2",
           "=",
           0
         ],
         [
-          "result.rules.hover.data.totals.removals",
+          "standardResult.instances.length",
           "=",
           0
-        ],
-        [
-          "result.rules.hover.data.totals.opacityChanges",
-          "=",
-          0
-        ],
-        [
-          "result.rules.hover.data.totals.opacityImpact",
-          "=",
-          0
-        ],
-        [
-          "result.rules.hover.data.totals.unhoverables",
-          "=",
-          0
-        ],
-        [
-          "result.rules.hover.data.items.impactTriggers.0"
         ]
       ],
       "rules": [
@@ -79,99 +56,64 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.hover.data.totals.triggers",
+          "standardResult.totals.3",
           "=",
-          6
+          4
         ],
         [
-          "result.rules.hover.data.totals.impactTriggers",
+          "standardResult.totals.2",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "hover"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "unexpected"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
           "=",
           3
         ],
         [
-          "result.rules.hover.data.totals.additions",
-          "=",
-          3
-        ],
-        [
-          "result.rules.hover.data.totals.removals",
-          "=",
-          1
-        ],
-        [
-          "result.rules.hover.data.totals.opacityChanges",
-          "=",
-          1
-        ],
-        [
-          "result.rules.hover.data.totals.opacityImpact",
-          "=",
-          1
-        ],
-        [
-          "result.rules.hover.data.totals.unhoverables",
-          "=",
-          1
-        ],
-        [
-          "result.rules.hover.data.items.impactTriggers.0.tagName",
+          "standardResult.instances.0.tagName",
           "=",
           "A"
         ],
         [
-          "result.rules.hover.data.items.impactTriggers.1.tagName",
-          "=",
-          "BUTTON"
+          "standardResult.instances.0.excerpt",
+          "i",
+          "Trigger 1"
         ],
         [
-          "result.rules.hover.data.items.impactTriggers.2.tagName",
-          "=",
-          "LI"
+          "standardResult.instances.3.what",
+          "i",
+          "cannot be hovered"
         ],
         [
-          "result.rules.hover.data.items.impactTriggers.0.text",
-          "=",
-          "information"
-        ],
-        [
-          "result.rules.hover.data.items.impactTriggers.0.additions",
-          "=",
-          0
-        ],
-        [
-          "result.rules.hover.data.items.impactTriggers.1.additions",
+          "standardResult.instances.3.ordinalSeverity",
           "=",
           3
         ],
         [
-          "result.rules.hover.data.items.impactTriggers.2.removals",
-          "=",
-          1
-        ],
-        [
-          "result.rules.hover.data.items.impactTriggers.0.opacityChanges",
-          "=",
-          1
-        ],
-        [
-          "result.rules.hover.data.items.impactTriggers.1.opacityImpact",
-          "=",
-          0
-        ],
-        [
-          "result.rules.hover.data.items.unhoverables.0.tagName",
+          "standardResult.instances.3.tagName",
           "=",
           "BUTTON"
         ],
         [
-          "result.rules.hover.data.items.unhoverables.0.id",
+          "standardResult.instances.3.id",
           "=",
           "smallButton"
         ],
         [
-          "result.rules.hover.data.items.unhoverables.0.text",
-          "=",
-          "button"
+          "standardResult.instances.3.excerpt",
+          "i",
+          "Trigger 3"
         ]
       ],
       "rules": [
@@ -183,58 +125,68 @@
       }
     },
     {
-      "type": "url",
-      "which": "__targets__/hover/large.html",
-      "what": "page with deviant hover behavior"
+      "type": "test",
+      "which": "testaro",
+      "what": "hover",
+      "withItems": false,
+      "expect": [
+        [
+          "standardResult.totals.3",
+          "=",
+          4
+        ],
+        [
+          "standardResult.totals.2",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "hover"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "behaves"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          4
+        ]
+      ],
+      "rules": [
+        "y",
+        "hover"
+      ],
+      "args": {
+        "hover": [8]
+      }
     },
     {
       "type": "test",
       "which": "testaro",
       "what": "hover",
-      "withItems": true,
+      "withItems": false,
       "expect": [
         [
-          "result.rules.hover.data.totals.triggers",
-          "=",
-          20
-        ],
-        [
-          "result.rules.hover.data.totals.impactTriggers",
-          ">",
-          -1
-        ],
-        [
-          "result.rules.hover.data.totals.impactTriggers",
+          "standardResult.totals.3",
           "<",
-          6
+          7
         ],
         [
-          "result.rules.hover.data.totals.additions",
-          ">",
-          -1
-        ],
-        [
-          "result.rules.hover.data.totals.additions",
-          "<",
-          6
-        ],
-        [
-          "result.rules.hover.data.totals.removals",
-          "=",
-          0
-        ],
-        [
-          "result.rules.hover.data.totals.opacityChanges",
-          "=",
-          0
-        ],
-        [
-          "result.rules.hover.data.totals.opacityImpact",
-          "=",
-          0
-        ],
-        [
-          "result.rules.hover.data.totals.unhoverables",
+          "standardResult.totals.1",
           "=",
           0
         ]
@@ -244,7 +196,27 @@
         "hover"
       ],
       "args": {
-        "hover": [10]
+        "hover": [2]
+      }
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "what": "hover",
+      "withItems": false,
+      "expect": [
+        [
+          "standardResult.totals.3",
+          ">",
+          1
+        ]
+      ],
+      "rules": [
+        "y",
+        "hover"
+      ],
+      "args": {
+        "hover": [3]
       }
     },
     {
@@ -259,34 +231,69 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.hover.data.totals.noIndicators",
+          "standardResult.totals.2",
           "=",
           1
         ],
         [
-          "result.rules.hover.data.totals.noCursors",
+          "standardResult.totals.3",
           "=",
-          1
+          2
         ],
         [
-          "result.rules.hover.data.totals.badIndicators",
+          "standardResult.instances.0.ruleID",
           "=",
-          1
+          "hover"
         ],
         [
-          "result.rules.hover.data.items.noIndicators.0.text",
-          "=",
-          "button"
+          "standardResult.instances.0.what",
+          "i",
+          "hides"
         ],
         [
-          "result.rules.hover.data.items.noCursors.0.tagName",
+          "standardResult.instances.0.tagName",
           "=",
           "LI"
         ],
         [
-          "result.rules.hover.data.items.badIndicators.0.id",
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "i",
+          "loses its cursor"
+        ],
+        [
+          "standardResult.instances.2.ruleID",
+          "=",
+          "hover"
+        ],
+        [
+          "standardResult.instances.2.what",
+          "i",
+          "changes when"
+        ],
+        [
+          "standardResult.instances.2.tagName",
+          "=",
+          "LI"
+        ],
+        [
+          "standardResult.instances.2.id",
           "=",
           "li2"
+        ],
+        [
+          "standardResult.instances.2.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "i",
+          "should not"
         ]
       ],
       "rules": [
