@@ -63,7 +63,17 @@
         [
           "standardResult.totals.2",
           "=",
-          0
+          1
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
+          4
+        ],
+        [
+          "standardResult.totals.0",
+          "=",
+          1
         ],
         [
           "standardResult.instances.0.ruleID",

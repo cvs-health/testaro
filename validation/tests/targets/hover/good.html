@@ -5,11 +5,17 @@
     <title>Page with standard hover behavior</title>
     <meta name="description" content="tester">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      button:hover {
+        background-color: #000;
+        color: #fff
+      }
+    </style>
   </head>
   <body>
     <main>
       <h1>Page with standard hover behavior</h1>
-      <p>This paragraph contains a link to <a href="https://en.wikipedia.org">information</a> and a <button type="button">button</button>. Both of them can be hovered over, and hovering over either of them does not trigger any change in content.</p>
+      <p>This paragraph contains a link to <a href="https://en.wikipedia.org">information</a> and a <button type="button">button</button>. Both of them can be hovered over, and hovering over either of them does not trigger any change in content. The Chrome browser changes the background color of the button slightly on hover, but leaves the value of the background-color style property as <q>buttonface</q>. So, to guarantee a noticeable an detectable change in background color, this page defines a hover style for buttons.</p>
       <p>Hovering over either of the following list items changes no content.</p>
       <ul>
         <li>This is a list item.</li>
