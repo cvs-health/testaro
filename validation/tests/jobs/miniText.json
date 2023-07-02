@@ -21,19 +21,91 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.miniText.data.total",
+          "standardResult.totals.2",
           "=",
           3
         ],
         [
-          "result.rules.miniText.data.items.0",
-          "i",
-          "rem"
+          "standardResult.totals.1",
+          "=",
+          0
         ],
         [
-          "result.rules.miniText.data.items.2",
+          "standardResult.instances.0.ruleID",
+          "=",
+          "miniText"
+        ],
+        [
+          "standardResult.instances.0.what",
           "i",
-          "named"
+          "font is smaller"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "P"
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "i",
+          "in rem"
+        ],
+        [
+          "standardResult.instances.1.excerpt",
+          "i",
+          "in px"
+        ],
+        [
+          "standardResult.instances.2.excerpt",
+          "i",
+          "with a named constant"
+        ]
+      ],
+      "rules": [
+        "y",
+        "miniText"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "what": "small text",
+      "withItems": false,
+      "expect": [
+        [
+          "standardResult.totals.2",
+          "=",
+          3
+        ],
+        [
+          "standardResult.totals.0",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "miniText"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "have fonts smaller"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
         ]
       ],
       "rules": [

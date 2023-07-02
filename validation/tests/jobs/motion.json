@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "webkit",
-      "what": "used for tests on which chromium fails on some URLs"
+      "what": "required browser for montion test"
     },
     {
       "type": "url",
@@ -17,35 +17,14 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "spontaneous change of content",
       "expect": [
         [
-          "result.rules.motion.data.meanLocalRatio",
-          "=",
-          1
-        ],
-        [
-          "result.rules.motion.data.maxLocalRatio",
-          "=",
-          1
-        ],
-        [
-          "result.rules.motion.data.globalRatio",
-          "=",
-          1
-        ],
-        [
-          "result.rules.motion.data.meanPixelChange",
+          "standardResult.totals.2",
           "=",
           0
         ],
         [
-          "result.rules.motion.data.maxPixelChange",
-          "=",
-          0
-        ],
-        [
-          "result.rules.motion.data.changeFrequency",
+          "standardResult.instances.length",
           "=",
           0
         ]
@@ -70,34 +49,29 @@
       "what": "spontaneous change of content",
       "expect": [
         [
-          "result.rules.motion.data.meanLocalRatio",
-          ">",
-          1
-        ],
-        [
-          "result.rules.motion.data.maxLocalRatio",
-          ">",
-          1
-        ],
-        [
-          "result.rules.motion.data.globalRatio",
-          ">",
-          1
-        ],
-        [
-          "result.rules.motion.data.meanPixelChange",
+          "standardResult.totals.2",
           ">",
           0
         ],
         [
-          "result.rules.motion.data.maxPixelChange",
-          ">",
+          "standardResult.totals.3",
+          "=",
           0
         ],
         [
-          "result.rules.motion.data.changeFrequency",
-          ">",
-          0
+          "standardResult.instances.length",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "motion"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "moves or changes"
         ]
       ],
       "withItems": true,
