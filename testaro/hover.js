@@ -3,8 +3,8 @@
   This test reports unexpected impacts of hovering. The effects include additions and removals
   of visible elements, opacity changes, unhoverable elements, and nonstandard hover cursors.
   The elements that are subjected to hovering (called “triggers”) are the Playwright-visible
-  elements that have 'A', 'BUTTON', or 'LI' tag names or have 'onmouseenter' or 'onmouseover'
-  attributes.
+  elements that have 'A', 'BUTTON', or (if not with role=menuitem) 'LI' tag names or have
+  'onmouseenter' or 'onmouseover' attributes.
 
   When a trigger is hovered over, the test examines the impacts on descendants of the great
   grandparents of triggers with tag names 'A' and 'BUTTON', grandparents of triggers with tag
@@ -33,28 +33,22 @@ let hasTimedOut = false;
 
 // FUNCTIONS
 
-// Gets the probability of a trigger being sampled.
-const samProb = (index, popSize, sampleRatio) =>
-  sampleRatio * (1 + Math.sin(Math.PI * index / popSize + Math.PI / 2));
-// Samples the trigger population and returns the sample and each member’s sampling probability.
+// Draws a location-weighted sample of triggers.
 const getSample = (population, sampleSize) => {
   const popSize = population.length;
-  // If the sample is at least as large as the population:
-  if (sampleSize >= popSize || sampleSize < 0) {
-    // Return the population as the sample.
-    return population.map(trigger => [trigger, 1]);
+  if (sampleSize < popSize) {
+    const WeightedPopulation = population.map((trigger, index) => {
+      const weight = 1 + Math.sin(Math.PI * index / popSize + Math.PI / 2);
+      const priority = weight * Math.random();
+      return [trigger, index, priority];
+    });
+    const sortedPopulation = WeightedPopulation.sort((a, b) => b[2] - a[2]);
+    const sample = sortedPopulation.slice(0, sampleSize);
+    const domOrderSample = sample.sort((a, b) => a[1] - b[1]);
+    return domOrderSample.map(trigger => trigger[0]);
   }
-  // Otherwise, i.e. if the sample is smaller than the population:
   else {
-    // Force the sample size to be an integer and at least 1.
-    sampleSize = Math.floor(Math.max(1, sampleSize));
-    const sampleRatio = sampleSize / popSize;
-    // Get the sample.
-    const sample = population.map((trigger, index) => {
-      const itemProb = samProb(index, popSize, sampleRatio);
-      return [trigger, itemProb];
-    }).filter(pair => pair[1] > Math.random());
-    return sample;
+    return population;
   }
 };
 // Returns the text of an element.
@@ -144,14 +138,14 @@ const find = async (data, withItems, page, sample) => {
   if (sample.length && ! hasTimedOut) {
     // Get and report the impacts until and unless the test times out.
     try {
-      // Identify the first trigger and its sampling probability.
+      // Identify the first trigger.
       const firstTrigger = sample[0];
-      const tagNameJSHandle = await firstTrigger[0].getProperty('tagName')
+      const tagNameJSHandle = await firstTrigger.getProperty('tagName')
       .catch(() => '');
       if (tagNameJSHandle) {
         const tagName = await tagNameJSHandle.jsonValue();
         // Identify the root of a subtree likely to contain impacted elements.
-        let root = firstTrigger[0];
+        let root = firstTrigger;
         if (['A', 'BUTTON', 'LI'].includes(tagName)) {
           const rootJSHandle = await page.evaluateHandle(
             trigger => {
@@ -160,7 +154,7 @@ const find = async (data, withItems, page, sample) => {
               const greatGrandparent = grandparent.parentElement || parent;
               return trigger.tagName === 'LI' ? grandparent : greatGrandparent;
             },
-            firstTrigger[0]
+            firstTrigger
           );
           root = rootJSHandle.asElement();
         }
@@ -171,16 +165,16 @@ const find = async (data, withItems, page, sample) => {
           element => window.getComputedStyle(element).opacity
         ), preDescendants);
         // Get the style properties of the trigger.
-        const triggerPreStyles = await getHoverStyles(page, firstTrigger[0]);
-        const totalEstimate = 1 / firstTrigger[1];
+        const triggerPreStyles = await getHoverStyles(page, firstTrigger);
+        const multiplier = data.sampling.triggers / data.sampling.triggerSample;
         const itemData = {
           tagName,
-          id: (await firstTrigger[0].getAttribute('id')) || '',
-          text: await textOf(firstTrigger[0], 100)
+          id: (await firstTrigger.getAttribute('id')) || '',
+          text: await textOf(firstTrigger, 100)
         };
         try {
           // Hover over the trigger.
-          await firstTrigger[0].hover({
+          await firstTrigger.hover({
             timeout: 500,
             noWaitAfter: true
           });
@@ -189,13 +183,13 @@ const find = async (data, withItems, page, sample) => {
             300, 4, root, page, preDescendants, preOpacities, firstTrigger
           );
           // Get the style properties of the trigger.
-          const triggerPostStyles = await getHoverStyles(page, firstTrigger[0]);
+          const triggerPostStyles = await getHoverStyles(page, firstTrigger);
           // Add cursor and other style defects to the data.
           const cursor = triggerPreStyles.cursor;
           // If the trigger has no cursor:
           if (cursor === 'none') {
             // Add this fact to the data.
-            data.totals.noCursors += totalEstimate;
+            data.totals.noCursors += multiplier;
             if (withItems) {
               data.items.noCursors.push(itemData);
             }
@@ -206,7 +200,7 @@ const find = async (data, withItems, page, sample) => {
             || tagName === 'BUTTON' && cursor !== 'default'
           ){
             // Add this fact to the data.
-            data.totals.badCursors += totalEstimate;
+            data.totals.badCursors += multiplier;
             if (withItems) {
               data.items.badCursors.push(itemData);
             }
@@ -217,7 +211,7 @@ const find = async (data, withItems, page, sample) => {
             && JSON.stringify(triggerPostStyles) !== JSON.stringify(triggerPreStyles)
           ) {
             // Add this fact to the data.
-            data.totals.badIndicators += totalEstimate;
+            data.totals.badIndicators += multiplier;
             if (withItems) {
               data.items.badIndicators.push(itemData);
             }
@@ -243,11 +237,11 @@ const find = async (data, withItems, page, sample) => {
               return Promise.resolve('');
             }
             else {
-              data.totals.impactTriggers += totalEstimate;
-              data.totals.additions += additions / firstTrigger[1];
-              data.totals.removals += removals / firstTrigger[1];
-              data.totals.opacityChanges += opacityChanges / firstTrigger[1];
-              data.totals.opacityImpact += opacityImpact / firstTrigger[1];
+              data.totals.impactTriggers += multiplier;
+              data.totals.additions += additions * multiplier;
+              data.totals.removals += removals * multiplier;
+              data.totals.opacityChanges += opacityChanges * multiplier;
+              data.totals.opacityImpact += opacityImpact * multiplier;
               // If details are to be reported:
               if (withItems) {
                 // Add them to the data.
@@ -270,7 +264,7 @@ const find = async (data, withItems, page, sample) => {
             return Promise.resolve('');
           }
           else {
-            data.totals.unhoverables += totalEstimate;
+            data.totals.unhoverables += multiplier;
             if (withItems) {
               try {
                 data.items.unhoverables.push(itemData);
@@ -297,9 +291,11 @@ const find = async (data, withItems, page, sample) => {
 exports.reporter = async (page, withItems, sampleSize = 20) => {
   // Initialize the result.
   let data = {
-    totals: {
+    sampling: {
       triggers: 0,
       triggerSample: 0,
+    },
+    totals: {
       impactTriggers: 0,
       additions: 0,
       removals: 0,
@@ -323,17 +319,17 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
     };
   }
   // Identify the triggers.
-  const selectors = ['a', 'button', 'li', '[onmouseenter]', '[onmouseover]'];
+  const selectors = ['a', 'button', 'li:not([role=menuitem])', '[onmouseenter]', '[onmouseover]'];
   const triggers = await page.$$(selectors.map(selector => `body ${selector}:visible`).join(', '))
   .catch(error => {
     console.log(`ERROR getting hover triggers (${error.message})`);
     data.prevented = true;
     return [];
   });
-  data.totals.triggers = triggers.length;
+  data.sampling.triggers = triggers.length;
   // Get the sample.
   const sample = getSample(triggers, sampleSize);
-  data.totals.triggerSample = sample.length;
+  data.sampling.triggerSample = sample.length;
   // Set a time limit to cover possible 2 seconds per trigger.
   const timeLimit = Math.round(2.8 * sample.length + 2);
   const timeout = setTimeout(async () => {

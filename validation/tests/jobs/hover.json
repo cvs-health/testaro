@@ -131,7 +131,7 @@
         "hover"
       ],
       "args": {
-        "hover": [8]
+        "hover": [6]
       }
     },
     {
@@ -148,7 +148,17 @@
         [
           "standardResult.totals.2",
           "=",
-          0
+          1
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
+          4
+        ],
+        [
+          "standardResult.totals.0",
+          "=",
+          1
         ],
         [
           "standardResult.instances.length",
@@ -173,7 +183,7 @@
         [
           "standardResult.instances.0.count",
           "=",
-          4
+          10
         ]
       ],
       "rules": [
@@ -181,7 +191,7 @@
         "hover"
       ],
       "args": {
-        "hover": [8]
+        "hover": [6]
       }
     },
     {
@@ -196,9 +206,19 @@
           7
         ],
         [
+          "standardResult.totals.2",
+          "<",
+          4
+        ],
+        [
           "standardResult.totals.1",
-          "=",
-          0
+          "<",
+          13
+        ],
+        [
+          "standardResult.totals.0",
+          "<",
+          4
         ]
       ],
       "rules": [
@@ -207,26 +227,6 @@
       ],
       "args": {
         "hover": [2]
-      }
-    },
-    {
-      "type": "test",
-      "which": "testaro",
-      "what": "hover",
-      "withItems": false,
-      "expect": [
-        [
-          "standardResult.totals.3",
-          ">",
-          1
-        ]
-      ],
-      "rules": [
-        "y",
-        "hover"
-      ],
-      "args": {
-        "hover": [3]
       }
     },
     {
@@ -241,14 +241,19 @@
       "withItems": true,
       "expect": [
         [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
           "standardResult.totals.2",
           "=",
-          1
+          2
         ],
         [
           "standardResult.totals.3",
           "=",
-          2
+          1
         ],
         [
           "standardResult.instances.0.ruleID",
@@ -276,24 +281,24 @@
           "loses its cursor"
         ],
         [
-          "standardResult.instances.2.ruleID",
+          "standardResult.instances.1.ruleID",
           "=",
           "hover"
         ],
         [
-          "standardResult.instances.2.what",
+          "standardResult.instances.1.what",
           "i",
-          "changes when"
+          "cursor nonstandard"
         ],
         [
           "standardResult.instances.2.tagName",
           "=",
-          "LI"
+          "A"
         ],
         [
           "standardResult.instances.2.id",
           "=",
-          "li2"
+          "trigger1"
         ],
         [
           "standardResult.instances.2.ordinalSeverity",
@@ -303,7 +308,7 @@
         [
           "standardResult.instances.0.excerpt",
           "i",
-          "should not"
+          "Trigger 1"
         ]
       ],
       "rules": [
@@ -311,7 +316,7 @@
         "hover"
       ],
       "args": {
-        "hover": [5]
+        "hover": [4]
       }
     }
   ],

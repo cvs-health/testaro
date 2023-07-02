@@ -6,10 +6,8 @@
     <meta name="description" content="tester">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-      button, button:hover {
-        color: red;
-        background-color: white;
-        border: 2px solid black;
+      a.qCursor {
+        cursor: help;
       }
       li.cursorless {
         cursor: none;
@@ -23,14 +21,15 @@
   <body>
     <main>
       <h1>Page with deviant hover indicators</h1>
-      <p>This page contains a link named <a href="https://en.wikipedia.org">Trigger 1</a> and a <button type="button">Trigger 2</button> button. The default style change of the button on hover is prevented.</p>
+      <p>This page contains a link named <a id="trigger1" class="qCursor" href="https://en.wikipedia.org">Trigger 1</a>. When hovered over, it changes the cursor to a question mark.</p>
       <p>This is a list.</p>
       <ul>
-        <li>This Trigger 3 is a normal list item.</li>
-        <li class="cursorless">This Trigger 4 is a list item that loses its cursor when hovered over.</li>
-        <li id="li2" class="hoverChanger">This Trigger 5 is a list item that changes when hovered over, although it should not.</li>
+        <li>This Trigger 2 is a normal list item.</li>
+        <li class="cursorless">This Trigger 3 is a list item that loses its cursor when hovered over.</li>
+        <li id="li2" class="hoverChanger">This Trigger 4 is a list item that changes when hovered over, although it should not.</li>
       </ul>
-      <p>Trigger 2 suppresses hover indication. Trigger 4 has no hover cursor. Trigger 5 changes style when hovered over.</p>
+      <p>Trigger 1 has a bad hover cursor. Trigger 3 has no hover cursor. Trigger 4 changes style when hovered over.</p>
+      <p>Impacts severities: no cursor 3, bad cursor 2, bad indicator 2.
     </main>
   </body>
 </html>
