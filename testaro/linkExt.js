@@ -29,7 +29,7 @@ exports.reporter = async (page, withItems) => {
     data.items.forEach(item => {
       standardInstances.push({
         ruleID: 'linkExt',
-        what: 'Element a has a target=_blank attribute',
+        what: 'Link has a target=_blank attribute',
         ordinalSeverity: 0,
         tagName: 'A',
         id: item.id,

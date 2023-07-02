@@ -1,0 +1,117 @@
+{
+  "id": "lineHeight",
+  "what": "validation of linkAmb test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/linkAmb/index.html",
+      "what": "page with unambiguous and ambiguous links"
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": true,
+      "expect": [
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.2",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "linkAmb"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "text has multiple"
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "A"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "i",
+          "basque information"
+        ]
+      ],
+      "rules": [
+        "y",
+        "linkAmb"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "expect": [
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.2",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "linkAmb"
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "texts have multiple"
+        ]
+      ],
+      "rules": [
+        "y",
+        "linkAmb"
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2013-05-28T12:00:00",
+  "timeStamp": "00000"
+}
