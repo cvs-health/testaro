@@ -11,8 +11,8 @@
     },
     {
       "type": "url",
-      "which": "__targets__/linkUl/good.html",
-      "what": "page with underlined adjacent links"
+      "which": "__targets__/linkUl/na.html",
+      "what": "page without inline links"
     },
     {
       "type": "test",
@@ -21,24 +21,46 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.linkUl.data.totals.links",
+          "standardResult.totals.1",
           "=",
-          6
+          0
         ],
         [
-          "result.rules.linkUl.data.totals.adjacent.total",
+          "standardResult.instances.length",
           "=",
-          2
+          0
+        ]
+      ],
+      "rules": [
+        "y",
+        "linkUl"
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/linkUl/good.html",
+      "what": "page with underlined inline links"
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "what": "adjacent-link underlining",
+      "withItems": false,
+      "expect": [
+        [
+          "standardResult.totals.1",
+          "=",
+          0
         ],
         [
-          "result.rules.linkUl.data.totals.adjacent.underlined",
+          "standardResult.totals.2",
           "=",
-          2
+          0
         ],
         [
-          "result.rules.linkUl.data.totals.adjacent.underlinedPercent",
+          "standardResult.instances.length",
           "=",
-          100
+          0
         ]
       ],
       "rules": [
@@ -49,70 +71,73 @@
     {
       "type": "url",
       "which": "__targets__/linkUl/bad.html",
-      "what": "page with nonunderlined adjacent links"
+      "what": "page with nonunderlined inline links"
     },
     {
       "type": "test",
       "which": "testaro",
-      "what": "adjacent-link underlining",
+      "what": "inline-link underlining",
       "withItems": true,
       "expect": [
         [
-          "result.rules.linkUl.data.totals.links",
+          "standardResult.totals.1",
           "=",
           6
         ],
         [
-          "result.rules.linkUl.data.totals.adjacent.total",
+          "standardResult.totals.2",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.length",
           "=",
           6
         ],
         [
-          "result.rules.linkUl.data.totals.adjacent.underlined",
+          "standardResult.instances.0.ruleID",
           "=",
-          0
+          "linkUl"
         ],
         [
-          "result.rules.linkUl.data.totals.adjacent.underlinedPercent",
-          "=",
-          0
-        ]
-      ],
-      "rules": [
-        "y",
-        "linkUl"
-      ]
-    },
-    {
-      "type": "url",
-      "which": "__targets__/linkUl/na.html",
-      "what": "page without adjacent links"
-    },
-    {
-      "type": "test",
-      "which": "testaro",
-      "what": "adjacent-link underlining",
-      "withItems": true,
-      "expect": [
-        [
-          "result.rules.linkUl.data.totals.links",
-          "=",
-          2
+          "standardResult.instances.0.what",
+          "i",
+          "but has no"
         ],
         [
-          "result.rules.linkUl.data.totals.adjacent.total",
+          "standardResult.instances.0.ordinalSeverity",
           "=",
-          0
+          1
         ],
         [
-          "result.rules.linkUl.data.totals.adjacent.underlined",
+          "standardResult.instances.0.tagName",
           "=",
-          0
+          "A"
         ],
         [
-          "result.rules.linkUl.data.totals.adjacent.underlinedPercent",
+          "standardResult.instances.0.id",
           "=",
-          "N/A"
+          "overline"
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "i",
+          "English"
+        ],
+        [
+          "standardResult.instances.5.what",
+          "i",
+          "but has no"
+        ],
+        [
+          "standardResult.instances.5.tagName",
+          "=",
+          "A"
+        ],
+        [
+          "standardResult.instances.5.excerpt",
+          "i",
+          "Turkish"
         ]
       ],
       "rules": [

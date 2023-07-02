@@ -265,6 +265,7 @@ exports.reporter = async (page, withItems) => {
     // FUNCTION DEFINITIONS END
     await testMenus(menus);
   }
+  // Initialize the standard data.
   const totals = data.totals ? [
     data.totals.navigations.all.incorrect,
     data.totals.menuItems.incorrect,
@@ -278,7 +279,7 @@ exports.reporter = async (page, withItems) => {
         ruleID: 'menuNav',
         what: `Menu item responds nonstandardly to ${item.navigationErrors.join(', ')}`,
         count: item.navigationErrors.length,
-        ordinalSeverity: 1,
+        ordinalSeverity: 0,
         tagName: item.tagName,
         id: item.id,
         location: {
@@ -295,7 +296,7 @@ exports.reporter = async (page, withItems) => {
       ruleID: 'menuNav',
       what: 'Menus and menu items have nonstandard navigation',
       count: data.totals.navigations.all.incorrect,
-      ordinalSeverity: 1,
+      ordinalSeverity: 0,
       tagName: '',
       id: '',
       location: {

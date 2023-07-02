@@ -11,7 +11,9 @@
   <body>
     <main>
       <h1>Page with deviant menu navigation</h1>
-      <p>This page contains a menu bar. In it, the personalities submenu implements pseudofocus management and the technologies menu implements true focus management. <a href="https://www.w3.org/TR/wai-aria-practices-1.1/#menu">These two patterns</a> are recommended by the Accessible Rich Internet Applications Working Group. However, the technologies menu manages focus in a nonstandard manner.</p>
+      <p>This page contains a menu bar. In it, the personalities submenu implements pseudofocus management and the technologies menu implements true focus management. <a href="https://www.w3.org/TR/wai-aria-practices-1.1/#menu">These two patterns</a> are recommended by the Accessible Rich Internet Applications Working Group.</p>
+      <p>However, the menus manage focus in nonstandard manners.</p>
+      <p></p>
       <p id="menuBarAbout">Choose a domain to toggle that domain&rsquo;s submenu open or closed. The submenu contains links to definitions (in a new tab).</p>
       <ul id="menubar" role="menubar" class="menubar blockLink" aria-labelledby="menuBarAbout">
         <li role="none">
@@ -80,6 +82,7 @@
           >
             <li role="none">
               <a
+                id="concrete"
                 tabindex="-1"
                 role="menuitem"
                 href="https://en.wikipedia.org/wiki/Prestressed_concrete"

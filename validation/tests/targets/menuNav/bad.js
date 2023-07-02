@@ -75,7 +75,7 @@ const activeIndexOf = (isButton, buttonOrMenu) => {
     return tabIndexes.indexOf(0);
   }
 };
-// Makes the specified (or the last if -1) menu item active and close any sibling menus.
+// Makes the specified (or the last if -1) menu item active and closes any sibling menus.
 const setActive = (focusType, menu, itemIndex) => {
   // Identify the menu items.
   const menuItems = menuItemsOf(menu);
@@ -147,12 +147,12 @@ const keyNav = (isBar, menu, key, focusType) => {
   let newIndex = oldIndex;
   // If the request is for the next menu item:
   if (['ArrowRight', 'ArrowDown'].includes(key)) {
-    // Change the index to the next menu item’s, without wrapping.
+    // Change the index to the next menu item’s, without wrapping. THIS IS NONSTANDARD.
     newIndex = Math.min(oldIndex + 1, menuItemCount - 1);
   }
   // Otherwise, if the request is for the previous menu item:
   else if (['ArrowLeft', 'ArrowUp'].includes(key)) {
-    // Change the index to the previous menu item’s, without wrapping.
+    // Change the index to the previous menu item’s, without wrapping. THIS IS NONSTANDARD.
     newIndex = Math.max(0, oldIndex - 1);
   }
   // Otherwise, if the request is for a menu item with an initial letter:
@@ -165,6 +165,10 @@ const keyNav = (isBar, menu, key, focusType) => {
     if (laterMatches.length) {
       newIndex = laterMatches[0];
     }
+  }
+  // Otherwise, i.e. if the requesting key is anything else, including Home or End:
+  else {
+    // Do nothing. THIS IS NONSTANDARD.
   }
   // Make the menu item with the new index active.
   if (newIndex > -1) {
@@ -211,7 +215,7 @@ document.body.addEventListener('click', event => {
           // If the button is also a menu item:
           if (isMenuItem(ownerButton)) {
             // Identify the menu that it is an item of.
-            const ownerMenu = ownerMenu(ownerButton);
+            const ownerMenu = owningMenuOf(ownerButton);
             // If it exists:
             if (ownerMenu) {
               // Identify the menu button’s index as a menu item.
@@ -316,6 +320,10 @@ window.addEventListener('keydown', event => {
               // Navigate within the menu bar according to the key.
               keyNav(true, menu, key, focusType);
             }
+            // Otherwise, if the focused element is not a menu button in a menu bar:
+            else {
+              // Do nothing. THIS IS NONSTANDARD.
+            }
           }
           // Otherwise, if the key specially navigates within the menu:
           else if (['Home', 'End'].includes(key) && ! shift) {
@@ -337,7 +345,7 @@ window.addEventListener('keydown', event => {
             else if (menuRole === 'menu' && itemType !== 'menuButton') {
               // Prevent default scrolling.
               event.preventDefault();
-              // Obey the key.
+              // Obey the keyNav rules for the key. THIS IS NONSTANDARD.
               keyNav(false, menu, key, focusType);
             }
           }
