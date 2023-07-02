@@ -291,22 +291,22 @@
           "cursor nonstandard"
         ],
         [
-          "standardResult.instances.2.tagName",
+          "standardResult.instances.1.tagName",
           "=",
           "A"
         ],
         [
-          "standardResult.instances.2.id",
+          "standardResult.instances.1.id",
           "=",
           "trigger1"
         ],
         [
-          "standardResult.instances.2.ordinalSeverity",
+          "standardResult.instances.1.ordinalSeverity",
           "=",
           2
         ],
         [
-          "standardResult.instances.0.excerpt",
+          "standardResult.instances.1.excerpt",
           "i",
           "Trigger 1"
         ]

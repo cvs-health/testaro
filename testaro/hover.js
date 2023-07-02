@@ -248,7 +248,7 @@ const find = async (data, withItems, page, sample) => {
                 data.items.impactTriggers.push({
                   tagName,
                   id: itemData.id,
-                  text: await textOf(firstTrigger[0], 100),
+                  text: await textOf(firstTrigger, 100),
                   additions,
                   removals,
                   opacityChanges,
