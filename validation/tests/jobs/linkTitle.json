@@ -1,6 +1,6 @@
 {
-  "id": "linkAmb",
-  "what": "validation of linkAmb test",
+  "id": "linkTitle",
+  "what": "validation of linkTitle test",
   "strict": true,
   "timeLimit": 20,
   "acts": [
@@ -11,8 +11,8 @@
     },
     {
       "type": "url",
-      "which": "__targets__/linkAmb/index.html",
-      "what": "page with unambiguous and ambiguous links"
+      "which": "__targets__/linkTitle/index.html",
+      "what": "page with normal and rodundantly titled links"
     },
     {
       "type": "test",
@@ -20,14 +20,14 @@
       "withItems": true,
       "expect": [
         [
-          "standardResult.totals.1",
-          "=",
-          0
-        ],
-        [
-          "standardResult.totals.2",
+          "standardResult.totals.0",
           "=",
           1
+        ],
+        [
+          "standardResult.totals.3",
+          "=",
+          0
         ],
         [
           "standardResult.instances.length",
@@ -37,12 +37,12 @@
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "linkAmb"
+          "linkTitle"
         ],
         [
           "standardResult.instances.0.what",
           "i",
-          "text has multiple"
+          "Link has"
         ],
         [
           "standardResult.instances.0.tagName",
@@ -50,19 +50,24 @@
           "A"
         ],
         [
+          "standardResult.instances.0.id",
+          "=",
+          "basqueInfo"
+        ],
+        [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          2
+          0
         ],
         [
           "standardResult.instances.0.excerpt",
           "i",
-          "basque information"
+          "Basque information"
         ]
       ],
       "rules": [
         "y",
-        "linkAmb"
+        "linkTitle"
       ]
     },
     {
@@ -71,14 +76,14 @@
       "withItems": false,
       "expect": [
         [
-          "standardResult.totals.1",
+          "standardResult.totals.0",
           "=",
-          0
+          1
         ],
         [
           "standardResult.totals.2",
           "=",
-          1
+          0
         ],
         [
           "standardResult.instances.length",
@@ -88,7 +93,7 @@
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "linkAmb"
+          "linkTitle"
         ],
         [
           "standardResult.instances.0.count",
@@ -98,12 +103,12 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "texts have multiple"
+          "Links have"
         ]
       ],
       "rules": [
         "y",
-        "linkAmb"
+        "linkTitle"
       ]
     }
   ],

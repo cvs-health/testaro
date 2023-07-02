@@ -13,7 +13,11 @@ exports.reporter = async (page, withItems) => {
       const compact = string => string.replace(/[\t\n]/g, ' ').replace(/\s{2,}/g, ' ').trim();
       const lcCompact = string => compact(string).toLowerCase();
       // FUNCTION DEFINITIONS END
-      const badLinks = titleLinks.filter(link => lcCompact(link.textContent).includes(lcCompact(link.title)));
+      const badLinks = titleLinks.filter(link => {
+        const compactText = lcCompact(link.textContent);
+        const compactTitle = lcCompact(link.title);
+        return compactText.includes(compactTitle);
+      });
       return badLinks.map(badLink => ({
         id: badLink.id || '',
         text: compact(badLink.textContent)
@@ -30,7 +34,7 @@ exports.reporter = async (page, withItems) => {
     data.items.forEach(item => {
       standardInstances.push({
         ruleID: 'linkTitle',
-        what: 'Element a has a title attribute that repeats link text content',
+        what: 'Link has a title attribute that repeats link text content',
         ordinalSeverity: 0,
         tagName: 'A',
         id: item.id,

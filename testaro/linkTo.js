@@ -28,7 +28,7 @@ exports.reporter = async (page, withItems) => {
     data.items.forEach(item => {
       standardInstances.push({
         ruleID: 'linkTo',
-        what: 'Element a has no href attribute',
+        what: 'Link has no href attribute',
         ordinalSeverity: 2,
         tagName: 'A',
         id: item.id,

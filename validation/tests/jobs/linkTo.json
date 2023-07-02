@@ -21,14 +21,86 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.linkTo.data.total",
+          "standardResult.totals.2",
           "=",
           1
         ],
         [
-          "result.rules.linkTo.data.items.0",
+          "standardResult.totals.1",
           "=",
-          "nothing at all"
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "linkTo"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "Link has no"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "A"
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "i",
+          "nothing"
+        ]
+      ],
+      "rules": [
+        "y",
+        "linkTo"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "what": "links without destinations",
+      "withItems": false,
+      "expect": [
+        [
+          "standardResult.totals.2",
+          "=",
+          1
+        ],
+        [
+          "standardResult.totals.3",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "linkTo"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "Links are missing"
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "A"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          1
         ]
       ],
       "rules": [
