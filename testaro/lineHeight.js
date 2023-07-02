@@ -37,12 +37,13 @@ exports.reporter = async (page, withItems) => {
     }
     // For each of them:
     textNodes.forEach(textNode => {
+      console.log(`Text node ${textNode.nodeValue}`);
       // Get the font size and line height of its parent element.
       const parentStyleDec = window.getComputedStyle(textNode.parentElement);
       const parentFontSizeText = parentStyleDec.fontSize;
       const parentLineHeightText = parentStyleDec.lineHeight;
       const parentFontSizeNum = Number.parseFloat(parentFontSizeText);
-      const parentLineHeightNum = Number.parseFloat(parentLineHeightText);
+      const parentLineHeightNum = Number.parseFloat(parentLineHeightText) || 1.5 * parentFontSizeNum;
       // If the line height is substandard:
       if (parentLineHeightNum < 1.5 * parentFontSizeNum) {
         // Add data on the text node to the result.

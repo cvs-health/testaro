@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Page with various line heights</title>
+    <meta name="description" content="tester">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      .extra {
+        line-height: 2rem;
+      }
+      .clipped {
+        line-height: 0.7rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Page with various line heights</h1>
+      <p>This text is normal.</p>
+      <p class="extra">This text has extra vertical space.</p>
+      <p id="clip" class="clipped">This puny text has insufficient<br>height, i.e. vertical space.</p>
+    </main>
+  </body>
+</html>

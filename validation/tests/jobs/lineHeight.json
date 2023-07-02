@@ -1,6 +1,6 @@
 {
-  "id": "distortion",
-  "what": "validation of distortion test",
+  "id": "lineHeight",
+  "what": "validation of lineHeight test",
   "strict": true,
   "timeLimit": 20,
   "acts": [
@@ -11,8 +11,8 @@
     },
     {
       "type": "url",
-      "which": "__targets__/distortion/index.html",
-      "what": "page with distorted text"
+      "which": "__targets__/lineheight/index.html",
+      "what": "page with various line heights"
     },
     {
       "type": "test",
@@ -22,42 +22,52 @@
         [
           "standardResult.totals.1",
           "=",
-          5
+          2
         ],
         [
           "standardResult.instances.length",
           "=",
-          5
+          2
         ],
         [
-          "standardResult.instances.1.what",
-          "i",
-          "P element"
-        ],
-        [
-          "standardResult.instances.1.id",
+          "standardResult.instances.0.ruleID",
           "=",
-          "matrixp"
+          "lineHeight"
         ],
         [
-          "standardResult.instances.2.excerpt",
+          "standardResult.instances.0.what",
           "i",
-          "z-axis"
+          "is less than 1.5 times"
         ],
         [
-          "standardResult.instances.3.ordinalSeverity",
+          "standardResult.instances.0.tagName",
+          "=",
+          "P"
+        ],
+        [
+          "standardResult.instances.0.id",
+          "=",
+          "clip"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
           "=",
           1
         ],
         [
-          "standardResult.instances.4.tagName",
-          "=",
-          "SPAN"
+          "standardResult.instances.0.excerpt",
+          "i",
+          "puny text"
+        ],
+        [
+          "standardResult.instances.1.excerpt",
+          "i",
+          "vertical"
         ]
       ],
       "rules": [
         "y",
-        "distortion"
+        "lineHeight"
       ]
     },
     {
@@ -68,7 +78,12 @@
         [
           "standardResult.totals.1",
           "=",
-          5
+          2
+        ],
+        [
+          "standardResult.totals.2",
+          "=",
+          0
         ],
         [
           "standardResult.instances.length",
@@ -76,14 +91,24 @@
           1
         ],
         [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "lineHeight"
+        ],
+        [
           "standardResult.instances.0.count",
           "=",
-          5
+          2
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "are less than 1.5"
         ]
       ],
       "rules": [
         "y",
-        "distortion"
+        "lineHeight"
       ]
     }
   ],
