@@ -10,7 +10,7 @@ exports.reporter = async (page, withItems) => {
   const data = await page.$$eval('br + br', br2s => {
     // Returns a space-minimized copy of a string.
     const compact = string => string
-    .replace(/[\t\n]/g, '')
+    .replace(/[\t\n]/g, ' ')
     .replace(/\s{2,}/g, ' ')
     .trim()
     .slice(0, 100);
@@ -18,9 +18,21 @@ exports.reporter = async (page, withItems) => {
     const dataSet = new Set([]);
     // For each br element with an immediately preceding br sibling:
     br2s.forEach(br2 => {
-      // Add it to the data.
-      const parent = br2.parentElement;
-      dataSet.add(parent);
+      // If no non-spacing text precedes it:
+      const priorSib = br2.previousSibling;
+      const priorSibValue = priorSib.nodeValue;
+      let areAdjacent = false;
+      if (typeof priorSibValue === 'string') {
+        areAdjacent = ! compact(priorSibValue);
+      }
+      else {
+        areAdjacent = true;
+      }
+      if (areAdjacent) {
+        // Add its parent to the data.
+        const parent = br2.parentElement;
+        dataSet.add(parent);
+      }
     });
     // Initialize data on the parents.
     const data = [];
@@ -44,7 +56,7 @@ exports.reporter = async (page, withItems) => {
       data.forEach(item => {
         standardInstances.push({
           ruleID: 'pseudoP',
-          what: `${item.tagName} element contains 2 or more adjacent br elements that may be nonsemantic substitute for a p element`,
+          what: 'Element contains 2 or more adjacent br elements that may be nonsemantic substitute for a p element',
           ordinalSeverity: 0,
           tagName: item.tagName.toUpperCase(),
           id: item.id,
@@ -63,7 +75,7 @@ exports.reporter = async (page, withItems) => {
       standardInstances.push({
         ruleID: 'pseudoP',
         what: 'Elements contain 2 or more adjacent br elements that may be nonsemantic substitutes for p elements',
-        ordinalSeverity: 2,
+        ordinalSeverity: 0,
         count: data.length,
         tagName: '',
         id: '',

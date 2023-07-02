@@ -70,7 +70,7 @@ exports.reporter = async (page, withItems) => {
       standardInstances.push({
         ruleID: 'nonTable',
         what: 'Table is misused to arrange content',
-        ordinalSeverity: 0,
+        ordinalSeverity: 2,
         tagName: 'TABLE',
         id: item.id,
         location: {
@@ -87,7 +87,7 @@ exports.reporter = async (page, withItems) => {
       ruleID: 'nonTable',
       what: 'Tables are misused to arrange content',
       count: data.total,
-      ordinalSeverity: 0,
+      ordinalSeverity: 2,
       tagName: 'TABLE',
       id: '',
       location: {

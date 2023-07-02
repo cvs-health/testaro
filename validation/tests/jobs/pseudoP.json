@@ -1,6 +1,6 @@
 {
-  "id": "nonTable",
-  "what": "validation of nonTable test",
+  "id": "pseudoP",
+  "what": "validation of pseudoP test",
   "strict": true,
   "timeLimit": 20,
   "acts": [
@@ -11,19 +11,69 @@
     },
     {
       "type": "url",
-      "which": "__targets__/nonTable/index.html",
-      "what": "page with a real table and 3 pseudotables"
+      "which": "__targets__/pseudoP/index.html",
+      "what": "page with a pseudo-paragraph"
     },
     {
       "type": "test",
       "which": "testaro",
-      "what": "tables used for layout",
       "withItems": true,
       "expect": [
         [
-          "standardResult.totals.2",
+          "standardResult.totals.0",
           "=",
-          3
+          1
+        ],
+        [
+          "standardResult.totals.3",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "pseudoP"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "contains 2 or more"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "P"
+        ],
+        [
+          "standardResult.instances.0.id",
+          "=",
+          "bad"
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "i",
+          "Shame"
+        ]
+      ],
+      "rules": [
+        "y",
+        "pseudoP"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "expect": [
+        [
+          "standardResult.totals.0",
+          "=",
+          1
         ],
         [
           "standardResult.totals.1",
@@ -33,84 +83,27 @@
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "nonTable"
+          "pseudoP"
         ],
         [
           "standardResult.instances.0.what",
           "i",
-          "is misused"
+          "contain 2 or more"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
-          "=",
-          2
-        ],
-        [
-          "standardResult.instances.0.tagName",
-          "=",
-          "TABLE"
-        ],
-        [
-          "standardResult.instances.0.excerpt",
-          "i",
-          "Given"
-        ],
-        [
-          "standardResult.instances.2.ruleID",
-          "=",
-          "nonTable"
-        ],
-        [
-          "standardResult.instances.2.id",
-          "=",
-          "ring"
-        ]
-      ],
-      "rules": [
-        "y",
-        "nonTable"
-      ]
-    },
-    {
-      "type": "test",
-      "which": "testaro",
-      "what": "tables used for layout",
-      "withItems": false,
-      "expect": [
-        [
-          "standardResult.totals.2",
-          "=",
-          3
-        ],
-        [
-          "standardResult.totals.0",
           "=",
           0
         ],
         [
-          "standardResult.instances.0.ruleID",
+          "standardResult.instances.0.count",
           "=",
-          "nonTable"
-        ],
-        [
-          "standardResult.instances.0.what",
-          "i",
-          "are misused"
-        ],
-        [
-          "standardResult.instances.0.ordinalSeverity",
-          "=",
-          2
-        ],
-        [
-          "standardResult.instances.0.tagName",
-          "=",
-          "TABLE"
+          1
         ]
       ],
       "rules": [
         "y",
-        "nonTable"
+        "pseudoP"
       ]
     }
   ],
