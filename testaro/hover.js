@@ -1,15 +1,12 @@
 /*
   hover
   This test reports unexpected impacts of hovering. The effects include additions and removals
-  of visible elements, opacity changes, unhoverable elements, and nonstandard hover indication.
+  of visible elements, opacity changes, unhoverable elements, and nonstandard hover cursors.
   The elements that are subjected to hovering (called “triggers”) are the Playwright-visible
   elements that have 'A', 'BUTTON', or 'LI' tag names or have 'onmouseenter' or 'onmouseover'
   attributes.
 
-  The test examines how the hover event is indicated to the user with the mouse cursor and with
-  changes of the styles of the trigger.
-
-  When a trigger is hovered over, the test also examines the impacts on descendants of the great
+  When a trigger is hovered over, the test examines the impacts on descendants of the great
   grandparents of triggers with tag names 'A' and 'BUTTON', grandparents of triggers with tag
   name 'LI', and otherwise the descendants of the triggers themselves. Four impacts are counted:
   (1) an element is added or becomes visible, (2) an element is removed or becomes invisible, (3)
@@ -149,8 +146,6 @@ const find = async (data, withItems, page, sample) => {
     try {
       // Identify the first trigger and its sampling probability.
       const firstTrigger = sample[0];
-      const onmouseenter = await firstTrigger[0].getAttribute('onmouseenter');
-      const onmouseover = await firstTrigger[0].getAttribute('onmouseover');
       const tagNameJSHandle = await firstTrigger[0].getProperty('tagName')
       .catch(() => '');
       if (tagNameJSHandle) {
@@ -214,17 +209,6 @@ const find = async (data, withItems, page, sample) => {
             data.totals.badCursors += totalEstimate;
             if (withItems) {
               data.items.badCursors.push(itemData);
-            }
-          }
-          // If hover indication is required but is absent:
-          if (
-            (tagName === 'BUTTON' || onmouseenter || onmouseover)
-            && JSON.stringify(triggerPostStyles) === JSON.stringify(triggerPreStyles)
-          ) {
-            // Add this fact to the data.
-            data.totals.noIndicators += totalEstimate;
-            if (withItems) {
-              data.items.noIndicators.push(itemData);
             }
           }
           // If hover indication is illicit but is present:
@@ -324,7 +308,6 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
       unhoverables: 0,
       noCursors: 0,
       badCursors: 0,
-      noIndicators: 0,
       badIndicators: 0
     }
   };
@@ -336,7 +319,6 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
       unhoverables: [],
       noCursors: [],
       badCursors: [],
-      noIndicators: [],
       badIndicators: []
     };
   }
@@ -386,7 +368,6 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
     unhoverables: 3,
     noCursors: 3,
     badCursors: 2,
-    noIndicators: 3,
     badIndicators: 2
   };
   const what = {
@@ -394,7 +375,6 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
     unhoverables: 'Operable element cannot be hovered over',
     noCursors: 'Hoverable element hides the mouse cursor',
     badCursors: 'Link or button makes the hovering mouse cursor nonstandard',
-    noIndicators: 'Button shows no indication of being hovered over',
     badIndicators: 'List item changes when hovered over'
   };
   const totals = [0, 0, 0, 0];
