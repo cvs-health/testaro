@@ -21,19 +21,19 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.labClash.data.totals.mislabeled",
+          "standardResult.totals.2",
           "=",
           0
         ],
         [
-          "result.rules.labClash.data.totals.unlabeled",
+          "standardResult.totals.3",
           "=",
           0
         ],
         [
-          "result.rules.labClash.data.totals.wellLabeled",
+          "standardResult.instances.length",
           "=",
-          7
+          0
         ]
       ],
       "rules": [
@@ -53,19 +53,64 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.labClash.data.totals.mislabeled",
+          "standardResult.totals.2",
           "=",
           3
         ],
         [
-          "result.rules.labClash.data.totals.unlabeled",
+          "standardResult.totals.3",
           "=",
           3
         ],
         [
-          "result.rules.labClash.data.totals.wellLabeled",
+          "standardResult.totals.1",
           "=",
           0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "labClash"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "aria-labelledby"
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "BUTTON"
+        ],
+        [
+          "standardResult.instances.0.id",
+          "=",
+          "labButton"
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "i",
+          "button"
+        ],
+        [
+          "standardResult.instances.4.ruleID",
+          "=",
+          "labClash"
+        ],
+        [
+          "standardResult.instances.4.what",
+          "i",
+          "is unlabeled"
+        ],
+        [
+          "standardResult.instances.4.tagName",
+          "=",
+          "INPUT"
+        ],
+        [
+          "standardResult.instances.4.excerpt",
+          "i",
+          "delete"
         ]
       ],
       "rules": [

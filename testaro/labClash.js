@@ -93,6 +93,12 @@ exports.reporter = async (page, withItems) => {
           texts.content = content;
         }
       }
+      // If the control has neither labeling nor content text:
+      const allTexts = Object.values(texts);
+      const allText = allTexts.filter(text => text.length).join('; ');
+      if (! allText) {
+        texts.code = debloat(labelee.outerHTML);
+      }
       const {totals} = data;
       const labelTypeCount = labelTypes.length;
       // If it is well labeled:
@@ -148,20 +154,25 @@ exports.reporter = async (page, withItems) => {
         }
       }
     });
+    // Initialize the standard data.
     const totals = [0, 0, data.totals.mislabeled, data.totals.unlabeled];
     const standardInstances = [];
+    // If itemization is required:
     if (data.items) {
+      // For each defect type:
       ['mislabeled', 'unlabeled'].forEach(issue => {
+        // For each control with that defect type:
         let diagnosis;
         let excerptTail;
         data.items[issue].forEach(item => {
+          // Add a standard instance.
           if (issue === 'mislabeled') {
             diagnosis = `has clashing labels of types: ${item.labelTypes.join(', ')}`;
             excerptTail = debloat(Object.values(item.texts).join(' '));
           }
           else {
             diagnosis = 'is unlabeled';
-            excerptTail = item.content || '';
+            excerptTail = item.content || item.texts.code;
           }
           standardInstances.push({
             ruleID: 'labClash',
@@ -174,11 +185,12 @@ exports.reporter = async (page, withItems) => {
               type: '',
               spec: ''
             },
-            excerpt: `${item.tagName}: ${excerptTail}`
+            excerpt: excerptTail
           });
         });
       });
     }
+    // Otherwise, i.e. if itemization is not required:
     else {
       if (data.totals.unlabeled) {
         standardInstances.push({
