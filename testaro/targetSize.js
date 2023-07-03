@@ -5,51 +5,61 @@
 */
 exports.reporter = async (page, withItems) => {
   // Identify the buttons, inputs, and non-inline links smaller than 44 pixels.
+  const linkTypesJSHandle = await require('../procs/linksByType').linksByType(page);
   const data = await page.$$eval(
     // Identify all buttons, inputs, and links.
-    'button, input, a',
-    suspects => {
+    'button, input',
+    (suspects, linkTypesJSHandle) => {
       // Initialize the result.
       const data = {
         total: 0,
         items: []
       };
-      // FUNCTION DEFINITION START
+      // FUNCTION DEFINITIONS START
       // Returns a space-minimized copy of a string.
       const compact = string => string.replace(/[\t\n]/g, '').replace(/\s{2,}/g, ' ').trim();
-      // FUNCTION DEFINITION END
+      const textsOf = element => {
+        const textContent = element.textContent;
+        const ariaLabel = element.ariaLabel;
+        const labeler = element.labels
+          ? Array.from(element.labels).map(label => label.textContent).join(' ')
+          : '';
+        const refLabelID = element.getAttribute('aria-labelledby');
+        const refLabel = refLabelID ? document.getElementById(refLabelID).textContent : '';
+        const texts = [];
+        [textContent, ariaLabel, labeler, refLabel].forEach(textType => {
+          if (textType) {
+            const compactTextType = compact(textType);
+            if (compactTextType) {
+              texts.push(compactTextType);
+            }
+          }
+        });
+        return texts.join(' ');
+      };
+      // FUNCTION DEFINITIONS END
       // Identify the buttons, inputs, and non-inline links.
-      const eligibles = suspects.filter(suspect => {
-        if (['BUTTON', 'INPUT'].includes(suspect.tagName)) {
-          return true;
-        }
-        else {
-          const parent = suspect.parentElement;
-          return (['DIV', 'P'].includes(parent.tagName) && parent.children.length === 1);
-        }
-      });
+      const eligibles = suspects.concat(linkTypesJSHandle.list);
       // For each of them:
       eligibles.forEach(eligible => {
         // If its size is substandard:
-        const styleDec = window.getComputedStyle(eligible);
-        const widthString = styleDec.width;
-        const widthNum = Number.parseFloat(widthString);
-        const heightString = styleDec.height;
-        const heightNum = Number.parseFloat(heightString);
-        if (widthNum < 44 || heightNum < 44) {
+        const width = eligible.offsetWidth;
+        const height = eligible.offsetHeight;
+        if (width < 44 || height < 44) {
+          console.log('Adding to result');
           // Add it to the result.
           data.total++;
           data.items.push({
-            width: widthNum,
-            height: heightNum,
+            width: width,
+            height: height,
             tagName: eligible.tagName,
             id: eligible.id || '',
-            text: compact(eligible.textContent)
+            text: textsOf(eligible)
           });
         }
       });
       return data;
-    }
+    }, linkTypesJSHandle
   );
   // Initialize the standard result.
   const totals = [data.total, 0, 0, 0];

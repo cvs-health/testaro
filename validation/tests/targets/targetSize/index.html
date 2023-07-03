@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Page with variously sized interaction targets</title>
+    <meta name="description" content="tester">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      a {
+        padding-left: 0.2rem;
+        padding-right: 0.2rem;
+      }
+      a.deep {
+        display: inline-block;
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem;
+      }
+      li {
+        text-align: left;
+        background-color: #ccc;
+        margin: 0.5rem 0;
+      }
+      ul {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Page with variously sized interaction targets</h1>
+      <h2>Buttons</h2>
+      <p>Here are three buttons:</p>
+      <p><button style="min-width: 3rem; min-height: 3rem" type="button">Big enough</button></p>
+      <p><button id="defaultbutton" type="button">Default (too small)</button></p>
+      <p><button style="height: 1.5rem" type="button">Too small</button></p>
+      <h2>Inputs</h2>
+      <p>Here are two inputs:</p>
+      <p><label>Enter a word in this big box: <input style="min-width: 3rem; min-height: 3rem" size="20" maxlength="30"></label></p>
+      <p><label>Enter a word in this small box: <input size="20" maxlength="30"></label></p>
+      <h2>Links</h2>
+      <ul>
+        <li style="min-height: 3rem"><a class="deep" href="https://w3c.org">World Wide Web Consortium</a></li>
+        <li><a href="https://wikimedia.org">Wikimedia Foundation</a></li>
+    </main>
+  </body>
+</html>

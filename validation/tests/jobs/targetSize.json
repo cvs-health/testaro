@@ -1,0 +1,137 @@
+{
+  "id": "targetSize",
+  "what": "validation of targetSize test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/targetSize/index.html",
+      "what": "page with variously sized interaction targets"
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": true,
+      "expect": [
+        [
+          "standardResult.totals.0",
+          "=",
+          4
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "targetSize"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "has a substandard size"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "BUTTON"
+        ],
+        [
+          "standardResult.instances.0.id",
+          "=",
+          "defaultbutton"
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "i",
+          "(too small)"
+        ],
+        [
+          "standardResult.instances.2.tagName",
+          "=",
+          "INPUT"
+        ],
+        [
+          "standardResult.instances.2.excerpt",
+          "i",
+          "small box"
+        ],
+        [
+          "standardResult.instances.3.tagName",
+          "=",
+          "A"
+        ],
+        [
+          "standardResult.instances.3.excerpt",
+          "i",
+          "Wikimedia"
+        ]
+      ],
+      "rules": [
+        "y",
+        "targetSize"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "expect": [
+        [
+          "standardResult.totals.0",
+          "=",
+          4
+        ],
+        [
+          "standardResult.totals.3",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "targetSize"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "are smaller"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          4
+        ]
+      ],
+      "rules": [
+        "y",
+        "targetSize"
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2013-05-28T12:00:00",
+  "timeStamp": "00000"
+}

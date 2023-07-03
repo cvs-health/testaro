@@ -43,12 +43,12 @@ exports.linksByType = async page => await page.evaluateHandle(() => {
       listLinks.push(... Array.from(list.querySelectorAll('a')));
     }
   });
-  // Identify the adjacent links in the page.
+  // Identify the inline links in the page.
   const allLinks = Array.from(document.body.querySelectorAll('a'));
-  const adjacentLinks = allLinks.filter(link => ! listLinks.includes(link));
+  const inlineLinks = allLinks.filter(link => ! listLinks.includes(link));
   // Return the data.
   return {
-    adjacent: adjacentLinks,
+    adjacent: inlineLinks,
     list: listLinks
   };
 });
