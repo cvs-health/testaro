@@ -21,19 +21,14 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.radioSet.data.totals.total",
+          "standardResult.totals.2",
           "=",
-          4
+          0
         ],
         [
-          "result.rules.radioSet.data.totals.inSet",
+          "standardResult.instances.length",
           "=",
-          4
-        ],
-        [
-          "result.rules.radioSet.data.totals.percent",
-          "=",
-          100
+          0
         ]
       ],
       "rules": [
@@ -53,19 +48,106 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.radioSet.data.totals.total",
+          "standardResult.totals.2",
           "=",
           8
         ],
         [
-          "result.rules.radioSet.data.totals.inSet",
+          "standardResult.totals.3",
           "=",
           0
         ],
         [
-          "result.rules.radioSet.data.totals.percent",
+          "standardResult.instances.0.ruleID",
+          "=",
+          "radioSet"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "and its peers"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "INPUT"
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "=",
+          "water"
+        ],
+        [
+          "standardResult.instances.5.ruleID",
+          "=",
+          "radioSet"
+        ],
+        [
+          "standardResult.instances.5.excerpt",
+          "=",
+          "apple"
+        ],
+        [
+          "standardResult.instances.6.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.6.excerpt",
+          "=",
+          "methane"
+        ]
+      ],
+      "rules": [
+        "y",
+        "radioSet"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "what": "radioSet",
+      "withItems": false,
+      "expect": [
+        [
+          "standardResult.totals.2",
+          "=",
+          8
+        ],
+        [
+          "standardResult.totals.1",
           "=",
           0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "radioSet"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "are not validly grouped"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          8
         ]
       ],
       "rules": [
