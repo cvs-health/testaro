@@ -21,44 +21,19 @@
       "what": "styleDiff",
       "expect": [
         [
-          "result.rules.styleDiff.data.totals.adjacentLink.total",
+          "standardResult.totals.0",
           "=",
-          2
+          0
         ],
         [
-          "result.rules.styleDiff.data.totals.listLink.total",
+          "standardResult.totals.3",
           "=",
-          2
+          0
         ],
         [
-          "result.rules.styleDiff.data.totals.button.total",
+          "standardResult.instances.length",
           "=",
-          2
-        ],
-        [
-          "result.rules.styleDiff.data.totals.h1.total",
-          "=",
-          1
-        ],
-        [
-          "result.rules.styleDiff.data.totals.h2.total",
-          "=",
-          4
-        ],
-        [
-          "result.rules.styleDiff.data.totals.adjacentLink.subtotals"
-        ],
-        [
-          "result.rules.styleDiff.data.totals.listLink.subtotals"
-        ],
-        [
-          "result.rules.styleDiff.data.totals.button.subtotals"
-        ],
-        [
-          "result.rules.styleDiff.data.totals.h1.subtotals"
-        ],
-        [
-          "result.rules.styleDiff.data.totals.h2.subtotals"
+          0
         ]
       ],
       "rules": [
@@ -78,77 +53,74 @@
       "what": "styleDiff",
       "expect": [
         [
-          "result.rules.styleDiff.data.totals.adjacentLink.total",
+          "standardResult.totals.0",
+          "=",
+          1
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
+          1
+        ],
+        [
+          "standardResult.totals.2",
+          "=",
+          1
+        ],
+        [
+          "standardResult.totals.3",
           "=",
           2
         ],
         [
-          "result.rules.styleDiff.data.totals.listLink.total",
+          "standardResult.instances.0.ruleID",
+          "=",
+          "styleDiff"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "In-line links have 2"
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "A"
+        ],
+        [
+          "standardResult.instances.3.ruleID",
+          "=",
+          "styleDiff"
+        ],
+        [
+          "standardResult.instances.3.what",
+          "i",
+          "Level-2 headings have 3"
+        ],
+        [
+          "standardResult.instances.3.count",
           "=",
           2
         ],
         [
-          "result.rules.styleDiff.data.totals.button.total",
-          "=",
-          2
-        ],
-        [
-          "result.rules.styleDiff.data.totals.h1.total",
-          "=",
-          1
-        ],
-        [
-          "result.rules.styleDiff.data.totals.h2.total",
-          "=",
-          4
-        ],
-        [
-          "result.rules.styleDiff.data.totals.adjacentLink.subtotals.0",
-          "=",
-          1
-        ],
-        [
-          "result.rules.styleDiff.data.totals.adjacentLink.subtotals.1",
-          "=",
-          1
-        ],
-        [
-          "result.rules.styleDiff.data.totals.listLink.subtotals.0",
-          "=",
-          1
-        ],
-        [
-          "result.rules.styleDiff.data.totals.listLink.subtotals.1",
-          "=",
-          1
-        ],
-        [
-          "result.rules.styleDiff.data.totals.button.subtotals.0",
-          "=",
-          1
-        ],
-        [
-          "result.rules.styleDiff.data.totals.button.subtotals.1",
-          "=",
-          1
-        ],
-        [
-          "result.rules.styleDiff.data.totals.h1.subtotals"
-        ],
-        [
-          "result.rules.styleDiff.data.totals.h2.subtotals.0",
+          "standardResult.instances.3.ordinalSeverity",
           "=",
           3
         ],
         [
-          "result.rules.styleDiff.data.totals.h2.subtotals.1",
+          "standardResult.instances.3.tagName",
           "=",
-          1
-        ],
-        [
-          "result.rules.styleDiff.data.items.adjacentLink.textDecorationStyle.double.0",
-          "=",
-          "French information"
+          "H2"
         ]
       ],
       "rules": [
