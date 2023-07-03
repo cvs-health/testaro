@@ -53,7 +53,7 @@ exports.reporter = async (page, withItems) => {
     data.items.forEach(item => {
       standardInstances.push({
         ruleID: 'zIndex',
-        what: `${item.tagName} element has a non-default Z index`,
+        what: 'Element has a non-default Z index',
         ordinalSeverity: 0,
         tagName: item.tagName,
         id: item.id,

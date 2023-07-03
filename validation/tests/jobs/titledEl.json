@@ -21,24 +21,91 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.titledEl.data.total",
+          "standardResult.totals.2",
           "=",
           1
         ],
         [
-          "result.rules.titledEl.data.items.0.tagName",
+          "standardResult.totals.3",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "titledEl"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "element has"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.tagName",
           "=",
           "P"
         ],
         [
-          "result.rules.titledEl.data.items.0.text",
+          "standardResult.instances.0.excerpt",
+          "i",
+          "This paragraph"
+        ]
+      ],
+      "rules": [
+        "y",
+        "titledEl"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "what": "title attributes on inappropriate elements",
+      "withItems": false,
+      "expect": [
+        [
+          "standardResult.totals.2",
           "=",
-          "This paragraph has an invalid title element."
+          1
         ],
         [
-          "result.rules.titledEl.data.items.0.title",
+          "standardResult.totals.1",
           "=",
-          "invalid title"
+          0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "titledEl"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "elements have"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          1
         ]
       ],
       "rules": [

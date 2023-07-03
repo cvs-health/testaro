@@ -21,7 +21,17 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.zIndex.data.totals.total",
+          "standardResult.totals.0",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.length",
           "=",
           0
         ]
@@ -43,12 +53,84 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.zIndex.data.totals.total",
+          "standardResult.totals.0",
           "=",
           2
         ],
         [
-          "result.rules.zIndex.data.totals.tagNames.BUTTON",
+          "standardResult.totals.2",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "zIndex"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "Element has"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "BUTTON"
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "i",
+          "Button 0"
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "i",
+          "Button 1"
+        ]
+      ],
+      "rules": [
+        "y",
+        "zIndex"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "what": "zIndex",
+      "withItems": false,
+      "expect": [
+        [
+          "standardResult.totals.0",
+          "=",
+          2
+        ],
+        [
+          "standardResult.totals.3",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "zIndex"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "Elements have"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.count",
           "=",
           2
         ]
