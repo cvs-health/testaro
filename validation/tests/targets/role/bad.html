@@ -44,9 +44,10 @@
         <p>This input is identical, except that it omits the <code>list</code> attribute. That makes its implicit role <code>textbox</code>, so the explicit role of <code>combobox</code> is bad. <input role="combobox"></p>
       </section>
       <p>Redundant: h2/heading, h3/heading, section/main, input/spinbutton</p>
-      <b>Bad: section/section, h3/heading(2), input/textbox, input/combobox</b>
-      <b>Redundant order: section/main, h2/heading, h3/heading, input/spinbutton</b>
-      <b>Bad order: section/section, h3/heading, input/textbox, input/combobox</b>
+      <p>Bad: section/section, h3/heading(2), input/textbox, input/combobox</p>
+      <p>Redundant order: section/main, h2/heading, h3/heading, input/spinbutton</p>
+      <p>Bad order: section/section, h3/heading, input/textbox, input/combobox</p>
+      <p>Instance order: section(main, section), h2(heading), h3(heading[3]), input(spinbutton, textbox, combobox)</p>
     </section>
   </body>
 </html>

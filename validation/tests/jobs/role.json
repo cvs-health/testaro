@@ -69,12 +69,12 @@
         [
           "standardResult.instances.1.what",
           "i",
-          "have redundant explicit role heading"
+          "invalid or native-replaceable explicit role section"
         ],
         [
           "standardResult.instances.1.ordinalSeverity",
           "=",
-          1
+          3
         ],
         [
           "standardResult.instances.1.count",
@@ -84,12 +84,62 @@
         [
           "standardResult.instances.1.tagName",
           "=",
-          "h2"
+          "SECTION"
         ],
         [
-          "standardResult.instances.1.excerpt",
+          "standardResult.instances.2.ruleID",
+          "=",
+          "role"
+        ],
+        [
+          "standardResult.instances.2.what",
           "i",
-          "redundant explicit role heading"
+          "have redundant explicit role heading"
+        ],
+        [
+          "standardResult.instances.2.ordinalSeverity",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.2.count",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.2.tagName",
+          "=",
+          "H2"
+        ],
+        [
+          "standardResult.instances.4.what",
+          "i",
+          "invalid or native-replaceable explicit role heading"
+        ],
+        [
+          "standardResult.instances.4.ordinalSeverity",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.4.count",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.4.tagName",
+          "=",
+          "H3"
+        ],
+        [
+          "standardResult.instances.7.what",
+          "i",
+          "combobox"
+        ],
+        [
+          "standardResult.instances.4.ordinalSeverity",
+          "=",
+          3
         ]
       ],
       "withItems": true,
