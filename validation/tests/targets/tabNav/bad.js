@@ -1,4 +1,8 @@
-// UTILITIES FOR EVENT HANDLERS
+/*
+  UTILITIES FOR EVENT HANDLERS
+  Omits handlers for keydown events. Therefore, fails to handle arrow, Home, and End keydown events
+  that standardly control the focus among tabs of a tab list.
+*/
 
 // Returns the tab list containing a tab.
 const allTabs = button => Array.from(button.parentElement.children);

@@ -21,152 +21,17 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.tabNav.data.totals.navigations.all.total",
-          "=",
-          21
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.all.correct",
-          "=",
-          21
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.all.incorrect",
+          "standardResult.totals.0",
           "=",
           0
         ],
         [
-          "result.rules.tabNav.data.totals.navigations.specific.tab.total",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.tab.correct",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.tab.incorrect",
+          "standardResult.totals.1",
           "=",
           0
         ],
         [
-          "result.rules.tabNav.data.totals.navigations.specific.left.total",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.left.correct",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.left.incorrect",
-          "=",
-          0
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.right.total",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.right.correct",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.right.incorrect",
-          "=",
-          0
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.up.total",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.up.correct",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.up.incorrect",
-          "=",
-          0
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.down.total",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.down.correct",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.down.incorrect",
-          "=",
-          0
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.home.total",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.home.correct",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.home.incorrect",
-          "=",
-          0
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.end.total",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.end.correct",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.end.incorrect",
-          "=",
-          0
-        ],
-        [
-          "result.rules.tabNav.data.totals.tabElements.total",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.tabElements.correct",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.tabElements.incorrect",
-          "=",
-          0
-        ],
-        [
-          "result.rules.tabNav.data.totals.tabLists.total",
-          "=",
-          1
-        ],
-        [
-          "result.rules.tabNav.data.totals.tabLists.correct",
-          "=",
-          1
-        ],
-        [
-          "result.rules.tabNav.data.totals.tabLists.incorrect",
+          "standardResult.instances.length",
           "=",
           0
         ]
@@ -188,154 +53,131 @@
       "withItems": true,
       "expect": [
         [
-          "result.rules.tabNav.data.totals.navigations.all.total",
-          "=",
-          21
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.all.correct",
-          "=",
-          9
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.all.incorrect",
+          "standardResult.totals.0",
           "=",
           12
         ],
         [
-          "result.rules.tabNav.data.totals.navigations.specific.tab.total",
+          "standardResult.totals.1",
           "=",
           3
         ],
         [
-          "result.rules.tabNav.data.totals.navigations.specific.tab.correct",
+          "standardResult.totals.2",
           "=",
           1
         ],
         [
-          "result.rules.tabNav.data.totals.navigations.specific.tab.incorrect",
-          "=",
-          2
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.left.total",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.left.correct",
+          "standardResult.totals.3",
           "=",
           0
         ],
         [
-          "result.rules.tabNav.data.totals.navigations.specific.left.incorrect",
+          "standardResult.instances.0.ruleID",
           "=",
-          3
+          "tabNav"
         ],
         [
-          "result.rules.tabNav.data.totals.navigations.specific.right.total",
-          "=",
-          3
+          "standardResult.instances.0.what",
+          "i",
+          "nonstandardly to Tab, ArrowLeft"
         ],
         [
-          "result.rules.tabNav.data.totals.navigations.specific.right.correct",
-          "=",
-          0
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.right.incorrect",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.up.total",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.up.correct",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.up.incorrect",
-          "=",
-          0
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.down.total",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.down.correct",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.down.incorrect",
-          "=",
-          0
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.home.total",
-          "=",
-          3
-        ],
-        [
-          "result.rules.tabNav.data.totals.navigations.specific.home.correct",
+          "standardResult.instances.0.ordinalSeverity",
           "=",
           1
         ],
         [
-          "result.rules.tabNav.data.totals.navigations.specific.home.incorrect",
+          "standardResult.instances.0.count",
           "=",
-          2
+          4
         ],
         [
-          "result.rules.tabNav.data.totals.navigations.specific.end.total",
+          "standardResult.instances.0.tagName",
           "=",
-          3
+          "BUTTON"
         ],
         [
-          "result.rules.tabNav.data.totals.navigations.specific.end.correct",
+          "standardResult.instances.0.id",
+          "=",
+          "ul"
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "i",
+          "ul"
+        ],
+        [
+          "standardResult.instances.1.what",
+          "i",
+          "Home, End"
+        ],
+        [
+          "standardResult.instances.1.ordinalSeverity",
           "=",
           1
         ],
         [
-          "result.rules.tabNav.data.totals.navigations.specific.end.incorrect",
+          "standardResult.instances.1.count",
           "=",
-          2
+          5
         ],
         [
-          "result.rules.tabNav.data.totals.tabElements.total",
+          "standardResult.instances.1.id",
+          "=",
+          "section"
+        ]
+      ],
+      "rules": [
+        "y",
+        "tabNav"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "what": "tab-list navigation",
+      "withItems": false,
+      "expect": [
+        [
+          "standardResult.totals.0",
+          "=",
+          12
+        ],
+        [
+          "standardResult.totals.1",
           "=",
           3
         ],
         [
-          "result.rules.tabNav.data.totals.tabElements.correct",
+          "standardResult.totals.2",
+          "=",
+          1
+        ],
+        [
+          "standardResult.totals.3",
           "=",
           0
         ],
         [
-          "result.rules.tabNav.data.totals.tabElements.incorrect",
+          "standardResult.instances.0.ruleID",
           "=",
-          3
+          "tabNav"
         ],
         [
-          "result.rules.tabNav.data.totals.tabLists.total",
+          "standardResult.instances.0.what",
+          "i",
+          "Tab lists have"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
           "=",
           1
         ],
         [
-          "result.rules.tabNav.data.totals.tabLists.correct",
+          "standardResult.instances.0.count",
           "=",
-          0
-        ],
-        [
-          "result.rules.tabNav.data.totals.tabLists.incorrect",
-          "=",
-          1
+          12
         ]
       ],
       "rules": [

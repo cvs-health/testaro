@@ -341,9 +341,9 @@ exports.reporter = async (page, withItems) => {
       standardInstances.push({
         ruleID: 'tabNav',
         what:
-        `${item.tagName} element responds nonstandardly to ${item.navigationErrors.join(', ')}`,
-        count: item.navigationErrors.length,
+        `Tab responds nonstandardly to ${item.navigationErrors.join(', ')}`,
         ordinalSeverity: 1,
+        count: item.navigationErrors.length,
         tagName: item.tagName,
         id: item.id,
         location: {
@@ -358,9 +358,9 @@ exports.reporter = async (page, withItems) => {
   else if (data.totals.navigations.all.incorrect) {
     standardInstances.push({
       ruleID: 'tabNav',
-      what: 'Tablists have nonstandard navigation',
-      count: data.totals.navigations.all.incorrect,
+      what: 'Tab lists have nonstandard navigation',
       ordinalSeverity: 1,
+      count: data.totals.navigations.all.incorrect,
       tagName: '',
       id: '',
       location: {
