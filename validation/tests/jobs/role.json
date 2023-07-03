@@ -20,17 +20,17 @@
       "what": "role",
       "expect": [
         [
-          "result.rules.role.data.roleElements",
-          "=",
-          1
-        ],
-        [
-          "result.rules.role.data.badRoleElements",
+          "standardResult.totals.1",
           "=",
           0
         ],
         [
-          "result.rules.role.data.redundantRoleElements",
+          "standardResult.totals.3",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.length",
           "=",
           0
         ]
@@ -52,69 +52,44 @@
       "what": "role",
       "expect": [
         [
-          "result.rules.role.data.roleElements",
-          "=",
-          9
-        ],
-        [
-          "result.rules.role.data.badRoleElements",
-          "=",
-          6
-        ],
-        [
-          "result.rules.role.data.redundantRoleElements",
+          "standardResult.totals.1",
           "=",
           3
         ],
         [
-          "result.rules.role.data.tagNames.SECTION.main.bad",
+          "standardResult.totals.3",
+          "=",
+          6
+        ],
+        [
+          "standardResult.instances.1.ruleID",
+          "=",
+          "role"
+        ],
+        [
+          "standardResult.instances.1.what",
+          "i",
+          "have redundant explicit role heading"
+        ],
+        [
+          "standardResult.instances.1.ordinalSeverity",
           "=",
           1
         ],
         [
-          "result.rules.role.data.tagNames.SECTION.section.bad",
+          "standardResult.instances.1.count",
           "=",
           1
         ],
         [
-          "result.rules.role.data.tagNames.H2.heading.bad",
+          "standardResult.instances.1.tagName",
           "=",
-          0
+          "h2"
         ],
         [
-          "result.rules.role.data.tagNames.H2.heading.redundant",
-          "=",
-          1
-        ],
-        [
-          "result.rules.role.data.tagNames.H3.heading.bad",
-          "=",
-          2
-        ],
-        [
-          "result.rules.role.data.tagNames.H3.heading.redundant",
-          "=",
-          1
-        ],
-        [
-          "result.rules.role.data.tagNames.INPUT.spinbutton.redundant",
-          "=",
-          1
-        ],
-        [
-          "result.rules.role.data.tagNames.INPUT.textbox.bad",
-          "=",
-          1
-        ],
-        [
-          "result.rules.role.data.tagNames.INPUT.textbox.redundant",
-          "=",
-          0
-        ],
-        [
-          "result.rules.role.data.tagNames.INPUT.combobox.bad",
-          "=",
-          1
+          "standardResult.instances.1.excerpt",
+          "i",
+          "redundant explicit role heading"
         ]
       ],
       "withItems": true,
