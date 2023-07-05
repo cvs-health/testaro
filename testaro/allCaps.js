@@ -59,7 +59,7 @@ exports.reporter = async (page, withItems) => {
         ruleID: 'allCaps',
         what: `${item.tagName} element has entirely upper-case text`,
         ordinalSeverity: 0,
-        tagName: item.tagName.toUpperCase(),
+        tagName: item.tagName,
         id: item.id,
         location: {
           doc: '',
