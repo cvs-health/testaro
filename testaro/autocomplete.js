@@ -5,96 +5,75 @@
 
 // ########## IMPORTS
 
-// Returns text associated with an element.
-const {allText} = require('../procs/allText');
+// Module to get locator data.
+const {getLocatorData} = require('../procs/getLocatorData');
 
 // ########## FUNCTIONS
 
-// Adds a failure, if any, to the data.
-const addFailure = async (withItems, input, inputText, autocomplete, data) => {
-  // If it does not have the required autocomplete attribute:
-  const autoValue = await input.getAttribute('autocomplete');
-  if (autoValue !== autocomplete) {
-    // Add this to the total.
-    data.total++;
-    // If itemization is required:
-    if (withItems) {
-      // Add the item to the data.
-      data.items.push([autocomplete, input.id || '', inputText.slice(0, 100)]);
-    }
-  }
-};
-// Reports failures.
-exports.reporter = async (page, withItems) => {
-  const data = {total: 0};
-  if (withItems) {
-    data.items = [];
-  }
-  // Identify the inputs.
-  const inputs = await page.$$('input');
-  // If there are any:
-  if (inputs.length) {
-    // For each one:
-    for (const input of inputs) {
-      const inputText = await allText(page, input);
-      // If it is a text input:
-      const inputType = await input.getAttribute('type');
-      if (inputType === 'text' || ! inputType) {
-        const inputTextLC = inputText.toLowerCase();
-        // If it requests a given name:
-        if (
-          inputTextLC === 'first'
-          || ['first name', 'given name'].some(phrase => inputTextLC.includes(phrase))
-        ) {
-          // Add any failure to the data.
-          await addFailure(withItems, input, inputText, 'given-name', data);
-        }
-        // Otherwise, if it requests a family name:
-        else if (
-          inputTextLC === 'last'
-          || ['last name', 'family name'].some(phrase => inputTextLC.includes(phrase))
-        ) {
-          // Add any failure to the data.
-          await addFailure(withItems, input, inputText, 'family-name', data);
-        }
-        // Otherwise, if it requests an email address:
-        else if (inputTextLC.includes('email')) {
-          // Add any failure to the data.
-          await addFailure(withItems, input, inputText, 'email', data);
-        }
-      }
-      // Otherwise, if it is an email input:
-      else if (inputType === 'email') {
-        // Add any failure to the data.
-        await addFailure(withItems, input, inputText, 'email', data);
-      }
-    }
-  }
+// Runs the test and returns the results.
+exports.reporter = async (
+  page,
+  withItems,
+  givenLabels = ['first name', 'forename', 'given name'],
+  familyLabels = ['last name', 'surname', 'family name'],
+  emailLabels = ['email']
+) => {
+  const autoValues = {
+    'given-name': givenLabels,
+    'family-name': familyLabels,
+    'email': emailLabels
+  };
+  // Get locators for all input elements of type text or email.
+  const locAll = page.locator('input[type=text], input[type=email], input:not([type]');
+  const locsAll = await locAll.all();
+  // Initialize the result.
+  const data = {};
+  const totals = [0, 0, 0, 0];
   const standardInstances = [];
-  if (data.items) {
-    data.items.forEach(item => {
-      standardInstances.push({
-        ruleID: 'autocomplete',
-        what: `Input is missing the required autocomplete attribute with value ${item[0]}`,
-        ordinalSeverity: 2,
-        tagName: 'INPUT',
-        id: item[1] || '',
-        location: {
-          doc: '',
-          type: '',
-          spec: ''
-        },
-        excerpt: item[2]
-      });
-    });
+  // For each of the inputs:
+  for (const loc of locsAll) {
+    // If it requires an autocomplete attribute but does not have it:
+    const data = await getLocatorData(loc);
+    const lcText = data.excerpt.toLowerCase();
+    const neededAutos = Object.keys(autoValues)
+    .filter(autoValue => autoValues[autoValue].some(typeLabel => lcText.includes(typeLabel)));
+    let neededAuto;
+    if (neededAutos.length === 1) {
+      neededAuto = neededAutos[0];
+    }
+    else if (! neededAutos.length && await loc.getAttribute('type') === 'email') {
+      neededAuto = 'email';
+    }
+    if (neededAuto) {
+      const actualAuto = await loc.getAttribute('autocomplete');
+      if (actualAuto !== neededAuto) {
+        // Add to the totals.
+        totals[2]++;
+        // If itemization is required:
+        if (withItems) {
+          // Add a standard instance.
+          standardInstances.push({
+            ruleID: 'autocomplete',
+            what: `Input is missing an autocomplete attribute with value ${neededAuto}`,
+            ordinalSeverity: 2,
+            tagName: 'INPUT',
+            id: data.id,
+            location: data.location,
+            excerpt: data.excerpt
+          });
+        }
+      }
+    }
   }
-  else if (data.total) {
+  // If itemization is not required and there are any instances:
+  if (! withItems && totals[2]) {
+    // Add a summary standard instance.
     standardInstances.push({
       ruleID: 'autocomplete',
-      what: 'Inputs are missing required autocomplete attributes',
+      what: 'Inputs are missing applicable autocomplete attributes',
       ordinalSeverity: 2,
-      count: data.total,
-      tagName: '',
+      count: totals[2],
+      tagName: 'INPUT',
       id: '',
       location: {
         doc: '',
@@ -107,7 +86,7 @@ exports.reporter = async (page, withItems) => {
   // Return the data.
   return {
     data,
-    totals: [0, 0, data.total, 0],
+    totals,
     standardInstances
   };
 };
