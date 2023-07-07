@@ -90,9 +90,44 @@
           "illicit value en"
         ],
         [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.0.location.spec.x",
+          "<",
+          1
+        ],
+        [
           "standardResult.instances.1.tagName",
           "=",
           "SPAN"
+        ],
+        [
+          "standardResult.instances.1.id",
+          "=",
+          "velo"
+        ],
+        [
+          "standardResult.instances.1.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.1.location.type",
+          "=",
+          "selector"
+        ],
+        [
+          "standardResult.instances.1.location.spec",
+          "=",
+          "#velo"
         ],
         [
           "standardResult.instances.1.excerpt",

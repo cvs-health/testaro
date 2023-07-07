@@ -45,12 +45,12 @@
           "Text is entirely"
         ],
         [
-          "standardResult.instances.2.loc.type",
+          "standardResult.instances.0.location.type",
           "=",
           "box"
         ],
         [
-          "standardResult.instances.2.loc.spec.y",
+          "standardResult.instances.0.location.spec.y",
           ">",
           0
         ],
@@ -65,17 +65,17 @@
           "indirect"
         ],
         [
-          "standardResult.instances.2.loc.doc",
+          "standardResult.instances.2.location.doc",
           "=",
           "dom"
         ],
         [
-          "standardResult.instances.2.loc.type",
+          "standardResult.instances.2.location.type",
           "=",
           "selector"
         ],
         [
-          "standardResult.instances.2.loc.spec",
+          "standardResult.instances.2.location.spec",
           "=",
           "#indirect"
         ],
