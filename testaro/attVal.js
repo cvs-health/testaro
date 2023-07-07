@@ -15,21 +15,14 @@ exports.reporter = async (page, withItems, attributeName, areLicit, values) => {
   // Get locators for all elements with the attribute.
   const locAll = page.locator(`[${attributeName}]`);
   const locsAll = await locAll.all();
-  // Get those that:
-  const locs = locsAll.filter(async loc => {
-    // Have illicit values on the attribute.
+  const locs = [];
+  // Get those that have illicit values on the attribute.
+  for (const loc of locsAll) {
     const value = await loc.getAttribute(attributeName);
-    console.log(`value is ${value}`);
-    if (areLicit) {
-      console.log('Specs are licit');
-      console.log(`About to decide ${! values.includes(value)}`);
-      return ! values.includes(value);
+    if (areLicit !== values.includes(value)) {
+      locs.push(loc);
     }
-    else {
-      return values.includes(value);
-    }
-  });
-  console.log(`Count of illicits: ${locs.length}`);
+  }
   // Initialize the results.
   const data = {};
   const totals = [0, 0, locs.length, 0];
@@ -54,8 +47,8 @@ exports.reporter = async (page, withItems, attributeName, areLicit, values) => {
       });
     }
   }
-  // Otherwise, i.e. if itemization is not required:
-  else {
+  // Otherwise, i.e. if itemization is not required and any instances exist:
+  else if (totals[2]) {
     // Add a summary standard instance.
     standardInstances.push({
       ruleID: 'attVal',

@@ -52,7 +52,10 @@ exports.getLocatorData = async loc => {
   // If an ID-based selector could not be defined:
   if (data.location.type === 'box') {
     // Define a bounding-box-based location.
-    data.location.spec = await loc.boundingBox();
+    const rawSpec = await loc.boundingBox();
+    Object.keys(rawSpec).forEach(specName => {
+      data.location.spec[specName] = Math.round(rawSpec[specName]);
+    });
   }
   // If the text is long:
   if (data.excerpt.length > 400) {
