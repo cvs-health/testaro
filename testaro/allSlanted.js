@@ -1,73 +1,84 @@
 /*
   allSlanted
   Related to Tenon rule 154.
-  This test reports leaf elements whose text contents are at least 40 characters long and are
-  entirely italic or oblique. Blocks of italic or oblique text are difficult to read.
+  This test reports normalized text nodes containing at least one substring of italic or
+  oblique characters at least 40 characters long. Blocks of slanted text are difficult
+  to read.
 */
+
+// ########## IMPORTS
+
+// Module to get text nodes.
+const {getTextNodes} = require('../procs/getTextNodes');
+
+// ########## FUNCTIONS
+
 // Runs the test and returns the results.
 exports.reporter = async (page, withItems) => {
-  // Identify the elements with upper-case text longer than 7 characters.
-  const data = await page.$$eval('body *', (elements, withItems) => {
-    // Returns a space-minimized copy of a string.
-    const compact = string => string
-    .replace(/[\t\n]/g, '')
-    .replace(/\s{2,}/g, ' ')
-    .trim()
-    .slice(0, 100);
-    // Get the leaf elements.
-    const leafElements = elements.filter(element => ! element.children.length);
-    // Get those with text contents longer than 39 characters.
-    const textElements = leafElements.filter(element => compact(element.textContent).length > 39);
-    // Get those with italic or oblique text.
-    const allSlantedElements = textElements.filter(element => {
-      const styleDec = window.getComputedStyle(element);
-      return ['italic', 'oblique'].includes(styleDec['font-style']);
-    });
+  // Get the text nodes of the page and their parent elements.
+  const textNodesData = await getTextNodes(page);
+  // Get data on the qualifying text nodes.
+  const result = await textNodesData.evaluate((textNodesData, withItems) => {
     // Initialize the result.
-    const data = {
-      total: allSlantedElements.length
+    const result = {
+      data: {},
+      totals: [0, 0, 0, 0],
+      standardInstances: []
     };
-    // If itemization is required:
-    if (withItems) {
-      // Add an itemization to the result.
-      data.items = [];
-      allSlantedElements.forEach(allSlantedElement => {
-        data.items.push({
-          tagName: allSlantedElement.tagName,
-          id: allSlantedElement.id || '',
-          text: compact(allSlantedElement.textContent)
-        });
-      });
+    // For each text node:
+    for (const textNodeData of textNodesData) {
+      // If it qualifies:
+      let isSlanted = false;
+      if (/.{40}/.test(textNodeData[0])) {
+        const styleDec = window.getComputedStyle(textNodeData[1]);
+        if (['italic', 'oblique'].includes(styleDec.fontStyle)) {
+          isSlanted = true;
+        }
+      }
+      if (isSlanted) {
+        // Add to the totals.
+        result.totals[0]++;
+        // If itemization is required:
+        if (withItems) {
+          // Add a standard instance.
+          const {id} = textNodeData[1];
+          let spec;
+          if (id) {
+            spec = `#${id}`;
+          }
+          else {
+            const domRect = textNodeData[1].getBoundingClientRect();
+            spec = {
+              x: Math.round(domRect.x),
+              y: Math.round(domRect.y),
+              width: Math.round(domRect.width),
+              height: Math.round(domRect.height)
+            };
+          }
+          result.standardInstances.push({
+            ruleID: 'allSlanted',
+            what: 'Text is entirely italic or oblique',
+            ordinalSeverity: 0,
+            tagName: textNodeData[1].tagName,
+            id: id || '',
+            location: {
+              doc: 'dom',
+              type: id ? 'selector' : 'box',
+              spec
+            },
+            excerpt: textNodeData[0]
+          });
+        }
+      }
     }
-    return data;
+    return result;
   }, withItems);
-  // Get the totals.
-  const totals = [data.total, 0, 0, 0];
-  // Get the required standard instances.
-  const standardInstances = [];
-  if (data.items) {
-    data.items.forEach(item => {
-      standardInstances.push({
-        ruleID: 'allSlanted',
-        what: `${item.tagName} element has entirely italic or oblique text`,
-        ordinalSeverity: 0,
-        tagName: item.tagName.toUpperCase(),
-        id: item.id,
-        location: {
-          doc: '',
-          type: '',
-          spec: ''
-        },
-        excerpt: item.text
-      });
-    });
-  }
-  else {
-    standardInstances.push({
+  if (! withItems) {
+    result.standardInstances.push({
       ruleID: 'allSlanted',
-      what: 'Elements have entirely italic or oblique texts',
+      what: 'Texts are entirely italic or oblique',
       ordinalSeverity: 0,
-      count: data.total,
+      count: result.totals[0],
       tagName: '',
       id: '',
       location: {
@@ -78,9 +89,5 @@ exports.reporter = async (page, withItems) => {
       excerpt: ''
     });
   }
-  return {
-    data,
-    totals,
-    standardInstances
-  };
+  return result;
 };

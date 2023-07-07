@@ -1,5 +1,5 @@
 /*
-  targetSize
+  lineHeight
   Related to Tenon rule 144.
   This test reports text nodes whose line heights are less than 1.5 times their font sizes.
 */
@@ -37,7 +37,6 @@ exports.reporter = async (page, withItems) => {
     }
     // For each of them:
     textNodes.forEach(textNode => {
-      console.log(`Text node ${textNode.nodeValue}`);
       // Get the font size and line height of its parent element.
       const parentStyleDec = window.getComputedStyle(textNode.parentElement);
       const parentFontSizeText = parentStyleDec.fontSize;

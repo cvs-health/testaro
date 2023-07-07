@@ -22,7 +22,7 @@
         [
           "standardResult.totals.0",
           "=",
-          3
+          4
         ],
         [
           "standardResult.totals.2",
@@ -45,7 +45,37 @@
           "SPAN"
         ],
         [
-          "standardResult.instances.2.excerpt",
+          "standardResult.instances.1.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.1.location.spec.x",
+          ">",
+          0
+        ],
+        [
+          "standardResult.instances.1.location.spec.width",
+          ">",
+          0
+        ],
+        [
+          "standardResult.instances.3.id",
+          "=",
+          "allUC"
+        ],
+        [
+          "standardResult.instances.3.location.type",
+          "=",
+          "selector"
+        ],
+        [
+          "standardResult.instances.3.location.spec",
+          "=",
+          "#allUC"
+        ],
+        [
+          "standardResult.instances.3.excerpt",
           "i",
           "ENTIRELY"
         ]
@@ -63,7 +93,7 @@
         [
           "standardResult.totals.0",
           "=",
-          3
+          4
         ],
         [
           "standardResult.totals.1",
@@ -83,7 +113,7 @@
         [
           "standardResult.instances.0.count",
           "=",
-          3
+          4
         ]
       ],
       "rules": [

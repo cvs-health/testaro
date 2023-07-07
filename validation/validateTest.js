@@ -1,8 +1,16 @@
 // validateTest.js
 // Validator for one Testaro test.
 
+// IMPORTS
+
+// Module to process files.
 const fs = require('fs').promises;
+// Module to run Testaro jebs.
 const {doJob} = require('../run');
+
+// FUNCTIONS
+
+// Validates a test.
 exports.validateTest = async testID => {
   const jobFileNames = await fs.readdir(`${__dirname}/tests/jobs`);
   for (const jobFileName of jobFileNames.filter(fileName => fileName === `${testID}.json`)) {

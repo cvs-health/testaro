@@ -8,7 +8,7 @@ exports.getLocatorData = async loc => {
     const id = element.id || '';
     // Texts.
     const {textContent} = element;
-    const alts = element.querySelectorAll('img[alt]:not([alt=""])');
+    const alts = Array.from(element.querySelectorAll('img[alt]:not([alt=""])'));
     const altTexts = alts.map(alt => alt.getAttribute('alt'));
     const altsText = altTexts.join(' ');
     const ariaLabelText = element.ariaLabel || '';

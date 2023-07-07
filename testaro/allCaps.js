@@ -1,68 +1,87 @@
 /*
   allCaps
   Related to Tenon rule 153.
-  This test reports leaf elements whose text contents contain at least one substring of upper-case
-  letters, hyphen-minuses, and spaces at least 8 characters long and no lower-case letters. Blocks
-  of upper-case text are difficult to read.
+  This test reports normalized text nodes containing at least one substring of upper-case letters,
+  hyphen-minuses, and spaces at least 8 characters long. Blocks of upper-case text are difficult
+  to read.
 */
 
 // ########## IMPORTS
 
-// Module to get locator data.
-const {getLocatorData} = require('../procs/getLocatorData');
+// Module to get text nodes.
+const {getTextNodes} = require('../procs/getTextNodes');
 
 // ########## FUNCTIONS
 
 // Runs the test and returns the results.
 exports.reporter = async (page, withItems) => {
-  // Identify the elements with upper-case text longer than 7 characters.
-  const nativeLocator = page.locator('body *', {
-    hasNot: page.locator('*'),
-    hasText: /[- A-Z]{8}/
-  });
-  const transLocator = page.locator('body [text-transform=uppercase]', {
-    hasNot: page.locator('*'),
-    hasText: /[- A-Za-z]{8}/
-  });
-  const nativeLocators = await nativeLocator.all();
-  const transLocators = await transLocator.all();
-  const elLocators = Array.from(new Set(nativeLocators.concat(transLocators)));
-  const data = {
-    total: elLocators.length
-  };
-  if (withItems) {
-    data.items = [];
-    for (const elLocator of elLocators) {
-      const elData = await getLocatorData(elLocator);
-      data.items.push(elData);
+  // Get the text nodes of the page and their parent elements.
+  const textNodesData = await getTextNodes(page);
+  // Get data on the qualifying text nodes.
+  const result = await textNodesData.evaluate((textNodesData, withItems) => {
+    // Initialize the result.
+    const result = {
+      data: {},
+      totals: [0, 0, 0, 0],
+      standardInstances: []
+    };
+    // For each text node:
+    for (const textNodeData of textNodesData) {
+      // If it qualifies:
+      let isCap = false;
+      if (/[- A-Z]{8}/.test(textNodeData[0])) {
+        isCap = true;
+      }
+      else if (/[- A-Za-z]{8}/.test(textNodeData[0])) {
+        const styleDec = window.getComputedStyle(textNodeData[1]);
+        if (styleDec.textTransform === 'uppercase') {
+          isCap = true;
+        }
+      }
+      if (isCap) {
+        // Add to the totals.
+        result.totals[0]++;
+        // If itemization is required:
+        if (withItems) {
+          // Add a standard instance.
+          const {id} = textNodeData[1];
+          let spec;
+          if (id) {
+            spec = `#${id}`;
+          }
+          else {
+            const domRect = textNodeData[1].getBoundingClientRect();
+            spec = {
+              x: Math.round(domRect.x),
+              y: Math.round(domRect.y),
+              width: Math.round(domRect.width),
+              height: Math.round(domRect.height)
+            };
+          }
+          result.standardInstances.push({
+            ruleID: 'allCaps',
+            what: 'Text is entirely upper-case',
+            ordinalSeverity: 0,
+            tagName: textNodeData[1].tagName,
+            id: id || '',
+            location: {
+              doc: 'dom',
+              type: id ? 'selector' : 'box',
+              spec
+            },
+            excerpt: textNodeData[0]
+          });
+        }
+      }
     }
-  }
-  // Get data for the standard result.
-  const totals = [data.total, 0, 0, 0];
-  const standardInstances = [];
-  if (withItems) {
-    data.items.forEach(item => {
-      standardInstances.push({
-        ruleID: 'allCaps',
-        what: 'Text is entirely upper-case',
-        ordinalSeverity: 0,
-        tagName: item.tagName,
-        id: item.id,
-        location: {
-          doc: 'dom',
-          type: item.location.type,
-          spec: item.location.spec
-        },
-        excerpt: item.text
-      });
-    });
-  }
-  else {
-    standardInstances.push({
+    return result;
+  }, withItems);
+  if (! withItems) {
+    result.standardInstances.push({
       ruleID: 'allCaps',
       what: 'Texts are entirely upper-case',
       ordinalSeverity: 0,
-      count: data.total,
+      count: result.totals[0],
       tagName: '',
       id: '',
       location: {
@@ -73,9 +92,5 @@ exports.reporter = async (page, withItems) => {
       excerpt: ''
     });
   }
-  return {
-    data,
-    totals,
-    standardInstances
-  };
+  return result;
 };
