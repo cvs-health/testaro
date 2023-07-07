@@ -46,18 +46,18 @@ exports.getLocatorData = async loc => {
       tagName,
       id,
       location,
-      text
+      excerpt: text
     };
   });
   // If an ID-based selector could not be defined:
   if (data.location.type === 'box') {
     // Define a bounding-box-based location.
-    data.location.spec = await location.boundingBox();
+    data.location.spec = await loc.boundingBox();
   }
   // If the text is long:
-  if (data.text.length > 400) {
+  if (data.excerpt.length > 400) {
     // Truncate its middle.
-    data.text = `${data.text.slice(0, 200)} … ${data.text.slice(-200)}`;
+    data.excerpt = `${data.excerpt.slice(0, 200)} … ${data.excerpt.slice(-200)}`;
   }
   // Return the data.
   return data;

@@ -67,12 +67,11 @@
     {
       "type": "url",
       "which": "__targets__/attVal/bad.html",
-      "what": "page with permitted attribute values"
+      "what": "page with illicit attribute values"
     },
     {
       "type": "test",
       "which": "testaro",
-      "what": "attribute values",
       "withItems": true,
       "expect": [
         [
@@ -138,7 +137,7 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "Elements have attributes"
+          "Elements have attribute lang"
         ]
       ],
       "rules": [

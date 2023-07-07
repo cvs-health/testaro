@@ -16,8 +16,9 @@ exports.reporter = async page => {
     data.error = 'ERROR: bulk timed out';
     return {result: data};
   });
-  const visibleElements = await page.$$('body :visible');
-  data.visibleElements = visibleElements.length;
+  const visiblesLoc = await page.locator('body :visible');
+  const visibleLocs = await visiblesLoc.all();
+  data.visibleElements = visibleLocs.length;
   const count = Math.round(data.visibleElements / 400);
   return {
     data,
