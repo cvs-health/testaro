@@ -73,6 +73,26 @@
           "BUTTON"
         ],
         [
+          "standardResult.instances.1.id",
+          "=",
+          "twiceLabeled"
+        ],
+        [
+          "standardResult.instances.1.location.doc",
+          "=",
+          "source"
+        ],
+        [
+          "standardResult.instances.1.location.type",
+          "=",
+          "selector"
+        ],
+        [
+          "standardResult.instances.1.location.spec",
+          "=",
+          "#twiceLabeled"
+        ],
+        [
           "standardResult.instances.1.excerpt",
           "i",
           "aria-label"

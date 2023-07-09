@@ -20,9 +20,9 @@ exports.reporter = async page => {
       tagName: 'HTML',
       id: '',
       location: {
-        doc: '',
-        type: '',
-        spec: ''
+        doc: 'dom',
+        type: 'selector',
+        spec: 'html'
       },
       excerpt: ''
     }]
