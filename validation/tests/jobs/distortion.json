@@ -32,12 +32,32 @@
         [
           "standardResult.instances.1.what",
           "i",
-          "P element"
+          "Element distorts"
+        ],
+        [
+          "standardResult.instances.1.tagName",
+          "=",
+          "P"
         ],
         [
           "standardResult.instances.1.id",
           "=",
           "matrixp"
+        ],
+        [
+          "standardResult.instances.1.location.type",
+          "=",
+          "selector"
+        ],
+        [
+          "standardResult.instances.1.location.spec",
+          "=",
+          "#matrixp"
+        ],
+        [
+          "standardResult.instances.2.location.type",
+          "=",
+          "box"
         ],
         [
           "standardResult.instances.2.excerpt",

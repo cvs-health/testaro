@@ -17,7 +17,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "autocomplete attributes for name and email",
       "withItems": true,
       "expect": [
         [
@@ -39,7 +38,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "autocomplete attributes for name and email",
       "withItems": false,
       "expect": [
         [
@@ -66,7 +64,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "autocomplete attributes for name and email",
       "withItems": true,
       "expect": [
         [
@@ -78,6 +75,26 @@
           "standardResult.instances.1.what",
           "i",
           "value family-name"
+        ],
+        [
+          "standardResult.instances.1.tagName",
+          "=",
+          "INPUT"
+        ],
+        [
+          "standardResult.instances.1.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.1.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.1.location.spec.height",
+          ">",
+          "15"
         ],
         [
           "standardResult.instances.2.excerpt",
