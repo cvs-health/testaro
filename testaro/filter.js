@@ -16,79 +16,53 @@ const {getLocatorData} = require('../procs/getLocatorData');
 exports.reporter = async (page, withItems) => {
   // Get locators for all elements in the body.
   const locAll = page.locator('body *');
-  const locsAll = loc.all();
+  const locsAll = await locAll.all();
   // Initialize the standard results.
   const data = {};
   const totals = [0, 0, 0, 0];
   const standardInstances = [];
+  // Initialize the instance locators.
+  const locs = [];
   // For each locator:
   for (const loc of locsAll) {
-
-  }
-  // Identify the elements with filter style properties.
-  const data = await page.evaluate(withItems => {
-    // Returns a space-minimized copy of a string.
-    const compact = string => string
-    .replace(/[\t\n]/g, '')
-    .replace(/\s{2,}/g, ' ')
-    .trim()
-    .slice(0, 100);
-    // Get all elements in the body.
-    const elements = Array.from(document.body.querySelectorAll('*'));
-    // Get those that have filter styles.
-    const filterElements = elements.filter(element => {
-      const elementStyles = window.getComputedStyle(element);
-      return elementStyles.filter !== 'none';
+    // If it has a filter style:
+    const hasFilter = await loc.evaluate(element => {
+      const styleDec = window.getComputedStyle(element);
+      return styleDec.filter !== 'none';
     });
-    const filterData = filterElements.map(element => ({
-      element,
-      impact: element.querySelectorAll('*').length
-    }));
-    // Initialize the result.
-    const data = {
-      totals: {
-        styledElements: filterElements.length,
-        impactedElements: filterData.reduce((total, current) => total + current.impact, 0)
-      }
-    };
+    if (hasFilter) {
+      // Add it to the instance locators.
+      locs.push(loc);
+    }
+  }
+  // For each instance locator:
+  for (const loc of locs) {
+    // Get data on its element.
+    const impact = await loc.evaluate(element => element.querySelectorAll('*').length);
+    const elData = await getLocatorData(loc);
+    // Add to the standard result.
+    totals[2]++;
+    totals[1] += impact;
     // If itemization is required:
     if (withItems) {
-      // Add it to the result.
-      data.items = [];
-      filterData.forEach(filterDatum => {
-        data.items.push({
-          tagName: filterDatum.element.tagName,
-          id: filterDatum.element.id,
-          text: compact(filterDatum.element.textContent) || compact(filterDatum.element.outerHTML),
-          impact: filterDatum.impact
-        });
-      });
-    }
-    return data;
-  }, withItems);
-  const totals = [0, data.totals.impactedElements, data.totals.styledElements, 0];
-  const standardInstances = [];
-  if (data.items) {
-    data.items.forEach(item => {
+      // Add a standard instance for the element.
       standardInstances.push({
         ruleID: 'filter',
-        what: `Element has a filter style; impacted element count: ${item.impact}`,
+        what: `Element has a filter style; impacted element count: ${impact}`,
         ordinalSeverity: 2,
-        tagName: item.tagName.toUpperCase(),
-        id: item.id,
-        location: {
-          doc: '',
-          type: '',
-          spec: ''
-        },
-        excerpt: item.text.slice(0, 200)
+        tagName: elData.tagName,
+        id: elData.id,
+        location: elData.location,
+        excerpt: elData.excerpt
       });
-    });
+    }
   }
-  else if (data.totals.styledElements) {
+  // If itemization is not required and there are any instances:
+  if (! withItems && totals[2]) {
+    // Adda summary instance:
     standardInstances.push({
       ruleID: 'filter',
-      what: 'Elements have filter styles impacting other elements',
+      what: 'Elements have filter styles',
       ordinalSeverity: 2,
       count: totals[2],
       tagName: '',
@@ -100,21 +74,26 @@ exports.reporter = async (page, withItems) => {
       },
       excerpt: ''
     });
-    standardInstances.push({
-      ruleID: 'filter',
-      what: 'Elements are impacted by elements with filter styles',
-      ordinalSeverity: 1,
-      count: totals[1],
-      tagName: '',
-      id: '',
-      location: {
-        doc: '',
-        type: '',
-        spec: ''
-      },
-      excerpt: ''
-    });
+    // If any impact occurred:
+    if (totals[1]) {
+      // Add a summary instance.
+      standardInstances.push({
+        ruleID: 'filter',
+        what: 'Elements are impacted by elements with filter styles',
+        ordinalSeverity: 1,
+        count: totals[1],
+        tagName: '',
+        id: '',
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: ''
+      });
+    }
   }
+  // Return the result.
   return {
     data,
     totals,

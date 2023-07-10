@@ -88,6 +88,21 @@
           2
         ],
         [
+          "standardResult.instances.1.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.1.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.1.location.spec.y",
+          ">",
+          0
+        ],
+        [
           "standardResult.instances.1.excerpt",
           "i",
           "Item"
