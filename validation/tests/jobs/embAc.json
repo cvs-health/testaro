@@ -60,7 +60,7 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "is embedded"
+          "is embedded in a link"
         ],
         [
           "standardResult.instances.0.tagName",
@@ -68,14 +68,29 @@
           "BUTTON"
         ],
         [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.0.location.spec.x",
+          ">",
+          0
+        ],
+        [
           "standardResult.instances.0.excerpt",
           "i",
-          "information about"
+          "buttons"
         ],
         [
           "standardResult.instances.1.excerpt",
           "i",
-          "about checkboxes"
+          "yes"
         ],
         [
           "standardResult.instances.6.ordinalSeverity",
