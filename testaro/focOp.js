@@ -18,196 +18,123 @@
   tablist, tab, gridcell, radiogroup, treegrid, widget, or scrollbar), or has an 'onclick'
   attribute. The test considers an element Tab-focusable if its tabIndex property has the value 0.
 */
+
+// ########## IMPORTS
+
+// Module to get locator data.
+const {getLocatorData} = require('../procs/getLocatorData');
+
+// ########## FUNCTIONS
+
 exports.reporter = async (page, withItems) => {
-  // Get data on focusability-operability-discrepant elements.
-  const data = await page.$$eval('body *', (elements, withItems) => {
-    // Initialize the data.
-    const data = {
-      totals: {
-        total: 0,
-        types: {
-          onlyFocusable: {
-            total: 0,
-            tagNames: {}
-          },
-          onlyOperable: {
-            total: 0,
-            tagNames: {}
-          }
-        }
-      }
-    };
-    if (withItems) {
-      data.items = {
-        onlyFocusable: [],
-        onlyOperable: []
-      };
-    }
-    // FUNCTION DEFINITIONS START
-    // Returns data on an element’s operability and prevents it from propagating a pointer.
-    const operabilityOf = element => {
-      // Identify the operable tag names.
-      const opTags = new Set(['A', 'BUTTON', 'IFRAME', 'INPUT', 'SELECT', 'TEXTAREA']);
-      // Identify the operable roles.
-      const opRoles = new Set([
-        'button',
-        'checkbox',
-        'combobox',
-        'composite',
-        'grid',
-        'gridcell',
-        'input',
-        'link',
-        'listbox',
-        'menu',
-        'menubar',
-        'menuitem',
-        'menuitemcheckbox',
-        'option',
-        'radio',
-        'radiogroup',
-        'scrollbar',
-        'searchbox',
-        'select',
-        'slider',
-        'spinbutton',
-        'switch',
-        'tab',
-        'tablist',
-        'textbox',
-        'tree',
-        'treegrid',
-        'treeitem',
-        'widget',
-      ]);
-      // Identify whether the element has a pointer cursor.
-      const hasPointer = window.getComputedStyle(element).cursor === 'pointer';
-      // Identify the bases for considering an element operable.
-      const opBases = [
-        opTags.has(element.tagName),
-        element.hasAttribute('onclick'),
-        opRoles.has(element.getAttribute('role')),
-        hasPointer && element.tagName !== 'LABEL'
-      ];
-      // If the element is operable:
-      const result = {operable: opBases.some(basis => basis)};
-      if (result.operable) {
-        // Add its data to its result.
-        result.byTag = opBases[0];
-        result.byOnClick = opBases[1];
-        result.byPointer = opBases[2];
-      }
-      // If the cursor is a pointer:
-      if (hasPointer) {
-        // Change it to the browser default to prevent pointer propagation.
-        element.style.cursor = 'default';
-      }
-      // Return the result.
-      return result;
-    };
-    // Adds facts about an element to data.
-    const addFacts = (element, status, byTag, byOnClick, byPointer) => {
-      const statusNames = {
-        f: 'onlyFocusable',
-        o: 'onlyOperable'
-      };
-      const statusName = statusNames[status];
-      data.totals.types[statusName].total++;
-      const tagNames = data.totals.types[statusName].tagNames;
-      const {id, tagName} = element;
-      tagNames[tagName] = (tagNames[tagName] || 0) + 1;
-      if (withItems) {
-        const elementData = {
-          tagName: element.tagName,
-          id: id || '',
-          text: (element.textContent.trim() || element.outerHTML.trim())
-          .replace(/\s{2,}/sg, ' ')
-          .slice(0, 100)
-        };
-        if (status !== 'f') {
-          elementData.byTag = byTag;
-          elementData.byOnClick = byOnClick;
-          elementData.byPointer = byPointer;
-        }
-        data.items[statusName].push(elementData);
-      }
-    };
-    // FUNCTION DEFINITIONS END
-    // For each element:
-    elements.forEach(element => {
-      // If its tab index is 0, deem it focusable and:
-      if (element.tabIndex === 0) {
-        // Determine whether and how it is operable.
-        const {operable} = operabilityOf(element);
-        // If it is not:
-        if (! operable) {
-          // Increment the total.
-          data.totals.total++;
-          // Add its data to the result.
-          addFacts(element, 'f');
-        }
-      }
-      // Otherwise, i.e. if it is not focusable:
-      else {
-        // Determine whether and how it is operable.
-        const {operable, byTag, byOnClick, byPointer} = operabilityOf(element);
-        // If it is:
-        if (operable) {
-          // Increment the total.
-          data.totals.total++;
-          // Add its data to the result.
-          addFacts(element, 'o', byTag, byOnClick, byPointer);
-        }
-      }
-    });
-    return data;
-  }, withItems)
-  .catch(error => {
-    console.log(`ERROR getting focOp data (${error.message})`);
-    data.prevented = true;
-  });
-  // Derive the standard data.
+  // Initialize the standard result.
+  const data = {};
   const totals = [0, 0, 0, 0];
-  if (
-    data.totals
-    && data.totals.types
-    && data.totals.types.onlyFocusable
-    && data.totals.types.onlyOperable
-    && typeof data.totals.types.onlyFocusable.total === 'number'
-    && typeof data.totals.types.onlyOperable.total === 'number'
-  ) {
-    totals[2] = data.totals.types.onlyFocusable.total;
-    totals[3] = data.totals.types.onlyOperable.total;
-  }
   const standardInstances = [];
-  if (data.items && data.items.onlyFocusable && data.items.onlyOperable) {
-    ['onlyFocusable', 'onlyOperable'].forEach(issue => {
-      const gripe = issue === 'onlyFocusable'
-        ? 'is focusable but not operable'
-        : 'is operable but not focusable';
-      const ordinalSeverity = issue === 'onlyFocusable' ? 2 : 3;
-      data.items[issue].forEach(item => {
+  // Identify the operable tag names.
+  const opTags = new Set(['A', 'BUTTON', 'IFRAME', 'INPUT', 'SELECT', 'TEXTAREA']);
+  // Identify the operable roles.
+  const opRoles = new Set([
+    'button',
+    'checkbox',
+    'combobox',
+    'composite',
+    'grid',
+    'gridcell',
+    'input',
+    'link',
+    'listbox',
+    'menu',
+    'menubar',
+    'menuitem',
+    'menuitemcheckbox',
+    'option',
+    'radio',
+    'radiogroup',
+    'scrollbar',
+    'searchbox',
+    'select',
+    'slider',
+    'spinbutton',
+    'switch',
+    'tab',
+    'tablist',
+    'textbox',
+    'tree',
+    'treegrid',
+    'treeitem',
+    'widget',
+  ]);
+  // Get a locator for all body elements.
+  const locAll = page.locator('body *');
+  const locsAll = await locAll.all();
+  // For each of them:
+  for (const loc of locsAll) {
+    // Get data on it.
+    const focOpData = await loc.evaluate(element => {
+      const {tabIndex} = element;
+      let hasPointer = false;
+      if (element.tagName !== 'LABEL') {
+        const styleDec = window.getComputedStyle(element);
+        hasPointer = styleDec.cursor === 'pointer';
+      }
+      const {tagName} = element;
+      return {
+        tabIndex,
+        hasPointer,
+        tagName
+      };
+    });
+    focOpData.onClick = await loc.getAttribute('onclick') !== null;
+    focOpData.role = await loc.getAttribute('role') || '';
+    focOpData.isFocusable = focOpData.tabIndex === 0;
+    focOpData.isOperable = focOpData.hasPointer
+    || opTags.has(focOpData.tagName)
+    || focOpData.onClick
+    || opRoles.has(focOpData.role);
+    // If it is focusable or operable but not both:
+    if (focOpData.isFocusable !== focOpData.isOperable) {
+      // Get more data on it.
+      const elData = await getLocatorData(loc);
+      // Add to the standard result.
+      const howOperable = [];
+      if (opTags.has(focOpData.tagName)) {
+        howOperable.push(`tag name ${focOpData.tagName}`);
+      }
+      if (focOpData.hasPointer) {
+        howOperable.push('pointer cursor');
+      }
+      if (focOpData.onClick) {
+        howOperable.push('click listener');
+      }
+      if (opRoles.has(focOpData.role)) {
+        howOperable.push(`role ${focOpData.role}`);
+      }
+      const gripe = focOpData.isFocusable
+        ? 'Tab-focusable but not operable'
+        : `operable (${howOperable.join(', ')}) but not Tab-focusable`;
+      const ordinalSeverity = focOpData.isFocusable ? 2 : 3;
+      totals[ordinalSeverity]++;
+      if (withItems) {
         standardInstances.push({
           ruleID: 'focOp',
-          what: `Element ${gripe}`,
+          what: `Element is ${gripe}`,
           ordinalSeverity,
-          tagName: item.tagName,
-          id: item.id,
-          location: {
-            doc: '',
-            type: '',
-            spec: ''
-          },
-          excerpt: item.text
+          tagName: elData.tagName,
+          id: elData.id,
+          location: elData.location,
+          excerpt: elData.excerpt
         });
-      });
-    });
+      }
+    }
   }
-  else {
+  // If itemization is not required:
+  if (! withItems) {
+    // Add summary instances to the standard result.
     if (totals[2]) {
       standardInstances.push({
         ruleID: 'focOp',
-        what: 'Focusable elements are inoperable',
+        what: 'Tab-focusable elements are inoperable',
         count: totals[2],
         ordinalSeverity: 2,
         tagName: '',
@@ -223,7 +150,7 @@ exports.reporter = async (page, withItems) => {
     if (totals[3]) {
       standardInstances.push({
         ruleID: 'focOp',
-        what: 'Operable elements are nonfocusable',
+        what: 'Operable elements are not Tab-focusable',
         count: totals[3],
         ordinalSeverity: 3,
         tagName: '',
@@ -244,6 +171,7 @@ exports.reporter = async (page, withItems) => {
   catch(error) {
     console.log('ERROR: page reload timed out');
   }
+  // Return the standard result.
   return {
     data,
     totals,

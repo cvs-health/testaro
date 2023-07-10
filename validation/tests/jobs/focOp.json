@@ -63,21 +63,6 @@
           3
         ],
         [
-          "standardResult.instances.0.ordinalSeverity",
-          "=",
-          2
-        ],
-        [
-          "standardResult.instances.0.excerpt",
-          "=",
-          "focusable part"
-        ],
-        [
-          "standardResult.instances.0.tagName",
-          "=",
-          "SPAN"
-        ],
-        [
           "standardResult.instances.1.ruleID",
           "=",
           "focOp"
@@ -85,32 +70,82 @@
         [
           "standardResult.instances.1.what",
           "i",
-          "operable but not focusable"
-        ],
-        [
-          "standardResult.instances.1.tagName",
-          "=",
-          "BUTTON"
+          "Element is Tab-focusable but"
         ],
         [
           "standardResult.instances.1.ordinalSeverity",
           "=",
-          3
+          2
+        ],
+        [
+          "standardResult.instances.1.tagName",
+          "=",
+          "SPAN"
+        ],
+        [
+          "standardResult.instances.1.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.1.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.1.location.spec.width",
+          ">",
+          0
         ],
         [
           "standardResult.instances.1.excerpt",
-          "i",
-          "button"
+          "=",
+          "focusable part"
         ],
         [
-          "standardResult.instances.1.what",
+          "standardResult.instances.0.ruleID",
+          "=",
+          "focOp"
+        ],
+        [
+          "standardResult.instances.0.what",
           "i",
-          "operable but not focusable"
+          "(tag name BUTTON) but not Tab-focusable"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "BUTTON"
         ],
         [
           "standardResult.instances.2.id",
           "=",
           "clickable"
+        ],
+        [
+          "standardResult.instances.2.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.2.location.type",
+          "=",
+          "selector"
+        ],
+        [
+          "standardResult.instances.2.location.spec",
+          "=",
+          "#clickable"
+        ],
+        [
+          "standardResult.instances.2.excerpt",
+          "i",
+          "this text"
         ]
       ],
       "rules": [
@@ -147,7 +182,7 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "Focusable elements"
+          "Tab-focusable elements"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
