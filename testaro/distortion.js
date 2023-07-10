@@ -17,17 +17,19 @@ exports.reporter = async (page, withItems) => {
   // Get locators for all body elements.
   const locAll = page.locator('body *');
   const locsAll = await locAll.all();
-  // Get those that:
-  const locs = locsAll.filter(async loc => {
+  // Get those that have distorting transform styles.
+  const locs = [];
+  for (const loc of locsAll) {
     const isDistorted = await loc.evaluate(el => {
-      // Have distorting transform styles.
       const styleDec = window.getComputedStyle(el);
       const {transform} = styleDec;
       return transform
       && ['matrix', 'perspective', 'rotate', 'scale', 'skew'].some(key => transform.includes(key));
     });
-    return isDistorted;
-  });
+    if (isDistorted) {
+      locs.push(loc);
+    }
+  };
   // Initialize the results.
   const data = {};
   const totals = [0, 0, 0, 0];

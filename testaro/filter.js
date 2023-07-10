@@ -5,8 +5,26 @@
   and requires the user to apply custom styles to neutralize it, which is difficult or impossible
   in some user environments.
 */
-// Runs the test and returns the results.
+
+// ########## IMPORTS
+
+// Module to get locator data.
+const {getLocatorData} = require('../procs/getLocatorData');
+
+// ########## FUNCTIONS
+
 exports.reporter = async (page, withItems) => {
+  // Get locators for all elements in the body.
+  const locAll = page.locator('body *');
+  const locsAll = loc.all();
+  // Initialize the standard results.
+  const data = {};
+  const totals = [0, 0, 0, 0];
+  const standardInstances = [];
+  // For each locator:
+  for (const loc of locsAll) {
+
+  }
   // Identify the elements with filter style properties.
   const data = await page.evaluate(withItems => {
     // Returns a space-minimized copy of a string.

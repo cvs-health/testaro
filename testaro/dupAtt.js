@@ -63,39 +63,40 @@ exports.reporter = async (page, withItems) => {
   rawPage = rawPage.replace(/ = | =|= /g, '=');
   // Remove any escaped quotation marks from it.
   rawPage = rawPage.replace(/\\"|\\'/g, '');
-  // Remove any quoted text from it.
-  rawPage = rawPage.replace(/"[^"]*"|'[^']*'/g, '');
-  // Remove any equal symbols from it.
-  rawPage = rawPage.replace(/=/g, '');
   // Remove any script code from it.
   rawPage = rawPage.replace(/<(script [^<>]+)>.*?<\/script>/g, '$1');
   // Remove any comments from it.
   rawPage = rawPage.replace(/<!--.*?-->/g, '');
   // Extract the opening tags of its elements.
   let elements = rawPage.match(/<[a-zA-Z][^<>]+>/g);
-  // Delete their enclosing angle brackets and the values of any attributes in them.
-  const elementsWithVals = elements.map(el => el.replace(/^< *| *>$/g, ''));
-  const elementsWithoutVals = elementsWithVals.map(el => el.replace(/^ *|=[^ ]*$/g, ''));
+  // Delete their enclosing angle brackets.
+  elements = elements.map(element => element.replace(/< ?| ?>/g, ''));
+  // Delete the values of any attributes in them.
+  const nvElements = elements.map(element => element.replace(/="[^"]*"/g, ''));
   // For each element:
-  elementsWithoutVals.forEach((elementWithoutVals, index) => {
+  nvElements.forEach((element, index) => {
     // Identify its tag name and attributes.
-    const terms = elementWithoutVals.split(' ');
+    const terms = element.split(' ');
     // If it has 2 or more attributes:
     if (terms.length > 2) {
       // If any is duplicated:
       const tagName = terms[0].toUpperCase();
       const attributes = terms.slice(1);
-      const attSet = new Set(attributes);
-      if (attSet.size < attributes.length) {
-        // Add it to the data.
+      attributes.sort();
+      const duplicatedAttribute = attributes.find(
+        (current, attIndex) => attributes[attIndex + 1] === current
+      );
+      if (duplicatedAttribute) {
+        // Add data on the element to the data.
+        const id = terms.includes('id')
+          ? elements[index].replace(/^.+id="/, '').replace(/".+/, '')
+          : '';
         data.total++;
         if (withItems) {
           data.items.push({
             tagName,
-            id: terms.includes('id')
-              ? elementsWithVals[index].replace(/^.+id=/, '').replace(/ .*$/, '')
-              : '',
-            attributes
+            id,
+            duplicatedAttribute
           });
         }
       }
@@ -111,11 +112,11 @@ exports.reporter = async (page, withItems) => {
         tagName: item.tagName,
         id: item.id,
         location: {
-          doc: '',
-          type: '',
-          spec: ''
+          doc: item.id ? 'source' : '',
+          type: item.id ? 'selector' : '',
+          spec: `#${item.id}`
         },
-        excerpt: item.attributes.join(' ... ')
+        excerpt: item.duplicatedAttribute
       });
     });
   }

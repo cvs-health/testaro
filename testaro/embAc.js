@@ -5,80 +5,62 @@
   but also complicates user interaction and creates risks of error. It becomes
   non-obvious what a user will activate with a click.
 */
-exports.reporter = async (page, withItems) => await page.$$eval(
-  'a a, a button, a input, a select, button a, button button, button input, button select',
-  (bads, withItems) => {
-    // FUNCTION DEFINITION START
-    // Returns a space-minimized copy of a string.
-    const compact = string => string.replace(/[\t\n]/g, '').replace(/\s{2,}/g, ' ').trim();
-    // FUNCTION DEFINITION END
-    const totals = {
-      links: 0,
-      buttons: 0,
-      inputs: 0,
-      selects: 0
-    };
-    const items = [];
-    // Total and, if requested, itemize the faulty elements.
-    bads.forEach(bad => {
-      totals[Object.keys(totals)[['A', 'BUTTON', 'INPUT', 'SELECT'].indexOf(bad.tagName)]]++;
-      let container;
-      if (withItems) {
-        if (['A', 'BUTTON'].includes(bad.parentElement.tagName)) {
-          container = bad.parentElement;
-        }
-        else {
-          container = bad.parentElement.parentElement;
-        }
-        items.push({
-          embeddedElement: bad.tagName,
-          embeddedID: bad.id || '',
-          excerpt: compact(container.outerHTML)
-        });
-      }
-    });
-    // Return the result.
-    const data = {totals};
-    const standardInstances = [];
-    const total = Object.values(data.totals).reduce((sum, current) => sum + current);
+
+// ########## IMPORTS
+
+// Module to get locator data.
+const {getLocatorData} = require('../procs/getLocatorData');
+
+// ########## FUNCTIONS
+
+exports.reporter = async (page, withItems) => {
+  // Get locators for all misembedded elements.
+  const loc = page.locator(
+    'a a, a button, a input, a select, button a, button button, button input, button select'
+  );
+  const locs = await loc.all();
+  // Initialize the result.
+  const data = {};
+  const totals = [0, 0, 0, 0];
+  const standardInstances = [];
+  // For each locator:
+  for (const loc of locs) {
+    // Get data on its element.
+    const parentTagName = await loc.evaluate(element => element.parentElement.tagName);
+    const elData = await getLocatorData(loc);
+    // Add data to the standard result.
+    totals[2]++;
     if (withItems) {
-      data.items = items;
-      items.forEach(item => {
-        standardInstances.push({
-          ruleID: 'embAc',
-          what: 'Interactive element is embedded in a link or button',
-          ordinalSeverity: 2,
-          tagName: item.embeddedElement,
-          id: item.embeddedID,
-          location: {
-            doc: '',
-            type: '',
-            spec: ''
-          },
-          excerpt: item.excerpt
-        });
-      });
-    }
-    else if (total) {
       standardInstances.push({
         ruleID: 'embAc',
-        what: 'Interactive elements are contained by links or buttons',
-        count: total,
+        what: `Interactive element is embedded in a ${parentTagName === 'A' ? 'link' : 'button'}`,
         ordinalSeverity: 2,
-        tagName: '',
-        id: '',
-        location: {
-          doc: '',
-          type: '',
-          spec: ''
-        },
-        excerpt: ''
+        tagName: elData.tagName,
+        id: elData.id,
+        location: elData.location,
+        excerpt: elData.excerpt
       });
     }
-    return {
-      data,
-      totals: [0, 0, total, 0],
-      standardInstances
-    };
-  }, withItems
-);
+  };
+  if (! withItems) {
+    standardInstances.push({
+      ruleID: 'embAc',
+      what: 'Interactive elements are contained by links or buttons',
+      ordinalSeverity: 2,
+      count: totals[2],
+      tagName: '',
+      id: '',
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: ''
+    });
+  }
+  return {
+    data,
+    totals,
+    standardInstances
+  };
+};

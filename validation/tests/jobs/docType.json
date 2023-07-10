@@ -70,6 +70,16 @@
           "standardResult.instances.0.ordinalSeverity",
           "=",
           3
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "HTML"
+        ],
+        [
+          "standardResult.instances.0.location.spec",
+          "=",
+          "html"
         ]
       ],
       "withItems": true,

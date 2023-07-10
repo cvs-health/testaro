@@ -24,7 +24,7 @@ exports.reporter = async (
     'email': emailLabels
   };
   // Get locators for all input elements of type text or email.
-  const locAll = page.locator('input[type=text], input[type=email], input:not([type]');
+  const locAll = page.locator('input[type=text], input[type=email], input:not([type])');
   const locsAll = await locAll.all();
   // Initialize the result.
   const data = {};
