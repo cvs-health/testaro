@@ -4,7 +4,28 @@
   This test reports links that are off the display when focused.
 */
 exports.reporter = async (page, withItems) => {
-  // Identify the initially visible links.
+  // Get a locator for the initially visible links.
+  const locAll = page.locator('a:visible');
+  const locsAll = await locAll.all();
+  // Get locators for those that are off the display when focused.
+  const locs = [];
+  for (const loc of locsAll) {
+    const isOff = await loc.evaluate(element => {
+      const isAbove = element.offsetTop + element.offsetHeight <= 0;
+      const isLeft = element.offsetLeft + element.offsetWidth <= 0;
+      const isOff = isAbove || isLeft;
+      return isOff;
+    });
+    if (isOff) {
+      locs.push(loc);
+    }
+  }
+  // For each off-display link:
+  for (const loc of locs) {
+    // Get data on it.
+    const elData = await getLocatorData(loc);
+  }
+
   const badLinks = await page.$$eval('a:visible', links => {
     // FUNCTION DEFINITION START
     // Returns a space-minimized copy of a string.
