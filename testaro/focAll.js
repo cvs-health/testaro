@@ -9,17 +9,16 @@
   widget, such as one radio button or tab in each group) merely by pressing the Tab key.
 */
 exports.reporter = async page => {
-  // Identify the count of visible focusable elements.
-  const tabFocusables = await page.$$eval(
-    'body *:visible',
-    visibles => {
-      const focusables = visibles.filter(visible => visible.tabIndex === 0);
-      // Count as focusable only 1 radio button per group.
-      const radios = focusables.filter(el => el.tagName === 'INPUT' && el.type === 'radio');
-      const radioNames = new Set(radios.map(radio => radio.name));
-      return focusables.length - radios.length + radioNames.size;
-    }
-  );
+  // Get locators of visible elements.
+  const locAll = await page.locator('body *:visible');
+  // Get the count of focusable elements.
+  const focusableCount = await locAll.evaluateAll(elements => {
+    const focusables = elements.filter(element => element.tabIndex === 0);
+    // Count as focusable only 1 radio button per group.
+    const radios = focusables.filter(el => el.tagName === 'INPUT' && el.type === 'radio');
+    const radioNames = new Set(radios.map(radio => radio.name));
+    return focusables.length - radios.length + radioNames.size;
+  });
   /*
     Repeatedly perform a Tab or (in webkit) Opt-Tab keypress and count the focused elements.
     Asumptions:
@@ -29,15 +28,16 @@ exports.reporter = async page => {
   */
   let tabFocused = 0;
   let refocused = 0;
+  const keyName = page.browserTypeName === 'webkit' ? 'Alt+Tab' : 'Tab';
   while (refocused < 100 && tabFocused < 2000) {
-    await page.keyboard.press(page.browserTypeName === 'webkit' ? 'Alt+Tab' : 'Tab');
+    await page.keyboard.press(keyName);
     const isNewFocus = await page.evaluate(() => {
       const focus = document.activeElement;
-      if (focus === null || focus.tagName === 'BODY' || focus.dataset.autotestfocused) {
+      if (focus === null || focus.tagName === 'BODY' || focus.dataset.testarofocused) {
         return false;
       }
       else {
-        focus.dataset.autotestfocused = 'true';
+        focus.dataset.testarofocused = 'true';
         return true;
       }
     });
@@ -49,9 +49,9 @@ exports.reporter = async page => {
     }
   }
   const data = {
-    tabFocusables,
+    focusableCount,
     tabFocused,
-    discrepancy: tabFocused - tabFocusables
+    discrepancy: tabFocused - focusableCount
   };
   // Reload the page.
   try {
@@ -60,14 +60,15 @@ exports.reporter = async page => {
   catch(error) {
     console.log('ERROR: page reload timed out');
   }
+  const count = Math.abs(data.discrepancy);
   // Return the result.
   return {
     data,
-    totals: [0, 0, Math.abs(data.discrepancy), 0],
-    standardInstances: data.discrepancy ? [{
+    totals: [0, 0, count, 0],
+    standardInstances: count ? [{
       ruleID: 'focAll',
       what: 'Some focusable elements are not Tab-focusable or vice versa',
-      count: Math.abs(data.discrepancy),
+      count,
       ordinalSeverity: 2,
       tagName: '',
       id: '',

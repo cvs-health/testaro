@@ -63,6 +63,11 @@
           2
         ],
         [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          3
+        ],
+        [
           "standardResult.instances.0.tagName",
           "=",
           "INPUT"
@@ -73,19 +78,34 @@
           "textInput"
         ],
         [
-          "standardResult.instances.0.ordinalSeverity",
+          "standardResult.instances.0.location.doc",
           "=",
-          3
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "selector"
+        ],
+        [
+          "standardResult.instances.0.location.spec",
+          "=",
+          "#textInput"
         ],
         [
           "standardResult.instances.0.excerpt",
           "i",
-          "textInput"
+          "text input"
         ],
         [
           "standardResult.instances.3.ruleID",
           "=",
           "focInd"
+        ],
+        [
+          "standardResult.instances.3.ordinalSeverity",
+          "=",
+          2
         ],
         [
           "standardResult.instances.3.tagName",
@@ -98,9 +118,9 @@
           "slowLink"
         ],
         [
-          "standardResult.instances.3.ordinalSeverity",
+          "standardResult.instances.3.location.spec",
           "=",
-          2
+          "#slowLink"
         ]
       ],
       "rules": [
