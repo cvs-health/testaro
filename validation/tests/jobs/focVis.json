@@ -33,7 +33,7 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "link is"
+          "link is above"
         ],
         [
           "standardResult.instances.0.tagName",
@@ -44,6 +44,21 @@
           "standardResult.instances.0.id",
           "=",
           "basqueInfo"
+        ],
+        [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "selector"
+        ],
+        [
+          "standardResult.instances.0.location.spec",
+          "=",
+          "#basqueInfo"
         ],
         [
           "standardResult.instances.0.excerpt",
