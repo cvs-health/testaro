@@ -25,6 +25,8 @@
   fail. Playwright defines the ability to receive events as being the target of an action on the
   location where the center of the element is, rather than some other element with a higher zIndex
   value in the same location being the target.
+
+  An alternative strategy meriting consideration is to take screen shots and measure pixel changes.
 */
 
 // VARIABLES

@@ -60,7 +60,7 @@
         [
           "standardResult.totals.3",
           "=",
-          3
+          0
         ],
         [
           "standardResult.totals.1",
@@ -88,29 +88,24 @@
           "labButton"
         ],
         [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "selector"
+        ],
+        [
+          "standardResult.instances.0.location.spec",
+          "=",
+          "#labButton"
+        ],
+        [
           "standardResult.instances.0.excerpt",
           "i",
           "button"
-        ],
-        [
-          "standardResult.instances.4.ruleID",
-          "=",
-          "labClash"
-        ],
-        [
-          "standardResult.instances.4.what",
-          "i",
-          "is unlabeled"
-        ],
-        [
-          "standardResult.instances.4.tagName",
-          "=",
-          "INPUT"
-        ],
-        [
-          "standardResult.instances.4.excerpt",
-          "i",
-          "delete"
         ]
       ],
       "rules": [

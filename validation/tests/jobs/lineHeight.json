@@ -20,14 +20,14 @@
       "withItems": true,
       "expect": [
         [
-          "standardResult.totals.1",
+          "standardResult.totals.3",
           "=",
-          2
+          1
         ],
         [
           "standardResult.instances.length",
           "=",
-          2
+          1
         ],
         [
           "standardResult.instances.0.ruleID",
@@ -37,7 +37,12 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "is less than 1.5 times"
+          "is less than 0.9 times"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          3
         ],
         [
           "standardResult.instances.0.tagName",
@@ -50,19 +55,24 @@
           "clip"
         ],
         [
-          "standardResult.instances.0.ordinalSeverity",
+          "standardResult.instances.0.location.doc",
           "=",
-          1
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "selector"
+        ],
+        [
+          "standardResult.instances.0.location.spec",
+          "=",
+          "#clip"
         ],
         [
           "standardResult.instances.0.excerpt",
           "i",
           "puny text"
-        ],
-        [
-          "standardResult.instances.1.excerpt",
-          "i",
-          "vertical"
         ]
       ],
       "rules": [
@@ -76,9 +86,9 @@
       "withItems": false,
       "expect": [
         [
-          "standardResult.totals.1",
+          "standardResult.totals.3",
           "=",
-          2
+          1
         ],
         [
           "standardResult.totals.2",
@@ -98,12 +108,12 @@
         [
           "standardResult.instances.0.count",
           "=",
-          2
+          1
         ],
         [
           "standardResult.instances.0.what",
           "i",
-          "are less than 1.5"
+          "heights less than 0.9 times"
         ]
       ],
       "rules": [

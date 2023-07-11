@@ -1,109 +1,100 @@
 /*
   lineHeight
   Related to Tenon rule 144.
-  This test reports text nodes whose line heights are less than 1.5 times their font sizes.
+  This test reports elements whose line heights are less than 1.5 times their font sizes. Even
+  such elements with no text create accessibility risk, because any text node added to one of
+  them would have a substandard line height. Nonetheless, elements with no non-spacing text in
+  their subtrees are excluded.
 */
+
+// ########## IMPORTS
+
+// Module to get locator data.
+const {getLocatorData} = require('../procs/getLocatorData');
+
+// ########## FUNCTIONS
+
+// Gets the ratio of line height to font size not reached, as text, from an ordinal severity.
+const getRatio = ordinalSeverity => ['1.5', '1.3', '1.1', '0.9'][ordinalSeverity];
 exports.reporter = async (page, withItems) => {
-  // Identify the text nodes with substandard line heights.
-  const data = await page.evaluate(() => {
-    // Initialize the result.
-    const data = [];
-    // Collapse any adjacent text nodes.
-    document.body.normalize();
-    // Remove the irrelevant text content.
-    const extraElements = Array.from(document.body.querySelectorAll('style, script, svg'));
-    extraElements.forEach(element => {
-      element.textContent = '';
+  // Initialize the standard result.
+  const data = {};
+  const totals = [0, 0, 0, 0];
+  const standardInstances = [];
+  // Get locators for all body elements with any descendant non-spacing text.
+  const locAll = page.locator('body *', {hasText: /[^\s]/});
+  const locsAll = await locAll.all();
+  // For each of them:
+  for (const loc of locsAll) {
+    // Get data on it.
+    const facts = await loc.evaluate(element => {
+      const styleDec = window.getComputedStyle(element);
+      const {fontSize, lineHeight} = styleDec;
+      return {
+        fontSize: Number.parseFloat(fontSize),
+        lineHeight: Number.parseFloat(lineHeight)
+      };
     });
-    // FUNCTION DEFINITION START
-    // Returns a space-minimized copy of a string.
-    const compact = string => string.replace(/[\t\n]/g, ' ').replace(/\s{2,}/g, ' ').trim();
-    // FUNCTION DEFINITION END
-    // Create a collection of the text nodes.
-    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-    const textNodes = [];
-    let more = true;
-    while(more) {
-      if (walker.nextNode()) {
-        const nodeText = walker.currentNode.nodeValue;
-        const compactNodeText = compact(nodeText);
-        if (compactNodeText) {
-          textNodes.push(walker.currentNode);
-        }
-      }
-      else {
-        more = false;
+    // If its line height is substandard:
+    const ratio = facts.lineHeight / facts.fontSize;
+    let ordinalSeverity = -1;
+    if (ratio < 0.9) {
+      ordinalSeverity = 3;
+    }
+    else if (ratio < 1.1) {
+      ordinalSeverity = 2;
+    }
+    else if (ratio < 1.3) {
+      ordinalSeverity = 1;
+    }
+    else if (ratio < 1.5) {
+      ordinalSeverity = 0;
+    }
+    if (ordinalSeverity > -1) {
+      // Add to the totals.
+      totals[ordinalSeverity]++;
+      // If itemization is required:
+      if (withItems) {
+        // Get data on the element.
+        const elData = await getLocatorData(loc);
+        // Add a standard instance.
+        standardInstances.push({
+          ruleID: 'lineHeight',
+          what:
+          `Element line height ${facts.lineHeight} px is less than ${getRatio(ordinalSeverity)} times its font size ${facts.fontSize} px`,
+          ordinalSeverity,
+          tagName: elData.tagName,
+          id: elData.id,
+          location: elData.location,
+          excerpt: elData.excerpt
+        });
       }
     }
-    // For each of them:
-    textNodes.forEach(textNode => {
-      // Get the font size and line height of its parent element.
-      const parentStyleDec = window.getComputedStyle(textNode.parentElement);
-      const parentFontSizeText = parentStyleDec.fontSize;
-      const parentLineHeightText = parentStyleDec.lineHeight;
-      const parentFontSizeNum = Number.parseFloat(parentFontSizeText);
-      const parentLineHeightNum = Number.parseFloat(parentLineHeightText) || 1.5 * parentFontSizeNum;
-      // If the line height is substandard:
-      if (parentLineHeightNum < 1.5 * parentFontSizeNum) {
-        // Add data on the text node to the result.
-        const parentElement = textNode.parentElement;
-        let shortText = compact(textNode.nodeValue);
-        if (shortText.length > 400) {
-          shortText = `${shortText.slice(0, 200)} … ${shortText.slice(-200)}`;
-        }
-        data.push({
-          tagName: parentElement.tagName,
-          id: parentElement.id || '',
-          fontSize: parentFontSizeNum,
-          lineHeight: parentLineHeightNum,
-          text: shortText
+  }
+  // If itemization is not required:
+  if (! withItems) {
+    // For each ordinal severity:
+    [0, 1, 2, 3].forEach(ordinalSeverity => {
+      // If there are instances with it:
+      if (totals[ordinalSeverity]) {
+        // Add a summary instance.
+        standardInstances.push({
+          ruleID: 'lineHeight',
+          what:
+          `Elements have line heights less than ${getRatio(ordinalSeverity)} times their font sizes`,
+          ordinalSeverity,
+          count: totals[ordinalSeverity],
+          tagName: '',
+          id: '',
+          location: {
+            doc: '',
+            type: '',
+            spec: ''
+          },
+          excerpt: ''
         });
       }
     });
-    return data;
-  });
-  // Initialize the result and standard result.
-  const totals = [0, data.length, 0, 0];
-  const standardInstances = [];
-  // If itemization is required:
-  if (withItems) {
-    // Add it to the standard result.
-    data.forEach(item => {
-      standardInstances.push({
-        ruleID: 'lineHeight',
-        what:
-        `Text line height ${item.lineHeight} px is less than 1.5 times its font size ${item.fontSize} px`,
-        ordinalSeverity: 1,
-        tagName: item.tagName,
-        id: item.id,
-        location: {
-          doc: '',
-          type: '',
-          spec: ''
-        },
-        excerpt: item.text
-      });
-    });
-  }
-  // Otherwise, i.e. if itemization is not required:
-  else {
-    // Add a summary instance to the standard result.
-    standardInstances.push({
-      ruleID: 'lineHeight',
-      what: 'Text line heights are less than 1.5 times their font sizes',
-      ordinalSeverity: 1,
-      count: data.length,
-      tagName: '',
-      id: '',
-      location: {
-        doc: '',
-        type: '',
-        spec: ''
-      },
-      excerpt: ''
-    });
-    // Delete the itemization from the result.
-    data.length = 0;
   }
   return {
     data,
