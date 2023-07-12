@@ -3,49 +3,48 @@
   Derived from the bbc-a11y anchorsMustHaveHrefs test.
   This test reports failures to equip links with destinations.
 */
+
+// ########## IMPORTS
+
+// Module to get locator data.
+const {getLocatorData} = require('../procs/getLocatorData');
+
+// ########## FUNCTIONS
+
 exports.reporter = async (page, withItems) => {
-  // Identify the visible links without href attributes.
-  const badLinkData = await page.$$eval(
-    'a:not([href]):visible',
-    badLinks => {
-      // FUNCTION DEFINITION START
-      // Returns a space-minimized copy of a string.
-      const compact = string => string.replace(/[\t\n]/g, '').replace(/\s{2,}/g, ' ').trim();
-      // FUNCTION DEFINITION END
-      return badLinks.map(link => ({
-        id: link.id,
-        text: compact(link.textContent)
-      }));
-    }
-  );
-  const data = {
-    total: badLinkData.length
-  };
-  const totals = [0, 0, data.total, 0];
+  const data = {};
+  const totals = [0, 0, 0, 0];
   const standardInstances = [];
-  if (withItems) {
-    data.items = badLinkData;
-    data.items.forEach(item => {
+  // Get locators for the visible links without href attributes.
+  const locAll = page.locator('a:not([href]):visible');
+  const locs = await locAll.all();
+  // For each of them:
+  for (const loc of locs) {
+    // If itemization is required:
+    if (withItems) {
+      // Get data on the element.
+      const elData = await getLocatorData(loc);
+      // Add an instance to the result.
       standardInstances.push({
         ruleID: 'linkTo',
         what: 'Link has no href attribute',
         ordinalSeverity: 2,
         tagName: 'A',
-        id: item.id,
-        location: {
-          doc: '',
-          type: '',
-          spec: ''
-        },
-        excerpt: item.text
+        id: elData.id,
+        location: elData.location,
+        excerpt: elData.excerpt
       });
-    });
+    }
   }
-  else if (data.total) {
+  // Add to the totals.
+  totals[2] = locs.length;
+  // If itemization is not required:
+  if (! withItems) {
+    // Add a summary instance to the result.
     standardInstances.push({
       ruleID: 'linkTo',
       what: 'Links are missing href attributes',
-      count: data.total,
+      count: totals[2],
       ordinalSeverity: 2,
       tagName: 'A',
       id: '',
@@ -57,6 +56,7 @@ exports.reporter = async (page, withItems) => {
       excerpt: ''
     });
   }
+  // Return the result.
   return {
     data,
     totals,

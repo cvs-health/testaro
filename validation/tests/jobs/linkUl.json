@@ -45,7 +45,7 @@
       "type": "test",
       "which": "testaro",
       "what": "adjacent-link underlining",
-      "withItems": false,
+      "withItems": true,
       "expect": [
         [
           "standardResult.totals.1",
@@ -120,6 +120,21 @@
           "overline"
         ],
         [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "selector"
+        ],
+        [
+          "standardResult.instances.0.location.spec",
+          "=",
+          "#overline"
+        ],
+        [
           "standardResult.instances.0.excerpt",
           "i",
           "English"
@@ -133,6 +148,21 @@
           "standardResult.instances.5.tagName",
           "=",
           "A"
+        ],
+        [
+          "standardResult.instances.5.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.5.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.5.location.spec.y",
+          ">",
+          0
         ],
         [
           "standardResult.instances.5.excerpt",
