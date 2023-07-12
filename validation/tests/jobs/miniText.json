@@ -38,7 +38,7 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "font is smaller"
+          "a font size of 8 pixels"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
@@ -51,6 +51,21 @@
           "P"
         ],
         [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.0.location.spec.y",
+          ">",
+          0
+        ],
+        [
           "standardResult.instances.0.excerpt",
           "i",
           "in rem"
@@ -59,6 +74,11 @@
           "standardResult.instances.1.excerpt",
           "i",
           "in px"
+        ],
+        [
+          "standardResult.instances.1.what",
+          "i",
+          "a font size of 7 pixels"
         ],
         [
           "standardResult.instances.2.excerpt",
@@ -100,7 +120,7 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "have fonts smaller"
+          "have font sizes smaller"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
