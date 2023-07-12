@@ -4,67 +4,48 @@
   This test reports text contents that are shared by links with distinct destinations.
   Text contents are compared case-insensitively.
 */
+
+// ########## IMPORTS
+
+// Module to get locator data.
+const {getLocatorData} = require('../procs/getLocatorData');
+
+// ########## FUNCTIONS
+
 exports.reporter = async (page, withItems) => {
-  // Identify the visible links with destinations.
-  const badLinkTexts = await page.$$eval(
-    'a[href]:visible',
-    links => {
-      // FUNCTION DEFINITION START
-      // Returns a space-minimized copy of a string.
-      const compact = string => string.replace(/[\t\n]/g, ' ').replace(/\s{2,}/g, ' ').trim().toLowerCase();
-      // FUNCTION DEFINITION END
-      // Initialize the result.
-      const linkTexts = {};
-      links.forEach(link => {
-        const linkText = compact(link.textContent);
-        if (! linkTexts[linkText]) {
-          linkTexts[linkText] = [];
-        }
-        if (! linkTexts[linkText].includes(link.href)) {
-          linkTexts[linkText].push(link.href);
-        }
-      });
-      Object.keys(linkTexts).forEach(linkText => {
-        if (linkTexts[linkText].length < 2) {
-          delete linkTexts[linkText];
-        }
-      });
-      return linkTexts;
-    }
-  );
-  // Initialize the result and the standard result.
-  const data = {
-    total: Object.values(badLinkTexts).reduce((total, current) => total + current.length - 1, 0)
-  };
-  const totals = [0, 0, data.total, 0];
+  const data = {};
+  const totals = [0, 0, 0, 0];
   const standardInstances = [];
-  if (withItems) {
-    data.items = badLinkTexts;
-    Object.keys(badLinkTexts).forEach(badText => {
-      const textSpec = badText.length > 200
-        ? `${badText.slice(0, 100)} … ${badText.slice(-100)}`
-        : badText;
-      const destinationSpec = badLinkTexts[badText].join(', ');
-      standardInstances.push({
-        ruleID: 'linkAmb',
-        what: `Link text has multiple destinations: ${destinationSpec}`,
-        ordinalSeverity: 2,
-        tagName: 'A',
-        id: '',
-        location: {
-          doc: '',
-          type: '',
-          spec: ''
-        },
-        excerpt: textSpec
-      });
-    });
+  // Get locators for the visible links with destinations.
+  const locAll = page.locator('a[href]:visible');
+  const locsAll = await locAll.all();
+  // Get data on them.
+  const excerpts = new Set();
+  for (const loc of locsAll) {
+    const elData = await getLocatorData(loc);
+    if (excerpts.has(elData.excerpt.toLowerCase())) {
+      totals[2]++;
+      if (withItems) {
+        standardInstances.push({
+          ruleID: 'linkAmb',
+          what: 'Link has the same text as, but a different destination from, another',
+          ordinalSeverity: 2,
+          tagName: 'A',
+          id: elData.id,
+          location: elData.location,
+          excerpt: elData.excerpt
+        });
+      }
+    }
+    else {
+      excerpts.add(elData.excerpt.toLowerCase());
+    }
   }
-  else if (data.total) {
+  if (! withItems && totals[2]) {
     standardInstances.push({
       ruleID: 'linkAmb',
-      what: 'Link texts have multiple destinations',
-      count: data.total,
+      what: 'Links have the same texts but different destinations',
+      count: totals[2],
       ordinalSeverity: 2,
       tagName: 'A',
       id: '',

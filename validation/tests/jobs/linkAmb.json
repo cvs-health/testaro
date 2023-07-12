@@ -42,12 +42,7 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "text has multiple"
-        ],
-        [
-          "standardResult.instances.0.tagName",
-          "=",
-          "A"
+          "Link has the same text"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
@@ -55,9 +50,34 @@
           2
         ],
         [
+          "standardResult.instances.0.tagName",
+          "=",
+          "A"
+        ],
+        [
+          "standardResult.instances.0.id",
+          "=",
+          "basqueInfoICB"
+        ],
+        [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "selector"
+        ],
+        [
+          "standardResult.instances.0.location.spec",
+          "=",
+          "#basqueInfoICB"
+        ],
+        [
           "standardResult.instances.0.excerpt",
           "i",
-          "basque information"
+          "Basque information"
         ]
       ],
       "rules": [
@@ -98,7 +118,7 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "texts have multiple"
+          "Links have the same texts"
         ]
       ],
       "rules": [
