@@ -45,6 +45,11 @@
           "Link has"
         ],
         [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          0
+        ],
+        [
           "standardResult.instances.0.tagName",
           "=",
           "A"
@@ -55,9 +60,14 @@
           "basqueInfo"
         ],
         [
-          "standardResult.instances.0.ordinalSeverity",
+          "standardResult.instances.0.location.type",
           "=",
-          0
+          "selector"
+        ],
+        [
+          "standardResult.instances.0.location.spec",
+          "=",
+          "#basqueInfo"
         ],
         [
           "standardResult.instances.0.excerpt",
