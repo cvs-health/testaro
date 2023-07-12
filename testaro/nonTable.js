@@ -3,90 +3,91 @@
   Derived from the bbc-a11y useTablesForData test. Crude heuristics omitted.
   This test reports tables used for layout.
 */
+
+// ########## IMPORTS
+
+// Module to get locator data.
+const {getLocatorData} = require('../procs/getLocatorData');
+
+// ########## FUNCTIONS
+
 exports.reporter = async (page, withItems) => {
-  // Identify the tables used for layout.
-  const badTableTexts = await page.$$eval('table', tables => {
-    // Initialize an array of pseudotable texts.
-    const badTableTexts = [];
-    // FUNCTION DEFINITIONS START
-    // Returns a space-minimized copy of a string.
-    const compact = string => string.replace(/[\t\n]/g, '').replace(/\s{2,}/g, ' ').trim();
-    // Adds the first 100 characters of the code of a pseudotable to the array of pseudotable texts.
-    const addBad = table => {
-      badTableTexts.push({
-        id: table.id,
-        text: compact(table.outerHTML).slice(0, 100)
-      });
-    };
-    // FUNCTION DEFINITIONS END
-    // For each table on the page:
-    tables.forEach(table => {
-      // Ignore it if it has a grid or treegrid role, a caption, or a table-like element.
-      const role = table.getAttribute('role');
-      if (
-        table.caption
-        || ['grid', 'treegrid'].includes(role)
-        || table.querySelector('col, colgroup, tfoot, thead, th')
-      ) {
-        return;
+  // Initialize the result.
+  const data = {};
+  const totals = [0, 0, 0, 0];
+  const standardInstances = [];
+  // Get locators for the table elements.
+  const locAll = page.locator('table');
+  const locs = await locAll.all();
+  // For each of them:
+  for (const loc of locs) {
+    // Get whether the table is misused.
+    const isBad = await loc.evaluate(element => {
+      const role = element.getAttribute('role');
+      // If it contains another table:
+      if (element.querySelector('table')) {
+        // Return misuse.
+        return true;
       }
-      // Otherwise, if the table contains another table:
-      else if (table.querySelector('table')) {
-        // Treat it as a pseudotable.
-        addBad(table);
-        return;
-      }
-      // Otherwise, if the table has only 1 row or 1 column:
+      // Otherwise, if it has only 1 column or 1 row:
       else if (
-        table.querySelectorAll('tr').length === 1
+        element.querySelectorAll('tr').length === 1
         || Math.max(
           ... Array
-          .from(table.querySelectorAll('tr'))
-          .map(row => Array.from(row.querySelectorAll('td')).length)
+          .from(element.querySelectorAll('tr'))
+          .map(row => Array.from(row.querySelectorAll('th, td')).length)
         ) === 1
       ) {
-        // Treat it as a pseudotable.
-        addBad(table);
-        return;
+        // Return misuse.
+        return true;
       }
-      // Otherwise, if the table contains an object or player:
-      else if (table.querySelector('object, embed, applet, audio, video')) {
-        // Treat it as a pseudotable.
-        addBad(table);
-        return;
+      // Otherwise, if it contains an object or player:
+      else if (element.querySelector('object, embed, applet, audio, video')) {
+        // Return misuse.
+        return true;
+      }
+      // Otherwise, if it contains a table-compatible element:
+      else if (
+        element.caption
+        || ['grid', 'treegrid'].includes(role)
+        || element.querySelector('col, colgroup, tfoot, thead, th')
+      ) {
+        // Return validity.
+        return false;
+      }
+      // Otherwise:
+      else {
+        // Return misuse.
+        return true;
       }
     });
-    // Return the array of pseudotable text beginnings.
-    return badTableTexts;
-  });
-  // Return the result.
-  const data = {
-    total: badTableTexts.length
-  };
-  const standardInstances = [];
-  if (withItems) {
-    data.items = badTableTexts;
-    data.items.forEach(item => {
-      standardInstances.push({
-        ruleID: 'nonTable',
-        what: 'Table is misused to arrange content',
-        ordinalSeverity: 2,
-        tagName: 'TABLE',
-        id: item.id,
-        location: {
-          doc: '',
-          type: '',
-          spec: ''
-        },
-        excerpt: item.text
-      });
-    });
+    // If it is misused:
+    if (isBad) {
+      // Add to the totals.
+      totals[2]++;
+      // If itemization is required:
+      if (withItems) {
+        // Get data on the table.
+        const elData = await getLocatorData(loc);
+        // Add an instance to the result.
+        standardInstances.push({
+          ruleID: 'nonTable',
+          what: 'Table is misused to arrange content',
+          ordinalSeverity: 2,
+          tagName: 'TABLE',
+          id: elData.id,
+          location: elData.location,
+          excerpt: elData.excerpt
+        });
+      }
+    }
   }
-  else if (data.total) {
+  // If itemization is not required:
+  if (! withItems) {
     standardInstances.push({
       ruleID: 'nonTable',
       what: 'Tables are misused to arrange content',
-      count: data.total,
+      count: totals[2],
       ordinalSeverity: 2,
       tagName: 'TABLE',
       id: '',
@@ -100,7 +101,7 @@ exports.reporter = async (page, withItems) => {
   }
   return {
     data,
-    totals: [0, 0, data.total, 0],
+    totals,
     standardInstances
   };
 };

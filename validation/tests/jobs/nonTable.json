@@ -17,7 +17,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "tables used for layout",
       "withItems": true,
       "expect": [
         [
@@ -51,6 +50,21 @@
           "TABLE"
         ],
         [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.0.location.spec.height",
+          ">",
+          0
+        ],
+        [
           "standardResult.instances.0.excerpt",
           "i",
           "Given"
@@ -64,6 +78,21 @@
           "standardResult.instances.2.id",
           "=",
           "ring"
+        ],
+        [
+          "standardResult.instances.2.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.2.location.type",
+          "=",
+          "selector"
+        ],
+        [
+          "standardResult.instances.2.location.spec",
+          "=",
+          "#ring"
         ]
       ],
       "rules": [
