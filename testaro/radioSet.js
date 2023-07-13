@@ -4,134 +4,134 @@
   that two or more radio buttons with the same name, and no other radio buttons, be grouped in a
   'fieldset' element with a valid 'legend' element.
 */
-const fs = require('fs').promises;
-// Tabulates and lists radio buttons in and not in accessible field sets.
+
+// ########## IMPORTS
+
+// Module to get locator data.
+const {getLocatorData} = require('../procs/getLocatorData');
+
+// ########## FUNCTIONS
+
+const whats = {
+  nameLeak: 'shares a name with others outside its field set',
+  fsMixed: 'shares a field set with others having different names',
+  only1RB: 'is the only one with its name in its field set',
+  legendBad: 'is in a field set without a valid legend',
+  noFS: 'is not in a field set',
+  noName: 'has no name attribute'
+};
 exports.reporter = async (page, withItems) => {
-  // Initialize the argument array to be passed to the page function.
-  const args = [withItems];
-  // If itemization is required:
-  if (withItems) {
-    // Add the body of the textOf function as a string to the array.
-    const textOfBody = await fs.readFile(`${__dirname}/../procs/textOf.txt`, 'utf8');
-    args.push(textOfBody);
-  }
-  // Get the result data.
-  const dataJSHandle = await page.evaluateHandle(args => {
-    const withItems = args[0];
-    // FUNCTION DEFINITIONS START
-    /*
-      If itemization is required, define the textOf function to get element texts.
-      The function body is read as a string and passed to this method because
-      a string can be passed in but a function cannot.
-    */
-    const textOf = args[1] ? new Function('element', args[1]) : '';
-    // Trim excess spaces from a string.
-    const debloat = text => text.trim().replace(/\s+/g, ' ');
-    // FUNCTION DEFINITIONS END
-    // Initialize a report.
-    const data = {
-      totals: {
-        total: 0,
-        inSet: 0,
-        percent: 0
-      }
-    };
-    if (withItems) {
-      data.items = {
-        inSet: [],
-        notInSet: []
-      };
-    }
-    // Get an array of all fieldset elements.
-    const fieldsets = Array.from(document.body.querySelectorAll('fieldset'));
-    // Get an array of those with valid legends.
-    const legendSets = fieldsets.filter(fieldset => {
-      const firstChild = fieldset.firstElementChild;
-      return firstChild
-      && firstChild.tagName === 'LEGEND'
-      && debloat(firstChild.textContent).length;
-    });
-    // Get an array of the radio buttons in those with homogeneous radio buttons.
-    const setRadios = legendSets.reduce((radios, currentSet) => {
-      const currentRadios = Array.from(currentSet.querySelectorAll('input[type=radio]'));
-      const radioCount = currentRadios.length;
-      if (radioCount == 1) {
-        radios.push(currentRadios[0]);
-      }
-      else if (radioCount > 1) {
-        const radioName = currentRadios[0].name;
-        if (radioName && currentRadios.slice(1).every(radio => radio.name === radioName)) {
-          radios.push(...currentRadios);
+  // Initialize the result.
+  const data = {};
+  const totals = [0, 0, 0, 0];
+  const standardInstances = [];
+  // Get locators for all radio buttons.
+  const locAll = page.locator('input[type=radio]');
+  const locs = await locAll.all();
+  // For each of them:
+  for (const loc of locs) {
+    // Get whether and, if so, how it violates the rule.
+    const howBad = await loc.evaluate(element => {
+      // Get its name.
+      const elName = element.name;
+      // If it has one:
+      if (elName) {
+        // Identify the field set of the element.
+        const elFS = element.closest('fieldset');
+        // If it has one:
+        if (elFS) {
+          // Get the first child element of the field set.
+          const fsChild1 = elFS.firstElementChild;
+          // Get whether the child is a legend with text content.
+          const legendOK = fsChild1.tagName === 'LEGEND'
+          && fsChild1.textContent.replace(/\s/g, '').length;
+          // If it is:
+          if (legendOK) {
+            // Get the count of radio buttons with the same name in the field set.
+            const nameGroupSize = elFS
+            .querySelectorAll(`input[type=radio][name=${elName}]`)
+            .length;
+            // If the count is at least 2:
+            if (nameGroupSize > 1) {
+              // Get the count of radio buttons in the field set.
+              const groupSize = elFS.querySelectorAll('input[type=radio]').length;
+              // If it is the same:
+              if (groupSize === nameGroupSize) {
+                // Get the count of radio buttons with the same name in the document.
+                const nameDocSize = document
+                .querySelectorAll(`input[type=radio][name=${elName}]`)
+                .length;
+                // If none of them is outside the field set:
+                if (nameDocSize === nameGroupSize) {
+                  // Return rule conformance.
+                  return false;
+                }
+                else {
+                  return 'nameLeak';
+                }
+              }
+              else {
+                return 'fsMixed';
+              }
+            }
+            else {
+              return 'only1RB';
+            }
+          }
+          else {
+            return 'legendBad';
+          }
+        }
+        else {
+          return 'noFS';
         }
       }
-      return radios;
-    }, []);
-    if (setRadios) {
-      // Get an array of all radio buttons.
-      const allRadios = Array.from(document.body.querySelectorAll('input[type=radio'));
-      // Tabulate the results.
-      const totals = data.totals;
-      totals.total = allRadios.length;
-      totals.inSet = setRadios.length;
-      totals.percent = totals.total ? Math.floor(100 * totals.inSet / totals.total) : 'N.A.';
-      const loneRadios = totals.total - totals.inSet;
-      // If itemization is required:
-      const standardInstances = [];
-      if (withItems) {
-        // Add it to the results.
-        const nonSetRadios = allRadios.filter(radio => ! setRadios.includes(radio));
-        const items = data.items;
-        items.inSet = setRadios.map(radio => textOf(radio));
-        items.notInSet = nonSetRadios.map(radio => ({
-          id: radio.id,
-          text: textOf(radio)
-        }));
-        items.notInSet.forEach(item => {
-          standardInstances.push({
-            ruleID: 'radioSet',
-            what: 'Radio button and its peers are not in a fieldset with a legend',
-            ordinalSeverity: 2,
-            tagName: 'INPUT',
-            id: item.id,
-            location: {
-              doc: '',
-              type: '',
-              spec: ''
-            },
-            excerpt: item.text
-          });
-        });
+      else {
+        return 'noName';
       }
-      else if (loneRadios > 0) {
+    });
+    // If it violates the rule:
+    if (howBad) {
+      // Get data on it.
+      const elData = await getLocatorData(loc);
+      // Add to the totals.
+      totals[2]++;
+      // If itemization is required:
+      if (withItems) {
         standardInstances.push({
           ruleID: 'radioSet',
-          what: 'Radio buttons are not validly grouped in fieldsets with legends',
-          count: loneRadios,
+          what: `Radio button ${whats[howBad]}`,
           ordinalSeverity: 2,
           tagName: 'INPUT',
-          id: '',
-          location: {
-            doc: '',
-            type: '',
-            spec: ''
-          },
-          excerpt: ''
+          id: elData.id,
+          location: elData.location,
+          excerpt: elData.excerpt
         });
       }
-      return {
-        data,
-        totals: [0, 0, loneRadios, 0],
-        standardInstances
-      };
     }
-    else {
-      return {
-        data: {
-          prevented: true,
-          error: 'ERROR identifying homogeneous field sets'
-        }
-      };
-    }
-  }, args);
-  return await dataJSHandle.jsonValue();
+  }
+  // If itemization is not required:
+  if (! withItems) {
+    // Add a summary instance to the result.
+    standardInstances.push({
+      ruleID: 'radioSet',
+      what: 'Radio buttons are not validly grouped in fieldsets with legends',
+      count: totals[2],
+      ordinalSeverity: 2,
+      tagName: 'INPUT',
+      id: '',
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: ''
+    });
+  }
+  // Return the result.
+  return {
+    data,
+    totals,
+    standardInstances
+  };
 };

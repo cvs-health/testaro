@@ -50,7 +50,7 @@
         [
           "standardResult.totals.2",
           "=",
-          8
+          11
         ],
         [
           "standardResult.totals.3",
@@ -65,7 +65,7 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "and its peers"
+          "shares a field set"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
@@ -78,6 +78,21 @@
           "INPUT"
         ],
         [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.0.location.spec.width",
+          ">",
+          0
+        ],
+        [
           "standardResult.instances.0.excerpt",
           "=",
           "water"
@@ -88,9 +103,19 @@
           "radioSet"
         ],
         [
+          "standardResult.instances.5.what",
+          "i",
+          "without a valid legend"
+        ],
+        [
           "standardResult.instances.5.excerpt",
           "=",
           "apple"
+        ],
+        [
+          "standardResult.instances.6.what",
+          "i",
+          "not in a field set"
         ],
         [
           "standardResult.instances.6.ordinalSeverity",
@@ -101,6 +126,16 @@
           "standardResult.instances.6.excerpt",
           "=",
           "methane"
+        ],
+        [
+          "standardResult.instances.8.what",
+          "i",
+          "the only one with its name"
+        ],
+        [
+          "standardResult.instances.10.what",
+          "i",
+          "shares a name with others outside"
         ]
       ],
       "rules": [
@@ -117,7 +152,7 @@
         [
           "standardResult.totals.2",
           "=",
-          8
+          11
         ],
         [
           "standardResult.totals.1",
@@ -147,7 +182,7 @@
         [
           "standardResult.instances.0.count",
           "=",
-          8
+          11
         ]
       ],
       "rules": [
