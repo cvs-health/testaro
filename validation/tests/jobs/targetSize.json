@@ -37,7 +37,7 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "has a substandard size"
+          "is only"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
@@ -55,9 +55,29 @@
           "defaultbutton"
         ],
         [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "selector"
+        ],
+        [
+          "standardResult.instances.0.location.spec",
+          "=",
+          "#defaultbutton"
+        ],
+        [
           "standardResult.instances.0.excerpt",
           "i",
           "(too small)"
+        ],
+        [
+          "standardResult.instances.2.what",
+          "i",
+          "is only"
         ],
         [
           "standardResult.instances.2.tagName",
@@ -68,6 +88,11 @@
           "standardResult.instances.2.excerpt",
           "i",
           "small box"
+        ],
+        [
+          "standardResult.instances.2.location.spec.y",
+          ">",
+          0
         ],
         [
           "standardResult.instances.3.tagName",
