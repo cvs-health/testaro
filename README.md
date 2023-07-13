@@ -4,7 +4,7 @@ Ensemble testing for web accessibility
 
 ## Introduction
 
-Testaro is a collection of web accessibility testing tools.
+Testaro is an application for automated web accessibility testing.
 
 The purposes of Testaro are to:
 - provide programmatic access to accessibility tests defined by several tools
@@ -25,7 +25,7 @@ Other software, located on any server or on the same workstation, can make use o
 - Monitoring of the health of Testaro
 - Management of clusters of workstations sharing workloads
 - Allocation of responsibilities among workstations
-- Receiving and fulfilling requests from users for jobs
+- Receiving and fulfilling user requests for jobs
 - Allocating testing responsibilities to human testers
 - Combining reports from workstations and human testers
 - Analyzing and summarizing (e.g., computing scores on the basis of) test results
@@ -53,6 +53,8 @@ Testaro performs tests of these tools:
 - [WAVE API](https://wave.webaim.org/api/) (WebAIM)
 
 The [BBC Accessibility Standards Checker](https://github.com/bbc/bbc-a11y) is not a formal dependency, but some of the tests in the Testaro tool are adaptations of tests of that tool.
+
+Level Access has acquired Tenon and has announced that it will retire Tenon in August 2023. Thereafter one should expect that Testaro will report failures to perform Tenon tests. In anticipation of the retirement of Tenon, tests have been added to Testaro that approximate those Tenon tests that, empirically, have been found to report issues not reported by other tools.
 
 ## Rules
 
@@ -181,9 +183,9 @@ Job properties:
 
 #### Introduction
 
-While each tool produces a _tool report_ of the results of its tests, Testaro also produces a _job report_, combining all of the tool reports of a job.
-- Tools append their reports to their acts in a job. For example, if one act in a job specifies some Continuum tests to be run, Continuum appends its report to that act. In that way, the act now describes not only the Continuum tests that were run, but also the results of those tests. Testaro does some pruning of tool reports, removing content that is judged unlikely to be useful. You can examine and modify the pruning algorithms in the modules located in the `tests` directory.
-- Testaro further elaborates a job by reporting comprehensive results in a job report. Testaro can add more facts to each of the tool reports and also adds whole-job facts, in a `jobData` property, to the job.
+Each tool produces a _tool report_ of the results of its tests. Testaro prunes the tool reports for brevity, removing content that is judged unlikely to be useful. Testaro then appends each tool report to the test act that invoked the tool.
+
+Testaro also generates some data about the job and adds those data to the job, in a `jobData` property.
 
 #### Formats
 
@@ -197,7 +199,7 @@ Testaro helps overcome this format diversity by offering to represent the main f
 
 In the conceptual scheme underlying the format standardization of Testaro, each tool has its own set of _rules_, where a rule is an algorithm for evaluating a target and determining whether instances of some kind of problem exist in it. With standardization, Testaro reports, in a uniform way, the outcomes from the application of rules by tools to a target.
 
-If the `STANDARD` environment variable has the value `also` (which it has by default) or `only`, Testaro converts some data in each tool report to a standard format. That permits you to ignore the format idiosyncrasies of the tools. If `STANDARD` has the value `also`, the job report includes both formats. If the value is `only`, the job report includes only the standard format. If the value is `no`, the job report includes only the original format of each tool report.
+If the `STANDARD` environment variable has the value `also` (which it has by default) or `only`, Testaro converts some data in each tool report to the standard format. That permits you to ignore the format idiosyncrasies of the tools. If `STANDARD` has the value `also`, the job report includes both formats. If the value is `only`, the job report includes only the standard format. If the value is `no`, the job report includes only the original format of each tool report.
 
 The standard format of each tool report has these properties:
 - `prevented`: `true` if the tool failed to run on the page, or otherwise omitted.
@@ -211,7 +213,7 @@ The standard format of each tool report has these properties:
     - `id`: value of the `id` property of that element
     - `location`: an object with three properties:
         - `doc`: whether the source (`source`) or the browser rendition (`dom`) was tested
-        - `type`: the type of location information provided by the tool (`line`, `selector`, or `xpath`)
+        - `type`: the type of location information provided by the tool (`line`, `selector`, `xpath`, or `box`)
         - `spec`: the location information
     - `excerpt`: some or all of the code
 
@@ -229,8 +231,13 @@ standardResult: {
       id: '',
       location: {
         doc: 'dom',
-        type: 'line',
-        spec: 32
+        type: 'box',
+        spec: {
+          x: 12,
+          y: 340,
+          width: 46,
+          height: 50
+        }
       },
       excerpt: '<button type="link"></button>'
     },
@@ -265,15 +272,15 @@ standardResult: {
 }
 ```
 
-If a tool has the option to be used without itemization and is being so used, the `instances` array may be empty.
+If a tool has the option to be used without itemization and is being so used, the `instances` array may be empty, or, as shown above, may contain one or more summary instances. Summary instances disclose the numbers of instances that they summarize with a `count` property.
 
 This standard format reflects some judgments. For example:
-- The `ordinalSeverity` property of an instance may have required interpretation. Tools may report severity, certainty, both, or neither; they may classify severity or certainty ordinally or metrically; and, if they classify ordinally, their scales may have more or fewer than 4 ranks. Testaro coerces each tool’s severity and/or certainty classification into a 4-rank ordinal classification. This classification is deemed to express the most common pattern among the tools.
+- The `ordinalSeverity` property of an instance may have required interpretation. Tools may report severity, certainty, priority, or some combination of those. They may use ordinal or metric quantifications. If they quantify ordinally, their scales may have more or fewer than 4 ranks. Testaro coerces each tool’s severity, certainty, and/or priority classification into a 4-rank ordinal classification. This classification is deemed to express the most common pattern among the tools.
 - The `tagName` property of an instance may not always be obvious, because in some cases the rule being tested for requires a relationship among more than one element (e.g., “An X element may not have a Y element as its parent”).
 
 You are not dependent on the judgments incorporated into the standard format, because Testaro can give you the original reports from the tools.
 
-The standard format does not express opinions issue classifications. A rule ID identifies something deemed to be an issue by a tool. Useful reporting from multi-tool testing still requires the classification of tool **rules** into **issues**. If tool `A` has `alt-incomplete` as a rule ID and tool `B` has `image_alt_stub` as a rule ID, Testaro does not decide whether those are really the same issue or different issues. That decision belongs to you. The standardization of tool reports by Testaro eliminates some of the drudgery in issue classification, but not any of the judgment required for issue classification.
+The standard format does not express opinions on issue classification. A rule ID identifies something deemed to be an issue by a tool. Useful reporting from multi-tool testing still requires the classification of tool **rules** into **issues**. If tool `A` has `alt-incomplete` as a rule ID and tool `B` has `image_alt_stub` as a rule ID, Testaro does not decide whether those are really the same issue or different issues. That decision belongs to you. The standardization of tool reports by Testaro eliminates some of the drudgery in issue classification, but not any of the judgment required for issue classification.
 
 ### Acts
 
@@ -293,7 +300,7 @@ The subsequent acts can tell Testaro to perform any of:
 - _moves_ (clicks, text inputs, hovers, etc.)
 - _navigations_ (browser launches, visits to URLs, waits for page conditions, etc.)
 - _alterations_ (changes to the page)
-- _tests_ (whether in dependency tools or defined within Testaro)
+- _tests_ (one or more of the tests defined by a tool)
 - _branching_ (continuing from an act other than the next one)
 
 ##### Moves
@@ -356,12 +363,12 @@ This act causes Testaro to alter the `display` and `visibility` style properties
 
 An act of type `test` performs the tests of a tool and reports a result. The result may indicate that a page passes or fails requirements. Typically, accessibility tests report successes and failures. But a test in Testaro is defined less restrictively, so it can report any result. As one example, the Testaro `elements` test reports facts about certain elements on a page, without asserting that those facts are successes or failures.
 
-The `which` property of a `test` act identifies a tool, such as `alfa`.
+The `which` property of a `test` act identifies a tool, such as `alfa` or `testaro`.
 
 ###### Configuration
 
-Every test in Testaro must have:
-- a property in the `tests` object defined in the `run.js` file, where the property name is the name of the test and the value is a description of the test
+Every tool invoked by Testaro must have:
+- a property in the `tests` object defined in the `run.js` file, where the property name is the code representing the tool and the value is the name of the tool
 - a `.js` file, defining the operation of the tool, in the `tests` directory, whose name base is the name of the tool
 
 The `actSpecs.js` file (described in detail below) contains a specification for any `test` act, namely:
@@ -398,7 +405,7 @@ An example of a `test` act is:
 }
 ```
 
-Most tools allow you to decide which of their _rules_ to apply. In effect, this means deciding which of their tests to run, since each test is considered a test of some rule. The act example given above,
+Most tools allow you to decide which of their rules to apply. In effect, this means deciding which of their tests to run, since each test is considered a test of some rule. The act example given above,
 
 ```javaScript
 {
@@ -409,7 +416,7 @@ Most tools allow you to decide which of their _rules_ to apply. In effect, this 
 }
 ```
 
-specifies that the tests for rules `r25` and `r71` of the `alfa` tool are to be run. If the `'y'` in the `rules` array were e`'n'` instead, the act would specify that all the tests of the `alfa` tool **except** those for rules `r25` and `r71` are to be run.
+specifies that the tests for rules `r25` and `r71` of the `alfa` tool are to be run. If the `'y'` in the `rules` array were `'n'` instead, the act would specify that all the tests of the `alfa` tool **except** those for rules `r25` and `r71` are to be run.
 
 One of the tools that allows rule selection, Testaro, has some rules that take additional arguments. As prescribed in `actSpecs.js`, you can pass such additional arguments to the `reporter` functions of those Testaro tests with an `args` property. Example:
 
@@ -426,7 +433,7 @@ One of the tools that allows rule selection, Testaro, has some rules that take a
 }
 ```
 
-This act specifies that the Testaro tests `hover` is to be run with the additional argument `20`, and `focInd` with the additional arguments `false` and `300`.
+This act specifies that the Testaro test `hover` is to be run with the additional argument `20`, and `focInd` is to be run with the additional arguments `false` and `300`.
 
 ###### Expectations
 
@@ -436,22 +443,14 @@ For example, a `test` act might have this `expect` property:
 
 ```javaScript
 'expect': [
-  ['total.links', '=', 5],
-  ['total.links.underlined', '<', 6],
-  ['total.links.outlined'],
-  ['docLang', '!', 'es-ES'],
-  ['items.3.tagName', '=', 'BUTTON']
+  ['standardResult.totals.0', '=', 0],
+  ['standardResult.instances.length', '=', 0]
 ]
 ```
 
-That would state the expectations that the `result` property of the act will have:
-- a `total.links` property with the value 5
-- a `total.links.underlined` property with a value less than 6
-- **no** `total.links.outlined` property
-- a `docLang` property with a value different from `es-ES`
-- an `items[3].tagName` property with the value `'BUTTON'`
+That would state the expectations that the `standardResult` property of the act will report no rule violations at severity level 0 and no instances of rule violations.
 
-The first item in each array is an identifier of a property within the `result` object. The item has the format of a string with `.` delimiters. Each `.`-delimited segment its the name of the next property in the hierarchy. If the current object is an array, the next segment must be a non-negative integer, representing the index of an element of the array.
+The first item in each array is an identifier of a property of the act. The item has the format of a string with `.` delimiters. Each `.`-delimited segment its the name of the next property in the hierarchy. If the current object is an array, the next segment must be a non-negative integer, representing the index of an element of the array.
 
 If there is only 1 item in an array, it states the expectation that the specified property does not exist. Otherwise, there are 3 items in the array.
 
@@ -590,7 +589,7 @@ If you do not specify rules when using the `testaro` tool, Testaro will test for
 
 The `rules` property for `testaro` is an array whose first item is either `'y'` or `'n'` and whose remaining items are rule IDs. If `'y'`, then only the specified rules’ tests are performed. If `'n'`, then all the evaluative tests are performed, except for the specified rules.
 
-It has been found that the `motion` test of the `testaro` tool measures motion only when the `webkit` browser type is in use. If you want to use `testaro` with different browser types for different tests, you can include 2 or 3 `testaro` test acts in your job, specifying different browser types and different rules.
+It has been found that the `focOp` and `motion` tests of the `testaro` tool work properly only when the `webkit` browser type is in use. If you want to use `testaro` with different browser types for different tests, you can include 2 or 3 `testaro` test acts in your job, specifying different browser types and different rules.
 
 The `testaro` tool (like the `ibm` tool) has a `withItems` property. If you set it to `false`, the `standardResult` object of `testaro` will contain an `instances` property with summaries that identify issues and instance counts. If you set it to `true`, some of the instances will be itemized.
 
