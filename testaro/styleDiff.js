@@ -8,9 +8,10 @@
 exports.reporter = async (page, withItems) => {
   // Get an object with arrays of list links and adjacent links as properties.
   const linkTypes = await require('../procs/linksByType').linksByType(page);
-  return await page.$eval('body', (body, args) => {
+  return await page.evaluate(args => {
     const linkTypes = args[0];
     const withItems = args[1];
+    const {body} = document;
     // Identify the settable style properties to be compared for all tag names.
     const mainStyles = [
       'fontStyle',

@@ -11,7 +11,7 @@
     https://www.w3.org/TR/html-aria/
     https://www.w3.org/TR/wai-aria/#roles_categorization
 */
-exports.reporter = async page => await page.$eval('body', body => {
+exports.reporter = async page => await page.evaluate(() => {
 
   // CONSTANTS
 
@@ -359,20 +359,21 @@ exports.reporter = async page => await page.$eval('body', body => {
   };
   // Array of th and td elements with redundant roles.
   const redundantCells = [];
+  const {body} = document;
   // Elements with role attributes.
   const roleElements = Array.from(body.querySelectorAll('[role]'));
   // th and td elements with redundant roles.
   const gridHeaders = Array.from(
-    document.body.querySelectorAll('table[role=grid] th, table[role=treegrid] th')
+    body.querySelectorAll('table[role=grid] th, table[role=treegrid] th')
   );
   const gridCells = Array.from(
-    document.body.querySelectorAll('table[role=grid] td, table[role=treegrid] td')
+    body.querySelectorAll('table[role=grid] td, table[role=treegrid] td')
   );
   const tableHeaders = Array.from(
-    document.body.querySelectorAll('table[role=table] th, table:not([role]) th')
+    body.querySelectorAll('table[role=table] th, table:not([role]) th')
   );
   const tableCells = Array.from(
-    document.body.querySelectorAll('table[role=table] td, table:not([role]) td')
+    body.querySelectorAll('table[role=table] td, table:not([role]) td')
   );
   // Initialized result.
   const data = {
