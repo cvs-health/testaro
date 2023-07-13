@@ -3,53 +3,51 @@
   Derived from the bbc-a11y titleAttributesOnlyOnInputs test.
   This test reports title attributes on inappropriate elements.
 */
+
+// ########## IMPORTS
+
+// Module to get locator data.
+const {getLocatorData} = require('../procs/getLocatorData');
+
+// ########## FUNCTIONS
+
 exports.reporter = async (page, withItems) => {
-  // Identify the inappropriate elements with title attributes.
-  const badTitleElements = await page.$$eval(
-    '[title]:not(input, button, textarea, select, iframe):visible',
-    badTitleElements => {
-      // FUNCTION DEFINITION START
-      // Returns a space-minimized copy of a string.
-      const compact = string => string
-        ? string.replace(/[\t\n]/g, '').replace(/\s{2,}/g, ' ').trim()
-        : '';
-      // FUNCTION DEFINITION END
-      return badTitleElements.map(element => ({
-        tagName: element.tagName,
-        id: element.id,
-        text: compact(element.textContent),
-        title: compact(element.title)
-      }));
-    }
-  );
-  const data = {
-    total: badTitleElements.length
-  };
+  // Initialize the result.
+  const data = {};
   const standardInstances = [];
-  if (withItems) {
-    data.items = badTitleElements;
-    badTitleElements.forEach(element => {
+  // Get locators for inappropriate elements with title attributes.
+  const locAll = page.locator('[title]:not(input, button, textarea, select, iframe):visible');
+  const locs = await locAll.all();
+  // For each of them:
+  for (const loc of locs) {
+    // If itemization is required:
+    if (withItems) {
+      // Get data on the element.
+      const elData = await getLocatorData(loc);
+      const rawTitle = await loc.getAttribute('title');
+      const title = rawTitle.replace(/\s+/g, ' ').slice(0, 50);
+      // Add an instance to the result.
       standardInstances.push({
         ruleID: 'titledEl',
-        what: 'Ineligible element has a title attribute',
+        what: `Ineligible element has a title (${title})`,
         ordinalSeverity: 2,
-        tagName: element.tagName,
-        id: element.id,
-        location: {
-          doc: '',
-          type: '',
-          spec: ''
-        },
-        excerpt: `${element.tagName} (${element.text}): ${element.title}`
+        tagName: elData.tagName,
+        id: elData.id,
+        location: elData.location,
+        excerpt: elData.excerpt
       });
-    });
+    }
   }
-  else if (data.total) {
+  // Define the totals.
+  const totals = [0, 0, locs.length, 0];
+  // If itemization is not required:
+  if (! withItems) {
+    // Add a summary instance to the result.
     standardInstances.push({
       ruleID: 'titledEl',
       what: 'Ineligible elements have title attributes',
       ordinalSeverity: 2,
-      count: data.total,
+      count: totals[2],
       tagName: '',
       id: '',
       location: {
@@ -62,7 +60,7 @@ exports.reporter = async (page, withItems) => {
   }
   return {
     data,
-    totals: [0, 0, data.total, 0],
+    totals,
     standardInstances
   };
 };

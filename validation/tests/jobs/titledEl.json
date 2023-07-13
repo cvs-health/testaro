@@ -43,7 +43,7 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "element has"
+          "element has a title (invalid title)"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
@@ -54,6 +54,21 @@
           "standardResult.instances.0.tagName",
           "=",
           "P"
+        ],
+        [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.0.location.spec.y",
+          ">",
+          0
         ],
         [
           "standardResult.instances.0.excerpt",
