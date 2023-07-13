@@ -55,6 +55,21 @@
           "bad"
         ],
         [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "selector"
+        ],
+        [
+          "standardResult.instances.0.location.spec",
+          "=",
+          "#bad"
+        ],
+        [
           "standardResult.instances.0.excerpt",
           "i",
           "Shame"

@@ -4,92 +4,80 @@
   This test reports 2 or more sequential br elements. They may be inferior substitutes for a
   p element.
 */
-// Runs the test and returns the results.
+
+// ########## IMPORTS
+
+// Module to get locator data.
+const {getLocatorData} = require('../procs/getLocatorData');
+
+// ########## FUNCTIONS
+
 exports.reporter = async (page, withItems) => {
-  // Identify the elements containing 2 or more consecutive br elements.
-  const data = await page.$$eval('br + br', br2s => {
-    // Returns a space-minimized copy of a string.
-    const compact = string => string
-    .replace(/[\t\n]/g, ' ')
-    .replace(/\s{2,}/g, ' ')
-    .trim()
-    .slice(0, 100);
-    // Initialize a set of the parent elements of successive br elements.
-    const dataSet = new Set([]);
-    // For each br element with an immediately preceding br sibling:
-    br2s.forEach(br2 => {
-      // If no non-spacing text precedes it:
-      const priorSib = br2.previousSibling;
-      const priorSibValue = priorSib.nodeValue;
-      let areAdjacent = false;
-      if (typeof priorSibValue === 'string') {
-        areAdjacent = ! compact(priorSibValue);
+  // Initialize the result.
+  const data = {};
+  const totals = [0, 0, 0, 0];
+  const standardInstances = [];
+  // Get locators for body elements with br descendants.
+  const locAll = page.locator('body *', {has: page.locator('br')});
+  const locs = await locAll.all();
+  // For each of them:
+  for (const loc of locs) {
+    // Get whether it contains adjacent br children without intervening nonspacing text.
+    const hasBrBr = await loc.evaluate(element => {
+      const has2Br = element.querySelector('br + br');
+      if (has2Br) {
+        const childNodes = Array.from(element.childNodes);
+        const nsChildNodes = childNodes.filter(
+          node => node.nodeType !== Node.TEXT_NODE || node.nodeValue.replace(/\s/g, '').length
+        );
+        return nsChildNodes.some(
+          (node, index) => node.nodeName === 'BR' && nsChildNodes[index + 1].nodeName === 'BR'
+        );
       }
       else {
-        areAdjacent = true;
-      }
-      if (areAdjacent) {
-        // Add its parent to the data.
-        const parent = br2.parentElement;
-        dataSet.add(parent);
+        return false;
       }
     });
-    // Initialize data on the parents.
-    const data = [];
-    dataSet.forEach(parent => {
-      data.push({
-        tagName: parent.tagName,
-        id: parent.id || '',
-        text: compact(parent.textContent)
-      });
-    });
-    return data;
-  });
-  // Initialize the standard result.
-  const totals = [data.length, 0, 0, 0];
-  // If there are any instances:
-  const standardInstances = [];
-  if (data.length) {
-    // If itemization is required:
-    if (withItems) {
-      // Add the instances to the standard result.
-      data.forEach(item => {
+    // If so:
+    if (hasBrBr) {
+      // Add to the totals.
+      totals[0]++;
+      // If itemization is required:
+      if (withItems) {
+        // Get data on the element.
+        const elData = await getLocatorData(loc);
+        // Add an instance to the result.
         standardInstances.push({
           ruleID: 'pseudoP',
           what: 'Element contains 2 or more adjacent br elements that may be nonsemantic substitute for a p element',
           ordinalSeverity: 0,
-          tagName: item.tagName.toUpperCase(),
-          id: item.id,
-          location: {
-            doc: '',
-            type: '',
-            spec: ''
-          },
-          excerpt: item.text.slice(0, 200)
+          tagName: elData.tagName,
+          id: elData.id,
+          location: elData.location,
+          excerpt: elData.excerpt
         });
-      });
-    }
-    // Otherwise, i.e. if itemization is not required:
-    else {
-      // Add a summary instance to the standard result.
-      standardInstances.push({
-        ruleID: 'pseudoP',
-        what: 'Elements contain 2 or more adjacent br elements that may be nonsemantic substitutes for p elements',
-        ordinalSeverity: 0,
-        count: data.length,
-        tagName: '',
-        id: '',
-        location: {
-          doc: '',
-          type: '',
-          spec: ''
-        },
-        excerpt: ''
-      });
-      data.length = 0;
+      }
     }
   }
-  // Return the result and the standard result.
+  // If itemization is not required:
+  if (! withItems) {
+    // Add a summary instance to the result.
+    standardInstances.push({
+      ruleID: 'pseudoP',
+      what: 'Elements contain 2 or more adjacent br elements that may be nonsemantic substitutes for p elements',
+      ordinalSeverity: 0,
+      count: totals[0],
+      tagName: '',
+      id: '',
+      location: {
+        doc: '',
+        type: '',
+        spec: ''
+      },
+      excerpt: ''
+    });
+  }
+  // Return the result.
   return {
     data,
     totals,
