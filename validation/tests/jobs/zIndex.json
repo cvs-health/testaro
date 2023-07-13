@@ -69,8 +69,8 @@
         ],
         [
           "standardResult.instances.0.what",
-          "=",
-          "Element has"
+          "i",
+          "non-default Z index (1)"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
@@ -83,12 +83,17 @@
           "BUTTON"
         ],
         [
+          "standardResult.instances.0.location.spec.x",
+          ">",
+          0
+        ],
+        [
           "standardResult.instances.0.excerpt",
           "i",
           "Button 0"
         ],
         [
-          "standardResult.instances.0.excerpt",
+          "standardResult.instances.1.excerpt",
           "i",
           "Button 1"
         ]
@@ -121,7 +126,7 @@
         ],
         [
           "standardResult.instances.0.what",
-          "=",
+          "i",
           "Elements have"
         ],
         [

@@ -7,70 +7,57 @@
   Tests for visibility of focus, for example, may fail if incapable of detecting that a focused
   element is covered by another element.
 */
+
+// ########## IMPORTS
+
+// Module to get locator data.
+const {getLocatorData} = require('../procs/getLocatorData');
+
+// ########## FUNCTIONS
+
 exports.reporter = async (page, withItems) => {
-  // Get data on the elements with non-auto z indexes.
-  const data = await page.$$eval('body *', (elements, withItems) => {
-    // Initialize the data.
-    const data = {
-      totals: {
-        total: 0,
-        tagNames: {}
-      }
-    };
-    if (withItems) {
-      data.items = [];
-    }
-    const addElementFacts = element => {
-      const tagName = element.tagName;
-      const tagNames = data.totals.tagNames;
-      if (tagNames[tagName]) {
-        tagNames[tagName]++;
-      }
-      else {
-        tagNames[tagName] = 1;
-      }
+  // Initialize the result.
+  const data = {};
+  const totals = [0, 0, 0, 0];
+  const standardInstances = [];
+  // Get locators for all eligible elements.
+  const locAll = page.locator('body *');
+  const locsAll = await locAll.all();
+  // For each of them:
+  for (const loc of locsAll) {
+    // Get its Z index.
+    const zIndex = await loc.evaluate(element => {
+      const styleDec = window.getComputedStyle(element);
+      return styleDec.zIndex;
+    });
+    // If it is not auto:
+    if (zIndex !== 'auto') {
+      // Add to the totals.
+      totals[0]++;
+      // If itemization is required:
       if (withItems) {
-        data.items.push({
-          tagName,
-          id: element.id || '',
-          text:
-          (element.textContent.trim() || element.outerHTML.trim())
-          .replace(/\s+/g, ' ')
-          .slice(0, 100)
+        // Get data on the element.
+        const elData = await getLocatorData(loc);
+        // Add an instance to the result.
+        standardInstances.push({
+          ruleID: 'zIndex',
+          what: `Element has a non-default Z index (${zIndex})`,
+          ordinalSeverity: 0,
+          tagName: elData.tagName,
+          id: elData.id,
+          location: elData.location,
+          excerpt: elData.excerpt
         });
       }
-    };
-    elements.forEach(element => {
-      if (window.getComputedStyle(element)['z-index'] !== 'auto') {
-        data.totals.total++;
-        addElementFacts(element);
-      }
-    });
-    return data;
-  }, withItems);
-  const standardInstances = [];
-  if (data.items) {
-    data.items.forEach(item => {
-      standardInstances.push({
-        ruleID: 'zIndex',
-        what: 'Element has a non-default Z index',
-        ordinalSeverity: 0,
-        tagName: item.tagName,
-        id: item.id,
-        location: {
-          doc: '',
-          type: '',
-          spec: ''
-        },
-        excerpt: item.text
-      });
-    });
+    }
   }
-  else if (data.totals.total) {
+  // If itemization is not required:
+  if (! withItems) {
+    // Add a summary instance to the result.
     standardInstances.push({
       ruleID: 'zIndex',
       what: 'Elements have non-default Z indexes',
-      count: data.totals.total,
+      count: totals[0],
       ordinalSeverity: 0,
       tagName: '',
       id: '',
@@ -84,7 +71,7 @@ exports.reporter = async (page, withItems) => {
   }
   return {
     data,
-    totals: [data.totals.total, 0, 0, 0],
+    totals,
     standardInstances
   };
 };
