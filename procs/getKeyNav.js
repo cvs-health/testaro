@@ -1,37 +1,40 @@
 /*
-  Returns the result of a key press when an element has focus. If the focus did not change, returns
-  an empty object. If the focus changed, returns an object containing data on the newly focused
-  element.
+  Returns the index of the newly focused member of a group of elements defined by a locator after
+  a member of the group is focused and a key is pressed, or, if the newly focused element is not
+  in the group, data on the newly focused element.
 */
 
-exports.getKeyNav = async (loc, key) => {
-  // Focus the element and press the key.
-  await loc.press(key);
-  // Get data on the newly focused element.
-  const focData = await loc.evaluate(oldFoc => {
-    const newFoc = document.activeElement;
-    // If it is unchanged:
-    if (newFoc === oldFoc) {
-      // Return this.
-      return {};
+exports.getKeyNav = async (groupLoc, startIndex, key) => {
+  // Click the element and press the key.
+  const locs = await groupLoc.all();
+  const startLoc = locs[startIndex];
+  await startLoc.click();
+  await startLoc.page.keyboard.press(key);
+  // Get the newly focused element.
+  const newFocusData = groupLoc.evaluateAll(elements => {
+    const allEls = Array.from(document.body.querySelectorAll('*'));
+    const groupIndexRange = [elements[0], elements.slice(-1)]
+    .map(groupEl => allEls.findIndex(groupEl));
+    const newFocusElement = document.activeElement;
+    const newFocusIndex = elements.findIndex(newFocusElement);
+    if (newFocusIndex > -1) {
+      return newFocusIndex;
     }
-    // Otherwise, i.e. if it is changed:
     else {
-      // Get more data on it.
-      const allEls = Array.from(document.body.querySelectorAll('*'));
-      const index = allEls.findIndex(newFoc);
-      const {tagName} = newFoc;
+      const index = allEls.findIndex(newFocusElement);
+      const {tagName} = newFocusElement;
       const attributes = {};
-      for (const attr of newFoc.attributes) {
+      for (const attr of newFocusElement.attributes) {
         attributes[attr.name] = attr.value;
       }
       return {
+        groupIndexRange,
         index,
         tagName,
         attributes
       };
     }
-  }, key);
+  });
   // Return the result.
-  return focData;
+  return newFocusData;
 };
