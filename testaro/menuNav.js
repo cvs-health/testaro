@@ -15,36 +15,6 @@ const {getLocatorData} = require('../procs/getLocatorData');
 
 // ########## FUNCTIONS
 
-// Returns an adjacent index, with wrapping.
-const wrap = (groupSize, startIndex, increment) => {
-  let newIndex = startIndex + increment;
-  if (newIndex < 0) {
-    newIndex = groupSize - 1;
-  }
-  else if (newIndex > groupSize - 1) {
-    newIndex = 0;
-  }
-  return newIndex;
-};
-// Returns the index of the menu item that is focused or pseudofocused.
-const getFocus = async groupLoc => {
-  const focus = await groupLoc.evaluateAll(elements => {
-    const focEl = document.activeElement;
-    console.log(`Active element: ${focEl ? focEl.tagName + '/' + focEl.id : 'NONE'}`);
-    let focus = elements.indexOf(focEl);
-    const focID = focEl.getAttribute('aria-activedescendant');
-    if (focID) {
-      console.log(`Effectively focused element ID: ${focID}`);
-      const elIDs = elements.map(element => element.id);
-      const pseudoFocus = elIDs.indexOf(focID);
-      if (pseudoFocus) {
-        focus = pseudoFocus;
-      }
-    }
-    return focus;
-  });
-  return focus;
-};
 exports.reporter = async (page, withItems) => {
   // Initialize the result.
   const data = {};
@@ -61,10 +31,23 @@ exports.reporter = async (page, withItems) => {
   }
   // Get the keys nonstandardly responded to by all menu items.
   const badKeyArrays = await locsAll.evaluate(menuItems => {
-    // FUNCTION DEFINITION START
+    // FUNCTION DEFINITIONS START
+    // Returns an adjacent index, with wrapping.
+    const wrap = (groupSize, startIndex, increment) => {
+      let newIndex = startIndex + increment;
+      if (newIndex < 0) {
+        newIndex = groupSize - 1;
+      }
+      else if (newIndex > groupSize - 1) {
+        newIndex = 0;
+      }
+      return newIndex;
+    };
     // Returns whether a menu item standardly responds to a key.
-    const test = async (key, menuItems, index, peerIndexes) => {
+    const test = async (key, allData, index, peerIndexes) => {
       // Get data on the menu item.
+      const peerIndex = peerIndexes.indexOf(index);
+      const peerCount = peerIndexes.length;
       const {menuItem, menu} = allData[index];
       const hasPopupVal = await menuItem.getAttribute('aria-haspopup');
       const hasPopup = ['menu', true].includes(hasPopupVal);
@@ -79,50 +62,70 @@ exports.reporter = async (page, withItems) => {
       menuItem.dispatchEvent(keydown);
       const keyup = new KeyboardEvent('keyup', {key});
       menuItem.dispatchEvent(keyup);
-      document.
+      // Identify the expected peer index of the resulting focus.
+      let okPeerIndex;
       if (key === 'Home') {
-        return 0;
+        okPeerIndex = 0;
       }
       else if (key === 'End') {
-        return groupLocs.length - 1;
+        okPeerIndex = peerCount - 1;
       }
       else if (key === 'Tab') {
-        return -1;
+        okPeerIndex = -1;
       }
-      else if (isHorizontal) {
+      else if (orientation === 'horizontal') {
         if (key === 'ArrowLeft') {
-          return wrap(groupLocs.length, startIndex, -1);
+          okPeerIndex = wrap(peerCount, peerIndex, -1);
         }
         else if (key === 'ArrowRight') {
-          return wrap(groupLocs.length, startIndex, 1);
+          okPeerIndex = wrap(peerCount, peerIndex, 1);
         }
         else if (['ArrowUp', 'ArrowDown'].includes(key)) {
-          return hasPopup ? -1 : startIndex;
+          okPeerIndex = hasPopup ? -1 : peerIndex;
         }
         else {
-          return startIndex;
+          okPeerIndex = peerIndex;
         }
       }
       else {
         if (key === 'ArrowUp') {
-          return wrap(groupLocs.length, startIndex, -1);
+          okPeerIndex = wrap(peerCount, peerIndex, -1);
         }
         else if (key === 'ArrowDown') {
-          return wrap(groupLocs.length, startIndex, 1);
+          okPeerIndex = wrap(peerCount, peerIndex, 1);
         }
         else if (['ArrowLeft', 'ArrowRight'].includes(key)) {
-          return hasPopup ? -1 : startIndex;
+          okPeerIndex = hasPopup ? -1 : peerIndex;
         }
         else {
-          return startIndex;
+          okPeerIndex = peerIndex;
         }
       }
+      // Identify the actual peer index of the focus or pseudofocus.
+      let focEl = document.activeElement;
+      let newPeerIndex;
+      if (focEl) {
+        const effectiveFocusID = focEl.getAttribute('aria-activedescendant');
+        if (effectiveFocusID) {
+          const effectiveFocEl = document.getElementById(effectiveFocusID);
+          if (effectiveFocEl) {
+            focEl = effectiveFocEl;
+          }
+        }
+        const miIndex = menuItems.indexOf(focEl);
+        newPeerIndex = miIndex > -1 ? peerIndexes.indexOf(miIndex) : -1;
+      }
+      else {
+        newPeerIndex = -1;
+      }
+      return newPeerIndex === okPeerIndex;
     };
-    // FUNCTION DEFINITION END
+    // FUNCTION DEFINITIONS END
     // Initialize the result.
     const allData = [];
-    // Get the menu that each menu item belongs to.
+    // For each menu item:
     menuItems.forEach(menuItem => {
+      // Add initialized data on it to the result.
       const menu = menuItem.closest('[role=menu], [role=menubar]');
       allData.push({
         menuItem,
@@ -144,90 +147,40 @@ exports.reporter = async (page, withItems) => {
       if (peerIndexes.length > 1) {
         // For each navigation key:
         ['Home', 'End', 'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].forEach(key => {
-          // Get whether it misbehaves.
+          // Get whether the menu item misbehaves.
           const isOK = test(key, allData, index, peerIndexes);
+          // If not:
           if (! isOK) {
+            // Add the key to the data on the menu item.
             allData[index].badKeys.push(key);
           }
         });
       }
     });
-      let menuIndex = menus.indexOf(menu);
-      if (menuIndex === -1) {
-        menus.push(menu);
-        menuIndex = menus.length - 1;
+    return allData.map(data => data.badKeys);
+  });
+  // For each menu item:
+  badKeyArrays.forEach((miBadKeys, index) => {
+    // For each of its misbehaviors:
+    miBadKeys.forEach(miBadKey => {
+      // Add to the totals.
+      totals[0]++;
+      // If itemization is required:
+      if (withItems) {
+        // Add an instance to the result.
+        const elData = elDataAll[index];
+        standardInstances.push({
+          ruleID: 'menuNav',
+          what: `Menu item responds nonstandardly to the ${miBadKey} key`,
+          ordinalSeverity: 0,
+          tagName: elData.tagName,
+          id: elData.id,
+          location: elData.location,
+          excerpt: elData.excerpt
+        });
       }
-      data = {menuIndex}
-      ['Home', 'End', 'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].forEach(key => {
-
-      })
     });
   });
-  // For each of them:
-  for (const menuLoc of menuLocsAll) {
-    // Get its orientation.
-    const menuRole = await menuLoc.getAttribute('role');
-    let orientation = await menuLoc.getAttribute('aria-orientation');
-    if (! orientation) {
-      orientation = menuRole === 'menubar' ? 'horizontal' : 'vertical';
-    }
-    // Get locators for its direct menu items.
-    const menuItemLocAll = menuLoc.locator(
-      ':scope [role=menuitem]:not([role=menu] [role=menuitem]):not([role=menubar] [role=menuitem])'
-    );
-    const menuItemLocsAll = await menuItemLocAll.all();
-    // If there are at least 2 of them:
-    console.log(`Menu item count: ${menuItemLocsAll.length}`);
-    if (menuItemLocsAll.length > 1) {
-      // Get whether they respond nonstandardly to each navigation key.
-      const 
-      // For each of them:
-      for (const index in menuItemLocsAll) {
-        const indexNum = Number.parseInt(index);
-        const loc = menuItemLocsAll[index];
-        // Get data on the element.
-        const elData = await getLocatorData(loc);
-        console.log(elData.id);
-        // For each navigation key:
-        for (
-          // const key of ['Home', 'End', 'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']
-          const key of ['ArrowLeft', 'ArrowRight']
-        ) {
-          // Isolate the move from previous moves by reloading the page.
-          await page.goto(page.url());
-          // Focus the menu item and press the key.
-          await loc.press(key);
-          // Get the index of the menu item expected to be focused.
-          const okFocus = await getNewFocus(
-            orientation === 'horizontal', menuItemLocsAll, indexNum, key
-          );
-          console.log(`Focus index should be ${okFocus}`);
-          // Get the index of the menu item actually focused.
-          const actualFocus = await getFocus(menuItemLocAll);
-          console.log(`Actual focus index is ${actualFocus}`);
-          // If they differ:
-          if (actualFocus !== okFocus) {
-            console.log('ERROR!');
-            // Add to the totals.
-            totals[0]++;
-            // If itemization is required:
-            if (withItems) {
-              // Add an instance to the result.
-              standardInstances.push({
-                ruleID: 'menuNav',
-                what: `Menu item responds nonstandardly to the ${key} key`,
-                ordinalSeverity: 0,
-                tagName: elData.tagName,
-                id: elData.id,
-                location: elData.location,
-                excerpt: elData.excerpt
-              });
-            }
-          }
-        }
-      }
-    }
-  }
   // If itemization is not required and there are any instances:
   if (! withItems && totals[0]) {
     // Add a summary instance to the result.
