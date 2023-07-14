@@ -19,46 +19,75 @@ const {getLocatorData} = require('../procs/getLocatorData');
 const wrap = (groupSize, startIndex, increment) => {
   let newIndex = startIndex + increment;
   if (newIndex < 0) {
-    return groupSize - 1;
+    newIndex = groupSize - 1;
   }
   else if (newIndex > groupSize - 1) {
-    return 0;
+    newIndex = 0;
   }
+  console.log(`New index should be ${newIndex}`);
+  return newIndex;
 };
 // Returns the index of the menu item expected to be focused or pseudofocused after a keypress.
-const getNewFocus = (isHorizontal, groupLocs, startIndex, key) => {
+const getNewFocus = async (isHorizontal, groupLocs, startIndex, key) => {
+  console.log(`${key} from ${startIndex}`);
+  const hasPopupVal = await groupLocs[startIndex].getAttribute('aria-haspopup');
+  const hasPopup = ['menu', true].includes(hasPopupVal);
   if (key === 'Home') {
     return 0;
   }
   else if (key === 'End') {
     return groupLocs.length - 1;
   }
-  else if (key === 'ArrowUp' && ! isHorizontal) {
-    return wrap(groupLocs.length, startIndex, -1);
-  }
-  else if (key === 'ArrowDown' && ! isHorizontal) {
-    return wrap(groupLocs.length, startIndex, 1);
-  }
-  else if (key === 'ArrowLeft' && isHorizontal) {
-    return wrap(groupLocs.length, startIndex, -1);
-  }
-  else if (key === 'ArrowRight' && isHorizontal) {
-    return wrap(groupLocs.length, startIndex, 1);
-  }
   else if (key === 'Tab') {
     return -1;
   }
+  else if (isHorizontal) {
+    if (key === 'ArrowLeft') {
+      return wrap(groupLocs.length, startIndex, -1);
+    }
+    else if (key === 'ArrowRight') {
+      return wrap(groupLocs.length, startIndex, 1);
+    }
+    else if (['ArrowUp', 'ArrowDown'].includes(key)) {
+      return hasPopup ? -1 : startIndex;
+    }
+    else {
+      return startIndex;
+    }
+  }
   else {
-    return startIndex;
+    if (key === 'ArrowUp') {
+      return wrap(groupLocs.length, startIndex, -1);
+    }
+    else if (key === 'ArrowDown') {
+      return wrap(groupLocs.length, startIndex, 1);
+    }
+    else if (['ArrowLeft', 'ArrowRight'].includes(key)) {
+      return hasPopup ? -1 : startIndex;
+    }
+    else {
+      return startIndex;
+    }
   }
 };
-// Returns the index of the menu item that is focused.
+// Returns the index of the menu item that is focused or pseudofocused.
 const getFocus = async groupLoc => {
   const focus = await groupLoc.evaluateAll(elements => {
     const focEl = document.activeElement;
-    const focus = elements.indexOf(focEl);
+    let focus = elements.indexOf(focEl);
+    if (focus === -1) {
+      const focID = focEl.getAttribute('aria-activedescendant');
+      if (focID) {
+        const elIDs = elements.map(element => element.id);
+        const pseudoFocus = elIDs.indexOf(focID);
+        if (pseudoFocus) {
+          focus = pseudoFocus;
+        }
+      }
+    }
     return focus;
   });
+  console.log(`Actual focus index is ${focus}`);
   return focus;
 };
 exports.reporter = async (page, withItems) => {
@@ -83,20 +112,27 @@ exports.reporter = async (page, withItems) => {
     );
     const menuItemLocsAll = await menuItemLocAll.all();
     // If there are at least 2 of them:
+    console.log(`Menu item count: ${menuItemLocsAll.length}`);
     if (menuItemLocsAll.length > 1) {
       // For each of them:
       for (const index in menuItemLocsAll) {
+        const indexNum = Number.parseInt(index);
         const loc = menuItemLocsAll[index];
         // Get data on the element.
         const elData = await getLocatorData(loc);
+        console.log(elData.id);
         // For each navigation key:
-        for (const key of ['Home', 'End', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']) {
+        for (
+          const key of ['Home', 'End', 'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']
+        ) {
           // Focus the menu item and press the key.
           await loc.press(key);
           // Get the index of the menu item expected to be focused.
-          const okFocus = getNewFocus(orientation === 'horizontal', menuItemLocsAll, index, key);
+          const okFocus = await getNewFocus(
+            orientation === 'horizontal', menuItemLocsAll, indexNum, key
+          );
           // Get the index of the menu item actually focused.
-          const actualFocus = getFocus(menuItemLocAll);
+          const actualFocus = await getFocus(menuItemLocAll);
           // If they differ:
           if (actualFocus !== okFocus) {
             // Add to the totals.
