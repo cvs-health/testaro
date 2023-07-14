@@ -26,6 +26,49 @@ const wrap = (groupSize, startIndex, increment) => {
   }
   return newIndex;
 };
+// Returns the index of the menu item expected to be focused or pseudofocused after a keypress.
+const getNewFocus = async (isHorizontal, groupLocs, startIndex, key) => {
+  console.log(`${key} from ${startIndex}`);
+  const hasPopupVal = await groupLocs[startIndex].getAttribute('aria-haspopup');
+  const hasPopup = ['menu', true].includes(hasPopupVal);
+  if (key === 'Home') {
+    return 0;
+  }
+  else if (key === 'End') {
+    return groupLocs.length - 1;
+  }
+  else if (key === 'Tab') {
+    return -1;
+  }
+  else if (isHorizontal) {
+    if (key === 'ArrowLeft') {
+      return wrap(groupLocs.length, startIndex, -1);
+    }
+    else if (key === 'ArrowRight') {
+      return wrap(groupLocs.length, startIndex, 1);
+    }
+    else if (['ArrowUp', 'ArrowDown'].includes(key)) {
+      return hasPopup ? -1 : startIndex;
+    }
+    else {
+      return startIndex;
+    }
+  }
+  else {
+    if (key === 'ArrowUp') {
+      return wrap(groupLocs.length, startIndex, -1);
+    }
+    else if (key === 'ArrowDown') {
+      return wrap(groupLocs.length, startIndex, 1);
+    }
+    else if (['ArrowLeft', 'ArrowRight'].includes(key)) {
+      return hasPopup ? -1 : startIndex;
+    }
+    else {
+      return startIndex;
+    }
+  }
+};
 // Returns the index of the menu item that is focused or pseudofocused.
 const getFocus = async groupLoc => {
   const focus = await groupLoc.evaluateAll(elements => {
@@ -50,119 +93,9 @@ exports.reporter = async (page, withItems) => {
   const data = {};
   const totals = [0, 0, 0, 0];
   const standardInstances = [];
-  // Get locators for all menu items.
-  const locAll = page.locator('[role=menuitem]');
-  const locsAll = await locAll.all();
-  // Get data on the menu items.
-  const elDataAll = [];
-  for (const loc of locsAll) {
-    const elData = await getLocatorData(loc);
-    elDataAll.push(elData);
-  }
-  // Get the keys nonstandardly responded to by all menu items.
-  const badKeyArrays = await locsAll.evaluate(menuItems => {
-    // FUNCTION DEFINITION START
-    // Returns whether a menu item standardly responds to a key.
-    const test = async (key, menuItems, index, peerIndexes) => {
-      // Get data on the menu item.
-      const {menuItem, menu} = allData[index];
-      const hasPopupVal = await menuItem.getAttribute('aria-haspopup');
-      const hasPopup = ['menu', true].includes(hasPopupVal);
-      const menuRole = await menu.getAttribute('role');
-      let orientation = await menu.getAttribute('aria-orientation');
-      if (! orientation) {
-        orientation = menuRole === 'menubar' ? 'horizontal' : 'vertical';
-      }
-      // Focus the menu item and press the key.
-      menuItem.focus();
-      const keydown = new KeyboardEvent('keydown', {key});
-      menuItem.dispatchEvent(keydown);
-      const keyup = new KeyboardEvent('keyup', {key});
-      menuItem.dispatchEvent(keyup);
-      document.
-      if (key === 'Home') {
-        return 0;
-      }
-      else if (key === 'End') {
-        return groupLocs.length - 1;
-      }
-      else if (key === 'Tab') {
-        return -1;
-      }
-      else if (isHorizontal) {
-        if (key === 'ArrowLeft') {
-          return wrap(groupLocs.length, startIndex, -1);
-        }
-        else if (key === 'ArrowRight') {
-          return wrap(groupLocs.length, startIndex, 1);
-        }
-        else if (['ArrowUp', 'ArrowDown'].includes(key)) {
-          return hasPopup ? -1 : startIndex;
-        }
-        else {
-          return startIndex;
-        }
-      }
-      else {
-        if (key === 'ArrowUp') {
-          return wrap(groupLocs.length, startIndex, -1);
-        }
-        else if (key === 'ArrowDown') {
-          return wrap(groupLocs.length, startIndex, 1);
-        }
-        else if (['ArrowLeft', 'ArrowRight'].includes(key)) {
-          return hasPopup ? -1 : startIndex;
-        }
-        else {
-          return startIndex;
-        }
-      }
-    };
-    // FUNCTION DEFINITION END
-    // Initialize the result.
-    const allData = [];
-    // Get the menu that each menu item belongs to.
-    menuItems.forEach(menuItem => {
-      const menu = menuItem.closest('[role=menu], [role=menubar]');
-      allData.push({
-        menuItem,
-        menu,
-        badKeys: []
-      });
-    });
-    // For each menu item:
-    menuItems.forEach((menuItem, index) => {
-      // Get its peers.
-      const {menu} = allData[index];
-      const peerIndexes = [];
-      allData.forEach((menuItemData, index) => {
-        if (menuItemData.menu === menu) {
-          peerIndexes.push(index);
-        }
-      });
-      // If it has at least 1 peer:
-      if (peerIndexes.length > 1) {
-        // For each navigation key:
-        ['Home', 'End', 'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].forEach(key => {
-          // Get whether it misbehaves.
-          const isOK = test(key, allData, index, peerIndexes);
-          if (! isOK) {
-            allData[index].badKeys.push(key);
-          }
-        });
-      }
-    });
-      let menuIndex = menus.indexOf(menu);
-      if (menuIndex === -1) {
-        menus.push(menu);
-        menuIndex = menus.length - 1;
-      }
-      data = {menuIndex}
-      ['Home', 'End', 'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].forEach(key => {
-
-      })
-    });
-  });
+  // Get locators for all visible menus.
+  const menuLocAll = page.locator('[role=menu]:visible, [role=menubar]:visible');
+  const menuLocsAll = await menuLocAll.all();
   // For each of them:
   for (const menuLoc of menuLocsAll) {
     // Get its orientation.
@@ -179,8 +112,6 @@ exports.reporter = async (page, withItems) => {
     // If there are at least 2 of them:
     console.log(`Menu item count: ${menuItemLocsAll.length}`);
     if (menuItemLocsAll.length > 1) {
-      // Get whether they respond nonstandardly to each navigation key.
-      const 
       // For each of them:
       for (const index in menuItemLocsAll) {
         const indexNum = Number.parseInt(index);
