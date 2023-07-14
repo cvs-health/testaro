@@ -30,7 +30,7 @@ exports.reporter = async (page, withItems) => {
     elDataAll.push(elData);
   }
   // Get the keys nonstandardly responded to by all menu items.
-  const badKeyArrays = await locsAll.evaluate(menuItems => {
+  const badKeyArrays = await locAll.evaluateAll(menuItems => {
     // FUNCTION DEFINITIONS START
     // Returns an adjacent index, with wrapping.
     const wrap = (groupSize, startIndex, increment) => {
@@ -44,15 +44,16 @@ exports.reporter = async (page, withItems) => {
       return newIndex;
     };
     // Returns whether a menu item standardly responds to a key.
-    const test = async (key, allData, index, peerIndexes) => {
+    const test = (key, allData, index, peerIndexes) => {
+      console.log(key);
       // Get data on the menu item.
       const peerIndex = peerIndexes.indexOf(index);
       const peerCount = peerIndexes.length;
       const {menuItem, menu} = allData[index];
-      const hasPopupVal = await menuItem.getAttribute('aria-haspopup');
+      const hasPopupVal = menuItem.getAttribute('aria-haspopup');
       const hasPopup = ['menu', true].includes(hasPopupVal);
-      const menuRole = await menu.getAttribute('role');
-      let orientation = await menu.getAttribute('aria-orientation');
+      const menuRole = menu.getAttribute('role');
+      let orientation = menu.getAttribute('aria-orientation');
       if (! orientation) {
         orientation = menuRole === 'menubar' ? 'horizontal' : 'vertical';
       }
@@ -101,8 +102,10 @@ exports.reporter = async (page, withItems) => {
           okPeerIndex = peerIndex;
         }
       }
+      console.log(`Should be ${okPeerIndex}`);
       // Identify the actual peer index of the focus or pseudofocus.
       let focEl = document.activeElement;
+      console.log(focEl.textContent);
       let newPeerIndex;
       if (focEl) {
         const effectiveFocusID = focEl.getAttribute('aria-activedescendant');
@@ -113,11 +116,13 @@ exports.reporter = async (page, withItems) => {
           }
         }
         const miIndex = menuItems.indexOf(focEl);
+        console.log(`MI index is ${miIndex}`);
         newPeerIndex = miIndex > -1 ? peerIndexes.indexOf(miIndex) : -1;
       }
       else {
         newPeerIndex = -1;
       }
+      console.log(`Is actually ${newPeerIndex}`);
       return newPeerIndex === okPeerIndex;
     };
     // FUNCTION DEFINITIONS END
@@ -134,7 +139,7 @@ exports.reporter = async (page, withItems) => {
       });
     });
     // For each menu item:
-    menuItems.forEach((menuItem, index) => {
+    for (const index in menuItems) {
       // Get its peers.
       const {menu} = allData[index];
       const peerIndexes = [];
@@ -146,7 +151,9 @@ exports.reporter = async (page, withItems) => {
       // If it has at least 1 peer:
       if (peerIndexes.length > 1) {
         // For each navigation key:
-        ['Home', 'End', 'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].forEach(key => {
+        for (
+          const key of ['Home', 'End', 'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']
+        ) {
           // Get whether the menu item misbehaves.
           const isOK = test(key, allData, index, peerIndexes);
           // If not:
@@ -154,9 +161,9 @@ exports.reporter = async (page, withItems) => {
             // Add the key to the data on the menu item.
             allData[index].badKeys.push(key);
           }
-        });
+        }
       }
-    });
+    }
     return allData.map(data => data.badKeys);
   });
   // For each menu item:

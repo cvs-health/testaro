@@ -53,9 +53,20 @@ exports.getLocatorData = async loc => {
   if (data.location.type === 'box') {
     // Define a bounding-box-based location.
     const rawSpec = await loc.boundingBox();
-    Object.keys(rawSpec).forEach(specName => {
-      data.location.spec[specName] = Math.round(rawSpec[specName]);
-    });
+    // If there is a bounding box:
+    if (rawSpec) {
+      // Populate the location.
+      Object.keys(rawSpec).forEach(specName => {
+        data.location.spec[specName] = Math.round(rawSpec[specName]);
+      });
+    }
+    // Otherwise, i.e. if there is no bounding box:
+    else {
+      // Empty the location.
+      data.location.doc = '';
+      data.location.type = '';
+      data.location.spec = '';
+    }
   }
   // If the text is long:
   if (data.excerpt.length > 400) {

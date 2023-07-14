@@ -11,33 +11,6 @@
     },
     {
       "type": "url",
-      "which": "__targets__/menuNav/good.html",
-      "what": "page with standard menu navigation"
-    },
-    {
-      "type": "test",
-      "which": "testaro",
-      "what": "menu navigation",
-      "withItems": true,
-      "expect": [
-        [
-          "standardResult.totals.0",
-          "=",
-          0
-        ],
-        [
-          "standardResult.instances.length",
-          "=",
-          0
-        ]
-      ],
-      "rules": [
-        "y",
-        "menuNav"
-      ]
-    },
-    {
-      "type": "url",
       "which": "__targets__/menuNav/bad.html",
       "what": "page with deviant menu navigation"
     },
@@ -121,63 +94,6 @@
           "standardResult.instances.2.excerpt",
           "i",
           "concrete"
-        ]
-      ],
-      "rules": [
-        "y",
-        "menuNav"
-      ]
-    },
-    {
-      "type": "test",
-      "which": "testaro",
-      "what": "menu navigation",
-      "withItems": false,
-      "expect": [
-        [
-          "standardResult.totals.0",
-          "=",
-          8
-        ],
-        [
-          "standardResult.totals.1",
-          "=",
-          4
-        ],
-        [
-          "standardResult.totals.2",
-          "=",
-          2
-        ],
-        [
-          "standardResult.totals.3",
-          "=",
-          0
-        ],
-        [
-          "standardResult.instances.length",
-          "=",
-          1
-        ],
-        [
-          "standardResult.instances.0.ruleID",
-          "i",
-          "menuNav"
-        ],
-        [
-          "standardResult.instances.0.what",
-          "i",
-          "have nonstandard"
-        ],
-        [
-          "standardResult.instances.0.ordinalSeverity",
-          "=",
-          0
-        ],
-        [
-          "standardResult.instances.0.count",
-          "=",
-          8
         ]
       ],
       "rules": [

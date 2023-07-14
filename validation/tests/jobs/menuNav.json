@@ -21,7 +21,7 @@
       "withItems": true,
       "expect": [
         [
-          "standardResult.totals.1",
+          "standardResult.totals.0",
           "=",
           0
         ],
