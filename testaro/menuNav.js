@@ -30,6 +30,7 @@ const getAdjacentIndexWithWrap = (groupSize, startIndex, increment) => {
 };
 // Returns the index of the menu item expected to be focused or pseudofocused after a keypress.
 const getExpectedFocusIndex = async (isHorizontal, hasPopup, groupSize, startIndex, key) => {
+  console.log(`Starting at ${startIndex}`);
   if (key === 'Home') {
     return 0;
   }
@@ -55,6 +56,7 @@ const getExpectedFocusIndex = async (isHorizontal, hasPopup, groupSize, startInd
   }
   else {
     if (key === 'ArrowUp') {
+      console.log(`Group size is ${groupSize}`);
       return getAdjacentIndexWithWrap(groupSize, startIndex, -1);
     }
     else if (key === 'ArrowDown') {
@@ -72,9 +74,11 @@ const getExpectedFocusIndex = async (isHorizontal, hasPopup, groupSize, startInd
 const getFocusIndex = async groupLoc => {
   const focusIndex = await groupLoc.evaluateAll(elements => {
     const focEl = document.activeElement;
+    console.log(`Newly active element ${focEl.id || focEl.textContent.trim()}`);
     let focusIndex = elements.indexOf(focEl);
     const focID = focEl.getAttribute('aria-activedescendant');
     if (focID) {
+      console.log(`Effective focus ID is ${focID}`);
       const elIDs = elements.map(element => element.id);
       const pseudoFocusIndex = elIDs.indexOf(focID);
       if (pseudoFocusIndex > -1) {
@@ -93,7 +97,7 @@ exports.reporter = async (page, withItems) => {
   // For each menu-item navigation key:
   for (
     // const key of ['Home', 'End', 'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']
-    const key of ['Home']
+    const key of ['ArrowUp']
   ) {
     console.log(`>>> ${key}`);
     // Make all elements visible.
@@ -120,6 +124,7 @@ exports.reporter = async (page, withItems) => {
         for (const index in miLocsAll) {
           // Get it and its index within the menu items of the menu.
           const loc = miLocsAll[index];
+          console.log((await loc.textContent()).trim());
           const indexNum = Number.parseInt(index);
           // Get data on the menu item.
           const elData = await getLocatorData(loc);
@@ -133,9 +138,9 @@ exports.reporter = async (page, withItems) => {
           await loc.press(key);
           // Get the index of the menu item actually focused.
           const actualFocusIndex = await getFocusIndex(miLocAll);
+          console.log(`Should be ${expectedFocusIndex} and is ${actualFocusIndex}`);
           // If they differ:
           if (actualFocusIndex !== expectedFocusIndex) {
-            console.log(`Should be ${expectedFocusIndex} but is ${actualFocusIndex}`);
             // Add to the totals.
             totals[0]++;
             // If itemization is required:

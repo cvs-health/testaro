@@ -75,7 +75,7 @@ const activeIndexOf = (isButton, buttonOrMenu) => {
     return tabIndexes.indexOf(0);
   }
 };
-// Makes the specified (or the last if -1) menu item active and close any sibling menus.
+// Makes the specified (or the last if -1) menu item active and closes any sibling menus.
 const setActive = (focusType, menu, itemIndex) => {
   // Identify the menu items.
   const menuItems = menuItemsOf(menu);
@@ -217,7 +217,7 @@ document.body.addEventListener('click', event => {
           // If the button is also a menu item:
           if (isMenuItem(ownerButton)) {
             // Identify the menu that it is an item of.
-            const ownerMenu = ownerMenu(ownerButton);
+            const ownerMenu = owningMenuOf(ownerButton);
             // If it exists:
             if (ownerMenu) {
               // Identify the menu button’s index as a menu item.
