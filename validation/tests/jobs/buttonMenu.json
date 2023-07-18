@@ -1,0 +1,46 @@
+{
+  "id": "buttonMenu",
+  "what": "validation of buttonMenu test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/buttonMenu/good.html",
+      "what": "page with standard menu navigation"
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": true,
+      "expect": [
+        [
+          "standardResult.totals.0",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          0
+        ]
+      ],
+      "rules": [
+        "y",
+        "buttonMenu"
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2013-05-28T12:00:00",
+  "timeStamp": "00000"
+}

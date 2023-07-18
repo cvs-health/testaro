@@ -1,0 +1,22 @@
+:focus:not(ul), .focal {
+  outline: 2px #00f solid;
+  outline-offset: 2px;
+}
+.menubar {
+  min-height: 7rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-evenly;
+}
+.menubar li {
+  list-style-type: none;
+}
+.open {
+  display: block;
+}
+.shut {
+  display: none;
+}
+ul:focus {
+  outline: none;
+}

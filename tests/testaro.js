@@ -11,6 +11,7 @@ const evalRules = {
   allSlanted: 'leaf elements with entirely italic or oblique text longer than 39 characters',
   autocomplete: 'name and email inputs without autocomplete attributes',
   bulk: 'large count of visible elements',
+  buttonMenu: 'nonstandard keyboard navigation between items of button-controlled menus',
   distortion: 'distorted text',
   docType: 'document without a doctype property',
   dupAtt: 'elements with duplicate attributes',
