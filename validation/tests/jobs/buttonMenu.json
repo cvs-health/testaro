@@ -20,7 +20,12 @@
       "withItems": true,
       "expect": [
         [
-          "standardResult.totals.0",
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.2",
           "=",
           0
         ],
@@ -28,6 +33,174 @@
           "standardResult.instances.length",
           "=",
           0
+        ]
+      ],
+      "rules": [
+        "y",
+        "buttonMenu"
+      ]
+    },
+    {
+      "type": "url",
+      "which": "__targets__/menuNav/bad.html",
+      "what": "page with deviant menu navigation"
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": true,
+      "args": {
+        "buttonMenu": [["End", "+", "-", "-", "Home"]]
+      },
+      "expect": [
+        [
+          "standardResult.totals.2",
+          "=",
+          2
+        ],
+        [
+          "standardResult.totals.0",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.3",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "buttonMenu"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "responds nonstandardly to the End key"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "UL"
+        ],
+        [
+          "standardResult.instances.0.id",
+          "=",
+          "persMenu"
+        ],
+        [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "selector"
+        ],
+        [
+          "standardResult.instances.0.location.spec",
+          "=",
+          "#persMenu"
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "i",
+          "Personalities"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "responds nonstandardly to the End key"
+        ],
+        [
+          "standardResult.instances.1.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.1.tagName",
+          "=",
+          "UL"
+        ],
+        [
+          "standardResult.instances.1.id",
+          "=",
+          "techMenu"
+        ],
+        [
+          "standardResult.instances.1.excerpt",
+          "i",
+          "Technologies"
+        ]
+      ],
+      "rules": [
+        "y",
+        "buttonMenu"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "args":{
+        "buttonMenu": [["End", "+", "-", "-", "Home"]]
+      },
+      "expect": [
+        [
+          "standardResult.totals.2",
+          "=",
+          2
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.0",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.3",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "i",
+          "buttonMenu"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "respond nonstandardly to navigation"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          2
         ]
       ],
       "rules": [
