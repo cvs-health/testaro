@@ -27,14 +27,14 @@ exports.reporter = async page => {
   // Make screenshots and get the result.
   const data = await visChange(page, {
     delayBefore: 2000,
-    delayBetween: 4000
+    delayBetween: 3000
   });
   // If the screenshots succeeded:
   if (data.success) {
     // Get the ordinal severity from the fractional pixel change.
-    const ordinalSeverity = Math.floor((data.changePercent - 1) / 25);
-    // If the fractional pixel change exceeded 1%:
-    if (data.changePercent > 1) {
+    const ordinalSeverity = Math.floor(Math.min(3, 0.4 * Math.sqrt(data.changePercent)));
+    // If any pixels were changed:
+    if (data.pixelChanges) {
       // Add to the totals.
       totals[ordinalSeverity] = 1;
       // Get a summary standard instance.

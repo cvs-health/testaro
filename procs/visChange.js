@@ -60,6 +60,7 @@ exports.visChange = async (page, options = {}) => {
         success: true,
         width,
         height,
+        pixelChanges,
         changePercent
       };
     }

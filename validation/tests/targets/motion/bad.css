@@ -5,11 +5,12 @@
   }
   to {
     margin-right: 50%;
-    font-size: 2rem;
+    font-size: 5rem;
   }
 }
 .moving {
-  animation-duration: 4s;
-  animation-iteration-count: 5;
+  animation-duration: 7s;
+  animation-iteration-count: 2;
   animation-name: shrink;
+  background-color: #ccc;
 }
