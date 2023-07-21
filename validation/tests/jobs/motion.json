@@ -19,7 +19,22 @@
       "which": "testaro",
       "expect": [
         [
+          "standardResult.totals.0",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
           "standardResult.totals.2",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.3",
           "=",
           0
         ],
@@ -33,10 +48,7 @@
       "rules": [
         "y",
         "motion"
-      ],
-      "args": {
-        "motion": [2400, 2600, 5]
-      }
+      ]
     },
     {
       "type": "url",
@@ -48,16 +60,6 @@
       "which": "testaro",
       "what": "spontaneous change of content",
       "expect": [
-        [
-          "standardResult.totals.2",
-          ">",
-          0
-        ],
-        [
-          "standardResult.totals.3",
-          "=",
-          0
-        ],
         [
           "standardResult.instances.length",
           "=",
@@ -72,16 +74,23 @@
           "standardResult.instances.0.what",
           "i",
           "moves or changes"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          ">",
+          -1
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "HTML"
         ]
       ],
       "withItems": true,
       "rules": [
         "y",
         "motion"
-      ],
-      "args": {
-        "motion": [2400, 2600, 5]
-      }
+      ]
     }
   ],
   "sources": {
