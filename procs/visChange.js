@@ -1,6 +1,7 @@
 /*
   visChange
-  This procedure reports a change in the visible content of a page between two times.
+  This procedure reports a change in the visible content of a page between two times, optionally
+  hovering over a locator-defined element immediately after the first time.
   WARNING: This test uses the Playwright page.screenshot method, which produces incorrect results
   when the browser type is chromium and is not implemented for the firefox browser type. The only
   browser type usable with this test is webkit.
@@ -37,10 +38,25 @@ exports.visChange = async (page, options = {}) => {
   if (delayBefore) {
     await page.waitForTimeout(delayBefore);
   }
-  // Make a screenshot.
+  // Make a screenshot, excluding an element in specified.
   const shot0 = await shoot(page, exclusion);
   // If it succeeded:
   if (shot0.length) {
+    // If an exclusion was specified, hover over it.
+    if (exclusion) {
+      try {
+        await exclusion.hover({
+          timeout: 500,
+          noWaitAfter: true
+        });
+      }
+      catch(error) {
+        return {
+          success: false,
+          error: 'Hovering failed'
+        };
+      }
+    }
     // Wait as specified, or 3 seconds.
     await page.waitForTimeout(delayBetween || 3000);
     // Make another screenshot.
@@ -68,7 +84,8 @@ exports.visChange = async (page, options = {}) => {
     else {
       // Return this.
       return {
-        success: false
+        success: false,
+        error: 'Second screenshot failed'
       };
     }
   }
@@ -76,7 +93,8 @@ exports.visChange = async (page, options = {}) => {
   else {
     // Return this.
     return {
-      success: false
+      success: false,
+      error: 'First screenshot failed'
     };
   }
 };

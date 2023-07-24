@@ -5,8 +5,8 @@
   by the time a user manages to stop motion, the motion may have caused annoyance or harm. For
   superior accessibility, a page contains no motion until and unless the user authorizes it. The
   test compares two screen shots of the viewport 2 seconds and 6 seconds after page load. It
-  reports a rule violation if more than 1% of the pixels change. The larger the change fraction,
-  the greater the ordinal severity.
+  reports a rule violation if any pixels change. The larger the change fraction, the greater the
+  ordinal severity.
   
   WARNING: This test uses the Playwright page.screenshot method, which produces incorrect results
   when the browser type is chromium and is not implemented for the firefox browser type. The only
@@ -15,6 +15,7 @@
 
 // IMPORTS
 
+// Module to get pixel changes between two times.
 const {visChange} = require('../procs/visChange');
 
 // FUNCTIONS
@@ -31,10 +32,10 @@ exports.reporter = async page => {
   });
   // If the screenshots succeeded:
   if (data.success) {
-    // Get the ordinal severity from the fractional pixel change.
-    const ordinalSeverity = Math.floor(Math.min(3, 0.4 * Math.sqrt(data.changePercent)));
     // If any pixels were changed:
     if (data.pixelChanges) {
+      // Get the ordinal severity from the fractional pixel change.
+      const ordinalSeverity = Math.floor(Math.min(3, 0.4 * Math.sqrt(data.changePercent)));
       // Add to the totals.
       totals[ordinalSeverity] = 1;
       // Get a summary standard instance.
