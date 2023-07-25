@@ -8,9 +8,8 @@
   reports a rule violation if any pixels change. The larger the change fraction, the greater the
   ordinal severity.
   
-  WARNING: This test uses the Playwright page.screenshot method, which produces incorrect results
-  when the browser type is chromium and is not implemented for the firefox browser type. The only
-  browser type usable with this test is webkit.
+  WARNING: This test uses the Playwright page.screenshot method, which is not implemented for the
+  firefox browser type.
 */
 
 // IMPORTS

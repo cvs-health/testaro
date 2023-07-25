@@ -24,14 +24,18 @@
       <p>Hovering over Trigger 5 changes content.</p>
 
       <ul>
-        <li onmouseover="document.getElementById('listDependent').setAttribute('hidden', true)">This is a list item, Trigger 5.</li>
+        <li onmouseover="document.getElementById('bottom').setAttribute('hidden', true)">This is a list item, Trigger 5.</li>
         <li>This is another list item, Trigger 6.</li>
       </ul>
 
-      <p id="listDependent">This paragraph becomes invisible when you hover over Trigger 5.</p>
+      <div id="bottom" style="background-color: #ccc">
 
-      <p>Triggers 1, 2, and 5 have impacts. Trigger 3 is unhoverable.</p>
-      <p>The ordinal severity of trigger 3 is 3. The ordinal severities of triggers 1, 2, and 5 are not straightforwardly predictable.</p>
+        <p>This division becomes invisible when you hover over Trigger 5.</p>
+
+        <p>Triggers 1, 2, and 5 have impacts. Trigger 3 is unhoverable.</p>
+        <p>The ordinal severity of trigger 3 is 3. The ordinal severities of triggers 1, 2, and 5 are not straightforwardly predictable.</p>
+
+      </div>
 
     </main>
   </body>

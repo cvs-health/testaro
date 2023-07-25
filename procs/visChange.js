@@ -18,15 +18,15 @@ const {PNG} = require('pngjs');
 const shoot = async (page, exclusion = null) => {
   // Make a screenshot as a buffer.
   const options = {
-    fullPage: false,
+    fullPage: true,
     omitBackground: true,
     timeout: 2000
   };
   if (exclusion) {
+    const exclusionText = await exclusion.textContent();
     options.mask = [exclusion];
   }
-  return await page.screenshot({
-  })
+  return await page.screenshot(options)
   .catch(error => {
     console.log(`ERROR: Screenshot failed (${error.message})`);
     return '';
@@ -38,12 +38,24 @@ exports.visChange = async (page, options = {}) => {
   if (delayBefore) {
     await page.waitForTimeout(delayBefore);
   }
+  // If an exclusion was specified:
+  if (exclusion) {
+    // Hover over the upper-left corner of the page for test isolation.
+    const docLoc = page.locator('html');
+    await docLoc.hover({
+      position: {
+        x: 0,
+        y: 0
+      }
+    });
+  }
   // Make a screenshot, excluding an element if specified.
   const shot0 = await shoot(page, exclusion);
   // If it succeeded:
   if (shot0.length) {
-    // If an exclusion was specified, hover over it.
+    // If an exclusion was specified:
     if (exclusion) {
+      // Hover over it.
       try {
         await exclusion.hover({
           timeout: 500,
@@ -70,7 +82,7 @@ exports.visChange = async (page, options = {}) => {
       // Get the count of differing pixels between the shots.
       const pixelChanges = pixelmatch(pngs[0].data, pngs[1].data, null, width, height);
       // Get the ratio of differing to all pixels as a percentage.
-      const changePercent = Math.round(100 * pixelChanges / (width * height));
+      const changePercent = 100 * pixelChanges / (width * height);
       // Return this.
       return {
         success: true,

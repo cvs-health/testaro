@@ -24,9 +24,8 @@
   action on the location where the center of the element is, rather than some other element with a
   higher zIndex value in the same location being the target.
 
-  WARNING: This test uses the Playwright page.screenshot method, which produces incorrect results
-  when the browser type is chromium and is not implemented for the firefox browser type. The only
-  browser type usable with this test is webkit.
+  WARNING: This test uses the Playwright page.screenshot method, which is not implemented for the
+  firefox browser type.
 */
 
 // IMPORTS
@@ -69,7 +68,8 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
   const standardInstances = [];
   // Identify the triggers.
   const selectors = ['a', 'button', 'li:not([role=menuitem])', '[onmouseenter]', '[onmouseover]'];
-  const locAll = page.locator(selectors.map(selector => `body ${selector}:visible`).join(', '));
+  const selectorString = selectors.map(selector => `body ${selector}:visible`).join(', ');
+  const locAll = page.locator(selectorString);
   const locsAll = await locAll.all();
   // Get the population-to-sample ratio.
   const psRatio = Math.max(1, locsAll.length / sampleSize);
@@ -87,9 +87,9 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
     // If the hovering and measurement succeeded:
     if (hoverData.success) {
       // If any pixels changed:
-      if (hoverData.pixelChanges) {
+      if (hoverData.changePercent) {
         // Get the ordinal severity from the fractional pixel change.
-        const ordinalSeverity = Math.floor(Math.min(3, 0.4 * Math.sqrt(data.changePercent)));
+        const ordinalSeverity = Math.floor(Math.min(3, 0.4 * Math.sqrt(hoverData.changePercent)));
         // Add to the totals.
         totals[ordinalSeverity] += psRatio;
         // If itemization is required:
@@ -129,6 +129,13 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
         });
       }
     }
+    // Reload the page to preserve locator integrity.
+    try {
+      await page.reload({timeout: 5000});
+    }
+    catch(error) {
+      console.log('ERROR: page reload timed out');
+    }
   }
   // If itemization is not required:
   if (! withItems) {
@@ -158,13 +165,6 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
   totals.forEach((total, index) => {
     totals[index] = Math.round(totals[index]);
   });
-  // Reload the page.
-  try {
-    await page.reload({timeout: 15000});
-  }
-  catch(error) {
-    console.log('ERROR: page reload timed out');
-  }
   // Return the result.
   return {
     data,

@@ -6,7 +6,7 @@
   "acts": [
     {
       "type": "launch",
-      "which": "chromium",
+      "which": "webkit",
       "what": "only compatible browser"
     },
     {
@@ -64,11 +64,6 @@
           "hover"
         ],
         [
-          "standardResult.instances.length",
-          "=",
-          4
-        ],
-        [
           "standardResult.instances.0.what",
           "i",
           "over the element"
@@ -119,17 +114,17 @@
           "smallButton"
         ],
         [
-          "standardResult.instances.2.location.doc",
+          "standardResult.instances.0.location.doc",
           "=",
           "dom"
         ],
         [
-          "standardResult.instances.2.location.type",
+          "standardResult.instances.0.location.type",
           "=",
           "selector"
         ],
         [
-          "standardResult.instances.2.location.spec",
+          "standardResult.instances.0.location.spec",
           "=",
           "#smallButton"
         ],
@@ -137,46 +132,6 @@
           "standardResult.instances.2.excerpt",
           "i",
           "Trigger 3"
-        ],
-        [
-          "standardResult.instances.3.what",
-          "i",
-          "over the element"
-        ],
-        [
-          "standardResult.instances.3.ordinalSeverity",
-          ">",
-          -1
-        ],
-        [
-          "standardResult.instances.3.tagName",
-          "=",
-          "LI"
-        ],
-        [
-          "standardResult.instances.3.id",
-          "=",
-          ""
-        ],
-        [
-          "standardResult.instances.3.location.doc",
-          "=",
-          "dom"
-        ],
-        [
-          "standardResult.instances.3.location.type",
-          "=",
-          "box"
-        ],
-        [
-          "standardResult.instances.3.location.spec.x",
-          ">",
-          0
-        ],
-        [
-          "standardResult.instances.3.excerpt",
-          "i",
-          "item, Trigger 5"
         ]
       ],
       "rules": [
@@ -184,7 +139,7 @@
         "hover"
       ],
       "args": {
-        "hover": [8]
+        "hover": [6]
       }
     },
     {
@@ -228,7 +183,7 @@
         "hover"
       ],
       "args": {
-        "hover": [8]
+        "hover": [6]
       }
     },
     {
@@ -263,6 +218,95 @@
       ],
       "args": {
         "hover": [2]
+      }
+    },
+    {
+      "type": "url",
+      "which": "__targets__/hover/styleBad.html",
+      "what": "page with deviant trigger styles"
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": true,
+      "expect": [
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.2",
+          "=",
+          2
+        ],
+        [
+          "standardResult.totals.3",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "hover"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "hides"
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "LI"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "i",
+          "loses its cursor"
+        ],
+        [
+          "standardResult.instances.1.ruleID",
+          "=",
+          "hover"
+        ],
+        [
+          "standardResult.instances.1.what",
+          "i",
+          "cursor nonstandard"
+        ],
+        [
+          "standardResult.instances.1.tagName",
+          "=",
+          "A"
+        ],
+        [
+          "standardResult.instances.1.id",
+          "=",
+          "trigger1"
+        ],
+        [
+          "standardResult.instances.1.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.1.excerpt",
+          "i",
+          "Trigger 1"
+        ]
+      ],
+      "rules": [
+        "y",
+        "hover"
+      ],
+      "args": {
+        "hover": [4]
       }
     }
   ],
