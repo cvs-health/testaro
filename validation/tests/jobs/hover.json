@@ -57,23 +57,8 @@
       "expect": [
         [
           "standardResult.totals.3",
-          "=",
-          4
-        ],
-        [
-          "standardResult.totals.2",
-          "=",
-          1
-        ],
-        [
-          "standardResult.totals.1",
-          "=",
-          4
-        ],
-        [
-          "standardResult.totals.0",
-          "=",
-          1
+          ">",
+          0
         ],
         [
           "standardResult.instances.0.ruleID",
@@ -83,12 +68,7 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "unexpected"
-        ],
-        [
-          "standardResult.instances.0.ordinalSeverity",
-          "=",
-          3
+          "over the element"
         ],
         [
           "standardResult.instances.0.tagName",
@@ -96,32 +76,62 @@
           "A"
         ],
         [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.0.location.spec.height",
+          "<",
+          "20"
+        ],
+        [
           "standardResult.instances.0.excerpt",
           "i",
           "Trigger 1"
         ],
         [
-          "standardResult.instances.3.what",
+          "standardResult.instances.2.what",
           "i",
-          "cannot be hovered"
+          "is not hoverable"
         ],
         [
-          "standardResult.instances.3.ordinalSeverity",
+          "standardResult.instances.2.ordinalSeverity",
           "=",
           3
         ],
         [
-          "standardResult.instances.3.tagName",
+          "standardResult.instances.2.tagName",
           "=",
           "BUTTON"
         ],
         [
-          "standardResult.instances.3.id",
+          "standardResult.instances.2.id",
           "=",
           "smallButton"
         ],
         [
-          "standardResult.instances.3.excerpt",
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "selector"
+        ],
+        [
+          "standardResult.instances.0.location.spec",
+          "=",
+          "#smallButton"
+        ],
+        [
+          "standardResult.instances.2.excerpt",
           "i",
           "Trigger 3"
         ]
@@ -142,28 +152,13 @@
       "expect": [
         [
           "standardResult.totals.3",
-          "=",
-          4
-        ],
-        [
-          "standardResult.totals.2",
-          "=",
-          1
-        ],
-        [
-          "standardResult.totals.1",
-          "=",
-          4
-        ],
-        [
-          "standardResult.totals.0",
-          "=",
-          1
+          ">",
+          0
         ],
         [
           "standardResult.instances.length",
-          "=",
-          1
+          ">",
+          0
         ],
         [
           "standardResult.instances.0.ruleID",
@@ -173,17 +168,17 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "behaves"
+          "over elements"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
-          "=",
-          3
+          ">",
+          -1
         ],
         [
           "standardResult.instances.0.count",
-          "=",
-          10
+          ">",
+          0
         ]
       ],
       "rules": [

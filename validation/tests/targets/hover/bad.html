@@ -13,11 +13,11 @@
 
       <p>Triggers 1 and 2. This page contains a link named <a href="https://en.wikipedia.org" onmouseover="document.getElementById('translucent').style.opacity = 1">Trigger 1</a> and a <button type="button" onmouseover="document.getElementById('hiddenP').style.display = 'block'">Trigger 2 button</button>. Both elements can be hovered over.</p>
 
-      <p id="hiddenP" style="display: none">The Trigger 2 button, when hovered over, makes this paragraph, and therefore this <a href="https://en.wikipedia.org/wiki/Web_accessibility">link on web accessibility</a> and this <button type="button">new button</button>, visible. 3 additions.</p>
+      <p id="hiddenP" style="display: none">The Trigger 2 button, when hovered over, makes this paragraph, and therefore this <a href="https://en.wikipedia.org/wiki/Web_accessibility">link on web accessibility</a> and this <button type="button">new button</button>, visible.</p>
 
       <p id="translucent" style="opacity: 0.4">The Trigger 1 link, when hovered over, changes the opacity of this paragraph from 0.4 to 1. That indirectly changes the opacity of this <span>word</span>, too.</p>
 
-      <p>The Trigger 3 button is mostly covered by a Trigger 4 one below, preventing the Trigger 3 button from receiving a hover event.</p>
+      <p>The Trigger 3 button is mostly covered by a Trigger 4 button below, preventing the Trigger 3 button from receiving a hover event.</p>
 
       <p style="position: relative"><button id="smallButton" style="position: absolute; left: 10rem">Trigger 3</button><button style="position: absolute; left: 11rem; top: -0.5rem; font-size: x-large">Trigger 4</button></p>
 
@@ -31,10 +31,7 @@
       <p id="listDependent">This paragraph becomes invisible when you hover over Trigger 5.</p>
 
       <p>Triggers 1, 2, and 5 have impacts. Trigger 3 is unhoverable.</p>
-      <p>Severity 3: impact triggers 3 (1, 2, 5), unhoverables 1 (3), total 4.</p>
-      <p>Severity 2: removals 1, total 1.</p>
-      <p>Severity 1: additions 3 (2), opacity changes 1 (1), total 4.</p>
-      <p>Severity 0: opacity impact 1.</p>
+      <p>The ordinal severity of trigger 3 is 3. The ordinal severities of triggers 1, 2, and 5 are not straightforwardly predictable.</p>
 
     </main>
   </body>

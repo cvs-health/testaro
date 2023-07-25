@@ -13,8 +13,9 @@
   navigation menus, the probability of the inclusion of a trigger in a sample decreases with the
   index of the trigger.
 
-  Pixel changes: If no pixel changes occur immediately, the page is examined once more, after 0.5 second.
-  The greater the fraction of changed pixels, the greater the ordinal severity.
+  Pixel changes: If no pixel changes occur immediately after an element is hovered over, the page
+  is examined once more, after 0.5 second. The greater the fraction of changed pixels, the greater
+  the ordinal severity.
 
   Unhoverability: An element is reported as unhoverable when it fails the Playwright actionability
   checks for hovering, i.e. fails to be attached to the DOM, visible, stable (not or no longer
@@ -22,9 +23,6 @@
   last two might fail. Playwright defines the ability to receive events as being the target of an
   action on the location where the center of the element is, rather than some other element with a
   higher zIndex value in the same location being the target.
-
-  If an element is unhoverable, testing stops and the sample size is changed to the size of the
-  subsample that was tested before the unhoverability occurred.
 
   WARNING: This test uses the Playwright page.screenshot method, which produces incorrect results
   when the browser type is chromium and is not implemented for the firefox browser type. The only
@@ -75,22 +73,10 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
   const locsAll = await locAll.all();
   // Get the population-to-sample ratio.
   const psRatio = Math.max(1, locsAll.length / sampleSize);
-  // Get a sample of them.
+  // Get a sample of the triggers.
   const sampleIndexes = getSample(locsAll, sampleSize);
   const sample = locsAll.filter((loc, index) => sampleIndexes.includes(index));
-  // Set a time limit to cover possible 1 second per trigger.
-  const timeLimit = Math.round(1.8 * sample.length + 2);
-  const timeout = setTimeout(async () => {
-    await page.close();
-    console.log(
-      `ERROR: hover test on sample of ${sample.length} triggers timed out at ${timeLimit} seconds; page closed`
-    );
-    data.prevented = true;
-    data.error = 'ERROR: hover test timed out';
-    clearTimeout(timeout);
-  }, 1000 * timeLimit);
   // For each trigger in the sample:
-  let successCount = 0;
   for (const loc of sample) {
     // Hover over it and get the fractional pixel change.
     const hoverData = await visChange(page, {
@@ -100,7 +86,6 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
     });
     // If the hovering and measurement succeeded:
     if (hoverData.success) {
-      successCount++;
       // If any pixels changed:
       if (hoverData.pixelChanges) {
         // Get the ordinal severity from the fractional pixel change.
@@ -124,21 +109,25 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
         }
       }
     }
-    // Otherwise, if hovering and measurement failed after at least 1 success:
-    else if (successCount) {
-      // Revise the totals accordingly.
-      totals.forEach((total, index) => {
-        totals[index] *= sample.length / successCount;
-      });
-      // Stop processing the sample.
-      break;
-    }
-    // Otherwise, i.e. if hovering and measurement failed on the first case:
+    // Otherwise, i.e. if hovering and measurement failed:
     else {
-      // Report this.
-      data.prevented = true;
-      data.error = `ERROR: Hovering and impact measurement failed after trial ${successCount}`;
-      break;
+      // Add to the totals.
+      totals[3] += psRatio;
+      // If itemization is required:
+      if (withItems) {
+        // Get data on the trigger.
+        const elData = await getLocatorData(loc);
+        // Add an instance to the result.
+        standardInstances.push({
+          ruleID: 'hover',
+          what: 'Element is not hoverable',
+          ordinalSeverity: 3,
+          tagName: elData.tagName,
+          id: elData.id,
+          location: elData.location,
+          excerpt: elData.excerpt
+        });
+      }
     }
   }
   // If itemization is not required:
@@ -150,7 +139,7 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
         // Add a summary instance to the result.
         standardInstances.push({
           ruleID: 'hover',
-          what: 'Hovering over elements changes the page',
+          what: 'Hovering over elements changes the page or fails',
           ordinalSeverity: index,
           count: Math.round(totals[index]),
           tagName: '',

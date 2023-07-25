@@ -38,7 +38,7 @@ exports.visChange = async (page, options = {}) => {
   if (delayBefore) {
     await page.waitForTimeout(delayBefore);
   }
-  // Make a screenshot, excluding an element in specified.
+  // Make a screenshot, excluding an element if specified.
   const shot0 = await shoot(page, exclusion);
   // If it succeeded:
   if (shot0.length) {
