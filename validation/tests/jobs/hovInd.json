@@ -20,9 +20,14 @@
       "withItems": true,
       "expect": [
         [
-          "standardResult.totals.1",
+          "standardResult.totals.0",
           "=",
           0
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
+          2
         ],
         [
           "standardResult.totals.2",
@@ -32,7 +37,7 @@
         [
           "standardResult.totals.3",
           "=",
-          1
+          0
         ],
         [
           "standardResult.instances.0.ruleID",
@@ -42,52 +47,107 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "hides"
-        ],
-        [
-          "standardResult.instances.0.tagName",
-          "=",
-          "LI"
+          "has a nonstandard"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          3
+          2
         ],
         [
-          "standardResult.instances.0.excerpt",
-          "i",
-          "loses its cursor"
-        ],
-        [
-          "standardResult.instances.1.ruleID",
-          "=",
-          "hovInd"
-        ],
-        [
-          "standardResult.instances.1.what",
-          "i",
-          "cursor nonstandard"
-        ],
-        [
-          "standardResult.instances.1.tagName",
+          "standardResult.instances.0.tagName",
           "=",
           "A"
         ],
         [
-          "standardResult.instances.1.id",
+          "standardResult.instances.0.id",
           "=",
           "trigger1"
         ],
         [
-          "standardResult.instances.1.ordinalSeverity",
+          "standardResult.instances.0.location.doc",
           "=",
-          2
+          "dom"
         ],
         [
-          "standardResult.instances.1.excerpt",
+          "standardResult.instances.0.location.type",
+          "=",
+          "selector"
+        ],
+        [
+          "standardResult.instances.0.location.spec",
+          "=",
+          "#trigger1"
+        ],
+        [
+          "standardResult.instances.0.excerpt",
           "i",
           "Trigger 1"
+        ],
+        [
+          "standardResult.instances.1.what",
+          "i",
+          "has a nonstandard"
+        ],
+        [
+          "standardResult.instances.2.ruleID",
+          "=",
+          "hovInd"
+        ],
+        [
+          "standardResult.instances.2.what",
+          "i",
+          "are alike"
+        ],
+        [
+          "standardResult.instances.2.ordinalSeverity",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.2.tagName",
+          "=",
+          "INPUT"
+        ],
+        [
+          "standardResult.instances.2.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.2.excerpt",
+          "i",
+          "Trigger 4: Enter"
+        ],
+        [
+          "standardResult.instances.3.ruleID",
+          "=",
+          "hovInd"
+        ],
+        [
+          "standardResult.instances.3.what",
+          "i",
+          "do not change"
+        ],
+        [
+          "standardResult.instances.3.ordinalSeverity",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.3.tagName",
+          "=",
+          "BUTTON"
+        ],
+        [
+          "standardResult.instances.3.location.spec.x",
+          ">",
+          0
+        ],
+        [
+          "standardResult.instances.3.excerpt",
+          "i",
+          "Trigger 5"
         ]
       ],
       "rules": [
@@ -95,7 +155,7 @@
         "hovInd"
       ],
       "args": {
-        "hovInd": [4]
+        "hovInd": [6]
       }
     }
   ],

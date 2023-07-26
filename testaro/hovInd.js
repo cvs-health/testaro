@@ -104,16 +104,28 @@ const getCursorData = hovStyles => {
   const data = {
     cursor
   };
+  // If the element is an input or a link:
   if (standardCursor[tagName]) {
+    // If it is an input:
     if (tagName === 'INPUT') {
+      // Get whether its hover cursor is standard.
       data.ok = cursor === (standardCursor.INPUT[hovStyles.inputType] || 'default');
     }
+    // Otherwise, i.e. if it is a link:
     else {
+      // Get whether its hover cursor is standard.
       data.ok = cursor === 'pointer';
     }
   }
-  else {
+  // Otherwise, if it is a button:
+  else if (tagName === 'BUTTON') {
+    // Get whether its hover cursor is standard.
     data.ok = cursor === 'default';
+  }
+  // Otherwise, i.e. if it has another type and a hover listener:
+  else {
+    // Assume its hover cursor is standard.
+    data.ok = true;
   }
 };
 // Returns whether two hover styles are effectively identical.
@@ -126,7 +138,7 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
     typeTotals: {
       badCursor: 0,
       hoverLikeDefault: 0,
-      fhLikeFocus: 0
+      hoverLikeFocus: 0
     }
   };
   const totals = [0, 0, 0, 0];
@@ -162,7 +174,7 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
     });
     // Get its style properties.
     const hovStyles = await getHoverStyles(loc);
-    // If the style properties belong to the same element:
+    // If all 4 style declarations belong to the same element:
     if ([focStyles, fhStyles, hovStyles].every(style => style.code === preStyles.code)) {
       // Get data on the element if itemization is required.
       const elData = withItems ? await getLocatorData(loc) : null;
@@ -205,17 +217,17 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
           });
         }
       }
-      // If the hover and focus-hover states are not distinct:
-      if (areAlike(hovStyles, fhStyles)) {
+      // If the hover and focus-hover states are indistinct but differ from the default state:
+      if (areAlike(hovStyles, focStyles) && ! areAlike(hovStyles, preStyles)) {
         // Add to the totals.
         totals[1] += psRatio;
-        data.typeTotals.fhLikeFocus += psRatio;
+        data.typeTotals.hoverLikeFocus += psRatio;
         // If itemization is required:
         if (withItems) {
           // Add an instance to the result.
           standardInstances.push({
             ruleID: 'hovInd',
-            what: 'Element border, outline, and background color on focus do not change when also hovered over',
+            what: 'Element border, outline, and background color are alike on hover and focus',
             ordinalSeverity: 1,
             tagName: elData.tagName,
             id: elData.id,
