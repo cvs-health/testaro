@@ -22,6 +22,7 @@ const evalRules = {
   focOp: 'discrepancies between focusability and operability',
   focVis: 'links that are invisible when focused',
   hover: 'hover-caused content changes',
+  hovInd: 'hover indication nonstandard',
   labClash: 'labeling inconsistencies',
   lineHeight: 'text with a line height less than 1.5 times its font size',
   linkExt: 'links that automatically open new windows',
