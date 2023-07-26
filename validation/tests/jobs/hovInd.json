@@ -1,229 +1,18 @@
 {
-  "id": "hover",
-  "what": "validation of hover test",
+  "id": "hovInd",
+  "what": "validation of hovInd test",
   "strict": true,
   "timeLimit": 40,
   "acts": [
     {
       "type": "launch",
-      "which": "webkit",
-      "what": "only compatible browser"
+      "which": "chromium",
+      "what": "browser"
     },
     {
       "type": "url",
-      "which": "__targets__/hover/good.html",
-      "what": "page with standard hover behavior"
-    },
-    {
-      "type": "test",
-      "which": "testaro",
-      "withItems": true,
-      "expect": [
-        [
-          "standardResult.totals.0",
-          "=",
-          0
-        ],
-        [
-          "standardResult.totals.2",
-          "=",
-          0
-        ],
-        [
-          "standardResult.instances.length",
-          "=",
-          0
-        ]
-      ],
-      "rules": [
-        "y",
-        "hover"
-      ],
-      "args": {
-        "hover": [5]
-      }
-    },
-    {
-      "type": "url",
-      "which": "__targets__/hover/bad.html",
-      "what": "page with deviant hover behavior"
-    },
-    {
-      "type": "test",
-      "which": "testaro",
-      "withItems": true,
-      "expect": [
-        [
-          "standardResult.totals.3",
-          ">",
-          0
-        ],
-        [
-          "standardResult.instances.0.ruleID",
-          "=",
-          "hover"
-        ],
-        [
-          "standardResult.instances.0.what",
-          "i",
-          "over the element"
-        ],
-        [
-          "standardResult.instances.0.tagName",
-          "=",
-          "A"
-        ],
-        [
-          "standardResult.instances.0.location.doc",
-          "=",
-          "dom"
-        ],
-        [
-          "standardResult.instances.0.location.type",
-          "=",
-          "box"
-        ],
-        [
-          "standardResult.instances.0.location.spec.height",
-          "<",
-          "20"
-        ],
-        [
-          "standardResult.instances.0.excerpt",
-          "i",
-          "Trigger 1"
-        ],
-        [
-          "standardResult.instances.2.what",
-          "i",
-          "is not hoverable"
-        ],
-        [
-          "standardResult.instances.2.ordinalSeverity",
-          "=",
-          3
-        ],
-        [
-          "standardResult.instances.2.tagName",
-          "=",
-          "BUTTON"
-        ],
-        [
-          "standardResult.instances.2.id",
-          "=",
-          "smallButton"
-        ],
-        [
-          "standardResult.instances.0.location.doc",
-          "=",
-          "dom"
-        ],
-        [
-          "standardResult.instances.0.location.type",
-          "=",
-          "selector"
-        ],
-        [
-          "standardResult.instances.0.location.spec",
-          "=",
-          "#smallButton"
-        ],
-        [
-          "standardResult.instances.2.excerpt",
-          "i",
-          "Trigger 3"
-        ]
-      ],
-      "rules": [
-        "y",
-        "hover"
-      ],
-      "args": {
-        "hover": [6]
-      }
-    },
-    {
-      "type": "test",
-      "which": "testaro",
-      "withItems": false,
-      "expect": [
-        [
-          "standardResult.totals.3",
-          ">",
-          0
-        ],
-        [
-          "standardResult.instances.length",
-          ">",
-          0
-        ],
-        [
-          "standardResult.instances.0.ruleID",
-          "=",
-          "hover"
-        ],
-        [
-          "standardResult.instances.0.what",
-          "i",
-          "over elements"
-        ],
-        [
-          "standardResult.instances.0.ordinalSeverity",
-          ">",
-          -1
-        ],
-        [
-          "standardResult.instances.0.count",
-          ">",
-          0
-        ]
-      ],
-      "rules": [
-        "y",
-        "hover"
-      ],
-      "args": {
-        "hover": [6]
-      }
-    },
-    {
-      "type": "test",
-      "which": "testaro",
-      "withItems": false,
-      "expect": [
-        [
-          "standardResult.totals.3",
-          "<",
-          7
-        ],
-        [
-          "standardResult.totals.2",
-          "<",
-          4
-        ],
-        [
-          "standardResult.totals.1",
-          "<",
-          13
-        ],
-        [
-          "standardResult.totals.0",
-          "<",
-          4
-        ]
-      ],
-      "rules": [
-        "y",
-        "hover"
-      ],
-      "args": {
-        "hover": [2]
-      }
-    },
-    {
-      "type": "url",
-      "which": "__targets__/hover/styleBad.html",
-      "what": "page with deviant trigger styles"
+      "which": "__targets__/hovInd/index.html",
+      "what": "page with varied hover indicators"
     },
     {
       "type": "test",
@@ -248,7 +37,7 @@
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "hover"
+          "hovInd"
         ],
         [
           "standardResult.instances.0.what",
@@ -273,7 +62,7 @@
         [
           "standardResult.instances.1.ruleID",
           "=",
-          "hover"
+          "hovInd"
         ],
         [
           "standardResult.instances.1.what",
@@ -303,10 +92,10 @@
       ],
       "rules": [
         "y",
-        "hover"
+        "hovInd"
       ],
       "args": {
-        "hover": [4]
+        "hovInd": [4]
       }
     }
   ],
