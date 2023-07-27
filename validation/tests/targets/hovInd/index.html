@@ -14,6 +14,9 @@
       .cursorless {
         cursor: none;
       }
+      .hoverBC:hover {
+        background-color: #fff;
+      }
       .inert, .inert:hover {
         background-color: #def;
         border: 2px solid blue;
@@ -28,12 +31,13 @@
       <h1>Page with various hover indicators</h1>
       <p>This <a href="https://www.w3.org/">Trigger 0</a> is plain.</p>
       <p>Here is a link named <a id="trigger1" class="qCursor" href="https://en.wikipedia.org">Trigger 1</a>. When hovered over, it wrongly changes the cursor to a question mark.</p>
-      <p>This is a button named <button class="cursorless">Trigger 2</button>. It makes the cursor invisible when being hovered over.</p>
+      <p>This is a button named <button class="cursorless">Trigger 2</button>. It makes the cursor invisible when being hovered over. It also makes no change to its other styles on hover. The browser may slightly darken the background color on hover, but keeps the computed background-color style unchanged. Since the change by the browser is almost imperceptible, this test treats it as no change.</p>
       <p>This is an input with a default type. <label>Trigger 3: Enter something <input></label></p>
       <p>This is an email input that fails to distinguish hover from focus states. <label>Trigger 4: Enter an email address <input class="ambig" type="email"></label></p>
       <p>This is a button named <button class="inert">Trigger 5</button>. It does not change when hovered over.</p>
+      <p>This is a button named <button class="hoverBC">Trigger 6</button>. Its background color changes when hovered over.</p>
       <p>Trigger 1 has a bad hover cursor. Trigger 2 has no hover cursor. Trigger 4 has the same focus and hover indicator. Trigger 5 has no hover indicator.</p>
-      <p>Impact severities: bad cursor 2 (2 instances), ambiguous indicator 1 (1 instance), missing hover indicator 1 (1 instance).
+      <p>Impact severities: bad cursor 2 (2 instances), ambiguous indicator 1 (1 instance), missing hover indicator 1 (2 instances).
     </main>
   </body>
 </html>

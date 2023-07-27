@@ -27,7 +27,7 @@
         [
           "standardResult.totals.1",
           "=",
-          2
+          3
         ],
         [
           "standardResult.totals.2",
@@ -97,27 +97,7 @@
         [
           "standardResult.instances.2.what",
           "i",
-          "are alike"
-        ],
-        [
-          "standardResult.instances.2.ordinalSeverity",
-          "=",
-          1
-        ],
-        [
-          "standardResult.instances.2.tagName",
-          "=",
-          "INPUT"
-        ],
-        [
-          "standardResult.instances.2.location.type",
-          "=",
-          "box"
-        ],
-        [
-          "standardResult.instances.2.excerpt",
-          "i",
-          "Trigger 4: Enter"
+          "do not change"
         ],
         [
           "standardResult.instances.3.ruleID",
@@ -127,7 +107,7 @@
         [
           "standardResult.instances.3.what",
           "i",
-          "do not change"
+          "are alike"
         ],
         [
           "standardResult.instances.3.ordinalSeverity",
@@ -137,15 +117,45 @@
         [
           "standardResult.instances.3.tagName",
           "=",
+          "INPUT"
+        ],
+        [
+          "standardResult.instances.3.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.3.excerpt",
+          "i",
+          "Trigger 4: Enter"
+        ],
+        [
+          "standardResult.instances.4.ruleID",
+          "=",
+          "hovInd"
+        ],
+        [
+          "standardResult.instances.4.what",
+          "i",
+          "do not change"
+        ],
+        [
+          "standardResult.instances.4.ordinalSeverity",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.4.tagName",
+          "=",
           "BUTTON"
         ],
         [
-          "standardResult.instances.3.location.spec.x",
+          "standardResult.instances.4.location.spec.x",
           ">",
           0
         ],
         [
-          "standardResult.instances.3.excerpt",
+          "standardResult.instances.4.excerpt",
           "i",
           "Trigger 5"
         ]
@@ -155,7 +165,7 @@
         "hovInd"
       ],
       "args": {
-        "hovInd": [6]
+        "hovInd": [7]
       }
     }
   ],

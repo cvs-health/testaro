@@ -39,7 +39,6 @@ const {getLocatorData} = require('../procs/getLocatorData');
 const standardCursor = {
   A: 'pointer',
   INPUT: {
-    '': 'text',
     email: 'text',
     image: 'pointer',
     number: 'text',
@@ -91,7 +90,7 @@ const getHoverStyles = async loc => await loc.evaluate(element => {
   } = window.getComputedStyle(element);
   return {
     tagName: element.tagName,
-    inputType: element.tagName === 'INPUT' ? element.getAttribute('type') : null,
+    inputType: element.tagName === 'INPUT' ? element.getAttribute('type') || 'text' : null,
     cursor: cursor.replace(/^.+, */, ''),
     border: `${borderColor} ${borderStyle} ${borderWidth}`,
     outline: `${outlineColor} ${outlineStyle} ${outlineWidth} ${outlineOffset}`,
@@ -127,10 +126,15 @@ const getCursorData = hovStyles => {
     // Assume its hover cursor is standard.
     data.ok = true;
   }
+  return data;
 };
 // Returns whether two hover styles are effectively identical.
-const areAlike = (styles0, styles1) => ['outline', 'border', 'backgroundColor']
-.every(style => styles1[style] === styles0[style]);
+const areAlike = (styles0, styles1) => {
+  // Return whether they are effectively identical.
+  const areAlike = ['outline', 'border', 'backgroundColor']
+  .every(style => styles1[style] === styles0[style]);
+  return areAlike;
+};
 // Performs the hovInd test and reports results.
 exports.reporter = async (page, withItems, sampleSize = 20) => {
   // Initialize the result.
@@ -157,6 +161,8 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
   for (const loc of sample) {
     // Get its style properties.
     const preStyles = await getHoverStyles(loc);
+    console.log('pre');
+    console.log(JSON.stringify(preStyles, null, 2));
     // Focus it.
     await loc.focus();
     // Get its style properties.
@@ -166,18 +172,18 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
     // Get its style properties.
     const fhStyles = await getHoverStyles(loc);
     // Blur it.
-    await page.focus({
-      location: {
-        x: 0,
-        y: 0
-      }
+    await loc.blur({
+      timeout: 500
     });
     // Get its style properties.
     const hovStyles = await getHoverStyles(loc);
+    console.log('hov');
+    console.log(JSON.stringify(hovStyles, null, 2));
     // If all 4 style declarations belong to the same element:
     if ([focStyles, fhStyles, hovStyles].every(style => style.code === preStyles.code)) {
       // Get data on the element if itemization is required.
       const elData = withItems ? await getLocatorData(loc) : null;
+      console.log(elData.excerpt);
       // If the hover cursor is nonstandard:
       const cursorData = getCursorData(hovStyles);
       if (! cursorData.ok) {
