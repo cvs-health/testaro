@@ -32,34 +32,13 @@
 
 // Module to get locator data.
 const {getLocatorData} = require('../procs/getLocatorData');
+// Module to draw a sample.
+const {getSample} = require('../procs/sample');
 // Module to get pixel changes between two times.
 const {visChange} = require('../procs/visChange');
 
 // FUNCTIONS
 
-// Draws a location-weighted sample of triggers.
-const getSample = (population, sampleSize) => {
-  const popSize = population.length;
-  // If the sample is smaller than the population:
-  if (sampleSize < popSize) {
-    // Assign to each trigger a priority randomly decreasing with its index.
-    const WeightedPopulation = population.map((trigger, index) => {
-      const weight = 1 + Math.sin(Math.PI * index / popSize + Math.PI / 2);
-      const priority = weight * Math.random();
-      return [index, priority];
-    });
-    // Return the indexes of the triggers with the highest priorities.
-    const sortedPopulation = WeightedPopulation.sort((a, b) => b[1] - a[1]);
-    const sample = sortedPopulation.slice(0, sampleSize);
-    const domOrderSample = sample.sort((a, b) => a[0] - b[0]);
-    return domOrderSample.map(trigger => trigger[0]);
-  }
-  // Otherwise, i.e. if the sample is at least as large as the population:
-  else {
-    // Return the population indexes.
-    return population.map((trigger, index) => index);
-  }
-};
 // Performs the hover test and reports results.
 exports.reporter = async (page, withItems, sampleSize = 20) => {
   // Initialize the result.

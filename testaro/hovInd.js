@@ -32,6 +32,8 @@
 
 // Module to get locator data.
 const {getLocatorData} = require('../procs/getLocatorData');
+// Module to draw a sample.
+const {getSample} = require('../procs/sample');
 
 // CONSTANTS
 
@@ -52,29 +54,6 @@ const standardCursor = {
 
 // FUNCTIONS
 
-// Draws a location-weighted sample of triggers.
-const getSample = (population, sampleSize) => {
-  const popSize = population.length;
-  // If the sample is smaller than the population:
-  if (sampleSize < popSize) {
-    // Assign to each trigger a priority randomly decreasing with its index.
-    const WeightedPopulation = population.map((trigger, index) => {
-      const weight = 1 + Math.sin(Math.PI * index / popSize + Math.PI / 2);
-      const priority = weight * Math.random();
-      return [index, priority];
-    });
-    // Return the indexes of the triggers with the highest priorities.
-    const sortedPopulation = WeightedPopulation.sort((a, b) => b[1] - a[1]);
-    const sample = sortedPopulation.slice(0, sampleSize);
-    const domOrderSample = sample.sort((a, b) => a[0] - b[0]);
-    return domOrderSample.map(trigger => trigger[0]);
-  }
-  // Otherwise, i.e. if the sample is at least as large as the population:
-  else {
-    // Return the population indexes.
-    return population.map((trigger, index) => index);
-  }
-};
 // Returns the hover-related style properties of a trigger.
 const getHoverStyles = async loc => await loc.evaluate(element => {
   const {
@@ -161,8 +140,6 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
   for (const loc of sample) {
     // Get its style properties.
     const preStyles = await getHoverStyles(loc);
-    console.log('pre');
-    console.log(JSON.stringify(preStyles, null, 2));
     // Focus it.
     await loc.focus();
     // Get its style properties.
@@ -177,13 +154,10 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
     });
     // Get its style properties.
     const hovStyles = await getHoverStyles(loc);
-    console.log('hov');
-    console.log(JSON.stringify(hovStyles, null, 2));
     // If all 4 style declarations belong to the same element:
     if ([focStyles, fhStyles, hovStyles].every(style => style.code === preStyles.code)) {
       // Get data on the element if itemization is required.
       const elData = withItems ? await getLocatorData(loc) : null;
-      console.log(elData.excerpt);
       // If the hover cursor is nonstandard:
       const cursorData = getCursorData(hovStyles);
       if (! cursorData.ok) {
