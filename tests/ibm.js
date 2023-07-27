@@ -6,7 +6,7 @@
   
   This test depends on aceconfig.js.
 
-  This test is compatible with Windows only if the accessibility-checker package
+  This tool is compatible with Windows only if the accessibility-checker package
   is revised. See README.md for details.
 */
 // Import required modules.

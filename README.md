@@ -60,6 +60,20 @@ Level Access has acquired Tenon and has announced that it will retire Tenon in A
 
 Each tool accessed with Testaro defines _rules_ and tests _targets_ for compliance with its rules. The counts of the rules range from about 30, for Testaro itself, to about 270, for Continuum Community Edition. In total, the ten tools define about 1350 rules. Some of the tools are under active development, and their rule counts change over time.
 
+When you ask Testaro to run tests of a tool, you may specify a subset of the rules of that tool, and the report will give you the results of only the tests for those rules. These tools will perform only those tests:
+- alfa
+- axe
+- continuum
+- htmlcs
+- qualWeb
+- testaro
+
+These tools always perform a fixed set of tests, and Testaro disregards irrelevant results when you specify a set of rules:
+- ibm
+- nuVal
+- tenon
+- wave
+
 ## Job data
 
 A report produced by Testaro discloses:
@@ -470,7 +484,7 @@ When a `test` act has an `expect` property, the result for that act has an `expe
 
 ###### Continuum
 
-The `continuum` tests makes use of the files in the `continuum` directory. The tool inserts the contents of all three files into the page as scripts and then uses them to perform the tests.
+The `continuum` tool makes use of the files in the `continuum` directory. The tool inserts the contents of all three files into the page as scripts and then uses them to perform the tests.
 
 Level Access on 22 August 2022 granted authorization for the copying of the `AccessEngine.community.js` file insofar as necessary for allowing Continuum community edition tests to be included in Testaro.
 
