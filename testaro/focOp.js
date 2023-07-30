@@ -2,10 +2,6 @@
   focOp
   Related to Tenon rule 190.
 
-  WARNING: The chromium and firefox browsers in Playwright fail to accept are stricter on this test than the
-  chromium browser is.
-  misclassifying the tabIndex values of elements. Launch the webkit browser to run this test.
-
   This test reports discrepancies between Tab-focusability and operability. The standard
   practice is to make focusable elements operable and vice versa. If focusable elements are not
   operable, users are likely to be surprised that nothing happens when they try to operate such
