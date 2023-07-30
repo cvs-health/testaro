@@ -2,11 +2,11 @@
   focOp
   Related to Tenon rule 190.
 
-  WARNING: The chromium and firefox browsers in Playwright make errors on this test by
-  misclassifying the cursor property values of the computed styles of elements. Launch the
-  webkit browser to run this test.
+  WARNING: The chromium and firefox browsers in Playwright fail to accept are stricter on this test than the
+  chromium browser is.
+  misclassifying the tabIndex values of elements. Launch the webkit browser to run this test.
 
-  This test reports descrepancies between Tab-focusability and operability. The standard
+  This test reports discrepancies between Tab-focusability and operability. The standard
   practice is to make focusable elements operable and vice versa. If focusable elements are not
   operable, users are likely to be surprised that nothing happens when they try to operate such
   elements. If operable elements are not focusable, users depending on keyboard navigation are
@@ -72,11 +72,19 @@ exports.reporter = async (page, withItems) => {
   for (const loc of locsAll) {
     // Get data on it.
     const focOpData = await loc.evaluate(element => {
+      // Tab index.
       const {tabIndex} = element;
+      // Cursor.
       let hasPointer = false;
       if (element.tagName !== 'LABEL') {
         const styleDec = window.getComputedStyle(element);
         hasPointer = styleDec.cursor === 'pointer';
+        // If the cursor is a pointer:
+        if (hasPointer) {
+          // Disregard this if the only reason is inheritance.
+          element.parentElement.style.cursor = 'default';
+          hasPointer = styleDec.cursor === 'pointer';
+        }
       }
       const {tagName} = element;
       return {
