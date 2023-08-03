@@ -91,7 +91,7 @@ exports.reporter = async (page, options) => {
         data.rules[rule][key] = report[key];
       });
       // If testing is to stop after a failure and the page failed the test:
-      if (stopOnFail && report.standardResult.totals.some(total => total)) {
+      if (stopOnFail && report.totals.some(total => total)) {
         // Stop testing.
         break;
       }

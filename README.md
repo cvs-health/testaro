@@ -603,9 +603,9 @@ If you do not specify rules when using the `testaro` tool, Testaro will test for
 
 The `rules` property for `testaro` is an array whose first item is either `'y'` or `'n'` and whose remaining items are rule IDs. If `'y'`, then only the specified rules’ tests are performed. If `'n'`, then all the evaluative tests are performed, except for the specified rules.
 
-It has been found that the `focOp` and `motion` tests of the `testaro` tool work properly only when the `webkit` browser type is in use. If you want to use `testaro` with different browser types for different tests, you can include 2 or 3 `testaro` test acts in your job, specifying different browser types and different rules.
-
 The `testaro` tool (like the `ibm` tool) has a `withItems` property. If you set it to `false`, the `standardResult` object of `testaro` will contain an `instances` property with summaries that identify issues and instance counts. If you set it to `true`, some of the instances will be itemized.
+
+Unlike any other tool, the `testaro` tools requires a `stopOnFail` property, which specifies whether a failure to conform to any rule (i.e. any value of `totals` other than `[0, 0, 0, 0]`) should terminate the execution of tests for the remaining rules.
 
 ###### WAVE
 
