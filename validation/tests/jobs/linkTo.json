@@ -19,6 +19,7 @@
       "which": "testaro",
       "what": "links without destinations",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",
@@ -81,6 +82,7 @@
       "which": "testaro",
       "what": "links without destinations",
       "withItems": false,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",

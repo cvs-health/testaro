@@ -18,6 +18,7 @@
       "type": "test",
       "which": "testaro",
       "what": "document title",
+      "stopOnFail": true,
       "expect": [
         [
           "result.rules.title.data.title",
@@ -40,6 +41,7 @@
       "type": "test",
       "which": "testaro",
       "what": "document title",
+      "stopOnFail": true,
       "expect": [
         [
           "result.rules.title.data.title",

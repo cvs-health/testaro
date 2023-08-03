@@ -19,6 +19,7 @@
       "which": "testaro",
       "what": "focusability and operability",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",
@@ -51,6 +52,7 @@
       "which": "testaro",
       "what": "focusability and operability",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",
@@ -158,6 +160,7 @@
       "which": "testaro",
       "what": "focusability and operability",
       "withItems": false,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",

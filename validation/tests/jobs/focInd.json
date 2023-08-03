@@ -19,6 +19,7 @@
       "which": "testaro",
       "withItems": true,
       "what": "focus indication",
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",
@@ -51,6 +52,7 @@
       "which": "testaro",
       "withItems": true,
       "what": "focus indication",
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",
@@ -133,6 +135,7 @@
       "which": "testaro",
       "withItems": false,
       "what": "focus indication",
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.1",

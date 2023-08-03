@@ -19,6 +19,7 @@
       "which": "testaro",
       "what": "filter",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",
@@ -46,6 +47,7 @@
       "which": "testaro",
       "what": "filter",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",
@@ -118,6 +120,7 @@
       "which": "testaro",
       "what": "filter",
       "withItems": false,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",

@@ -18,6 +18,7 @@
       "type": "test",
       "which": "testaro",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",
@@ -39,6 +40,7 @@
       "type": "test",
       "which": "testaro",
       "withItems": false,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",
@@ -65,6 +67,7 @@
       "type": "test",
       "which": "testaro",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",
@@ -117,6 +120,7 @@
       "which": "testaro",
       "what": "autocomplete attributes for name and email",
       "withItems": false,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",

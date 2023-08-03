@@ -18,6 +18,7 @@
       "type": "test",
       "which": "testaro",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.0",
@@ -114,6 +115,7 @@
       "type": "test",
       "which": "testaro",
       "withItems": false,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.0",

@@ -19,6 +19,7 @@
       "which": "testaro",
       "withItems": true,
       "what": "styleDiff",
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.0",
@@ -51,6 +52,7 @@
       "which": "testaro",
       "withItems": true,
       "what": "styleDiff",
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.0",

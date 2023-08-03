@@ -54,7 +54,7 @@ const etcRules = {
 
 // Conducts and reports a Testaro test.
 exports.reporter = async (page, options) => {
-  const {withItems, args} = options;
+  const {withItems, stopOnFail, args} = options;
   const argRules = args ? Object.keys(args) : null;
   const rules = options.rules || ['y', ... Object.keys(evalRules)];
   // Initialize the data.
@@ -90,6 +90,11 @@ exports.reporter = async (page, options) => {
       Object.keys(report).forEach(key => {
         data.rules[rule][key] = report[key];
       });
+      // If testing is to stop after a failure and the page failed the test:
+      if (stopOnFail && report.standardResult.totals.some(total => total)) {
+        // Stop testing.
+        break;
+      }
     }
   }
   // Otherwise, i.e. if the rule specification is invalid:

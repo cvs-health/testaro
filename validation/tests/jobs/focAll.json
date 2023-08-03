@@ -19,6 +19,7 @@
       "which": "testaro",
       "what": "Tab-focusability",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",
@@ -46,6 +47,7 @@
       "which": "testaro",
       "what": "Tab-focusability",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",
@@ -93,6 +95,7 @@
       "which": "testaro",
       "what": "Tab-focusability",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",

@@ -19,6 +19,7 @@
       "which": "testaro",
       "what": "title attributes on inappropriate elements",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",
@@ -86,6 +87,7 @@
       "which": "testaro",
       "what": "title attributes on inappropriate elements",
       "withItems": false,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",

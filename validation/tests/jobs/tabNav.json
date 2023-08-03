@@ -19,6 +19,7 @@
       "which": "testaro",
       "what": "tab-list navigation",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.0",
@@ -51,6 +52,7 @@
       "which": "testaro",
       "what": "tab-list navigation",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.0",
@@ -138,6 +140,7 @@
       "which": "testaro",
       "what": "tab-list navigation",
       "withItems": false,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.0",

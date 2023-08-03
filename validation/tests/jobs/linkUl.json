@@ -19,6 +19,7 @@
       "which": "testaro",
       "what": "adjacent-link underlining",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.1",
@@ -46,6 +47,7 @@
       "which": "testaro",
       "what": "adjacent-link underlining",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.1",
@@ -78,6 +80,7 @@
       "which": "testaro",
       "what": "inline-link underlining",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.1",

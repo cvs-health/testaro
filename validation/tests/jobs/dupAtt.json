@@ -19,6 +19,7 @@
       "which": "testaro",
       "what": "elements with duplicate attributes",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",
@@ -46,6 +47,7 @@
       "which": "testaro",
       "what": "elements with duplicate attributes",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",
@@ -108,6 +110,7 @@
       "which": "testaro",
       "what": "elements with duplicate attributes",
       "withItems": false,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",

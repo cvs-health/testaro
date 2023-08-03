@@ -17,6 +17,7 @@
     {
       "type": "test",
       "which": "testaro",
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.0",
@@ -59,6 +60,7 @@
       "type": "test",
       "which": "testaro",
       "what": "spontaneous change of content",
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.instances.length",

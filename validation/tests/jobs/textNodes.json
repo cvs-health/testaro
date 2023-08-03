@@ -18,6 +18,7 @@
       "type": "test",
       "which": "testaro",
       "what": "text nodes",
+      "stopOnFail": true,
       "expect": [
         [
           "result.rules.textNodes.data.nodeCount",
@@ -38,6 +39,7 @@
       "type": "test",
       "which": "testaro",
       "what": "text nodes",
+      "stopOnFail": true,
       "expect": [
         [
           "result.rules.textNodes.data.nodeCount",
@@ -58,6 +60,7 @@
       "type": "test",
       "which": "testaro",
       "what": "text nodes",
+      "stopOnFail": true,
       "expect": [
         [
           "result.rules.textNodes.data.nodeCount",
@@ -83,6 +86,7 @@
       "type": "test",
       "which": "testaro",
       "what": "text nodes",
+      "stopOnFail": true,
       "expect": [
         [
           "result.rules.textNodes.data.nodeCount",
@@ -167,6 +171,7 @@
       "type": "test",
       "which": "testaro",
       "what": "text nodes",
+      "stopOnFail": true,
       "expect": [
         [
           "result.rules.textNodes.data.nodeCount",

@@ -19,6 +19,7 @@
       "which": "testaro",
       "what": "attribute values",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",
@@ -44,6 +45,7 @@
       "which": "testaro",
       "what": "attribute values",
       "withItems": false,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",
@@ -73,6 +75,7 @@
       "type": "test",
       "which": "testaro",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.2",
@@ -148,6 +151,7 @@
       "which": "testaro",
       "what": "attribute values",
       "withItems": false,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.3",

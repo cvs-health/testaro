@@ -19,6 +19,7 @@
       "which": "testaro",
       "what": "zIndex",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.0",
@@ -51,6 +52,7 @@
       "which": "testaro",
       "what": "zIndex",
       "withItems": true,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.0",
@@ -108,6 +110,7 @@
       "which": "testaro",
       "what": "zIndex",
       "withItems": false,
+      "stopOnFail": true,
       "expect": [
         [
           "standardResult.totals.0",
