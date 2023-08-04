@@ -17,7 +17,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "off-display focused links",
       "withItems": true,
       "stopOnFail": true,
       "expect": [

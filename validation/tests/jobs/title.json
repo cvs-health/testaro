@@ -17,7 +17,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "document title",
       "stopOnFail": true,
       "expect": [
         [
@@ -40,7 +39,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "document title",
       "stopOnFail": true,
       "expect": [
         [

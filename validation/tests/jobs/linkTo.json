@@ -17,7 +17,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "links without destinations",
       "withItems": true,
       "stopOnFail": true,
       "expect": [
@@ -80,7 +79,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "links without destinations",
       "withItems": false,
       "stopOnFail": true,
       "expect": [

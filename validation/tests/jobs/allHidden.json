@@ -17,7 +17,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "entirely or mainly hidden page",
       "stopOnFail": true,
       "expect": [
         [
@@ -60,7 +59,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "entirely or mainly hidden page",
       "stopOnFail": true,
       "expect": [
         [

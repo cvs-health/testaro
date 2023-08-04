@@ -17,7 +17,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "Tab-focusability",
       "withItems": true,
       "stopOnFail": true,
       "expect": [
@@ -45,7 +44,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "Tab-focusability",
       "withItems": true,
       "stopOnFail": true,
       "expect": [
@@ -93,7 +91,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "Tab-focusability",
       "withItems": true,
       "stopOnFail": true,
       "expect": [

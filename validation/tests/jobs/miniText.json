@@ -17,7 +17,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "small text",
       "withItems": true,
       "stopOnFail": true,
       "expect": [
@@ -95,7 +94,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "small text",
       "withItems": false,
       "stopOnFail": true,
       "expect": [

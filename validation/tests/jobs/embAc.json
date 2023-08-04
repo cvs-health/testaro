@@ -17,7 +17,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "embedded active elements",
       "withItems": true,
       "stopOnFail": true,
       "expect": [
@@ -45,7 +44,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "embedded active elements",
       "withItems": true,
       "stopOnFail": true,
       "expect": [
@@ -108,7 +106,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "embedded active elements",
       "withItems": false,
       "stopOnFail": true,
       "expect": [

@@ -104,7 +104,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "tables used for layout",
       "withItems": false,
       "stopOnFail": true,
       "expect": [

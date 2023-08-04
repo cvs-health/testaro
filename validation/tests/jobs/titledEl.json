@@ -17,7 +17,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "title attributes on inappropriate elements",
       "withItems": true,
       "stopOnFail": true,
       "expect": [
@@ -85,7 +84,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "title attributes on inappropriate elements",
       "withItems": false,
       "stopOnFail": true,
       "expect": [

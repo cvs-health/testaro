@@ -17,7 +17,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "visible element count",
       "stopOnFail": true,
       "expect": [
         [
@@ -45,7 +44,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "visible element count",
       "stopOnFail": true,
       "expect": [
         [

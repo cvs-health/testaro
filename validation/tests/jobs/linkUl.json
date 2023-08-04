@@ -17,7 +17,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "adjacent-link underlining",
       "withItems": true,
       "stopOnFail": true,
       "expect": [
@@ -45,7 +44,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "adjacent-link underlining",
       "withItems": true,
       "stopOnFail": true,
       "expect": [
@@ -78,7 +76,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "inline-link underlining",
       "withItems": true,
       "stopOnFail": true,
       "expect": [

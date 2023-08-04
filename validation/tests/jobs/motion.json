@@ -59,7 +59,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "spontaneous change of content",
       "stopOnFail": true,
       "expect": [
         [

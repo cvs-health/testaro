@@ -17,7 +17,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "filter",
       "withItems": true,
       "stopOnFail": true,
       "expect": [
@@ -45,7 +44,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "filter",
       "withItems": true,
       "stopOnFail": true,
       "expect": [
@@ -118,7 +116,6 @@
     {
       "type": "test",
       "which": "testaro",
-      "what": "filter",
       "withItems": false,
       "stopOnFail": true,
       "expect": [
