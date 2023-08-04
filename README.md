@@ -48,13 +48,10 @@ Testaro performs tests of these tools:
 - [HTML CodeSniffer](https://www.npmjs.com/package/html_codesniffer) (Squiz Labs)
 - [Nu Html Checker](https://github.com/validator/validator) (World Wide Web Consortium)
 - [QualWeb core](https://www.npmjs.com/package/@qualweb/core) (University of Lisbon)
-- [Tenon](https://tenon.io/documentation/what-tenon-tests.php) (Tenon)
 - [Testaro](https://www.npmjs.com/package/testaro) (Testaro)
 - [WAVE API](https://wave.webaim.org/api/) (WebAIM)
 
-The [BBC Accessibility Standards Checker](https://github.com/bbc/bbc-a11y) is not a formal dependency, but some of the tests in the Testaro tool are adaptations of tests of that tool.
-
-Level Access has acquired Tenon and has announced that it will retire Tenon in August 2023. Thereafter one should expect that Testaro will report failures to perform Tenon tests. In anticipation of the retirement of Tenon, tests have been added to Testaro that approximate those Tenon tests that, empirically, have been found to report issues not reported by other tools.
+Some of the rules tested by Testaro are based on rules of the [BBC Accessibility Standards Checker](https://github.com/bbc/bbc-a11y) and of Tenon, a service that existed until August 2023.
 
 ## Rules
 
@@ -71,7 +68,6 @@ When you ask Testaro to run tests of a tool, you may specify a subset of the rul
 These tools always perform a fixed set of tests, and Testaro disregards irrelevant results when you specify a set of rules:
 - ibm
 - nuVal
-- tenon
 - wave
 
 ## Job data
@@ -126,7 +122,7 @@ To run Testaro after installation, provide the environment variables described b
 
 ## Payment
 
-All of the tests that Testaro can perform are free of cost, except those performed by the Tenon and WAVE tools. The owner of each of those tools gives new registrants a free allowance of credits before it becomes necessary to pay for use of the API of the tool. The required environment variables for authentication and payment are described below under “Environment variables”.
+All of the tests that Testaro can perform are free of cost, except those performed by the WAVE tool. The owner of that tool gives new registrants a free allowance of credits before it becomes necessary to pay for use of the API of the tool. The required environment variable for authentication and payment is described below under “Environment variables”.
 
 ## Process objects
 
@@ -402,7 +398,7 @@ That means that a test act (i.e. an act with a `type` property having the value 
 
 If a particular test act either must have or may have any other properties, those properties are specified in the `tests` property in `actSpecs.js`.
 
-When you include a `rules` property, you limit the tests of the tool that are performed or reported. For some tools (`alfa`, `axe`, `continuum`, `htmlcs`, `qualWeb`, and `testaro`), only the specified tests are performed. Other tools (`ibm`, `nuVal`, `tenon`, and `wave`) do not allow such a limitation, so, for those tools, all tests are performed but results are reported from only the specified tests.
+When you include a `rules` property, you limit the tests of the tool that are performed or reported. For some tools (`alfa`, `axe`, `continuum`, `htmlcs`, `qualWeb`, and `testaro`), only the specified tests are performed. Other tools (`ibm`, `nuVal`, and `wave`) do not allow such a limitation, so, for those tools, all tests are performed but results are reported from only the specified tests.
 
 The `nuVal` and `testaro` tools require specific formats for the `rules` property. Those formats are described below in the sections about those tools.
 
@@ -554,48 +550,6 @@ Its `rules` argument is **not** an array of rule IDs, but instead is an array of
 ###### QualWeb
 
 The `qualWeb` tool performs the ACT rules, WCAG Techniques, and best-practices tests of QualWeb. Only failures and warnings are included in the report. The EARL report of QualWeb is not generated, because it is equivalent to the report of the ACT rules tests.
-
-###### Tenon
-
-Most tools require only one act, but the `tenon` tool requires two acts:
-- An act of type `tenonRequest`.
-- An act of type `test` with `tenon` as the value of `which`.
-
-Example:
-
-```json
-  {
-    "type": "tenonRequest",
-    "id": "a",
-    "withNewContent": true,
-    "what": "Tenon API version 2 test request"
-  }
-  ```
-
-  followed by
-
-```json
-  {
-    "type": "test",
-    "which": "tenon",
-    "id": "a",
-    "what": "Tenon API version 2 result retrieval"
-  }
-```
-
-The reason is that the Tenon API operates asynchronously. You ask it to perform a test, and it puts your request into a queue. To learn whether Tenon has completed your test, you make a status request. You can continue making status requests until Tenon replies that your test has been completed. Then you submit a request for the test result, and Tenon replies with the result. (As of May 2022, however, status requests were observed to misreport still-running tests as completed. The `tenon` test act works around that by requesting only the result and using the response to determine whether the tests have been completed.)
-
-Tenon says that tests are typically completed in 3 to 6 seconds but that the latency can be longer, depending on demand.
-
-Therefore, you can include a `tenonRequest` act early in your job, and a `tenon` test act late in your job. Tenon will move your request through its queue while Testaro is processing your job. When Testaro reaches your `tenon` test act, Tenon will most likely have completed your test. If not, the `tenon` test will wait and then make a second request before giving up.
-
-Thus, a `tenon` test act actually does not perform any test; it merely collects the result. The page that was active when the `tenonRequest` act was performed is the one that Tenon tests.
-
-In case you want to perform the Tenon tests more than once in the same job, you can do so. Just give each pair of acts a distinct `id` property, so each `tenon` test act will request the correct result.
-
-Tenon recommends giving it a public URL rather than giving it the content of a page, if possible. So, it is best to give the `withNewContent` property of the `tenonRequest` act the value `true`, unless the page is not public.
-
-If a `tenon` test act is included in a job, environment variables named `TENON_USER` and `TENON_PASSWORD` must exist, with your Tenon username and password, respectively, as their values. These could be obtained from [Tenon](https://tenon.io/documentation/overview) until Tenon was closed to new subscribers in or about October 2022.
 
 ###### Testaro
 
@@ -805,8 +759,6 @@ You may store environment variables in an untracked `.env` file if you wish, and
 
 ```conf
 URL_INJECT=yes
-TENON_USER=you@yourdomain.tld
-TENON_PASSWORD=yourTenonPassword
 WAVE_KEY=yourwavekey
 PROTOCOL=https
 JOB_URL=yourserver.tld/job

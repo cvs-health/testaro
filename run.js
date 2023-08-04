@@ -42,7 +42,6 @@ const tests = {
   ibm: 'IBM Accessibility Checker',
   nuVal: 'Nu Html Checker',
   qualWeb: 'QualWeb',
-  tenon: 'Tenon',
   testaro: 'Testaro',
   wave: 'WAVE',
 };
@@ -54,11 +53,6 @@ const browserTypeNames = {
 };
 // Items that may be waited for.
 const waitables = ['url', 'title', 'body'];
-// Tenon data.
-const tenonData = {
-  accessToken: '',
-  requestIDs: {}
-};
 // Strings in log messages indicating errors.
 const errorWords = [
   'but not used',
@@ -864,119 +858,6 @@ const doActs = async (report, actIndex, page) => {
                 success: true
               };
             }
-            // Otherwise, if the act is a tenon request:
-            else if (act.type === 'tenonRequest') {
-              const {id, withNewContent} = act;
-              const https = require('https');
-              // If a Tenon access token has not yet been obtained:
-              if (! tenonData.accessToken) {
-                // Authenticate with the Tenon API.
-                const authData = await new Promise(resolve => {
-                  const request = https.request(
-                    {
-                      host: 'tenon.io',
-                      path: '/api/v2/auth',
-                      port: 443,
-                      protocol: 'https:',
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        'Cache-Control': 'no-cache'
-                      }
-                    },
-                    response => {
-                      let responseData = '';
-                      response.on('data', chunk => {
-                        responseData += chunk;
-                      });
-                      response.on('end', () => {
-                        try {
-                          const responseJSON = JSON.parse(responseData);
-                          return resolve(responseJSON);
-                        }
-                        catch(error) {
-                          return resolve({
-                            error: 'Tenon did not return JSON authentication data.',
-                            responseData
-                          });
-                        }
-                      });
-                    }
-                  );
-                  const tenonUser = process.env.TENON_USER;
-                  const tenonPassword = process.env.TENON_PASSWORD;
-                  const postData = JSON.stringify({
-                    username: tenonUser,
-                    password: tenonPassword
-                  });
-                  request.write(postData);
-                  request.end();
-                });
-                // If the authentication succeeded:
-                if (authData.access_token) {
-                  // Record the access token.
-                  tenonData.accessToken = authData.access_token;
-                }
-                // Otherwise, i.e. if the authentication failed:
-                else {
-                  console.log('ERROR: tenon authentication failed');
-                }
-              }
-              // If a Tenon access token exists:
-              if (tenonData.accessToken) {
-                // Request a Tenon test of the page and get a response ID.
-                const option = {};
-                // If Tenon is to be given the URL and not the content of the page:
-                if (withNewContent) {
-                  // Specify this.
-                  option.url = page.url();
-                }
-                // Otherwise, i.e. if Tenon is to be given the page content:
-                else {
-                  // Specify this.
-                  option.src = await page.content();
-                }
-                // Request a Tenon test and get a response ID.
-                const responseID = await new Promise(resolve => {
-                  const request = https.request(
-                    {
-                      host: 'tenon.io',
-                      path: '/api/v2/',
-                      port: 443,
-                      protocol: 'https:',
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        'Cache-Control': 'no-cache',
-                        Authorization: `Bearer ${tenonData.accessToken}`
-                      }
-                    },
-                    response => {
-                      let resultJSON = '';
-                      response.on('data', chunk => {
-                        resultJSON += chunk;
-                      });
-                      // When the data arrive, return them as an object.
-                      response.on('end', () => {
-                        try {
-                          const result = JSON.parse(resultJSON);
-                          resolve(result.data.responseID || '');
-                        }
-                        catch (error) {
-                          console.log('ERROR: Tenon did not return JSON.');
-                          resolve('');
-                        }
-                      });
-                    }
-                  );
-                  const postData = JSON.stringify(option);
-                  request.write(postData);
-                  request.end();
-                });
-                // Record the response ID.
-                tenonData.requestIDs[id] = responseID || '';
-              }
-            }
             // Otherwise, if the act performs the tests of a tool:
             else if (act.type === 'test') {
               // Add a description of the test to the act.
@@ -997,7 +878,7 @@ const doActs = async (report, actIndex, page) => {
                 }
               };
               try {
-                const args = [act.which === 'tenon' ? tenonData : page, options];
+                const args = [page, options];
                 testReport = await require(`./tests/${act.which}`).reporter(... args);
                 testReport.result.success = true;
               }

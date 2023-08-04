@@ -381,40 +381,6 @@ const convert = (toolName, result, standardResult) => {
       doQualWeb(result, standardResult, 'best-practices');
     }
   }
-  // tenon
-  else if (toolName === 'tenon' && result.data && result.data.resultSet) {
-    result.data.resultSet.forEach(item => {
-      const identifiers = getIdentifiers(
-        item.errorSnippet.replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-      );
-      if (! identifiers[0] && item.xpath) {
-        const tagNameArray = item.xpath.match(/^.+\/([^/[]+)/);
-        if (tagNameArray && tagNameArray.length === 2) {
-          identifiers[0] = tagNameArray[1].toUpperCase();
-        }
-      }
-      const instance = {
-        ruleID: item.tID ? item.tID.toString() : '',
-        what: item.errorTitle || '',
-        ordinalSeverity: Math.min(
-          3, Math.max(0, Math.round((item.certainty || 0) * (item.priority || 0) / 3333))
-        ),
-        tagName: identifiers[0],
-        id: identifiers[1],
-        location: {
-          doc: 'dom',
-          type: 'xpath',
-          spec: item.xpath || ''
-        },
-        excerpt: cap(item.errorSnippet || '').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-      };
-      standardResult.instances.push(instance);
-    });
-    standardResult.totals = [0, 0, 0, 0];
-    standardResult.instances.forEach(instance => {
-      standardResult.totals[instance.ordinalSeverity]++;
-    });
-  }
   // testaro
   else if (toolName === 'testaro') {
     const rules = result.rules ? Object.keys(result.rules) : [];

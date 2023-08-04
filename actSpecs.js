@@ -113,14 +113,6 @@ exports.actSpecs = {
         what: [false, 'string', 'hasLength', 'comment']
       }
     ],
-    tenonRequest: [
-      'Request a Tenon test',
-      {
-        id: [true, 'string', 'hasLength', 'ID for this test instance'],
-        withNewContent: [true, 'boolean', '', 'true: use a URL; false: use page content'],
-        what: [false, 'string', 'hasLength', 'comment']
-      }
-    ],
     test: [
       'Perform tests of a tool',
       {
@@ -172,12 +164,6 @@ exports.actSpecs = {
       'Perform QualWeb tests',
       {
         withNewContent: [true, 'boolean', '', 'whether to use a URL instead of page content']
-      }
-    ],
-    tenon: [
-      'Perform Tenon tests',
-      {
-        id: [true, 'string', 'hasLength', 'ID of the requested test instance']
       }
     ],
     testaro: [
