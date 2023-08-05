@@ -30,7 +30,6 @@ const evalRules = {
   linkTitle: 'links with title attributes repeating text content',
   linkTo: 'links without destinations',
   linkUl: 'missing underlines on inline links',
-  menuNav: 'nonstandard keyboard navigation between focusable menu items',
   miniText: 'text smaller than 11 pixels',
   motion: 'motion without user request',
   nonTable: 'table elements used for layout',

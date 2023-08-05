@@ -2,6 +2,10 @@
 
 Ensemble testing for web accessibility
 
+## Notice: tool change
+
+As of this version 18.0.0, the 10 tools integrated by Testaro have been changed to 9 tools. One tool, Tenon, was withdrawn by its owner on 2023-08-06, so it was removed from Testaro.
+
 ## Introduction
 
 Testaro is an application for automated web accessibility testing.
