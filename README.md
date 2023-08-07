@@ -156,7 +156,7 @@ Here is an example of a job:
       type: 'test',
       which: 'alfa',
       what: 'Siteimprove alfa tool',
-      rules: ['y', 'r25', 'r71']
+      rules: ['r25', 'r71']
     }
   ],
   sources: {
