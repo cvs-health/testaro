@@ -167,7 +167,7 @@ const doQualWeb = (result, standardResult, ruleClassName) => {
           const identifiers = getIdentifiers(htmlCode);
           const instance = {
             ruleID,
-            what: ruleResult.description,
+            what: item.description,
             ordinalSeverity: severities[ruleClassName][item.verdict],
             tagName: identifiers[0],
             id: identifiers[1],
