@@ -23,12 +23,12 @@
         [
           "standardResult.totals.1",
           "=",
-          2
+          3
         ],
         [
           "standardResult.instances.length",
           "=",
-          2
+          3
         ],
         [
           "standardResult.instances.0.ruleID",

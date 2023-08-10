@@ -60,7 +60,7 @@ exports.reporter = async (page, withItems) => {
           const elData = await getLocatorData(loc);
           // Add a standard instance.
           standardInstances.push({
-            ruleID: 'sibHeading',
+            ruleID: 'headingAmb',
             what: 'Heading has the same text as a prior same-level sibling heading',
             ordinalSeverity: 1,
             tagName: elData.tagName,
@@ -80,7 +80,7 @@ exports.reporter = async (page, withItems) => {
     else {
       // Add a summary instance.
       standardInstances.push({
-        ruleID: 'sibHeading',
+        ruleID: 'headingAmb',
         what: 'Sibling same-level headings have the same text',
         ordinalSeverity: 1,
         count: totals[1],
