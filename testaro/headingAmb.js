@@ -22,7 +22,7 @@ exports.reporter = async (page, withItems) => {
   const headingLevels = [1, 2, 3, 4, 5, 6];
   const locAll = page.locator(headingLevels.map(level => `body h${level}`).join(', '));
   const locsAll = await locAll.all();
-  const ambIndexes = await locsAll.evaluateAll(headings => {
+  const ambIndexes = await locAll.evaluateAll(headings => {
     // Initialize the array of indexes of violating headings.
     const badIndexes = [];
     // For each heading:
@@ -37,59 +37,62 @@ exports.reporter = async (page, withItems) => {
             .slice(priorIndex + 1, index)
             .every(betweenHeading => betweenHeading.tagName[1] >= heading.tagName[1])
           ) {
-            // Add to the totals.
-            totals[1]++;
             // Add the index of the later heading to the index of violating headings.
-            badIndexes.push(headings.findIndex(heading));
+            badIndexes.push(headings.indexOf(heading));
           }
         }
       });
     });
   });
-  // If there were any instances and itemization is required:
-  if (withItems && ambIndexes.length) {
-    // For each instance:
-    for (const index of ambIndexes) {
-      // If it exists:
-      const loc = locsAll[index];
-      if (loc) {
-        // Get data on the element.
-        const elData = await getLocatorData(loc);
-        // Add a standard instance.
-        standardInstances.push({
-          ruleID: 'sibHeading',
-          what: 'Heading has the same text as a prior same-level sibling heading',
-          ordinalSeverity: 1,
-          tagName: elData.tagName,
-          id: elData.id,
-          location: elData.location,
-          excerpt: elData.excerpt
-        });
-      }
-      // Otherwise, i.e. if it does not exist:
-      else {
-        // Report this.
-        console.log('ERROR: Reportedly same-text sibling heading not found');
+  // If there were any instances:
+  if (ambIndexes.length) {
+    // Add to the totals.
+    totals[1] = ambIndexes.length;
+    // If itemization is required:
+    if (withItems) {
+      // For each instance:
+      for (const index of ambIndexes) {
+        // If it exists:
+        const loc = locsAll[index];
+        if (loc) {
+          // Get data on the element.
+          const elData = await getLocatorData(loc);
+          // Add a standard instance.
+          standardInstances.push({
+            ruleID: 'sibHeading',
+            what: 'Heading has the same text as a prior same-level sibling heading',
+            ordinalSeverity: 1,
+            tagName: elData.tagName,
+            id: elData.id,
+            location: elData.location,
+            excerpt: elData.excerpt
+          });
+        }
+        // Otherwise, i.e. if it does not exist:
+        else {
+          // Report this.
+          console.log('ERROR: Reportedly same-text sibling heading not found');
+        }
       }
     }
-  }
-  // Otherwise, if there were any instances:
-  else if (ambIndexes.length) {
-    // Add a summary instance.
-    standardInstances.push({
-      ruleID: 'sibHeading',
-      what: 'Sibling same-level headings have the same text',
-      ordinalSeverity: 1,
-      count: totals[1],
-      tagName: '',
-      id: '',
-      location: {
-        doc: '',
-        type: '',
-        spec: ''
-      },
-      excerpt: ''
-    });
+    // Otherwise, i.e. if itemization is not required:
+    else {
+      // Add a summary instance.
+      standardInstances.push({
+        ruleID: 'sibHeading',
+        what: 'Sibling same-level headings have the same text',
+        ordinalSeverity: 1,
+        count: totals[1],
+        tagName: '',
+        id: '',
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: ''
+      });
+    }
   }
   return {
     data,

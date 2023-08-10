@@ -21,6 +21,7 @@ const evalRules = {
   focInd: 'missing and nonstandard focus indicators',
   focOp: 'discrepancies between focusability and operability',
   focVis: 'links that are invisible when focused',
+  headingAmb: 'same-level sibling headings with identical texts',
   hover: 'hover-caused content changes',
   hovInd: 'hover indication nonstandard',
   labClash: 'labeling inconsistencies',
