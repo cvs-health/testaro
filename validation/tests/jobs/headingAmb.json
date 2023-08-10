@@ -1,0 +1,129 @@
+{
+  "id": "headingAmb",
+  "what": "validation of headingAmb test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/headingAmb/index.html",
+      "what": "page with and without heading ambiguity"
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": true,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.1",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "headingAmb"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "Heading has the same text"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "H2"
+        ],
+        [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.0.location.spec.y",
+          ">",
+          0
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "=",
+          "Level-2 heading"
+        ]
+      ],
+      "rules": [
+        "y",
+        "headingAmb"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.1",
+          "=",
+          2
+        ],
+        [
+          "standardResult.totals.2",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "headingAmb"
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "Sibling same-level headings"
+        ]
+      ],
+      "rules": [
+        "y",
+        "headingAmb"
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2013-05-28T12:00:00",
+  "timeStamp": "00000"
+}

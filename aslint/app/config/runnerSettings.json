@@ -1,0 +1,15 @@
+{
+  "asyncRunner": false,
+  "context": ":root",
+  "debugMode": false,
+  "description": "",
+  "direction": "ltr",
+  "includeHidden": true,
+  "includeElementReference": false,
+  "namespace": "aslint",
+  "reportFormat": {
+    "json": true
+  },
+  "rules": {},
+  "watchDomChanges": false
+}

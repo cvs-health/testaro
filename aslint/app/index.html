@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>ASLint</title>
+  <meta charset="utf-8" />
+  <meta name="description"
+    content="testwpoe pweor pwoer pweokrpwoe rpweok rpwoek rpwoekr pwoke rpwoke rpow eprow keprk wpeor pweork wepork wpeor pwe rkpwoek rpwoke rpwoek rpwoke rpwk epr " />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <style id="test">
+    @media all and (orientation: landscape) {
+      .rotate {
+        display: block;
+      }
+
+      .content {
+        display: none;
+      }
+    }
+
+    @media all and (orientation: portrait) {
+      .rotate {
+        display: none;
+      }
+
+      .content {
+        display: block;
+      }
+    }
+
+    .rotate {
+      text-align: center;
+      font-size: 2rem;
+      margin-top: 4rem;
+    }
+  </style>
+  <script>
+    window.setInterval(() => {
+      document.getElementById('test-dynamic').innerHTML += '<li>' + parseInt(Math.random() * 10000) + '</li>';
+    }, 20000);
+  </script>
+</head>
+
+<body>
+  <p style="text-indent: -2000px;">Test</p>
+  <h1 title="This is h1 title">Hello ASLint!</h1>
+
+  <a href="javascript: void()">Unclear href</a>
+
+  <p style="color: black; text-decoration: none;">Some text with <a href="https://www.w3.org" style="color: black; text-decoration: none;">link</a></p>
+
+  <ul id="test-dynamic"></ul>
+
+  <div id="testElement" style="animation-duration: 9000ms; animation-iteration-count: infinite;"><p>I use green color.</p>Descendant text.</div>
+
+  <svg role="img" width="1rem" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    <path
+      d="M256 0C114.615 0 0 114.615 0 256s114.615 256 256 256 256-114.615 256-256S397.385 0 256 0zm0 480C132.288 480 32 379.712 32 256S132.288 32 256 32s224 100.288 224 224-100.288 224-224 224z" />
+    <circle cx="176" cy="176" r="32" />
+    <circle cx="336" cy="176" r="32" />
+    <path
+      d="M368 256c0 61.856-50.144 112-112 112s-112-50.144-112-112h-32c0 79.529 64.471 144 144 144s144-64.471 144-144h-32z" />
+  </svg>
+
+  <script>
+    /*
+     * temporary unless it's known what inserts
+     *  module.exports = require('./').polyfill();
+     * into the rollup-produced bundle, making drowser to fail
+     */
+    module = { exports: function () { } };
+    function require() { return { polyfill: function () { } }; }
+
+    // Bookmarklet's code direct injection
+    (function (global) {
+      var head = document.head;
+      var timeout = null;
+      var options = {
+        asyncRunner: true,
+        context: document.documentElement,
+        includeElementReference: true,
+        reportFormat: { JSON: true },
+        watchDomChanges: false // false for bookmarklet by default
+      };
+      var appInstance = global.document.getElementById('aslintBox');
+
+      if (appInstance) {
+        appInstance.parentNode.removeChild(appInstance);
+      }
+
+      var message = '<div id="aslintInitMessage" style="position: fixed; top: 0; left: 0; margin: 0; padding: 0; box-shadow: none; font-size: 1em; text-align: center; width: 100%; background: transparent; z-index: 999999"><p style="background: {%background%}; border-radius: 3px; color: white; margin: 0.25em auto 0; padding: 0.25em 0.75em; display: inline-block;">{%message%}</p></div>';
+
+      function hideMessage() {
+        var el = global.document.getElementById('aslintInitMessage');
+        if (el !== null) {
+          el.parentNode.removeChild(el);
+        }
+      }
+
+      function showMessage(msg) {
+        hideMessage();
+
+        if (timeout) {
+          clearTimeout(timeout);
+          timeout = null;
+        }
+
+        var fragment = global.document.createDocumentFragment();
+        var div = global.document.createElement('div');
+        div.innerHTML = msg;
+
+        while (div.firstChild) {
+          fragment.appendChild(div.firstChild);
+        }
+        global.document.body.appendChild(fragment.querySelector('#aslintInitMessage'));
+      }
+
+      showMessage(message.replace('{%background%}', 'black').replace('{%message%}', 'Loading ASLint'));
+
+      var s = global.document.createElement('script');
+
+      s.type = 'text/javascript';
+      s.async = true;
+      s.src = 'https://localhost.aslint.org/aslint.bundle.js?ver=latest&now=' + Date.now();
+
+      function onAslintLoaded(res) {
+        hideMessage();
+
+        if (typeof global.aslint === 'undefined') {
+          showMessage(message.replace('{%background%}', 'red').replace('{%message%}', 'ASLint is not available. One of the reason could be Content Security Policy.'));
+          return;
+        }
+
+        global.aslint
+          .config(options)
+          //.setLocale('pl-pl')
+          .addListener('onValidatorStarted', function () {
+            console.log('@ Validator started');
+          })
+          .addListener('onValidatorComplete', function (error, report) {
+            console.log('onValidatorComplete', error, report);
+          })
+          //.removeListener('onValidator.started')
+          .addFilter('onBeforeRuleValidate', function (ruleId, nodes) {
+            return Array.isArray(nodes) ? nodes.filter(function (node) {
+              return Math.random() >= 0.35;
+            }) : nodes;
+          })
+          .addFilter('onBeforeRuleReport', function (report) {
+            return report;
+          })
+          .setRules([]/*['empty-content']*/, { isSelectedForScanning: true }) // null - ALL registered rules
+          .addRule(
+            'abc-custom-rule',
+            {
+              type: 'WCAG-AA',
+              severity: 'high',
+              links: [],
+              recommendations: []
+            },
+            function (context, report, options) {
+              console.log('@ Custom rule context: ', context);
+              console.log('@ Custom rule options: ', options);
+
+              this.validator.report({
+                message: 'Oh no! Validation of the whole document failed.',
+                node: document.body,
+                ruleId: 'abc-custom-rule'
+              });
+            },
+            'h1',
+            {
+              abc: 123
+            }
+          )
+          .setRule('accessible-svg', { resources: [{ content: 'test', url: 'testUrl' }], isMarkedAsFalsePositive: true, isSelectedForScanning: false })
+          .setRule('orientation', { isSelectedForScanning: true })
+          .setRule('flickering', { isSelectedForScanning: false })
+          //.run(function(err, res) { console.log('Callback: ', res); })
+          .run()
+          .then(function (res) {
+            console.log('Resolved: ', res);
+          })
+          .catch((error) => {
+            console.error('[ASLint error]', error);
+          });
+      }
+
+      function onAslintLoadError(err) {
+        showMessage(message.replace('{%background%}', 'red').replace('{%message%}', 'Failed to load ASLint'));
+        timeout = global.setTimeout(function () {
+          hideMessage();
+        }, 5000);
+      }
+
+      s.addEventListener('load', onAslintLoaded);
+      s.addEventListener('error', onAslintLoadError);
+
+      head.insertBefore(s, head.firstChild);
+    })(this);
+  </script>
+</body>
+
+</html>

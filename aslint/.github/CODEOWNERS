@@ -1,0 +1,4 @@
+# See https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners
+
+# Default owners for everything in the repo
+* @essentialaccessibility/aslint-codeowners

@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Test case: fieldset-no-legend</title>
+    </head>
+    <body>
+        <h1>Test case: fieldset-no-legend</h1>
+        <form>
+            <fieldset>
+                <p>This should fail</p>
+            </fieldset>
+            <fieldset>
+                <legend>This should pass</legend>
+            </fieldset>
+            <fieldset>
+                <p>This is not a legend</p>
+                <legend>But it should pass this test anyway</legend>
+            </fieldset>
+        </form>
+    </body>
+</html>

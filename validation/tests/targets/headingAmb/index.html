@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Page with and without heading ambiguity</title>
+    <meta name="description" content="tester">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <main>
+      <h1>Page with and without heading ambiguity</h1>
+      <p>This is a paragraph.</p>
+      <h2>Level-2 heading</h2>
+      <h2>Level-2 heading</h2>
+      <p>The heading of this paragraph is a violator.</p>
+      <h2>Yet another level-2 heading</h2>
+      <h3>Level-3 heading</h3>
+      <div>
+        <h2>Level-2 heading</h2>
+        <p>The heading of this paragraph is another violator, notwithstanding the div.</p>
+        <h3>Level-3 heading</h3>
+        <p>The heading of this paragraph is OK, because a superior heading intervenes.</p>
+      </div>
+    </main>
+  </body>
+</html>
