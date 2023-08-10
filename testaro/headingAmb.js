@@ -43,6 +43,7 @@ exports.reporter = async (page, withItems) => {
         }
       });
     });
+    return badIndexes;
   });
   // If there were any instances:
   if (ambIndexes.length) {
