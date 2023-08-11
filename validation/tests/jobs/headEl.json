@@ -1,0 +1,159 @@
+{
+  "id": "headEl",
+  "what": "validation of headEl test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "what": "usual browser"
+    },
+    {
+      "type": "url",
+      "which": "__targets__/headEl/index.html",
+      "what": "page with valid and invalid elements in the head"
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": true,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.2",
+          "=",
+          2
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "headEl"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "Element is within"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "P"
+        ],
+        [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.0.location.spec.x",
+          ">",
+          0
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "i",
+          "paragraph"
+        ],
+        [
+          "standardResult.instances.1.tagName",
+          "=",
+          "SPAN"
+        ],
+        [
+          "standardResult.instances.1.id",
+          "=",
+          "headSpan"
+        ],
+        [
+          "standardResult.instances.1.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.1.location.type",
+          "=",
+          "selector"
+        ],
+        [
+          "standardResult.instances.1.location.spec",
+          "=",
+          "#headSpan"
+        ],
+        [
+          "standardResult.instances.1.excerpt",
+          "=",
+          "span"
+        ]
+      ],
+      "rules": [
+        "y",
+        "headEl"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.2",
+          "=",
+          2
+        ],
+        [
+          "standardResult.totals.3",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "headEl"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "Elements within"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          2
+        ]
+      ],
+      "rules": [
+        "y",
+        "headEl"
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2013-05-28T12:00:00",
+  "timeStamp": "00000"
+}
