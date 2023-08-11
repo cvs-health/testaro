@@ -5,82 +5,75 @@
 
 // ########## IMPORTS
 
-// Module to get locator data.
-const {getLocatorData} = require('../procs/getLocatorData');
-// Module to make HTTP requests.
-const fetch = require('node-fetch');
-// Module to process files.
-const fs = require('fs/promises');
+// Module to get the document source.
+const {getSource} = require('../procs/getSource');
 
 // ########## FUNCTIONS
 
 // Performs the test.
-exports.reporter = async (page, withItems) => {
-  // Initialize the standard result.
-  const data = {};
-  const totals = [0, 0, 0, 0];
+exports.reporter = async page => {
+  // Initialize the data and standard result.
+  const data = {
+    total: 0,
+    badTagNames: []
+  };
+  let totals = [];
   const standardInstances = [];
-  // Get locators for all applicable elements.
-  const locAll = page.locator('head *');
-  const locsAll = await locAll.all();
-  console.log(locsAll.length);
-  // For each of them:
-  const validTagNames = [
-    'BASE',
-    'LINK',
-    'META',
-    'SCRIPT',
-    'STYLE',
-    'TITLE',
-    'NOSCRIPT',
-    'TEMPLATE'  
-  ];
-  for (const loc of locsAll) {
-    // Get data on it.
-    const isValid = await loc.evaluate((element, validTagNames) => {
-      return validTagNames.includes(element.tagName);
-    }, validTagNames);
-    console.log(await loc.innerText());
-    console.log(isValid);
-    // If it is invalid:
-    if (! isValid) {
-      // Add to the totals.
-      totals[2]++;
-      // If itemization is required:
-      if (withItems) {
-        // Get data on the element.
-        const elData = await getLocatorData(loc);
-        // Add a standard instance.
-        standardInstances.push({
-          ruleID: 'headEl',
-          what: 'Element is within the head but is not allowed there',
-          ordinalSeverity: 2,
-          tagName: elData.tagName,
-          id: elData.id,
-          location: elData.location,
-          excerpt: elData.excerpt
-        });
+  // Get the source.
+  const sourceData = await getSource(page);
+  // If it was not obtained:
+  if (sourceData.prevented) {
+    // Report this.
+    data.prevented = true;
+  }
+  // Otherwise, i.e. if it was obtained:
+  else {
+    let rawPage = sourceData.source;
+    // Change any spacing character sequences in it to single spaces.
+    rawPage = rawPage.replace(/\s+/g, ' ');
+    // Delete everything in it except the head content.
+    rawPage = rawPage.replace(/^.*<head[^>]*>|<\/head>.*$/g, '');
+    // Get the tag names of the remaining elements.
+    const tags = rawPage.match(/<([a-z]+)/g);
+    const ucTagNames = tags.map(tag => tag.toUpperCase().slice(1));
+    const validTagNames = [
+      'BASE',
+      'LINK',
+      'META',
+      'SCRIPT',
+      'STYLE',
+      'TITLE',
+      'NOSCRIPT',
+      'TEMPLATE'  
+    ];
+    // For each tag name:
+    ucTagNames.forEach(tagName => {
+      // If it is invalid:
+      if (! validTagNames.includes(tagName)) {
+        // Add this to the result.
+        data.total++;
+        data.badTagNames.push(tagName);
       }
-    }
-  }
-  // If itemization is not required and there are any instances:
-  if (! withItems && totals[2]) {
-    // Add a summary instance.
-    standardInstances.push({
-      ruleID: 'headEl',
-      what: 'Elements within the head are not allowed there',
-      ordinalSeverity: 2,
-      count: totals[2],
-      tagName: '',
-      id: '',
-      location: {
-        doc: '',
-        type: '',
-        spec: ''
-      },
-      excerpt: ''
     });
+    // If there are any instances:
+    if (data.total) {
+      // Add a summary instance.
+      standardInstances.push({
+        ruleID: 'headEl',
+        what: `Invalid elements within the head: ${data.badTagNames.join(', ')}`,
+        ordinalSeverity: 2,
+        count: data.total,
+        location: {
+          doc: '',
+          type: '',
+          spec: ''
+        },
+        excerpt: ''
+      });
+    }
+    totals = [0, 0, data.total, 0];
   }
+  // Return the data.
   return {
     data,
     totals,

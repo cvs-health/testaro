@@ -26,98 +26,6 @@
           2
         ],
         [
-          "standardResult.totals.1",
-          "=",
-          0
-        ],
-        [
-          "standardResult.instances.0.ruleID",
-          "=",
-          "headEl"
-        ],
-        [
-          "standardResult.instances.0.what",
-          "i",
-          "Element is within"
-        ],
-        [
-          "standardResult.instances.0.ordinalSeverity",
-          "=",
-          2
-        ],
-        [
-          "standardResult.instances.0.tagName",
-          "=",
-          "P"
-        ],
-        [
-          "standardResult.instances.0.location.doc",
-          "=",
-          "dom"
-        ],
-        [
-          "standardResult.instances.0.location.type",
-          "=",
-          "box"
-        ],
-        [
-          "standardResult.instances.0.location.spec.x",
-          ">",
-          0
-        ],
-        [
-          "standardResult.instances.0.excerpt",
-          "i",
-          "paragraph"
-        ],
-        [
-          "standardResult.instances.1.tagName",
-          "=",
-          "SPAN"
-        ],
-        [
-          "standardResult.instances.1.id",
-          "=",
-          "headSpan"
-        ],
-        [
-          "standardResult.instances.1.location.doc",
-          "=",
-          "dom"
-        ],
-        [
-          "standardResult.instances.1.location.type",
-          "=",
-          "selector"
-        ],
-        [
-          "standardResult.instances.1.location.spec",
-          "=",
-          "#headSpan"
-        ],
-        [
-          "standardResult.instances.1.excerpt",
-          "=",
-          "span"
-        ]
-      ],
-      "rules": [
-        "y",
-        "headEl"
-      ]
-    },
-    {
-      "type": "test",
-      "which": "testaro",
-      "withItems": false,
-      "stopOnFail": true,
-      "expect": [
-        [
-          "standardResult.totals.2",
-          "=",
-          2
-        ],
-        [
           "standardResult.totals.3",
           "=",
           0
@@ -130,7 +38,7 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "Elements within"
+          ": P, SPAN"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
