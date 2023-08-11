@@ -1,5 +1,6 @@
 /*
   headEl
+  Related to ASLint rule elements-not-allowed-in-head.
   This test reports invalid descendants of the head element in the source of the document.
 */
 
