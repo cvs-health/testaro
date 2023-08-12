@@ -25,7 +25,7 @@ const evalRules = {
   headingAmb: 'same-level sibling headings with identical texts',
   hover: 'hover-caused content changes',
   hovInd: 'hover indication nonstandard',
-  hrRisk: 'hr element instead of styles used for vertical segmentation',
+  hr: 'hr element instead of styles used for vertical segmentation',
   labClash: 'labeling inconsistencies',
   lineHeight: 'text with a line height less than 1.5 times its font size',
   linkExt: 'links that automatically open new windows',

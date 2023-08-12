@@ -1,5 +1,5 @@
 /*
-  hrRisk
+  hr
   Related to ASLint test horizontal-rule.
   This test reports the existence of hr elements. Their semantics are inconsistently defined and
   interpreted and impair accessibility compared with stylistic segmentation.
@@ -31,7 +31,7 @@ exports.reporter = async (page, withItems) => {
       const elData = await getLocatorData(loc);
       // Add a standard instance.
       standardInstances.push({
-        ruleID: 'hrRisk',
+        ruleID: 'hr',
         what: 'Element instead of styling is used for vertical segmentation',
         ordinalSeverity: 0,
         tagName: 'HR',
@@ -45,7 +45,7 @@ exports.reporter = async (page, withItems) => {
   if (! withItems && totals[0]) {
     // Add a summary instance.
     standardInstances.push({
-      ruleID: 'hrRisk',
+      ruleID: 'hr',
       what: 'Elements instead of styling are used for vertical segmentation',
       ordinalSeverity: 0,
       count: totals[0],

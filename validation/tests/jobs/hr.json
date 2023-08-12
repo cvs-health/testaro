@@ -1,5 +1,5 @@
 {
-  "id": "hrRisk",
+  "id": "hr",
   "what": "validation of hrRisk test",
   "strict": true,
   "timeLimit": 20,
@@ -11,7 +11,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/hrRisk/index.html",
+      "which": "__targets__/hr/index.html",
       "what": "page with an hr element"
     },
     {
@@ -33,7 +33,7 @@
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "hrRisk"
+          "hr"
         ],
         [
           "standardResult.instances.0.what",
@@ -73,7 +73,7 @@
       ],
       "rules": [
         "y",
-        "hrRisk"
+        "hr"
       ]
     },
     {
@@ -100,7 +100,7 @@
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "hrRisk"
+          "hr"
         ],
         [
           "standardResult.instances.0.what",
@@ -120,7 +120,7 @@
       ],
       "rules": [
         "y",
-        "hrRisk"
+        "hr"
       ]
     }
   ],
