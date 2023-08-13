@@ -10,7 +10,7 @@ const {init, report} = require('../procs/testaro');
 
 // ########## FUNCTIONS
 
-// Runs the test and returns the results.
+// Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
   // Initialize the locators and result.
   const all = await init(page, 'body *');

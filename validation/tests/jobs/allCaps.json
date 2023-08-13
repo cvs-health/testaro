@@ -31,6 +31,16 @@
           0
         ],
         [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "allCaps"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "Element contains"
+        ],
+        [
           "standardResult.instances.0.tagName",
           "=",
           "P"
@@ -111,6 +121,11 @@
           "standardResult.instances.0.ordinalSeverity",
           "=",
           0
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "Elements contain"
         ],
         [
           "standardResult.instances.0.count",

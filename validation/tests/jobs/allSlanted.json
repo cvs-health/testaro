@@ -31,6 +31,16 @@
           0
         ],
         [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "allSlanted"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "Element contains"
+        ],
+        [
           "standardResult.instances.0.tagName",
           "=",
           "P"
@@ -39,11 +49,6 @@
           "standardResult.instances.0.ordinalSeverity",
           "=",
           0
-        ],
-        [
-          "standardResult.instances.0.what",
-          "i",
-          "Text is entirely"
         ],
         [
           "standardResult.instances.0.location.type",

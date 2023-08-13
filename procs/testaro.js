@@ -8,9 +8,9 @@ const {getLocatorData} = require('../procs/getLocatorData');
 // ########## FUNCTIONS
 
 // Initializes locators and a result.
-exports.init = async (page, locAllSelector) => {
+exports.init = async (page, locAllSelector, options = {}) => {
   // Get locators for the specified elements.
-  const locAll = page.locator(locAllSelector);
+  const locAll = page.locator(locAllSelector, options);
   const allLocs = await locAll.all();
   const result = {
     data: {},
