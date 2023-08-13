@@ -7,19 +7,17 @@
 
 // ########## IMPORTS
 
-// Module to get locator data.
-const {getLocatorData} = require('../procs/getLocatorData');
+// Module to perform common operations.
+const {init, report} = require('../procs/testaro');
 
 // ########## FUNCTIONS
 
 // Runs the test and returns the results.
 exports.reporter = async (page, withItems) => {
-  // Get locators for all body elements.
-  const locAll = page.locator('body *');
-  const locsAll = await locAll.all();
+  // Initialize the locators and result.
+  const all = await init(page, 'body *');
   // Get those that have distorting transform styles.
-  const locs = [];
-  for (const loc of locsAll) {
+  for (const loc of all.allLocs) {
     const isDistorted = await loc.evaluate(el => {
       const styleDec = window.getComputedStyle(el);
       const {transform} = styleDec;
@@ -27,54 +25,10 @@ exports.reporter = async (page, withItems) => {
       && ['matrix', 'perspective', 'rotate', 'scale', 'skew'].some(key => transform.includes(key));
     });
     if (isDistorted) {
-      locs.push(loc);
-    }
-  };
-  // Initialize the results.
-  const data = {};
-  const totals = [0, 0, 0, 0];
-  const standardInstances = [];
-  // For each qualifying locator:
-  for (const loc of locs) {
-    // Get data on its element.
-    const elData = await getLocatorData(loc);
-    // Add to the totals.
-    totals[1]++;
-    // If itemization is required:
-    if (withItems) {
-      // Add a standard instance.
-      standardInstances.push({
-        ruleID: 'distortion',
-        what: 'Element distorts its text',
-        ordinalSeverity: 1,
-        tagName: elData.tagName,
-        id: elData.id,
-        location: elData.location,
-        excerpt: elData.excerpt
-      });
+      all.locs.push(loc);
     }
   }
-  // If itemization is not required:
-  if (! withItems) {
-    // Add a summary standard instance.
-    standardInstances.push({
-      ruleID: 'distortion',
-      what: 'Elements distort their texts',
-      ordinalSeverity: 1,
-      count: totals[1],
-      tagName: '',
-      id: '',
-      location: {
-        doc: '',
-        type: '',
-        spec: ''
-      },
-      excerpt: ''
-    });
-  }
-  return {
-    data,
-    totals,
-    standardInstances
-  };
+  // Populate the result.
+  const whats = ['Element distorts its text', 'Elements distort their texts'];
+  return await report(withItems, all, 'distortion', whats, 1);
 };
