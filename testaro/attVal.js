@@ -5,69 +5,30 @@
 
 // ########## IMPORTS
 
-// Module to get locator data.
-const {getLocatorData} = require('../procs/getLocatorData');
+// Module to perform common operations.
+const {init, report} = require('../procs/testaro');
 
 // ########## FUNCTIONS
 
-// Runs the test and returns the results.
+// Runs the test and returns the result.
 exports.reporter = async (page, withItems, attributeName, areLicit, values) => {
-  // Get locators for all elements with the attribute.
-  const locAll = page.locator(`[${attributeName}]`);
-  const locsAll = await locAll.all();
-  const locs = [];
-  // Get those that have illicit values on the attribute.
-  for (const loc of locsAll) {
+  // Initialize the locators and result.
+  const all = await init(page, `[${attributeName}]`);
+  // For each locator:
+  for (const loc of all.allLocs) {
+    // Get whether its element violates the rule.
     const value = await loc.getAttribute(attributeName);
-    if (areLicit !== values.includes(value)) {
-      locs.push(loc);
+    const isBad = areLicit !== values.includes(value);
+    // If it does:
+    if (isBad) {
+      // Add the locator to the array of violators.
+      all.locs.push([loc, value]);
     }
   }
-  // Initialize the results.
-  const data = {};
-  const totals = [0, 0, locs.length, 0];
-  const standardInstances = [];
-  // If itemization is required:
-  if (withItems) {
-    // For each qualifying locator:
-    for (const loc of locs) {
-      // Get data on its element.
-      const elData = await getLocatorData(loc);
-      // Get the illicit value of the attribute.
-      const badValue = await loc.getAttribute(attributeName);
-      // Add a standard instance.
-      standardInstances.push({
-        ruleID: 'attVal',
-        what: `Element has attribute ${attributeName} with illicit value ${badValue}`,
-        ordinalSeverity: 2,
-        tagName: elData.tagName,
-        id: elData.id,
-        location: elData.location,
-        excerpt: elData.excerpt
-      });
-    }
-  }
-  // Otherwise, i.e. if itemization is not required and any instances exist:
-  else if (totals[2]) {
-    // Add a summary standard instance.
-    standardInstances.push({
-      ruleID: 'attVal',
-      what: `Elements have attribute ${attributeName} with illicit values`,
-      ordinalSeverity: 2,
-      count: totals[2],
-      tagName: '',
-      id: '',
-      location: {
-        doc: '',
-        type: '',
-        spec: ''
-      },
-      excerpt: ''
-    });
-  }
-  return {
-    data,
-    totals,
-    standardInstances
-  };
+  // Populate and return the result.
+  const whats = [
+    `Element has attribute ${attributeName} with illicit value “__param__”`,
+    `Elements have attribute ${attributeName} with illicit values`
+  ];
+  return await report(withItems, all, 'attVal', whats, 2);
 };

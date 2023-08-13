@@ -30,8 +30,16 @@ exports.report = async (withItems, all, ruleID, whats, ordinalSeverity, tagName 
   const {locs, result} = all;
   const {totals, standardInstances} = result;
   // For each instance locator:
-  for (const loc of locs) {
+  for (const locItem of locs) {
     // Get data on its element.
+    let loc, whatParam;
+    if (Array.isArray(locItem)) {
+      loc = locItem[0];
+      whatParam = locItem[1];
+    }
+    else {
+      loc = locItem;
+    }
     const elData = await getLocatorData(loc);
     // Add to the totals.
     totals[ordinalSeverity]++;
@@ -40,7 +48,7 @@ exports.report = async (withItems, all, ruleID, whats, ordinalSeverity, tagName 
       // Add a standard instance to the result.
       standardInstances.push({
         ruleID,
-        what: whats[0],
+        what: whatParam ? whats[0].replace('__param__', whatParam) : whats[0],
         ordinalSeverity,
         tagName: elData.tagName,
         id: elData.id,
@@ -49,8 +57,8 @@ exports.report = async (withItems, all, ruleID, whats, ordinalSeverity, tagName 
       });
     }
   }
-  // If itemization is not required:
-  if (! withItems) {
+  // If itemization is not required and any instances exist:
+  if (! withItems && locs.length) {
     // Add a summary standard instance to the result.
     standardInstances.push({
       ruleID,
