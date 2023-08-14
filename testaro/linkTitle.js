@@ -1,66 +1,36 @@
 /*
   linkTitle
   Related to Tenon rule 79.
-  This test reports links with title attributes with values contained in the link text contents.
+  This test reports links with title attributes whose values the link text contains.
 */
 
-// ########## IMPORTS
-
+// Module to perform common operations.
+const {init, report} = require('../procs/testaro');
 // Module to get locator data.
 const {getLocatorData} = require('../procs/getLocatorData');
 
 // ########## FUNCTIONS
 
+// Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
-  const data = {};
-  const totals = [0, 0, 0, 0];
-  const standardInstances = [];
-  // Get locators for the links with title attributes.
-  const locAll = page.locator('a[title]');
-  const locs = await locAll.all();
-  // For each of them:
-  for (const loc of locs) {
-    // Get data on it.
-    const title = await loc.getAttribute('title');
+  // Initialize the locators and result.
+  const all = await init(page, 'a[title]');
+  // For each locator:
+  for (const loc of all.allLocs) {
+    // Get whether its element violates the rule.
     const elData = await getLocatorData(loc);
-    // If the title value is contained in the excerpt:
-    if (elData.excerpt.toLowerCase().includes(title.toLowerCase())) {
-      // Add to the result.
-      totals[0]++;
-      if (withItems) {
-        standardInstances.push({
-          ruleID: 'linkTitle',
-          what: 'Link has a title attribute that repeats link text content',
-          ordinalSeverity: 0,
-          tagName: 'A',
-          id: elData.id,
-          location: elData.location,
-          excerpt: elData.excerpt
-        });
-      }
+    const title = await loc.getAttribute('title');
+    const isBad = elData.excerpt.toLowerCase().includes(title.toLowerCase());
+    // If it does:
+    if (isBad) {
+      // Add the locator to the array of violators.
+      all.locs.push(loc);
     }
   }
-  // If itemization is not required and there are any instances:
-  if (! withItems && totals[0]) {
-    // Add a summary instance to the result.
-    standardInstances.push({
-      ruleID: 'linkTitle',
-      what: 'Links have title attributes that repeat link text contents',
-      count: totals[0],
-      ordinalSeverity: 0,
-      tagName: 'A',
-      id: '',
-      location: {
-        doc: '',
-        type: '',
-        spec: ''
-      },
-      excerpt: ''
-    });
-  }
-  return {
-    data,
-    totals,
-    standardInstances
-  };
+  // Populate and return the result.
+  const whats = [
+    'Link has a title attribute that repeats link text content',
+    'Links have title attributes that repeat link text contents'
+  ];
+  return await report(withItems, all, 'linkTitle', whats, 0);
 };
