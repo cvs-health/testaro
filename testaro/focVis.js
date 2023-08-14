@@ -6,88 +6,43 @@
 
 // ########## IMPORTS
 
-// Module to get locator data.
-const {getLocatorData} = require('../procs/getLocatorData');
+// Module to perform common operations.
+const {init, report} = require('../procs/testaro');
 
 // ########## FUNCTIONS
 
+// Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
-  // Get a locator for the initially visible links.
-  const locAll = page.locator('a:visible');
-  const locsAll = await locAll.all();
-  // Get locators for those that are off the display when focused.
-  const locs = [];
-  for (const loc of locsAll) {
-    const isOff = await loc.evaluate(element => {
-      const isAbove = element.offsetTop + element.offsetHeight <= 0;
-      const isLeft = element.offsetLeft + element.offsetWidth <= 0;
-      const isOff = isAbove || isLeft;
-      return isOff;
+  // Initialize the locators and result.
+  const all = await init(page, 'a:visible');
+  // For each locator:
+  for (const loc of all.allLocs) {
+    // Get how its element violates the rule, if it does.
+    const isBad = await loc.evaluate(el => {
+      const isAbove = el.offsetTop + el.offsetHeight <= 0;
+      const isLeft = el.offsetLeft + el.offsetWidth <= 0;
+      return [isAbove, isLeft];
     });
-    if (isOff) {
-      locs.push(loc);
-    }
-  }
-  // Initialize the standard result.
-  const data = {};
-  const totals = [0, 0, 0, 0];
-  const standardInstances = [];
-  // For each off-display link:
-  for (const loc of locs) {
-    // Get data on it.
-    const elData = await getLocatorData(loc);
-    // Add to the totals.
-    totals[2]++;
-    if (withItems) {
-      let where;
-      if (elData.location.type === 'selector') {
-        where = 'above or to the left of';
+    // If it does:
+    if (isBad[0] || isBad[1]) {
+      // Add the locator to the array of violators.
+      let param;
+      if (isBad[0] && isBad[1]) {
+        param = 'above and to the left of';
+      }
+      else if (isBad[0]) {
+        param = 'above';
       }
       else {
-        const isLeft = elData.location.spec.x < 0;
-        const isAbove = elData.location.spec.y < 0;
-        if (isLeft && isAbove) {
-          where = 'above and to the left of';
-        }
-        else if (isLeft) {
-          where = 'to the left of';
-        }
-        else if (isAbove) {
-          where = 'above';
-        }
-        else {
-          where = 'possibly above or to the left of';
-        }
+        param = 'to the left of';
       }
-      standardInstances.push({
-        ruleID: 'focVis',
-        what: `Visible link is ${where} the display`,
-        ordinalSeverity: 2,
-        tagName: 'A',
-        id: elData.id,
-        location: elData.location,
-        excerpt: elData.excerpt
-      });
+      all.locs.push([loc, param]);
     }
   }
-  if (! withItems) {
-    standardInstances.push({
-      ruleID: 'focVis',
-      what: 'Visible links are above or to the left of the display',
-      ordinalSeverity: 2,
-      tagName: 'A',
-      id: '',
-      location: {
-        doc: '',
-        type: '',
-        spec: ''
-      },
-      excerpt: ''
-    });
-  }
-  return {
-    data,
-    totals,
-    standardInstances
-  };
+  // Populate and return the result.
+  const whats = [
+    'Visible link is __param__ the display',
+    'Visible links are above or to the left of the display'
+  ];
+  return await report(withItems, all, 'focVis', whats, 2);
 };
