@@ -21,7 +21,7 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.3",
+          "standardResult.totals.1",
           "=",
           1
         ],
@@ -38,12 +38,12 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "is less than 0.9 times"
+          "is less than 1.5 times"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          3
+          1
         ],
         [
           "standardResult.instances.0.tagName",
@@ -88,7 +88,7 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.3",
+          "standardResult.totals.1",
           "=",
           1
         ],
@@ -115,7 +115,7 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "heights less than 0.9 times"
+          "heights less than 1.5 times"
         ]
       ],
       "rules": [
