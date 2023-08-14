@@ -104,6 +104,7 @@ exports.reporter = async (page, withItems, trialKeySpecs = []) => {
   const mbLocAll = page.locator(
     'button[aria-controls][aria-expanded][aria-haspopup=true], button[aria-controls][aria-expanded][aria-haspopup=menu]'
   );
+  // For each menu button:
   const mbLocsAll = await mbLocAll.all();
   for (const mbLoc of mbLocsAll) {
     // Get a locator for its menu.
