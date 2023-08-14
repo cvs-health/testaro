@@ -5,61 +5,38 @@
   Text contents are compared case-insensitively.
 */
 
-// ########## IMPORTS
-
+// Module to perform common operations.
+const {init, report} = require('../procs/testaro');
 // Module to get locator data.
 const {getLocatorData} = require('../procs/getLocatorData');
 
 // ########## FUNCTIONS
 
+// Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
-  const data = {};
-  const totals = [0, 0, 0, 0];
-  const standardInstances = [];
-  // Get locators for the visible links with destinations.
-  const locAll = page.locator('a[href]:visible');
-  const locsAll = await locAll.all();
-  // Get data on them.
-  const excerpts = new Set();
-  for (const loc of locsAll) {
+  // Initialize the locators and result.
+  const all = await init(page, 'a[href]:visible');
+  const linkTexts = new Set();
+  // For each locator:
+  for (const loc of all.allLocs) {
+    // Get its text.
     const elData = await getLocatorData(loc);
-    if (excerpts.has(elData.excerpt.toLowerCase())) {
-      totals[2]++;
-      if (withItems) {
-        standardInstances.push({
-          ruleID: 'linkAmb',
-          what: 'Link has the same text as, but a different destination from, another',
-          ordinalSeverity: 2,
-          tagName: 'A',
-          id: elData.id,
-          location: elData.location,
-          excerpt: elData.excerpt
-        });
-      }
+    // If a previous link has the same text:
+    const linkText = elData.excerpt.toLowerCase();
+    if (linkTexts.has(linkText)) {
+      // Add the locator to the array of violators.
+      all.locs.push(loc);
     }
+    // Otherwise, i.e. if this is the first link with the text:
     else {
-      excerpts.add(elData.excerpt.toLowerCase());
+      // Record its text.
+      linkTexts.add(linkText);
     }
   }
-  if (! withItems && totals[2]) {
-    standardInstances.push({
-      ruleID: 'linkAmb',
-      what: 'Links have the same texts but different destinations',
-      count: totals[2],
-      ordinalSeverity: 2,
-      tagName: 'A',
-      id: '',
-      location: {
-        doc: '',
-        type: '',
-        spec: ''
-      },
-      excerpt: ''
-    });
-  }
-  return {
-    data,
-    totals,
-    standardInstances
-  };
+  // Populate and return the result.
+  const whats = [
+    'Link has the same text as, but a different destination from, another',
+    'Links have the same texts but different destinations'
+  ];
+  return await report(withItems, all, 'linkAmb', whats, 2);
 };
