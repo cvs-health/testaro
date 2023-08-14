@@ -68,6 +68,11 @@
           "BUTTON"
         ],
         [
+          "standardResult.instances.0.id",
+          "=",
+          "buttonInLink"
+        ],
+        [
           "standardResult.instances.0.location.doc",
           "=",
           "dom"
@@ -75,12 +80,12 @@
         [
           "standardResult.instances.0.location.type",
           "=",
-          "box"
+          "selector"
         ],
         [
-          "standardResult.instances.0.location.spec.x",
-          ">",
-          0
+          "standardResult.instances.0.location.spec",
+          "=",
+          "#buttonInLink"
         ],
         [
           "standardResult.instances.0.excerpt",
