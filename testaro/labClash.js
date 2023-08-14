@@ -5,80 +5,42 @@
   labels are additive, not conflicting.
 */
 
-// ########## IMPORTS
-
-// Module to get locator data.
-const {getLocatorData} = require('../procs/getLocatorData');
+// Module to perform common operations.
+const {init, report} = require('../procs/testaro');
 
 // ########## FUNCTIONS
 
+// Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
-  // Initialize the standard result.
-  const data = {};
-  const totals = [0, 0, 0, 0];
-  const standardInstances = [];
-  // Get locators for eligible elements.
-  const locAll = page.locator('button, input:not([type=hidden]), select, textarea');
-  const locsAll = await locAll.all();
-  // For each of them:
-  for (const loc of locsAll) {
-    // Get its label types.
-    const labelTypes = await loc.evaluate(element => {
+  // Initialize the locators and result.
+  const all = await init(page, 'button, input:not([type=hidden]), select, textarea');
+  // For each locator:
+  for (const loc of all.allLocs) {
+    // Get the label types of its element.
+    const labelTypes = await loc.evaluate(el => {
       const labelTypes = [];
-      // Attribute label.
-      if (element.hasAttribute('aria-label')) {
-        labelTypes.push('aria-label');
-      }
-      // Reference label.
-      if (element.hasAttribute('aria-labelledby')) {
-        labelTypes.push('aria-labelledby');
-      }
+      // Attribute and reference labels.
+      ['aria-label', 'aria-labelledby'].forEach(type => {
+        if (el.hasAttribute(type)) {
+          labelTypes.push(type);
+        }
+      });
       // Explicit and implicit labels.
-      const labels = Array.from(element.labels);
+      const labels = Array.from(el.labels);
       if (labels.length) {
         labelTypes.push('label');
       }
       return labelTypes;
     });
-    // If it has clashing labels:
+    // If it has more than 1:
     if (labelTypes.length > 1) {
-      // Add to the standard result.
-      totals[2]++;
-      if (withItems) {
-        const elData = await getLocatorData(loc);
-        standardInstances.push({
-          ruleID: 'labClash',
-          what: `Element has inconsistent label types (${labelTypes.join(', ')})`,
-          ordinalSeverity: 2,
-          tagName: elData.tagName,
-          id: elData.id,
-          location: elData.location,
-          excerpt: elData.excerpt
-        });
-      }
-    }
-    // If there are any instances and itemization is not required:
-    if (totals[2] && ! withItems) {
-      // Add a summary standard instance.
-      standardInstances.push({
-        ruleID: 'labClash',
-        what: 'Elements have inconsistent label types',
-        count: totals[2],
-        ordinalSeverity: 2,
-        tagName: '',
-        id: '',
-        location: {
-          doc: '',
-          type: '',
-          spec: ''
-        },
-        excerpt: ''
-      });
+      // Add the locator and a list of them to the array of violators.
+      all.locs.push([loc, labelTypes.join(', ')]);
     }
   }
-  return {
-    data,
-    totals,
-    standardInstances
-  };
+  // Populate and return the result.
+  const whats = [
+    'Element has inconsistent label types (__param__)', 'Elements have inconsistent label types'
+  ];
+  return await report(withItems, all, 'labClash', whats, 2);
 };
