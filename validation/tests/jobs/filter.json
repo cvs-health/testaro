@@ -55,7 +55,7 @@
         [
           "standardResult.totals.1",
           "=",
-          7
+          0
         ],
         [
           "standardResult.instances.0.ruleID",
@@ -65,7 +65,7 @@
         [
           "standardResult.instances.0.what",
           "i",
-          ": 5"
+          "Element has"
         ],
         [
           "standardResult.instances.0.tagName",
@@ -127,7 +127,12 @@
         [
           "standardResult.totals.1",
           "=",
-          7
+          0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          1
         ],
         [
           "standardResult.instances.0.ruleID",
@@ -140,19 +145,9 @@
           "Elements have"
         ],
         [
-          "standardResult.instances.1.ordinalSeverity",
-          "=",
-          1
-        ],
-        [
           "standardResult.instances.0.count",
           "=",
           2
-        ],
-        [
-          "standardResult.instances.1.count",
-          "=",
-          7
         ]
       ],
       "rules": [

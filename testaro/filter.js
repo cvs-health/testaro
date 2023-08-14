@@ -8,95 +8,29 @@
 
 // ########## IMPORTS
 
-// Module to get locator data.
-const {getLocatorData} = require('../procs/getLocatorData');
+// Module to perform common operations.
+const {init, report} = require('../procs/testaro');
 
 // ########## FUNCTIONS
 
+// Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
-  // Get locators for all elements in the body.
-  const locAll = page.locator('body *');
-  const locsAll = await locAll.all();
-  // Initialize the standard results.
-  const data = {};
-  const totals = [0, 0, 0, 0];
-  const standardInstances = [];
-  // Initialize the instance locators.
-  const locs = [];
+  // Initialize the locators and result.
+  const all = await init(page, 'body *');
   // For each locator:
-  for (const loc of locsAll) {
-    // If it has a filter style:
-    const hasFilter = await loc.evaluate(element => {
-      const styleDec = window.getComputedStyle(element);
+  for (const loc of all.allLocs) {
+    // Get whether its element violates the rule.
+    const isBad = await loc.evaluate(el => {
+      const styleDec = window.getComputedStyle(el);
       return styleDec.filter !== 'none';
     });
-    if (hasFilter) {
-      // Add it to the instance locators.
-      locs.push(loc);
+    // If it does:
+    if (isBad) {
+      // Add the locator to the array of violators.
+      all.locs.push(loc);
     }
   }
-  // For each instance locator:
-  for (const loc of locs) {
-    // Get data on its element.
-    const impact = await loc.evaluate(element => element.querySelectorAll('*').length);
-    const elData = await getLocatorData(loc);
-    // Add to the standard result.
-    totals[2]++;
-    totals[1] += impact;
-    // If itemization is required:
-    if (withItems) {
-      // Add a standard instance for the element.
-      standardInstances.push({
-        ruleID: 'filter',
-        what: `Element has a filter style; impacted element count: ${impact}`,
-        ordinalSeverity: 2,
-        tagName: elData.tagName,
-        id: elData.id,
-        location: elData.location,
-        excerpt: elData.excerpt
-      });
-    }
-  }
-  // If itemization is not required and there are any instances:
-  if (! withItems && totals[2]) {
-    // Adda summary instance:
-    standardInstances.push({
-      ruleID: 'filter',
-      what: 'Elements have filter styles',
-      ordinalSeverity: 2,
-      count: totals[2],
-      tagName: '',
-      id: '',
-      location: {
-        doc: '',
-        type: '',
-        spec: ''
-      },
-      excerpt: ''
-    });
-    // If any impact occurred:
-    if (totals[1]) {
-      // Add a summary instance.
-      standardInstances.push({
-        ruleID: 'filter',
-        what: 'Elements are impacted by elements with filter styles',
-        ordinalSeverity: 1,
-        count: totals[1],
-        tagName: '',
-        id: '',
-        location: {
-          doc: '',
-          type: '',
-          spec: ''
-        },
-        excerpt: ''
-      });
-    }
-  }
-  // Return the result.
-  return {
-    data,
-    totals,
-    standardInstances
-  };
+  // Populate and return the result.
+  const whats = ['Element has a filter style', 'Elements have filter styles'];
+  return await report(withItems, all, 'filter', whats, 2);
 };
