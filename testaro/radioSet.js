@@ -7,37 +7,33 @@
 
 // ########## IMPORTS
 
-// Module to get locator data.
-const {getLocatorData} = require('../procs/getLocatorData');
+// Module to perform common operations.
+const {init, report} = require('../procs/testaro');
 
 // ########## FUNCTIONS
 
-const whats = {
-  nameLeak: 'shares a name with others outside its field set',
-  fsMixed: 'shares a field set with others having different names',
-  only1RB: 'is the only one with its name in its field set',
-  legendBad: 'is in a field set without a valid legend',
-  noFS: 'is not in a field set',
-  noName: 'has no name attribute'
-};
+// Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
-  // Initialize the result.
-  const data = {};
-  const totals = [0, 0, 0, 0];
-  const standardInstances = [];
-  // Get locators for all radio buttons.
-  const locAll = page.locator('input[type=radio]');
-  const locs = await locAll.all();
-  // For each of them:
-  for (const loc of locs) {
+  // Initialize the locators and result.
+  const all = await init(page, 'input[type=radio]');
+  const params = {
+    nameLeak: 'shares a name with others outside its field set',
+    fsMixed: 'shares a field set with others having different names',
+    only1RB: 'is the only one with its name in its field set',
+    legendBad: 'is in a field set without a valid legend',
+    noFS: 'is not in a field set',
+    noName: 'has no name attribute'
+  };
+  // For each locator:
+  for (const loc of all.allLocs) {
     // Get whether and, if so, how it violates the rule.
-    const howBad = await loc.evaluate(element => {
+    const howBad = await loc.evaluate(el => {
       // Get its name.
-      const elName = element.name;
+      const elName = el.name;
       // If it has one:
       if (elName) {
         // Identify the field set of the element.
-        const elFS = element.closest('fieldset');
+        const elFS = el.closest('fieldset');
         // If it has one:
         if (elFS) {
           // Get the first child element of the field set.
@@ -90,48 +86,15 @@ exports.reporter = async (page, withItems) => {
         return 'noName';
       }
     });
-    // If it violates the rule:
+    // If it does:
     if (howBad) {
-      // Get data on it.
-      const elData = await getLocatorData(loc);
-      // Add to the totals.
-      totals[2]++;
-      // If itemization is required:
-      if (withItems) {
-        standardInstances.push({
-          ruleID: 'radioSet',
-          what: `Radio button ${whats[howBad]}`,
-          ordinalSeverity: 2,
-          tagName: 'INPUT',
-          id: elData.id,
-          location: elData.location,
-          excerpt: elData.excerpt
-        });
-      }
+      // Add the locator to the array of violators.
+      all.locs.push([loc, params[howBad]]);
     }
   }
-  // If itemization is not required:
-  if (! withItems) {
-    // Add a summary instance to the result.
-    standardInstances.push({
-      ruleID: 'radioSet',
-      what: 'Radio buttons are not validly grouped in fieldsets with legends',
-      count: totals[2],
-      ordinalSeverity: 2,
-      tagName: 'INPUT',
-      id: '',
-      location: {
-        doc: '',
-        type: '',
-        spec: ''
-      },
-      excerpt: ''
-    });
-  }
-  // Return the result.
-  return {
-    data,
-    totals,
-    standardInstances
-  };
+  // Populate and return the result.
+  const whats = [
+    'Radio button __param__', 'Radio buttons are not validly grouped in fieldsets with legends'
+  ];
+  return await report(withItems, all, 'radioSet', whats, 2, 'INPUT');
 };
