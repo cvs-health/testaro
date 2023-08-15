@@ -10,68 +10,32 @@
 
 // ########## IMPORTS
 
-// Module to get locator data.
-const {getLocatorData} = require('../procs/getLocatorData');
+// Module to perform common operations.
+const {init, report} = require('../procs/testaro');
 
 // ########## FUNCTIONS
 
+// Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
-  // Initialize the result.
-  const data = {};
-  const totals = [0, 0, 0, 0];
-  const standardInstances = [];
-  // Get locators for all eligible elements.
-  const locAll = page.locator('body *');
-  const locsAll = await locAll.all();
-  // For each of them:
-  for (const loc of locsAll) {
-    // Get its Z index.
-    const zIndex = await loc.evaluate(element => {
-      const styleDec = window.getComputedStyle(element);
-      return styleDec.zIndex;
+  // Initialize the locators and result.
+  const all = await init(page, 'body *');
+  // For each locator:
+  for (const loc of all.allLocs) {
+    // Get whether its element violates the rule.
+    const badZ = await loc.evaluate(el => {
+      const styleDec = window.getComputedStyle(el);
+      const {zIndex} = styleDec;
+      return zIndex !== 'auto' ? zIndex : null;
     });
-    // If it is not auto:
-    if (zIndex !== 'auto') {
-      // Add to the totals.
-      totals[0]++;
-      // If itemization is required:
-      if (withItems) {
-        // Get data on the element.
-        const elData = await getLocatorData(loc);
-        // Add an instance to the result.
-        standardInstances.push({
-          ruleID: 'zIndex',
-          what: `Element has a non-default Z index (${zIndex})`,
-          ordinalSeverity: 0,
-          tagName: elData.tagName,
-          id: elData.id,
-          location: elData.location,
-          excerpt: elData.excerpt
-        });
-      }
+    // If it does:
+    if (badZ) {
+      // Add the locator to the array of violators.
+      all.locs.push([loc, badZ]);
     }
   }
-  // If itemization is not required:
-  if (! withItems) {
-    // Add a summary instance to the result.
-    standardInstances.push({
-      ruleID: 'zIndex',
-      what: 'Elements have non-default Z indexes',
-      count: totals[0],
-      ordinalSeverity: 0,
-      tagName: '',
-      id: '',
-      location: {
-        doc: '',
-        type: '',
-        spec: ''
-      },
-      excerpt: ''
-    });
-  }
-  return {
-    data,
-    totals,
-    standardInstances
-  };
+  // Populate and return the result.
+  const whats = [
+    'Element has a non-default Z index (__param__)', 'Elements have non-default Z indexes'
+  ];
+  return await report(withItems, all, 'zIndex', whats, 0);
 };
