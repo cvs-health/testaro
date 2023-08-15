@@ -6,89 +6,44 @@
 
 // ########## IMPORTS
 
-// Module to get locator data.
-const {getLocatorData} = require('../procs/getLocatorData');
+// Module to perform common operations.
+const {init, report} = require('../procs/testaro');
 // Module to classify links.
 const {isInlineLink} = require('../procs/isInlineLink');
 
 // ########## FUNCTIONS
 
+// Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
-  // Initialize the result.
-  const data = {};
-  const totals = [0, 0, 0, 0];
-  const standardInstances = [];
-  // Get locators for all eligible elements.
-  const nonlinkLocAll = page.locator('button, input');
-  const nonlinkLocsAll = await nonlinkLocAll.all();
-  const linkLocAll = page.locator('a');
-  const linkLocsAll = await linkLocAll.all();
-  const locs = nonlinkLocsAll;
-  for (const loc of linkLocsAll) {
-    if (! await isInlineLink(loc)) {
-      locs.push(loc);
-    }
-  }
-  // For each of them:
-  for (const loc of locs) {
-    // Get whether it violates the rule, and, if so, how.
-    const howBad = await loc.evaluate(element => {
-      const width = element.offsetWidth;
-      const height = element.offsetHeight;
-      if (width < 44 || height < 44) {
-        return {
-          width,
-          height
-        };
-      }
-      else {
-        return null;
-      }
+  // Initialize the locators and result.
+  const all = await init(page, 'a, button, input');
+  // For each locator:
+  for (const loc of all.allLocs) {
+    // Get the size of its element, if small.
+    const sizeData = await loc.evaluate(el => {
+      const width = el.offsetWidth;
+      const height = el.offsetHeight;
+      const tagName = el.tagName;
+      return width < 44 || height < 44 ? {tagName, width, height} : null;
     });
-    // If so:
-    if (howBad) {
-      // Add to the totals.
-      totals[0]++;
-      // If itemization is required:
-      if (withItems) {
-        // Get data on the element.
-        const elData = await getLocatorData(loc);
-        // Add an instance to the result.
-        standardInstances.push({
-          ruleID: 'targetSize',
-          what:
-          `Interactive element is only ${howBad.width} pixels wide and ${howBad.height} pixels high`,
-          ordinalSeverity: 0,
-          tagName: elData.tagName,
-          id: elData.id,
-          location: elData.location,
-          excerpt: elData.excerpt
-        });
+    // If it is small:
+    if (sizeData) {
+      // Get whether it violates the rule.
+      let isBad = true;
+      if (sizeData.tagName === 'A') {
+        isBad = await isInlineLink(loc);
+      }
+      // If it does:
+      if (isBad) {
+        // Add the locator to the array of violators.
+        all.locs.push([loc, `${sizeData.width} wide by ${sizeData.height} high`]);
       }
     }
   }
-  // If itemization is not required:
-  if (! withItems) {
-    // Add a summary instance to the result.
-    standardInstances.push({
-      ruleID: 'targetSize',
-      what: 'Interactive elements are smaller than 44 pixels wide and high',
-      ordinalSeverity: 0,
-      count: totals[0],
-      tagName: '',
-      id: '',
-      location: {
-        doc: '',
-        type: '',
-        spec: ''
-      },
-      excerpt: ''
-    });
-  }
-  // Return the result.
-  return {
-    data,
-    totals,
-    standardInstances
-  };
+  // Populate and return the result.
+  const whats = [
+    'Interactive element pixel size (__param__) is less than 44 by 44',
+    'Interactive elements are smaller than 44 pixels wide and high'
+  ];
+  return await report(withItems, all, 'targetSize', whats, 1);
 };

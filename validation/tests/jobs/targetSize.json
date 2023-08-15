@@ -23,12 +23,12 @@
         [
           "standardResult.totals.0",
           "=",
-          4
+          0
         ],
         [
           "standardResult.totals.1",
           "=",
-          0
+          4
         ],
         [
           "standardResult.instances.0.ruleID",
@@ -38,12 +38,12 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "is only"
+          "is less than"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          0
+          1
         ],
         [
           "standardResult.instances.0.tagName",
@@ -78,7 +78,7 @@
         [
           "standardResult.instances.2.what",
           "i",
-          "is only"
+          "is less than"
         ],
         [
           "standardResult.instances.2.tagName",
@@ -102,8 +102,8 @@
         ],
         [
           "standardResult.instances.3.excerpt",
-          "i",
-          "Wikimedia"
+          "=",
+          "Wikimedia Foundation"
         ]
       ],
       "rules": [
@@ -118,7 +118,7 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.0",
+          "standardResult.totals.1",
           "=",
           4
         ],
@@ -140,7 +140,7 @@
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          0
+          1
         ],
         [
           "standardResult.instances.0.count",
