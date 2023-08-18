@@ -59,20 +59,20 @@ Some of the rules tested by Testaro are based on rules of the [BBC Accessibility
 
 ## Rules
 
-Each tool accessed with Testaro defines _rules_ and tests _targets_ for compliance with its rules. The counts of the rules range from about 30, for Testaro itself, to about 270, for Continuum Community Edition. In total, the ten tools define about 1350 rules. Some of the tools are under active development, and their rule counts change over time.
+Each tool accessed with Testaro defines _rules_ and tests _targets_ for compliance with its rules. The counts of the rules range from about 40, for Testaro itself, to about 270, for Continuum Community Edition. In total, the nine tools define about 920 rules. Some of the tools are under active development, and their rule counts change over time.
 
 When you ask Testaro to run tests of a tool, you may specify a subset of the rules of that tool, and the report will give you the results of only the tests for those rules. These tools will perform only those tests:
-- alfa
-- axe
-- continuum
-- htmlcs
-- qualWeb
-- testaro
+- `alfa`
+- `axe`
+- `continuum`
+- `htmlcs`
+- `qualWeb`
+- `testaro`
 
 These tools always perform a fixed set of tests, and Testaro disregards irrelevant results when you specify a set of rules:
-- ibm
-- nuVal
-- wave
+- `ibm`
+- `nuVal`
+- `wave`
 
 ## Job data
 
