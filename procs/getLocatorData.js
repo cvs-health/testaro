@@ -19,7 +19,7 @@ exports.getLocatorData = async loc => {
       const refLabelText = refLabel ? refLabel.textContent : '';
       let labelsText = '';
       if (tagName === 'INPUT') {
-        const labels = element.labels;
+        const labels = element.labels || [];
         const labelTexts = [];
         labels.forEach(label => {
           labelTexts.push(label.textContent);
