@@ -33,7 +33,9 @@ exports.reporter = async page => {
     // Change any spacing character sequences in it to single spaces.
     rawPage = rawPage.replace(/\s+/g, ' ');
     // Delete everything in it except the head content.
-    rawPage = rawPage.replace(/^.*<head[^>]*>|<\/head>.*$/g, '');
+    rawPage = rawPage.replace(/^.*<head>|<\/head>.*$/g, '');
+    // Delete any scripts from it.
+    rawPage = rawPage.replace(/<script[ >].+?<\/script>/g, '');
     // Get the tag names of the remaining elements.
     const tags = rawPage.match(/<([a-z]+)/g);
     const ucTagNames = tags.map(tag => tag.toUpperCase().slice(1));
