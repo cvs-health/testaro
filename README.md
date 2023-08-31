@@ -484,7 +484,9 @@ When a `test` act has an `expect` property, the result for that act has an `expe
 
 ###### Continuum
 
-The `continuum` tool makes use of the files in the `continuum` directory. The tool inserts the contents of all three files into the page as scripts and then uses them to perform the tests.
+The `continuum` tool makes use of the files in the `continuum` directory. The tool inserts the contents of all three files into the page as scripts and then uses them to perform the tests. The files for this tool are included in the repository of Testaro instead of the tool package being only referenced as a dependency because the files are not published for automatic download.
+
+The files are used without modification, except for format modifications in the `continuum.conf.js` file.
 
 Level Access on 22 August 2022 granted authorization for the copying of the `AccessEngine.community.js` file insofar as necessary for allowing Continuum community edition tests to be included in Testaro.
 

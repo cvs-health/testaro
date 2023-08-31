@@ -1,11 +1,3 @@
-/* eslint-disable semi */
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-useless-escape */
-/* eslint-disable brace-style */
-/* eslint-disable no-case-declarations */
-/* eslint-disable no-use-before-define */
-/* eslint-disable quotes */
-/* eslint-disable indent */
 var LevelAccess_AccessContinuumVersion="community";'use strict';
 
 // media type IDs as defined in AMP
@@ -39,6 +31,7 @@ class Continuum {
 		this._webStandardNameById = {};
 
 		this._AMPReportingService = null;
+		this._ElevinReportingService = null;
 	}
 
 	/**
@@ -114,6 +107,10 @@ class Continuum {
 		if (this.AMPReportingService) {
 			this.AMPReportingService.driver = driver;
 		}
+
+		if (this.ElevinReportingService) {
+			this.ElevinReportingService.driver = driver;
+		}
 	}
 
 	/**
@@ -141,6 +138,10 @@ class Continuum {
 
 		if (this.AMPReportingService) {
 			this.AMPReportingService.windowUnderTest = window;
+		}
+
+		if (this.ElevinReportingService) {
+			this.ElevinReportingService.windowUnderTest = window;
 		}
 	}
 
@@ -216,6 +217,20 @@ class Continuum {
 
 	set AMPReportingService(AMPReportingService) {
 		this._AMPReportingService = AMPReportingService;
+	}
+
+	/**
+	 * Gets the instance of the Elevin reporting service associated with this instance of Continuum.
+	 * Please consult our support documentation for more information on how to report to Elevin.
+	 *
+	 * @returns {ElevinReportingService} the Elevin reporting service associated with this instance of Continuum
+	 */
+	get ElevinReportingService() {
+		return this._ElevinReportingService;
+	}
+
+	set ElevinReportingService(ElevinReportingService) {
+		this._ElevinReportingService = ElevinReportingService;
 	}
 
 	/**
@@ -659,6 +674,10 @@ class Continuum {
 			this._AMPReportingService = new AMPReportingService(this._driver, this._windowUnderTest);
 		}
 
+		if (this._ElevinReportingService === null) {
+			this._ElevinReportingService = new ElevinReportingService(this._driver, this._windowUnderTest);
+		}
+
 		this._retrieveAccessEngineCode();
 
 		let testDataFetched = false;
@@ -727,6 +746,24 @@ class Continuum {
 		});
 	}
 
+	_convertAccessEngineResultsToAssertions(results) {
+		if (!results) {
+			return null;
+		}
+
+		const resultsArr = JSON.parse(results);
+		let assertions = [];
+
+		resultsArr.forEach(result => {
+			const assertion = {
+				...Assertion.fromJSON(result)
+			}
+			assertions.push(assertion);
+		});
+
+		return assertions;
+	}
+
 	/**
 	 * Runs all automatic Access Engine tests against the current page, as defined by the web driver used previously to invoke {@link Continuum#setUp}.
 	 * Make sure to invoke this {@link Continuum#setUp} method before invoking this method.
@@ -738,15 +775,30 @@ class Continuum {
 			const injectAccessEngine = this._injectAccessEngine();
 
 			const execApi = new Promise((resolve, reject) => {
+				const isElevinFormat = Configuration.getAccessibilityConcernsConfiguration().format === 'elevin';
+
 				if (this.driver) {
 					const testTypeJsonArrayString = this.includePotentialAccessibilityConcerns ? "[4,5]" : "[4]";
-					this.driver.executeScript(`return LevelAccess_Continuum_AccessEngine.ast_runAllTests_returnInstances_JSON(${testTypeJsonArrayString});`).then((outcome) => {
-						this.accessibilityConcerns = this._convertAccessEngineResultsToAccessibilityConcerns(outcome);
+					const script = isElevinFormat
+						? `return LevelAccess_Continuum_AccessEngine.nextgen_runAllTests_returnInstances_JSON(${testTypeJsonArrayString}, true);`
+						: `return LevelAccess_Continuum_AccessEngine.ast_runAllTests_returnInstances_JSON(${testTypeJsonArrayString});`;
+
+					this.driver.executeScript(script).then((outcome) => {
+						this.accessibilityConcerns = isElevinFormat
+							? this._convertAccessEngineResultsToAssertions(outcome)
+							: this._convertAccessEngineResultsToAccessibilityConcerns(outcome);
+
 						resolve(this.accessibilityConcerns);
 					});
 				} else if (this.windowUnderTest) {
 					const testTypeJsonArray = this.includePotentialAccessibilityConcerns ? [4,5] : [4];
-					this.accessibilityConcerns = this._convertAccessEngineResultsToAccessibilityConcerns(this.windowUnderTest.LevelAccess_Continuum_AccessEngine.ast_runAllTests_returnInstances_JSON(testTypeJsonArray));
+					const outcome = isElevinFormat
+						? this.windowUnderTest.LevelAccess_Continuum_AccessEngine.nextgen_runAllTests_returnInstances_JSON(testTypeJsonArray, true)
+						: this.windowUnderTest.LevelAccess_Continuum_AccessEngine.ast_runAllTests_returnInstances_JSON(testTypeJsonArray);
+
+					this.accessibilityConcerns = isElevinFormat
+						? this._convertAccessEngineResultsToAssertions(outcome)
+						: this._convertAccessEngineResultsToAccessibilityConcerns(outcome);
 					resolve(this.accessibilityConcerns);
 				} else {
 					reject();
@@ -994,6 +1046,56 @@ class Continuum {
 		return this.accessibilityConcerns;
 	}
 
+	/**
+	 * Retrieves the set of metadata for the current page.
+	 *
+	 * @returns {Metadata}
+ 	*/
+	async getPageMetadata() {
+		this._injectAccessEngine();
+
+		const metadata = new Metadata();
+		let environmentDetails = {};
+
+		if (this.driver) {
+			metadata.contentType = await this.driver.executeScript("return document.contentType");
+			metadata.title = await this.driver.getTitle();
+			metadata.redirectedUrl = await this.driver.getCurrentUrl();
+			environmentDetails = await this.driver.executeScript("return window.LevelAccess_Continuum_AccessEngine.getEnvironmentDetails();");
+			metadata.engineSuccess = await this.driver.executeScript("return window.LevelAccess_Continuum_AccessEngine.getSuccess();");
+		} else if (this.windowUnderTest) {
+			const { document } = this.windowUnderTest;
+
+			metadata.contentType = document.contentType;
+			metadata.title = document.title;
+			metadata.redirectedUrl = document.location.href;
+			environmentDetails = this.windowUnderTest.LevelAccess_Continuum_AccessEngine.getEnvironmentDetails();
+			metadata.engineSuccess = this.windowUnderTest.LevelAccess_Continuum_AccessEngine.getSuccess();
+		}
+
+		metadata.width = environmentDetails.width;
+		metadata.height = environmentDetails.height;
+		metadata.docHeight = environmentDetails.docHeight;
+		metadata.docWidth = environmentDetails.docWidth;
+		metadata.orientation = environmentDetails.orientation;
+		metadata.userAgent = environmentDetails.userAgent;
+
+		return metadata;
+	}
+
+	/**
+	 * @returns {String}
+	 */
+	static getRandomUUID() {
+		function s4() {
+			return Math.floor((1 + Math.random()) * 0x10000)
+				.toString(16)
+				.substring(1);
+		}
+
+		return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+	}
+
 	/////
 	// Deprecated API Functions
 
@@ -1061,7 +1163,12 @@ class Configuration {
 		const configuration = new Configuration();
 
 		configuration.accessEngineType = config.accessEngineType;
-		configuration.ampInstanceUrl = config.ampInstanceUrl;
+		if ( ( config.ampInstanceUrl ) && ( config.ampInstanceUrl.trim().endsWith( "/" )  ) ) {
+			const trimmedUrl = config.ampInstanceUrl.trim();
+			configuration.ampInstanceUrl = trimmedUrl.substring( 0, trimmedUrl.length - 1 );
+		} else {
+			configuration.ampInstanceUrl = config.ampInstanceUrl;
+		}
 		configuration.defaultStandardIds = config.defaultStandardIds;
 		configuration.includePotentialAccessibilityConcerns = config.includePotentialAccessibilityConcerns;
 		configuration.ampApiToken = config.ampApiToken;
@@ -1074,6 +1181,27 @@ class Configuration {
 			configuration.proxyConfiguration.password = config.proxy.password;
 		} else {
 			configuration.proxyConfiguration = null;
+		}
+
+		if (config.elevin) {
+			configuration.elevinConfiguration = new Configuration.ElevinConfiguration();
+			configuration.elevinConfiguration.apiKey = config.elevin.apiKey;
+		}
+
+		if (config.elevin && config.elevin.baseUrl
+			&& config.elevin.baseUrl.trim().endsWith("/")) {
+			const trimmedUrl = config.elevin.baseUrl.trim();
+			configuration.elevinConfiguration.baseUrl = trimmedUrl.substring(0, trimmedUrl.length - 1);
+		} else {
+			configuration.elevinConfiguration.baseUrl = config.elevin.baseUrl;
+		}
+
+		if (config.accessibilityConcerns) {
+			configuration.accessibilityConcerns = {...config.accessibilityConcerns};
+		}
+
+		if (config.accessibilityConcerns && config.accessibilityConcerns.format) {
+			configuration.useAssertions = config.accessibilityConcerns.format === 'elevin';
 		}
 
 		Configuration.instance = configuration;
@@ -1115,6 +1243,8 @@ class Configuration {
 	 * If enabled, any accessibility concerns that require manual review will have {@link AccessibilityConcern#needsReview} return true.
 	 * This setting can be toggled programmatically using {@link Continuum#setIncludePotentialAccessibilityConcerns}, overriding this value specified in continuum.conf.js.
 	 *
+     * @deprecated Please use {@link Configuration.AccessibilityConcernsConfiguration#getIncludePotentialConcerns()} instead
+     *
 	 * @returns {boolean}
 	 */
 	static getIncludePotentialAccessibilityConcerns() {
@@ -1139,6 +1269,19 @@ class Configuration {
 	 */
 	static getProxyConfiguration() {
 		return Configuration.INSTANCE.proxyConfiguration;
+	}
+
+	/**
+	 * Gets the Elevin-specific configuration in Continuum represented by the 'elevin' object defined in continuum.conf.js.
+	 *
+	 * @returns {Configuration.ElevinConfiguration}
+	 */
+	static getElevinConfiguration() {
+		return Configuration.INSTANCE.elevinConfiguration;
+	}
+
+	static getAccessibilityConcernsConfiguration() {
+		return Configuration.INSTANCE.accessibilityConcerns;
 	}
 }
 
@@ -1182,7 +1325,7 @@ Configuration.Proxy = class Proxy {
 	}
 
 	/**
-	 * Gets the value for the 'password' attribute of the the 'proxy' object defined in continuum.conf.js.
+	 * Gets the value for the 'password' attribute of the 'proxy' object defined in continuum.conf.js.
 	 * The password for the desired proxy to route all network traffic from Continuum through.
 	 * Set to null if your proxy does not require a password, or if you don't want to use a proxy.
 	 *
@@ -1192,6 +1335,62 @@ Configuration.Proxy = class Proxy {
 		return Configuration.INSTANCE.proxyConfiguration.password;
 	}
 };
+
+
+/**
+ * This encapsulates all of Elevin-specific properties required for integration
+ *
+ * @hideconstructor
+ * */
+Configuration.ElevinConfiguration = class ElevinConfiguration {
+	/**
+	* This is the API key used in requests to Elevin services
+	*
+	* @returns {?string}
+	*/
+	getApiKey() {
+		return Configuration.INSTANCE.elevinConfiguration.apiKey;
+	}
+
+	/**
+	* This is the base URL where Elevin services are located
+	*
+	* @returns {?string}
+	*/
+	getBaseUrl() {
+		return Configuration.INSTANCE.elevinConfiguration.baseUrl;
+	}
+}
+
+/**
+ * Configuration properties relating to accessibility concerns
+ *
+ * @hideconstructor
+ */
+Configuration.AccessibilityConcernsConfiguration = class AccessibilityConcernsConfiguration {
+	/**
+	* Gets the value for the 'includePotentialAccessibilityConcerns' attribute defined in continuum.json.
+	* Used to determine whether or not accessibility concerns that require manual review are returned in any of Continuum's test results.
+	* If enabled, any accessibility concerns that require manual review will have {@link AccessibilityConcern#getNeedsReview} return true.
+	* This setting can be toggled programmatically using {@link Continuum#setIncludePotentialAccessibilityConcerns(boolean)}, overriding this value specified in continuum.json.
+	*
+	* @returns {boolean}
+	*/
+	getIncludePotentialConcerns() {
+		return Configuration.INSTANCE.accessibilityConcerns.includePotentialConcerns;
+	}
+
+	/**
+	* Determines the format of the test results being generated where explicit
+	* calls to SDK methods don't return a specific type.
+	*
+	* @returns {?string}
+	*/
+
+	getFormat() {
+		return Configuration.INSTANCE.accessibilityConcerns.format;
+	}
+}
 
 /**
  * This class represents an accessibility concern identified by Access Engine.
@@ -1545,6 +1744,101 @@ class NetworkUtil {
 		return NetworkUtil._getFromAMP('POST', urlEndpointPath, null, bodyParams, includeToken, driver, windowUnderTest);
 	}
 
+	/**
+	 * Sends a message to Elevin at the endpoint specified by url using the HTTP method specified by method. If a payload
+	 * argument is non-null, it will be converted to a gzip-compressed base64 string and used as the request body.
+	 *
+	 * If the response received back from Elevin indicates success (e.g. a 200 response code) then the response body will
+	 * be converted from a JSON string to an object which is returned from the method. If the response body is
+	 * empty though, null will be returned.
+	 *
+	 * @param method
+	 * @param url
+	 * @param payload
+	 * @param driver
+	 * @param windowUnderTest
+	 * @return The object representation of the JSON content of the response body. Null if the response body is empty.
+	 * @throws HttpErrorException
+	 */
+	static async sendToElevin({ method, url, payload, driver, windowUnderTest }) {
+		try {
+			return await NetworkUtil._sendToElevin({
+				method,
+				url,
+				payload,
+				driver,
+				windowUnderTest
+			});
+		} catch (e) {
+			console.log(e);
+		}
+
+	}
+
+	static async _handleProxy({ callback }) {
+		let credentials = "";
+		if (Configuration.getProxyConfiguration().getUsername()) {
+			credentials = `${Configuration.getProxyConfiguration().getUsername()}:${Configuration.getProxyConfiguration().getPassword()}@`;
+		}
+
+		// enable the proxy, perform our network request, then disable the proxy
+		require('global-agent/bootstrap');
+		global.GLOBAL_AGENT.HTTP_PROXY = `http://${credentials}${Configuration.getProxyConfiguration().getHost()}:${Configuration.getProxyConfiguration().getPort()}`;
+		try {
+			if (callback.constructor.name === 'AsyncFunction') {
+				return await callback();
+			} else {
+				return callback();
+			}
+		} finally {
+			global.GLOBAL_AGENT.HTTP_PROXY = '';
+		}
+	}
+
+	static async _sendServerRequest({ url, method, headers, payload }) {
+		const body = await NetworkUtil._convertToGzip(payload);
+
+		const axios = require("axios");
+		try {
+			const { data } = await axios({
+				method,
+				url,
+				data: body,
+				headers
+			});
+
+			return data;
+		} catch (e) {
+			throw new HttpErrorException(`Something went wrong while sending ${method} request to ${url}`);
+		}
+	}
+
+	static async _sendClientRequest({ method, url, headers, payload }) {
+		const processedPayload = await NetworkUtil._convertToGzip(payload);
+
+		return new Promise((resolve, reject) => {
+			const request = new XMLHttpRequest();
+			request.open(method, url, true);
+			headers.forEach(header => {
+				request.setRequestHeader(header.key, header.value);
+			});
+			request.timeout = NetworkUtil._getTimeout();
+			request.onload = () => {
+				if (request.readyState === 4) {
+					if (request.status === 200) {
+						resolve(request.responseText ? JSON.parse(request.responseText) : null);
+					} else {
+						throw new HttpErrorException(`Unexpectedly encountered a non-200 status code (${request.status} ${request.statusText}) while attempting to ${method} data from ${url}`);
+					}
+				}
+			};
+			request.onerror = (err) => {
+				reject(err);
+			};
+			request.send(processedPayload);
+		});
+	}
+
 	static _getFromAMP(method, urlEndpointPath, queryParams, bodyParams, includeToken, driver, windowUnderTest) {
 		if (includeToken) {
 			if (!queryParams) {
@@ -1572,6 +1866,7 @@ class NetworkUtil {
 							'Content-Type': 'application/json;charset=UTF-8'
 						},
 					};
+
 					if (socket) {
 						options.socket = socket;
 						options.agent = false;
@@ -1583,44 +1878,37 @@ class NetworkUtil {
 						}
 
 						res.setEncoding('utf8');
-
 						let output = '';
+
 						res.on('data', (chunk) => {
 							output += chunk;
 						});
+
 						res.on('end', () => {
 							resolve(output ? JSON.parse(output) : null);
 						});
 					});
+
 					req.on('socket', (socket) => {
 						socket.setTimeout(NetworkUtil._getTimeout());
 						socket.on('timeout', () => {
 							req.abort();
 						});
 					});
+
 					req.on('error', (err) => {
 						reject(err);
 					});
+
 					if (method === 'POST') {
 						req.write(NetworkUtil._formatBodyParams(bodyParams));
 					}
+
 					req.end();
 				};
 
 				if (Configuration.getProxyConfiguration() && Configuration.getProxyConfiguration().getHost()) {
-					let credentials = "";
-					if (Configuration.getProxyConfiguration().getUsername()) {
-						credentials = `${Configuration.getProxyConfiguration().getUsername()}:${Configuration.getProxyConfiguration().getPassword()}@`;
-					}
-
-					// enable the proxy, perform our network request, then disable the proxy
-					require('global-agent/bootstrap');
-					global.GLOBAL_AGENT.HTTP_PROXY = `http://${credentials}${Configuration.getProxyConfiguration().getHost()}:${Configuration.getProxyConfiguration().getPort()}`;
-					try {
-						sendAMPRequest();
-					} finally {
-						global.GLOBAL_AGENT.HTTP_PROXY = '';
-					}
+					NetworkUtil._handleProxy({ callback: sendAMPRequest });
 				} else {
 					sendAMPRequest();
 				}
@@ -1628,6 +1916,7 @@ class NetworkUtil {
 		} else if (windowUnderTest) {
 			return new Promise((resolve, reject) => {
 				const request = new XMLHttpRequest();
+
 				request.open(method, url, true);
 				request.setRequestHeader('Content-Type', "application/json;charset=UTF-8");
 				request.timeout = NetworkUtil._getTimeout();
@@ -1648,7 +1937,47 @@ class NetworkUtil {
 		}
 	}
 
-	static _getTimeout() {
+	static async _sendToElevin({ method, url, payload, driver, windowUnderTest }) {
+		let urlString = Configuration.getElevinConfiguration().getBaseUrl() + url;
+
+		if (driver) {
+			const sendElevinRequest = async () => {
+				return await NetworkUtil._sendServerRequest({
+					url: urlString,
+					method,
+					payload,
+					headers: {
+						'Content-Type': 'application/json; charset=UTF-8',
+						'X-Api-Key': Configuration.getElevinConfiguration().getApiKey()
+					}
+				});
+			};
+
+			if (Configuration.getProxyConfiguration() && Configuration.getProxyConfiguration().getHost()) {
+				return NetworkUtil._handleProxy({ callback: sendElevinRequest });
+			} else {
+				return await sendElevinRequest();
+			}
+		} else if (windowUnderTest) {
+			const headers = [{
+				key: "Content-Type",
+				value: "application/json;charset=UTF-8"
+			},
+			{
+				key: "X-Api-Key",
+				value: Configuration.getElevinConfiguration().getApiKey()
+			}];
+
+			return await NetworkUtil._sendClientRequest({
+				method,
+				url: urlString,
+				headers,
+				payload
+			});
+		}
+	}
+
+    static _getTimeout() {
 		return 60000;  // in milliseconds
 	}
 
@@ -1668,6 +1997,23 @@ class NetworkUtil {
 		}
 
 		return JSON.stringify(bodyParams);
+	}
+
+	static async _convertToGzip(payload) {
+		if (!payload) {
+			return payload;
+		}
+
+		if (typeof require !== 'undefined') {
+			const zlib = require("zlib");
+			const util = require("util");
+			const gzip = util.promisify(zlib.gzip);
+			const compressedPayload = await gzip(JSON.stringify(payload));
+			return compressedPayload.toString('base64');
+		} else {
+			const compressedPayload = window.pako.gzip(JSON.stringify(payload), { to: 'string' });
+			return btoa(compressedPayload); // base64 encoding
+		}
 	}
 }
 
@@ -2422,6 +2768,271 @@ class AMPReportingService {
 }
 
 /**
+ * This class encapsulates all of functionality for submitting accessibility concerns identified using Continuum to Elevin.
+ *
+ * Reporting test results from Continuum to Elevin is accomplished through a kind of state machine, where you set the active Elevin instance, organization, asset, report, and module to use; once these are set, they remain set for as long as they're not set again and for as long as Continuum is initialized.
+ * Depending on the report and module management strategies you decide to use—see {@link ReportManagementStrategy} and {@link ModuleManagementStrategy}, respectively—invoking {@link ElevinReportingService#submitAccessibilityConcernsToElevin} will first create, overwrite, and/or delete reports and modules from Elevin, then publish your test results to the active Elevin module.
+ * You can set the active report and module management strategies using {@link ElevinReportingService#setActiveReportManagementStrategy} and {@link ElevinReportingService#setActiveModuleManagementStrategy}, respectively.
+ * Only once all of these active items are set should you invoke {@link ElevinReportingService#submitAccessibilityConcernsToElevin} using the list of accessibility concerns you'd like to report.
+ *
+ * More on report and module management strategies: they are designed with two primary use cases in mind: continuous integration (CI) workflows (where you usually want to retain the results of previously published reports), and more manual workflows (e.g. when Continuum is run from a developer's local workstation, where you usually don't want to retain the results of previously published reports).
+ * Here? Choosing the correct report and module management strategies to meet your business objectives is critical to using Continuum's Elevin reporting functionality correctly, so please consult our support documentation for more information.
+ *
+ * @hideconstructor
+ */
+
+class ElevinReportingService {
+	/**
+	 * @constructor
+	 * @returns {ElevinReportingService}
+	 */
+	constructor(driver, windowUnderTest) {
+		this._driver = driver;
+		this._windowUnderTest = windowUnderTest;
+		this._activeScanId = null;
+	}
+
+	get activeScanId() {
+		return this._activeScanId;
+	}
+
+	set activeScanId(activeScanId) {
+		this._activeScanId = activeScanId;
+	}
+
+	/**
+	 * @private
+	 * @returns {*}
+	 */
+	get driver() {
+		return this._driver;
+	}
+
+	set driver(driver) {
+		this._driver = driver;
+	}
+
+	/**
+	 * @private
+	 * @returns {Window}
+	 */
+	get windowUnderTest() {
+		return this._windowUnderTest;
+	}
+
+	set windowUnderTest(window) {
+		this._windowUnderTest = window;
+	}
+
+	validateConfigurationProperties() {
+		if (!Configuration.getAccessibilityConcernsConfiguration()) {
+			throw new IllegalStateException("Configuration property 'accessibilityConcerns' is required, but could not be found");
+		}
+
+		if ((!Configuration.getAccessibilityConcernsConfiguration().format)
+			|| Configuration.getAccessibilityConcernsConfiguration().format !== 'elevin') {
+			throw new IllegalStateException(
+				"Configuration property 'accessibilityConcerns.format' is required, but no valid value could be found. Please make sure the property's value is set to 'elevin'."
+			);
+		}
+
+		if (!Configuration.getElevinConfiguration()) {
+			throw new IllegalStateException("Configuration propery 'elevin' is required, but could not be found");
+		}
+
+		if (!Configuration.getElevinConfiguration().getBaseUrl()) {
+			throw new IllegalStateException("Configuration property 'elevin.baseUrl' is required, but no valid value could be found");
+		}
+
+		if (!Configuration.getElevinConfiguration().getApiKey()) {
+			throw new IllegalStateException("Configuration property 'elevin.apiKey' is required, but no valid value could be found");
+		}
+	}
+
+	/**
+	 * Begins a new Elevin scan. This must be done in order for any assertions to be submitted to Elevin.
+	 * Note that there can be at most one active scan at a time. If there is an active scan and an attempt
+	 * is made to begin a new one the Elevin service will reject the request resulting in an exception
+	 * being thrown.
+	 *
+	 * @returns {String}
+	 * @throws HttpErrorException
+	 * @throws IllegalStateException
+	 */
+	async beginScan() {
+		const storageAvailabe = typeof sessionStorage !== 'undefined';
+		this.validateConfigurationProperties();
+
+		if (this.activeScanId || (storageAvailabe && sessionStorage.getItem('activeScanId'))) {
+			throw new IllegalStateException("Cannot begin a new scan while there is an active scan in progress.");
+		}
+
+		let response;
+
+		try {
+			response = await NetworkUtil.sendToElevin({
+				method: 'POST',
+				url: '/accounts/continuum/scans',
+				payload: null,
+				driver: this.driver,
+				windowUnderTest: this.windowUnderTest,
+			});
+		} catch (e) {
+			throw new HttpErrorException(`Unexpectedly encountered a non-200 status code while attempting to POST data`);
+		}
+
+		const { scanId } = response;
+
+		if (scanId) {
+			this.activeScanId = scanId;
+
+			if (storageAvailabe) {
+				sessionStorage.setItem("activeScanId", scanId);
+			}
+			return this.activeScanId;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Submits the supplied assertions to Elevin for the current page within the currently active scan.
+	 * Note that a scan must have been started prior to this method being called, otherwise an exception will be thrown.
+	 *
+	 * @param assertions The list of assertions to be sent to Elevin for the currently active scan.
+	 * @throws Exception
+	 * @throws HttpErrorException
+	 * @throws IllegalStateException
+	 */
+	async submit(assertions) {
+		const storageAvailabe = typeof sessionStorage !== 'undefined';
+		const scanId = this.activeScanId || (storageAvailabe && sessionStorage.getItem('activeScanId'));
+		const resizeScreenshot = ({ dataUrl, maxWidth = 1024 }) => {
+			return this.driver.executeAsyncScript(`
+				const callback = arguments[0];
+				const img = new Image();
+				img.crossOrigin = 'Anonymous';
+				img.onload = function () {
+					const canvas = document.createElement('canvas');
+					canvas.width = Math.min(img.width, ${maxWidth});
+					canvas.height = (canvas.width / img.width) * img.height;
+					canvas.getContext('2d')?.drawImage(img, 0, 0, canvas.width, canvas.height);
+					callback(canvas.toDataURL('image/jpeg'));
+				};
+				img.src = "${dataUrl}";
+			`);
+		};
+
+		this.validateConfigurationProperties();
+
+		if (!scanId) {
+			throw new IllegalStateException("Cannot submit assertions if there is not an active scan in progress.");
+		}
+
+		const metadata = await continuum.getPageMetadata();
+		const environment = new Environment(
+			metadata.orientation,
+			metadata.userAgent,
+			metadata.width,
+			metadata.height,
+			metadata.docWidth,
+			metadata.docHeight
+		);
+		let screenshotDataURI = null;
+
+		if (this.driver && ('takeScreenshot' in this.driver) && (typeof this.driver.takeScreenshot === 'function')) {
+			try {
+				screenshotDataURI = await resizeScreenshot({
+					dataUrl: `data:image/png;base64,${await this.driver.takeScreenshot()}`,
+				});
+			} catch (e) {
+				console.error(
+					"Failed to take screenshot. The test results will be submitted without a screenshot. Reason", e.message
+				);
+			}
+		}
+
+		let subject = null;
+
+		if (this.driver) {
+			subject = await this.driver.getCurrentUrl();
+		} else if (this.windowUnderTest) {
+			subject = this.windowUnderTest.document.location.href;
+		}
+
+		let impressionId = null;
+		if (typeof crypto !== 'undefined') {
+			impressionId = crypto.randomUUID();
+		} else if (this.driver) {
+			impressionId = require('crypto').randomUUID();
+		} else {
+			impressionId = Continuum.getRandomUUID();
+		}
+
+		const timestamp = new Date().toISOString();
+		const testResults = new UnifiedTestResults(
+			subject,
+			metadata.title,
+			impressionId,
+			timestamp,
+			metadata.engineSuccess,
+			environment.toObject(),
+			assertions,
+			screenshotDataURI
+		);
+
+		try {
+			await NetworkUtil.sendToElevin({
+				method: "POST",
+				url: `/accounts/continuum/scans/${scanId}/testing/results`,
+				payload: testResults.toObject(),
+				driver: this.driver,
+				windowUnderTest: this.windowUnderTest
+			});
+		} catch (e) {
+			console.log(e);
+			throw new HttpErrorException(`Unexpectedly encountered a non-200 status code while attempting to POST data`);
+		}
+	}
+
+	/**
+	 * Completes the currently active Elevin scan. After calling this method no further assertions will be accepted for the currently active scan id.
+	 * Note that a scan must have been started prior to this method being called, otherwise an exception will be thrown.
+	 *
+	 * @throws HttpErrorException
+	 * @throws IllegalStateException
+	 */
+	async completeScan() {
+		const storageAvailabe = typeof sessionStorage !== 'undefined';
+		const scanId = this.activeScanId || (storageAvailabe && sessionStorage.getItem('activeScanId'));
+
+		this.validateConfigurationProperties();
+
+		if (!scanId) {
+			throw new IllegalStateException("Cannot complete a scan if there is not an active scan in progress");
+		}
+
+		try {
+			await NetworkUtil.sendToElevin({
+				method: "PUT",
+				url: `/accounts/continuum/scans/${scanId}`,
+				payload: null,
+				driver: this.driver,
+				windowUnderTest: this.windowUnderTest
+			});
+		} catch (e) {
+			console.log(e);
+			throw new HttpErrorException(`Unexpectedly encountered a non-200 status code while attempting to ${method} data from/to ${url}`);
+		}
+
+		this.activeScanId = null;
+		if (storageAvailabe) {
+			sessionStorage.removeItem('activeScanId');
+		}
+	}
+}
+
+/**
  * Defines supported strategies with which to create new reports and edit existing ones.
  * Choosing the correct report management strategy to meet your business objectives is critical to using Continuum's AMP reporting functionality correctly, so please consult our support documentation for more information.
  *
@@ -2499,6 +3110,432 @@ const ModuleManagementStrategy = Object.freeze({
 	 */
 	ABORT: "ABORT"
 });
+
+/**
+ * This class encapsulates Metadata info for the current page relevant to an Elevin report.
+ *
+ */
+class Metadata {
+	constructor() {
+		this._contentType = null;
+		this._title = null;
+		this._redirectedUrl = null;
+		this._width = null;
+		this._height = null;
+		this._docHeight = null;
+		this._docWidth = null;
+		this._orientation = null;
+		this._userAgent = null;
+		this._engineSuccess = null;
+	}
+
+	get contentType() {
+		return this._contentType;
+	}
+
+	set contentType(contentType) {
+		this._contentType = contentType;
+	}
+
+	get title() {
+		return this._title;
+	}
+
+	set title(title) {
+		this._title = title;
+	}
+
+	get redirectedUrl() {
+		return this._redirectedUrl;
+	}
+
+	set redirectedUrl(redirectedUrl) {
+		this._redirectedUrl = redirectedUrl;
+	}
+
+	get width() {
+		return this._width;
+	}
+
+	set width(width) {
+		this._width = width;
+	}
+
+	get height() {
+		return this._height;
+	}
+
+	set height(height) {
+		this._height = height;
+	}
+
+	get docHeight() {
+		return this._docHeight;
+	}
+
+	set docHeight(docHeight) {
+		this._docHeight = docHeight;
+	}
+
+	get docWidth() {
+		return this._docWidth;
+	}
+
+	set docWidth(docWidth) {
+		this._docWidth = docWidth;
+	}
+
+	get orientation() {
+		return this._orientation;
+	}
+
+	set orientation(orientation) {
+		this._orientation = orientation;
+	}
+
+	get userAgent() {
+		return this._userAgent;
+	}
+
+	set userAgent(userAgent) {
+		this._userAgent = userAgent;
+	}
+
+	get engineSuccess() {
+		return this._engineSuccess;
+	}
+
+	set engineSuccess(engineSuccess) {
+		this._engineSuccess = engineSuccess;
+	}
+}
+
+/**
+ * This class encapsulates Environment info for the current page.
+ *
+ */
+class Environment {
+	constructor(
+		orientation,
+		userAgent,
+		width,
+		height,
+		docWidth,
+		docHeight
+	) {
+		this._orientation = orientation;
+		this._userAgent = userAgent;
+		this._width = width;
+		this._height = height;
+		this._docWidth = docWidth;
+		this._docHeight = docHeight;
+	}
+
+	get orientation() {
+		return this._orientation;
+	}
+
+	set orientation(orientation) {
+		this._orientation = orientation;
+	}
+
+	get userAgent() {
+		return this._userAgent;
+	}
+
+	set userAgent(userAgent) {
+		this._userAgent = userAgent;
+	}
+
+	get height() {
+		return this._height;
+	}
+
+	set height(heigth) {
+		this._height = heigth;
+	}
+
+	get width() {
+		return this._width;
+	}
+
+	set width(width) {
+		this._width = width;
+	}
+
+	get docWidth() {
+		return this._docWidth;
+	}
+
+	set docWidth(docWidth) {
+		this._docWidth = docWidth;
+	}
+
+	get docHeight() {
+		return this._docHeight;
+	}
+
+	set docHeight(docHeight) {
+		this._docHeight = docHeight;
+	}
+
+	toObject() {
+		return {
+			orientation: this._orientation || "",
+			userAgent: this._userAgent,
+			width: this._width,
+			height: this._height,
+			docHeight: this._docHeight || this._height,
+			docWidth: this._docWidth || this._width
+		};
+	}
+}
+
+class Assertion {
+	constructor() {
+		this._testId = null;
+		this._testType = null;
+		this._outcome = null;
+		this._results = [];
+	}
+
+	get testId() {
+		return this._testId;
+	}
+
+	set testId(testId) {
+		this._testId = testId;
+	}
+
+	get testType() {
+		return this._testType;
+	}
+
+	set testType(testType) {
+		this._testType = testType;
+	}
+
+	get outcome() {
+		return this._outcome;
+	}
+
+	set outcome(outcome) {
+		this._outcome = outcome;
+	}
+
+	get results() {
+		return this._results;
+	}
+
+	set results(results) {
+		this._results = results;
+	}
+
+	getTestURL() {
+		return this._testId ? `https://accessipedia.elevin.cloud/test/${this.testId}` : null;
+	}
+
+	static toJSON() {
+		return {
+			testId: this._testId,
+			testType: this._testType,
+			outcome: this._outcome,
+			results: this._results
+		};
+	}
+
+	static fromJSON(data) {
+		const { testId, testType, outcome, results } = data;
+
+		return {
+			testId,
+			testType,
+			outcome,
+			results,
+		};
+	}
+}
+
+class ClusteringData {
+	constructor() {
+		this._uniqueId = null;
+		this._tagName = null;
+		this._attributes = null;
+		this._text = null;
+		this._children = [];
+	}
+
+	static toJSON() {
+		return {
+			uniqueId: this._uniqueId,
+			tagName: this._tagName,
+			attributes: this._attributes,
+			text: this._text,
+			children: this._children
+		};
+	}
+
+	static fromJSON(data) {
+		const { uniqueId, tagName, attributes, text, children } = data;
+
+		return {
+			uniqueId,
+			tagName,
+			attributes,
+			text,
+			children
+		};
+	}
+}
+
+class TestResult {
+	constructor() {
+		this._attrNo = null;
+		this._css = null;
+		this._uel = null;
+		this._encoding = [];
+		this._element = null;
+		this._timestamp = null;
+		this._clusteringData = null;
+	}
+
+	static toJSON() {
+		return JSON.stringify({
+			attrNo: this._attrNo,
+			css: this._css,
+			uel: this._uel,
+			encoding: this._encoding,
+			element: this._element,
+			timestamp: this._timestamp,
+			clusteringData: this._clusteringData
+		});
+	}
+
+	static fromJSON(data) {
+		const {
+			attrNo,
+			css,
+			uel,
+			encoding,
+			element,
+			timestamp,
+			clusteringData
+		} = data;
+
+		return {
+			attrNo,
+			css,
+			uel,
+			encoding,
+			element,
+			timestamp,
+			clusteringData
+		};
+	}
+}
+
+/**
+ * This class encapsulates UnifiedTestResults submitted to Evelin.
+ *
+ */
+class UnifiedTestResults {
+	constructor(
+		subject,
+		title,
+		impressionId,
+		timestamp,
+		engineSuccess,
+		environment,
+		assertions,
+		screenshot,
+	) {
+		this._subject = subject;
+		this._title = title;
+		this._impressionId = impressionId;
+		this._timestamp = timestamp;
+		this._engineSuccess = engineSuccess;
+		this._environment = environment;
+		this._assertions = assertions;
+		this._screenshot = screenshot;
+	}
+
+	get subject() {
+		return this._subject;
+	}
+
+	set subject(subject) {
+		this._subject = subject;
+	}
+
+	get title() {
+		return this._title;
+	}
+
+	set title(title) {
+		this._title = title;
+	}
+
+	get impressionId() {
+		return this._impressionId;
+	}
+
+	set impressionId(impressionId) {
+		this._impressionId = impressionId;
+	}
+
+	get timestamp() {
+		return this._timestamp;
+	}
+
+	set timestamp(timestamp) {
+		this._timestamp = timestamp;
+	}
+
+	get engineSuccess() {
+		return this._engineSuccess;
+	}
+
+	set engineSuccess(engineSuccess) {
+		this._engineSuccess = engineSuccess;
+	}
+
+	get environment() {
+		return this._environment;
+	}
+
+	set environment(environment) {
+		this._environment = environment;
+	}
+
+	get assertions() {
+		return this._assertions;
+	}
+
+	set assertions(assertions) {
+		this._assertions = assertions;
+	}
+
+	get screenshot() {
+		return this._screenshot;
+	}
+
+	set screenshot(screenshot) {
+		this._screenshot = screenshot;
+	}
+
+	toObject() {
+		return {
+			subject: this._subject,
+			title: this._title,
+			impressionId: this._impressionId,
+			timestamp: this._timestamp,
+			engineSuccess: this._engineSuccess,
+			environment: this._environment,
+			assertions: this._assertions,
+			screenshot: this._screenshot,
+		};
+	}
+}
 
 /**
  * This class encapsulates all the metadata relevant to an AMP report.
@@ -2689,6 +3726,18 @@ class NotFoundException extends Error {}
  * @type {Continuum}
  */
 const continuum = new Continuum();
+
+// TODO: https://levelaccess-internal.atlassian.net/browse/CONT-846
+if (typeof document !== 'undefined') {
+	const body = document.getElementsByTagName('body')[0];
+
+	if (body) {
+		const script = document.createElement('script');
+		script.type = 'text/javascript';
+		script.src = 'https://cdn.jsdelivr.net/pako/1.0.3/pako.min.js';
+		body.appendChild(script);
+	}
+}
 
 if (typeof module !== 'undefined') {
 	module.exports.Continuum = continuum;

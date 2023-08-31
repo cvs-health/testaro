@@ -1,9 +1,7 @@
-/* eslint-disable semi */
-/* eslint-disable quotes */
 window.LevelAccess_AccessContinuumConfiguration = {
-  "accessEngineType": "community",
-  "ampInstanceUrl": "https://amp.levelaccess.net",
-  "defaultStandardIds": [
+  'accessEngineType': 'community',
+  'ampInstanceUrl': 'https://amp.levelaccess.net',
+  'defaultStandardIds': [
     610, /* WCAG 2.0 Level A */
     611, /* WCAG 2.0 Level AA */
     612, /* WCAG 2.0 Level AAA */
@@ -13,7 +11,20 @@ window.LevelAccess_AccessContinuumConfiguration = {
     1140, /* Section 508 and 255 (Revised 2017) */
     1471 /* WCAG 2.0 Level A & AA Baseline */
   ],
-  // includePotentialAccessibilityConcerns may be true only in the Professional Edition.
-  "includePotentialAccessibilityConcerns": false,
-  "ampApiToken": null
-}
+  'includePotentialAccessibilityConcerns': false,
+  'ampApiToken': null,
+  'proxy': {
+    'host': null,
+    'port': null,
+    'username': null,
+    'password': null
+  },
+  'accessibilityConcerns': {
+    'includePotentialConcerns': false,
+    'format': 'amp'
+  },
+  'elevin': {
+    'baseUrl': null,
+    'apiKey': null
+  },
+};

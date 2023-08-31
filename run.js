@@ -614,6 +614,7 @@ const doActs = async (report, actIndex, page) => {
     // Add data on the aborted act to the report.
     report.jobData.abortTime = nowString();
     report.jobData.abortedAct = actIndex;
+    report.jobData.aborted = true;
     // Prevent performance of additional acts.
     actIndex = -2;
     // Report this.
