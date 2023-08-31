@@ -557,6 +557,8 @@ Its `rules` argument is **not** an array of rule IDs, but instead is an array of
 
 The `qualWeb` tool performs the ACT rules, WCAG Techniques, and best-practices tests of QualWeb. Only failures and warnings are included in the report. The EARL report of QualWeb is not generated, because it is equivalent to the report of the ACT rules tests.
 
+QualWeb allows specification of rules for 3 modules: `act-rules`, `wcag-techniques`, and `best-practices`. If you include a `rules` argument in a QualWeb test act, its strings are the names of the rules to be included, each prefixed by a code indicating which module the rule belongs to. The prefixes are `ar:`, `wt:`, and `bp:`, respectively.
+
 ###### Testaro
 
 If you do not specify rules when using the `testaro` tool, Testaro will test for the rules listed in the `evalRules` object of the `tests/testaro.js` file.

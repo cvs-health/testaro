@@ -34,9 +34,6 @@ exports.reporter = async (page, options) => {
       wcag: ! rules,
       bp: ! rules,
       counter: ! rules
-    },
-    'act-rules': {
-      exclude: []
     }
   };
   if (withNewContent) {
@@ -45,15 +42,42 @@ exports.reporter = async (page, options) => {
   else {
     qualWebOptions.html = await page.content();
   }
-  if (rules) {
-    qualWebOptions['act-rules'].rules = rules;
+  const arRules = rules
+    ? rules.filter(rule => rule.startsWith('ar:')).map(rule => rule.slice(3))
+    : [];
+  const wtRules = rules
+    ? rules.filter(rule => rule.startsWith('wt:')).map(rule => rule.slice(3))
+    : [];
+  const bpRules = rules
+    ? rules.filter(rule => rule.startsWith('bp:')).map(rule => rule.slice(3))
+    : [];
+  if (arRules.length) {
+    qualWebOptions['act-rules'] = {rules: arRules};
   }
   else {
-    qualWebOptions['act-rules'].levels = ['A', 'AA', 'AAA'];
-    qualWebOptions['act-rules'].principles = [
-      'Perceivable', 'Operable', 'Understandable', 'Robust'
-    ];
+    qualWebOptions['act-rules'] = {
+      levels: ['A', 'AA', 'AAA'],
+      principles: ['Perceivable', 'Operable', 'Understandable', 'Robust']
+    };
   }
+  if (wtRules.length) {
+    qualWebOptions['wcag-techniques'] = {rules: wtRules};
+  }
+  else {
+    qualWebOptions['wcag-techniques'] = {
+      levels: ['A', 'AA', 'AAA'],
+      principles: ['Perceivable', 'Operable', 'Understandable', 'Robust']
+    };
+  }
+  if (bpRules.length) {
+    qualWebOptions['best-practices'] = {bestPractices: bpRules};
+  }
+  else {
+    qualWebOptions['best-practices'] = {
+      bestPractices: ['QW-BP28']
+    };
+  }
+  console.log(JSON.stringify(qualWebOptions, null, 2));
   // Get the report.
   let reports = await qualWeb.evaluate(qualWebOptions);
   // Remove the copy of the DOM from it.
