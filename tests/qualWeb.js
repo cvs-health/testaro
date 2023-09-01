@@ -42,8 +42,8 @@ exports.reporter = async (page, options) => {
   }
   // Specify which rules to test for.
   const actSpec = rules ? rules.find(typeRules => typeRules.startsWith('act:')) : null;
-  const wcagSpec = rules ? rules.find(typeRules => typeRules.startsWith('wcag:')) : [];
-  const bestSpec = rules ? rules.find(typeRules => typeRules.startsWith('best:')) : [];
+  const wcagSpec = rules ? rules.find(typeRules => typeRules.startsWith('wcag:')) : null;
+  const bestSpec = rules ? rules.find(typeRules => typeRules.startsWith('best:')) : null;
   if (actSpec) {
     if (actSpec === 'act:') {
       qualWebOptions.execute.act = false;
