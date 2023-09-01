@@ -404,7 +404,7 @@ If a particular test act either must have or may have any other properties, thos
 
 When you include a `rules` property, you limit the tests of the tool that are performed or reported. For some tools (`alfa`, `axe`, `continuum`, `htmlcs`, `qualWeb`, and `testaro`), only the specified tests are performed. Other tools (`ibm`, `nuVal`, and `wave`) do not allow such a limitation, so, for those tools, all tests are performed but results are reported from only the specified tests.
 
-The `nuVal` and `testaro` tools require specific formats for the `rules` property. Those formats are described below in the sections about those tools.
+The `nuVal`, `qualWeb`, and `testaro` tools require specific formats for the `rules` property. Those formats are described below in the sections about those tools.
 
 ###### Examples
 
@@ -557,7 +557,23 @@ Its `rules` argument is **not** an array of rule IDs, but instead is an array of
 
 The `qualWeb` tool performs the ACT rules, WCAG Techniques, and best-practices tests of QualWeb. Only failures and warnings are included in the report. The EARL report of QualWeb is not generated, because it is equivalent to the report of the ACT rules tests.
 
-QualWeb allows specification of rules for 3 modules: `act-rules`, `wcag-techniques`, and `best-practices`. If you include a `rules` argument in a QualWeb test act, its strings are the names of the rules to be included, each prefixed by a code indicating which module the rule belongs to. The prefixes are `ar:`, `wt:`, and `bp:`, respectively.
+QualWeb allows specification of rules for 3 modules: `act-rules`, `wcag-techniques`, and `best-practices`. If you include a `rules` argument in a QualWeb test act, its value must be an array of 1, 2, or 3 strings. Any string in that array is a specification for one of these modules. The string has this format:
+
+```javascript
+'mod:m,n,o,p,…'
+```
+
+In that format:
+- Replace `mod` with `act`, `wcag`, or `best`.
+- Replace `m`, `n`, `o`, `p`, etc. with the 0 or more integers that identify rules.
+
+For example, `'best:6,11'` would specify that QualWeb is to test for `best-practices` rules `QW-BP6` and `QW-BP11`, but not for any other `best-practices` rules.
+
+When a string contains only a module prefix and no integers, such as `best:`, it specifies that the module is not to be run at all.
+
+When no string pertains to a module, then QualWeb will test for all of the rules in that module.
+
+Thus, when the `rules` argument is omitted, QualWeb will test for all of the rules in all of these modules.
 
 ###### Testaro
 

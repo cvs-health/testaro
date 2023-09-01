@@ -16,7 +16,7 @@ exports.reporter = async (page, options) => {
   // Initialize the report.
   // Start the QualWeb core engine.
   await qualWeb.start(clusterOptions);
-  // Specify the test options.
+  // Specify the invariant test options.
   const qualWebOptions = {
     log: {
       console: true
@@ -29,55 +29,68 @@ exports.reporter = async (page, options) => {
       logging: true
     },
     execute: {
-      wappalyzer: ! rules,
-      act: true,
-      wcag: ! rules,
-      bp: ! rules,
-      counter: ! rules
+      wappalyzer: true,
+      counter: true
     }
   };
+  // Specify a URL or provide the content.
   if (withNewContent) {
     qualWebOptions.url = page.url();
   }
   else {
     qualWebOptions.html = await page.content();
   }
-  const arRules = rules
-    ? rules.filter(rule => rule.startsWith('ar:')).map(rule => rule.slice(3))
-    : [];
-  const wtRules = rules
-    ? rules.filter(rule => rule.startsWith('wt:')).map(rule => rule.slice(3))
-    : [];
-  const bpRules = rules
-    ? rules.filter(rule => rule.startsWith('bp:')).map(rule => rule.slice(3))
-    : [];
-  if (arRules.length) {
-    qualWebOptions['act-rules'] = {rules: arRules};
+  // Specify which rules to test for.
+  const actSpec = rules ? rules.find(typeRules => typeRules.startsWith('act:')) : null;
+  const wcagSpec = rules ? rules.find(typeRules => typeRules.startsWith('wcag:')) : [];
+  const bestSpec = rules ? rules.find(typeRules => typeRules.startsWith('best:')) : [];
+  if (actSpec) {
+    if (actSpec === 'act:') {
+      qualWebOptions.execute.act = false;
+    }
+    else {
+      const actRules = actSpec.slice(4).split(',').map(num => `QW-ACT-R${num}`);
+      qualWebOptions['act-rules'] = {rules: actRules};
+      qualWebOptions.execute.act = true;
+    }
   }
   else {
     qualWebOptions['act-rules'] = {
       levels: ['A', 'AA', 'AAA'],
       principles: ['Perceivable', 'Operable', 'Understandable', 'Robust']
     };
+    qualWebOptions.execute.act = true;
   }
-  if (wtRules.length) {
-    qualWebOptions['wcag-techniques'] = {rules: wtRules};
+  if (wcagSpec) {
+    if (wcagSpec === 'wcag:') {
+      qualWebOptions.execute.wcag = false;
+    }
+    else {
+      const wcagTechniques = wcagSpec.slice(5).split(',').map(num => `QW-WCAG-T${num}`);
+      qualWebOptions['wcag-techniques'] = {rules: wcagTechniques};
+      qualWebOptions.execute.wcag = true;
+    }
   }
   else {
     qualWebOptions['wcag-techniques'] = {
       levels: ['A', 'AA', 'AAA'],
       principles: ['Perceivable', 'Operable', 'Understandable', 'Robust']
     };
+    qualWebOptions.execute.wcag = true;
   }
-  if (bpRules.length) {
-    qualWebOptions['best-practices'] = {bestPractices: bpRules};
+  if (bestSpec) {
+    if (bestSpec === 'best:') {
+      qualWebOptions.execute.bp = false;
+    }
+    else {
+      const bestPractices = bestSpec.slice(5).split(',').map(num => `QW-BP${num}`);
+      qualWebOptions['best-practices'] = {bestPractices};
+      qualWebOptions.execute.bp = true;
+    }
   }
   else {
-    qualWebOptions['best-practices'] = {
-      bestPractices: ['QW-BP28']
-    };
+    qualWebOptions.execute.bp = true;
   }
-  console.log(JSON.stringify(qualWebOptions, null, 2));
   // Get the report.
   let reports = await qualWeb.evaluate(qualWebOptions);
   // Remove the copy of the DOM from it.
