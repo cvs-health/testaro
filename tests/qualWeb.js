@@ -65,7 +65,7 @@ exports.reporter = async (page, options) => {
     }
     else {
       const wcagTechniques = wcagSpec.slice(5).split(',').map(num => `QW-WCAG-T${num}`);
-      qualWebOptions['wcag-techniques'] = {rules: wcagTechniques};
+      qualWebOptions['wcag-techniques'] = {techniques: wcagTechniques};
       qualWebOptions.execute.wcag = true;
     }
   }
@@ -83,85 +83,94 @@ exports.reporter = async (page, options) => {
     else {
       const bestPractices = bestSpec.slice(5).split(',').map(num => `QW-BP${num}`);
       qualWebOptions['best-practices'] = {bestPractices};
-      qualWebOptions.execute.bp = true;
+      // qualWebOptions.execute.bp = true;
+      // Temporarily disable best practices, because they crash QualWeb.
+      qualWebOptions.execute.bp = false;
     }
   }
+  else {
+    // qualWebOptions.execute.bp = true;
+    // Temporarily disable best practices, because they crash QualWeb.
+    qualWebOptions.execute.bp = false;
+  }
   // Get the report.
+  console.log(JSON.stringify(qualWebOptions, null, 2));
   let reports = await qualWeb.evaluate(qualWebOptions);
   // Remove the copy of the DOM from it.
   let report = reports[withNewContent ? qualWebOptions.url : 'customHtml'];
   if (report && report.system && report.system.page && report.system.page.dom) {
     delete report.system.page.dom;
-    // For each section of the report:
-    const sections = ['act-rules'];
-    if (! rules) {
-      sections.push('wcag-techniques', 'best-practices');
-    }
-    sections.forEach(section => {
-      // For each test:
-      const {modules} = report;
-      if (modules && modules[section]) {
-        const {assertions} = modules[section];
-        if (assertions) {
-          const ruleIDs = Object.keys(assertions);
-          ruleIDs.forEach(ruleID => {
-            // Remove passing results.
-            const ruleAssertions = assertions[ruleID];
-            const {metadata} = ruleAssertions;
-            if (metadata) {
-              if (metadata.warning === 0 && metadata.failed === 0) {
-                delete assertions[ruleID];
-              }
-              else {
-                if (ruleAssertions.results) {
-                  ruleAssertions.results = ruleAssertions.results.filter(
-                    result => result.verdict !== 'passed'
-                  );
+    // For each test section of the report:
+    const {modules} = report;
+    if (modules) {
+      for (const section of ['act-rules', 'wcag-techniques', 'best-practices']) {
+        if (qualWebOptions[section]) {
+          if (modules[section]) {
+            const {assertions} = modules[section];
+            if (assertions) {
+              const ruleIDs = Object.keys(assertions);
+              ruleIDs.forEach(ruleID => {
+                // Remove passing results.
+                const ruleAssertions = assertions[ruleID];
+                const {metadata} = ruleAssertions;
+                if (metadata) {
+                  if (metadata.warning === 0 && metadata.failed === 0) {
+                    delete assertions[ruleID];
+                  }
+                  else {
+                    if (ruleAssertions.results) {
+                      ruleAssertions.results = ruleAssertions.results.filter(
+                        result => result.verdict !== 'passed'
+                      );
+                    }
+                  }
                 }
-              }
-            }
-            // Shorten long HTML codes of elements.
-            const {results} = ruleAssertions;
-            results.forEach(result => {
-              const {elements} = result;
-              if (elements && elements.length) {
-                elements.forEach(element => {
-                  if (element.htmlCode && element.htmlCode.length > 700) {
-                    element.htmlCode = `${element.htmlCode.slice(0, 700)} …`;
+                // Shorten long HTML codes of elements.
+                const {results} = ruleAssertions;
+                results.forEach(result => {
+                  const {elements} = result;
+                  if (elements && elements.length) {
+                    elements.forEach(element => {
+                      if (element.htmlCode && element.htmlCode.length > 700) {
+                        element.htmlCode = `${element.htmlCode.slice(0, 700)} …`;
+                      }
+                    });
                   }
                 });
-              }
-            });
-          });
-        }
-        else {
-          report.prevented = true;
-          report.error = 'ERROR: No assertions';
+              });
+            }
+            else {
+              report.prevented = true;
+              report.error = 'ERROR: No assertions';
+            }
+          }
+          else {
+            report.prevented = true;
+            report.error = `ERROR: No ${section} section`;
+          }
         }
       }
-      else {
-        report.prevented = true;
-        report.error = `ERROR: No ${section} section`;
-      }
-    });
-    // Stop the QualWeb core engine.
-    await qualWeb.stop();
-    // Return the result.
-    try {
-      JSON.stringify(report);
     }
-    catch(error) {
-      console.log(`ERROR: qualWeb result cannot be made JSON (${error.message})`);
-      report = {
-        prevented: true,
-        error: `ERROR: qualWeb result cannot be made JSON (${error.message})`
-      };
+    else {
+      report.prevented = true;
+      report.error = 'ERROR: No modules';
     }
   }
   else {
+    report.prevented = true;
+    report.error = 'ERROR: No DOM';
+  }
+  // Stop the QualWeb core engine.
+  await qualWeb.stop();
+  // Return the result.
+  try {
+    JSON.stringify(report);
+  }
+  catch(error) {
+    console.log(`ERROR: qualWeb result cannot be made JSON (${error.message})`);
     report = {
       prevented: true,
-      error: 'ERROR: qualWeb evaluation failed to produce standard output'
+      error: `ERROR: qualWeb result cannot be made JSON (${error.message})`
     };
   }
   return {result: report};

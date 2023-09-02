@@ -575,6 +575,8 @@ When no string pertains to a module, then QualWeb will test for all of the rules
 
 Thus, when the `rules` argument is omitted, QualWeb will test for all of the rules in all of these modules.
 
+**Notice**: As of 2023-09-02, any attempt to perform best-practices tests of QualWeb caused QualWeb to throw an error. This issue was [reported to QualWeb](https://github.com/qualweb/core/issues/29). Until this issue is resolved, Testaro does not try to run any QualWeb best-practices tests, regardless of the value of the `rules` argument.
+
 ###### Testaro
 
 If you do not specify rules when using the `testaro` tool, Testaro will test for the rules listed in the `evalRules` object of the `tests/testaro.js` file.
