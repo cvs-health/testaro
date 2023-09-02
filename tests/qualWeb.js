@@ -13,7 +13,6 @@ const clusterOptions = {
 // Conducts and reports a QualWeb test.
 exports.reporter = async (page, options) => {
   const {withNewContent, rules} = options;
-  // Initialize the report.
   // Start the QualWeb core engine.
   await qualWeb.start(clusterOptions);
   // Specify the invariant test options.
@@ -29,7 +28,6 @@ exports.reporter = async (page, options) => {
       logging: true
     },
     execute: {
-      wappalyzer: true,
       counter: true
     }
   };
@@ -87,9 +85,6 @@ exports.reporter = async (page, options) => {
       qualWebOptions['best-practices'] = {bestPractices};
       qualWebOptions.execute.bp = true;
     }
-  }
-  else {
-    qualWebOptions.execute.bp = true;
   }
   // Get the report.
   let reports = await qualWeb.evaluate(qualWebOptions);
