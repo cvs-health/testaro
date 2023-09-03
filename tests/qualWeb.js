@@ -94,7 +94,6 @@ exports.reporter = async (page, options) => {
     qualWebOptions.execute.bp = false;
   }
   // Get the report.
-  console.log(JSON.stringify(qualWebOptions, null, 2));
   let reports = await qualWeb.evaluate(qualWebOptions);
   // Remove the copy of the DOM from it.
   let report = reports[withNewContent ? qualWebOptions.url : 'customHtml'];
