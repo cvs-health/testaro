@@ -1,8 +1,10 @@
 /*
-  distortion
-  Related to Tenon rule 271.
-  This test reports elements whose transform style properties distort the content. Distortion makes
-  text difficult to read.
+  templateFast
+  This test reports ….
+  Note: This template contains more complex code than templateSimple. Tests based on this template
+  perform faster than those based on templateSimple if the argument to querySelectorAll is 'body *'
+  and the page is very large. If only a small subset of body descendants is to be evaluated, use
+  templateSimple for parsimony.
 */
 
 // ########## IMPORTS
@@ -24,7 +26,7 @@ exports.reporter = async (page, withItems) => {
       && ['matrix', 'perspective', 'rotate', 'scale', 'skew'].some(key => transform.includes(key));
     });
   });
-  // Get locators for all body descendants.
+  // Get locators for all elements.
   const allLoc = await page.locator('body *');
   const allLocs = await allLoc.all();
   // Get the result.
