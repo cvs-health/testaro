@@ -62,7 +62,8 @@ exports.reporter = async (page, options) => {
   // Initialize the data.
   const data = {
     rules: {},
-    preventions: []
+    preventions: [],
+    testTimes: {}
   };
   // If the rule specification is valid:
   if (
@@ -74,6 +75,7 @@ exports.reporter = async (page, options) => {
     const realRules = rules[0] === 'y'
       ? rules.slice(1)
       : Object.keys(evalRules).filter(ruleID => ! rules.slice(1).includes(ruleID));
+    const testTimes = [];
     for (const rule of realRules) {
       // Initialize an argument array.
       const ruleArgs = [page, withItems];
@@ -90,7 +92,10 @@ exports.reporter = async (page, options) => {
       data.rules[rule].what = what;
       console.log(`>>>>>> ${rule} (${what})`);
       try {
+        const startTime = Date.now();
         const report = await require(`../testaro/${rule}`).reporter(... ruleArgs);
+        const endTime = Date.now();
+        testTimes.push([rule, Math.round((endTime - startTime) / 1000)]);
         Object.keys(report).forEach(key => {
           data.rules[rule][key] = report[key];
           if (report.prevented) {
@@ -110,6 +115,9 @@ exports.reporter = async (page, options) => {
         console.log(`ERROR: Test of testaro rule ${rule} prevented (${error.message})`);
       }
     }
+    testTimes.sort((a, b) => b[1] - a[1]).forEach(pair => {
+      data.testTimes[pair[0]] = pair[1];
+    });
   }
   // Otherwise, i.e. if the rule specification is invalid:
   else {
