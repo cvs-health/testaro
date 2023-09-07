@@ -54,7 +54,7 @@ const etcRules = {
 
 // FUNCTIONS
 
-// Conducts and reports a Testaro test.
+// Conducts and reports Testaro tests.
 exports.reporter = async (page, options) => {
   const {withItems, stopOnFail, args} = options;
   const argRules = args ? Object.keys(args) : null;
@@ -93,6 +93,9 @@ exports.reporter = async (page, options) => {
         const report = await require(`../testaro/${rule}`).reporter(... ruleArgs);
         Object.keys(report).forEach(key => {
           data.rules[rule][key] = report[key];
+          if (report.prevented) {
+            data.preventions.push(rule);
+          }
         });
         // If testing is to stop after a failure and the page failed the test:
         if (stopOnFail && report.totals.some(total => total)) {
