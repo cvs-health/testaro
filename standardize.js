@@ -400,6 +400,20 @@ const convert = (toolName, result, standardResult) => {
         console.log(`ERROR: Testaro rule ${rule} result has no standardInstances property`);
       }
     });
+    const preventionCount = result.preventions && result.preventions.length;
+    if (preventionCount) {
+      standardResult.totals[3] += preventionCount;
+      standardResult.instances.push({
+        ruleID: 'testPrevention',
+        what: 'Page prevented tests from being performed',
+        ordinalSeverity: 3,
+        count: preventionCount,
+        tagName: '',
+        id: '',
+        location: '',
+        excerpt: ''
+      });
+    }
     standardResult.totals = standardResult.totals.map(total => Math.round(total));
   }
   // wave

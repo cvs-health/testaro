@@ -23,7 +23,6 @@ const shoot = async (page, exclusion = null) => {
     timeout: 2000
   };
   if (exclusion) {
-    const exclusionText = await exclusion.textContent();
     options.mask = [exclusion];
   }
   return await page.screenshot(options)

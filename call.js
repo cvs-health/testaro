@@ -26,7 +26,7 @@ const {cycle} = require('./watch');
 const fn = process.argv[2];
 const fnArgs = process.argv.slice(3);
 const jobDir = process.env.JOBDIR;
-const toDoDir = `${jobDir}/todo`;
+const todoDir = `${jobDir}/todo`;
 const reportDir = process.env.REPORTDIR;
 const rawDir = `${reportDir}/raw`;
 
@@ -35,17 +35,17 @@ const rawDir = `${reportDir}/raw`;
 // Fulfills a testing request.
 const callRun = async jobIDStart => {
   // Find the job.
-  const jobDirFileNames = await fs.readdir(toDoDir);
+  const jobDirFileNames = await fs.readdir(todoDir);
   const jobFileName = jobDirFileNames.find(fileName => fileName.startsWith(jobIDStart));
   // If it exists:
   if (jobFileName) {
     // Get it.
-    const jobJSON = await fs.readFile(`${toDoDir}/${jobFileName}`, 'utf8');
+    const jobJSON = await fs.readFile(`${todoDir}/${jobFileName}`, 'utf8');
     const report = JSON.parse(jobJSON);
     // Run it.
     await doJob(report);
     // Archive it.
-    await fs.rename(`${toDoDir}/${jobFileName}`, `${jobDir}/done/${jobFileName}`);
+    await fs.rename(`${todoDir}/${jobFileName}`, `${jobDir}/done/${jobFileName}`);
     // Save the report.
     await fs.writeFile(`${rawDir}/${jobFileName}`, JSON.stringify(report, null, 2));
     console.log(`Job completed and report ${report.id}.json saved in ${rawDir}`);
