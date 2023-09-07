@@ -61,7 +61,8 @@ exports.reporter = async (page, options) => {
   const rules = options.rules || ['y', ... Object.keys(evalRules)];
   // Initialize the data.
   const data = {
-    rules: {}
+    rules: {},
+    preventions: []
   };
   // If the rule specification is valid:
   if (
@@ -88,14 +89,22 @@ exports.reporter = async (page, options) => {
       }
       data.rules[rule].what = what;
       console.log(`>>>>>> ${rule} (${what})`);
-      const report = await require(`../testaro/${rule}`).reporter(... ruleArgs);
-      Object.keys(report).forEach(key => {
-        data.rules[rule][key] = report[key];
-      });
-      // If testing is to stop after a failure and the page failed the test:
-      if (stopOnFail && report.totals.some(total => total)) {
-        // Stop testing.
-        break;
+      try {
+        const report = await require(`../testaro/${rule}`).reporter(... ruleArgs);
+        Object.keys(report).forEach(key => {
+          data.rules[rule][key] = report[key];
+        });
+        // If testing is to stop after a failure and the page failed the test:
+        if (stopOnFail && report.totals.some(total => total)) {
+          // Stop testing.
+          break;
+        }
+      }
+      // If an error is thrown by the test:
+      catch(error) {
+        // Report this.
+        data.preventions.push(rule);
+        console.log(`ERROR: Test of testaro rule ${rule} prevented (${error.message})`);
       }
     }
   }
