@@ -16,12 +16,12 @@ let sampleSize = 100;
 // Initializes locators and a result.
 exports.init = async (page, locAllSelector, options = {}) => {
   // Get locators for the specified elements.
-  const locWhole = page.locator(locAllSelector, options);
-  const locWholePopulation = await locWhole.all();
-  const populationSize = locWholePopulation.length;
+  const locPop = page.locator(locAllSelector, options);
+  const locPops = await locPop.all();
+  const populationSize = locPops.length;
   sampleSize = Math.min(sampleSize, populationSize);
-  const locAll = getSample(locWholePopulation, sampleSize);
-  const allLocs = await locAll.all();
+  const locIndexes = getSample(locPops, sampleSize);
+  const allLocs = locIndexes.map(index => locPops[index]);
   const result = {
     data: {
       populationSize,
