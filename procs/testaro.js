@@ -2,21 +2,37 @@
 
 // ########## IMPORTS
 
+// Module to sample a population.
+const {getSample} = require('../procs/sample');
 // Module to get locator data.
 const {getLocatorData} = require('../procs/getLocatorData');
+
+// ########## CONSTANTS
+
+let sampleSize = 100;
 
 // ########## FUNCTIONS
 
 // Initializes locators and a result.
 exports.init = async (page, locAllSelector, options = {}) => {
   // Get locators for the specified elements.
-  const locAll = page.locator(locAllSelector, options);
+  const locWholePopulation = page.locator(locAllSelector, options);
+  const populationSize = locWholePopulation.length;
+  sampleSize = Math.min(sampleSize, populationSize);
+  const locAll = getSample(locWholePopulation, sampleSize);
   const allLocs = await locAll.all();
   const result = {
     data: {},
     totals: [0, 0, 0, 0],
     standardInstances: []
   };
+  if (populationSize > sampleSize) {
+    data.sampling = {
+      populationSize,
+      sampleSize,
+      sampleRatio: Math.round(100 * sampleSize / populationSize) / 100
+    };
+  }
   // Return the result.
   return {
     allLocs,
@@ -42,7 +58,7 @@ exports.report = async (withItems, all, ruleID, whats, ordinalSeverity, tagName 
     }
     const elData = await getLocatorData(loc);
     // Add to the totals.
-    totals[ordinalSeverity]++;
+    totals[ordinalSeverity] += populationSize / sampleSize;
     // If itemization is required:
     if (withItems) {
       // Add a standard instance to the result.
@@ -64,7 +80,7 @@ exports.report = async (withItems, all, ruleID, whats, ordinalSeverity, tagName 
       ruleID,
       what: whats[1],
       ordinalSeverity,
-      count: totals[ordinalSeverity],
+      count: Math.round(totals[ordinalSeverity]),
       tagName,
       id: '',
       location: {
