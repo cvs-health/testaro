@@ -11,32 +11,28 @@
 // ########## IMPORTS
 
 // Module to perform common operations.
-const {report} = require('../procs/testaro');
+const {init, report} = require('../procs/testaro');
 
 // ########## FUNCTIONS
 
 // Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
   // Initialize the locators and result.
-  const areLifted = await page.evaluate(() => {
-    const allElements = Array.from(document.querySelectorAll('body *'));
-    return allElements.map(el => {
+  const all = await init(page, 'body *');
+  // For each locator:
+  for (const loc of all.allLocs) {
+    // Get whether its element violates the rule.
+    const badZ = await loc.evaluate(el => {
       const styleDec = window.getComputedStyle(el);
-      return styleDec.zIndex !== 'auto';
+      const {zIndex} = styleDec;
+      return zIndex !== 'auto' ? zIndex : null;
     });
-  });
-  // Get locators for all body descendants.
-  const allLoc = await page.locator('body *');
-  const allLocs = await allLoc.all();
-  // Get the result.
-  const all = {
-    locs: allLocs.filter((loc, index) => areLifted[index]),
-    result: {
-      data: {},
-      totals: [0, 0, 0, 0],
-      standardInstances: []
+    // If it does:
+    if (badZ) {
+      // Add the locator to the array of violators.
+      all.locs.push([loc, badZ]);
     }
-  };
+  }
   // Populate and return the result.
   const whats = [
     'Element has a non-default Z index (__param__)', 'Elements have non-default Z indexes'

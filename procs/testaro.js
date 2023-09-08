@@ -16,23 +16,21 @@ let sampleSize = 100;
 // Initializes locators and a result.
 exports.init = async (page, locAllSelector, options = {}) => {
   // Get locators for the specified elements.
-  const locWholePopulation = page.locator(locAllSelector, options);
+  const locWhole = page.locator(locAllSelector, options);
+  const locWholePopulation = await locWhole.all();
   const populationSize = locWholePopulation.length;
   sampleSize = Math.min(sampleSize, populationSize);
   const locAll = getSample(locWholePopulation, sampleSize);
   const allLocs = await locAll.all();
   const result = {
-    data: {},
+    data: {
+      populationSize,
+      sampleSize,
+      populationRatio: sampleSize ? populationSize / sampleSize : null
+    },
     totals: [0, 0, 0, 0],
     standardInstances: []
   };
-  if (populationSize > sampleSize) {
-    data.sampling = {
-      populationSize,
-      sampleSize,
-      sampleRatio: Math.round(100 * sampleSize / populationSize) / 100
-    };
-  }
   // Return the result.
   return {
     allLocs,
@@ -44,7 +42,7 @@ exports.init = async (page, locAllSelector, options = {}) => {
 // Populates a result.
 exports.report = async (withItems, all, ruleID, whats, ordinalSeverity, tagName = '') => {
   const {locs, result} = all;
-  const {totals, standardInstances} = result;
+  const {data, totals, standardInstances} = result;
   // For each instance locator:
   for (const locItem of locs) {
     // Get data on its element.
@@ -58,7 +56,7 @@ exports.report = async (withItems, all, ruleID, whats, ordinalSeverity, tagName 
     }
     const elData = await getLocatorData(loc);
     // Add to the totals.
-    totals[ordinalSeverity] += populationSize / sampleSize;
+    totals[ordinalSeverity] += data.populationRatio;
     // If itemization is required:
     if (withItems) {
       // Add a standard instance to the result.

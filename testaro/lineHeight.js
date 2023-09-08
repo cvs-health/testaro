@@ -7,53 +7,34 @@
   their subtrees are excluded.
 */
 
-// ########## IMPORTS
-
 // Module to perform common operations.
-const {report} = require('../procs/testaro');
+const {init, report} = require('../procs/testaro');
 
 // ########## FUNCTIONS
 
 // Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
-  // Get an array of violator indexes.
-  const areSquashed = await page.evaluate(() => {
-    const allElements = Array.from(document.querySelectorAll('body *'));
-    return allElements.map(el => {
-      const elText = el.textContent.replace(/\s/g, '');
-      if (elText) {
-        const styleDec = window.getComputedStyle(el);
-        const fontSize = Number.parseFloat(styleDec.fontSize);
-        const lineHeight = Number.parseFloat(styleDec.lineHeight);
-        if (lineHeight < 1.5 * fontSize) {
-          return false;
-        }
-        else {
-          return {
-            fontSize,
-            lineHeight
-          };
-        }
-      }
+  // Initialize the locators and result.
+  const all = await init(page, 'body *', {hasText: /[^\s]/});
+  // For each locator:
+  for (const loc of all.allLocs) {
+    // Get whether its element violates the rule.
+    const data = await loc.evaluate(el => {
+      const styleDec = window.getComputedStyle(el);
+      const {fontSize, lineHeight} = styleDec;
+      return {
+        fontSize: Number.parseFloat(fontSize),
+        lineHeight: Number.parseFloat(lineHeight)
+      };
     });
-  });
-  // Get locators for all body descendants.
-  const allLoc = await page.locator('body *');
-  const allLocs = await allLoc.all();
-  const locs = allLocs
-  .map((loc, index) => [loc, areSquashed[index]])
-  .filter(pair => pair[1])
-  .map(pair => [pair[0], `font size ${pair[1].fontSize} px, line height ${pair[1].lineHeight} px`]);
-  // Get the result.
-  const all = {
-    locs,
-    result: {
-      data: {},
-      totals: [0, 0, 0, 0],
-      standardInstances: []  
+    // If it does:
+    const isBad = data.lineHeight < 1.5 * data.fontSize;
+    if (isBad) {
+      // Add the locator to the array of violators.
+      all.locs.push([loc, `font size ${data.fontSize} px, line height ${data.lineHeight} px`]);
     }
-  };
-  // Populate the result.
+  }
+  // Populate and return the result.
   const whats = [
     'Element line height is less than 1.5 times its font size (__param__)',
     'Elements have line heights less than 1.5 times their font sizes'
