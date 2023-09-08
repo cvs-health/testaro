@@ -23,87 +23,117 @@ const {getLocatorData} = require('../procs/getLocatorData');
 // ########## FUNCTIONS
 
 exports.reporter = async (page, withItems) => {
-  // Initialize the standard result.
-  const data = {};
-  const totals = [0, 0, 0, 0];
-  const standardInstances = [];
-  // Identify the operable tag names.
-  const opTags = new Set(['A', 'BUTTON', 'IFRAME', 'INPUT', 'SELECT', 'TEXTAREA']);
-  // Identify the operable roles.
-  const opRoles = new Set([
-    'button',
-    'checkbox',
-    'combobox',
-    'composite',
-    'grid',
-    'gridcell',
-    'input',
-    'link',
-    'listbox',
-    'menu',
-    'menubar',
-    'menuitem',
-    'menuitemcheckbox',
-    'option',
-    'radio',
-    'radiogroup',
-    'scrollbar',
-    'searchbox',
-    'select',
-    'slider',
-    'spinbutton',
-    'switch',
-    'tab',
-    'tablist',
-    'textbox',
-    'tree',
-    'treegrid',
-    'treeitem',
-    'widget',
-  ]);
-  // Get a locator for all body elements.
-  const locAll = page.locator('body *');
-  const locsAll = await locAll.all();
-  // For each of them:
-  for (const loc of locsAll) {
-    // Get data on it.
-    const focOpData = await loc.evaluate(element => {
-      // Tab index.
-      const {tabIndex} = element;
-      // Cursor.
+  // Get data on the discrepancies.
+  const focOpData = await page.evaluate(() => {
+    // Identify the operable tag names.
+    const opTags = new Set(['A', 'BUTTON', 'IFRAME', 'INPUT', 'SELECT', 'TEXTAREA']);
+    // Identify the operable roles.
+    const opRoles = new Set([
+      'button',
+      'checkbox',
+      'combobox',
+      'composite',
+      'grid',
+      'gridcell',
+      'input',
+      'link',
+      'listbox',
+      'menu',
+      'menubar',
+      'menuitem',
+      'menuitemcheckbox',
+      'option',
+      'radio',
+      'radiogroup',
+      'scrollbar',
+      'searchbox',
+      'select',
+      'slider',
+      'spinbutton',
+      'switch',
+      'tab',
+      'tablist',
+      'textbox',
+      'tree',
+      'treegrid',
+      'treeitem',
+      'widget',
+    ]);
+    // Initialize an array of data on the elements.
+    const allElements = Array.from(document.querySelectorAll('body *'));
+    // Return an array of facts about them. For each element:
+    return allElements.map(el => {
+      // Get whether its cursor is deemed a pointer.
       let hasPointer = false;
-      if (element.tagName !== 'LABEL') {
-        const styleDec = window.getComputedStyle(element);
+      if (el.tagName !== 'LABEL') {
+        const styleDec = window.getComputedStyle(el);
         hasPointer = styleDec.cursor === 'pointer';
         // If the cursor is a pointer:
         if (hasPointer) {
           // Disregard this if the only reason is inheritance.
-          element.parentElement.style.cursor = 'default';
+          el.parentElement.style.cursor = 'default';
           hasPointer = styleDec.cursor === 'pointer';
         }
       }
-      const {tagName} = element;
-      return {
-        tabIndex,
-        hasPointer,
-        tagName
-      };
+      // Get whether it is focusable and whether it is operable.
+      const tagName = el.tagName;
+      const role = el.getAttribute('role') || '';
+      const onClick = el.getAttribute('onclick') !== null;
+      const isFocusable = el.tabIndex === 0;
+      const isOperable = hasPointer
+      || opTags.has(tagName)
+      || onClick
+      || opRoles.has(role);
+      // If it is focusable or operable but not both:
+      if (isFocusable !== isOperable) {
+        let opTagName, opRole;
+        if (isOperable) {
+          opTagName = opTags.has(tagName) ? tagName : '';
+          const role = el.getAttribute('role');
+          opRole = opRoles.has(role) ? role : '';
+        }
+        // Add data on the element to the array.
+        return {
+          role,
+          onClick,
+          isFocusable,
+          isOperable,
+          opTagName,
+          opRole
+        };
+      }
+      // Otherwise, i.e. if it is not discrepant:
+      else {
+        // Add this to the array.
+        return false;
+      }
     });
-    focOpData.onClick = await loc.getAttribute('onclick') !== null;
-    focOpData.role = await loc.getAttribute('role') || '';
-    focOpData.isFocusable = focOpData.tabIndex === 0;
-    focOpData.isOperable = focOpData.hasPointer
-    || opTags.has(focOpData.tagName)
-    || focOpData.onClick
-    || opRoles.has(focOpData.role);
-    // If it is focusable or operable but not both:
-    if (focOpData.isFocusable !== focOpData.isOperable) {
-      // Get more data on it.
-      const elData = await getLocatorData(loc);
-      // Add to the standard result.
+  });
+  // Get locators for all body descendants.
+  const allLoc = await page.locator('body *');
+  const allLocs = await allLoc.all();
+  // Get arrays of discrepant locators and their data.
+  const locs = allLocs.filter((loc, index) => focOpData[index]);
+  const locData = focOpData.filter(item => item);
+  // Initialize the standard result.
+  const data = {};
+  const totals = [0, 0, 0, 0];
+  const standardInstances = [];
+  // For each discrepant element:
+  locs.forEach(async (loc, index) => {
+    // Get data on it.
+    const elData = await getLocatorData(loc);
+    const focOpData = locData[index];
+    // Get its ordinal severity.
+    const ordinalSeverity = focOpData.isFocusable ? 2 : 3;
+    // Add to the totals.
+    totals[ordinalSeverity]++;
+    // If itemization is required:
+    if (withItems) {
+      // Get data on its operability.
       const howOperable = [];
-      if (opTags.has(focOpData.tagName)) {
-        howOperable.push(`tag name ${focOpData.tagName}`);
+      if (focOpData.opTagName) {
+        howOperable.push(`tag name ${focOpData.opTagName}`);
       }
       if (focOpData.hasPointer) {
         howOperable.push('pointer cursor');
@@ -111,27 +141,25 @@ exports.reporter = async (page, withItems) => {
       if (focOpData.onClick) {
         howOperable.push('click listener');
       }
-      if (opRoles.has(focOpData.role)) {
-        howOperable.push(`role ${focOpData.role}`);
+      if (focOpData.opRole) {
+        howOperable.push(`role ${focOpData.opRole}`);
       }
+      // Get a discrepancy description.
       const gripe = focOpData.isFocusable
         ? 'Tab-focusable but not operable'
         : `operable (${howOperable.join(', ')}) but not Tab-focusable`;
-      const ordinalSeverity = focOpData.isFocusable ? 2 : 3;
-      totals[ordinalSeverity]++;
-      if (withItems) {
-        standardInstances.push({
-          ruleID: 'focOp',
-          what: `Element is ${gripe}`,
-          ordinalSeverity,
-          tagName: elData.tagName,
-          id: elData.id,
-          location: elData.location,
-          excerpt: elData.excerpt
-        });
-      }
+      // Add a standard instance.
+      standardInstances.push({
+        ruleID: 'focOp',
+        what: `Element is ${gripe}`,
+        ordinalSeverity,
+        tagName: elData.tagName,
+        id: elData.id,
+        location: elData.location,
+        excerpt: elData.excerpt
+      });
     }
-  }
+  });
   // If itemization is not required:
   if (! withItems) {
     // Add summary instances to the standard result.
