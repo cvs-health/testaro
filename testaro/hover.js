@@ -54,7 +54,7 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
   const psRatio = Math.max(1, locsAll.length / sampleSize);
   // Get a sample of the triggers.
   const sampleIndexes = getSample(locsAll, sampleSize);
-  const sample = locsAll.filter((loc, index) => sampleIndexes.includes(index));
+  const sample = sampleIndexes.map(index => locsAll[index]);
   // For each trigger in the sample:
   for (const loc of sample) {
     // Hover over it and get the fractional pixel change.
