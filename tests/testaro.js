@@ -1,6 +1,6 @@
 /*
   testaro
-  This test implements the Testaro evaluative ruleset for accessibility.
+  This test implements the Testaro evaluative rules.
 */
 
 // CONSTANTS

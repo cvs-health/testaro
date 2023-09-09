@@ -7,9 +7,9 @@
   test compares two screen shots of the viewport 2 seconds and 6 seconds after page load. It
   reports a rule violation if any pixels change. The larger the change fraction, the greater the
   ordinal severity.
-  
-  WARNING: This test uses the Playwright page.screenshot method, which is not implemented for the
-  firefox browser type.
+
+  WARNING: This test uses the procs/visChange module. See the warning in that module about browser
+  types.
 */
 
 // IMPORTS

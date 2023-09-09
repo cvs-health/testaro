@@ -1,9 +1,6 @@
 /*
-  templateSimple
+  template
   This test reports ….
-  Note: Tests based on this template perform slowly on very large pages if the second argument to
-  init() is 'body *'. For better performance when all body descendants are to be evaluated, use
-  templateFast.
 */
 
 // ########## IMPORTS
