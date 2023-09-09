@@ -3,7 +3,7 @@
   This test implements the Testaro evaluative rules.
 */
 
-// CONSTANTS
+// ######## CONSTANTS
 
 const evalRules = {
   allCaps: 'leaf elements with entirely upper-case text longer than 7 characters',
@@ -72,11 +72,11 @@ exports.reporter = async (page, options) => {
     && rules.slice(1).every(rule => evalRules[rule] || etcRules[rule])
   ) {
     // For each rule invoked:
-    const realRules = rules[0] === 'y'
+    const calledRules = rules[0] === 'y'
       ? rules.slice(1)
       : Object.keys(evalRules).filter(ruleID => ! rules.slice(1).includes(ruleID));
     const testTimes = [];
-    for (const rule of realRules) {
+    for (const rule of calledRules) {
       // Initialize an argument array.
       const ruleArgs = [page, withItems];
       // If the rule has extra arguments:
@@ -93,17 +93,17 @@ exports.reporter = async (page, options) => {
       console.log(`>>>>>> ${rule} (${what})`);
       try {
         const startTime = Date.now();
-        const report = await require(`../testaro/${rule}`).reporter(... ruleArgs);
+        const ruleReport = await require(`../testaro/${rule}`).reporter(... ruleArgs);
         const endTime = Date.now();
         testTimes.push([rule, Math.round((endTime - startTime) / 1000)]);
-        Object.keys(report).forEach(key => {
-          data.rules[rule][key] = report[key];
-          if (report.prevented) {
+        Object.keys(ruleReport).forEach(key => {
+          data.rules[rule][key] = ruleReport[key];
+          if (ruleReport.prevented) {
             data.preventions.push(rule);
           }
         });
         // If testing is to stop after a failure and the page failed the test:
-        if (stopOnFail && report.totals.some(total => total)) {
+        if (stopOnFail && ruleReport.totals.some(total => total)) {
           // Stop testing.
           break;
         }
