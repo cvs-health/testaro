@@ -82,7 +82,6 @@ let actCount = 0;
 // Facts about the current browser.
 let browser;
 let browserContext;
-let browserTypeName;
 let currentPage;
 let requestedURL = '';
 
@@ -294,14 +293,64 @@ const browserClose = async () => {
 };
 // Returns the first line of an error message.
 const errorStart = error => error.message.replace(/\n.+/s, '');
-// Launches a browser.
-const launch = async (report, typeName, lowMotion = false) => {
-  const browserType = playwright[typeName];
+// Visits a URL and returns the response of the server.
+const goTo = async (report, page, url, timeout, waitUntil) => {
+  if (url.startsWith('file://')) {
+    url = url.replace('file://', `file://${__dirname}/`);
+  }
+  // Visit the URL.
+  const startTime = Date.now();
+  try {
+    const response = await page.goto(url, {
+      timeout,
+      waitUntil
+    });
+    report.jobData.visitLatency += Math.round((Date.now() - startTime) / 1000);
+    const httpStatus = response.status();
+    // If the response status was normal:
+    if ([200, 304].includes(httpStatus) || url.startsWith('file:')) {
+      // If the browser was redirected in violation of a strictness requirement:
+      const actualURL = page.url();
+      if (report.strict && deSlash(actualURL) !== deSlash(url)) {
+        // Return an error.
+        console.log(`ERROR: Visit to ${url} redirected to ${actualURL}`);
+        return {
+          exception: 'badRedirection'
+        };
+      }
+      // Otherwise, i.e. if no prohibited redirection occurred:
+      else {
+        // Press the Escape key to dismiss any modal dialog.
+        await page.keyboard.press('Escape');
+        // Return the response.
+        return response;
+      }
+    }
+    // Otherwise, i.e. if the response status was abnormal:
+    else {
+      // Return an error.
+      console.log(`ERROR: Visit to ${url} got status ${httpStatus}`);
+      report.jobData.visitRejectionCount++;
+      return {
+        error: 'badStatus'
+      };
+    }
+  }
+  catch(error) {
+    console.log(`ERROR visiting ${url} (${error.message.slice(0, 200)})`);
+    return {
+      error: 'noVisit'
+    };
+  }
+};
+// Launches a browser, navigates to a URL, and returns the status.
+const launch = async (report, typeName, url, isLowMotion = false) => {
   // If the specified browser type exists:
+  const browserType = playwright[typeName];
   if (browserType) {
     // Close the current browser, if any.
     await browserClose();
-    // Launch a browser of that type.
+    // Launch a browser of the specified type.
     const browserOptions = {
       logger: {
         isEnabled: () => false,
@@ -314,70 +363,90 @@ const launch = async (report, typeName, lowMotion = false) => {
     if (waits) {
       browserOptions.slowMo = waits;
     }
-    let healthy = true;
     browser = await browserType.launch(browserOptions)
-    .catch(error => {
+    // If the launch failed:
+    .catch(async error => {
       healthy = false;
       console.log(`ERROR launching browser (${errorStart(error)})`);
+      // Return this.
+      return false;
     });
-    // If the launch succeeded:
-    if (healthy) {
-      // Open a context (i.e. browser tab), with reduced motion if specified.
-      const options = {reduceMotion: lowMotion ? 'reduce' : 'no-preference'};
-      browserContext = await browser.newContext(options);
-      // When a page (i.e. browser tab) is added to the browser context (i.e. browser window):
-      browserContext.on('page', async page => {
-        // Make the page current.
-        currentPage = page;
-        // If it emits a message:
-        page.on('console', msg => {
-          const msgText = msg.text();
-          let indentedMsg = '';
-          // If debugging is on:
-          if (debug) {
-            // Log a summary of the message on the console.
-            const parts = [msgText.slice(0, 75)];
-            if (msgText.length > 75) {
-              parts.push(msgText.slice(75, 150));
-              if (msgText.length > 150) {
-                const tail = msgText.slice(150).slice(-150);
-                if (msgText.length > 300) {
-                  parts.push('...');
-                }
-                parts.push(tail.slice(0, 75));
-                if (tail.length > 75) {
-                  parts.push(tail.slice(75));
-                }
+    // Open a context (i.e. browser tab), with reduced motion if specified.
+    const options = {reduceMotion: isLowMotion ? 'reduce' : 'no-preference'};
+    browserContext = await browser.newContext(options);
+    // When a page (i.e. browser tab) is added to the browser context (i.e. browser window):
+    browserContext.on('page', async page => {
+      // Make the page current.
+      currentPage = page;
+      // If it emits a message:
+      page.on('console', msg => {
+        const msgText = msg.text();
+        let indentedMsg = '';
+        // If debugging is on:
+        if (debug) {
+          // Log a summary of the message on the console.
+          const parts = [msgText.slice(0, 75)];
+          if (msgText.length > 75) {
+            parts.push(msgText.slice(75, 150));
+            if (msgText.length > 150) {
+              const tail = msgText.slice(150).slice(-150);
+              if (msgText.length > 300) {
+                parts.push('...');
+              }
+              parts.push(tail.slice(0, 75));
+              if (tail.length > 75) {
+                parts.push(tail.slice(75));
               }
             }
-            indentedMsg = parts.map(part => `    | ${part}`).join('\n');
-            console.log(`\n${indentedMsg}`);
           }
-          // Add statistics on the message to the report.
-          const msgTextLC = msgText.toLowerCase();
-          const msgLength = msgText.length;
-          report.jobData.logCount++;
-          report.jobData.logSize += msgLength;
-          if (errorWords.some(word => msgTextLC.includes(word))) {
-            report.jobData.errorLogCount++;
-            report.jobData.errorLogSize += msgLength;
-          }
-          const msgLC = msgText.toLowerCase();
-          if (
-            msgText.includes('403') && (msgLC.includes('status')
-            || msgLC.includes('prohibited'))
-          ) {
-            report.jobData.prohibitedCount++;
-          }
-        });
+          indentedMsg = parts.map(part => `    | ${part}`).join('\n');
+          console.log(`\n${indentedMsg}`);
+        }
+        // Add statistics on the message to the report.
+        const msgTextLC = msgText.toLowerCase();
+        const msgLength = msgText.length;
+        report.jobData.logCount++;
+        report.jobData.logSize += msgLength;
+        if (errorWords.some(word => msgTextLC.includes(word))) {
+          report.jobData.errorLogCount++;
+          report.jobData.errorLogSize += msgLength;
+        }
+        const msgLC = msgText.toLowerCase();
+        if (
+          msgText.includes('403') && (msgLC.includes('status')
+          || msgLC.includes('prohibited'))
+        ) {
+          report.jobData.prohibitedCount++;
+        }
       });
-      // Open the first page of the context.
-      currentPage = await browserContext.newPage();
+    });
+    // Open the first page of the context and save it.
+    currentPage = await browserContext.newPage();
+    try {
       // Wait until it is stable.
-      await currentPage.waitForLoadState('domcontentloaded', {timeout: 15000});
-      // Update the name of the current browser type and store it in the page.
-      currentPage.browserTypeName = browserTypeName = typeName;
+      await currentPage.waitForLoadState('domcontentloaded', {timeout: 5000});
+      // Navigate to the specified URL.
+      const navResult = await goTo(report, currentPage, url, 15000, 'domcontentloaded');
+      // If the navigation succeeded:
+      if (! navResult.error) {
+        // Update the name of the current browser type and store it in the page.
+        currentPage.browserTypeName = typeName;
+        // Return success.
+        return true;
+      }
     }
+    // If it fails to become stable by the deadline:
+    catch(error) {
+      // Return this.
+      console.log(`ERROR: Blank page load in new tab timed out (${error.message})`);
+      return false;
+    }
+  }
+  // Otherwise, i.e. if it does not exist:
+  else {
+    // Return this.
+    console.log(`ERROR: Browser of type ${typeName} could not be launched`);
+    return false;
   }
 };
 // Normalizes spacing characters and cases in a string.
@@ -557,56 +626,6 @@ const addError = (act, error, message) => {
     act.result.prevented = true;
   }
 };
-// Visits a URL and returns the response of the server.
-const goTo = async (report, page, url, timeout, waitUntil, isStrict) => {
-  if (url.startsWith('file://')) {
-    url = url.replace('file://', `file://${__dirname}/`);
-  }
-  // Visit the URL.
-  const startTime = Date.now();
-  try {
-    const response = await page.goto(url, {
-      timeout,
-      waitUntil
-    });
-    report.jobData.visitLatency += Math.round((Date.now() - startTime) / 1000);
-    const httpStatus = response.status();
-    // If the response status was normal:
-    if ([200, 304].includes(httpStatus) || url.startsWith('file:')) {
-      // If the browser was redirected in violation of a strictness requirement:
-      const actualURL = page.url();
-      if (isStrict && deSlash(actualURL) !== deSlash(url)) {
-        // Return an error.
-        console.log(`ERROR: Visit to ${url} redirected to ${actualURL}`);
-        return {
-          exception: 'badRedirection'
-        };
-      }
-      // Otherwise, i.e. if no prohibited redirection occurred:
-      else {
-        // Press the Escape key to dismiss any modal dialog.
-        await page.keyboard.press('Escape');
-        // Return the response.
-        return response;
-      }
-    }
-    // Otherwise, i.e. if the response status was abnormal:
-    else {
-      // Return an error.
-      console.log(`ERROR: Visit to ${url} got status ${httpStatus}`);
-      report.jobData.visitRejectionCount++;
-      return {
-        error: 'badStatus'
-      };
-    }
-  }
-  catch(error) {
-    console.log(`ERROR visiting ${url} (${error.message.slice(0, 200)})`);
-    return {
-      error: 'noVisit'
-    };
-  }
-};
 // Recursively performs the acts in a report.
 const doActs = async (report, actIndex, page) => {
   // Quits and reports the performance being aborted.
@@ -678,53 +697,36 @@ const doActs = async (report, actIndex, page) => {
       }
       // Otherwise, if the act is a launch:
       else if (act.type === 'launch') {
-        // Launch the specified browser, creating a browser context and a page in it.
-        await launch(report, act.which, act.lowMotion ? 'reduce' : 'no-preference');
-        // Identify its only page as current.
-        page = browserContext.pages()[0];
+        // Launch the specified browser and navigate to the specified URL.
+        const success = await launch(report, act.which, act.lowMotion ? 'reduce' : 'no-preference');
+        // If the launch and navigation succeeded:
+        if (success) {
+          // Identify its only page as current.
+          page = browserContext.pages()[0];
+        }
+        // Otherwise, i.e. if the launch or navigation failed:
+        else {
+          // Abort the job.
+          await abortActs();
+        }
       }
       // Otherwise, if a current page exists:
       else if (page) {
-        // If the act is a url:
+        const {strict} = report;
+        // If the act is navigation to a url:
         if (act.type === 'url') {
           // Identify the URL.
           const resolved = act.which.replace('__dirname', __dirname);
           requestedURL = resolved;
-          const {strict} = report;
           // Visit it and wait until the DOM is loaded.
-          let response = await goTo(report, page, requestedURL, 15000, 'domcontentloaded', strict);
-          // If the visit fails:
-          if (response.error) {
-            // Launch another browser type.
-            const newBrowserName = Object.keys(browserTypeNames)
-            .find(name => name !== browserTypeName);
-            console.log(`>> Launching ${newBrowserName} instead`);
-            await launch(newBrowserName);
-            // Identify its only page as current.
-            page = browserContext.pages()[0];
-            // Visit the URL and wait until the DOM is loaded.
-            response = await goTo(report, page, requestedURL, 10000, 'domcontentloaded', strict);
-            // If the visit fails:
-            if (response.error) {
-              // Try again and wait until a load.
-              response = await goTo(report, page, requestedURL, 5000, 'load', strict);
-              // If the visit fails:
-              if (response.error) {
-                // Navigate to a blank page instead.
-                await page.goto('about:blank')
-                .catch(error => {
-                  console.log(`ERROR: Navigation to blank page failed (${error.message})`);
-                });
-              }
-            }
-          }
-          // If none of the visits succeeded:
+          const response = await goTo(report, page, requestedURL, 15000, 'domcontentloaded');
+          // If the visit failed:
           if (response.error) {
             // Report this and quit.
             addError(act, 'failure', 'ERROR: Visits failed');
             await abortActs();
           }
-          // Otherwise, i.e. if the last visit attempt succeeded:
+          // Otherwise, i.e. if the visit succeeded:
           else {
             // If a prohibited redirection occurred:
             if (response.exception === 'badRedirection') {
@@ -847,7 +849,7 @@ const doActs = async (report, actIndex, page) => {
           const url = page.url();
           // If redirection is inapplicable, is permitted, or did not occur:
           if (
-            url.startsWith('file:') || ! report.strict || deSlash(url) === deSlash(requestedURL)
+            url.startsWith('file:') || ! strict || deSlash(url) === deSlash(requestedURL)
           ) {
             // Add the URL to the act.
             act.url = url;
@@ -871,21 +873,25 @@ const doActs = async (report, actIndex, page) => {
                   options[key] = act[key];
                 }
               });
-              // Conduct, report, and time the test.
+              // Initialize the test report.
               const startTime = Date.now();
               let testReport = {
                 result: {
                   success: false
                 }
               };
+              // Perform the specified tests of the tool and get a report.
               try {
                 const args = [page, options];
                 testReport = await require(`./tests/${act.which}`).reporter(... args);
                 testReport.result.success = true;
               }
+              // If the testing failed:
               catch(error) {
+                // Report this but do not abort the job.
                 console.log(`ERROR: Test act ${act.which} failed (${error.message.slice(0, 400)})`);
               }
+              // Add the elapsed time to the report.
               report.jobData.testTimes.push(
                 [act.which, Math.round((Date.now() - startTime) / 1000)]
               );
@@ -908,8 +914,8 @@ const doActs = async (report, actIndex, page) => {
                   // Remove it.
                   delete act.result;
                 }
-                const expectations = act.expect;
                 // If the test has expectations:
+                const expectations = act.expect;
                 if (expectations) {
                   // Initialize whether they were fulfilled.
                   act.expectations = [];

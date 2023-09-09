@@ -27,9 +27,10 @@ exports.actSpecs = {
     launch: [
       'Launch a Playwright browser',
       {
-        which: [true, 'string', 'isBrowserType', '“chromium”, “firefox”, or “webkit”'],
-        what: [false, 'string', 'hasLength', 'comment'],
-        lowMotion: [false, 'boolean', '', 'set reduced-motion option if true']
+        which: [true, 'string', 'isBrowserType', 'chromium, firefox, or webkit'],
+        url: [true, 'string', 'isURL', 'initial URL to navigate to'],
+        lowMotion: [false, 'boolean', '', 'set reduced-motion option if true'],
+        what: [false, 'string', 'hasLength', 'comment']
       }
     ],
     link: [
