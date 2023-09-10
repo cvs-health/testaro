@@ -6,49 +6,46 @@
   an 'onclick' attribute.
 */
 
-// ########## CONSTANTS
-
-// Operable tag names.
-const opTags = new Set(['A', 'BUTTON', 'IFRAME', 'INPUT', 'SELECT', 'TEXTAREA']);
-// Operable roles.
-const opRoles = new Set([
-  'button',
-  'checkbox',
-  'combobox',
-  'composite',
-  'grid',
-  'gridcell',
-  'input',
-  'link',
-  'listbox',
-  'menu',
-  'menubar',
-  'menuitem',
-  'menuitemcheckbox',
-  'option',
-  'radio',
-  'radiogroup',
-  'scrollbar',
-  'searchbox',
-  'select',
-  'slider',
-  'spinbutton',
-  'switch',
-  'tab',
-  'tablist',
-  'textbox',
-  'tree',
-  'treegrid',
-  'treeitem',
-  'widget',
-]);
-
 // ########## FUNCTIONS
 
 // Gets whether an element is operable.
 exports.isOperable = async loc => {
   // Get whether and, if so, how the element is operable.
   const operabilities = await loc.evaluate(el => {
+    // Operable tag names.
+    const opTags = new Set(['A', 'BUTTON', 'IFRAME', 'INPUT', 'SELECT', 'TEXTAREA']);
+    // Operable roles.
+    const opRoles = new Set([
+      'button',
+      'checkbox',
+      'combobox',
+      'composite',
+      'grid',
+      'gridcell',
+      'input',
+      'link',
+      'listbox',
+      'menu',
+      'menubar',
+      'menuitem',
+      'menuitemcheckbox',
+      'option',
+      'radio',
+      'radiogroup',
+      'scrollbar',
+      'searchbox',
+      'select',
+      'slider',
+      'spinbutton',
+      'switch',
+      'tab',
+      'tablist',
+      'textbox',
+      'tree',
+      'treegrid',
+      'treeitem',
+      'widget',
+    ]);
     // Initialize the operabilities.
     const opHow = [];
     // If the element is not a label and has a non-inherited pointer cursor:
@@ -57,7 +54,7 @@ exports.isOperable = async loc => {
       const styleDec = window.getComputedStyle(el);
       hasPointer = styleDec.cursor === 'pointer';
       if (hasPointer) {
-        element.parentElement.style.cursor = 'default';
+        el.parentElement.style.cursor = 'default';
         hasPointer = styleDec.cursor === 'pointer';
       }
     }

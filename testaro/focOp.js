@@ -12,6 +12,8 @@
 
 // ########## IMPORTS
 
+// Module to perform common operations.
+const {init, report} = require('../procs/testaro');
 // Module to get operabilities.
 const {isOperable} = require('../procs/operable');
 
