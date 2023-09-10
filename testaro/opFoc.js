@@ -46,5 +46,13 @@ exports.reporter = async (page, withItems) => {
     'Element is operable (__param__) but not Tab-focusable',
     'Elements are operable but not Tab-focusable'
   ];
-  return await report(withItems, all, 'opFoc', whats, 3);
+  const testReport = await report(withItems, all, 'opFoc', whats, 3);
+  // Reload the page, because isOperable() modified it.
+  try {
+    await page.reload({timeout: 15000});
+  }
+  catch(error) {
+    console.log('ERROR: page reload timed out');
+  }
+  return testReport;
 };
