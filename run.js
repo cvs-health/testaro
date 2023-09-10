@@ -1273,18 +1273,21 @@ exports.doJob = async report => {
     report.jobData.presses = 0;
     report.jobData.amountRead = 0;
     report.jobData.toolTimes = {};
-    // Recursively perform the acts and get any page if debugging is on and a job was aborted.
+    // Recursively perform the acts.
     await doActs(report, 0, null);
     // Add the end time and duration to the report.
     const endTime = new Date();
     report.jobData.endTime = nowString();
     report.jobData.elapsedSeconds =  Math.floor((endTime - startTime) / 1000);
     // Consolidate and sort the tool times.
-    const timeTools = Object.keys(toolTimes).sort((a, b) => toolTimes[b] - toolTimes[a]);
-    const toolTimes = timeTools.map(tool => [tool, tool])
-    timeTools.forEach
-    report.jobData.toolTimes = report.jobData.toolTimes.reduce((times, item) => {
-
-    }, [])
+    const {toolTimes} = report.jobData;
+    const toolTimeData = Object
+    .keys(toolTimes)
+    .sort((a, b) => toolTimes[b] - toolTimes[a])
+    .map(tool => [tool, toolTimes[tool]]);
+    report.jobData.toolTimes = {};
+    toolTimeData.forEach(item => {
+      report.jobData.toolTimes[item[0]] = item[1];
+    });
   }
 };
