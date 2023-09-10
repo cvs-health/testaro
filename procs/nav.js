@@ -178,7 +178,7 @@ const launch = async (report, typeName, url, debug, waits, isLowMotion = false) 
         }
       });
     });
-    // Open the first page of the context and save it.
+    // Open the first page of the context.
     currentPage = await browserContext.newPage();
     try {
       // Wait until it is stable.
@@ -194,8 +194,11 @@ const launch = async (report, typeName, url, debug, waits, isLowMotion = false) 
       else if (! navResult.error) {
         // Update the name of the current browser type and store it in the page.
         currentPage.browserTypeName = typeName;
-        // Return success.
-        return true;
+        // Return the browser context and the page.
+        return {
+          browserContext,
+          currentPage
+        };
       }
     }
     // If it fails to become stable by the deadline:

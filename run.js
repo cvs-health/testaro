@@ -495,13 +495,15 @@ const doActs = async (report, actIndex, page) => {
       // Otherwise, if the act is a launch:
       else if (act.type === 'launch') {
         // Launch the specified browser and navigate to the specified URL.
-        const success = await launch(
+        const browserData = await launch(
           report, act.which, act.url, debug, waits, act.lowMotion ? 'reduce' : 'no-preference'
         );
         // If the launch and navigation succeeded:
-        if (success) {
-          // Identify its only page as current.
-          page = browserContext.pages()[0];
+        if (browserData) {
+          // Save the browser data.
+          browserContext = browserData.browserContext;
+          currentPage = browserData.currentPage;
+          page = currentPage;
           // Add the actual URL to the act.
           act.actualURL = page.url();
         }
