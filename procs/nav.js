@@ -5,6 +5,10 @@
 // Playwright package.
 const playwright = require('playwright');
 
+// ######## VARIABLES
+
+let browser;
+
 // ######## FUNCTIONS
 
 // Visits a URL and returns the response of the server.

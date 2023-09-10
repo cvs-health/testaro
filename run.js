@@ -74,7 +74,6 @@ const errorWords = [
 // Facts about the current session.
 let actCount = 0;
 // Facts about the current browser.
-let browser;
 let browserContext;
 let currentPage;
 let requestedURL = '';
