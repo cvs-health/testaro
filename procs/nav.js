@@ -35,6 +35,8 @@ let browser;
 
 // ######## FUNCTIONS
 
+// Returns a string with any final slash removed.
+const deSlash = string => string.endsWith('/') ? string.slice(0, -1) : string;
 // Visits a URL and returns the response of the server.
 const goTo = async (report, page, url, timeout, waitUntil) => {
   if (url.startsWith('file://')) {

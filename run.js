@@ -341,8 +341,6 @@ const textOf = async (page, element) => {
     return null;
   }
 };
-// Returns a string with any final slash removed.
-const deSlash = string => string.endsWith('/') ? string.slice(0, -1) : string;
 // Returns a property value and whether it satisfies an expectation.
 const isTrue = (object, specs) => {
   const property = specs[0];
