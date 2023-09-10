@@ -1,5 +1,12 @@
 // nav
 
+// ######## IMPORTS
+
+// Playwright package.
+const playwright = require('playwright');
+
+// ######## FUNCTIONS
+
 // Visits a URL and returns the response of the server.
 const goTo = async (report, page, url, timeout, waitUntil) => {
   if (url.startsWith('file://')) {
@@ -48,6 +55,20 @@ const goTo = async (report, page, url, timeout, waitUntil) => {
     return {
       error: 'noVisit'
     };
+  }
+};
+// Closes the current browser.
+const browserClose = async () => {
+  if (browser) {
+    const browserType = browser.browserType().name();
+    let contexts = browser.contexts();
+    for (const context of contexts) {
+      await context.close();
+      contexts = browser.contexts();
+    }
+    await browser.close();
+    browser = null;
+    console.log(`${browserType} browser closed`);
   }
 };
 // Launches a browser, navigates to a URL, and returns the status.
@@ -161,5 +182,6 @@ const launch = async (report, typeName, url, debug, waits, isLowMotion = false) 
     return false;
   }
 };
+exports.browserClose = browserClose;
 exports.goTo = goTo;
 exports.launch = launch;

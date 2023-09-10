@@ -10,11 +10,9 @@ require('dotenv').config();
 // Requirements for acts.
 const {actSpecs} = require('./actSpecs');
 // Navigation.
-const {goTo, launch} = require('./procs/nav');
+const {browserClose, goTo, launch} = require('./procs/nav');
 // Module to standardize report formats.
 const {standardize} = require('./procs/standardize');
-// Playwright package.
-const playwright = require('playwright');
 
 // ########## CONSTANTS
 
@@ -270,20 +268,6 @@ const isValidReport = report => {
 
 // Returns a string representing the date and time.
 const nowString = () => (new Date()).toISOString().slice(0, 19);
-// Closes the current browser.
-const browserClose = async () => {
-  if (browser) {
-    const browserType = browser.browserType().name();
-    let contexts = browser.contexts();
-    for (const context of contexts) {
-      await context.close();
-      contexts = browser.contexts();
-    }
-    await browser.close();
-    browser = null;
-    console.log(`${browserType} browser closed`);
-  }
-};
 // Returns the first line of an error message.
 const errorStart = error => error.message.replace(/\n.+/s, '');
 // Normalizes spacing characters and cases in a string.
