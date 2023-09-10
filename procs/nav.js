@@ -5,6 +5,30 @@
 // Playwright package.
 const playwright = require('playwright');
 
+// ######## CONSTANTS
+
+// Strings in log messages indicating errors.
+const errorWords = [
+  'but not used',
+  'content security policy',
+  'deprecated',
+  'error',
+  'exception',
+  'expected',
+  'failed',
+  'invalid',
+  'missing',
+  'non-standard',
+  'not supported',
+  'refused',
+  'requires',
+  'sorry',
+  'suspicious',
+  'unrecognized',
+  'violates',
+  'warning'
+];
+
 // ######## VARIABLES
 
 let browser;

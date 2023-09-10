@@ -47,27 +47,6 @@ const tests = {
 };
 // Items that may be waited for.
 const waitables = ['url', 'title', 'body'];
-// Strings in log messages indicating errors.
-const errorWords = [
-  'but not used',
-  'content security policy',
-  'deprecated',
-  'error',
-  'exception',
-  'expected',
-  'failed',
-  'invalid',
-  'missing',
-  'non-standard',
-  'not supported',
-  'refused',
-  'requires',
-  'sorry',
-  'suspicious',
-  'unrecognized',
-  'violates',
-  'warning'
-];
 
 // ########## VARIABLES
 
