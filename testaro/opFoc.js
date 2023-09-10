@@ -23,12 +23,15 @@ const {isOperable} = require('../procs/operable');
 exports.reporter = async (page, withItems) => {
   // Initialize the locators and result.
   const all = await init(page, 'body *');
+  all.result.data.operableCount = 0;
   // For each locator:
   for (const loc of all.allLocs) {
     // Get whether and, if so, how its element is operable.
     const operabilities = await isOperable(loc);
     // If it is:
     if (operabilities.length) {
+      // Add this to the report.
+      all.result.data.operableCount++;
       // Get whether it is focusable.
       const isFocusable = await loc.evaluate(el => el.tabIndex === 0);
       // If it is not:

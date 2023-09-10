@@ -100,11 +100,11 @@ exports.reporter = async (page, options) => {
         testTimes.push([rule, Math.round((endTime - startTime) / 1000)]);
         Object.keys(ruleReport).forEach(key => {
           data.rules[rule][key] = ruleReport[key];
-          data.rules[rule].totals = data.rules[rule].totals.map(total => Math.round(total));
-          if (ruleReport.prevented) {
-            data.preventions.push(rule);
-          }
         });
+        data.rules[rule].totals = data.rules[rule].totals.map(total => Math.round(total));
+        if (ruleReport.prevented) {
+          data.preventions.push(rule);
+        }
         // If testing is to stop after a failure and the page failed the test:
         if (stopOnFail && ruleReport.totals.some(total => total)) {
           // Stop testing.
