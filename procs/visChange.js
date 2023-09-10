@@ -2,6 +2,7 @@
   visChange
   This procedure reports a change in the visible content of a page between two times, optionally
   hovering over a locator-defined element immediately after the first time.
+
   WARNING: This test uses the Playwright page.screenshot method, which produces incorrect results
   when the browser type is chromium and is not implemented for the firefox browser type. The only
   browser type usable with this test is webkit.

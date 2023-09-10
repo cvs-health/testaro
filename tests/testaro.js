@@ -94,10 +94,12 @@ exports.reporter = async (page, options) => {
       try {
         const startTime = Date.now();
         const ruleReport = await require(`../testaro/${rule}`).reporter(... ruleArgs);
+        // Add data from the test to the result.
         const endTime = Date.now();
         testTimes.push([rule, Math.round((endTime - startTime) / 1000)]);
         Object.keys(ruleReport).forEach(key => {
           data.rules[rule][key] = ruleReport[key];
+          data.rules[rule].totals = data.rules[rule].totals.map(total => Math.round(total));
           if (ruleReport.prevented) {
             data.preventions.push(rule);
           }

@@ -33,7 +33,7 @@ const moves = {
   select: 'select',
   text: 'input'
 };
-// Names and descriptions of tests.
+// Names and descriptions of tools.
 const tests = {
   alfa: 'alfa',
   axe: 'Axe',

@@ -144,13 +144,8 @@ Here is an example of a job:
     {
       type: 'launch',
       which: 'chromium',
+      url: 'https://www.w3c.org',
       what: 'Chromium browser'
-    },
-    {
-      type: 'url',
-      which: 'https://www.w3c.org',
-      what: 'World Wide Web Consortium',
-      id: 'w3c'
     },
     {
       type: 'test',
@@ -174,9 +169,8 @@ Here is an example of a job:
 }
 ```
 
-This job contains three _acts_, telling Testaro to:
-1. open a page in the Chromium browser
-1. navigate to a specified URL
+This job contains two _acts_, telling Testaro to:
+1. open a page in the Chromium browser and navigate to a specified URL
 1. perform two of the tests of the `alfa` tool (the tests for rules `r25` and `r71`) on that URL
 
 Job properties:
@@ -306,7 +300,7 @@ Each act object has a `type` property and optionally has a `name` property (used
 
 #### Act sequence
 
-The first two acts in any job have the types `launch` and `url`, respectively, as shown in the example above. They launch a browser and then use it to visit a URL.
+The first act in any job has the type `launch`, as shown in the example above. It launches a browser and then uses it to visit a URL.
 
 #### Act types
 
@@ -338,11 +332,9 @@ When the texts of multiple elements of the same type will contain the same `whic
 
 ##### Navigations
 
-An example of a **navigation** is the act of type `url` above.
+An example of a **navigation** is the act of type `launch` above.
 
-Once you have included a `url` act in a job, you do not need to add more `url` acts unless you want the browser to visit a different URL or revisit the same URL.
-
-If any act alters the page, you can restore the page to its original state for the next act by inserting new `launch` and `url` acts (and, if necessary, additional page-specific acts) between them.
+If any act alters the page, you can restore the page to its original state for the next act by inserting a new `launch` act (and, if necessary, additional page-specific acts) between them.
 
 Another navigation example is:
 
@@ -585,7 +577,7 @@ The `rules` property for `testaro` is an array whose first item is either `'y'` 
 
 The `testaro` tool (like the `ibm` tool) has a `withItems` property. If you set it to `false`, the `standardResult` object of `testaro` will contain an `instances` property with summaries that identify issues and instance counts. If you set it to `true`, some of the instances will be itemized.
 
-Unlike any other tool, the `testaro` tools requires a `stopOnFail` property, which specifies whether a failure to conform to any rule (i.e. any value of `totals` other than `[0, 0, 0, 0]`) should terminate the execution of tests for the remaining rules.
+Unlike any other tool, the `testaro` tool requires a `stopOnFail` property, which specifies whether a failure to conform to any rule (i.e. any value of `totals` other than `[0, 0, 0, 0]`) should terminate the execution of tests for the remaining rules.
 
 Warnings in the `testaro/hover.js`, `testaro/motion.js`, and `procs/visChange.js` files advise you to avoid launching particular browser types for the performance of particular Testaro tests.
 
@@ -621,6 +613,26 @@ An example of a **branching** act is:
 This act checks the result of the previous act to determine whether its `result.totals.invalid` property has a positive value. If so, it changes the next act to be performed, specifying the act 4 acts before this one.
 
 A `next` act can use a `next` property instead of a `jump` property. The value of the `next` property is an act name. It tells Testaro to continue performing acts starting with the act having that value as the value of its `name` property.
+
+#### Browser types
+
+After any act in a job, you can change the browser type by inserting a `launch` act. One reason for specifying a particular browser type is that particular tests have different results with different browser types. Another is that you may wish to perform tests with more than a single browser type.
+
+The warning comments in the `testaro/hover.js` and `testaro/motion.js` files state that those tests operate correctly only with the `webkit` browser type.
+
+When you want to run some tests of a tool with one browser type and other tests of the same tool with another browser type, you can do so by splitting the rules into two test acts. For example, one test act can specify the rules as
+
+```javascript
+['y', 'r15', 'r54']
+```
+
+and the other test act can specify the rules as
+
+```javascript
+['n', 'r15', 'r54']
+```
+
+Before each test act, you can ensure that the latest `launch` act has specified the browser type to be used in that test act.
 
 #### `actSpecs` file
 

@@ -9,7 +9,7 @@ const {getLocatorData} = require('../procs/getLocatorData');
 
 // ########## CONSTANTS
 
-let sampleSize = 100;
+const sampleMax = 100;
 
 // ########## FUNCTIONS
 
@@ -19,7 +19,7 @@ exports.init = async (page, locAllSelector, options = {}) => {
   const locPop = page.locator(locAllSelector, options);
   const locPops = await locPop.all();
   const populationSize = locPops.length;
-  sampleSize = Math.min(sampleSize, populationSize);
+  const sampleSize = Math.min(sampleMax, populationSize);
   const locIndexes = getSample(locPops, sampleSize);
   const allLocs = locIndexes.map(index => locPops[index]);
   const result = {
