@@ -28,6 +28,7 @@ const {init, report} = require('../procs/testaro');
 exports.reporter = async (page, withItems) => {
   // Initialize the locators and result.
   const all = await init(page, 'body *:visible');
+  all.result.data.focusableCount = 0;
   // For each locator:
   for (const loc of all.allLocs) {
     // Get whether its element is focusable.
@@ -37,7 +38,7 @@ exports.reporter = async (page, withItems) => {
       // Add this to the report.
       all.result.data.focusableCount++;
       // Get whether it has a nonstandard focus indicator.
-      const hasBadIndicator = loc.evaluate(el => {
+      const hasBadIndicator = await loc.evaluate(el => {
         // Get the live style declaration of the element.
         const styleDec = window.getComputedStyle(el);
         // If the element has an outline:
@@ -48,7 +49,7 @@ exports.reporter = async (page, withItems) => {
         // Otherwise, i.e. if the element has no outline:
         else {
           // Focus the element.
-          element.focus({preventScroll: true});
+          el.focus({preventScroll: true});
           // If it now has no standard outline:
           if (
             Number.parseFloat(styleDec.outlineWidth) < 2
@@ -74,5 +75,5 @@ exports.reporter = async (page, withItems) => {
   }
   // Populate and return the result.
   const whats = ['Element has __param__', 'Elements fail to have standard focus indicators'];
-  return await report(withItems, all, 'focUnd', whats, 1);
+  return await report(withItems, all, 'focInd', whats, 1);
 };
