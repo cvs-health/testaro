@@ -618,7 +618,7 @@ A `next` act can use a `next` property instead of a `jump` property. The value o
 
 After any act in a job, you can change the browser type by inserting a `launch` act. One reason for specifying a particular browser type is that particular tests have different results with different browser types. Another is that you may wish to perform tests with more than a single browser type.
 
-The warning comments in the `testaro/hover.js` and `testaro/motion.js` files state that those tests operate correctly only with the `webkit` browser type.
+The warning comments in the `testaro/hover.js` and `testaro/motion.js` files state that those tests operate correctly only with the `webkit` browser type. The warning comment in the `testaro/focInd.js` file states that that test operates incorrectly with the `firefox` browser type.
 
 When you want to run some tests of a tool with one browser type and other tests of the same tool with another browser type, you can do so by splitting the rules into two test acts. For example, one test act can specify the rules as
 
@@ -632,7 +632,7 @@ and the other test act can specify the rules as
 ['n', 'r15', 'r54']
 ```
 
-Before each test act, you can ensure that the latest `launch` act has specified the browser type to be used in that test act.
+Together, they get all tests of the tool performed. Before each test act, you can ensure that the latest `launch` act has specified the browser type to be used in that test act.
 
 #### `actSpecs` file
 
