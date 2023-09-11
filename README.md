@@ -4,7 +4,7 @@ Ensemble testing for web accessibility
 
 ## Notice: tool change
 
-As of this version 18.0.0, the 10 tools integrated by Testaro have been changed to 9 tools. One tool, Tenon, was withdrawn by its owner on 2023-08-06, so it was removed from Testaro.
+As of version 18.0.0, the 10 tools integrated by Testaro have been changed to 9 tools. One tool, Tenon, was withdrawn by its owner on 2023-08-06, so it was removed from Testaro. New rules were added to the Testaro tool to cover some issues that Tenon was uniquely or especially effective at discovering.
 
 ## Introduction
 
