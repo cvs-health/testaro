@@ -9,10 +9,10 @@
 require('dotenv').config();
 // Requirements for acts.
 const {actSpecs} = require('./actSpecs');
+// Navigation.
+const {browserClose, goTo, launch} = require('./procs/nav');
 // Module to standardize report formats.
-const {standardize} = require('./standardize');
-// Playwright package.
-const playwright = require('playwright');
+const {standardize} = require('./procs/standardize');
 
 // ########## CONSTANTS
 
@@ -33,7 +33,7 @@ const moves = {
   select: 'select',
   text: 'input'
 };
-// Names and descriptions of tests.
+// Names and descriptions of tools.
 const tests = {
   alfa: 'alfa',
   axe: 'Axe',
@@ -45,44 +45,15 @@ const tests = {
   testaro: 'Testaro',
   wave: 'WAVE',
 };
-// Browser types available in PlayWright.
-const browserTypeNames = {
-  'chromium': 'Chrome',
-  'webkit': 'Safari',
-  'firefox': 'Firefox'
-};
 // Items that may be waited for.
 const waitables = ['url', 'title', 'body'];
-// Strings in log messages indicating errors.
-const errorWords = [
-  'but not used',
-  'content security policy',
-  'deprecated',
-  'error',
-  'exception',
-  'expected',
-  'failed',
-  'invalid',
-  'missing',
-  'non-standard',
-  'not supported',
-  'refused',
-  'requires',
-  'sorry',
-  'suspicious',
-  'unrecognized',
-  'violates',
-  'warning'
-];
 
 // ########## VARIABLES
 
 // Facts about the current session.
 let actCount = 0;
 // Facts about the current browser.
-let browser;
 let browserContext;
-let browserTypeName;
 let currentPage;
 let requestedURL = '';
 
@@ -238,14 +209,11 @@ const isValidReport = report => {
     if (acts[0].type !== 'launch') {
       return 'First act type not launch';
     }
-    if (acts[1].type !== 'url') {
-      return 'Second act type not url';
-    }
     if (! ['chromium', 'webkit', 'firefox'].includes(acts[0].which)) {
       return 'Bad first act which';
     }
-    if (! acts[1].which || typeof acts[1].which !== 'string' || ! isURL(acts[1].which)) {
-      return 'Second act which not a URL';
+    if (! acts[0].url || typeof acts[0].url !== 'string' || ! isURL(acts[0].url)) {
+      return 'First act url not a URL';
     }
     const invalidAct = acts.find(act => ! isValidAct(act));
     if (invalidAct) {
@@ -278,108 +246,8 @@ const isValidReport = report => {
 
 // Returns a string representing the date and time.
 const nowString = () => (new Date()).toISOString().slice(0, 19);
-// Closes the current browser.
-const browserClose = async () => {
-  if (browser) {
-    const browserType = browser.browserType().name();
-    let contexts = browser.contexts();
-    for (const context of contexts) {
-      await context.close();
-      contexts = browser.contexts();
-    }
-    await browser.close();
-    browser = null;
-    console.log(`${browserType} browser closed`);
-  }
-};
 // Returns the first line of an error message.
 const errorStart = error => error.message.replace(/\n.+/s, '');
-// Launches a browser.
-const launch = async (report, typeName, lowMotion = false) => {
-  const browserType = playwright[typeName];
-  // If the specified browser type exists:
-  if (browserType) {
-    // Close the current browser, if any.
-    await browserClose();
-    // Launch a browser of that type.
-    const browserOptions = {
-      logger: {
-        isEnabled: () => false,
-        log: (name, severity, message) => console.log(message.slice(0, 100))
-      }
-    };
-    if (debug) {
-      browserOptions.headless = false;
-    }
-    if (waits) {
-      browserOptions.slowMo = waits;
-    }
-    let healthy = true;
-    browser = await browserType.launch(browserOptions)
-    .catch(error => {
-      healthy = false;
-      console.log(`ERROR launching browser (${errorStart(error)})`);
-    });
-    // If the launch succeeded:
-    if (healthy) {
-      // Open a context (i.e. browser tab), with reduced motion if specified.
-      const options = {reduceMotion: lowMotion ? 'reduce' : 'no-preference'};
-      browserContext = await browser.newContext(options);
-      // When a page (i.e. browser tab) is added to the browser context (i.e. browser window):
-      browserContext.on('page', async page => {
-        // Make the page current.
-        currentPage = page;
-        // If it emits a message:
-        page.on('console', msg => {
-          const msgText = msg.text();
-          let indentedMsg = '';
-          // If debugging is on:
-          if (debug) {
-            // Log a summary of the message on the console.
-            const parts = [msgText.slice(0, 75)];
-            if (msgText.length > 75) {
-              parts.push(msgText.slice(75, 150));
-              if (msgText.length > 150) {
-                const tail = msgText.slice(150).slice(-150);
-                if (msgText.length > 300) {
-                  parts.push('...');
-                }
-                parts.push(tail.slice(0, 75));
-                if (tail.length > 75) {
-                  parts.push(tail.slice(75));
-                }
-              }
-            }
-            indentedMsg = parts.map(part => `    | ${part}`).join('\n');
-            console.log(`\n${indentedMsg}`);
-          }
-          // Add statistics on the message to the report.
-          const msgTextLC = msgText.toLowerCase();
-          const msgLength = msgText.length;
-          report.jobData.logCount++;
-          report.jobData.logSize += msgLength;
-          if (errorWords.some(word => msgTextLC.includes(word))) {
-            report.jobData.errorLogCount++;
-            report.jobData.errorLogSize += msgLength;
-          }
-          const msgLC = msgText.toLowerCase();
-          if (
-            msgText.includes('403') && (msgLC.includes('status')
-            || msgLC.includes('prohibited'))
-          ) {
-            report.jobData.prohibitedCount++;
-          }
-        });
-      });
-      // Open the first page of the context.
-      currentPage = await browserContext.newPage();
-      // Wait until it is stable.
-      await currentPage.waitForLoadState('domcontentloaded', {timeout: 15000});
-      // Update the name of the current browser type and store it in the page.
-      currentPage.browserTypeName = browserTypeName = typeName;
-    }
-  }
-};
 // Normalizes spacing characters and cases in a string.
 const debloat = string => string.replace(/\s/g, ' ').trim().replace(/ {2,}/g, ' ').toLowerCase();
 // Returns the text of an element, lower-cased.
@@ -473,8 +341,6 @@ const textOf = async (page, element) => {
     return null;
   }
 };
-// Returns a string with any final slash removed.
-const deSlash = string => string.endsWith('/') ? string.slice(0, -1) : string;
 // Returns a property value and whether it satisfies an expectation.
 const isTrue = (object, specs) => {
   const property = specs[0];
@@ -557,56 +423,6 @@ const addError = (act, error, message) => {
     act.result.prevented = true;
   }
 };
-// Visits a URL and returns the response of the server.
-const goTo = async (report, page, url, timeout, waitUntil, isStrict) => {
-  if (url.startsWith('file://')) {
-    url = url.replace('file://', `file://${__dirname}/`);
-  }
-  // Visit the URL.
-  const startTime = Date.now();
-  try {
-    const response = await page.goto(url, {
-      timeout,
-      waitUntil
-    });
-    report.jobData.visitLatency += Math.round((Date.now() - startTime) / 1000);
-    const httpStatus = response.status();
-    // If the response status was normal:
-    if ([200, 304].includes(httpStatus) || url.startsWith('file:')) {
-      // If the browser was redirected in violation of a strictness requirement:
-      const actualURL = page.url();
-      if (isStrict && deSlash(actualURL) !== deSlash(url)) {
-        // Return an error.
-        console.log(`ERROR: Visit to ${url} redirected to ${actualURL}`);
-        return {
-          exception: 'badRedirection'
-        };
-      }
-      // Otherwise, i.e. if no prohibited redirection occurred:
-      else {
-        // Press the Escape key to dismiss any modal dialog.
-        await page.keyboard.press('Escape');
-        // Return the response.
-        return response;
-      }
-    }
-    // Otherwise, i.e. if the response status was abnormal:
-    else {
-      // Return an error.
-      console.log(`ERROR: Visit to ${url} got status ${httpStatus}`);
-      report.jobData.visitRejectionCount++;
-      return {
-        error: 'badStatus'
-      };
-    }
-  }
-  catch(error) {
-    console.log(`ERROR visiting ${url} (${error.message.slice(0, 200)})`);
-    return {
-      error: 'noVisit'
-    };
-  }
-};
 // Recursively performs the acts in a report.
 const doActs = async (report, actIndex, page) => {
   // Quits and reports the performance being aborted.
@@ -678,53 +494,41 @@ const doActs = async (report, actIndex, page) => {
       }
       // Otherwise, if the act is a launch:
       else if (act.type === 'launch') {
-        // Launch the specified browser, creating a browser context and a page in it.
-        await launch(report, act.which, act.lowMotion ? 'reduce' : 'no-preference');
-        // Identify its only page as current.
-        page = browserContext.pages()[0];
+        // Launch the specified browser and navigate to the specified URL.
+        const browserData = await launch(
+          report, act.which, act.url, debug, waits, act.lowMotion ? 'reduce' : 'no-preference'
+        );
+        // If the launch and navigation succeeded:
+        if (browserData) {
+          // Save the browser data.
+          browserContext = browserData.browserContext;
+          currentPage = browserData.currentPage;
+          page = currentPage;
+          // Add the actual URL to the act.
+          act.actualURL = page.url();
+        }
+        // Otherwise, i.e. if the launch or navigation failed:
+        else {
+          // Abort the job.
+          await abortActs();
+        }
       }
       // Otherwise, if a current page exists:
       else if (page) {
-        // If the act is a url:
+        // If the act is navigation to a url:
         if (act.type === 'url') {
           // Identify the URL.
           const resolved = act.which.replace('__dirname', __dirname);
           requestedURL = resolved;
-          const {strict} = report;
           // Visit it and wait until the DOM is loaded.
-          let response = await goTo(report, page, requestedURL, 15000, 'domcontentloaded', strict);
-          // If the visit fails:
-          if (response.error) {
-            // Launch another browser type.
-            const newBrowserName = Object.keys(browserTypeNames)
-            .find(name => name !== browserTypeName);
-            console.log(`>> Launching ${newBrowserName} instead`);
-            await launch(newBrowserName);
-            // Identify its only page as current.
-            page = browserContext.pages()[0];
-            // Visit the URL and wait until the DOM is loaded.
-            response = await goTo(report, page, requestedURL, 10000, 'domcontentloaded', strict);
-            // If the visit fails:
-            if (response.error) {
-              // Try again and wait until a load.
-              response = await goTo(report, page, requestedURL, 5000, 'load', strict);
-              // If the visit fails:
-              if (response.error) {
-                // Navigate to a blank page instead.
-                await page.goto('about:blank')
-                .catch(error => {
-                  console.log(`ERROR: Navigation to blank page failed (${error.message})`);
-                });
-              }
-            }
-          }
-          // If none of the visits succeeded:
+          const response = await goTo(report, page, requestedURL, 15000, 'domcontentloaded');
+          // If the visit failed:
           if (response.error) {
             // Report this and quit.
             addError(act, 'failure', 'ERROR: Visits failed');
             await abortActs();
           }
-          // Otherwise, i.e. if the last visit attempt succeeded:
+          // Otherwise, i.e. if the visit succeeded:
           else {
             // If a prohibited redirection occurred:
             if (response.exception === 'badRedirection') {
@@ -845,535 +649,531 @@ const doActs = async (report, actIndex, page) => {
         // Otherwise, if the page has a URL:
         else if (page.url() && page.url() !== 'about:blank') {
           const url = page.url();
-          // If redirection is inapplicable, is permitted, or did not occur:
-          if (
-            url.startsWith('file:') || ! report.strict || deSlash(url) === deSlash(requestedURL)
-          ) {
-            // Add the URL to the act.
-            act.url = url;
-            // If the act is a revelation:
-            if (act.type === 'reveal') {
-              // Make all elements in the page visible.
-              await require('./procs/allVis').allVis(page);
-              act.result = {
-                success: true
-              };
+          // Add the URL to the act.
+          act.actualURL = url;
+          // If the act is a revelation:
+          if (act.type === 'reveal') {
+            // Make all elements in the page visible.
+            await require('./procs/allVis').allVis(page);
+            act.result = {
+              success: true
+            };
+          }
+          // Otherwise, if the act performs tests of a tool:
+          else if (act.type === 'test') {
+            // Add a description of the test to the act.
+            act.what = tests[act.which];
+            // Initialize the options argument.
+            const options = {};
+            // Add any specified arguments to it.
+            Object.keys(act).forEach(key => {
+              if (! ['type', 'which'].includes(key)) {
+                options[key] = act[key];
+              }
+            });
+            // Initialize the test report.
+            const startTime = Date.now();
+            let toolReport = {
+              result: {
+                success: false
+              }
+            };
+            // Perform the specified tests of the tool and get a report.
+            try {
+              const args = [page, options];
+              toolReport = await require(`./tests/${act.which}`).reporter(... args);
+              toolReport.result.success = true;
             }
-            // Otherwise, if the act performs the tests of a tool:
-            else if (act.type === 'test') {
-              // Add a description of the test to the act.
-              act.what = tests[act.which];
-              // Initialize the options argument.
-              const options = {};
-              // Add any specified arguments to it.
-              Object.keys(act).forEach(key => {
-                if (! ['type', 'which'].includes(key)) {
-                  options[key] = act[key];
-                }
-              });
-              // Conduct, report, and time the test.
-              const startTime = Date.now();
-              let testReport = {
-                result: {
-                  success: false
-                }
+            // If the testing failed:
+            catch(error) {
+              // Report this but do not abort the job.
+              console.log(`ERROR: Test act ${act.which} failed (${error.message.slice(0, 400)})`);
+            }
+            // Add the elapsed time to the report.
+            const time = Math.round((Date.now() - startTime) / 1000);
+            const {toolTimes} = report.jobData;
+            if (! toolTimes[act.which]) {
+              toolTimes[act.which] = 0;
+            }
+            toolTimes[act.which] += time;
+            // Add the result object (possibly an array) to the act.
+            const resultCount = Object.keys(toolReport.result).length;
+            act.result = resultCount ? toolReport.result : {success: false};
+            // If a standard-format result is to be included in the report:
+            const standard = process.env.STANDARD;
+            if (['also', 'only'].includes(standard)) {
+              // Initialize it.
+              act.standardResult = {
+                totals: [],
+                instances: []
               };
-              try {
-                const args = [page, options];
-                testReport = await require(`./tests/${act.which}`).reporter(... args);
-                testReport.result.success = true;
+              // Populate it.
+              standardize(act);
+              // If the original-format result is not to be included in the report:
+              if (standard === 'only') {
+                // Remove it.
+                delete act.result;
               }
-              catch(error) {
-                console.log(`ERROR: Test act ${act.which} failed (${error.message.slice(0, 400)})`);
-              }
-              report.jobData.testTimes.push(
-                [act.which, Math.round((Date.now() - startTime) / 1000)]
-              );
-              report.jobData.testTimes.sort((a, b) => b[1] - a[1]);
-              // Add the result object (possibly an array) to the act.
-              const resultCount = Object.keys(testReport.result).length;
-              act.result = resultCount ? testReport.result : {success: false};
-              // If a standard-format result is to be included in the report:
-              const standard = process.env.STANDARD;
-              if (['also', 'only'].includes(standard)) {
-                // Initialize it.
-                act.standardResult = {
-                  totals: [],
-                  instances: []
-                };
-                // Populate it.
-                standardize(act);
-                // If the original-format result is not to be included in the report:
-                if (standard === 'only') {
-                  // Remove it.
-                  delete act.result;
-                }
-                const expectations = act.expect;
-                // If the test has expectations:
-                if (expectations) {
-                  // Initialize whether they were fulfilled.
-                  act.expectations = [];
-                  let failureCount = 0;
-                  // For each expectation:
-                  expectations.forEach(spec => {
-                    const truth = isTrue(act, spec);
-                    act.expectations.push({
-                      property: spec[0],
-                      relation: spec[1],
-                      criterion: spec[2],
-                      actual: truth[0],
-                      passed: truth[1]
-                    });
-                    if (! truth[1]) {
-                      failureCount++;
-                    }
+              // If the test has expectations:
+              const expectations = act.expect;
+              if (expectations) {
+                // Initialize whether they were fulfilled.
+                act.expectations = [];
+                let failureCount = 0;
+                // For each expectation:
+                expectations.forEach(spec => {
+                  const truth = isTrue(act, spec);
+                  act.expectations.push({
+                    property: spec[0],
+                    relation: spec[1],
+                    criterion: spec[2],
+                    actual: truth[0],
+                    passed: truth[1]
                   });
-                  act.expectationFailures = failureCount;
-                }
+                  if (! truth[1]) {
+                    failureCount++;
+                  }
+                });
+                act.expectationFailures = failureCount;
               }
             }
-            // Otherwise, if the act is a move:
-            else if (moves[act.type]) {
-              const selector = typeof moves[act.type] === 'string' ? moves[act.type] : act.what;
-              // Try up to 5 times to:
-              act.result = {found: false};
-              let selection = {};
-              let tries = 0;
-              const slimText = act.which ? debloat(act.which) : '';
-              while (tries++ < 5 && ! act.result.found) {
-                if (page) {
-                  // Identify the elements of the specified type.
-                  const selections = await page.$$(selector);
-                  // If there are any:
-                  if (selections.length) {
-                    // If there are enough to make a match possible:
-                    if ((act.index || 0) < selections.length) {
-                      // For each element of the specified type:
-                      let matchCount = 0;
-                      const selectionTexts = [];
-                      for (selection of selections) {
-                        // Add its lower-case text or an empty string to the list of element texts.
-                        const selectionText = slimText ? await textOf(page, selection) : '';
-                        selectionTexts.push(selectionText);
-                        // If its text includes any specified text, case-insensitively:
-                        if (selectionText.includes(slimText)) {
-                          // If the element has the specified index among such elements:
-                          if (matchCount++ === (act.index || 0)) {
-                            // Report it as the matching element and stop checking.
-                            act.result.found = true;
-                            act.result.textSpec = slimText;
-                            act.result.textContent = selectionText;
-                            break;
-                          }
+          }
+          // Otherwise, if the act is a move:
+          else if (moves[act.type]) {
+            const selector = typeof moves[act.type] === 'string' ? moves[act.type] : act.what;
+            // Try up to 5 times to:
+            act.result = {found: false};
+            let selection = {};
+            let tries = 0;
+            const slimText = act.which ? debloat(act.which) : '';
+            while (tries++ < 5 && ! act.result.found) {
+              if (page) {
+                // Identify the elements of the specified type.
+                const selections = await page.$$(selector);
+                // If there are any:
+                if (selections.length) {
+                  // If there are enough to make a match possible:
+                  if ((act.index || 0) < selections.length) {
+                    // For each element of the specified type:
+                    let matchCount = 0;
+                    const selectionTexts = [];
+                    for (selection of selections) {
+                      // Add its lower-case text or an empty string to the list of element texts.
+                      const selectionText = slimText ? await textOf(page, selection) : '';
+                      selectionTexts.push(selectionText);
+                      // If its text includes any specified text, case-insensitively:
+                      if (selectionText.includes(slimText)) {
+                        // If the element has the specified index among such elements:
+                        if (matchCount++ === (act.index || 0)) {
+                          // Report it as the matching element and stop checking.
+                          act.result.found = true;
+                          act.result.textSpec = slimText;
+                          act.result.textContent = selectionText;
+                          break;
                         }
-                      }
-                      // If no element satisfied the specifications:
-                      if (! act.result.found) {
-                        // Add the failure data to the report.
-                        act.result.success = false;
-                        act.result.error = 'exhausted';
-                        act.result.typeElementCount = selections.length;
-                        if (slimText) {
-                          act.result.textElementCount = --matchCount;
-                        }
-                        act.result.message = 'Not enough specified elements exist';
-                        act.result.candidateTexts = selectionTexts;
                       }
                     }
-                    // Otherwise, i.e. if there are too few such elements to make a match possible:
-                    else {
+                    // If no element satisfied the specifications:
+                    if (! act.result.found) {
                       // Add the failure data to the report.
                       act.result.success = false;
-                      act.result.error = 'fewer';
+                      act.result.error = 'exhausted';
                       act.result.typeElementCount = selections.length;
-                      act.result.message = 'Elements of specified type too few';
+                      if (slimText) {
+                        act.result.textElementCount = --matchCount;
+                      }
+                      act.result.message = 'Not enough specified elements exist';
+                      act.result.candidateTexts = selectionTexts;
                     }
                   }
-                  // Otherwise, i.e. if there are no elements of the specified type:
+                  // Otherwise, i.e. if there are too few such elements to make a match possible:
                   else {
                     // Add the failure data to the report.
                     act.result.success = false;
-                    act.result.error = 'none';
-                    act.result.typeElementCount = 0;
-                    act.result.message = 'No elements of specified type found';
+                    act.result.error = 'fewer';
+                    act.result.typeElementCount = selections.length;
+                    act.result.message = 'Elements of specified type too few';
                   }
                 }
-                // Otherwise, i.e. if the page no longer exists:
+                // Otherwise, i.e. if there are no elements of the specified type:
                 else {
                   // Add the failure data to the report.
                   act.result.success = false;
-                  act.result.error = 'gone';
-                  act.result.message = 'Page gone';
-                }
-                if (! act.result.found) {
-                  await wait(2000);
+                  act.result.error = 'none';
+                  act.result.typeElementCount = 0;
+                  act.result.message = 'No elements of specified type found';
                 }
               }
-              // If a match was found:
-              if (act.result.found) {
-                // FUNCTION DEFINITION START
-                // Performs a click or Enter keypress and waits for the network to be idle.
-                const doAndWait = async isClick => {
-                  // Perform and report the move.
-                  const move = isClick ? 'click' : 'Enter keypress';
+              // Otherwise, i.e. if the page no longer exists:
+              else {
+                // Add the failure data to the report.
+                act.result.success = false;
+                act.result.error = 'gone';
+                act.result.message = 'Page gone';
+              }
+              if (! act.result.found) {
+                await wait(2000);
+              }
+            }
+            // If a match was found:
+            if (act.result.found) {
+              // FUNCTION DEFINITION START
+              // Performs a click or Enter keypress and waits for the network to be idle.
+              const doAndWait = async isClick => {
+                // Perform and report the move.
+                const move = isClick ? 'click' : 'Enter keypress';
+                try {
+                  await isClick
+                    ? selection.click({timeout: 4000})
+                    : selection.press('Enter', {timeout: 4000});
+                  act.result.success = true;
+                  act.result.move = move;
+                }
+                // If the move fails:
+                catch(error) {
+                  // Quit and add failure data to the report.
+                  act.result.success = false;
+                  act.result.error = 'moveFailure';
+                  act.result.message = `ERROR: ${move} failed`;
+                  console.log(`ERROR: ${move} failed (${errorStart(error)})`);
+                  await abortActs();
+                }
+                if (act.result.success) {
                   try {
-                    await isClick
-                      ? selection.click({timeout: 4000})
-                      : selection.press('Enter', {timeout: 4000});
-                    act.result.success = true;
-                    act.result.move = move;
+                    await page.context().waitForEvent('networkidle', {timeout: 10000});
+                    act.result.idleTimely = true;
                   }
-                  // If the move fails:
                   catch(error) {
-                    // Quit and add failure data to the report.
-                    act.result.success = false;
-                    act.result.error = 'moveFailure';
-                    act.result.message = `ERROR: ${move} failed`;
-                    console.log(`ERROR: ${move} failed (${errorStart(error)})`);
-                    await abortActs();
+                    console.log(`ERROR: Network busy after ${move} (${errorStart(error)})`);
+                    act.result.idleTimely = false;
                   }
-                  if (act.result.success) {
-                    try {
-                      await page.context().waitForEvent('networkidle', {timeout: 10000});
-                      act.result.idleTimely = true;
+                  // If the move created a new page, make it current.
+                  page = currentPage;
+                  act.result.newURL = page.url();
+                }
+              };
+              // FUNCTION DEFINITION END
+              // If the move is a button click, perform it.
+              if (act.type === 'button') {
+                await selection.click({timeout: 3000});
+                act.result.success = true;
+                act.result.move = 'clicked';
+              }
+              // Otherwise, if it is checking a radio button or checkbox, perform it.
+              else if (['checkbox', 'radio'].includes(act.type)) {
+                await selection.waitForElementState('stable', {timeout: 2000})
+                .catch(error => {
+                  console.log(`ERROR waiting for stable ${act.type} (${error.message})`);
+                  act.result.success = false;
+                  act.result.error = `ERROR waiting for stable ${act.type}`;
+                });
+                if (! act.result.error) {
+                  const isEnabled = await selection.isEnabled();
+                  if (isEnabled) {
+                    await selection.check({
+                      force: true,
+                      timeout: 2000
+                    })
+                    .catch(error => {
+                      console.log(`ERROR checking ${act.type} (${error.message})`);
+                      act.result.success = false;
+                      act.result.error = `ERROR checking ${act.type}`;
+                    });
+                    if (! act.result.error) {
+                      act.result.success = true;
+                      act.result.move = 'checked';
                     }
-                    catch(error) {
-                      console.log(`ERROR: Network busy after ${move} (${errorStart(error)})`);
-                      act.result.idleTimely = false;
-                    }
-                    // If the move created a new page, make it current.
-                    page = currentPage;
+                  }
+                  else {
+                    const report = `ERROR: could not check ${act.type} because disabled`;
+                    console.log(report);
+                    act.result.success = false;
+                    act.result.error = report;
+                  }
+                }
+              }
+              // Otherwise, if it is focusing the element, perform it.
+              else if (act.type === 'focus') {
+                await selection.focus({timeout: 2000});
+                act.result.success = true;
+                act.result.move = 'focused';
+              }
+              // Otherwise, if it is clicking a link:
+              else if (act.type === 'link') {
+                const href = await selection.getAttribute('href');
+                const target = await selection.getAttribute('target');
+                act.result.href = href || 'NONE';
+                act.result.target = target || 'DEFAULT';
+                // If the destination is a new page:
+                if (target && target !== '_self') {
+                  // Click the link and wait for the network to be idle.
+                  doAndWait(true);
+                }
+                // Otherwise, i.e. if the destination is in the current page:
+                else {
+                  // Click the link and wait for the resulting navigation.
+                  try {
+                    await selection.click({timeout: 5000});
+                    // Wait for the new content to load.
+                    await page.waitForLoadState('domcontentloaded', {timeout: 6000});
+                    act.result.success = true;
+                    act.result.move = 'clicked';
                     act.result.newURL = page.url();
                   }
-                };
-                // FUNCTION DEFINITION END
-                // If the move is a button click, perform it.
-                if (act.type === 'button') {
-                  await selection.click({timeout: 3000});
-                  act.result.success = true;
-                  act.result.move = 'clicked';
-                }
-                // Otherwise, if it is checking a radio button or checkbox, perform it.
-                else if (['checkbox', 'radio'].includes(act.type)) {
-                  await selection.waitForElementState('stable', {timeout: 2000})
-                  .catch(error => {
-                    console.log(`ERROR waiting for stable ${act.type} (${error.message})`);
+                  // If the click or load failed:
+                  catch(error) {
+                    // Quit and add failure data to the report.
+                    console.log(`ERROR clicking link (${errorStart(error)})`);
                     act.result.success = false;
-                    act.result.error = `ERROR waiting for stable ${act.type}`;
-                  });
+                    act.result.error = 'unclickable';
+                    act.result.message = 'ERROR: click or load timed out';
+                    await abortActs();
+                  }
+                  // If the link click succeeded:
                   if (! act.result.error) {
-                    const isEnabled = await selection.isEnabled();
-                    if (isEnabled) {
-                      await selection.check({
-                        force: true,
-                        timeout: 2000
-                      })
-                      .catch(error => {
-                        console.log(`ERROR checking ${act.type} (${error.message})`);
-                        act.result.success = false;
-                        act.result.error = `ERROR checking ${act.type}`;
-                      });
-                      if (! act.result.error) {
-                        act.result.success = true;
-                        act.result.move = 'checked';
-                      }
-                    }
-                    else {
-                      const report = `ERROR: could not check ${act.type} because disabled`;
-                      console.log(report);
-                      act.result.success = false;
-                      act.result.error = report;
-                    }
+                    // Add success data to the report.
+                    act.result.success = true;
+                    act.result.move = 'clicked';
                   }
-                }
-                // Otherwise, if it is focusing the element, perform it.
-                else if (act.type === 'focus') {
-                  await selection.focus({timeout: 2000});
-                  act.result.success = true;
-                  act.result.move = 'focused';
-                }
-                // Otherwise, if it is clicking a link:
-                else if (act.type === 'link') {
-                  const href = await selection.getAttribute('href');
-                  const target = await selection.getAttribute('target');
-                  act.result.href = href || 'NONE';
-                  act.result.target = target || 'DEFAULT';
-                  // If the destination is a new page:
-                  if (target && target !== '_self') {
-                    // Click the link and wait for the network to be idle.
-                    doAndWait(true);
-                  }
-                  // Otherwise, i.e. if the destination is in the current page:
-                  else {
-                    // Click the link and wait for the resulting navigation.
-                    try {
-                      await selection.click({timeout: 5000});
-                      // Wait for the new content to load.
-                      await page.waitForLoadState('domcontentloaded', {timeout: 6000});
-                      act.result.success = true;
-                      act.result.move = 'clicked';
-                      act.result.newURL = page.url();
-                    }
-                    // If the click or load failed:
-                    catch(error) {
-                      // Quit and add failure data to the report.
-                      console.log(`ERROR clicking link (${errorStart(error)})`);
-                      act.result.success = false;
-                      act.result.error = 'unclickable';
-                      act.result.message = 'ERROR: click or load timed out';
-                      await abortActs();
-                    }
-                    // If the link click succeeded:
-                    if (! act.result.error) {
-                      // Add success data to the report.
-                      act.result.success = true;
-                      act.result.move = 'clicked';
-                    }
-                  }
-                }
-                // Otherwise, if it is selecting an option in a select list, perform it.
-                else if (act.type === 'select') {
-                  const options = await selection.$$('option');
-                  let optionText = '';
-                  if (options && Array.isArray(options) && options.length) {
-                    const optionTexts = [];
-                    for (const option of options) {
-                      const optionText = await option.textContent();
-                      optionTexts.push(optionText);
-                    }
-                    const matchTexts = optionTexts.map(
-                      (text, index) => text.includes(act.what) ? index : -1
-                    );
-                    const index = matchTexts.filter(text => text > -1)[act.index || 0];
-                    if (index !== undefined) {
-                      await selection.selectOption({index});
-                      optionText = optionTexts[index];
-                    }
-                  }
-                  act.result.success = true;
-                  act.result.move = 'selected';
-                  act.result.option = optionText;
-                }
-                // Otherwise, if it is entering text in an input element:
-                else if (['text', 'search'].includes(act.type)) {
-                  act.result.attributes = {};
-                  const {attributes} = act.result;
-                  const type = await selection.getAttribute('type');
-                  const label = await selection.getAttribute('aria-label');
-                  const labelRefs = await selection.getAttribute('aria-labelledby');
-                  attributes.type = type || '';
-                  attributes.label = label || '';
-                  attributes.labelRefs = labelRefs || '';
-                  // If the text contains a placeholder for an environment variable:
-                  let {what} = act;
-                  if (/__[A-Z]+__/.test(what)) {
-                    // Replace it.
-                    const envKey = /__([A-Z]+)__/.exec(what)[1];
-                    const envValue = process.env[envKey];
-                    what = what.replace(/__[A-Z]+__/, envValue);
-                  }
-                  // Enter the text.
-                  await selection.type(act.what);
-                  report.jobData.presses += act.what.length;
-                  act.result.success = true;
-                  act.result.move = 'entered';
-                  // If the input is a search input:
-                  if (act.type === 'search') {
-                    // Press the Enter key and wait for a network to be idle.
-                    doAndWait(false);
-                  }
-                }
-                // Otherwise, i.e. if the move is unknown, add the failure to the act.
-                else {
-                  // Report the error.
-                  const report = 'ERROR: move unknown';
-                  act.result.success = false;
-                  act.result.error = report;
-                  console.log(report);
                 }
               }
-              // Otherwise, i.e. if no match was found:
+              // Otherwise, if it is selecting an option in a select list, perform it.
+              else if (act.type === 'select') {
+                const options = await selection.$$('option');
+                let optionText = '';
+                if (options && Array.isArray(options) && options.length) {
+                  const optionTexts = [];
+                  for (const option of options) {
+                    const optionText = await option.textContent();
+                    optionTexts.push(optionText);
+                  }
+                  const matchTexts = optionTexts.map(
+                    (text, index) => text.includes(act.what) ? index : -1
+                  );
+                  const index = matchTexts.filter(text => text > -1)[act.index || 0];
+                  if (index !== undefined) {
+                    await selection.selectOption({index});
+                    optionText = optionTexts[index];
+                  }
+                }
+                act.result.success = true;
+                act.result.move = 'selected';
+                act.result.option = optionText;
+              }
+              // Otherwise, if it is entering text in an input element:
+              else if (['text', 'search'].includes(act.type)) {
+                act.result.attributes = {};
+                const {attributes} = act.result;
+                const type = await selection.getAttribute('type');
+                const label = await selection.getAttribute('aria-label');
+                const labelRefs = await selection.getAttribute('aria-labelledby');
+                attributes.type = type || '';
+                attributes.label = label || '';
+                attributes.labelRefs = labelRefs || '';
+                // If the text contains a placeholder for an environment variable:
+                let {what} = act;
+                if (/__[A-Z]+__/.test(what)) {
+                  // Replace it.
+                  const envKey = /__([A-Z]+)__/.exec(what)[1];
+                  const envValue = process.env[envKey];
+                  what = what.replace(/__[A-Z]+__/, envValue);
+                }
+                // Enter the text.
+                await selection.type(act.what);
+                report.jobData.presses += act.what.length;
+                act.result.success = true;
+                act.result.move = 'entered';
+                // If the input is a search input:
+                if (act.type === 'search') {
+                  // Press the Enter key and wait for a network to be idle.
+                  doAndWait(false);
+                }
+              }
+              // Otherwise, i.e. if the move is unknown, add the failure to the act.
               else {
-                // Quit and add failure data to the report.
+                // Report the error.
+                const report = 'ERROR: move unknown';
                 act.result.success = false;
-                act.result.error = 'absent';
-                act.result.message = 'ERROR: specified element not found';
-                console.log('ERROR: Specified element not found');
-                await abortActs();
+                act.result.error = report;
+                console.log(report);
               }
             }
-            // Otherwise, if the act is a keypress:
-            else if (act.type === 'press') {
-              // Identify the number of times to press the key.
-              let times = 1 + (act.again || 0);
-              report.jobData.presses += times;
-              const key = act.which;
-              // Press the key.
-              while (times--) {
-                await page.keyboard.press(key);
-              }
-              const qualifier = act.again ? `${1 + act.again} times` : 'once';
-              act.result = {
-                success: true,
-                message: `pressed ${qualifier}`
-              };
+            // Otherwise, i.e. if no match was found:
+            else {
+              // Quit and add failure data to the report.
+              act.result.success = false;
+              act.result.error = 'absent';
+              act.result.message = 'ERROR: specified element not found';
+              console.log('ERROR: Specified element not found');
+              await abortActs();
             }
-            // Otherwise, if it is a repetitive keyboard navigation:
-            else if (act.type === 'presses') {
-              const {navKey, what, which, withItems} = act;
-              const matchTexts = which ? which.map(text => debloat(text)) : [];
-              // Initialize the loop variables.
-              let status = 'more';
-              let presses = 0;
-              let amountRead = 0;
-              let items = [];
-              let matchedText;
-              // As long as a matching element has not been reached:
-              while (status === 'more') {
-                // Press the Escape key to dismiss any modal dialog.
-                await page.keyboard.press('Escape');
-                // Press the specified navigation key.
-                await page.keyboard.press(navKey);
-                presses++;
-                // Identify the newly current element or a failure.
-                const currentJSHandle = await page.evaluateHandle(actCount => {
-                  // Initialize it as the focused element.
-                  let currentElement = document.activeElement;
-                  // If it exists in the page:
-                  if (currentElement && currentElement.tagName !== 'BODY') {
-                    // Change it, if necessary, to its active descendant.
-                    if (currentElement.hasAttribute('aria-activedescendant')) {
-                      currentElement = document.getElementById(
-                        currentElement.getAttribute('aria-activedescendant')
-                      );
-                    }
-                    // Or change it, if necessary, to its selected option.
-                    else if (currentElement.tagName === 'SELECT') {
-                      const currentIndex = Math.max(0, currentElement.selectedIndex);
-                      const options = currentElement.querySelectorAll('option');
-                      currentElement = options[currentIndex];
-                    }
-                    // Or change it, if necessary, to its active shadow-DOM element.
-                    else if (currentElement.shadowRoot) {
-                      currentElement = currentElement.shadowRoot.activeElement;
-                    }
-                    // If there is a current element:
-                    if (currentElement) {
-                      // If it was already reached within this act:
-                      if (currentElement.dataset.pressesReached === actCount.toString(10)) {
-                        // Report the error.
-                        console.log(`ERROR: ${currentElement.tagName} element reached again`);
-                        status = 'ERROR';
-                        return 'ERROR: locallyExhausted';
-                      }
-                      // Otherwise, i.e. if it is newly reached within this act:
-                      else {
-                        // Mark and return it.
-                        currentElement.dataset.pressesReached = actCount;
-                        return currentElement;
-                      }
-                    }
-                    // Otherwise, i.e. if there is no current element:
-                    else {
+          }
+          // Otherwise, if the act is a keypress:
+          else if (act.type === 'press') {
+            // Identify the number of times to press the key.
+            let times = 1 + (act.again || 0);
+            report.jobData.presses += times;
+            const key = act.which;
+            // Press the key.
+            while (times--) {
+              await page.keyboard.press(key);
+            }
+            const qualifier = act.again ? `${1 + act.again} times` : 'once';
+            act.result = {
+              success: true,
+              message: `pressed ${qualifier}`
+            };
+          }
+          // Otherwise, if it is a repetitive keyboard navigation:
+          else if (act.type === 'presses') {
+            const {navKey, what, which, withItems} = act;
+            const matchTexts = which ? which.map(text => debloat(text)) : [];
+            // Initialize the loop variables.
+            let status = 'more';
+            let presses = 0;
+            let amountRead = 0;
+            let items = [];
+            let matchedText;
+            // As long as a matching element has not been reached:
+            while (status === 'more') {
+              // Press the Escape key to dismiss any modal dialog.
+              await page.keyboard.press('Escape');
+              // Press the specified navigation key.
+              await page.keyboard.press(navKey);
+              presses++;
+              // Identify the newly current element or a failure.
+              const currentJSHandle = await page.evaluateHandle(actCount => {
+                // Initialize it as the focused element.
+                let currentElement = document.activeElement;
+                // If it exists in the page:
+                if (currentElement && currentElement.tagName !== 'BODY') {
+                  // Change it, if necessary, to its active descendant.
+                  if (currentElement.hasAttribute('aria-activedescendant')) {
+                    currentElement = document.getElementById(
+                      currentElement.getAttribute('aria-activedescendant')
+                    );
+                  }
+                  // Or change it, if necessary, to its selected option.
+                  else if (currentElement.tagName === 'SELECT') {
+                    const currentIndex = Math.max(0, currentElement.selectedIndex);
+                    const options = currentElement.querySelectorAll('option');
+                    currentElement = options[currentIndex];
+                  }
+                  // Or change it, if necessary, to its active shadow-DOM element.
+                  else if (currentElement.shadowRoot) {
+                    currentElement = currentElement.shadowRoot.activeElement;
+                  }
+                  // If there is a current element:
+                  if (currentElement) {
+                    // If it was already reached within this act:
+                    if (currentElement.dataset.pressesReached === actCount.toString(10)) {
                       // Report the error.
+                      console.log(`ERROR: ${currentElement.tagName} element reached again`);
                       status = 'ERROR';
-                      return 'noActiveElement';
+                      return 'ERROR: locallyExhausted';
+                    }
+                    // Otherwise, i.e. if it is newly reached within this act:
+                    else {
+                      // Mark and return it.
+                      currentElement.dataset.pressesReached = actCount;
+                      return currentElement;
                     }
                   }
-                  // Otherwise, i.e. if there is no focus in the page:
+                  // Otherwise, i.e. if there is no current element:
                   else {
                     // Report the error.
                     status = 'ERROR';
-                    return 'ERROR: globallyExhausted';
-                  }
-                }, actCount);
-                // If the current element exists:
-                const currentElement = currentJSHandle.asElement();
-                if (currentElement) {
-                  // Update the data.
-                  const tagNameJSHandle = await currentElement.getProperty('tagName');
-                  const tagName = await tagNameJSHandle.jsonValue();
-                  const text = await textOf(page, currentElement);
-                  // If the text of the current element was found:
-                  if (text !== null) {
-                    const textLength = text.length;
-                    // If it is non-empty and there are texts to match:
-                    if (matchTexts.length && textLength) {
-                      // Identify the matching text.
-                      matchedText = matchTexts.find(matchText => text.includes(matchText));
-                    }
-                    // Update the item data if required.
-                    if (withItems) {
-                      const itemData = {
-                        tagName,
-                        text,
-                        textLength
-                      };
-                      if (matchedText) {
-                        itemData.matchedText = matchedText;
-                      }
-                      items.push(itemData);
-                    }
-                    amountRead += textLength;
-                    // If there is no text-match failure:
-                    if (matchedText || ! matchTexts.length) {
-                      // If the element has any specified tag name:
-                      if (! what || tagName === what) {
-                        // Change the status.
-                        status = 'done';
-                        // Perform the action.
-                        const inputText = act.text;
-                        if (inputText) {
-                          await page.keyboard.type(inputText);
-                          presses += inputText.length;
-                        }
-                        if (act.action) {
-                          presses++;
-                          await page.keyboard.press(act.action);
-                          await page.waitForLoadState();
-                        }
-                      }
-                    }
-                  }
-                  else {
-                    status = 'ERROR';
+                    return 'noActiveElement';
                   }
                 }
-                // Otherwise, i.e. if there was a failure:
+                // Otherwise, i.e. if there is no focus in the page:
                 else {
-                  // Update the status.
-                  status = await currentJSHandle.jsonValue();
+                  // Report the error.
+                  status = 'ERROR';
+                  return 'ERROR: globallyExhausted';
+                }
+              }, actCount);
+              // If the current element exists:
+              const currentElement = currentJSHandle.asElement();
+              if (currentElement) {
+                // Update the data.
+                const tagNameJSHandle = await currentElement.getProperty('tagName');
+                const tagName = await tagNameJSHandle.jsonValue();
+                const text = await textOf(page, currentElement);
+                // If the text of the current element was found:
+                if (text !== null) {
+                  const textLength = text.length;
+                  // If it is non-empty and there are texts to match:
+                  if (matchTexts.length && textLength) {
+                    // Identify the matching text.
+                    matchedText = matchTexts.find(matchText => text.includes(matchText));
+                  }
+                  // Update the item data if required.
+                  if (withItems) {
+                    const itemData = {
+                      tagName,
+                      text,
+                      textLength
+                    };
+                    if (matchedText) {
+                      itemData.matchedText = matchedText;
+                    }
+                    items.push(itemData);
+                  }
+                  amountRead += textLength;
+                  // If there is no text-match failure:
+                  if (matchedText || ! matchTexts.length) {
+                    // If the element has any specified tag name:
+                    if (! what || tagName === what) {
+                      // Change the status.
+                      status = 'done';
+                      // Perform the action.
+                      const inputText = act.text;
+                      if (inputText) {
+                        await page.keyboard.type(inputText);
+                        presses += inputText.length;
+                      }
+                      if (act.action) {
+                        presses++;
+                        await page.keyboard.press(act.action);
+                        await page.waitForLoadState();
+                      }
+                    }
+                  }
+                }
+                else {
+                  status = 'ERROR';
                 }
               }
-              // Add the result to the act.
-              act.result = {
-                success: true,
-                status,
-                totals: {
-                  presses,
-                  amountRead
-                }
-              };
-              if (status === 'done' && matchedText) {
-                act.result.matchedText = matchedText;
+              // Otherwise, i.e. if there was a failure:
+              else {
+                // Update the status.
+                status = await currentJSHandle.jsonValue();
               }
-              if (withItems) {
-                act.result.items = items;
+            }
+            // Add the result to the act.
+            act.result = {
+              success: true,
+              status,
+              totals: {
+                presses,
+                amountRead
               }
-              // Add the totals to the report.
-              report.jobData.presses += presses;
-              report.jobData.amountRead += amountRead;
+            };
+            if (status === 'done' && matchedText) {
+              act.result.matchedText = matchedText;
             }
-            // Otherwise, i.e. if the act type is unknown:
-            else {
-              // Add the error result to the act.
-              addError(act, 'badType', 'ERROR: Invalid act type');
+            if (withItems) {
+              act.result.items = items;
             }
+            // Add the totals to the report.
+            report.jobData.presses += presses;
+            report.jobData.amountRead += amountRead;
           }
-          // Otherwise, i.e. if redirection is prohibited but occurred:
+          // Otherwise, i.e. if the act type is unknown:
           else {
-            // Add an error result to the act.
-            addError(act, 'redirection', `ERROR: Page redirected to (${url})`);
+            // Add the error result to the act.
+            addError(act, 'badType', 'ERROR: Invalid act type');
           }
         }
         // Otherwise, a page URL is required but does not exist, so:
@@ -1434,12 +1234,22 @@ exports.doJob = async report => {
     report.jobData.abortedAct = null;
     report.jobData.presses = 0;
     report.jobData.amountRead = 0;
-    report.jobData.testTimes = [];
-    // Recursively perform the acts and get any page if debugging is on and a job was aborted.
+    report.jobData.toolTimes = {};
+    // Recursively perform the acts.
     await doActs(report, 0, null);
     // Add the end time and duration to the report.
     const endTime = new Date();
     report.jobData.endTime = nowString();
     report.jobData.elapsedSeconds =  Math.floor((endTime - startTime) / 1000);
+    // Consolidate and sort the tool times.
+    const {toolTimes} = report.jobData;
+    const toolTimeData = Object
+    .keys(toolTimes)
+    .sort((a, b) => toolTimes[b] - toolTimes[a])
+    .map(tool => [tool, toolTimes[tool]]);
+    report.jobData.toolTimes = {};
+    toolTimeData.forEach(item => {
+      report.jobData.toolTimes[item[0]] = item[1];
+    });
   }
 };

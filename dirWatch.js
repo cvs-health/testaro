@@ -34,11 +34,11 @@ const reWatch = () => {
     }
     if (code === 0) {
       console.log('Watcher exited successfully');
+      reWatch();
     }
     else {
       console.log(`Watcher exited with error code ${code}`);
     }
-    reWatch();
   });
 };
 

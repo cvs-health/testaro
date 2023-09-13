@@ -1,9 +1,9 @@
 /*
   testaro
-  This test implements the Testaro evaluative ruleset for accessibility.
+  This test implements the Testaro evaluative rules.
 */
 
-// CONSTANTS
+// ######## CONSTANTS
 
 const evalRules = {
   allCaps: 'leaf elements with entirely upper-case text longer than 7 characters',
@@ -19,7 +19,7 @@ const evalRules = {
   filter: 'filter styles on elements',
   focAll: 'discrepancies between focusable and Tab-focused elements',
   focInd: 'missing and nonstandard focus indicators',
-  focOp: 'discrepancies between focusability and operability',
+  focOp: 'Tab-focusable elements that are not operable',
   focVis: 'links that are invisible when focused',
   headEl: 'invalid elements within the head',
   headingAmb: 'same-level sibling headings with identical texts',
@@ -36,6 +36,7 @@ const evalRules = {
   miniText: 'text smaller than 11 pixels',
   motion: 'motion without user request',
   nonTable: 'table elements used for layout',
+  opFoc: 'Operable elements that are not Tab-focusable',
   pseudoP: 'adjacent br elements suspected of nonsemantically simulating p elements',
   radioSet: 'radio buttons not grouped into standard field sets',
   role: 'invalid and native-replacing explicit roles',
@@ -62,7 +63,8 @@ exports.reporter = async (page, options) => {
   // Initialize the data.
   const data = {
     rules: {},
-    preventions: []
+    preventions: [],
+    testTimes: {}
   };
   // If the rule specification is valid:
   if (
@@ -71,10 +73,11 @@ exports.reporter = async (page, options) => {
     && rules.slice(1).every(rule => evalRules[rule] || etcRules[rule])
   ) {
     // For each rule invoked:
-    const realRules = rules[0] === 'y'
+    const calledRules = rules[0] === 'y'
       ? rules.slice(1)
       : Object.keys(evalRules).filter(ruleID => ! rules.slice(1).includes(ruleID));
-    for (const rule of realRules) {
+    const testTimes = [];
+    for (const rule of calledRules) {
       // Initialize an argument array.
       const ruleArgs = [page, withItems];
       // If the rule has extra arguments:
@@ -90,15 +93,20 @@ exports.reporter = async (page, options) => {
       data.rules[rule].what = what;
       console.log(`>>>>>> ${rule} (${what})`);
       try {
-        const report = await require(`../testaro/${rule}`).reporter(... ruleArgs);
-        Object.keys(report).forEach(key => {
-          data.rules[rule][key] = report[key];
-          if (report.prevented) {
-            data.preventions.push(rule);
-          }
+        const startTime = Date.now();
+        const ruleReport = await require(`../testaro/${rule}`).reporter(... ruleArgs);
+        // Add data from the test to the result.
+        const endTime = Date.now();
+        testTimes.push([rule, Math.round((endTime - startTime) / 1000)]);
+        Object.keys(ruleReport).forEach(key => {
+          data.rules[rule][key] = ruleReport[key];
         });
+        data.rules[rule].totals = data.rules[rule].totals.map(total => Math.round(total));
+        if (ruleReport.prevented) {
+          data.preventions.push(rule);
+        }
         // If testing is to stop after a failure and the page failed the test:
-        if (stopOnFail && report.totals.some(total => total)) {
+        if (stopOnFail && ruleReport.totals.some(total => total)) {
           // Stop testing.
           break;
         }
@@ -110,6 +118,9 @@ exports.reporter = async (page, options) => {
         console.log(`ERROR: Test of testaro rule ${rule} prevented (${error.message})`);
       }
     }
+    testTimes.sort((a, b) => b[1] - a[1]).forEach(pair => {
+      data.testTimes[pair[0]] = pair[1];
+    });
   }
   // Otherwise, i.e. if the rule specification is invalid:
   else {

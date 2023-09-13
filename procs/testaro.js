@@ -2,18 +2,32 @@
 
 // ########## IMPORTS
 
+// Module to sample a population.
+const {getSample} = require('../procs/sample');
 // Module to get locator data.
 const {getLocatorData} = require('../procs/getLocatorData');
+
+// ########## CONSTANTS
+
+const sampleMax = 100;
 
 // ########## FUNCTIONS
 
 // Initializes locators and a result.
 exports.init = async (page, locAllSelector, options = {}) => {
   // Get locators for the specified elements.
-  const locAll = page.locator(locAllSelector, options);
-  const allLocs = await locAll.all();
+  const locPop = page.locator(locAllSelector, options);
+  const locPops = await locPop.all();
+  const populationSize = locPops.length;
+  const sampleSize = Math.min(sampleMax, populationSize);
+  const locIndexes = getSample(locPops, sampleSize);
+  const allLocs = locIndexes.map(index => locPops[index]);
   const result = {
-    data: {},
+    data: {
+      populationSize,
+      sampleSize,
+      populationRatio: sampleSize ? populationSize / sampleSize : null
+    },
     totals: [0, 0, 0, 0],
     standardInstances: []
   };
@@ -28,7 +42,7 @@ exports.init = async (page, locAllSelector, options = {}) => {
 // Populates a result.
 exports.report = async (withItems, all, ruleID, whats, ordinalSeverity, tagName = '') => {
   const {locs, result} = all;
-  const {totals, standardInstances} = result;
+  const {data, totals, standardInstances} = result;
   // For each instance locator:
   for (const locItem of locs) {
     // Get data on its element.
@@ -42,7 +56,7 @@ exports.report = async (withItems, all, ruleID, whats, ordinalSeverity, tagName 
     }
     const elData = await getLocatorData(loc);
     // Add to the totals.
-    totals[ordinalSeverity]++;
+    totals[ordinalSeverity] += data.populationRatio;
     // If itemization is required:
     if (withItems) {
       // Add a standard instance to the result.
@@ -64,7 +78,7 @@ exports.report = async (withItems, all, ruleID, whats, ordinalSeverity, tagName 
       ruleID,
       what: whats[1],
       ordinalSeverity,
-      count: totals[ordinalSeverity],
+      count: Math.round(totals[ordinalSeverity]),
       tagName,
       id: '',
       location: {

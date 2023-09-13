@@ -2,7 +2,7 @@
   hover
   This test reports unexpected impacts of hovering on the visible page. Impacts are measured by
   pixel changes outside the hovered element and by unhoverability.
-  
+
   The elements that are subjected to hovering (called “triggers”) are the Playwright-visible
   elements that have 'A', 'BUTTON', or (if not with role=menuitem) 'LI' tag names or have
   'onmouseenter' or 'onmouseover' attributes.
@@ -24,8 +24,8 @@
   action on the location where the center of the element is, rather than some other element with a
   higher zIndex value in the same location being the target.
 
-  WARNING: This test uses the Playwright page.screenshot method, which is not implemented for the
-  firefox browser type.
+  WARNING: This test uses the procs/visChange module. See the warning in that module about browser
+  types.
 */
 
 // IMPORTS
@@ -54,7 +54,7 @@ exports.reporter = async (page, withItems, sampleSize = 20) => {
   const psRatio = Math.max(1, locsAll.length / sampleSize);
   // Get a sample of the triggers.
   const sampleIndexes = getSample(locsAll, sampleSize);
-  const sample = locsAll.filter((loc, index) => sampleIndexes.includes(index));
+  const sample = sampleIndexes.map(index => locsAll[index]);
   // For each trigger in the sample:
   for (const loc of sample) {
     // Hover over it and get the fractional pixel change.
