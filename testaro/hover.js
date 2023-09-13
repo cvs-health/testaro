@@ -25,7 +25,8 @@ exports.reporter = async (page, withItems) => {
   // For each locator:
   for (const loc of all.allLocs) {
     // Get how many elements are added or subtracted when the element is hovered over.
-    const additions = await loc.evaluate(el => {
+    const additions = await loc.evaluate(async el => {
+      console.log(el.getAttribute('aria-controls'), el.getAttribute('aria-expanded'));
       const mouseout = new Event('mouseout');
       el.dispatchEvent(mouseout);
       const elementCount0 = document.body.querySelectorAll('*').length;
@@ -33,7 +34,18 @@ exports.reporter = async (page, withItems) => {
       el.dispatchEvent(mouseenter);
       const mouseover = new Event('mouseover');
       el.dispatchEvent(mouseover);
+      const pause = ms => {
+        const promise = new Promise(resolve => {
+          const timeout = setTimeout(() => {
+            resolve();
+            clearTimeout(timeout);
+          }, ms);
+        });
+        return promise;
+      };
+      await pause(500);
       const elementCount1 = document.body.querySelectorAll('*').length;
+      console.log(elementCount0, elementCount1);
       const additions = elementCount1 - elementCount0;
       el.dispatchEvent(mouseout);
       return additions;
