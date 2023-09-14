@@ -25,6 +25,7 @@ exports.reporter = async (page, withItems) => {
   // For each locator:
   for (const loc of all.allLocs) {
     // Get how many elements are added or subtracted when the element is hovered over.
+    await page.mouse.move(0, 0);
     const loc0 = page.locator('body *:visible');
     const elementCount0 = await loc0.count();
     try {
@@ -56,7 +57,7 @@ exports.reporter = async (page, withItems) => {
       }
     }
     catch(error) {
-      console.log(`Hovering timed out (${error.message})`);
+      console.log(`Hovering timed out (${error.message.replace(/\n.+/, '')})`);
     }
   }
   // Populate and return the result.
