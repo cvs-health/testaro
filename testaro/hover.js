@@ -65,5 +65,5 @@ exports.reporter = async (page, withItems) => {
     'Hovering over the element __param__',
     'Hovering over elements adds elements to or subtracts elements from the page'
   ];
-  return await report(withItems, all, 'ruleID', whats, 0);
+  return await report(withItems, all, 'hover', whats, 0);
 };
