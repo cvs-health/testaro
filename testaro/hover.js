@@ -31,19 +31,8 @@ exports.reporter = async (page, withItems) => {
     try {
       await loc.hover({
         force: true,
-        noWaitAfter: true,
         timeout: 100
       });
-      const pause = ms => {
-        const promise = new Promise(resolve => {
-          const timeout = setTimeout(() => {
-            resolve();
-            clearTimeout(timeout);
-          }, ms);
-        });
-        return promise;
-      };
-      await pause(500);
       const loc1 = page.locator('body *:visible');
       const elementCount1 = await loc1.count();
       const additions = elementCount1 - elementCount0;
@@ -57,7 +46,7 @@ exports.reporter = async (page, withItems) => {
       }
     }
     catch(error) {
-      console.log(`Hovering timed out (${error.message.replace(/\n.+/, '')})`);
+      console.log(`Hovering timed out (${error.message.replace(/[\n].+/s, '')})`);
     }
   }
   // Populate and return the result.
