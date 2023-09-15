@@ -2,10 +2,6 @@
 
 Ensemble testing for web accessibility
 
-## Notice: tool change
-
-As of version 18.0.0, the 10 tools integrated by Testaro have been changed to 9 tools. One tool, Tenon, was withdrawn by its owner on 2023-08-06, so it was removed from Testaro. New rules were added to the Testaro tool to cover some issues that Tenon was uniquely or especially effective at discovering.
-
 ## Introduction
 
 Testaro is an application for automated web accessibility testing.
@@ -48,23 +44,21 @@ Testaro performs tests of these tools:
 - [accessibility-checker](https://www.npmjs.com/package/accessibility-checker) (IBM)
 - [alfa](https://alfa.siteimprove.com/) (Siteimprove)
 - [axe-playwright](https://www.npmjs.com/package/axe-playwright) (Deque)
-- [Continuum Community Edition](https://www.webaccessibility.com/tools/) (Level Access)
 - [HTML CodeSniffer](https://www.npmjs.com/package/html_codesniffer) (Squiz Labs)
 - [Nu Html Checker](https://github.com/validator/validator) (World Wide Web Consortium)
 - [QualWeb core](https://www.npmjs.com/package/@qualweb/core) (University of Lisbon)
-- [Testaro](https://www.npmjs.com/package/testaro) (Testaro)
+- [Testaro](https://www.npmjs.com/package/testaro) (CVS Health)
 - [WAVE API](https://wave.webaim.org/api/) (WebAIM)
 
-Some of the rules tested by Testaro are based on rules of the [BBC Accessibility Standards Checker](https://github.com/bbc/bbc-a11y) and of Tenon, a service that existed until August 2023.
+Some of the tests of Testaro are designed to act as approximate alternatives to tests of vulnerable, restricted, or no longer available tools. One such tool is the [BBC Accessibility Standards Checker](https://github.com/bbc/bbc-a11y). In all such cases the Testaro rules are independently designed and implemented, without reference to the code of the tests that inspired them.
 
 ## Rules
 
-Each tool accessed with Testaro defines _rules_ and tests _targets_ for compliance with its rules. The counts of the rules range from about 40, for Testaro itself, to about 270, for Continuum Community Edition. In total, the nine tools define about 920 rules. Some of the tools are under active development, and their rule counts change over time.
+Each tool accessed with Testaro defines _rules_ and tests _targets_ for compliance with its rules. In total, the eight tools define about 650 rules. Some of the tools are under active development, and their rule counts change over time.
 
 When you ask Testaro to run tests of a tool, you may specify a subset of the rules of that tool, and the report will give you the results of only the tests for those rules. These tools will perform only those tests:
 - `alfa`
 - `axe`
-- `continuum`
 - `htmlcs`
 - `qualWeb`
 - `testaro`
@@ -394,7 +388,7 @@ That means that a test act (i.e. an act with a `type` property having the value 
 
 If a particular test act either must have or may have any other properties, those properties are specified in the `tests` property in `actSpecs.js`.
 
-When you include a `rules` property, you limit the tests of the tool that are performed or reported. For some tools (`alfa`, `axe`, `continuum`, `htmlcs`, `qualWeb`, and `testaro`), only the specified tests are performed. Other tools (`ibm`, `nuVal`, and `wave`) do not allow such a limitation, so, for those tools, all tests are performed but results are reported from only the specified tests.
+When you include a `rules` property, you limit the tests of the tool that are performed or reported. For some tools (`alfa`, `axe`, `htmlcs`, `qualWeb`, and `testaro`), only the specified tests are performed. Other tools (`ibm`, `nuVal`, and `wave`) do not allow such a limitation, so, for those tools, all tests are performed but results are reported from only the specified tests.
 
 The `nuVal`, `qualWeb`, and `testaro` tools require specific formats for the `rules` property. Those formats are described below in the sections about those tools.
 
@@ -473,14 +467,6 @@ The third item in each array, if there are 3 items in the array, is the criterio
 A typical use for an `expect` property is checking the correctness of a Testaro test. Thus, the validation jobs in the `validation/tests/jobs` directory all contain `test` acts with `expect` properties. See the “Validation” section below.
 
 When a `test` act has an `expect` property, the result for that act has an `expectations` property reporting whether the expectations were satisfied. The value of `expectations` is an array of objects, one object per expectation. Each object includes a `property` property identifying the expectation, and a `passed` property with `true` or `false` value reporting whether the expectation was satisfied. If applicable, it also has other properties identifying what was expected and what was actually reported.
-
-###### Continuum
-
-The `continuum` tool makes use of the files in the `continuum` directory. The tool inserts the contents of all three files into the page as scripts and then uses them to perform the tests. The files for this tool are included in the repository of Testaro instead of the tool package being only referenced as a dependency because the files are not published for automatic download.
-
-The files are used without modification, except for format modifications in the `continuum.conf.js` file.
-
-Level Access on 22 August 2022 granted authorization for the copying of the `AccessEngine.community.js` file insofar as necessary for allowing Continuum community edition tests to be included in Testaro.
 
 ###### HTML CodeSniffer
 
@@ -592,10 +578,6 @@ If a `wave` test act is included in the job, an environment variable named `WAVE
 The `wave` API does not accept a transmitted document for testing. WAVE must be given only a URL, which it then visits to perform its tests. Therefore, you cannot manipulate a page and then have WAVE test it, or ask WAVE to test a page that cannot be reached directly with a URL.
 
 This limitation of WAVE may be overcome in a future version of Testaro by means of the invocation of the WAVE Chrome extension with Playwright.
-
-###### BBC Accessibility Standards Checker
-
-The BBC Accessibility Standards Checker has obsolete dependencies with security vulnerabilities. Therefore, it is not used as a dependency of Testaro. Instead, 6 of its tests are reimplemented, in some cases with revisions, as Testaro tests. They are drawn from the 18 automated tests of the Checker. The other 12 tests were found too duplicative of other tests to justify reimplementation.
 
 ##### Branching
 

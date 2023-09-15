@@ -275,36 +275,6 @@ const convert = (toolName, result, standardResult) => {
     doAxe(result, standardResult, 'incomplete');
     doAxe(result, standardResult, 'violations');
   }
-  // continuum
-  else if (toolName === 'continuum' && Array.isArray(result) && result.length) {
-    standardResult.totals = [0, 0, 0, result.length];
-    result.forEach(item => {
-      let tagName = '';
-      let id = '';
-      if (item.fingerprint && item.fingerprint.css) {
-        const {css} = item.fingerprint;
-        tagName = css.replace(/[^a-z].*$/, '').toUpperCase();
-        const idArray = css.match(/\[id="([^"]+)"\]/);
-        if (idArray && idArray.length) {
-          id = idArray[1];
-        }
-      }
-      const instance = {
-        ruleID: item.engineTestId.toString(),
-        what: item.attributeDetail,
-        ordinalSeverity: 3,
-        tagName,
-        id,
-        location: {
-          doc: 'dom',
-          type: 'selector',
-          spec: item.path
-        },
-        excerpt: item.element
-      };
-      standardResult.instances.push(instance);
-    });
-  }
   // htmlcs
   else if (toolName === 'htmlcs' && result) {
     doHTMLCS(result, standardResult, 'Warning');
