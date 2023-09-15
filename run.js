@@ -37,7 +37,6 @@ const moves = {
 const tests = {
   alfa: 'alfa',
   axe: 'Axe',
-  continuum: 'Level Access Continuum, community edition',
   htmlcs: 'HTML CodeSniffer WCAG 2.1 AA ruleset',
   ibm: 'IBM Accessibility Checker',
   nuVal: 'Nu Html Checker',
