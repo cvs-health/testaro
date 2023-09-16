@@ -56,47 +56,7 @@
         [
           "standardResult.totals.3",
           "=",
-          3
-        ],
-        [
-          "standardResult.instances.1.ruleID",
-          "=",
-          "focOp"
-        ],
-        [
-          "standardResult.instances.1.what",
-          "i",
-          "Element is Tab-focusable but"
-        ],
-        [
-          "standardResult.instances.1.ordinalSeverity",
-          "=",
-          2
-        ],
-        [
-          "standardResult.instances.1.tagName",
-          "=",
-          "SPAN"
-        ],
-        [
-          "standardResult.instances.1.location.doc",
-          "=",
-          "dom"
-        ],
-        [
-          "standardResult.instances.1.location.type",
-          "=",
-          "box"
-        ],
-        [
-          "standardResult.instances.1.location.spec.width",
-          ">",
           0
-        ],
-        [
-          "standardResult.instances.1.excerpt",
-          "=",
-          "focusable part"
         ],
         [
           "standardResult.instances.0.ruleID",
@@ -106,42 +66,42 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "(tag name BUTTON) but not Tab-focusable"
+          "Element is Tab-focusable but"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          3
+          2
         ],
         [
           "standardResult.instances.0.tagName",
           "=",
-          "BUTTON"
+          "SPAN"
         ],
         [
-          "standardResult.instances.2.id",
+          "standardResult.instances.0.id",
           "=",
-          "clickable"
+          "badSpan"
         ],
         [
-          "standardResult.instances.2.location.doc",
+          "standardResult.instances.0.location.doc",
           "=",
           "dom"
         ],
         [
-          "standardResult.instances.2.location.type",
+          "standardResult.instances.0.location.type",
           "=",
           "selector"
         ],
         [
-          "standardResult.instances.2.location.spec",
+          "standardResult.instances.0.location.spec",
           "=",
-          "#clickable"
+          "#badSpan"
         ],
         [
-          "standardResult.instances.2.excerpt",
-          "i",
-          "this text"
+          "standardResult.instances.0.excerpt",
+          "=",
+          "focusable span"
         ]
       ],
       "rules": [
@@ -163,7 +123,7 @@
         [
           "standardResult.totals.3",
           "=",
-          3
+          0
         ],
         [
           "standardResult.totals.1",
@@ -189,21 +149,6 @@
           "standardResult.instances.0.count",
           "=",
           1
-        ],
-        [
-          "standardResult.instances.1.ruleID",
-          "=",
-          "focOp"
-        ],
-        [
-          "standardResult.instances.1.ordinalSeverity",
-          "=",
-          3
-        ],
-        [
-          "standardResult.instances.1.count",
-          "=",
-          3
         ]
       ],
       "rules": [
