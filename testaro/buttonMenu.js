@@ -73,7 +73,7 @@ const focusSuccess = async (miLocsDir, priorIndex, key, isPseudo) => {
       }
       else if (['ArrowRight', 'ArrowDown'].includes(key)) {
         const expectedIndex = getAdjacentIndexWithWrap(miCount, priorIndex, 1);
-        if (focData.miFocIndex === expectedIndex) {
+        if (miFocIndex === expectedIndex) {
           result.isOK = true;
           result.newFocIndex = expectedIndex;
         }
