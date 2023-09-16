@@ -40,7 +40,7 @@ const deSlash = string => string.endsWith('/') ? string.slice(0, -1) : string;
 // Visits a URL and returns the response of the server.
 const goTo = async (report, page, url, timeout, waitUntil) => {
   if (url.startsWith('file://')) {
-    url = url.replace('file://', `file://${__dirname}/`);
+    url = url.replace('file://', `file://${__dirname}/../`);
   }
   // Visit the URL.
   const startTime = Date.now();
