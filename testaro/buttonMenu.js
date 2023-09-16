@@ -96,7 +96,6 @@ exports.reporter = async (page, withItems, trialKeySpecs = []) => {
   );
   // For each menu button:
   const mbLocsAll = await mbLocAll.all();
-  console.log(`Count of menu buttons: ${mbLocsAll.length}`);
   for (const mbLoc of mbLocsAll) {
     // Get a locator for its menu.
     const menuID = await mbLoc.getAttribute('aria-controls');
@@ -132,16 +131,16 @@ exports.reporter = async (page, withItems, trialKeySpecs = []) => {
         if (extraData) {
           // Get locators for its descendant non-menu menu items.
           const miLocAll = menuLoc.locator(
-            '[role=menuitem]:not([role=menu], [role=menuitem]):not([role=menubar])'
+            '[role=menuitem]:not([role=menu]), [role=menuitem]:not([role=menubar])'
           );
           // Get which of them are direct descendants.
-          const areDirect = miLocAll.evaluateAll(els => {
+          const areDirect = await miLocAll.evaluateAll((els, menuID) => {
             return els.map(el => {
               const itsMenu = el.closest('[role=menu], [role=menubar]');
               return itsMenu.id && itsMenu.id === menuID;
             });
           }, menuID);
-          const miLocsAll= await miLocAll.all();
+          const miLocsAll = await miLocAll.all();
           const miLocsDir = miLocsAll.filter((loc, index) => areDirect[index]);
           // If there are at least 2 of them:
           if (miLocsDir.length > 1) {
