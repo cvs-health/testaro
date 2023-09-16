@@ -31,7 +31,7 @@ exports.validateTest = async testID => {
     ) {
       console.log('Success: Reports have been correctly populated');
       if (testActs.every(testAct => testAct.expectationFailures === 0)) {
-        console.log('Success: No failures');
+        console.log('######## Success: No failures\n');
       }
       else {
         console.log('Failure: The test has at least one failure');
