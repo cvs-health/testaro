@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/labClash/good.html",
+      "url": "__targets__/labClash/good.html",
       "what": "page with standard labeling"
     },
     {

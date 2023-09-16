@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/headingAmb/index.html",
+      "url": "__targets__/headingAmb/index.html",
       "what": "page with and without heading ambiguity"
     },
     {

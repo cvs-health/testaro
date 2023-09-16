@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/embAc/good.html",
+      "url": "__targets__/embAc/good.html",
       "what": "page without embedding in links or buttons"
     },
     {

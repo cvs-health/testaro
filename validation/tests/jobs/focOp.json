@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/focOp/good.html",
+      "url": "__targets__/focOp/good.html",
       "what": "page with standard focusability and operability"
     },
     {

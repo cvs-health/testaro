@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/linkExt/index.html",
+      "url": "__targets__/linkExt/index.html",
       "what": "page with normal and forcibly external links"
     },
     {

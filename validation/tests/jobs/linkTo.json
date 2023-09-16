@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/linkTo/index.html",
+      "url": "__targets__/linkTo/index.html",
       "what": "page with links with and without destinations"
     },
     {
