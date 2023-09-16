@@ -34,7 +34,9 @@ exports.validateTest = async testID => {
         console.log('######## Success: No failures\n');
       }
       else {
-        console.log('Failure: The test has at least one failure');
+        console.log(
+          '######## Failure: The test has at least one failure (see “"passed": false” below)\n'
+        );
         console.log(
           JSON.stringify(
             acts.filter(act => act.type === 'test' && act.expectationFailures), null, 2
