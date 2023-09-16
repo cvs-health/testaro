@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "webkit",
-      "what": "required browser for montion test"
-    },
-    {
-      "type": "url",
-      "which": "file://validation/tests/targets/motion/good.html",
+      "url": "file://validation/tests/targets/motion/good.html",
       "what": "page without motion"
     },
     {

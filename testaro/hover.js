@@ -18,11 +18,29 @@ const {init, report} = require('../procs/testaro');
 // Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
   // Initialize the locators and result.
-  const all = await init(
-    page, 'body [aria-controls], body [aria-expanded], body [aria-haspopup], body [onmouseenter], body [onmouseover]'
+  const allTrigger = await init(
+    page, '[aria-controls], [aria-expanded], [aria-haspopup], [onmouseenter], [onmouseover]'
   );
-  const miscAll = await init(page, 'body *:visible');
-  all.allLocs.push(... miscAll.allLocs.slice(0, - all.allLocs.length));
+  const allNonTrigger = await init(
+    page,
+    'body *:not([aria-controls]):not([aria-expanded]):not([aria-haspopup]):not([onmouseenter]):not([onmouseover])'
+  );
+  const populationSize
+    = allTrigger.result.data.populationSize + allNonTrigger.result.data.populationSize;
+  const sampleSize = allTrigger.result.data.sampleSize + allNonTrigger.result.data.sampleSize;
+  const all = {
+    allLocs: [allTrigger.allLocs.concat(allNonTrigger.allLocs)],
+    locs: [],
+    result: {
+      data: {
+        populationSize,
+        sampleSize,
+        populationRatio: sampleSize ? populationSize / sampleSize : null
+      },
+      totals: [0, 0, 0, 0],
+      standardInstances: []
+    }
+  };
   // For each locator:
   for (const loc of all.allLocs) {
     // Get how many elements are added or subtracted when the element is hovered over.
