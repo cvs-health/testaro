@@ -1,10 +1,11 @@
 /*
   hover
   This test reports unexpected impacts of hovering. The elements that are subjected to hovering
-  (called “triggers”) include all the elements that have aria-controls, aria-expanded,
-  onmouseenter, or onmouseover' attributes and a sample of all visible elements in the body. If
-  hovering over an element results in an increase or decrease in the total count of visible
-  elements in the body, the rule is considered violated.
+  (called “triggers”) include all the elements that have ARIA attributes associated with control
+  over the visibility of other elements and all the elements that have onmouseenter or
+  onmouseover attributes, as well as a sample of all visible elements in the body. If hovering over
+  an element results in an increase or decrease in the total count of visible elements in the body,
+  the rule is considered violated.
 */
 
 // ########## IMPORTS
@@ -18,7 +19,7 @@ const {init, report} = require('../procs/testaro');
 exports.reporter = async (page, withItems) => {
   // Initialize the locators and result.
   const all = await init(
-    page, 'body [aria-controls], body [aria-expanded], body [onmouseenter], body [onmouseover]'
+    page, 'body [aria-controls], body [aria-expanded], body [aria-haspopup], body [onmouseenter], body [onmouseover]'
   );
   const miscAll = await init(page, 'body *:visible');
   all.allLocs.push(... miscAll.allLocs.slice(0, - all.allLocs.length));

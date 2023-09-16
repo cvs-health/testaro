@@ -139,6 +139,7 @@ exports.reporter = async (page, withItems, trialKeySpecs = []) => {
         });
         // If they were obtained:
         if (extraData) {
+          console.log('Got data');
           // Get locators for its direct menu items.
           const miLocAll = menuLoc.locator(
             ':scope [role=menuitem]:not([role=menu] [role=menuitem]):not([role=menubar] [role=menuitem])'

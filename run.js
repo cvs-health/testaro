@@ -462,7 +462,16 @@ const doActs = async (report, actIndex, page) => {
     const act = acts[actIndex];
     // If it is valid:
     if (isValidAct(act)) {
-      const whichSuffix = act.which ? ` (${act.which})` : '';
+      let actInfo = '';
+      if (act.which) {
+        if (act.type === 'launch' && act.url) {
+          actInfo = `${act.which} to ${act.url}`;
+        }
+        else {
+          actInfo = act.which;
+        }
+      }
+      const whichSuffix = actInfo ? ` (${actInfo})` : '';
       console.log(`>>>> ${act.type}${whichSuffix}`);
       // Increment the count of acts performed.
       actCount++;
