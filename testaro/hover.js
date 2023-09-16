@@ -29,7 +29,7 @@ exports.reporter = async (page, withItems) => {
     = allTrigger.result.data.populationSize + allNonTrigger.result.data.populationSize;
   const sampleSize = allTrigger.result.data.sampleSize + allNonTrigger.result.data.sampleSize;
   const all = {
-    allLocs: [allTrigger.allLocs.concat(allNonTrigger.allLocs)],
+    allLocs: allTrigger.allLocs.concat(allNonTrigger.allLocs),
     locs: [],
     result: {
       data: {
@@ -73,5 +73,12 @@ exports.reporter = async (page, withItems) => {
     'Hovering over the element __param__',
     'Hovering over elements adds elements to or subtracts elements from the page'
   ];
+  // Reload the page.
+  try {
+    await page.reload({timeout: 15000});
+  }
+  catch(error) {
+    console.log('ERROR: page reload timed out');
+  }
   return await report(withItems, all, 'hover', whats, 0);
 };
