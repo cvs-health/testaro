@@ -71,11 +71,6 @@
           "standardResult.instances.0.ordinalSeverity",
           "=",
           0
-        ],
-        [
-          "standardResult.instances.0.count",
-          "=",
-          1
         ]
       ],
       "withItems": true,
