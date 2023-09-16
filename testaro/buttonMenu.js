@@ -139,8 +139,8 @@ exports.reporter = async (page, withItems, trialKeySpecs = []) => {
             return els.map(el => {
               const itsMenu = el.closest('[role=menu], [role=menubar]');
               return itsMenu.id && itsMenu.id === menuID;
-            }, menuID);
-          });
+            });
+          }, menuID);
           const miLocsAll= await miLocAll.all();
           const miLocsDir = miLocsAll.filter((loc, index) => areDirect[index]);
           // If there are at least 2 of them:
