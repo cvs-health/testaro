@@ -63,7 +63,7 @@ exports.isOperable = async loc => {
       opHow.push('pointer cursor');
     }
     // If the element is clickable:
-    if (el.onClick) {
+    if (el.onclick) {
       // Add this to the operabilities.
       opHow.push('click listener');
     }
