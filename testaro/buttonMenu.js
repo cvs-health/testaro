@@ -27,68 +27,58 @@ const getAdjacentIndexWithWrap = (groupSize, startIndex, increment) => {
   return newIndex;
 };
 // Returns whether a key created the expected effective focus.
-const focusSuccess = async (miLocAll, priorIndex, key, isPseudo) => {
+const focusSuccess = async (miLocsDir, priorIndex, key, isPseudo) => {
   // Initialize the result.
   const result = {
     isOK: false,
     newFocIndex: null
   };
-  // Get the index of the effectively focused menu item.
-  const focData = await miLocAll.evaluateAll((elements, isPseudo) => {
-    // Get the currently focused element.
-    let focEl = document.activeElement;
-    // If the menu manages pseudofocus:
-    let miFocIndex;
-    if (isPseudo) {
-      // Get the index of the effectively focused menu item.
-      const pseudoFocID = focEl.getAttribute('aria-activedescendant');
-      if (pseudoFocID) {
-        miFocIndex = elements.map(element => element.id).indexOf(pseudoFocID);
+  // For each of the menu items directly descending from the menu:
+  for (const miLocDir of miLocsDir) {
+    // Get whether it is effectively focused.
+    const hasFocus = await miLocDir.evaluate((el, isPseudo) => {
+      if (isPseudo) {
+        const effectiveID = document.activeElement.getAttribute('aria-activeDescendant');
+        if (effectiveID) {
+          const effectiveEl = document.getElementById(effectiveID);
+          return effectiveEl === el;
+        }
+        else {
+          return false;
+        }
       }
-    }
-    // Otherwise, i.e. if the menu manages true focus:
-    else {
-      // Get the index of the focused menu item.
-      miFocIndex = elements.indexOf(focEl);
-    }
-    // If an effectively focused menu item was identified:
-    if (miFocIndex > -1) {
-      // Return data on the menu items.
-      return {
-        count: elements.length,
-        miFocIndex
-      };
-    }
-    // Otherwise, i.e. if no effectively focused menu item was identified:
-    else {
-      // Return this.
-      return null;
-    }
-  }, isPseudo);
-  // If data on the menu items were obtained:
-  if (focData) {
-    // Get whether the effective focus is as expected and update the result.
-    if (key === 'Home' && focData.miFocIndex === 0) {
-      result.isOK = true;
-      result.newFocIndex = 0;
-    }
-    else if (key === 'End' && focData.miFocIndex === focData.count - 1) {
-      result.isOK = true;
-      result.newFocIndex = focData.count - 1;
-    }
-    else if (['ArrowLeft', 'ArrowUp'].includes(key)) {
-      const expectedIndex = getAdjacentIndexWithWrap(focData.count, priorIndex, -1);
-      if (focData.miFocIndex === expectedIndex) {
+      else {
+        return document.activeElement === el;
+      }
+    }, isPseudo);
+    // If it is:
+    if (hasFocus) {
+      // Get whether the effective focus is as expected and update the result.
+      const miFocIndex = miLocsDir.indexOf(miLocDir);
+      const miCount = miLocsDir.length;
+      if (key === 'Home' && miFocIndex === 0) {
         result.isOK = true;
-        result.newFocIndex = expectedIndex;
+        result.newFocIndex = 0;
       }
-    }
-    else if (['ArrowRight', 'ArrowDown'].includes(key)) {
-      const expectedIndex = getAdjacentIndexWithWrap(focData.count, priorIndex, 1);
-      if (focData.miFocIndex === expectedIndex) {
+      else if (key === 'End' && miFocIndex === miCount - 1) {
         result.isOK = true;
-        result.newFocIndex = expectedIndex;
+        result.newFocIndex = miCount - 1;
       }
+      else if (['ArrowLeft', 'ArrowUp'].includes(key)) {
+        const expectedIndex = getAdjacentIndexWithWrap(miCount, priorIndex, -1);
+        if (miFocIndex === expectedIndex) {
+          result.isOK = true;
+          result.newFocIndex = expectedIndex;
+        }
+      }
+      else if (['ArrowRight', 'ArrowDown'].includes(key)) {
+        const expectedIndex = getAdjacentIndexWithWrap(miCount, priorIndex, 1);
+        if (focData.miFocIndex === expectedIndex) {
+          result.isOK = true;
+          result.newFocIndex = expectedIndex;
+        }
+      }
+      break;
     }
   }
   // Return the result.
@@ -106,6 +96,7 @@ exports.reporter = async (page, withItems, trialKeySpecs = []) => {
   );
   // For each menu button:
   const mbLocsAll = await mbLocAll.all();
+  console.log(`Count of menu buttons: ${mbLocsAll.length}`);
   for (const mbLoc of mbLocsAll) {
     // Get a locator for its menu.
     const menuID = await mbLoc.getAttribute('aria-controls');
@@ -139,14 +130,21 @@ exports.reporter = async (page, withItems, trialKeySpecs = []) => {
         });
         // If they were obtained:
         if (extraData) {
-          console.log('Got data');
-          // Get locators for its direct menu items.
+          // Get locators for its descendant non-menu menu items.
           const miLocAll = menuLoc.locator(
-            ':scope [role=menuitem]:not([role=menu] [role=menuitem]):not([role=menubar] [role=menuitem])'
+            '[role=menuitem]:not([role=menu], [role=menuitem]):not([role=menubar])'
           );
-          const miLocsAll = await miLocAll.all();
+          // Get which of them are direct descendants.
+          const areDirect = miLocAll.evaluateAll(els => {
+            return els.map(el => {
+              const itsMenu = el.closest('[role=menu], [role=menubar]');
+              return itsMenu.id && itsMenu.id === menuID;
+            }, menuID);
+          });
+          const miLocsAll= await miLocAll.all();
+          const miLocsDir = miLocsAll.filter((loc, index) => areDirect[index]);
           // If there are at least 2 of them:
-          if (miLocsAll.length > 1) {
+          if (miLocsDir.length > 1) {
             // Ensure that the menu is collapsed.
             await menuLoc.evaluate(element => {
               element.setAttribute('aria-expanded', false);
@@ -194,7 +192,7 @@ exports.reporter = async (page, withItems, trialKeySpecs = []) => {
               // Press it.
               await page.keyboard.press(key);
               // Get whether the expected focus occurred.
-              const focData = await focusSuccess(miLocAll, focIndex, key, extraData.isPseudo);
+              const focData = await focusSuccess(miLocsDir, focIndex, key, extraData.isPseudo);
               // If so:
               if (focData.isOK) {
                 // Update the index of the effective focus.
