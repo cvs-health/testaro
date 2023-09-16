@@ -39,7 +39,7 @@
     },
     {
       "type": "url",
-      "which": "file://validation/tests/targets/menuNav/bad.html",
+      "which": "file://validation/tests/targets/buttonMenu/bad.html",
       "what": "page with deviant menu navigation"
     },
     {
