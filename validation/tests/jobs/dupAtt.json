@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/dupAtt/good.html",
+      "url": "file://validation/tests/targets/dupAtt/good.html",
       "what": "page without duplicate attributes"
     },
     {
@@ -34,7 +34,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/dupAtt/bad.html",
+      "which": "file://validation/tests/targets/dupAtt/bad.html",
       "what": "page with duplicate attributes"
     },
     {

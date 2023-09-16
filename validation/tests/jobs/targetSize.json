@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/targetSize/index.html",
+      "url": "file://validation/tests/targets/targetSize/index.html",
       "what": "page with variously sized interaction targets"
     },
     {

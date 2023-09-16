@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/linkTo/index.html",
+      "url": "file://validation/tests/targets/linkTo/index.html",
       "what": "page with links with and without destinations"
     },
     {

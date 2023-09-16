@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/autocomplete/good.html",
+      "url": "file://validation/tests/targets/autocomplete/good.html",
       "what": "page with correct autocomplete attributes"
     },
     {
@@ -56,7 +56,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/autocomplete/bad.html",
+      "which": "file://validation/tests/targets/autocomplete/bad.html",
       "what": "page with incorrect autocomplete attributes"
     },
     {

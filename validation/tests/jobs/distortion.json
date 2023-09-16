@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/distortion/index.html",
+      "url": "file://validation/tests/targets/distortion/index.html",
       "what": "page with distorted text"
     },
     {

@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/titledEl/index.html",
+      "url": "file://validation/tests/targets/titledEl/index.html",
       "what": "page with valid and invalid title attributes"
     },
     {

@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/pseudoP/index.html",
+      "url": "file://validation/tests/targets/pseudoP/index.html",
       "what": "page with a pseudo-paragraph"
     },
     {

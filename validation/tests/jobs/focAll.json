@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/focAll/good.html",
+      "url": "file://validation/tests/targets/focAll/good.html",
       "what": "fully Tab-focusable page"
     },
     {
@@ -34,7 +34,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/focAll/less.html",
+      "which": "file://validation/tests/targets/focAll/less.html",
       "what": "partly Tab-focusable page"
     },
     {
@@ -81,7 +81,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/focAll/more.html",
+      "which": "file://validation/tests/targets/focAll/more.html",
       "what": "page with added Tab-focusability"
     },
     {

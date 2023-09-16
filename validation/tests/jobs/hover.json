@@ -11,7 +11,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/hover/good.html",
+      "which": "file://validation/tests/targets/hover/good.html",
       "what": "page with standard hover behavior"
     },
     {
@@ -46,7 +46,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/hover/bad.html",
+      "which": "file://validation/tests/targets/hover/bad.html",
       "what": "page with deviant hover behavior"
     },
     {

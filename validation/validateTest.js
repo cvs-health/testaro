@@ -14,8 +14,7 @@ const {doJob} = require('../run');
 exports.validateTest = async testID => {
   const jobFileNames = await fs.readdir(`${__dirname}/tests/jobs`);
   for (const jobFileName of jobFileNames.filter(fileName => fileName === `${testID}.json`)) {
-    const rawJobJSON = await fs.readFile(`${__dirname}/tests/jobs/${jobFileName}`, 'utf8');
-    const jobJSON = rawJobJSON.replace(/__targets__/g, 'file://validation/tests/targets');
+    const jobJSON = await fs.readFile(`${__dirname}/tests/jobs/${jobFileName}`, 'utf8');
     const report = JSON.parse(jobJSON);
     await doJob(report);
     const {acts, jobData} = report;

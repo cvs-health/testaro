@@ -39,8 +39,10 @@ let browser;
 const deSlash = string => string.endsWith('/') ? string.slice(0, -1) : string;
 // Visits a URL and returns the response of the server.
 const goTo = async (report, page, url, timeout, waitUntil) => {
+  // If the URL is a file path:
   if (url.startsWith('file://')) {
-    url = url.replace('file://', `file://${__dirname}/../`);
+    // Make it absolute.
+    url = url.replace('file://', `file://${__dirname.replace(/procs$/, '')}`);
   }
   // Visit the URL.
   const startTime = Date.now();

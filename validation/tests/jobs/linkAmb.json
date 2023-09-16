@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/linkAmb/index.html",
+      "url": "file://validation/tests/targets/linkAmb/index.html",
       "what": "page with unambiguous and ambiguous links"
     },
     {

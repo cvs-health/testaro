@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/linkTitle/index.html",
+      "url": "file://validation/tests/targets/linkTitle/index.html",
       "what": "page with normal and rodundantly titled links"
     },
     {

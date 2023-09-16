@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/allHidden/good.html",
+      "url": "file://validation/tests/targets/allHidden/good.html",
       "what": "page with nothing hidden"
     },
     {
@@ -49,7 +49,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/allHidden/noBody.html",
+      "which": "file://validation/tests/targets/allHidden/noBody.html",
       "what": "page with no body"
     },
     {
@@ -86,7 +86,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/allHidden/noMain.html",
+      "which": "file://validation/tests/targets/allHidden/noMain.html",
       "what": "page with no main landmark"
     },
     {
@@ -124,7 +124,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/allHidden/hiddenMain.html",
+      "which": "file://validation/tests/targets/allHidden/hiddenMain.html",
       "what": "page with a hidden main landmark"
     },
     {
@@ -167,7 +167,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/allHidden/visHiddenMain.html",
+      "which": "file://validation/tests/targets/allHidden/visHiddenMain.html",
       "what": "page with a visually hidden main landmark"
     },
     {
@@ -205,7 +205,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/allHidden/ariaHiddenBody.html",
+      "which": "file://validation/tests/targets/allHidden/ariaHiddenBody.html",
       "what": "page with an ARIA-hidden body"
     },
     {
@@ -238,7 +238,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/allHidden/mixedHidden.html",
+      "which": "file://validation/tests/targets/allHidden/mixedHidden.html",
       "what": "page with mixed hidden states"
     },
     {
@@ -271,7 +271,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/allHidden/noneDoc.html",
+      "which": "file://validation/tests/targets/allHidden/noneDoc.html",
       "what": "page with none as its display property"
     },
     {

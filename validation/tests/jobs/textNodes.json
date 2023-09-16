@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/textNodes/index.html",
+      "url": "file://validation/tests/targets/textNodes/index.html",
       "what": "page with a shadow root"
     },
     {

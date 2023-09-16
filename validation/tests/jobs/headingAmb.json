@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/headingAmb/index.html",
+      "url": "file://validation/tests/targets/headingAmb/index.html",
       "what": "page with and without heading ambiguity"
     },
     {

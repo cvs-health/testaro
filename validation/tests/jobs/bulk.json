@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/bulk/good.html",
+      "url": "file://validation/tests/targets/bulk/good.html",
       "what": "small page"
     },
     {
@@ -34,7 +34,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/bulk/bad.html",
+      "which": "file://validation/tests/targets/bulk/bad.html",
       "what": "large page"
     },
     {

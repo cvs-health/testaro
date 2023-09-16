@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/linkExt/index.html",
+      "url": "file://validation/tests/targets/linkExt/index.html",
       "what": "page with normal and forcibly external links"
     },
     {

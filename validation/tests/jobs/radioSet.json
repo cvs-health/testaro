@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/radioSet/good.html",
+      "url": "file://validation/tests/targets/radioSet/good.html",
       "what": "page with standard radio-button grouping"
     },
     {
@@ -35,7 +35,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/radioSet/bad.html",
+      "which": "file://validation/tests/targets/radioSet/bad.html",
       "what": "page with deviant radio-button grouping"
     },
     {

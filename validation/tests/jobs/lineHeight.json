@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/lineheight/index.html",
+      "url": "file://validation/tests/targets/lineheight/index.html",
       "what": "page with various line heights"
     },
     {

@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/focInd/good.html",
+      "url": "file://validation/tests/targets/focInd/good.html",
       "what": "page with outline focus indication"
     },
     {
@@ -39,7 +39,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/focInd/bad.html",
+      "which": "file://validation/tests/targets/focInd/bad.html",
       "what": "page with mixed focus indication"
     },
     {

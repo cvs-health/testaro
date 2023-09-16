@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/hr/index.html",
+      "url": "file://validation/tests/targets/hr/index.html",
       "what": "page with an hr element"
     },
     {

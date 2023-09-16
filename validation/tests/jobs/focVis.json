@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/focVis/index.html",
+      "url": "file://validation/tests/targets/focVis/index.html",
       "what": "page with links inside and outside the viewport"
     },
     {

@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/focOp/good.html",
+      "url": "file://validation/tests/targets/focOp/good.html",
       "what": "page with standard focusability and operability"
     },
     {
@@ -39,7 +39,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/focOp/bad.html",
+      "which": "file://validation/tests/targets/focOp/bad.html",
       "what": "page with deviant focusability and operability"
     },
     {

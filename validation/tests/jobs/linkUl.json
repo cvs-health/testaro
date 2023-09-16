@@ -7,7 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "url": "__targets__/linkUl/na.html",
+      "url": "file://validation/tests/targets/linkUl/na.html",
       "what": "page without inline links"
     },
     {
@@ -34,7 +34,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/linkUl/good.html",
+      "which": "file://validation/tests/targets/linkUl/good.html",
       "what": "page with underlined inline links"
     },
     {
@@ -66,7 +66,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/linkUl/bad.html",
+      "which": "file://validation/tests/targets/linkUl/bad.html",
       "what": "page with nonunderlined inline links"
     },
     {

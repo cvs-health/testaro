@@ -11,7 +11,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/hovInd/index.html",
+      "which": "file://validation/tests/targets/hovInd/index.html",
       "what": "page with varied hover indicators"
     },
     {
