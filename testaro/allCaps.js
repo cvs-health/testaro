@@ -15,7 +15,7 @@ const {init, report} = require('../procs/testaro');
 // Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
   // Initialize the locators and result.
-  const all = await init(page, 'body *:not(style):not(script):not(svg)');
+  const all = await init(page, 'body *:not(style, script, svg)');
   // For each locator:
   for (const loc of all.allLocs) {
     // Get whether its element violates the rule.

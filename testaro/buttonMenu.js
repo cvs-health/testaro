@@ -130,9 +130,7 @@ exports.reporter = async (page, withItems, trialKeySpecs = []) => {
         // If they were obtained:
         if (extraData) {
           // Get locators for its descendant non-menu menu items.
-          const miLocAll = menuLoc.locator(
-            '[role=menuitem]:not([role=menu]), [role=menuitem]:not([role=menubar])'
-          );
+          const miLocAll = menuLoc.locator('[role=menuitem]:not([role=menu], [role=menubar])');
           // Get which of them are direct descendants.
           const areDirect = await miLocAll.evaluateAll((els, menuID) => {
             return els.map(el => {

@@ -23,7 +23,7 @@ exports.reporter = async (page, withItems) => {
   );
   const allNonTrigger = await init(
     page,
-    'body *:not([aria-controls]):not([aria-expanded]):not([aria-haspopup]):not([onmouseenter]):not([onmouseover])'
+    'body *:not([aria-controls], [aria-expanded], [aria-haspopup], [onmouseenter], [onmouseover])'
   );
   const populationSize
     = allTrigger.result.data.populationSize + allNonTrigger.result.data.populationSize;

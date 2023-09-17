@@ -1,0 +1,10 @@
+{
+  "ruleID": "titledEl",
+  "selector": "[title]:not(input, button, textarea, select, iframe):visible",
+  "complaints": {
+    "instance": "Ineligible element has a title attribute",
+    "summary": "Ineligible elements have title attributes"
+  },
+  "ordinalSeverity": 2,
+  "summaryTagName": ""
+}
