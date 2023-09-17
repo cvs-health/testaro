@@ -9,10 +9,10 @@
   <body>
     <main>
       <h1>Page with deviant focusability and operability</h1>
-      <p>This paragraph contains a link to <a href="https://en.wikipedia.org">information</a>, a <button type="button" tabindex="-1">button</button>, and a <label>text input <input type="text"></label>. The button is not focusable.</p>
-      <p>This paragraph contains a <span style="font-weight: bold" tabindex="0">focusable part</span> that is not operable.</p>
-      <p>If you click <span id="clickable" style="color: red" onclick="document.getElementById('clickable').style.color = 'black'">this text</span>, it will turn black, but it is not focusable.</p>
-      <p>This <span style="cursor: pointer">word</span> is not focusable, but its cursor makes you think it is operable.</p>
+      <p>This paragraph contains a link to <a href="https://en.wikipedia.org">information</a>, a <button type="button" tabindex="-1">button</button>, and a <label>text input <input type="text"></label>. Defect 1: The button is not focusable.</p>
+      <p>This paragraph contains a <span style="font-weight: bold" tabindex="0">focusable part</span> that is not operable. This test does not cover that defect.</p>
+      <p>Defect 2: If you click <span id="clickable" style="color: red" onclick="document.getElementById('clickable').style.color = 'black'">this text</span>, it will turn black, but it is not focusable.</p>
+      <p>Defect 3: This <span style="cursor: pointer">word</span> is not focusable, but its cursor makes you think it is operable.</p>
     </main>
   </body>
 </html>

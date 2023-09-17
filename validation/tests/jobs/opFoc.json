@@ -1,0 +1,172 @@
+{
+  "id": "opFoc",
+  "what": "validation of opFoc test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "url": "file://validation/tests/targets/opFoc/good.html",
+      "what": "page with standard focusability and operability"
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": true,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.2",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.3",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          0
+        ]
+      ],
+      "rules": [
+        "y",
+        "focOp"
+      ]
+    },
+    {
+      "type": "url",
+      "which": "file://validation/tests/targets/focOp/bad.html",
+      "what": "page with deviant focusability and operability"
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": true,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.2",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.3",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "opFoc"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "Element is operable (tag name BUTTON)"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "BUTTON"
+        ],
+        [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.0.location.spec.width",
+          ">",
+          0
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "=",
+          "button"
+        ],
+        [
+          "standardResult.instances.1.tagName",
+          "=",
+          "SPAN"
+        ],
+        [
+          "standardResult.instances.2.what",
+          "i",
+          "Element is operable (pointer cursor)"
+        ]
+      ],
+      "rules": [
+        "y",
+        "focOp"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.2",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.3",
+          "=",
+          3
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "opFoc"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "Elements are operable but"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          3
+        ]
+      ],
+      "rules": [
+        "y",
+        "focOp"
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2013-05-28T12:00:00",
+  "timeStamp": "00000"
+}
