@@ -40,7 +40,7 @@ exports.reporter = async (page, withItems) => {
         // Return misuse.
         return true;
       }
-      // Otherwise, if it contains a table-compatible el:
+      // Otherwise, if it contains a table-compatible element:
       else if (
         el.caption
         || ['grid', 'treegrid'].includes(role)

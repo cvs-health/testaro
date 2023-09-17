@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Page with partly nonstandard labeling</title>
+    <meta name="description" content="tester">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <main>
+      <h1>Page with partly nonstandard labeling</h1>
+      <h2>Inputs without placeholders</h2>
+      <h3>Input with explicit label</h3>
+      <label for="input1">Enter the name of a fruit</label>
+      <p><input size="30" maxlength="30" name="fruit"></p>
+      <h3>Input with implicit label</h3>
+      <p><label>
+        Enter the name of a tool
+        <input size="30" maxlength="30" name="tool">
+      </label></p>
+      <h3>Input with reference label</h3>
+      <p id="placeLabel">Enter the name of a place</p>
+      <p><input size="30" maxlength="30" name="place" aria-labelledby="placeLabel"></p>
+      <h3>Input with attribute label</h3>
+      <p><input size="30" maxlength="30" name="person" aria-label="Enter the name of a person"></p>
+      <h3>Input with a title and no label</h3>
+      <p><input size="30" maxlength="30" name="river1" title="Enter the name of a river"></p>
+      <h3>Input with no label</h3>
+      <p>Enter the name of a company</p>
+      <p><input size="30" maxlength="30" name="company1"></p>
+      <h2>Inputs with placeholders</h2>
+      <h3>Input with explicit label</h3>
+      <label for="input1">Enter the name of a fruit</label>
+      <p><input id="input1" size="30" maxlength="30" name="fruit" placeholder="fruit"></p>
+      <h3>Input with implicit label</h3>
+      <p><label>
+        Enter the name of a tool
+        <input size="30" maxlength="30" name="tool" placeholder="tool">
+      </label></p>
+      <h3>Input with reference label</h3>
+      <p id="placeLabel">Enter the name of a place</p>
+      <p><input size="30" maxlength="30" name="place" aria-labelledby="placeLabel" placeholder="place"></p>
+      <h3>Input with attribute label</h3>
+      <p><input size="30" maxlength="30" name="person" aria-label="Enter the name of a person" placeholder="person"></p>
+      <h3>Input with a title and no label</h3>
+      <p><input size="30" maxlength="30" name="river2" title="Enter the name of a river" placeholder="river"></p>
+      <h3>Input with no label</h3>
+      <p>Enter the name of a company</p>
+      <p><input size="30" maxlength="30" name="company2" placeholder="company"></p>
+      <p>The last two inputs violate the phOnly rule.</p>
+    </main>
+  </body>
+</html>

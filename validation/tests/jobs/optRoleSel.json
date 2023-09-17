@@ -1,51 +1,50 @@
 {
-  "id": "legendLoc",
-  "what": "validation of legendLoc test",
+  "id": "optRoleSel",
+  "what": "validation of optRoleSel test",
   "strict": true,
   "timeLimit": 20,
   "acts": [
     {
       "type": "launch",
       "which": "chromium",
-      "url": "file://validation/tests/targets/legendLoc/index.html",
-      "what": "page with standard and nonstandard legend locations"
+      "url": "file://validation/tests/targets/optRoleSel/index.html",
+      "what": "page with and without aria-select attributes on option-role elements"
     },
     {
       "type": "test",
       "which": "testaro",
-      "what": "legendLoc",
       "withItems": true,
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.3",
+          "standardResult.totals.1",
           "=",
-          2
+          1
         ],
         [
-          "standardResult.totals.1",
+          "standardResult.totals.0",
           "=",
           0
         ],
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "legendLoc"
+          "optRoleSel"
         ],
         [
           "standardResult.instances.0.what",
           "=",
-          "Element is not the first child of a fieldset element"
+          "Element has an explicit option role but no aria-selected attribute"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          3
+          1
         ],
         [
           "standardResult.instances.0.tagName",
           "=",
-          "LEGEND"
+          "P"
         ],
         [
           "standardResult.instances.0.location.doc",
@@ -65,22 +64,12 @@
         [
           "standardResult.instances.0.excerpt",
           "=",
-          "Choose a food"
-        ],
-        [
-          "standardResult.instances.1.ruleID",
-          "=",
-          "legendLoc"
-        ],
-        [
-          "standardResult.instances.1.excerpt",
-          "=",
-          "Choose a gas"
+          "Vegan"
         ]
       ],
       "rules": [
         "y",
-        "legendLoc"
+        "optRoleSel"
       ]
     },
     {
@@ -90,12 +79,12 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.3",
+          "standardResult.totals.1",
           "=",
-          2
+          1
         ],
         [
-          "standardResult.totals.1",
+          "standardResult.totals.2",
           "=",
           0
         ],
@@ -107,32 +96,27 @@
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "legendLoc"
+          "optRoleSel"
         ],
         [
           "standardResult.instances.0.what",
           "=",
-          "legend elements are not the first children of fieldset elements"
+          "Elements with explicit option roles have no aria-selected attributes"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          3
+          1
         ],
         [
           "standardResult.instances.0.count",
           "=",
-          2
-        ],
-        [
-          "standardResult.instances.0.tagName",
-          "=",
-          "LEGEND"
+          1
         ]
       ],
       "rules": [
         "y",
-        "legendLoc"
+        "optRoleSel"
       ]
     }
   ],

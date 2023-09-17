@@ -1,51 +1,50 @@
 {
-  "id": "legendLoc",
-  "what": "validation of legendLoc test",
+  "id": "phOnly",
+  "what": "validation of phOnly test",
   "strict": true,
   "timeLimit": 20,
   "acts": [
     {
       "type": "launch",
       "which": "chromium",
-      "url": "file://validation/tests/targets/legendLoc/index.html",
-      "what": "page with standard and nonstandard legend locations"
+      "url": "file://validation/tests/targets/phOnly/index.html",
+      "what": "page with inputs with and without labels and placeholders"
     },
     {
       "type": "test",
       "which": "testaro",
-      "what": "legendLoc",
       "withItems": true,
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.3",
+          "standardResult.totals.2",
           "=",
           2
         ],
         [
-          "standardResult.totals.1",
+          "standardResult.totals.0",
           "=",
           0
         ],
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "legendLoc"
+          "phOnly"
         ],
         [
           "standardResult.instances.0.what",
           "=",
-          "Element is not the first child of a fieldset element"
+          "Element has a placeholder but no accessible name"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          3
+          2
         ],
         [
           "standardResult.instances.0.tagName",
           "=",
-          "LEGEND"
+          "INPUT"
         ],
         [
           "standardResult.instances.0.location.doc",
@@ -58,29 +57,29 @@
           "box"
         ],
         [
-          "standardResult.instances.0.location.spec.width",
+          "standardResult.instances.0.location.spec.y",
           ">",
           0
         ],
         [
           "standardResult.instances.0.excerpt",
-          "=",
-          "Choose a food"
+          "i",
+          "river2"
         ],
         [
-          "standardResult.instances.1.ruleID",
+          "standardResult.instances.1.tagName",
           "=",
-          "legendLoc"
+          "INPUT"
         ],
         [
           "standardResult.instances.1.excerpt",
-          "=",
-          "Choose a gas"
+          "i",
+          "company2"
         ]
       ],
       "rules": [
         "y",
-        "legendLoc"
+        "phOnly"
       ]
     },
     {
@@ -90,7 +89,7 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.3",
+          "standardResult.totals.2",
           "=",
           2
         ],
@@ -107,17 +106,17 @@
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "legendLoc"
+          "phOnly"
         ],
         [
           "standardResult.instances.0.what",
           "=",
-          "legend elements are not the first children of fieldset elements"
+          "input elements have placeholders but no accessible names"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          3
+          2
         ],
         [
           "standardResult.instances.0.count",
@@ -127,12 +126,12 @@
         [
           "standardResult.instances.0.tagName",
           "=",
-          "LEGEND"
+          "INPUT"
         ]
       ],
       "rules": [
         "y",
-        "legendLoc"
+        "phOnly"
       ]
     }
   ],
