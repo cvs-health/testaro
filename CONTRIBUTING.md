@@ -1,34 +1,58 @@
-# testaro
+# Contributing to Testaro
 
-Ensemble testing for web accessibility
+## Types of contributions
 
-## Contributing
+Testaro can benefit from contributions of various types, such as:
+- Adding other tools to the tools that it integrates.
+- Improving its execution speed.
+- Improving its own rule implementations.
+- Implementing new rules.
 
-Contributions to Testaro are welcome.
+## Adding tools
 
-### Testaro rule specification
+To come.
 
-Testaro integrates 8 accessibility testing tools, and one of them is Testaro itself. The Testaro tool has defined 43 rules, and the other 7 tools have defined about 600 rules in the aggregate. Contributing a new Testaro rule can add value if the new rule will not merely duplicate one of the existing rules. The issue classification (`tic…`) files in the `procs` directory of the [Testilo](https://www.npmjs.com/package/testilo) package can help in this determination.
+## Improving execution speed
 
-If you determine that a new Testaro rule would be valuable, the first step is to specify it. This specification has the following parts:
-1. Adding an entry to the `evalRules` or `etcRules` object in the `tests/testaro.js` file.
-1. Adding a validation target directory to the `validation/tests/targets` directory.
-1. Adding at least one validation target to the target directory.
-1. Adding a validation job to the `validation/tests/jobs` directory.
+To come.
 
-### Testaro rule validation
+## Improving rule implementations.
 
-All Testaro rules have validators, as mentioned above.
+To come.
 
-The first step in creating a validator is to create at least one HTML file that will be tested against the new rule. A single `index.html` file may suffice. It should contain cases that will pass the test and cases that will fail the test. If appropriate, you can create multiple targets, such as `good.html` and `bad.html`.
+## Implementing new rules
 
-The second step is to create a validation job. It launches a browser, navigates to a validation target, and conducts the test. It includes expectations about the results. Typically, the expectations relate to the standard instances included in the results. The `Tests/Expectations` section of the `README.md` file describes the syntax of expectations.
+Testaro has about 50 of its own rules, in addition to the approximately 600 rules of the other tools that it integrates. According to the issue classifications in the [Testilo](https://www.npmjs.com/package/testilo) package, these 650 or so rules can be distilled into about 260 accessibility _issues_, because some rules of some tools duplicate (or approximately duplicate) some rules of other tools.
 
-When a rule `xyz` has been defined and the `npm test xyz` statement is executed, the validation job will be run.
+However, many other significant accessibility issues exist that are not covered by any of the existing rules. Testaro welcomes contributions of new rules for such issues.
 
-### Rule creation
+### Step 1
 
-Once you have specified a new rule, you, or somebody else, can develop the rule in accord with your specification. Developing the rule consists of:
+The first step in contributing a new rule to Testaro is to satisfy yourself that it will not duplicate existing rules. The `procs/score/tic35.js` file in the Testilo package should be helpful here.
+
+### Step 2
+
+The second step is to write a validator for the new rule. A validator is software that defines the correct behavior of the implementation of the rule.
+
+Every Testaro rule has a correspoding validator. A validator has two parts:
+- A job file, in the `validation/tests/jobs` directory.
+- A target directory, within the `validation/tests/targets` directory. The target directory contains one or more HTML files that will be tested by the job.
+
+If you inspect some of the jobs and targets in the `validation/tests` directory, you can see that the jobs perform tests on the target documents and also define the expected behavior.
+
+### Step 3
+
+The third step is to add an entry to the `evalRules` or `etcRules` object in the `tests/testaro.js` file.
+
+### Step 4
+
+The fourth step is to implement the rule. To optimize quality, it may be wise for one person to perform steps 1, 2, and 3, and then for a second person to perform step 4.
+
+The rule is implemented in a JavaScript or JSON file that is saved in the `testaro` directory.
+
+
+
+develop the rule in accord with your specification. Developing the rule consists of:
 1. Creating a rule-definition file.
 1. Adding the file to the `testaro` directory.
 1. Validating it.
