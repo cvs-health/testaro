@@ -34,12 +34,12 @@
       ],
       "rules": [
         "y",
-        "focOp"
+        "opFoc"
       ]
     },
     {
       "type": "url",
-      "which": "file://validation/tests/targets/focOp/bad.html",
+      "which": "file://validation/tests/targets/opFoc/bad.html",
       "what": "page with deviant focusability and operability"
     },
     {
@@ -111,7 +111,7 @@
       ],
       "rules": [
         "y",
-        "focOp"
+        "opFoc"
       ]
     },
     {
@@ -158,7 +158,7 @@
       ],
       "rules": [
         "y",
-        "focOp"
+        "opFoc"
       ]
     }
   ],
