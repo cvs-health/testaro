@@ -39,6 +39,7 @@ const evalRules = {
   lineHeight: 'text with a line height less than 1.5 times its font size',
   linkExt: 'links that automatically open new windows',
   linkAmb: 'links with identical texts but different destinations',
+  linkOldAtt: 'links with deprecated attributes',
   linkTitle: 'links with title attributes repeating text content',
   linkTo: 'links without destinations',
   linkUl: 'missing underlines on inline links',

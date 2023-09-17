@@ -1,14 +1,14 @@
 {
-  "id": "linkTo",
-  "what": "validation of linkTo test",
+  "id": "linkOldAtt",
+  "what": "validation of linkOldAtt test",
   "strict": true,
   "timeLimit": 20,
   "acts": [
     {
       "type": "launch",
       "which": "chromium",
-      "url": "file://validation/tests/targets/linkTo/index.html",
-      "what": "page with links with and without destinations"
+      "url": "file://validation/tests/targets/linkOldAtt/index.html",
+      "what": "page with links with and without deprecated attributes"
     },
     {
       "type": "test",
@@ -17,29 +17,29 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.2",
+          "standardResult.totals.1",
           "=",
-          1
+          2
         ],
         [
-          "standardResult.totals.1",
+          "standardResult.totals.2",
           "=",
           0
         ],
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "linkTo"
+          "linkOldAtt"
         ],
         [
           "standardResult.instances.0.what",
           "i",
-          "Element has no"
+          "Element has a deprecated attribute"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          2
+          1
         ],
         [
           "standardResult.instances.0.tagName",
@@ -57,19 +57,19 @@
           "box"
         ],
         [
-          "standardResult.instances.0.location.spec.x",
+          "standardResult.instances.0.location.spec.y",
           ">",
           0
         ],
         [
           "standardResult.instances.0.excerpt",
-          "i",
-          "nothing"
+          "=",
+          "French information"
         ]
       ],
       "rules": [
         "y",
-        "linkTo"
+        "linkOldAtt"
       ]
     },
     {
@@ -79,9 +79,9 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.2",
+          "standardResult.totals.1",
           "=",
-          1
+          2
         ],
         [
           "standardResult.totals.3",
@@ -91,12 +91,12 @@
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "linkTo"
+          "linkOldAtt"
         ],
         [
           "standardResult.instances.0.what",
           "i",
-          "Links are missing"
+          "Links have deprecated attributes"
         ],
         [
           "standardResult.instances.0.tagName",
@@ -106,17 +106,17 @@
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          2
+          1
         ],
         [
           "standardResult.instances.0.count",
           "=",
-          1
+          2
         ]
       ],
       "rules": [
         "y",
-        "linkTo"
+        "linkOldAtt"
       ]
     }
   ],
