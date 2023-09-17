@@ -15,6 +15,6 @@ exports.reporter = async (page, withItems) => {
   const all = await init(page, 'a:not([href]):visible');
   all.locs = all.allLocs;
   // Populate and return the result.
-  const whats = ['Link has no href attribute', 'inks are missing href attributes'];
-  return await report(withItems, all, 'linkTo', whats, 2);
+  const whats = ['Link has no href attribute', 'Links are missing href attributes'];
+  return await report(withItems, all, 'linkTo', whats, 2, 'A');
 };
