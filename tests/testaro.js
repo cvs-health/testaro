@@ -3,6 +3,11 @@
   This test implements the Testaro evaluative rules.
 */
 
+// ######## IMPORTS
+
+// Module to perform common operations.
+const {init, report} = require('../procs/testaro');
+
 // ######## CONSTANTS
 
 const evalRules = {
@@ -53,8 +58,26 @@ const etcRules = {
   title: 'page title',
 };
 
-// FUNCTIONS
+// ######## FUNCTIONS
 
+// Conducts a JSON-defined test.
+const jsonTest = async (ruleID, ruleArgs) => {
+  const [page, withItems] = ruleArgs;
+  // Get the rule definition.
+  const ruleJSON = await fs.readFile(`../testaro/${ruleID}.json`, 'utf8');
+  const ruleObj = JSON.parse(ruleJSON);
+  // Initialize the locators and result.
+  const all = await init(page, ruleObj.selector);
+  all.locs = all.allLocs;
+  // Populate and return the result.
+  const whats = [
+    ruleObj.complaints.instance,
+    ruleObj.complaints.summary
+  ];
+  return await report(
+    withItems, all, ruleObj.ruleID, whats, ruleObj.ordinalSeverity, ruleObj.tagName
+  );
+};
 // Conducts and reports Testaro tests.
 exports.reporter = async (page, options) => {
   const {withItems, stopOnFail, args} = options;
@@ -80,42 +103,55 @@ exports.reporter = async (page, options) => {
     for (const rule of calledRules) {
       // Initialize an argument array.
       const ruleArgs = [page, withItems];
-      // If the rule has extra arguments:
-      if (argRules && argRules.includes(rule)) {
-        // Add them to the argument array.
-        ruleArgs.push(... args[rule]);
-      }
-      // Test the page.
-      const what = evalRules[rule] || etcRules[rule];
-      if (! data.rules[rule]) {
-        data.rules[rule] = {};
-      }
-      data.rules[rule].what = what;
-      console.log(`>>>>>> ${rule} (${what})`);
-      try {
-        const startTime = Date.now();
-        const ruleReport = await require(`../testaro/${rule}`).reporter(... ruleArgs);
-        // Add data from the test to the result.
-        const endTime = Date.now();
-        testTimes.push([rule, Math.round((endTime - startTime) / 1000)]);
-        Object.keys(ruleReport).forEach(key => {
-          data.rules[rule][key] = ruleReport[key];
-        });
-        data.rules[rule].totals = data.rules[rule].totals.map(total => Math.round(total));
-        if (ruleReport.prevented) {
+      // If the rule is defined with JavaScript or JSON but not both:
+      const ruleFileNames = await fs.readdir('../testaro');
+      const isJS = ruleFileNames.includes(`${rule}.js`);
+      const isJSON = ruleFileNames.includes(`${rule}.json`);
+      if ((isJS || isJSON) && ! (isJS && isJSON)) {
+        // If with JavaScript and it has extra arguments:
+        if (isJS && argRules && argRules.includes(rule)) {
+          // Add them to the argument array.
+          ruleArgs.push(... args[rule]);
+        }
+        // Test the page.
+        const what = evalRules[rule] || etcRules[rule];
+        if (! data.rules[rule]) {
+          data.rules[rule] = {};
+        }
+        data.rules[rule].what = what;
+        console.log(`>>>>>> ${rule} (${what})`);
+        try {
+          const startTime = Date.now();
+          const ruleReport = await isJS
+            ? require(`../testaro/${rule}`).reporter(... ruleArgs)
+            : jsonTest(rule, ruleArgs);
+          // Add data from the test to the result.
+          const endTime = Date.now();
+          testTimes.push([rule, Math.round((endTime - startTime) / 1000)]);
+          Object.keys(ruleReport).forEach(key => {
+            data.rules[rule][key] = ruleReport[key];
+          });
+          data.rules[rule].totals = data.rules[rule].totals.map(total => Math.round(total));
+          if (ruleReport.prevented) {
+            data.preventions.push(rule);
+          }
+          // If testing is to stop after a failure and the page failed the test:
+          if (stopOnFail && ruleReport.totals.some(total => total)) {
+            // Stop testing.
+            break;
+          }
+        }
+        // If an error is thrown by the test:
+        catch(error) {
+          // Report this.
           data.preventions.push(rule);
-        }
-        // If testing is to stop after a failure and the page failed the test:
-        if (stopOnFail && ruleReport.totals.some(total => total)) {
-          // Stop testing.
-          break;
+          console.log(`ERROR: Test of testaro rule ${rule} prevented (${error.message})`);
         }
       }
-      // If an error is thrown by the test:
-      catch(error) {
+      // Otherwise, i.e. if the rule is undefined or doubly defined:
+      else {
         // Report this.
-        data.preventions.push(rule);
-        console.log(`ERROR: Test of testaro rule ${rule} prevented (${error.message})`);
+        console.log(`ERROR: Rule ${rule} not validly defined`);
       }
     }
     testTimes.sort((a, b) => b[1] - a[1]).forEach(pair => {
