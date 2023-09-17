@@ -7,6 +7,8 @@
 
 // Module to perform common operations.
 const {init, report} = require('../procs/testaro');
+// Module to handle files.
+const fs = require('fs/promises');
 
 // ######## CONSTANTS
 
@@ -64,7 +66,7 @@ const etcRules = {
 const jsonTest = async (ruleID, ruleArgs) => {
   const [page, withItems] = ruleArgs;
   // Get the rule definition.
-  const ruleJSON = await fs.readFile(`../testaro/${ruleID}.json`, 'utf8');
+  const ruleJSON = await fs.readFile(`${__dirname}/../testaro/${ruleID}.json`, 'utf8');
   const ruleObj = JSON.parse(ruleJSON);
   // Initialize the locators and result.
   const all = await init(page, ruleObj.selector);
@@ -75,7 +77,7 @@ const jsonTest = async (ruleID, ruleArgs) => {
     ruleObj.complaints.summary
   ];
   return await report(
-    withItems, all, ruleObj.ruleID, whats, ruleObj.ordinalSeverity, ruleObj.tagName
+    withItems, all, ruleObj.ruleID, whats, ruleObj.ordinalSeverity, ruleObj.summaryTagName
   );
 };
 // Conducts and reports Testaro tests.
@@ -104,7 +106,7 @@ exports.reporter = async (page, options) => {
       // Initialize an argument array.
       const ruleArgs = [page, withItems];
       // If the rule is defined with JavaScript or JSON but not both:
-      const ruleFileNames = await fs.readdir('../testaro');
+      const ruleFileNames = await fs.readdir(`${__dirname}/../testaro`);
       const isJS = ruleFileNames.includes(`${rule}.js`);
       const isJSON = ruleFileNames.includes(`${rule}.json`);
       if ((isJS || isJSON) && ! (isJS && isJSON)) {
@@ -122,9 +124,9 @@ exports.reporter = async (page, options) => {
         console.log(`>>>>>> ${rule} (${what})`);
         try {
           const startTime = Date.now();
-          const ruleReport = await isJS
-            ? require(`../testaro/${rule}`).reporter(... ruleArgs)
-            : jsonTest(rule, ruleArgs);
+          const ruleReport = isJS
+            ? await require(`../testaro/${rule}`).reporter(... ruleArgs)
+            : await jsonTest(rule, ruleArgs);
           // Add data from the test to the result.
           const endTime = Date.now();
           testTimes.push([rule, Math.round((endTime - startTime) / 1000)]);
