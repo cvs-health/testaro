@@ -15,7 +15,7 @@ exports.reporter = async (page, withItems) => {
   const all = await init(page, 'table');
   // For each locator:
   for (const loc of all.allLocs) {
-    // Get whether its el violates the rule.
+    // Get whether its element violates the rule.
     const isBad = await loc.evaluate(el => {
       const role = el.getAttribute('role');
       // If it contains another table:

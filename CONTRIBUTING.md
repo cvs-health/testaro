@@ -22,9 +22,9 @@ To come.
 
 ## Implementing new rules
 
-Testaro has about 50 of its own rules, in addition to the approximately 600 rules of the other tools that it integrates. According to the issue classifications in the [Testilo](https://www.npmjs.com/package/testilo) package, these 650 or so rules can be distilled into about 260 accessibility _issues_, because some rules of some tools duplicate (or approximately duplicate) some rules of other tools.
+Testaro has about 50 of its own rules, in addition to the approximately 600 rules of the other tools that it integrates. According to the issue classifications in the [Testilo](https://www.npmjs.com/package/testilo) package, these 650 or so rules can be classified into about 260 accessibility _issues_, because some rules of some tools at least approximately duplicate some rules of other tools.
 
-However, many other significant accessibility issues exist that are not covered by any of the existing rules. Testaro welcomes contributions of new rules for such issues.
+However, many other significant accessibility issues exist that are not covered by any of the existing rules. Thus, Testaro welcomes contributions of new rules for such issues.
 
 ### Step 1
 
@@ -35,10 +35,10 @@ The first step in contributing a new rule to Testaro is to satisfy yourself that
 The second step is to write a validator for the new rule. A validator is software that defines the correct behavior of the implementation of the rule.
 
 Every Testaro rule has a correspoding validator. A validator has two parts:
-- A job file, in the `validation/tests/jobs` directory.
+- A job file, in the `validation/tests/jobs` directory. It tells Testaro what tests to perform and what the results should be.
 - A target directory, within the `validation/tests/targets` directory. The target directory contains one or more HTML files that will be tested by the job.
 
-If you inspect some of the jobs and targets in the `validation/tests` directory, you can see that the jobs perform tests on the target documents and also define the expected behavior.
+Inspecting some of the jobs and targets in the `validation/tests` directory can help you understand how validators work.
 
 ### Step 3
 
@@ -46,24 +46,23 @@ The third step is to add an entry to the `evalRules` or `etcRules` object in the
 
 ### Step 4
 
-The fourth step is to implement the rule. To optimize quality, it may be wise for one person to perform steps 1, 2, and 3, and then for a second person to perform step 4.
+The fourth step is to implement the new rule by creating a JavaScript or JSON file and saving it in the `testaro` directory.
 
-The rule is implemented in a JavaScript or JSON file that is saved in the `testaro` directory.
+To optimize quality, it may be wise for one person to perform steps 1, 2, and 3, and then for a second person independently to perform step 4 (“clean-room” development).
 
+At any time after an implementation is attempted or revised, the developer can run the validation on it, simply by executing the statement `npm test xyz` (replacing `xyz` with the name of the new rule). When the implementation fails validation, diagnosis may find fault either with the implementation or with the validator.
 
-
-develop the rule in accord with your specification. Developing the rule consists of:
-1. Creating a rule-definition file.
-1. Adding the file to the `testaro` directory.
-1. Validating it.
-
-For example, if the new rule has the ID `bigAlt`, it must succeed when the statement `npm test bigAlt` is executed.
+Whether a new rule should be implemented in JSON or JavaScript depends on the complexity of the rule. The JSON format is effective for simple rules,and JavaScript is needed for more complex rules.
 
 ### Simple rules
 
-Some existing Testaro rules are simple enough to be defined in JSON files. If a new rule is similarly simple, you can define it with a similar JSON file.
+You can create a JSON-defined rule if a single CSS selector can identify all and only the elements on a page that violate the rule.
 
-An example is the `titledEl` rule:
+Suppose, for example, that you want a rule prohibiting `i` elements (because `i` represents confusingly many different semantic properties). A single CSS selector, namely `"i"`, will identify all the `i` elements on the page, so this rule can be defined with JSON.
+
+ Substantially more complex rules, too, can satisfy this criterion. An example is the `captionLoc` rule, which prohibits `caption` elements that are not the first children of `table` elements. Its CSS selector is `"*:not(table) > caption, caption:not(:first-child)"`. That selector identifies every `caption` element that is the child of any non-`table` element, and also every caption element that is not the first among its sibling elements. The only ways to **avoid** being caught by this selector are (1) not to be a `caption` element and (2) to be a `caption` element that is the first child of a `table` element. Thus, the selector catches all the `caption` elements that are not first children of `table` elements, and only those.
+
+You can copy and revise any of the existing JSON files in the `testaro` directory to implement a new rule. If, for example, you start with a copy of the `titledEl` file, you can change its properties to fit your new rule. In particular:
 
 ```json
 {
@@ -78,20 +77,20 @@ An example is the `titledEl` rule:
 }
 ```
 
-To create a simple rule, you can copy one of the existing JSON files and replace the values with values that are appropriate for the new rule. Testaro uses the properties in the file as follows:
-- Every element matching the selector is treated as a violator of the rule.
-- Testaro describes violations with one of the `complaints` values. If the user has requested itemized results, the `instance` value is used; otherwise the `summary` value is used.
-- Testaro assigns the `ordinalSeverity` value as the ordinal severity of each violation. This is a scale of integers, from 0 to 3.
-- When Testaro itemizes results, it reports the tag name of violating elements. When it only summarizes results, it includes the `summaryTagName`. If every violating element necessarily has one particular tag name, then you should make that (e.g., `BUTTON`) the value of `summaryTagName`.
+- Assign a violation description for a single instance to `complaints.instance`.
+- Assign a violation description for a summary instance (when itemization has been turned off) to `complaints.summary`.
+- Assign an integer from 0 through 3 to `ordinalSeverity`.
+- If all instances of violations of the rule necessarily involve elements of the same type, assign its tag name (such as `"BUTTON"`) to `summaryTagName`.
 
 ### Complex rules
 
-Your new rule may not be quite so simple. For example, it may need to examine the selected elements and identify only some of them as rule violators.
-
-You will need to define such a rule in a JavaScript file, rather than a JSON file.
-
-An example of such an existing rule is `filter`. The test for that rule initially selects all elements that descend from the `body` element (or a sample of 100 such elements in the page contains more than 100). Then it examines each selected element to determine whether it violates the rule. Specifically, it determines whether the element has a `filter` style property with a value other than `'none'`. It reports those violations.
-
-To define such a rule, you can copy an existing rule file and replace parts of its code as needed. Examples include:
-- `allSlanted`, `distortion`, `filter`, `miniText`, `zIndex`: violations based on element styles.
+More complex Testaro rules are implemented in JavaScript. You can use any of the existing JavaScript rules, or `data/template.js` file, as an example to begin with. Examples include:
+- `allSlanted`, `distortion`, `filter`, `lineHeight`, `miniText`, `zIndex`: violations based on element styles.
+- `focOp`, `opFoc`, `targetSize`: violations based on attributes
 - `linkTitle`: violations based on attributes and text content.
+- `linkAmb`, `pseudoP`, `radioSet`: violations based on relations among elements and text.
+- `hover`, `tabNav`: violations based on performing actions and observing page behavior.
+- `role`: violations based on data about standards.
+- `docType`, `title`: violations based on page properties.
+
+Some utility functions in modules in the `procs` directory are available for support of new rules.
