@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/role/good.html",
+      "url": "file://validation/tests/targets/role/good.html",
       "what": "page with standard roles"
     },
     {
@@ -43,7 +39,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/role/bad.html",
+      "which": "file://validation/tests/targets/role/bad.html",
       "what": "page with deviant roles"
     },
     {

@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/allCaps/index.html",
+      "url": "file://validation/tests/targets/allCaps/index.html",
       "what": "page with various letter cases"
     },
     {

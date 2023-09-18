@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Page with standard and nonstandard caption locations</title>
+    <meta name="description" content="tester">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      table {
+        border-collapse: collapse;
+      }
+      td, th {
+        padding: 0.3rem;
+        border: 0.2rem black solid;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Page with standard and nonstandard caption locations</h1>
+      <h2>Standard table</h2>
+      <table>
+        <caption>Factory personnel</caption>
+        <thead>
+          <tr><th>Name</th><th>Department</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>Amy</th><td>Accessibility</td></tr>
+          <tr><th>Abe</th><td>Marketing</td></tr>
+        </tbody>
+      </table>
+      <h2>Nonstandard table</h2>
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Department</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>Amy</th><td>Accessibility</td></tr>
+          <tr><th>Abe</th><td>Marketing</td></tr>
+        </tbody>
+        <caption>Office personnel</caption>
+      </table>
+      <h2>Headerless table with caption in the head</h2>
+      <table>
+        <thead>
+          <caption>Farm personnel</caption>
+        </thead>
+        <tbody>
+          <tr><td>Given name</td><td>Unit</td></tr>
+          <tr><td>Kim</td><td>Cattle</td></tr>
+          <tr><td>Ken</td><td>Grain</td></tr>
+        </tbody>
+      </table>
+    </main>
+  </body>
+</html>

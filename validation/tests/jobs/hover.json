@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "only compatible browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/hover/good.html",
+      "url": "file://validation/tests/targets/hover/good.html",
       "what": "page with standard hover behavior"
     },
     {
@@ -46,7 +42,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/hover/bad.html",
+      "which": "file://validation/tests/targets/hover/bad.html",
       "what": "page with deviant hover behavior"
     },
     {
@@ -57,7 +53,7 @@
       "expect": [
         [
           "standardResult.totals.3",
-          ">",
+          "=",
           0
         ],
         [
@@ -68,7 +64,7 @@
         [
           "standardResult.instances.length",
           "=",
-          4
+          3
         ],
         [
           "standardResult.instances.0.what",
@@ -76,9 +72,14 @@
           "over the element"
         ],
         [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          0
+        ],
+        [
           "standardResult.instances.0.tagName",
           "=",
-          "A"
+          "BUTTON"
         ],
         [
           "standardResult.instances.0.location.doc",
@@ -93,32 +94,27 @@
         [
           "standardResult.instances.0.location.spec.height",
           "<",
-          "20"
+          "45"
         ],
         [
           "standardResult.instances.0.excerpt",
           "i",
-          "Trigger 1"
+          "Trigger 2"
         ],
         [
           "standardResult.instances.2.what",
           "i",
-          "is not hoverable"
+          "Hovering over the"
         ],
         [
           "standardResult.instances.2.ordinalSeverity",
           "=",
-          3
+          0
         ],
         [
           "standardResult.instances.2.tagName",
           "=",
-          "BUTTON"
-        ],
-        [
-          "standardResult.instances.2.id",
-          "=",
-          "smallButton"
+          "SPAN"
         ],
         [
           "standardResult.instances.2.location.doc",
@@ -128,66 +124,23 @@
         [
           "standardResult.instances.2.location.type",
           "=",
-          "selector"
-        ],
-        [
-          "standardResult.instances.2.location.spec",
-          "=",
-          "#smallButton"
-        ],
-        [
-          "standardResult.instances.2.excerpt",
-          "i",
-          "Trigger 3"
-        ],
-        [
-          "standardResult.instances.3.what",
-          "i",
-          "over the element"
-        ],
-        [
-          "standardResult.instances.3.ordinalSeverity",
-          ">",
-          -1
-        ],
-        [
-          "standardResult.instances.3.tagName",
-          "=",
-          "LI"
-        ],
-        [
-          "standardResult.instances.3.id",
-          "=",
-          ""
-        ],
-        [
-          "standardResult.instances.3.location.doc",
-          "=",
-          "dom"
-        ],
-        [
-          "standardResult.instances.3.location.type",
-          "=",
           "box"
         ],
         [
-          "standardResult.instances.3.location.spec.x",
+          "standardResult.instances.2.location.spec.x",
           ">",
           0
         ],
         [
-          "standardResult.instances.3.excerpt",
+          "standardResult.instances.2.excerpt",
           "i",
-          "item, Trigger 5"
+          "Hover over me"
         ]
       ],
       "rules": [
         "y",
         "hover"
-      ],
-      "args": {
-        "hover": [8]
-      }
+      ]
     },
     {
       "type": "test",
@@ -196,14 +149,14 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.3",
-          ">",
-          0
+          "standardResult.totals.0",
+          "=",
+          3
         ],
         [
           "standardResult.instances.length",
-          ">",
-          0
+          "=",
+          1
         ],
         [
           "standardResult.instances.0.ruleID",
@@ -217,57 +170,19 @@
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
-          ">",
-          -1
+          "=",
+          0
         ],
         [
           "standardResult.instances.0.count",
-          ">",
-          0
+          "=",
+          3
         ]
       ],
       "rules": [
         "y",
         "hover"
-      ],
-      "args": {
-        "hover": [8]
-      }
-    },
-    {
-      "type": "test",
-      "which": "testaro",
-      "withItems": false,
-      "stopOnFail": true,
-      "expect": [
-        [
-          "standardResult.totals.3",
-          "<",
-          7
-        ],
-        [
-          "standardResult.totals.2",
-          "<",
-          4
-        ],
-        [
-          "standardResult.totals.1",
-          "<",
-          13
-        ],
-        [
-          "standardResult.totals.0",
-          "<",
-          4
-        ]
-      ],
-      "rules": [
-        "y",
-        "hover"
-      ],
-      "args": {
-        "hover": [2]
-      }
+      ]
     }
   ],
   "sources": {

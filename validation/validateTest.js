@@ -14,8 +14,7 @@ const {doJob} = require('../run');
 exports.validateTest = async testID => {
   const jobFileNames = await fs.readdir(`${__dirname}/tests/jobs`);
   for (const jobFileName of jobFileNames.filter(fileName => fileName === `${testID}.json`)) {
-    const rawJobJSON = await fs.readFile(`${__dirname}/tests/jobs/${jobFileName}`, 'utf8');
-    const jobJSON = rawJobJSON.replace(/__targets__/g, 'file://validation/tests/targets');
+    const jobJSON = await fs.readFile(`${__dirname}/tests/jobs/${jobFileName}`, 'utf8');
     const report = JSON.parse(jobJSON);
     await doJob(report);
     const {acts, jobData} = report;
@@ -32,10 +31,12 @@ exports.validateTest = async testID => {
     ) {
       console.log('Success: Reports have been correctly populated');
       if (testActs.every(testAct => testAct.expectationFailures === 0)) {
-        console.log('Success: No failures');
+        console.log('######## Success: No failures\n');
       }
       else {
-        console.log('Failure: The test has at least one failure');
+        console.log(
+          '######## Failure: The test has at least one failure (see “"passed": false” below)\n'
+        );
         console.log(
           JSON.stringify(
             acts.filter(act => act.type === 'test' && act.expectationFailures), null, 2

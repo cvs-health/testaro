@@ -1,0 +1,10 @@
+{
+  "ruleID": "captionLoc",
+  "selector": "*:not(table) > caption, caption:not(:first-child)",
+  "complaints": {
+    "instance": "Element is not the first child of a table element",
+    "summary": "caption elements are not the first children of table elements"
+  },
+  "ordinalSeverity": 3,
+  "summaryTagName": "CAPTION"
+}

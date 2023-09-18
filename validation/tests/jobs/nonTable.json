@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/nonTable/index.html",
+      "url": "file://validation/tests/targets/nonTable/index.html",
       "what": "page with a real table and 3 pseudotables"
     },
     {

@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/elements/index.html",
+      "url": "file://validation/tests/targets/elements/index.html",
       "what": "page with a shadow root"
     },
     {

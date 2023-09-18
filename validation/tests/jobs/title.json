@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/title/good.html",
+      "url": "file://validation/tests/targets/title/good.html",
       "what": "page with a title"
     },
     {
@@ -33,7 +29,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/title/bad.html",
+      "which": "file://validation/tests/targets/title/bad.html",
       "what": "page without a title"
     },
     {

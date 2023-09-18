@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/docType/good.html",
+      "url": "file://validation/tests/targets/docType/good.html",
       "what": "page with doctype"
     },
     {
@@ -38,7 +34,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/docType/bad.html",
+      "which": "file://validation/tests/targets/docType/bad.html",
       "what": "page without doctype"
     },
     {

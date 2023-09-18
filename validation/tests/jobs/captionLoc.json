@@ -1,0 +1,140 @@
+{
+  "id": "captionLoc",
+  "what": "validation of captionLoc test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "url": "file://validation/tests/targets/captionLoc/index.html",
+      "what": "page with standard and nonstandard caption locations"
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": true,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.3",
+          "=",
+          2
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "captionLoc"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "Element is not the first child of a table element"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "CAPTION"
+        ],
+        [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.0.location.spec.width",
+          ">",
+          0
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "=",
+          "Office personnel"
+        ],
+        [
+          "standardResult.instances.1.excerpt",
+          "=",
+          "Farm personnel"
+        ]
+      ],
+      "rules": [
+        "y",
+        "captionLoc"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.3",
+          "=",
+          2
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "captionLoc"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "caption elements are not the first children of table elements"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "CAPTION"
+        ]
+      ],
+      "rules": [
+        "y",
+        "captionLoc"
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2013-05-28T12:00:00",
+  "timeStamp": "00000"
+}

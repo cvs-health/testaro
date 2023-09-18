@@ -1,0 +1,146 @@
+{
+  "id": "legendLoc",
+  "what": "validation of legendLoc test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "url": "file://validation/tests/targets/legendLoc/index.html",
+      "what": "page with standard and nonstandard legend locations"
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "what": "legendLoc",
+      "withItems": true,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.3",
+          "=",
+          2
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "legendLoc"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "Element is not the first child of a fieldset element"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "LEGEND"
+        ],
+        [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.0.location.spec.width",
+          ">",
+          0
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "=",
+          "Choose a food"
+        ],
+        [
+          "standardResult.instances.1.ruleID",
+          "=",
+          "legendLoc"
+        ],
+        [
+          "standardResult.instances.1.excerpt",
+          "=",
+          "Choose a gas"
+        ]
+      ],
+      "rules": [
+        "y",
+        "legendLoc"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.3",
+          "=",
+          2
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "legendLoc"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "legend elements are not the first children of fieldset elements"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "LEGEND"
+        ]
+      ],
+      "rules": [
+        "y",
+        "legendLoc"
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2013-05-28T12:00:00",
+  "timeStamp": "00000"
+}

@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/focInd/good.html",
+      "url": "file://validation/tests/targets/focInd/good.html",
       "what": "page with outline focus indication"
     },
     {
@@ -43,7 +39,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/focInd/bad.html",
+      "which": "file://validation/tests/targets/focInd/bad.html",
       "what": "page with mixed focus indication"
     },
     {
@@ -54,29 +50,24 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.2",
+          "standardResult.totals.1",
           "=",
-          4
+          8
         ],
         [
           "standardResult.totals.3",
           "=",
-          2
+          0
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          3
+          1
         ],
         [
           "standardResult.instances.0.tagName",
           "=",
-          "INPUT"
-        ],
-        [
-          "standardResult.instances.0.id",
-          "=",
-          "textInput"
+          "A"
         ],
         [
           "standardResult.instances.0.location.doc",
@@ -86,17 +77,17 @@
         [
           "standardResult.instances.0.location.type",
           "=",
-          "selector"
+          "box"
         ],
         [
-          "standardResult.instances.0.location.spec",
-          "=",
-          "#textInput"
+          "standardResult.instances.0.location.spec.y",
+          ">",
+          0
         ],
         [
           "standardResult.instances.0.excerpt",
           "i",
-          "text input"
+          "English"
         ],
         [
           "standardResult.instances.3.ruleID",
@@ -106,22 +97,22 @@
         [
           "standardResult.instances.3.ordinalSeverity",
           "=",
-          2
+          1
         ],
         [
           "standardResult.instances.3.tagName",
           "=",
-          "A"
+          "INPUT"
         ],
         [
           "standardResult.instances.3.id",
           "=",
-          "slowLink"
+          "thickOutlineInput"
         ],
         [
           "standardResult.instances.3.location.spec",
           "=",
-          "#slowLink"
+          "#thickOutlineInput"
         ]
       ],
       "rules": [
@@ -138,12 +129,12 @@
         [
           "standardResult.totals.1",
           "=",
-          0
+          8
         ],
         [
-          "standardResult.totals.3",
+          "standardResult.totals.0",
           "=",
-          2
+          0
         ],
         [
           "standardResult.instances.0.ruleID",
@@ -153,27 +144,17 @@
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          2
+          1
         ],
         [
           "standardResult.instances.0.count",
           "=",
-          4
+          8
         ],
         [
           "standardResult.instances.0.what",
           "i",
-          "Elements have non"
-        ],
-        [
-          "standardResult.instances.1.ordinalSeverity",
-          "=",
-          3
-        ],
-        [
-          "standardResult.instances.1.count",
-          "=",
-          2
+          "Elements fail"
         ]
       ],
       "rules": [

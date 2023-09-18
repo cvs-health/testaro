@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/titledEl/index.html",
+      "url": "file://validation/tests/targets/titledEl/index.html",
       "what": "page with valid and invalid title attributes"
     },
     {
@@ -43,7 +39,7 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "element has a title (invalid title)"
+          "Ineligible element has"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",

@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/miniText/index.html",
+      "url": "file://validation/tests/targets/miniText/index.html",
       "what": "page with text in various font sizes"
     },
     {

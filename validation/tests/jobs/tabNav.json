@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/tabNav/good.html",
+      "url": "file://validation/tests/targets/tabNav/good.html",
       "what": "page with standard menu navigation"
     },
     {
@@ -43,7 +39,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/tabNav/bad.html",
+      "which": "file://validation/tests/targets/tabNav/bad.html",
       "what": "page with deviant menu navigation"
     },
     {

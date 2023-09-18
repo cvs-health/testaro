@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/headEl/index.html",
+      "url": "file://validation/tests/targets/headEl/index.html",
       "what": "page with valid and invalid elements in the head"
     },
     {

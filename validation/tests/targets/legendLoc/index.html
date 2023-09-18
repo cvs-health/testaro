@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Page with standard and nonstandard fieldset legends</title>
+    <meta name="description" content="tester">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <main>
+      <h1>Page with standard and nonstandard fieldset legends</h1>
+      <form>
+        <p>The next fieldset has its legend in a standard location.</p>
+        <div><fieldset>
+          <legend>Choose a drink</legend>
+          <p><label><input type="radio" name="drink" value="water">water</label></p>
+          <p><label><input type="radio" name="drink" value="juice">juice</label></p>
+        </fieldset></div>
+        <div><fieldset>
+          <p>Defect 1: This fieldset has a nonstandard legend location.</p>
+          <legend>Choose a food</legend>
+          <p><label><input type="radio" name="food" value="rice">rice</label></p>
+          <p><label><input type="radio" name="food" value="apple">apple</label></p>
+        </fieldset></div>
+        <p>Defect 2: The next legend is not in a fieldset.</p>
+        <div>
+          <legend>Choose a gas</legend>
+          <p><label><input type="radio" name="gas" value="methane">methane</label></p>
+          <p><label><input type="radio" name="gas" value="nitrogen">nitrogen</label></p>
+        </div>
+      </form>
+    </main>
+  </body>
+</html>

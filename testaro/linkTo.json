@@ -1,0 +1,10 @@
+{
+  "ruleID": "linkTo",
+  "selector": "a:not([href]):visible",
+  "complaints": {
+    "instance": "Element has no href attribute",
+    "summary": "Links are missing href attributes"
+  },
+  "ordinalSeverity": 2,
+  "summaryTagName": "A"
+}

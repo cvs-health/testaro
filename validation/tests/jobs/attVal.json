@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/attVal/good.html",
+      "url": "file://validation/tests/targets/attVal/good.html",
       "what": "page with permitted attribute values"
     },
     {
@@ -66,7 +62,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/attVal/bad.html",
+      "which": "file://validation/tests/targets/attVal/bad.html",
       "what": "page with illicit attribute values"
     },
     {

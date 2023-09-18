@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/hovInd/index.html",
+      "url": "file://validation/tests/targets/hovInd/index.html",
       "what": "page with varied hover indicators"
     },
     {

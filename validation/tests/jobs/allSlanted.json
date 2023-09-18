@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/allSlanted/index.html",
+      "url": "file://validation/tests/targets/allSlanted/index.html",
       "what": "page with various slantednesses"
     },
     {

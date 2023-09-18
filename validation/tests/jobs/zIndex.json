@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/zIndex/good.html",
+      "url": "file://validation/tests/targets/zIndex/good.html",
       "what": "page with no explicit z-index attributes"
     },
     {
@@ -43,7 +39,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/zIndex/bad.html",
+      "which": "file://validation/tests/targets/zIndex/bad.html",
       "what": "page with explicit z-index attributes"
     },
     {

@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/linkExt/index.html",
+      "url": "file://validation/tests/targets/linkExt/index.html",
       "what": "page with normal and forcibly external links"
     },
     {
@@ -121,6 +117,11 @@
           "standardResult.instances.0.what",
           "i",
           "Links have"
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "A"
         ]
       ],
       "rules": [

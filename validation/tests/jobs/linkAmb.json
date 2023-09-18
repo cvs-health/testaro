@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/linkAmb/index.html",
+      "url": "file://validation/tests/targets/linkAmb/index.html",
       "what": "page with unambiguous and ambiguous links"
     },
     {

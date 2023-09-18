@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Page with partly nonstandard option roles</title>
+    <meta name="description" content="tester">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <main>
+      <h1>Page with partly nonstandard option roles</h1>
+      <h2>Dietary preference</h2>
+      <div
+        id="pseudoSelect"
+        role="listbox"
+        name="diet"
+        aria-label="Choose one dietary option"
+        onclick="Array.from(document.getElementById('pseudoSelect').children).forEach(p => {p.style.fontWeight=400}); event.target.style.fontWeight=700"
+      >
+        <p role="option" aria-selected="false">Carnivorous</p>
+        <p role="option" aria-selected="true">Vegetarian</p>
+        <p role="option">Vegan</p>
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,130 @@
+{
+  "id": "linkOldAtt",
+  "what": "validation of linkOldAtt test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "url": "file://validation/tests/targets/linkOldAtt/index.html",
+      "what": "page with links with and without deprecated attributes"
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": true,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.1",
+          "=",
+          2
+        ],
+        [
+          "standardResult.totals.2",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "linkOldAtt"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "Element has a deprecated attribute"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "A"
+        ],
+        [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.0.location.spec.y",
+          ">",
+          0
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "=",
+          "French information"
+        ]
+      ],
+      "rules": [
+        "y",
+        "linkOldAtt"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.1",
+          "=",
+          2
+        ],
+        [
+          "standardResult.totals.3",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "linkOldAtt"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "Links have deprecated attributes"
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "A"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          2
+        ]
+      ],
+      "rules": [
+        "y",
+        "linkOldAtt"
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2013-05-28T12:00:00",
+  "timeStamp": "00000"
+}

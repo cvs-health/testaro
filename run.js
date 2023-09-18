@@ -211,8 +211,20 @@ const isValidReport = report => {
     if (! ['chromium', 'webkit', 'firefox'].includes(acts[0].which)) {
       return 'Bad first act which';
     }
-    if (! acts[0].url || typeof acts[0].url !== 'string' || ! isURL(acts[0].url)) {
-      return 'First act url not a URL';
+    if (acts[0].type !== 'launch' || (
+      (
+        ! acts[0].url
+        || typeof acts[0].url !== 'string'
+        || ! isURL(acts[0].url)
+      )
+      && (
+        acts[1].type !== 'url'
+        || ! acts[1].which
+        || typeof acts[1].which !== 'string'
+        || ! isURL(acts[1].which)
+      )
+    )) {
+      return 'First or second act has no valid URL';
     }
     const invalidAct = acts.find(act => ! isValidAct(act));
     if (invalidAct) {
@@ -450,7 +462,16 @@ const doActs = async (report, actIndex, page) => {
     const act = acts[actIndex];
     // If it is valid:
     if (isValidAct(act)) {
-      const whichSuffix = act.which ? ` (${act.which})` : '';
+      let actInfo = '';
+      if (act.which) {
+        if (act.type === 'launch' && act.url) {
+          actInfo = `${act.which} to ${act.url}`;
+        }
+        else {
+          actInfo = act.which;
+        }
+      }
+      const whichSuffix = actInfo ? ` (${actInfo})` : '';
       console.log(`>>>> ${act.type}${whichSuffix}`);
       // Increment the count of acts performed.
       actCount++;

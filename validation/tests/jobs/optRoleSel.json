@@ -1,0 +1,130 @@
+{
+  "id": "optRoleSel",
+  "what": "validation of optRoleSel test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "url": "file://validation/tests/targets/optRoleSel/index.html",
+      "what": "page with and without aria-select attributes on option-role elements"
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": true,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.1",
+          "=",
+          1
+        ],
+        [
+          "standardResult.totals.0",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "optRoleSel"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "Element has an explicit option role but no aria-selected attribute"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "P"
+        ],
+        [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.0.location.spec.width",
+          ">",
+          0
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "=",
+          "Vegan"
+        ]
+      ],
+      "rules": [
+        "y",
+        "optRoleSel"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.1",
+          "=",
+          1
+        ],
+        [
+          "standardResult.totals.2",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "optRoleSel"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "Elements with explicit option roles have no aria-selected attributes"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          1
+        ]
+      ],
+      "rules": [
+        "y",
+        "optRoleSel"
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2013-05-28T12:00:00",
+  "timeStamp": "00000"
+}

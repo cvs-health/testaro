@@ -7,11 +7,7 @@
     {
       "type": "launch",
       "which": "chromium",
-      "what": "usual browser"
-    },
-    {
-      "type": "url",
-      "which": "__targets__/labClash/good.html",
+      "url": "file://validation/tests/targets/labClash/good.html",
       "what": "page with standard labeling"
     },
     {
@@ -43,7 +39,7 @@
     },
     {
       "type": "url",
-      "which": "__targets__/labClash/bad.html",
+      "which": "file://validation/tests/targets/labClash/bad.html",
       "what": "page with deviant labeling"
     },
     {
