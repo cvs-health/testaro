@@ -34,6 +34,7 @@ const evalRules = {
   hover: 'hover-caused content changes',
   hovInd: 'hover indication nonstandard',
   hr: 'hr element instead of styles used for vertical segmentation',
+  imageLink: 'links with image files as their destinations',
   labClash: 'labeling inconsistencies',
   legendLoc: 'legend elements that are not first children of fieldset elements',
   lineHeight: 'text with a line height less than 1.5 times its font size',

@@ -1,0 +1,145 @@
+{
+  "id": "imageLink",
+  "what": "validation of imageLink test",
+  "strict": true,
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "url": "file://validation/tests/targets/imageLink/index.html",
+      "what": "page with links to web pages and to image files"
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": true,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.0",
+          "=",
+          4
+        ],
+        [
+          "standardResult.totals.2",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          4
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "imageLink"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "Link destination is an image file"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "A"
+        ],
+        [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "selector"
+        ],
+        [
+          "standardResult.instances.0.location.spec",
+          "=",
+          "#mapGIF"
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "=",
+          "an animated map of the USA"
+        ],
+        [
+          "standardResult.instances.2.ruleID",
+          "=",
+          "imageLink"
+        ],
+        [
+          "standardResult.instances.3.excerpt",
+          "=",
+          "a bird"
+        ]
+      ],
+      "rules": [
+        "y",
+        "imageLink"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.0",
+          "=",
+          4
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "imageLink"
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          4
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "Links have image files as their destinations"
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "A"
+        ]
+      ],
+      "rules": [
+        "y",
+        "imageLink"
+      ]
+    }
+  ],
+  "sources": {
+    "script": "",
+    "host": {},
+    "requester": ""
+  },
+  "creationTime": "2013-05-28T12:00:00",
+  "timeStamp": "00000"
+}
