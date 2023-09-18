@@ -13,6 +13,7 @@ const fs = require('fs/promises');
 // ######## CONSTANTS
 
 const evalRules = {
+  adbID: 'elements with ambiguous or missing referenced descriptions',
   allCaps: 'leaf elements with entirely upper-case text longer than 7 characters',
   allHidden: 'page that is entirely or mostly hidden',
   allSlanted: 'leaf elements with entirely italic or oblique text longer than 39 characters',
