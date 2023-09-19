@@ -1,14 +1,14 @@
 {
-  "id": "titledEl",
-  "what": "validation of titledEl test",
+  "id": "datalistRef",
+  "what": "validation of datalistRef test",
   "strict": true,
   "timeLimit": 20,
   "acts": [
     {
       "type": "launch",
       "which": "chromium",
-      "url": "file://validation/tests/targets/titledEl/index.html",
-      "what": "page with valid and invalid title attributes"
+      "url": "file://validation/tests/targets/datalistRef/index.html",
+      "what": "page with correct and erroneous datalist references"
     },
     {
       "type": "test",
@@ -19,37 +19,32 @@
         [
           "standardResult.totals.2",
           "=",
-          2
-        ],
-        [
-          "standardResult.totals.3",
-          "=",
           0
         ],
         [
-          "standardResult.instances.length",
+          "standardResult.totals.3",
           "=",
           2
         ],
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "titledEl"
+          "datalistRef"
         ],
         [
           "standardResult.instances.0.what",
-          "i",
-          "Ineligible element has"
+          "=",
+          "list attribute of the element references an ambiguous or missing datalist element"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          2
+          3
         ],
         [
           "standardResult.instances.0.tagName",
           "=",
-          "P"
+          "INPUT"
         ],
         [
           "standardResult.instances.0.location.doc",
@@ -62,29 +57,24 @@
           "box"
         ],
         [
-          "standardResult.instances.0.location.spec.y",
+          "standardResult.instances.0.location.spec.height",
           ">",
           0
         ],
         [
           "standardResult.instances.0.excerpt",
           "i",
-          "This paragraph"
-        ],
-        [
-          "standardResult.instances.1.tagName",
-          "=",
-          "P"
+          "material"
         ],
         [
           "standardResult.instances.1.excerpt",
           "i",
-          "still violates"
+          "city"
         ]
       ],
       "rules": [
         "y",
-        "titledEl"
+        "datalistRef"
       ]
     },
     {
@@ -94,49 +84,39 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.2",
-          "=",
-          2
-        ],
-        [
           "standardResult.totals.1",
           "=",
           0
         ],
         [
-          "standardResult.instances.length",
+          "standardResult.totals.3",
           "=",
-          1
+          2
         ],
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "titledEl"
+          "datalistRef"
         ],
         [
           "standardResult.instances.0.what",
-          "i",
-          "elements have"
+          "=",
+          "list attributes of elements reference ambiguous or missing datalist elements"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          2
+          3
         ],
         [
           "standardResult.instances.0.count",
           "=",
           2
-        ],
-        [
-          "standardResult.instances.0.tagName",
-          "=",
-          ""
         ]
       ],
       "rules": [
         "y",
-        "titledEl"
+        "datalistRef"
       ]
     }
   ],

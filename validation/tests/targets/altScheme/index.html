@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Page with textual and URL text alternatives</title>
+    <meta name="description" content="tester">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <main>
+      <h1>Page with textual and URL text alternatives</h1>
+      <p>This is a link to <a href="https://urbaninstitute.github.io/r-at-urban/">a page containing an image</a>.</p>
+      <p>Look at this map with a valid text alternative:</p>
+      <p><img id="mapGIF" href="https://urbaninstitute.github.io/r-at-urban/mapping/www/images/yay_maps.gif" alt="animated map of the USA"></p>
+      <p>Defect 1: Look at this other map:</p>
+      <p><img id="mapPNG" href="https://upload.wikimedia.org/wikipedia/commons/f/f7/Blank_map_of_states.png" alt="https://upload.wikimedia.org/wikipedia/commons/f/f7/Blank_map_of_states.png"></p>
+      <p>Defect 2: Look at this pattern:</p>
+      <p><img href="http://httpforever.com/css/images/header-major-on-light.svg" alt="http://httpforever.com/css/images/header-major-on-light.svg"></p>
+      <p>Defect 3: Look at this icon:</p>
+      <p><img href="file://favicon.png" alt="file://favicon.png"></p>
+      <p>This map has an empty text alternative, but that does not violate the altScheme rule:</p>
+      <p><img id="mapGIFBad" href="https://urbaninstitute.github.io/r-at-urban/mapping/www/images/yay_maps.gif" alt=""></p>
+    </main>
+  </body>
+</html>

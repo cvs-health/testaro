@@ -21,6 +21,7 @@ const evalRules = {
   bulk: 'large count of visible elements',
   buttonMenu: 'nonstandard keyboard navigation between items of button-controlled menus',
   captionLoc: 'caption elements that are not first children of table elements',
+  datalistRef: 'elements with ambiguous or missing referenced datalist elements',
   distortion: 'distorted text',
   docType: 'document without a doctype property',
   dupAtt: 'elements with duplicate attributes',

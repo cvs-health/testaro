@@ -17,10 +17,7 @@ exports.reporter = async (page, withItems) => {
   // For each locator:
   for (const loc of all.allLocs) {
     // Get whether its element violates the rule.
-    const isBad = await loc.evaluate(el => {
-      const isViolator = ! el.href;
-      return isViolator;
-    });
+    const isBad = await loc.evaluate(el => el.tabIndex !== 0);
     // If it does:
     if (isBad) {
       // Add the locator to the array of violators.
