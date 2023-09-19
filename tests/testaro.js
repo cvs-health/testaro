@@ -17,6 +17,7 @@ const evalRules = {
   allCaps: 'leaf elements with entirely upper-case text longer than 7 characters',
   allHidden: 'page that is entirely or mostly hidden',
   allSlanted: 'leaf elements with entirely italic or oblique text longer than 39 characters',
+  altScheme: 'img elements with alt attributes having URLs as their entire values',
   autocomplete: 'name and email inputs without autocomplete attributes',
   bulk: 'large count of visible elements',
   buttonMenu: 'nonstandard keyboard navigation between items of button-controlled menus',
