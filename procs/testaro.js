@@ -14,7 +14,7 @@ const sampleMax = 100;
 // ########## FUNCTIONS
 
 // Initializes locators and a result.
-exports.init = async (page, locAllSelector, options = {}) => {
+const init = async (page, locAllSelector, options = {}) => {
   // Get locators for the specified elements.
   const locPop = page.locator(locAllSelector, options);
   const locPops = await locPop.all();
@@ -40,7 +40,7 @@ exports.init = async (page, locAllSelector, options = {}) => {
 };
 
 // Populates a result.
-exports.report = async (withItems, all, ruleID, whats, ordinalSeverity, tagName = '') => {
+const report = async (withItems, all, ruleID, whats, ordinalSeverity, tagName = '') => {
   const {locs, result} = all;
   const {data, totals, standardInstances} = result;
   // For each instance locator:
@@ -92,3 +92,41 @@ exports.report = async (withItems, all, ruleID, whats, ordinalSeverity, tagName 
   // Return the result.
   return result;
 };
+// Performs a simplifiable test.
+const simplify = async (page, withItems, ruleData) => {
+  const {
+    ruleID, selector, pruner, isDestructive, complaints, ordinalSeverity, summaryTagName
+  } = ruleData;
+  // Initialize the locators and result.
+  const all = await init(page, selector);
+  // For each locator:
+  for (const loc of all.allLocs) {
+    // Get whether its element violates the rule.
+    const isBad = await pruner(loc);
+    // If it does:
+    if (isBad) {
+      // Add the locator to the array of violators.
+      all.locs.push(loc);
+    }
+  }
+  // Populate and return the result.
+  const whats = [
+    complaints.instance,
+    complaints.summary
+  ];
+  const testReport = await report(withItems, all, ruleID, whats, ordinalSeverity, summaryTagName);
+  // If the pruner modifies the page:
+  if (isDestructive) {
+    // Reload the page.
+    try {
+      await page.reload({timeout: 15000});
+    }
+    catch(error) {
+      console.log('ERROR: page reload timed out');
+    }
+  }
+  return testReport;
+};
+exports.init = init;
+exports.report = report;
+exports.simplify = simplify;

@@ -170,6 +170,63 @@
         "y",
         "linkUl"
       ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.1",
+          "=",
+          6
+        ],
+        [
+          "standardResult.totals.2",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "linkUl"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "missing"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          6
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "A"
+        ],
+        [
+          "standardResult.instances.0.location.doc",
+          "=",
+          ""
+        ]
+      ],
+      "rules": [
+        "y",
+        "linkUl"
+      ]
     }
   ],
   "sources": {

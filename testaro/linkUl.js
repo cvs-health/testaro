@@ -8,8 +8,10 @@
   merely to discover which passages are links.
 */
 
+// ########## IMPORTS
+
 // Module to perform common operations.
-const {init, report} = require('../procs/testaro');
+const {simplify} = require('../procs/testaro');
 // Module to classify links.
 const {isInlineLink} = require('../procs/isInlineLink');
 
@@ -17,27 +19,30 @@ const {isInlineLink} = require('../procs/isInlineLink');
 
 // Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
-  // Initialize the locators and result.
-  const all = await init(page, 'a');
-  // For each locator:
-  for (const loc of all.allLocs) {
-    // Get whether its element is underlined.
-    const isUnderlined = await loc.evaluate(el => {
-      const styleDec = window.getComputedStyle(el);
-      return styleDec.textDecorationLine === 'underline';
-    });
-    // If it is not:
-    if (! isUnderlined) {
-      // Get whether it is inline.
-      const isInline = await isInlineLink(loc);
-      // If it is:
-      if (isInline) {
-        // Add the locator to the array of violators.
-        all.locs.push(loc);
+  // Specify the rule.
+  const ruleData = {
+    ruleID: 'linkUl',
+    selector: 'a',
+    pruner: async loc => {
+      // Get whether each link is underlined.
+      const isUnderlined = await loc.evaluate(el => {
+        const styleDec = window.getComputedStyle(el);
+        return styleDec.textDecorationLine === 'underline';
+      });
+      // If it is not:
+      if (! isUnderlined) {
+        // Return whether it is a violator.
+        return await isInlineLink(loc);
       }
-    }
-  }
-  // Populate and return the result.
-  const whats = ['Link is inline but has no underline', 'Inline links are missing underlines'];
-  return await report(withItems, all, 'linkUl', whats, 1);
+    },
+    isDestructive: false,
+    complaints: {
+      instance: 'Link is inline but has no underline',
+      summary: 'Inline links are missing underlines'
+    },
+    ordinalSeverity: 1,
+    summaryTagName: 'A'
+  };
+  // Run the test and return the result.
+  return await simplify(page, withItems, ruleData);
 };

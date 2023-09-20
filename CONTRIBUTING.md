@@ -82,15 +82,16 @@ You can copy and revise any of the existing JSON files in the `testaro` director
 - Assign an integer from 0 through 3 to `ordinalSeverity`.
 - If all instances of violations of the rule necessarily involve elements of the same type, assign its tag name (such as `"BUTTON"`) to `summaryTagName`.
 
+### Simplifiable rules
+
+More complex Testaro rules are implemented in JavaScript. Some rules are _simplifiable_. These can be implemented with JavaScript modules like the one for the `allSlanted` rule. To implement such a rule, you can copy an existing module and replace the 7 values of the `ruleData` object. The significant decisions here are about the values of the `selector` and `pruner` properties.
+
+The `selector` value is a CSS selector that identifies candidate elements for violation reporting. What makes this rule simplifiable, instead of simple, is that these elements may or may not be determined to violate the rule. Each of the elements identified by the selector must be further analyzed by the pruner. The pruner takes a Playwright locator as its argument and returns `true` if it finds that the element located by the locator violates the rule, or `false` if not.
+
+The `isDestructive` property should be set to `true` if your pruner modifies the page. Any pruner that calls the `isOperable()` function from the `operable` module does so.
+
 ### Complex rules
 
-More complex Testaro rules are implemented in JavaScript. You can use any of the existing JavaScript rules, or `data/template.js` file, as an example to begin with. Examples include:
-- `allSlanted`, `distortion`, `filter`, `lineHeight`, `miniText`, `zIndex`: violations based on element styles.
-- `focOp`, `opFoc`, `targetSize`: violations based on attributes
-- `linkTitle`: violations based on attributes and text content.
-- `linkAmb`, `pseudoP`, `radioSet`: violations based on relations among elements and text.
-- `hover`, `tabNav`: violations based on performing actions and observing page behavior.
-- `role`: violations based on data about standards.
-- `docType`, `title`: violations based on page properties.
+Even more complex Testaro rules require analysis that cannot fit into the simple or simplifiable category. You can begin with existing JavaScript rules, or the `data/template.js` file, as an example.
 
-Some utility functions in modules in the `procs` directory are available for support of new rules.
+Some utility functions in modules in the `procs` directory are available for support of new rules. Among these modules are `testaro` (used in many tests), `isInlineLink`, `operable`, and `visChange`,

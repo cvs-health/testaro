@@ -8,18 +8,17 @@
 // ########## IMPORTS
 
 // Module to perform common operations.
-const {init, report} = require('../procs/testaro');
+const {simplify} = require('../procs/testaro');
 
 // ########## FUNCTIONS
 
 // Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
-  // Initialize the locators and result.
-  const all = await init(page, 'body *:not(style, script, svg)');
-  // For each locator:
-  for (const loc of all.allLocs) {
-    // Get whether its element violates the rule.
-    const isBad = await loc.evaluate(el => {
+  // Specify the rule.
+  const ruleData = {
+    ruleID: 'allCaps',
+    selector: 'body *:not(style, script, svg)',
+    pruner: async loc => await loc.evaluate(el => {
       const elText = Array
       .from(el.childNodes)
       .filter(node => node.nodeType === Node.TEXT_NODE)
@@ -37,14 +36,15 @@ exports.reporter = async (page, withItems) => {
         const transformStyle = elStyleDec.textTransform;
         return transformStyle === 'uppercase' && elText.length > 7;
       }
-    });
-    // If it does:
-    if (isBad) {
-      // Add the locator to the array of violators.
-      all.locs.push(loc);
-    }
-  }
-  // Populate and return the result.
-  const whats = ['Element contains all-capital text', 'Elements contain all-capital text'];
-  return await report(withItems, all, 'allCaps', whats, 0);
+    }),
+    isDestructive: false,
+    complaints: {
+      instance: 'Element contains all-capital text',
+      summary: 'Elements contain all-capital text'
+    },
+    ordinalSeverity: 0,
+    summaryTagName: ''
+  };
+  // Run the test and return the result.
+  return await simplify(page, withItems, ruleData);
 };

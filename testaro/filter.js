@@ -9,28 +9,28 @@
 // ########## IMPORTS
 
 // Module to perform common operations.
-const {init, report} = require('../procs/testaro');
+const {simplify} = require('../procs/testaro');
 
 // ########## FUNCTIONS
 
 // Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
-  // Initialize the locators and result.
-  const all = await init(page, 'body *');
-  // For each locator:
-  for (const loc of all.allLocs) {
-    // Get whether its element violates the rule.
-    const isBad = await loc.evaluate(el => {
+  // Specify the rule.
+  const ruleData = {
+    ruleID: 'filter',
+    selector: 'body *',
+    pruner: async loc => await loc.evaluate(el => {
       const styleDec = window.getComputedStyle(el);
       return styleDec.filter !== 'none';
-    });
-    // If it does:
-    if (isBad) {
-      // Add the locator to the array of violators.
-      all.locs.push(loc);
-    }
-  }
-  // Populate and return the result.
-  const whats = ['Element has a filter style', 'Elements have filter styles'];
-  return await report(withItems, all, 'filter', whats, 2);
+    }),
+    isDestructive: false,
+    complaints: {
+      instance: 'Element has a filter style',
+      summary: 'Elements have filter styles'
+    },
+    ordinalSeverity: 2,
+    summaryTagName: ''
+  };
+  // Run the test and return the result.
+  return await simplify(page, withItems, ruleData);
 };

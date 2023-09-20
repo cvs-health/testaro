@@ -4,19 +4,20 @@
   This test reports tables used for layout.
 */
 
+// ########## IMPORTS
+
 // Module to perform common operations.
-const {init, report} = require('../procs/testaro');
+const {simplify} = require('../procs/testaro');
 
 // ########## FUNCTIONS
 
 // Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
-  // Initialize the locators and result.
-  const all = await init(page, 'table');
-  // For each locator:
-  for (const loc of all.allLocs) {
-    // Get whether its element violates the rule.
-    const isBad = await loc.evaluate(el => {
+  // Specify the rule.
+  const ruleData = {
+    ruleID: 'nonTable',
+    selector: 'table',
+    pruner: async loc => await loc.evaluate(el => {
       const role = el.getAttribute('role');
       // If it contains another table:
       if (el.querySelector('table')) {
@@ -54,14 +55,15 @@ exports.reporter = async (page, withItems) => {
         // Return misuse.
         return true;
       }
-    });
-    // If it does:
-    if (isBad) {
-      // Add the locator to the array of violators.
-      all.locs.push(loc);
-    }
-  }
-  // Populate and return the result.
-  const whats = ['Table is misused to arrange content', 'Tables are misused to arrange content'];
-  return await report(withItems, all, 'nonTable', whats, 2, 'TABLE');
+    }),
+    isDestructive: false,
+    complaints: {
+      instance: 'Table is misused to arrange content',
+      summary: 'Tables are misused to arrange content'
+    },
+    ordinalSeverity: 2,
+    summaryTagName: 'TABLE'
+  };
+  // Run the test and return the result.
+  return await simplify(page, withItems, ruleData);
 };

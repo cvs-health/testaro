@@ -8,27 +8,30 @@
 // ########## IMPORTS
 
 // Module to perform common operations.
-const {init, report} = require('../procs/testaro');
+const {simplify} = require('../procs/testaro');
 
 // ########## FUNCTIONS
 
 // Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
-  // Initialize the locators and result.
-  const all = await init(page, 'body *');
-  // Get those that have distorting transform styles.
-  for (const loc of all.allLocs) {
-    const isDistorted = await loc.evaluate(el => {
+  // Specify the rule.
+  const ruleData = {
+    ruleID: 'distortion',
+    selector: 'body *',
+    pruner: async loc => await loc.evaluate(el => {
       const styleDec = window.getComputedStyle(el);
       const {transform} = styleDec;
       return transform
       && ['matrix', 'perspective', 'rotate', 'scale', 'skew'].some(key => transform.includes(key));
-    });
-    if (isDistorted) {
-      all.locs.push(loc);
-    }
-  }
-  // Populate the result.
-  const whats = ['Element distorts its text', 'Elements distort their texts'];
-  return await report(withItems, all, 'distortion', whats, 1);
+    }),
+    isDestructive: false,
+    complaints: {
+      instance: 'Element distorts its text',
+      summary: 'Elements distort their texts'
+    },
+    ordinalSeverity: 1,
+    summaryTagName: ''
+  };
+  // Run the test and return the result.
+  return await simplify(page, withItems, ruleData);
 };

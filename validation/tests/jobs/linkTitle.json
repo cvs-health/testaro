@@ -112,6 +112,11 @@
           "standardResult.instances.0.what",
           "i",
           "Links have"
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "A"
         ]
       ],
       "rules": [

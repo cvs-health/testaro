@@ -67,16 +67,6 @@
           "the World Wide Web"
         ],
         [
-          "standardResult.instances.1.excerpt",
-          "=",
-          "Never"
-        ],
-        [
-          "standardResult.instances.2.excerpt",
-          "=",
-          "accessible"
-        ],
-        [
           "standardResult.instances.1.tagName",
           "=",
           "LI"

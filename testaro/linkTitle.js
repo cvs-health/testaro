@@ -4,8 +4,10 @@
   This test reports links with title attributes whose values the link text contains.
 */
 
+// ########## IMPORTS
+
 // Module to perform common operations.
-const {init, report} = require('../procs/testaro');
+const {simplify} = require('../procs/testaro');
 // Module to get locator data.
 const {getLocatorData} = require('../procs/getLocatorData');
 
@@ -13,24 +15,23 @@ const {getLocatorData} = require('../procs/getLocatorData');
 
 // Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
-  // Initialize the locators and result.
-  const all = await init(page, 'a[title]');
-  // For each locator:
-  for (const loc of all.allLocs) {
-    // Get whether its element violates the rule.
-    const elData = await getLocatorData(loc);
-    const title = await loc.getAttribute('title');
-    const isBad = elData.excerpt.toLowerCase().includes(title.toLowerCase());
-    // If it does:
-    if (isBad) {
-      // Add the locator to the array of violators.
-      all.locs.push(loc);
-    }
-  }
-  // Populate and return the result.
-  const whats = [
-    'Link has a title attribute that repeats link text content',
-    'Links have title attributes that repeat link text contents'
-  ];
-  return await report(withItems, all, 'linkTitle', whats, 0);
+  // Specify the rule.
+  const ruleData = {
+    ruleID: 'linkTitle',
+    selector: 'a[title]',
+    pruner: async loc => {
+      const elData = await getLocatorData(loc);
+      const title = await loc.getAttribute('title');
+      return elData.excerpt.toLowerCase().includes(title.toLowerCase());
+    },
+    isDestructive: false,
+    complaints: {
+      instance: 'Link has a title attribute that repeats link text content',
+      summary: 'Links have title attributes that repeat link text contents'
+    },
+    ordinalSeverity: 0,
+    summaryTagName: 'A'
+  };
+  // Run the test and return the result.
+  return await simplify(page, withItems, ruleData);
 };
