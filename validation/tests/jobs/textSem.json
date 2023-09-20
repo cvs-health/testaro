@@ -1,14 +1,14 @@
 {
-  "id": "adbID",
-  "what": "validation of adbID test",
+  "id": "textSem",
+  "what": "validation of textSem test",
   "strict": true,
   "timeLimit": 20,
   "acts": [
     {
       "type": "launch",
       "which": "chromium",
-      "url": "file://validation/tests/targets/adbID/index.html",
-      "what": "page with elements having good and bad description references"
+      "url": "file://validation/tests/targets/textSem/index.html",
+      "what": "page with semantically and nonsemantically varied text"
     },
     {
       "type": "test",
@@ -19,32 +19,32 @@
         [
           "standardResult.totals.0",
           "=",
-          0
+          4
         ],
         [
-          "standardResult.totals.3",
+          "standardResult.totals.1",
           "=",
-          2
+          0
         ],
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "adbID"
+          "textSem"
         ],
         [
           "standardResult.instances.0.what",
           "=",
-          "Referenced description of the element is ambiguous or missing"
+          "Element is semantically vague"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          3
+          0
         ],
         [
           "standardResult.instances.0.tagName",
           "=",
-          "SPAN"
+          "I"
         ],
         [
           "standardResult.instances.0.location.doc",
@@ -57,14 +57,19 @@
           "box"
         ],
         [
-          "standardResult.instances.0.location.spec.height",
+          "standardResult.instances.0.location.spec.width",
           ">",
           0
         ],
         [
           "standardResult.instances.0.excerpt",
           "=",
-          "the World Wide Web"
+          "tag"
+        ],
+        [
+          "standardResult.instances.1.tagName",
+          "=",
+          "I"
         ],
         [
           "standardResult.instances.1.excerpt",
@@ -72,29 +77,34 @@
           "Never"
         ],
         [
+          "standardResult.instances.2.ordinalSeverity",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.2.tagName",
+          "=",
+          "B"
+        ],
+        [
           "standardResult.instances.2.excerpt",
           "=",
           "accessible"
         ],
         [
-          "standardResult.instances.1.tagName",
+          "standardResult.instances.3.tagName",
           "=",
-          "LI"
+          "SMALL"
         ],
         [
-          "standardResult.instances.1.excerpt",
+          "standardResult.instances.3.excerpt",
           "=",
-          "Defect 2: United States of America"
-        ],
-        [
-          "standardResult.instances.1.location.spec.y",
-          ">",
-          0
+          "This situation is rare and probably does not apply to you."
         ]
       ],
       "rules": [
         "y",
-        "adbID"
+        "textSem"
       ]
     },
     {
@@ -104,39 +114,39 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.1",
+          "standardResult.totals.0",
           "=",
-          0
+          4
         ],
         [
           "standardResult.totals.3",
           "=",
-          2
+          0
         ],
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "adbID"
+          "textSem"
         ],
         [
           "standardResult.instances.0.what",
           "=",
-          "Referenced descriptions of elements are ambiguous or missing"
+          "Semantically vague elements i, b, and/or small are used"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          3
+          0
         ],
         [
           "standardResult.instances.0.count",
           "=",
-          2
+          4
         ]
       ],
       "rules": [
         "y",
-        "adbID"
+        "textSem"
       ]
     }
   ],

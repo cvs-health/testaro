@@ -60,6 +60,7 @@ const evalRules = {
   styleDiff: 'style inconsistencies',
   tabNav: 'nonstandard keyboard navigation between elements with the tab role',
   targetSize: 'buttons, inputs, and non-inline links smaller than 44 pixels wide and high',
+  textSem: 'semantically vague elements i, b, and/or small',
   titledEl: 'title attributes on inappropriate elements',
   zIndex: 'non-default Z indexes'
 };

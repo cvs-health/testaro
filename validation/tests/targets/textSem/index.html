@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Page with semantically and nonsemantically varied text</title>
+    <meta name="description" content="tester">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      .minor {
+        font-size: small;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Page with semantically and nonsemantically varied text</h1>
+      <p>OK: An <dfn>HTML tag</dfn> is a symbol or pair of symbols that creates an element.</p>
+      <p>Defect 1: A <i>tag</i> is a symbol or pair of symbols that create an element.</p>
+      <p>OK: <em>Do not</em> use the <code>font</code> element.</p>
+      <p>Defect 2: <i>Never</i> use the <code>font</code> element.</p>
+      <p>OK: It is usable, and, more importantly, <strong>accessible (a11y)</strong>.</p>
+      <p>Defect 3: It is usable, and, more importantly, <b>accessible</b>.</p>
+      <p>OK: <span class="minor">This situation is rare and unlikely to apply to you.</span></p>
+      <p>Defect 4: <small>This situation is rare and probably does not apply to you.</small></p>
+    </main>
+  </body>
+</html>
