@@ -10,7 +10,9 @@ Testaro can benefit from contributions of various types, such as:
 
 ## Adding tools
 
-To come.
+Tools that may merit consideration include:
+- Arc (by TPGi). Costs $0.05 per page tested, and requires each user to have an account with the tool maker and to allow the tool maker to charge a charge account for payment.
+- Aslint (by Essential Accessibility). Apparently requires using a bundle file that is in the repository but is also listed in the `.gitignore` file and is missing from the published package, so would need to be physically included in the Testaro code rather than referenced as a dependency.
 
 ## Improving execution speed
 
