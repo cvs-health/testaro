@@ -17,46 +17,43 @@
       <p>Bugs 7 and 8. This <button type="button"> Check this <input type="checkbox" aria-label="I have read the button article"> and click <a href="https://en.wikipedia.org/wiki/Button">buttons</a> button</button> contains a checkbox and a link.</p>
     </main>
     <script>
-      (function (global) {
-        const head = document.head;
-        const timeout = null;
-        const options = {
-          asyncRunner: true,
-          context: document.documentElement,
-          includeElementReference: true,
-          reportFormat: {JSON: true},
-          watchDomChanges: false
-        };
-  
-        const s = document.createElement('script');
-        s.async = true;
-        s.src = 'file:///Users/c162712/Documents/repos/jrpool/aslint/dist/aslint.bundle.js';
-  
-        function onAslintLoaded(res) {
-          global
-          .aslint
-          .config(options)
-          .addListener('onValidatorStarted', function () {
-            console.log('@ Validator started');
-          })
-          .addListener('onValidatorComplete', function (error, report) {
-            console.log('onValidatorComplete', error, report);
-          })
-          .addFilter('onBeforeRuleReport', function (report) {
-            return report;
-          })
-          .setRule('turn-me-off', {isSelectedForScanning: false})
-          .run()
-          .then(function (res) {
-            console.log('Resolved: ', res);
-          })
-          .catch((error) => {
-            console.error('[ASLint error]', error);
-          });
-        }
-        s.addEventListener('load', onAslintLoaded);
-        head.insertBefore(s, head.firstChild);
-      })(this);
+      const options = {
+        asyncRunner: true,
+        context: document.documentElement,
+        includeElementReference: true,
+        reportFormat: {JSON: true},
+        watchDomChanges: false
+      };
+
+      const s = document.createElement('script');
+      s.async = true;
+      s.src = 'file:///Users/c162712/Documents/repos/jrpool/aslint/dist/aslint.bundle.js';
+
+      function onAslintLoaded(res) {
+        window
+        .aslint
+        .config(options)
+        .addListener('onValidatorStarted', function () {
+          console.log('@ Validator started');
+        })
+        .addListener('onValidatorComplete', function (error, report) {
+          console.log('onValidatorComplete', error, report);
+        })
+        .addFilter('onBeforeRuleReport', function (report) {
+          return report;
+        })
+        .setRule('turn-me-off', {isSelectedForScanning: false})
+        .run()
+        .then(function (res) {
+          console.log('Resolved: ', res);
+        })
+        .catch(error => {
+          console.error('[ASLint error]', error);
+        });
+      }
+      s.addEventListener('load', onAslintLoaded);
+      const {head} = document;
+      head.insertBefore(s, head.firstChild);
     </script>
   </body>
 </html>
