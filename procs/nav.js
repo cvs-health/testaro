@@ -37,6 +37,26 @@ let browser;
 
 // Returns a string with any final slash removed.
 const deSlash = string => string.endsWith('/') ? string.slice(0, -1) : string;
+// Gets the script nonce from a response.
+const getNonce = response => {
+  let nonce = '';
+  // If the response includes a content security policy:
+  const csp = response.headers && response.headers['Content-Security-Policy'];
+  if (csp) {
+    // If it requires scripts to have a nonce:
+    const directives = csp.split(/ * ; */).map(directive => directive.split(/ +/));
+    const scriptDirective = directives.find(dir => dir[0] === 'script-src');
+    if (scriptDirective) {
+      const nonceSpec = scriptDirective.find(valPart => valPart.startsWith('nonce-'));
+      if (nonceSpec) {
+        // Return the nonce.
+        nonce = nonceSpec.replace(/^nonce-/, '');
+      }
+    }
+  }
+  // Return the nonce, if any.
+  return nonce;
+};
 // Visits a URL and returns the response of the server.
 const goTo = async (report, page, url, timeout, waitUntil) => {
   // If the URL is a file path:
@@ -68,8 +88,11 @@ const goTo = async (report, page, url, timeout, waitUntil) => {
       else {
         // Press the Escape key to dismiss any modal dialog.
         await page.keyboard.press('Escape');
-        // Return the response.
-        return response;
+        // Return the result of the navigation.
+        return {
+          success: true,
+          response
+        };
       }
     }
     // Otherwise, i.e. if the response status was abnormal:
@@ -78,6 +101,7 @@ const goTo = async (report, page, url, timeout, waitUntil) => {
       console.log(`ERROR: Visit to ${url} got status ${httpStatus}`);
       report.jobData.visitRejectionCount++;
       return {
+        success: false,
         error: 'badStatus'
       };
     }
@@ -85,6 +109,7 @@ const goTo = async (report, page, url, timeout, waitUntil) => {
   catch(error) {
     console.log(`ERROR visiting ${url} (${error.message.slice(0, 200)})`);
     return {
+      success: false,
       error: 'noVisit'
     };
   }
@@ -129,7 +154,10 @@ const launch = async (report, typeName, url, debug, waits, isLowMotion = false) 
       healthy = false;
       console.log(`ERROR launching browser (${error.message.slice(0, 200)})`);
       // Return this.
-      return false;
+      return {
+        success: false,
+        error: 'Browser launch failed'
+      };
     });
     // Open a context (i.e. browser tab), with reduced motion if specified.
     const options = {reduceMotion: isLowMotion ? 'reduce' : 'no-preference'};
@@ -187,19 +215,24 @@ const launch = async (report, typeName, url, debug, waits, isLowMotion = false) 
       await currentPage.waitForLoadState('domcontentloaded', {timeout: 5000});
       // Navigate to the specified URL.
       const navResult = await goTo(report, currentPage, url, 15000, 'domcontentloaded');
+      // If the navigation succeeded:
+      if (navResult.success) {
+        // Update the name of the current browser type and store it in the page.
+        currentPage.browserTypeName = typeName;
+        // Return the response, the browser context, and the page.
+        return {
+          success: true,
+          response: navResult.response,
+          browserContext,
+          currentPage
+        };
+      }
       // If the navigation failed:
       if (navResult.error) {
         // Return this.
-        return false;
-      }
-      // Otherwise, i.e. if it succeeded:
-      else if (! navResult.error) {
-        // Update the name of the current browser type and store it in the page.
-        currentPage.browserTypeName = typeName;
-        // Return the browser context and the page.
         return {
-          browserContext,
-          currentPage
+          success: false,
+          error: 'Navigation failed'
         };
       }
     }
@@ -207,16 +240,23 @@ const launch = async (report, typeName, url, debug, waits, isLowMotion = false) 
     catch(error) {
       // Return this.
       console.log(`ERROR: Blank page load in new tab timed out (${error.message})`);
-      return false;
+      return {
+        success: false,
+        error: 'Blank page load in new tab timed out'
+      };
     }
   }
   // Otherwise, i.e. if it does not exist:
   else {
     // Return this.
     console.log(`ERROR: Browser of type ${typeName} could not be launched`);
-    return false;
+    return {
+      success: false,
+      error: `${typeName} browser launch failed`
+    };
   }
 };
 exports.browserClose = browserClose;
+exports.getNonce = getNonce;
 exports.goTo = goTo;
 exports.launch = launch;

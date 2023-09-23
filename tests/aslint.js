@@ -11,18 +11,24 @@ const fs = require('fs/promises');
 // FUNCTIONS
 
 // Conducts and reports an ASLint test.
-exports.reporter = async page => {
+exports.reporter = async (page, options) => {
   // Initialize the report.
   let data = {};
   // Inject the ASLint bundle script into the page.
   const aslintBundle = await fs.readFile(
     `${__dirname}/../node_modules/aslint-testaro/aslint.bundle.js`, 'utf8'
   );
-  await page.evaluate(script => {
+  await page.evaluate(args => {
+    const cspNonce = args[0];
+    const aslintBundle = args[1];
     const scriptEl = document.createElement('script');
-    scriptEl.textContent = script;
+    // Give the script a nonce attribute if necessary.
+    if (cspNonce) {
+      scriptEl.nonce = cspNonce;
+    }
+    scriptEl.textContent = aslintBundle;
     document.body.insertAdjacentElement('beforeend', scriptEl);
-  }, aslintBundle)
+  }, [cspNonce, aslintBundle])
   // await page.addScriptTag({path: `${__dirname}/../node_modules/aslint-testaro/aslint.bundle.js`})
   .catch(error => {
     console.log(`ERROR: ASLint injection failed (${error.message.slice(0, 400)})`);

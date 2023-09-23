@@ -10,7 +10,7 @@ require('dotenv').config();
 // Requirements for acts.
 const {actSpecs} = require('./actSpecs');
 // Navigation.
-const {browserClose, goTo, launch} = require('./procs/nav');
+const {browserClose, getNonce, goTo, launch} = require('./procs/nav');
 // Module to standardize report formats.
 const {standardize} = require('./procs/standardize');
 
@@ -516,17 +516,21 @@ const doActs = async (report, actIndex, page) => {
       // Otherwise, if the act is a launch:
       else if (act.type === 'launch') {
         // Launch the specified browser and navigate to the specified URL.
-        const browserData = await launch(
+        const launchResult = await launch(
           report, act.which, act.url, debug, waits, act.lowMotion ? 'reduce' : 'no-preference'
         );
         // If the launch and navigation succeeded:
-        if (browserData) {
+        if (launchResult && launchResult.success) {
           // Save the browser data.
-          browserContext = browserData.browserContext;
-          currentPage = browserData.currentPage;
+          const {response, browserContext, currentPage} = launchResult;
           page = currentPage;
           // Add the actual URL to the act.
           act.actualURL = page.url();
+          // Add any nonce to the Act.
+          const nonce = getNonce(response);
+          if (nonce) {
+            act.cspNonce = nonce;
+          }
         }
         // Otherwise, i.e. if the launch or navigation failed:
         else {
@@ -542,41 +546,32 @@ const doActs = async (report, actIndex, page) => {
           const resolved = act.which.replace('__dirname', __dirname);
           requestedURL = resolved;
           // Visit it and wait until the DOM is loaded.
-          const response = await goTo(report, page, requestedURL, 15000, 'domcontentloaded');
-          // If the visit failed:
-          if (response.error) {
-            // Report this and quit.
-            addError(act, 'failure', 'ERROR: Visits failed');
-            await abortActs();
-          }
-          // Otherwise, i.e. if the visit succeeded:
-          else {
-            // If a prohibited redirection occurred:
-            if (response.exception === 'badRedirection') {
-              // Report this and quit.
-              addError(act, 'badRedirection', 'ERROR: Navigation illicitly redirected');
-              await abortActs();
+          const navResult = await goTo(report, page, requestedURL, 15000, 'domcontentloaded');
+          // If the visit succeeded:
+          if (navResult.success) {
+            // Add the script nonce, if any, to the act.
+            const {response} = navResult;
+            const scriptNonce = getNonce(response);
+            if (scriptNonce) {
+              act.cspNonce = scriptNonce;
             }
             // Add the resulting URL to the act.
             if (! act.result) {
               act.result = {};
             }
             act.result.url = page.url();
-            // If the response includes a content security policy:
-            const csp = response.headers && response.headers['Content-Security-Policy'];
-            if (csp) {
-              // If it requires scripts to have a nonce:
-              const directives = csp.split(/ * ; */).map(directive => directive.split(/ +/));
-              const scriptDirective = directives.find(dir => dir[0] === 'script-src');
-              if (scriptDirective) {
-                const nonceSpec = scriptDirective.find(valPart => valPart.startsWith('nonce-'));
-                if (nonceSpec) {
-                  // Add the nonce to the act.
-                  const nonce = nonceSpec.replace(/^nonce-/, '');
-                  act.cspNonce = nonce;
-                }
-              }
+            // If a prohibited redirection occurred:
+            if (response.exception === 'badRedirection') {
+              // Report this and quit.
+              addError(act, 'badRedirection', 'ERROR: Navigation illicitly redirected');
+              await abortActs();
             }
+          }
+          // If the visit failed:
+          if (response.error) {
+            // Report this and quit.
+            addError(act, 'failure', 'ERROR: Visits failed');
+            await abortActs();
           }
         }
         // Otherwise, if the act is a wait for text:
@@ -700,7 +695,7 @@ const doActs = async (report, actIndex, page) => {
             // Add a description of the test to the act.
             act.what = tests[act.which];
             // Initialize the options argument.
-            const options = {};
+            const options = {act};
             // Add any specified arguments to it.
             Object.keys(act).forEach(key => {
               if (! ['type', 'which'].includes(key)) {
@@ -716,8 +711,7 @@ const doActs = async (report, actIndex, page) => {
             };
             // Perform the specified tests of the tool and get a report.
             try {
-              const args = [page, options];
-              toolReport = await require(`./tests/${act.which}`).reporter(... args);
+              toolReport = await require(`./tests/${act.which}`).reporter(page, options);
               toolReport.result.success = true;
             }
             // If the testing failed:
