@@ -562,6 +562,21 @@ const doActs = async (report, actIndex, page) => {
               act.result = {};
             }
             act.result.url = page.url();
+            // If the response includes a content security policy:
+            const csp = response.headers && response.headers['Content-Security-Policy'];
+            if (csp) {
+              // If it requires scripts to have a nonce:
+              const directives = csp.split(/ * ; */).map(directive => directive.split(/ +/));
+              const scriptDirective = directives.find(dir => dir[0] === 'script-src');
+              if (scriptDirective) {
+                const nonceSpec = scriptDirective.find(valPart => valPart.startsWith('nonce-'));
+                if (nonceSpec) {
+                  // Add the nonce to the act.
+                  const nonce = nonceSpec.replace(/^nonce-/, '');
+                  act.cspNonce = nonce;
+                }
+              }
+            }
           }
         }
         // Otherwise, if the act is a wait for text:
