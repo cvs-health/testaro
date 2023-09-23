@@ -12,21 +12,27 @@ const fs = require('fs/promises');
 
 // Conducts and reports an ASLint test.
 exports.reporter = async page => {
+  // Initialize the report.
+  let data = {};
   // Inject the ASLint bundle script into the page.
-  await page.addScriptTag(`${__dirname}/../node_modules/aslint-testaro/aslint.bundle.js`)
+  const aslintBundle = await fs.readFile(
+    `${__dirname}/../node_modules/aslint-testaro/aslint.bundle.js`, 'utf8'
+  );
+  await page.evaluate(script => {
+    const scriptEl = document.createElement('script');
+    scriptEl.textContent = script;
+    document.body.insertAdjacentElement('beforeend', scriptEl);
+  }, aslintBundle)
+  // await page.addScriptTag({path: `${__dirname}/../node_modules/aslint-testaro/aslint.bundle.js`})
   .catch(error => {
-    console.log(`ERROR: ASLint injection failed (${error.message.slice(0, 200)})`);
+    console.log(`ERROR: ASLint injection failed (${error.message.slice(0, 400)})`);
     data.prevented = true;
     data.error = 'ERROR: ASLint injection failed';
   });
   // If the injection succeeded:
   if (! data.prevented) {
     // Get the data on the elements violating the specified ASLint rules.
-    const aslintReport = 'stuff'
-    .catch(error => {
-      console.log(`ERROR: ASLint failed (${error.message.slice(0, 200)}'`);
-      return '';
-    });
+    const aslintReport = 'stuff';
     // If the test succeeded:
     if (aslintReport.length) {
       // Initialize the result.

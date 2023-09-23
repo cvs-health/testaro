@@ -127,7 +127,7 @@ const launch = async (report, typeName, url, debug, waits, isLowMotion = false) 
     // If the launch failed:
     .catch(async error => {
       healthy = false;
-      console.log(`ERROR launching browser (${errorStart(error)})`);
+      console.log(`ERROR launching browser (${error.message.slice(0, 200)})`);
       // Return this.
       return false;
     });
