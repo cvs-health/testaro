@@ -2,14 +2,20 @@
   qualWeb
   This test implements the QualWeb ruleset for accessibility.
 */
+
 // IMPORTS
+
 const {QualWeb} = require('@qualweb/core');
+
 // CONSTANTS
+
 const qualWeb = new QualWeb({});
 const clusterOptions = {
   timeout: 25 * 1000
 };
+
 // FUNCTIONS
+
 // Conducts and reports a QualWeb test.
 exports.reporter = async (page, options) => {
   const {withNewContent, rules} = options;

@@ -33,6 +33,7 @@
     "@siteimprove/alfa-rules": "*",
     "@siteimprove/alfa-scraper": "*",
     "accessibility-checker": "*",
+    "aslint-testaro": "*",
     "axe-playwright": "*",
     "dotenv": "*",
     "node-fetch": "<3.0.0",

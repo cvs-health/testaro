@@ -36,6 +36,7 @@ const moves = {
 // Names and descriptions of tools.
 const tests = {
   alfa: 'alfa',
+  aslint: 'ASLint',
   axe: 'Axe',
   htmlcs: 'HTML CodeSniffer WCAG 2.1 AA ruleset',
   ibm: 'IBM Accessibility Checker',

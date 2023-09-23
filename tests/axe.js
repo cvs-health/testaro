@@ -18,9 +18,13 @@
   category (“tag”), such as 'wcag21aaa'. Scoring can consider test categories by getting the value
   of the 'tags' property of each rule.
 */
+
 // IMPORTS
+
 const {injectAxe, getAxeResults} = require('axe-playwright');
+
 // FUNCTIONS
+
 // Conducts and reports an Axe test.
 exports.reporter = async (page, options) => {
   const {detailLevel, rules} = options;
