@@ -14,21 +14,65 @@ const fs = require('fs/promises');
 exports.reporter = async (page, options) => {
   // Initialize the report.
   let data = {};
-  // Inject the ASLint bundle script into the page.
+  // Inject the ASLint runner into the page.
+  const aslintRunnerLines = [
+    'const options = {',
+      'asyncRunner: true,',
+      'context: document.documentElement,',
+      'includeElementReference: true,',
+      'reportFormat: {JSON: true},',
+      'watchDomChanges: false',
+    '};',
+    'document.getElementById("aslintBundle").addEventListener(load, result => {',
+      'window',
+      '.aslint',
+      '.config(options)',
+      '.addListener("onValidatorStarted", function () {',
+        'console.log("@ Validator started");',
+      '})',
+      '.addListener("onValidatorComplete", function (error, report) {',
+        'console.log("onValidatorComplete", error, report);',
+      '})',
+      '.addFilter("onBeforeRuleReport", function (report) {',
+        'return report;',
+      '})',
+      '.setRule("turn-me-off", {isSelectedForScanning: false})',
+      '.run()',
+      '.then(function (result) {',
+        'const resultEl = document.createElement("pre");',
+        'resultEl.id = "result";',
+        'resultEl.textContent = result;',
+        'document.body.insertAdjacentElement("beforeend", resultEl);',
+      '})',
+      '.catch(error => {',
+        'console.error("[ASLint error]", error);',
+      '});',
+    '});',
+  ];
+  // Inject any nonce and the ASLint runner and bundle scripts into the page.
+  const aslintRunnerContent = aslintRunnerLines.join('\n');
   const aslintBundle = await fs.readFile(
     `${__dirname}/../node_modules/aslint-testaro/aslint.bundle.js`, 'utf8'
   );
+  const cspNonce = options.act && options.act.cspNonce;
   await page.evaluate(args => {
     const cspNonce = args[0];
-    const aslintBundle = args[1];
-    const scriptEl = document.createElement('script');
-    // Give the script a nonce attribute if necessary.
+    const aslintRunnerContent = args[1];
+    const aslintBundle = args[2];
+    const runnerScriptEl = document.createElement('script');
     if (cspNonce) {
-      scriptEl.nonce = cspNonce;
+      runnerScriptEl.nonce = cspNonce;
     }
-    scriptEl.textContent = aslintBundle;
-    document.body.insertAdjacentElement('beforeend', scriptEl);
-  }, [cspNonce, aslintBundle])
+    runnerScriptEl.textContent = aslintRunnerContent;
+    document.body.insertAdjacentElement('beforeend', runnerScriptEl);
+    const bundleScriptEl = document.createElement('script');
+    bundleScriptEl.id = 'aslintBundle';
+    if (cspNonce) {
+      bundleScriptEl.nonce = cspNonce;
+    }
+    bundleScriptEl.textContent = aslintBundle;
+    document.head.insertAdjacentElement('beforeend', scriptEl);
+  }, [cspNonce, aslintRunnerContent, aslintBundle])
   // await page.addScriptTag({path: `${__dirname}/../node_modules/aslint-testaro/aslint.bundle.js`})
   .catch(error => {
     console.log(`ERROR: ASLint injection failed (${error.message.slice(0, 400)})`);
@@ -37,15 +81,17 @@ exports.reporter = async (page, options) => {
   });
   // If the injection succeeded:
   if (! data.prevented) {
-    // Get the data on the elements violating the specified ASLint rules.
-    const aslintReport = 'stuff';
-    // If the test succeeded:
-    if (aslintReport.length) {
+    // Get the test results.
+    const reportLoc = await page.locator('#result');
+    // If there were any:
+    if (reportLoc) {
+      // Get them.
+      const report = await reportLoc.textContent();
       // Initialize the result.
       data.totals = {
         stuff: 0
       };
-      data.details = 'details';
+      data.details = report;
       // Populate the totals.
       // Delete irrelevant properties from the report details.
     }

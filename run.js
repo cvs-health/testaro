@@ -527,7 +527,7 @@ const doActs = async (report, actIndex, page) => {
           // Add the actual URL to the act.
           act.actualURL = page.url();
           // Add any nonce to the Act.
-          const nonce = getNonce(response);
+          const nonce = await getNonce(response);
           if (nonce) {
             act.cspNonce = nonce;
           }

@@ -38,13 +38,15 @@ let browser;
 // Returns a string with any final slash removed.
 const deSlash = string => string.endsWith('/') ? string.slice(0, -1) : string;
 // Gets the script nonce from a response.
-const getNonce = response => {
+const getNonce = async response => {
   let nonce = '';
   // If the response includes a content security policy:
-  const csp = response.headers && response.headers['Content-Security-Policy'];
-  if (csp) {
+  const headers = await response.allHeaders();
+  const cspWithQuotes = headers && headers['content-security-policy'];
+  if (cspWithQuotes) {
     // If it requires scripts to have a nonce:
-    const directives = csp.split(/ * ; */).map(directive => directive.split(/ +/));
+    const csp = cspWithQuotes.replace(/'/g, '');
+    const directives = csp.split(/ *; */).map(directive => directive.split(/ +/));
     const scriptDirective = directives.find(dir => dir[0] === 'script-src');
     if (scriptDirective) {
       const nonceSpec = scriptDirective.find(valPart => valPart.startsWith('nonce-'));
