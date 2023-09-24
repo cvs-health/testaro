@@ -522,14 +522,14 @@ const doActs = async (report, actIndex, page) => {
         // If the launch and navigation succeeded:
         if (launchResult && launchResult.success) {
           // Save the browser data.
-          const {response, browserContext, currentPage} = launchResult;
+          const {response, currentPage} = launchResult;
           page = currentPage;
           // Add the actual URL to the act.
           act.actualURL = page.url();
           // Add any nonce to the Act.
-          const nonce = await getNonce(response);
-          if (nonce) {
-            act.cspNonce = nonce;
+          const scriptNonce = await getNonce(response);
+          if (scriptNonce) {
+            report.jobData.lastScriptNonce = scriptNonce;
           }
         }
         // Otherwise, i.e. if the launch or navigation failed:
@@ -553,7 +553,7 @@ const doActs = async (report, actIndex, page) => {
             const {response} = navResult;
             const scriptNonce = getNonce(response);
             if (scriptNonce) {
-              act.cspNonce = scriptNonce;
+              report.jobData.lastScriptNonce = scriptNonce;
             }
             // Add the resulting URL to the act.
             if (! act.result) {
@@ -695,7 +695,10 @@ const doActs = async (report, actIndex, page) => {
             // Add a description of the test to the act.
             act.what = tests[act.which];
             // Initialize the options argument.
-            const options = {act};
+            const options = {
+              act,
+              scriptNonce: report.jobData.lastScriptNonce || ''
+            };
             // Add any specified arguments to it.
             Object.keys(act).forEach(key => {
               if (! ['type', 'which'].includes(key)) {

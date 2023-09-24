@@ -20,29 +20,28 @@ exports.reporter = async (page, options) => {
     `${__dirname}/../node_modules/aslint-testaro/aslint.bundle.js`, 'utf8'
   );
   // Get the nonce, if any.
-  const cspNonce = options.act && options.act.cspNonce;
-  console.log(`cspNonce is ${cspNonce}`);
+  const scriptNonce = options.scriptNonce;
   // Inject the ASLint bundle and runner into the page.
   await page.evaluate(args => {
-    const {cspNonce, aslintBundle, aslintRunner} = args;
+    const {scriptNonce, aslintBundle, aslintRunner} = args;
     // Bundle.
     const bundleEl = document.createElement('script');
     bundleEl.id = 'aslintBundle';
-    if (cspNonce) {
-      bundleEl.nonce = cspNonce;
-      console.log(`Added nonce ${cspNonce} to bundle`);
+    if (scriptNonce) {
+      bundleEl.nonce = scriptNonce;
+      console.log(`Added nonce ${scriptNonce} to bundle`);
     }
     bundleEl.textContent = aslintBundle;
     document.head.insertAdjacentElement('beforeend', bundleEl);
     // Runner.
     const runnerEl = document.createElement('script');
-    if (cspNonce) {
-      runnerEl.nonce = cspNonce;
-      console.log(`Added nonce ${cspNonce} to runner`);
+    if (scriptNonce) {
+      runnerEl.nonce = scriptNonce;
+      console.log(`Added nonce ${scriptNonce} to runner`);
     }
     runnerEl.textContent = aslintRunner;
     document.body.insertAdjacentElement('beforeend', runnerEl);
-  }, {cspNonce, aslintBundle, aslintRunner})
+  }, {scriptNonce, aslintBundle, aslintRunner})
   .catch(error => {
     console.log(`ERROR: ASLint injection failed (${error.message.slice(0, 400)})`);
     data.prevented = true;
