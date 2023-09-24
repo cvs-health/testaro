@@ -21,6 +21,7 @@ exports.reporter = async (page, options) => {
   );
   // Get the nonce, if any.
   const cspNonce = options.act && options.act.cspNonce;
+  console.log(`cspNonce is ${cspNonce}`);
   // Inject the ASLint bundle and runner into the page.
   await page.evaluate(args => {
     const {cspNonce, aslintBundle, aslintRunner} = args;
@@ -29,6 +30,7 @@ exports.reporter = async (page, options) => {
     bundleEl.id = 'aslintBundle';
     if (cspNonce) {
       bundleEl.nonce = cspNonce;
+      console.log(`Added nonce ${cspNonce} to bundle`);
     }
     bundleEl.textContent = aslintBundle;
     document.head.insertAdjacentElement('beforeend', bundleEl);
@@ -36,6 +38,7 @@ exports.reporter = async (page, options) => {
     const runnerEl = document.createElement('script');
     if (cspNonce) {
       runnerEl.nonce = cspNonce;
+      console.log(`Added nonce ${cspNonce} to runner`);
     }
     runnerEl.textContent = aslintRunner;
     document.body.insertAdjacentElement('beforeend', runnerEl);
@@ -47,36 +50,22 @@ exports.reporter = async (page, options) => {
   });
   // If the injection succeeded:
   if (! data.prevented) {
-    // Get the test results.
-    console.log('About to get test results');
+    // Wait for the test results.
     const reportLoc = page.locator('#aslintResult');
     await reportLoc.waitFor({
       state: 'attached',
-      timeout: 3000
+      timeout: 10000
     });
-    // If there were any:
-    // if (reportExists) {
-      console.log('Results exist');
-      // Get them.
-      const report = await reportLoc.textContent();
-      console.log('Got report');
-      // Initialize the result.
-      data.totals = {
-        stuff: 0
-      };
-      data.details = report;
-      // Populate the totals.
-      // Delete irrelevant properties from the report details.
-    // }
-    // Otherwise, i.e. if the test failed:
-    /*
-    else {
-      // Report this.
-      data.prevented = true;
-      data.error = 'ERROR: ASLint failed';
-      console.log('ERROR: ASLint failed');
-    }
-    */
+    // Get them.
+    const report = await reportLoc.textContent();
+    // Populate the tool report.
+    data = JSON.parse(report);
+    // Delete irrelevant properties from the tool report details.
+    Object.keys(data.rules).forEach(ruleID => {
+      if (data.rules[ruleID].status.type === 'passed') {
+        delete data.rules[ruleID];
+      }
+    });
   }
   // Return the result.
   try {
