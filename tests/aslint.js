@@ -48,11 +48,18 @@ exports.reporter = async (page, options) => {
   // If the injection succeeded:
   if (! data.prevented) {
     // Get the test results.
-    const reportLoc = await page.locator('#aslintResult');
+    console.log('About to get test results');
+    const reportLoc = page.locator('#aslintResult');
+    await reportLoc.waitFor({
+      state: 'attached',
+      timeout: 3000
+    });
     // If there were any:
-    if (reportLoc) {
+    // if (reportExists) {
+      console.log('Results exist');
       // Get them.
       const report = await reportLoc.textContent();
+      console.log('Got report');
       // Initialize the result.
       data.totals = {
         stuff: 0
@@ -60,14 +67,16 @@ exports.reporter = async (page, options) => {
       data.details = report;
       // Populate the totals.
       // Delete irrelevant properties from the report details.
-    }
+    // }
     // Otherwise, i.e. if the test failed:
+    /*
     else {
       // Report this.
       data.prevented = true;
       data.error = 'ERROR: ASLint failed';
       console.log('ERROR: ASLint failed');
     }
+    */
   }
   // Return the result.
   try {

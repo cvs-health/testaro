@@ -10,7 +10,9 @@ const options = {
   watchDomChanges: false
 };
 const bundleEl = document.getElementById('aslintBundle');
-bundleEl.addEventListener('load', () => {
+console.log('Defined bundle');
+// bundleEl.addEventListener('load', () => {
+  console.log('Bundle loaded');
   window
   .aslint
   .config(options)
@@ -28,10 +30,10 @@ bundleEl.addEventListener('load', () => {
   .then(function (result) {
     const resultEl = document.createElement('pre');
     resultEl.id = 'aslintResult';
-    resultEl.textContent = result;
+    resultEl.textContent = JSON.stringify(result, null, 2);
     document.body.insertAdjacentElement('beforeend', resultEl);
   })
   .catch(error => {
     console.error('[ASLint error]', error);
   });
-});
+// });
