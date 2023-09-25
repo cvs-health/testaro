@@ -270,7 +270,7 @@ const convert = (toolName, result, standardResult) => {
         ruleResults.forEach(ruleResult => {
           const {issueType} = result.rules[ruleID];
           const xpath = ruleResult.element && ruleResult.element.xpath || '';
-          const tagName = xpath && xpath.replace(/^.*\//, '').replace(/\[.*$/, '').toUpperCase()
+          const tagName = xpath && xpath.replace(/^.*\//, '').replace(/[^-\w].*$/, '').toUpperCase()
           || '';
           const excerpt = ruleResult.element && ruleResult.element.html || '';
           const idDraft = excerpt && excerpt.replace(/^[^>]+id="/, 'id=').replace(/".*$/, '');
