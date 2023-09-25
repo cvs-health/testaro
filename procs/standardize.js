@@ -273,7 +273,7 @@ const convert = (toolName, result, standardResult) => {
           const tagName = xpath && xpath.replace(/^.*\//, '').replace(/[^-\w].*$/, '').toUpperCase()
           || '';
           const excerpt = ruleResult.element && ruleResult.element.html || '';
-          const idDraft = excerpt && excerpt.replace(/^[^>]+id="/, 'id=').replace(/".*$/, '');
+          const idDraft = excerpt && excerpt.replace(/^[^[>]+id="/, 'id=').replace(/".*$/, '');
           const id = idDraft && idDraft.length > 3 && idDraft.startsWith('id=')
             ? idDraft.slice(3)
             : '';
