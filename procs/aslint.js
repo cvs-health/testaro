@@ -10,7 +10,6 @@ const options = {
   watchDomChanges: false
 };
 const bundleEl = document.getElementById('aslintBundle');
-console.log('Defined bundle');
 window
 .aslint
 .config(options)
@@ -28,25 +27,56 @@ window
 .then(function (result) {
   const resultEl = document.createElement('pre');
   resultEl.id = 'aslintResult';
-  console.log('About to populate result element');
-  console.log(`result keys are ${Object.keys(result)}`);
   if (result.rules) {
     const ruleIDs = Object.keys(result.rules);
+    ruleIDs.forEach(ruleID => {
+      const {results} = result.rules[ruleID];
+      if (results && results.length) {
+        results.forEach(ruleResult => {
+          delete ruleResult.data;
+          delete ruleResult.element.reference;
+          delete ruleResult.message.expected;
+          delete ruleResult.skipReason;
+          ruleResult.element.html = ruleResult
+          .element
+          .html
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
+          .replace(/&quot;/g, '\"')
+          .replace(/&#x3D;/g, '=')
+          .replace(/&#x2F;/g, '/')
+          .replace(/&#39;/g, '\'')
+          .replace(/&amp;(?:amp;)*/g, '&')
+          .replace(/%3A/g, ':')
+          .replace(/%2F/g, '/');
+          ruleResult.message.actual.description = ruleResult
+          .message
+          .actual
+          .description
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
+          .replace(/&quot;/g, '\"')
+          .replace(/&#x3D;/g, '=')
+          .replace(/&#x2F;/g, '/')
+          .replace(/&amp;(?:amp;)*/g, '&')
+          .replace(/%2F/g, '/');
+        });
+      }
+    });
     ruleIDs.forEach(ruleID => {
       try {
         JSON.stringify(result.rules[ruleID]);
       }
       catch(error) {
-        console.log(`ERROR: Rule ${ruleID} result not stringifiable so deleted`);
-        delete result.rules[ruleID];
+        console.log(`ERROR: Rule ${ruleID} result not stringifiable so its results deleted`);
+        delete result.rules[ruleID].results;
+        result.rules[ruleID].success = false;
+        result.rules[ruleID].error = 'Result property not stringifiable so deleted';
       }
     });
   }
   resultEl.textContent = JSON.stringify(result, null, 2);
-  console.log(`Result:\n${resultEl.textContent}`);
-  console.log('Populated result element');
   document.body.insertAdjacentElement('beforeend', resultEl);
-  console.log('Result element inserted')
 })
 .catch(error => {
   console.error('[ASLint error]', error);
