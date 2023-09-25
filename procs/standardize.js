@@ -259,6 +259,39 @@ const convert = (toolName, result, standardResult) => {
       standardResult.instances.push(instance);
     });
   }
+  // aslint
+  else if (toolName === 'aslint' && result.summary && result.summary.byIssueType) {
+    standardResult.totals = [
+      result.summary.byIssueType.warning, 0, 0, result.summary.byIssueType.error
+    ];
+    Object.keys(result.rules).forEach(ruleID => {
+      const ruleResults = result.rules[ruleID].results;
+      if (ruleResults && ruleResults.length) {
+        ruleResults.forEach(ruleResult => {
+          const {issueType} = result.rules[ruleID];
+          const xpath = ruleResult.element && ruleResult.element.xpath || '';
+          const tagName = xpath && xpath.replace(/^.*\//, '').replace(/[^-a-z].*$/, '').toUpperCase
+          || '';
+          const excerpt = ruleResult.element && ruleResult.element.html || '';
+          const id = excerpt && excerpt.replace(/^[^>]+id="/, '').replace(/".*$/, '') || '';
+          const instance = {
+            ruleID,
+            what: ruleResult.message.actual.description,
+            ordinalSeverity: ['warning', 0, 0, 'error'].indexOf(issueType),
+            tagName,
+            id,
+            location: {
+              doc: 'dom',
+              type: 'xpath',
+              spec: xpath
+            },
+            excerpt
+          };
+          standardResult.instances.push(instance);
+        });
+      }
+    });
+  }
   // axe
   else if (
     toolName === 'axe'

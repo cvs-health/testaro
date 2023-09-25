@@ -62,7 +62,7 @@ exports.reporter = async (page, options) => {
     // Delete irrelevant properties from the tool report details.
     if (data.rules) {
       Object.keys(data.rules).forEach(ruleID => {
-        if (data.rules[ruleID].status.type === 'passed') {
+        if (['passed', 'skipped'].includes(data.rules[ruleID].status.type)) {
           delete data.rules[ruleID];
         }
       });
