@@ -10,6 +10,8 @@ The purposes of Testaro are to:
 - provide programmatic access to accessibility tests defined by several tools
 - facilitate the integration of the reports of the tools into a unified report
 
+Testaro is described in [Testaro: Efficient Ensemble Testing for Web Accessibility](https://arxiv.org/abs/2309.10167).
+
 The need for multi-tool integration, and its costs, are discussed in [Accessibility Metatesting: Comparing Nine Testing Tools](https://arxiv.org/abs/2304.07591).
 
 Testaro launches and controls web browsers, performing operations, conducting tests, and recording results.
@@ -43,6 +45,7 @@ Testaro uses:
 Testaro performs tests of these tools:
 - [accessibility-checker](https://www.npmjs.com/package/accessibility-checker) (IBM)
 - [alfa](https://alfa.siteimprove.com/) (Siteimprove)
+- [aslint](https://www.npmjs.com/package/@essentialaccessibility/aslint) (eSSENTIAL Accessibility)
 - [axe-playwright](https://www.npmjs.com/package/axe-playwright) (Deque)
 - [HTML CodeSniffer](https://www.npmjs.com/package/html_codesniffer) (Squiz Labs)
 - [Nu Html Checker](https://github.com/validator/validator) (World Wide Web Consortium)
@@ -50,11 +53,11 @@ Testaro performs tests of these tools:
 - [Testaro](https://www.npmjs.com/package/testaro) (CVS Health)
 - [WAVE API](https://wave.webaim.org/api/) (WebAIM)
 
-Some of the tests of Testaro are designed to act as approximate alternatives to tests of vulnerable, restricted, or no longer available tools. One such tool is the [BBC Accessibility Standards Checker](https://github.com/bbc/bbc-a11y). In all such cases the Testaro rules are independently designed and implemented, without reference to the code of the tests that inspired them.
+Some of the tests of Testaro are designed to act as approximate alternatives to tests of vulnerable, restricted, or no longer available tools. In all such cases the Testaro rules are independently designed and implemented, without reference to the code of the tests that inspired them.
 
 ## Rules
 
-Each tool accessed with Testaro defines _rules_ and tests _targets_ for compliance with its rules. In total, the eight tools define about 650 rules. Some of the tools are under active development, and their rule counts change over time.
+Each tool accessed with Testaro defines _rules_ and tests _targets_ for compliance with its rules. In total, the nine tools define about 760 rules. Some of the tools are under active development, and their rule counts change over time.
 
 When you ask Testaro to run tests of a tool, you may specify a subset of the rules of that tool, and the report will give you the results of only the tests for those rules. These tools will perform only those tests:
 - `alfa`
@@ -67,6 +70,8 @@ These tools always perform a fixed set of tests, and Testaro disregards irreleva
 - `ibm`
 - `nuVal`
 - `wave`
+
+The `aslint` tool does not yet allow rule specification.
 
 ## Job data
 
@@ -392,6 +397,8 @@ When you include a `rules` property, you limit the tests of the tool that are pe
 
 The `nuVal`, `qualWeb`, and `testaro` tools require specific formats for the `rules` property. Those formats are described below in the sections about those tools.
 
+The `aslint` tool does not yet allow rule specification.
+
 ###### Examples
 
 An example of a `test` act is:
@@ -664,7 +671,7 @@ The validity criterion named in item 2 may be any of these:
 - `'isBrowserType'`: is `'chromium'`, `'firefox'`, or `'webkit'`
 - `'isFocusable'`: is `'a'`, `'button'`, `'input'`, `'select'`, or `'option'`
 - `'isState'`: is `'loaded'` or `'idle'`
-- `'isTest'`: is the name of a test
+- `'isTest'`: is the name of a tool
 - `'isWaitable'`: is `'url'`, `'title'`, or `'body'`
 - `'areStrings'`: is an array of strings
 
