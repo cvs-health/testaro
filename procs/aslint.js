@@ -9,14 +9,13 @@ const options = {
   reportFormat: {JSON: true},
   watchDomChanges: false
 };
-const bundleEl = document.getElementById('aslintBundle');
 window
 .aslint
 .config(options)
 .addListener('onValidatorStarted', function () {
   console.log('@ Validator started');
 })
-.addListener('onValidatorComplete', function (error, report) {
+.addListener('onValidatorComplete', function () {
   console.log('@ Validator Complete');
 })
 .addFilter('onBeforeRuleReport', function (report) {
@@ -42,7 +41,7 @@ window
           .html
           .replace(/&lt;/g, '<')
           .replace(/&gt;/g, '>')
-          .replace(/&quot;/g, '\"')
+          .replace(/&quot;/g, '"')
           .replace(/&#x3D;/g, '=')
           .replace(/&#x2F;/g, '/')
           .replace(/&#39;/g, '\'')
@@ -55,7 +54,7 @@ window
           .description
           .replace(/&lt;/g, '<')
           .replace(/&gt;/g, '>')
-          .replace(/&quot;/g, '\"')
+          .replace(/&quot;/g, '"')
           .replace(/&#x3D;/g, '=')
           .replace(/&#x2F;/g, '/')
           .replace(/&amp;(?:amp;)*/g, '&')
