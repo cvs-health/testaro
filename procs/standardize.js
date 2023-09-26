@@ -268,6 +268,10 @@ const convert = (toolName, result, standardResult) => {
       const ruleResults = result.rules[ruleID].results;
       if (ruleResults && ruleResults.length) {
         ruleResults.forEach(ruleResult => {
+          const what = ruleResult.message.actual.description;
+          if (ruleID === 'misused-required-attribute' && what.includes('not needed')) {
+            ruleID = 'misused-required-attributeR';
+          }
           const {issueType} = result.rules[ruleID];
           const xpath = ruleResult.element && ruleResult.element.xpath || '';
           const tagName = xpath && xpath.replace(/^.*\//, '').replace(/[^-\w].*$/, '').toUpperCase()
@@ -279,7 +283,7 @@ const convert = (toolName, result, standardResult) => {
             : '';
           const instance = {
             ruleID,
-            what: ruleResult.message.actual.description,
+            what,
             ordinalSeverity: ['warning', 0, 0, 'error'].indexOf(issueType),
             tagName,
             id,
