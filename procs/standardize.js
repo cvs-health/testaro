@@ -272,6 +272,17 @@ const convert = (toolName, result, standardResult) => {
           if (ruleID === 'misused-required-attribute' && what.includes('not needed')) {
             ruleID = 'misused-required-attributeR';
           }
+          else if (ruleID === 'accessible-svg') {
+            if (what.includes('associated')) {
+              ruleID = 'accessible-svgI';
+            }
+            else if (what.includes('tabindex')) {
+              ruleID = 'accessible-svgT';
+            }
+            else {
+              ruleID = 'accessible-svgN';
+            }
+          }
           const {issueType} = result.rules[ruleID];
           const xpath = ruleResult.element && ruleResult.element.xpath || '';
           const tagName = xpath && xpath.replace(/^.*\//, '').replace(/[^-\w].*$/, '').toUpperCase()
