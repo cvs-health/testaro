@@ -39,6 +39,21 @@ const getIdentifiers = code => {
   }
   return [tagName, id];
 };
+// Specifies conversions of rule IDs of aslint based on what substrings.
+const aslintData = {
+  'misused-required-attribute': [
+    ['not needed', 'misused-required-attributeR']
+  ],
+  'accessible-svg': [
+    ['associated', 'accessible-svgI'],
+    ['tabindex', 'accessible-svgT']
+  ],
+  'audio-alternative': [
+    ['track', 'audio-alternativeT'],
+    ['alternative', 'audio-alternativeA'],
+    ['bgsound', 'audio-alternativeB']
+  ]
+};
 // Converts issue instances at an axe certainty level.
 const doAxe = (result, standardResult, certainty) => {
   if (result.details && result.details[certainty]) {
@@ -269,20 +284,6 @@ const convert = (toolName, result, standardResult) => {
       if (ruleResults && ruleResults.length) {
         ruleResults.forEach(ruleResult => {
           const what = ruleResult.message.actual.description;
-          if (ruleID === 'misused-required-attribute' && what.includes('not needed')) {
-            ruleID = 'misused-required-attributeR';
-          }
-          else if (ruleID === 'accessible-svg') {
-            if (what.includes('associated')) {
-              ruleID = 'accessible-svgI';
-            }
-            else if (what.includes('tabindex')) {
-              ruleID = 'accessible-svgT';
-            }
-            else {
-              ruleID = 'accessible-svgN';
-            }
-          }
           const {issueType} = result.rules[ruleID];
           const xpath = ruleResult.element && ruleResult.element.xpath || '';
           const tagName = xpath && xpath.replace(/^.*\//, '').replace(/[^-\w].*$/, '').toUpperCase()
@@ -292,6 +293,13 @@ const convert = (toolName, result, standardResult) => {
           const id = idDraft && idDraft.length > 3 && idDraft.startsWith('id=')
             ? idDraft.slice(3)
             : '';
+          const ruleData = aslintData[ruleID];
+          if (ruleData) {
+            const changer = ruleData.find(pair => what.includes(pair[0]));
+            if (changer) {
+              ruleID = changer[1];
+            }
+          }
           const instance = {
             ruleID,
             what,

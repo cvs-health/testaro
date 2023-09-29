@@ -285,7 +285,7 @@ This standard format reflects some judgments. For example:
 - The `ordinalSeverity` property of an instance may have required interpretation. Tools may report severity, certainty, priority, or some combination of those. They may use ordinal or metric quantifications. If they quantify ordinally, their scales may have more or fewer than 4 ranks. Testaro coerces each tool’s severity, certainty, and/or priority classification into a 4-rank ordinal classification. This classification is deemed to express the most common pattern among the tools.
 - The `tagName` property of an instance may not always be obvious, because in some cases the rule being tested for requires a relationship among more than one element (e.g., “An X element may not have a Y element as its parent”).
 - The `ruleID` property of an instance is a matching rule if the tool issues a message but no rule identifier for each instance. The `nuVal` tool does this. In this case, Testaro is classifying the messages into rules.
-- The `ruleID` property of an instance may reclassify tool rules. For example, if a tool rule covers multiple situations that are dissimilar (such as having dissimilar user impacts), that rule may be split into multiple rules with distinct `ruleID` properties.
+- The `ruleID` property of an instance may reclassify tool rules. For example, if a tool rule covers multiple situations that are dissimilar, that rule may be split into multiple rules with distinct `ruleID` properties.
 
 You are not dependent on the judgments incorporated into the standard format, because Testaro can give you the original reports from the tools.
 
