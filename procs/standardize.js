@@ -52,6 +52,15 @@ const aslintData = {
     ['track', 'audio-alternativeT'],
     ['alternative', 'audio-alternativeA'],
     ['bgsound', 'audio-alternativeB']
+  ],
+  'table-missing-description': [
+    ['describedby', 'associated', 'table-missing-descriptionDM'],
+    ['labeledby', 'associated', 'table-missing-descriptionLM'],
+    ['caption', 'not been defined', 'table-missing-descriptionC'],
+    ['summary', 'empty', 'table-missing-descriptionS'],
+    ['describedby', 'empty', 'table-missing-descriptionDE'],
+    ['labeledby', 'empty', 'table-missing-descriptionLE'],
+    ['caption', 'no content', 'table-missing-descriptionE']
   ]
 };
 // Converts issue instances at an axe certainty level.
@@ -295,7 +304,9 @@ const convert = (toolName, result, standardResult) => {
             : '';
           const ruleData = aslintData[ruleID];
           if (ruleData) {
-            const changer = ruleData.find(pair => what.includes(pair[0]));
+            const changer = ruleData.find(
+              specs => specs.slice(0, -1).every(matcher => what.includes(matcher))
+            );
             if (changer) {
               ruleID = changer[1];
             }
