@@ -112,6 +112,23 @@ const aslintData = {
   'page-title': [
     ['empty', 'page-titleN'],
     ['not identify', 'page-titleU']
+  ],
+  'aria-labelledby-association': [
+    ['exist', 'aria-labelledby-associationN'],
+    ['empty', 'aria-labelledby-associationE']
+  ],
+  'html-lang-attr': [
+    ['parameters', 'html-lang-attrP'],
+    ['nothing', 'html-lang-attrN'],
+    ['empty', 'html-lang-attrE']
+  ],
+  'missing-label': [
+    ['associated', 'missing-labelI'],
+    ['defined', 'missing-labelN'],
+    ['multiple labels', 'missing-labelM']
+  ],
+  'orientation': [
+    ['loaded', 'orientationT']
   ]
 };
 // Converts issue instances at an axe certainty level.
