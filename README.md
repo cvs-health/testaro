@@ -387,6 +387,18 @@ An act of type `test` performs the tests of a tool and reports a result. The res
 
 The `which` property of a `test` act identifies a tool, such as `alfa` or `testaro`.
 
+##### Target modification
+
+Some tools modify the page, so isolation of tests from one another requires that a browser be relaunched or, at least, navigate to the URL again, after a test act running any of those tools before a test act running another tool.
+
+Of the 9 tools, 6 are target-modifying:
+- `alfa`
+- `aslint`
+- `axe`
+- `htmlcs`
+- `ibm`
+- `testaro`
+
 ###### Configuration
 
 Every tool invoked by Testaro must have:
