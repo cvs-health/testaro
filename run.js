@@ -200,7 +200,7 @@ const isValidReport = report => {
     if (typeof timeLimit !== 'number' || timeLimit < 1) {
       return 'Bad report time limit';
     }
-    if (! acts || ! Array.isArray(acts) || acts.length < 2) {
+    if (! acts || ! Array.isArray(acts) || ! acts.length) {
       return 'Bad report acts';
     }
     if (! acts.every(act => act.type && typeof act.type === 'string')) {
@@ -437,7 +437,7 @@ const addError = (act, error, message) => {
 };
 // Recursively performs the acts in a report.
 const doActs = async (report, actIndex, page) => {
-  // Quits and reports the performance being aborted.
+  // Quits and reports the job being aborted.
   const abortActs = async () => {
     // Add data on the aborted act to the report.
     report.jobData.abortTime = nowString();
@@ -447,8 +447,6 @@ const doActs = async (report, actIndex, page) => {
     actIndex = -2;
     // Report this.
     console.log('ERROR: Job aborted');
-    // Stop the action until the user resumes it.
-    await page.pause();
   };
   process.on('message', message => {
     if (message === 'interrupt') {

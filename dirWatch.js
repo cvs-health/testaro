@@ -33,7 +33,7 @@ const reWatch = () => {
       }
     }
     if (code === 0) {
-      console.log('Watcher exited successfully');
+      console.log('Watcher exited successfully\n');
       reWatch();
     }
     else {
