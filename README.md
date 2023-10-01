@@ -57,7 +57,22 @@ Some of the tests of Testaro are designed to act as approximate alternatives to 
 
 ## Rules
 
-Each tool accessed with Testaro defines _rules_ and tests _targets_ for compliance with its rules. In total, the nine tools define about 760 rules. Some of the tools are under active development, and their rule counts change over time.
+Each tool accessed with Testaro defines _rules_ and tests _targets_ for compliance with its rules. In total, the nine tools define about 960 rules. The latest tabulation of tool rules is:
+
+```
+alfa: 59
+aslint: 133
+axe: 80
+htmlcs: 115
+ibm: 132
+nuVal: 215
+qualWeb: 131
+testaro: 36
+wave: 58
+total: 959
+```
+
+Some of the tools are under active development, and their rule counts change over time.
 
 When you ask Testaro to run tests of a tool, you may specify a subset of the rules of that tool, and the report will give you the results of only the tests for those rules. These tools will perform only those tests:
 - `alfa`
