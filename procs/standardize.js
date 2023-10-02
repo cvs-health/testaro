@@ -52,6 +52,83 @@ const aslintData = {
     ['track', 'audio-alternativeT'],
     ['alternative', 'audio-alternativeA'],
     ['bgsound', 'audio-alternativeB']
+  ],
+  'table-missing-description': [
+    ['describedby', 'associated', 'table-missing-descriptionDM'],
+    ['labeledby', 'associated', 'table-missing-descriptionLM'],
+    ['caption', 'not been defined', 'table-missing-descriptionC'],
+    ['summary', 'empty', 'table-missing-descriptionS'],
+    ['describedby', 'empty', 'table-missing-descriptionDE'],
+    ['labeledby', 'empty', 'table-missing-descriptionLE'],
+    ['caption', 'no content', 'table-missing-descriptionE']
+  ],
+  'label-implicitly-associated': [
+    ['only whice spaces', 'label-implicitly-associatedW'],
+    ['more than one', 'label-implicitly-associatedM']
+  ],
+  'label-inappropriate-association': [
+    ['Missing', 'label-inappropriate-associationM'],
+    ['non-form', 'label-inappropriate-associationN']
+  ],
+  'table-row-and-column-headers': [
+    ['headers', 'table-row-and-column-headersRC'],
+    ['Content', 'table-row-and-column-headersB'],
+    ['head of the columns', 'table-row-and-column-headersH']
+  ],
+  'color-contrast-state-pseudo-classes-abstract': [
+    ['position: fixed', 'color-contrast-state-pseudo-classes-abstractF'],
+    ['transparent', 'color-contrast-state-pseudo-classes-abstractB'],
+    ['least 3:1', 'color-contrast-state-pseudo-classes-abstract3'],
+    ['least 4.5:1', 'color-contrast-state-pseudo-classes-abstract4']
+  ],
+  'color-contrast-state-pseudo-classes-active': [
+    ['position: fixed', 'color-contrast-state-pseudo-classes-abstractF'],
+    ['transparent', 'color-contrast-state-pseudo-classes-abstractB'],
+    ['least 3:1', 'color-contrast-state-pseudo-classes-abstract3'],
+    ['least 4.5:1', 'color-contrast-state-pseudo-classes-abstract4']
+  ],
+  'color-contrast-state-pseudo-classes-focus': [
+    ['position: fixed', 'color-contrast-state-pseudo-classes-abstractF'],
+    ['transparent', 'color-contrast-state-pseudo-classes-abstractB'],
+    ['least 3:1', 'color-contrast-state-pseudo-classes-abstract3'],
+    ['least 4.5:1', 'color-contrast-state-pseudo-classes-abstract4']
+  ],
+  'color-contrast-state-pseudo-classes-hover': [
+    ['position: fixed', 'color-contrast-state-pseudo-classes-abstractF'],
+    ['transparent', 'color-contrast-state-pseudo-classes-abstractB'],
+    ['least 3:1', 'color-contrast-state-pseudo-classes-abstract3'],
+    ['least 4.5:1', 'color-contrast-state-pseudo-classes-abstract4']
+  ],
+  'color-contrast-aaa': [
+    ['transparent', 'color-contrast-aaaB'],
+    ['least 4.5:1', 'color-contrast-aaa4'],
+    ['least 7:1', 'color-contrast-aaa7']
+  ],
+  'animation': [
+    ['duration', 'animationD'],
+    ['iteration', 'animationI'],
+    ['mechanism', 'animationM']
+  ],
+  'page-title': [
+    ['empty', 'page-titleN'],
+    ['not identify', 'page-titleU']
+  ],
+  'aria-labelledby-association': [
+    ['exist', 'aria-labelledby-associationN'],
+    ['empty', 'aria-labelledby-associationE']
+  ],
+  'html-lang-attr': [
+    ['parameters', 'html-lang-attrP'],
+    ['nothing', 'html-lang-attrN'],
+    ['empty', 'html-lang-attrE']
+  ],
+  'missing-label': [
+    ['associated', 'missing-labelI'],
+    ['defined', 'missing-labelN'],
+    ['multiple labels', 'missing-labelM']
+  ],
+  'orientation': [
+    ['loaded', 'orientationT']
   ]
 };
 // Converts issue instances at an axe certainty level.
@@ -295,7 +372,9 @@ const convert = (toolName, result, standardResult) => {
             : '';
           const ruleData = aslintData[ruleID];
           if (ruleData) {
-            const changer = ruleData.find(pair => what.includes(pair[0]));
+            const changer = ruleData.find(
+              specs => specs.slice(0, -1).every(matcher => what.includes(matcher))
+            );
             if (changer) {
               ruleID = changer[1];
             }

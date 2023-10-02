@@ -57,7 +57,22 @@ Some of the tests of Testaro are designed to act as approximate alternatives to 
 
 ## Rules
 
-Each tool accessed with Testaro defines _rules_ and tests _targets_ for compliance with its rules. In total, the nine tools define about 760 rules. Some of the tools are under active development, and their rule counts change over time.
+Each tool accessed with Testaro defines _rules_ and tests _targets_ for compliance with its rules. In total, the nine tools define about 960 rules. The latest tabulation of tool rules is:
+
+```
+alfa: 59
+aslint: 136
+axe: 80
+htmlcs: 115
+ibm: 132
+nuVal: 215
+qualWeb: 131
+testaro: 36
+wave: 58
+total: 962
+```
+
+Some of the tools are under active development, and their rule counts change over time.
 
 When you ask Testaro to run tests of a tool, you may specify a subset of the rules of that tool, and the report will give you the results of only the tests for those rules. These tools will perform only those tests:
 - `alfa`
@@ -371,6 +386,18 @@ This act causes Testaro to alter the `display` and `visibility` style properties
 An act of type `test` performs the tests of a tool and reports a result. The result may indicate that a page passes or fails requirements. Typically, accessibility tests report successes and failures. But a test in Testaro is defined less restrictively, so it can report any result. As one example, the Testaro `elements` test reports facts about certain elements on a page, without asserting that those facts are successes or failures.
 
 The `which` property of a `test` act identifies a tool, such as `alfa` or `testaro`.
+
+##### Target modification
+
+Some tools modify the page, so isolation of tests from one another requires that a browser be relaunched or, at least, navigate to the URL again, after a test act running any of those tools before a test act running another tool.
+
+Of the 9 tools, 6 are target-modifying:
+- `alfa`
+- `aslint`
+- `axe`
+- `htmlcs`
+- `ibm`
+- `testaro`
 
 ###### Configuration
 

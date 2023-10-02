@@ -100,6 +100,7 @@ exports.reporter = async (page, options) => {
   const data = {
     rules: {},
     preventions: [],
+    invalid: [],
     testTimes: {}
   };
   // If the rule specification is valid:
@@ -164,6 +165,7 @@ exports.reporter = async (page, options) => {
       // Otherwise, i.e. if the rule is undefined or doubly defined:
       else {
         // Report this.
+        data.invalid.push(rule);
         console.log(`ERROR: Rule ${rule} not validly defined`);
       }
     }
