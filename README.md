@@ -61,7 +61,7 @@ Each tool accessed with Testaro defines _rules_ and tests _targets_ for complian
 
 ```
 alfa: 59
-aslint: 133
+aslint: 136
 axe: 80
 htmlcs: 115
 ibm: 132
@@ -69,7 +69,7 @@ nuVal: 215
 qualWeb: 131
 testaro: 36
 wave: 58
-total: 959
+total: 962
 ```
 
 Some of the tools are under active development, and their rule counts change over time.
