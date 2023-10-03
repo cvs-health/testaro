@@ -16,7 +16,7 @@ The need for multi-tool integration, and its costs, are discussed in [Accessibil
 
 Testaro launches and controls web browsers, performing operations, conducting tests, and recording results.
 
-Testaro is designed to be a workstation-based agent, because many of the tests performed by Testaro simulate the use of a web browser on a workstation. Testaro can be installed under MacOS, Windows, or potentially Ubuntu Linux.
+Testaro is designed to be a workstation-based agent, because many of the tests performed by Testaro simulate the use of a web browser on a workstation. Testaro can be installed under a MacOS, Windows, Debian, or Ubuntu operating system.
 
 Testaro accepts _jobs_, performs them, and returns _reports_.
 
