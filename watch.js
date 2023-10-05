@@ -11,6 +11,9 @@ require('dotenv').config();
 const fs = require('fs/promises');
 // Module to perform tests.
 const {doJob} = require('./run');
+// HTTP and HTTPS clients.
+const http = require('http');
+const https = require('https');
 
 // ########## CONSTANTS
 
@@ -107,6 +110,13 @@ const checkNetJob = async watchee => {
           error: errorMessage,
           message: error.message
         });
+      })
+      .on('timeout', () => {
+        const errorMessage = `ERROR: Request to ${watchJobURL} timed out`;
+        console.log(errorMessage);
+        return resolve({
+          error: errorMessage
+        });
       });
       request.end();
     });
@@ -158,6 +168,7 @@ const writeNetReport = async report => {
       const destination = report.sources.sendReportTo;
       if (destination) {
         // Send it.
+        const client = destination.startsWith('https://') ? https : http;
         const request = client.request(destination, {method: 'POST'}, response => {
           const chunks = [];
           response.on('data', chunk => {
