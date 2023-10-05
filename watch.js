@@ -14,8 +14,8 @@ const {doJob} = require('./run');
 
 // ########## CONSTANTS
 
-const protocol = process.env.PROTOCOL || 'https';
-const client = require(protocol);
+const httpClient = require('http');
+const httpsClient = require('https');
 const jobURLs = process.env.JOB_URLs;
 const agent = process.env.AGENT;
 const jobDir = process.env.JOBDIR;
@@ -66,10 +66,12 @@ const checkNetJob = async watchee => {
   }
   // For each watchee:
   for (const watchJobURL of watchJobURLs) {
+    console.log(`About to check ${watchJobURL}`);
     const job = await new Promise(resolve => {
       // Request a job from it.
-      const wholeURL = `${protocol}://${watchJobURL}?agent=${agent}`;
-      const request = client.request(wholeURL, response => {
+      const wholeURL = `${watchJobURL}?agent=${agent}`;
+      const client = wholeURL.startsWith('https://') ? httpsClient : httpClient;
+      const request = client.request(wholeURL, {timeout: 1000}, response => {
         const chunks = [];
         response.on('data', chunk => {
           chunks.push(chunk);
@@ -81,14 +83,14 @@ const checkNetJob = async watchee => {
             const jobJSON = chunks.join('');
             const job = JSON.parse(jobJSON);
             // Make it the response of the watchee.
-            resolve(job);
+            return resolve(job);
           }
           // Otherwise, i.e. if the response was not JSON-formatted:
           catch(error) {
             // Make an error report the response of the watchee.
             const errorMessage = `ERROR: Response of ${watchJobURL} was not JSON`;
             console.log(errorMessage);
-            resolve({
+            return resolve({
               error: errorMessage,
               message: error.message,
               status: response.statusCode
@@ -101,13 +103,14 @@ const checkNetJob = async watchee => {
         // Make an error report the response of the watchee.
         const errorMessage = `ERROR checking ${watchJobURL} for a network job`;
         console.log(`${errorMessage} (${error.message})`);
-        resolve({
+        return resolve({
           error: errorMessage,
           message: error.message
         });
       });
       request.end();
     });
+    console.log('Check done');
     // If the watchee sent a job:
     if (job.id) {
       // Stop checking and return it.
