@@ -80,6 +80,13 @@ const checkNetJob = async watchee => {
           });
         }
       });
+      response.on('error', error => {
+        resolve({
+          error: 'ERROR getting network job',
+          message: error.message,
+          status: response.statusCode
+        });
+      });
     });
     request.on('error', error => {
       console.log(`ERROR checking for a network job (${error.message})`);
