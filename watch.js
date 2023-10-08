@@ -118,7 +118,6 @@ const checkNetJob = async watchee => {
           error: errorMessage
         });
       });
-<<<<<<< HEAD
       response.on('error', error => {
         resolve({
           error: 'ERROR getting network job',
@@ -126,9 +125,7 @@ const checkNetJob = async watchee => {
           status: response.statusCode
         });
       });
-=======
       request.end();
->>>>>>> multiwatch
     });
     console.log('Check done');
     // If the watchee sent a job:
