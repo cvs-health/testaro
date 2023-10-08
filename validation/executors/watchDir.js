@@ -8,7 +8,6 @@ const fs = require('fs/promises');
 // CONSTANTS
 
 // Override cycle environment variables with validation-specific ones.
-process.env.PROTOCOL = 'http';
 process.env.JOBDIR = `${__dirname}/../watch`;
 process.env.REPORTDIR = `${__dirname}/../../temp`;
 const jobID = '00000-simple-example';
