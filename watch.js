@@ -78,9 +78,9 @@ const checkNetJob = async watchee => {
         const chunks = [];
         response.on('data', chunk => {
           chunks.push(chunk);
-        });
+        })
         // When response arrives:
-        response.on('end', () => {
+        .on('end', () => {
           // If the response was JSON-formatted:
           try {
             const jobJSON = chunks.join('');
@@ -99,6 +99,13 @@ const checkNetJob = async watchee => {
               status: response.statusCode
             });
           }
+        })
+        .on('error', error => {
+          return resolve({
+            error: 'ERROR getting network job',
+            message: error.message,
+            status: response.statusCode
+          });
         });
       });
       // If the check threw an error:
@@ -118,16 +125,8 @@ const checkNetJob = async watchee => {
           error: errorMessage
         });
       });
-      response.on('error', error => {
-        resolve({
-          error: 'ERROR getting network job',
-          message: error.message,
-          status: response.statusCode
-        });
-      });
       request.end();
     });
-    console.log('Check done');
     // If the watchee sent a job:
     if (job.id) {
       // Stop checking and return it.
