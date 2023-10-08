@@ -453,12 +453,6 @@ const doActs = async (report, actIndex, page) => {
     // Report this.
     console.log('ERROR: Job aborted');
   };
-  process.on('message', message => {
-    if (message === 'interrupt') {
-      console.log('ERROR: Terminal interrupted doActs');
-      process.exit();
-    }
-  });
   const {acts} = report;
   // If any more acts are to be performed:
   if (actIndex > -1 && actIndex < acts.length) {
@@ -476,27 +470,25 @@ const doActs = async (report, actIndex, page) => {
         }
       }
       const whichSuffix = actInfo ? ` (${actInfo})` : '';
-      console.log(`>>>> ${act.type}${whichSuffix}`);
       // If granular reporting has been specified:
+      let granularSuffix = '';
       if (report.observe) {
         // Notify the server of the act.
-        const observer = report.sources.sendReportTo;
+        const observer = report.sources.sendReportTo.replace(/report$/, 'granular');
         const whoParams = `agent=${agent}&jobID=${report.id || ''}`;
         const actParams = `act=${act.type}&which=${act.which || ''}`;
-        const wholeURL = `${observer}/api/granular?${whoParams}&${actParams}`;
+        const wholeURL = `${observer}?${whoParams}&${actParams}`;
         const client = wholeURL.startsWith('https://') ? httpsClient : httpClient;
-        const request = client.request(wholeURL, {timeout: 1000});
-        // If the check threw an error:
+        const request = client.request(wholeURL);
+        // If the notification threw an error:
         request.on('error', error => {
           // Report the error.
           const errorMessage = `ERROR notifying the server of an act`;
           console.log(`${errorMessage} (${error.message})`);
-        })
-        .on('timeout', () => {
-          const errorMessage = `ERROR: Notification of an act to the server timed out`;
-          console.log(errorMessage);
         });
         request.end();
+        granularSuffix = ' with notice to server';
+        console.log(`>>>> ${act.type}${whichSuffix}${granularSuffix}`);
       }
       // Increment the count of acts performed.
       actCount++;
@@ -1292,6 +1284,12 @@ exports.doJob = async report => {
     report.jobData.presses = 0;
     report.jobData.amountRead = 0;
     report.jobData.toolTimes = {};
+    process.on('message', message => {
+      if (message === 'interrupt') {
+        console.log('ERROR: Terminal interrupted the job');
+        process.exit();
+      }
+    });
     // Recursively perform the acts.
     await doActs(report, 0, null);
     // Add the end time and duration to the report.

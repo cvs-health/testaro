@@ -69,7 +69,6 @@ const checkNetJob = async watchee => {
   }
   // For each watchee:
   for (const watchJobURL of watchJobURLs) {
-    console.log(`About to check ${watchJobURL}`);
     const job = await new Promise(resolve => {
       // Request a job from it.
       const wholeURL = `${watchJobURL}?agent=${agent}`;
@@ -218,6 +217,12 @@ const writeNetReport = async report => {
     }
   });
   // Return the server response.
+  if (ack) {
+    return ack.message || ack;
+  }
+  else {
+    return '';
+  }
   return ack;
 };
 // Archives a job.
@@ -252,7 +257,7 @@ const runJob = async (job, isDirWatch) => {
       else {
         // Send the report to the server.
         const ack = await writeNetReport(job);
-        console.log(JSON.stringify(ack, null, 2));
+        console.log(ack);
       }
     }
     // If the job failed:
