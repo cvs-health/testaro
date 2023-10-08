@@ -205,11 +205,10 @@ const writeNetReport = async report => {
           });
         });
         const reportJSON = JSON.stringify(report, null, 2);
-        request.write(reportJSON);
-        request.end();
+        request.end(reportJSON);
         console.log(`Report ${report.id} submitted (${nowString()})`);
       }
-      // Otherwise, i.e. if the report does not specificy where to send it:
+      // Otherwise, i.e. if the report does not specify where to send it:
       else {
         // Report this.
         console.log('ERROR: Report specifies no submission destination');
