@@ -139,7 +139,11 @@ exports.reporter = async (page, options) => {
         const what = evalRules[rule] || etcRules[rule];
         if (granular) {
           // Report the rule to the server.
-          tellServer(options.report, `act=test&which=testaro&rule=${rule}`, `>>>>>> ${rule} (${what})`);
+          tellServer(
+            options.report,
+            `act=test&which=testaro&rule=${rule}&what=${what}`,
+            `>>>>>> ${rule} (${what})`
+          );
         }
         // Test the page.
         if (! data.rules[rule]) {
