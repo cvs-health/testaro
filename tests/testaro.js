@@ -9,21 +9,27 @@
 const {init, report} = require('../procs/testaro');
 // Module to handle files.
 const fs = require('fs/promises');
+// Module to send a notice to the server.
+const {tellServer} = require('../procs/tellServer');
 
 // ######## CONSTANTS
 
-const futureEvalRules = {
-  adbID: 'elements with ambiguous or missing referenced descriptions',
+/*
+const futureEvalRulesTraining = {
   altScheme: 'img elements with alt attributes having URLs as their entire values',
   captionLoc: 'caption elements that are not first children of table elements',
   datalistRef: 'elements with ambiguous or missing referenced datalist elements',
+  secHeading: 'headings that violate the logical level order in their sectioning containers',
+  textSem: 'semantically vague elements i, b, and/or small'
+};
+const futureEvalRulesCleanRoom = {
+  adbID: 'elements with ambiguous or missing referenced descriptions',
   imageLink: 'links with image files as their destinations',
   legendLoc: 'legend elements that are not first children of fieldset elements',
   optRoleSel: 'Non-option elements with option roles that have no aria-selected attributes',
-  phOnly: 'input elements with placeholders but no accessible names',
-  secHeading: 'headings that violate the logical level order in their sectioning containers',
-  textSem: 'semantically vague elements i, b, and/or small',
+  phOnly: 'input elements with placeholders but no accessible names'
 };
+*/
 const evalRules = {
   allCaps: 'leaf elements with entirely upper-case text longer than 7 characters',
   allHidden: 'page that is entirely or mostly hidden',
@@ -95,7 +101,7 @@ const jsonTest = async (ruleID, ruleArgs) => {
 };
 // Conducts and reports Testaro tests.
 exports.reporter = async (page, options) => {
-  const {withItems, stopOnFail, args} = options;
+  const {withItems, stopOnFail, granular, args} = options;
   const argRules = args ? Object.keys(args) : null;
   const rules = options.rules || ['y', ... Object.keys(evalRules)];
   // Initialize the data.
@@ -129,13 +135,17 @@ exports.reporter = async (page, options) => {
           // Add them to the argument array.
           ruleArgs.push(... args[rule]);
         }
-        // Test the page.
+        // If granular reporting is specified:
         const what = evalRules[rule] || etcRules[rule];
+        if (granular) {
+          // Report the rule to the server.
+          tellServer(options.report, `act=test&which=testaro&rule=${rule}`, `>>>>>> ${rule} (${what})`);
+        }
+        // Test the page.
         if (! data.rules[rule]) {
           data.rules[rule] = {};
         }
         data.rules[rule].what = what;
-        console.log(`>>>>>> ${rule} (${what})`);
         try {
           const startTime = Date.now();
           const ruleReport = isJS

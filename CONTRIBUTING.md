@@ -12,7 +12,6 @@ Testaro can benefit from contributions of various types, such as:
 
 Tools that may merit consideration include:
 - Arc (by TPGi). Costs $0.05 per page tested, and requires each user to have an account with the tool maker and to allow the tool maker to charge a charge account for payment.
-- Aslint (by Essential Accessibility). Apparently requires using a bundle file that is in the repository but is also listed in the `.gitignore` file and is missing from the published package, so would need to be physically included in the Testaro code rather than referenced as a dependency.
 
 ## Improving execution speed
 
@@ -24,13 +23,13 @@ To come.
 
 ## Implementing new rules
 
-Testaro has about 50 of its own rules, in addition to the approximately 600 rules of the other tools that it integrates. According to the issue classifications in the [Testilo](https://www.npmjs.com/package/testilo) package, these 650 or so rules can be classified into about 260 accessibility _issues_, because some rules of some tools at least approximately duplicate some rules of other tools.
+Testaro has about 50 of its own rules, in addition to the approximately 900 rules of the other tools that it integrates. According to the issue classifications in the [Testilo](https://www.npmjs.com/package/testilo) package, these 950 or so rules can be classified into about 290 accessibility _issues_, because some rules of some tools at least approximately duplicate some rules of other tools.
 
 However, many other significant accessibility issues exist that are not covered by any of the existing rules. Thus, Testaro welcomes contributions of new rules for such issues.
 
 ### Step 1
 
-The first step in contributing a new rule to Testaro is to satisfy yourself that it will not duplicate existing rules. The `procs/score/tic35.js` file in the Testilo package should be helpful here.
+The first step in contributing a new rule to Testaro is to satisfy yourself that it will not duplicate existing rules. The `procs/score/tic36.js` file in the Testilo package should be helpful here.
 
 ### Step 2
 

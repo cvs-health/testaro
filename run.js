@@ -13,6 +13,8 @@ const {actSpecs} = require('./actSpecs');
 const {browserClose, getNonce, goTo, launch} = require('./procs/nav');
 // Module to standardize report formats.
 const {standardize} = require('./procs/standardize');
+// Module to send a notice to the server.
+const {tellServer} = require('./procs/tellServer');
 
 // ########## CONSTANTS
 
@@ -45,10 +47,6 @@ const tests = {
   testaro: 'Testaro',
   wave: 'WAVE',
 };
-// Observation items.
-const httpClient = require('http');
-const httpsClient = require('https');
-const agent = process.env.AGENT;
 
 // ########## VARIABLES
 
@@ -466,26 +464,12 @@ const doActs = async (report, actIndex, page) => {
           actInfo = act.which;
         }
       }
-      const whichSuffix = actInfo ? ` (${actInfo})` : '';
       // If granular reporting has been specified:
-      let granularSuffix = '';
       if (report.observe) {
         // Notify the server of the act.
-        const observer = report.sources.sendReportTo.replace(/report$/, 'granular');
-        const whoParams = `agent=${agent}&jobID=${report.id || ''}`;
-        const actParams = `act=${act.type}&which=${act.which || ''}`;
-        const wholeURL = `${observer}?${whoParams}&${actParams}`;
-        const client = wholeURL.startsWith('https://') ? httpsClient : httpClient;
-        const request = client.request(wholeURL);
-        // If the notification threw an error:
-        request.on('error', error => {
-          // Report the error.
-          const errorMessage = 'ERROR notifying the server of an act';
-          console.log(`${errorMessage} (${error.message})`);
-        });
-        request.end();
-        granularSuffix = ' with notice to server';
-        console.log(`>>>> ${act.type}${whichSuffix}${granularSuffix}`);
+        const whichParam = act.which ? `&which=${act.which}` : '';
+        const messageParams = `act=${act.type}${whichParam}`;
+        tellServer(report, messageParams, `>>>> ${act.type}: ${actInfo}`);
       }
       // Increment the count of acts performed.
       actCount++;
@@ -709,7 +693,9 @@ const doActs = async (report, actIndex, page) => {
             act.what = tests[act.which];
             // Initialize the options argument.
             const options = {
+              report,
               act,
+              granular: report.observe,
               scriptNonce: report.jobData.lastScriptNonce || ''
             };
             // Add any specified arguments to it.
