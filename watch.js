@@ -158,7 +158,7 @@ const writeDirReport = async report => {
       console.log(`Report ${reportName} saved in ${rawDir}`);
     }
     catch(error) {
-      console.log(`ERROR: Failed to write report (${error.message})`);
+      console.log(`ERROR: Failed to write report ${jobID} (${error.message})`);
     }
   }
   else {
@@ -254,7 +254,7 @@ const runJob = async (job, isDirWatch) => {
       }
       // Otherwise, i.e. if the network was watched:
       else {
-        // Send the report to the server.
+        // Send the report to the server and report its response.
         const ack = await writeNetReport(job);
         console.log(ack);
       }
@@ -278,7 +278,7 @@ exports.cycle = async (isDirWatch, isForever, interval = 300, watchee = null) =>
   let empty = false;
   const intervalMS = 1000 * Number.parseInt(interval);
   const intervalSpec = isForever ? `with intervals of ${interval} seconds when idle ` : '';
-  console.log(`Watching started ${intervalSpec}(${nowString()})`);
+  console.log(`Watching started ${intervalSpec}(${nowString()})\n`);
   while (statusOK) {
     if (empty) {
       await wait(intervalMS);
