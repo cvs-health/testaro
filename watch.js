@@ -223,7 +223,6 @@ const writeNetReport = async report => {
   else {
     return '';
   }
-  return ack;
 };
 // Archives a job.
 const archiveJob = async (job, watchee) => {
