@@ -826,13 +826,12 @@ You may store environment variables in an untracked `.env` file if you wish, and
 ```conf
 URL_INJECT=yes
 WAVE_KEY=yourwavekey
-PROTOCOL=https
-JOB_URL=yourserver.tld/job
-REPORT_URL=yourserver.tld/report
+JOB_URLs=https://yourserver.tld/job+http://localhost:3004/testapp
 JOBDIR=../testing/jobs/ThisWorkstation
 REPORTDIR=../testing/reports
 AGENT=ThisWorkstation
 DEBUG=false
+WAITS=0
 ```
 
 ## Validation

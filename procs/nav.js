@@ -127,7 +127,6 @@ const browserClose = async () => {
     }
     await browser.close();
     browser = null;
-    console.log(`${browserType} browser closed`);
   }
 };
 // Launches a browser, navigates to a URL, and returns the status.

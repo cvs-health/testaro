@@ -12,17 +12,25 @@ const fs = require('fs/promises');
 
 // ######## CONSTANTS
 
-const evalRules = {
+const futureEvalRules = {
   adbID: 'elements with ambiguous or missing referenced descriptions',
+  altScheme: 'img elements with alt attributes having URLs as their entire values',
+  captionLoc: 'caption elements that are not first children of table elements',
+  datalistRef: 'elements with ambiguous or missing referenced datalist elements',
+  imageLink: 'links with image files as their destinations',
+  legendLoc: 'legend elements that are not first children of fieldset elements',
+  optRoleSel: 'Non-option elements with option roles that have no aria-selected attributes',
+  phOnly: 'input elements with placeholders but no accessible names',
+  secHeading: 'headings that violate the logical level order in their sectioning containers',
+  textSem: 'semantically vague elements i, b, and/or small',
+};
+const evalRules = {
   allCaps: 'leaf elements with entirely upper-case text longer than 7 characters',
   allHidden: 'page that is entirely or mostly hidden',
   allSlanted: 'leaf elements with entirely italic or oblique text longer than 39 characters',
-  altScheme: 'img elements with alt attributes having URLs as their entire values',
   autocomplete: 'name and email inputs without autocomplete attributes',
   bulk: 'large count of visible elements',
   buttonMenu: 'nonstandard keyboard navigation between items of button-controlled menus',
-  captionLoc: 'caption elements that are not first children of table elements',
-  datalistRef: 'elements with ambiguous or missing referenced datalist elements',
   distortion: 'distorted text',
   docType: 'document without a doctype property',
   dupAtt: 'elements with duplicate attributes',
@@ -37,9 +45,7 @@ const evalRules = {
   hover: 'hover-caused content changes',
   hovInd: 'hover indication nonstandard',
   hr: 'hr element instead of styles used for vertical segmentation',
-  imageLink: 'links with image files as their destinations',
   labClash: 'labeling inconsistencies',
-  legendLoc: 'legend elements that are not first children of fieldset elements',
   lineHeight: 'text with a line height less than 1.5 times its font size',
   linkExt: 'links that automatically open new windows',
   linkAmb: 'links with identical texts but different destinations',
@@ -50,17 +56,13 @@ const evalRules = {
   miniText: 'text smaller than 11 pixels',
   motion: 'motion without user request',
   nonTable: 'table elements used for layout',
-  opFoc: 'Operable elements that are not Tab-focusable',
-  optRoleSel: 'Non-option elements with option roles that have no aria-selected attributes',
-  phOnly: 'input elements with placeholders but no accessible names',
+  opFoc: 'operable elements that are not Tab-focusable',
   pseudoP: 'adjacent br elements suspected of nonsemantically simulating p elements',
   radioSet: 'radio buttons not grouped into standard field sets',
   role: 'invalid and native-replacing explicit roles',
-  secHeading: 'headings that violate the logical level order in their sectioning containers',
   styleDiff: 'style inconsistencies',
   tabNav: 'nonstandard keyboard navigation between elements with the tab role',
   targetSize: 'buttons, inputs, and non-inline links smaller than 44 pixels wide and high',
-  textSem: 'semantically vague elements i, b, and/or small',
   titledEl: 'title attributes on inappropriate elements',
   zIndex: 'non-default Z indexes'
 };

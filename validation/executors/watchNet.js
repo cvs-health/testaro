@@ -8,13 +8,11 @@ const fs = require('fs/promises');
 // CONSTANTS
 
 // Override cycle environment variables with validation-specific ones.
-process.env.PROTOCOL = 'http';
 const jobDir = `${__dirname}/../jobs/todo`;
-process.env.JOB_URL = 'localhost:3007/api/job';
-process.env.REPORT_URL = 'localhost:3007/api';
+process.env.JOB_URL = 'http://localhost:3007/api/job';
 process.env.AGENT = 'testarauth';
 const {cycle} = require('../../watch');
-const client = require(process.env.PROTOCOL);
+const client = require('http');
 const jobID = '00000-simple-example';
 
 // OPERATION

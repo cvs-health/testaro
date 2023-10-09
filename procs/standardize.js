@@ -41,91 +41,91 @@ const getIdentifiers = code => {
 };
 // Specifies conversions of rule IDs of aslint based on what substrings.
 const aslintData = {
-  'misused-required-attribute': [
-    ['not needed', 'misused-required-attributeR']
+  'misused_required_attribute': [
+    ['not needed', 'misused_required_attributeR']
   ],
-  'accessible-svg': [
-    ['associated', 'accessible-svgI'],
-    ['tabindex', 'accessible-svgT']
+  'accessible_svg': [
+    ['associated', 'accessible_svgI'],
+    ['tabindex', 'accessible_svgT']
   ],
-  'audio-alternative': [
-    ['track', 'audio-alternativeT'],
-    ['alternative', 'audio-alternativeA'],
-    ['bgsound', 'audio-alternativeB']
+  'audio_alternative': [
+    ['track', 'audio_alternativeT'],
+    ['alternative', 'audio_alternativeA'],
+    ['bgsound', 'audio_alternativeB']
   ],
-  'table-missing-description': [
-    ['describedby', 'associated', 'table-missing-descriptionDM'],
-    ['labeledby', 'associated', 'table-missing-descriptionLM'],
-    ['caption', 'not been defined', 'table-missing-descriptionC'],
-    ['summary', 'empty', 'table-missing-descriptionS'],
-    ['describedby', 'empty', 'table-missing-descriptionDE'],
-    ['labeledby', 'empty', 'table-missing-descriptionLE'],
-    ['caption', 'no content', 'table-missing-descriptionE']
+  'table_missing_description': [
+    ['describedby', 'associated', 'table_missing_descriptionDM'],
+    ['labeledby', 'associated', 'table_missing_descriptionLM'],
+    ['caption', 'not been defined', 'table_missing_descriptionC'],
+    ['summary', 'empty', 'table_missing_descriptionS'],
+    ['describedby', 'empty', 'table_missing_descriptionDE'],
+    ['labeledby', 'empty', 'table_missing_descriptionLE'],
+    ['caption', 'no content', 'table_missing_descriptionE']
   ],
-  'label-implicitly-associated': [
-    ['only whice spaces', 'label-implicitly-associatedW'],
-    ['more than one', 'label-implicitly-associatedM']
+  'label_implicitly_associated': [
+    ['only whice spaces', 'label_implicitly_associatedW'],
+    ['more than one', 'label_implicitly_associatedM']
   ],
-  'label-inappropriate-association': [
-    ['Missing', 'label-inappropriate-associationM'],
-    ['non-form', 'label-inappropriate-associationN']
+  'label_inappropriate_association': [
+    ['Missing', 'label_inappropriate_associationM'],
+    ['non-form', 'label_inappropriate_associationN']
   ],
-  'table-row-and-column-headers': [
-    ['headers', 'table-row-and-column-headersRC'],
-    ['Content', 'table-row-and-column-headersB'],
-    ['head of the columns', 'table-row-and-column-headersH']
+  'table_row_and_column_headers': [
+    ['headers', 'table_row_and_column_headersRC'],
+    ['Content', 'table_row_and_column_headersB'],
+    ['head of the columns', 'table_row_and_column_headersH']
   ],
-  'color-contrast-state-pseudo-classes-abstract': [
-    ['position: fixed', 'color-contrast-state-pseudo-classes-abstractF'],
-    ['transparent', 'color-contrast-state-pseudo-classes-abstractB'],
-    ['least 3:1', 'color-contrast-state-pseudo-classes-abstract3'],
-    ['least 4.5:1', 'color-contrast-state-pseudo-classes-abstract4']
+  'color_contrast_state_pseudo_classes_abstract': [
+    ['position: fixed', 'color_contrast_state_pseudo_classes_abstractF'],
+    ['transparent', 'color_contrast_state_pseudo_classes_abstractB'],
+    ['least 3:1', 'color_contrast_state_pseudo_classes_abstract3'],
+    ['least 4.5:1', 'color_contrast_state_pseudo_classes_abstract4']
   ],
-  'color-contrast-state-pseudo-classes-active': [
-    ['position: fixed', 'color-contrast-state-pseudo-classes-abstractF'],
-    ['transparent', 'color-contrast-state-pseudo-classes-abstractB'],
-    ['least 3:1', 'color-contrast-state-pseudo-classes-abstract3'],
-    ['least 4.5:1', 'color-contrast-state-pseudo-classes-abstract4']
+  'color_contrast_state_pseudo_classes_active': [
+    ['position: fixed', 'color_contrast_state_pseudo_classes_abstractF'],
+    ['transparent', 'color_contrast_state_pseudo_classes_abstractB'],
+    ['least 3:1', 'color_contrast_state_pseudo_classes_abstract3'],
+    ['least 4.5:1', 'color_contrast_state_pseudo_classes_abstract4']
   ],
-  'color-contrast-state-pseudo-classes-focus': [
-    ['position: fixed', 'color-contrast-state-pseudo-classes-abstractF'],
-    ['transparent', 'color-contrast-state-pseudo-classes-abstractB'],
-    ['least 3:1', 'color-contrast-state-pseudo-classes-abstract3'],
-    ['least 4.5:1', 'color-contrast-state-pseudo-classes-abstract4']
+  'color_contrast_state_pseudo_classes_focus': [
+    ['position: fixed', 'color_contrast_state_pseudo_classes_abstractF'],
+    ['transparent', 'color_contrast_state_pseudo_classes_abstractB'],
+    ['least 3:1', 'color_contrast_state_pseudo_classes_abstract3'],
+    ['least 4.5:1', 'color_contrast_state_pseudo_classes_abstract4']
   ],
-  'color-contrast-state-pseudo-classes-hover': [
-    ['position: fixed', 'color-contrast-state-pseudo-classes-abstractF'],
-    ['transparent', 'color-contrast-state-pseudo-classes-abstractB'],
-    ['least 3:1', 'color-contrast-state-pseudo-classes-abstract3'],
-    ['least 4.5:1', 'color-contrast-state-pseudo-classes-abstract4']
+  'color_contrast_state_pseudo_classes_hover': [
+    ['position: fixed', 'color_contrast_state_pseudo_classes_abstractF'],
+    ['transparent', 'color_contrast_state_pseudo_classes_abstractB'],
+    ['least 3:1', 'color_contrast_state_pseudo_classes_abstract3'],
+    ['least 4.5:1', 'color_contrast_state_pseudo_classes_abstract4']
   ],
-  'color-contrast-aaa': [
-    ['transparent', 'color-contrast-aaaB'],
-    ['least 4.5:1', 'color-contrast-aaa4'],
-    ['least 7:1', 'color-contrast-aaa7']
+  'color_contrast_aaa': [
+    ['transparent', 'color_contrast_aaaB'],
+    ['least 4.5:1', 'color_contrast_aaa4'],
+    ['least 7:1', 'color_contrast_aaa7']
   ],
   'animation': [
     ['duration', 'animationD'],
     ['iteration', 'animationI'],
     ['mechanism', 'animationM']
   ],
-  'page-title': [
-    ['empty', 'page-titleN'],
-    ['not identify', 'page-titleU']
+  'page_title': [
+    ['empty', 'page_titleN'],
+    ['not identify', 'page_titleU']
   ],
-  'aria-labelledby-association': [
-    ['exist', 'aria-labelledby-associationN'],
-    ['empty', 'aria-labelledby-associationE']
+  'aria_labelledby_association': [
+    ['exist', 'aria_labelledby_associationN'],
+    ['empty', 'aria_labelledby_associationE']
   ],
-  'html-lang-attr': [
-    ['parameters', 'html-lang-attrP'],
-    ['nothing', 'html-lang-attrN'],
-    ['empty', 'html-lang-attrE']
+  'html_lang_attr': [
+    ['parameters', 'html_lang_attrP'],
+    ['nothing', 'html_lang_attrN'],
+    ['empty', 'html_lang_attrE']
   ],
-  'missing-label': [
-    ['associated', 'missing-labelI'],
-    ['defined', 'missing-labelN'],
-    ['multiple labels', 'missing-labelM']
+  'missing_label': [
+    ['associated', 'missing_labelI'],
+    ['defined', 'missing_labelN'],
+    ['multiple labels', 'missing_labelM']
   ],
   'orientation': [
     ['loaded', 'orientationT']
@@ -353,47 +353,65 @@ const convert = (toolName, result, standardResult) => {
   }
   // aslint
   else if (toolName === 'aslint' && result.summary && result.summary.byIssueType) {
+    // Get the totals.
     standardResult.totals = [
       result.summary.byIssueType.warning, 0, 0, result.summary.byIssueType.error
     ];
+    // For each rule:
     Object.keys(result.rules).forEach(ruleID => {
-      const ruleResults = result.rules[ruleID].results;
-      if (ruleResults && ruleResults.length) {
-        ruleResults.forEach(ruleResult => {
-          const what = ruleResult.message.actual.description;
-          const {issueType} = result.rules[ruleID];
-          const xpath = ruleResult.element && ruleResult.element.xpath || '';
-          const tagName = xpath && xpath.replace(/^.*\//, '').replace(/[^-\w].*$/, '').toUpperCase()
-          || '';
-          const excerpt = ruleResult.element && ruleResult.element.html || '';
-          const idDraft = excerpt && excerpt.replace(/^[^[>]+id="/, 'id=').replace(/".*$/, '');
-          const id = idDraft && idDraft.length > 3 && idDraft.startsWith('id=')
-            ? idDraft.slice(3)
-            : '';
-          const ruleData = aslintData[ruleID];
-          if (ruleData) {
-            const changer = ruleData.find(
-              specs => specs.slice(0, -1).every(matcher => what.includes(matcher))
-            );
-            if (changer) {
-              ruleID = changer[1];
+      // If it has a valid issue type:
+      const {issueType} = result.rules[ruleID];
+      if (issueType && ['warning', 'error'].includes(issueType)) {
+        // If there are any violations:
+        const ruleResults = result.rules[ruleID].results;
+        if (ruleResults && ruleResults.length) {
+          // For each violation:
+          ruleResults.forEach(ruleResult => {
+            // If it has a description:
+            if (
+              ruleResult.message
+              && ruleResult.message.actual
+              && ruleResult.message.actual.description
+            ) {
+
+              const what = ruleResult.message.actual.description;
+              // Get its differentiated ID if any.
+              const ruleData = aslintData[ruleID];
+              let finalRuleID = ruleID;
+              if (ruleData) {
+                const changer = ruleData.find(
+                  specs => specs.slice(0, -1).every(matcher => what.includes(matcher))
+                );
+                if (changer) {
+                  finalRuleID = changer[changer.length - 1];
+                }
+              }
+              const xpath = ruleResult.element && ruleResult.element.xpath || '';
+              const tagName = xpath
+              && xpath.replace(/^.*\//, '').replace(/[^-\w].*$/, '').toUpperCase()
+              || '';
+              const excerpt = ruleResult.element && ruleResult.element.html || '';
+              const idDraft = excerpt && excerpt.replace(/^[^[>]+id="/, 'id=').replace(/".*$/, '');
+              const id = idDraft && idDraft.length > 3 && idDraft.startsWith('id=')
+                ? idDraft.slice(3)
+                : '';
+              const instance = {
+                ruleID: finalRuleID,
+                what,
+                ordinalSeverity: ['warning', 0, 0, 'error'].indexOf(issueType),
+                tagName,
+                id,
+                location: {
+                  doc: 'dom',
+                  type: 'xpath',
+                  spec: xpath
+                },
+                excerpt
+              };
+              standardResult.instances.push(instance);
             }
-          }
-          const instance = {
-            ruleID,
-            what,
-            ordinalSeverity: ['warning', 0, 0, 'error'].indexOf(issueType),
-            tagName,
-            id,
-            location: {
-              doc: 'dom',
-              type: 'xpath',
-              spec: xpath
-            },
-            excerpt
-          };
-          standardResult.instances.push(instance);
-        });
+          });
+        }
       }
     });
   }

@@ -11,15 +11,17 @@ require('dotenv').config();
 const fs = require('fs/promises');
 // Module to perform tests.
 const {doJob} = require('./run');
+// HTTP and HTTPS clients.
+const http = require('http');
+const https = require('https');
 
 // ########## CONSTANTS
 
-const protocol = process.env.PROTOCOL || 'https';
-const client = require(protocol);
-const jobURL = process.env.JOB_URL;
+const httpClient = require('http');
+const httpsClient = require('https');
+const jobURLs = process.env.JOB_URLs;
 const agent = process.env.AGENT;
 const jobDir = process.env.JOBDIR;
-const reportURL = process.env.REPORT_URL;
 const reportDir = process.env.REPORTDIR;
 
 // ########## FUNCTIONS
@@ -55,48 +57,94 @@ const checkDirJob = async watchee => {
     return {};
   }
 };
-// Checks for and returns a network job.
+// Checks for and, if obtained, returns a network job.
 const checkNetJob = async watchee => {
-  const watchJobURL = watchee || jobURL;
-  const job = await new Promise(resolve => {
-    const wholeURL = `${protocol}://${watchJobURL}?agent=${agent}`;
-    const request = client.request(wholeURL, response => {
-      const chunks = [];
-      response.on('data', chunk => {
-        chunks.push(chunk);
-      });
-      response.on('end', () => {
-        try {
-          const jobJSON = chunks.join('');
-          const job = JSON.parse(jobJSON);
-          // Return it.
-          resolve(job);
-        }
-        catch(error) {
-          resolve({
-            error: 'ERROR: Response was not JSON',
+  let watchJobURLs = [watchee];
+  if (! watchJobURLs[0]) {
+    watchJobURLs = jobURLs
+    .split('+')
+    .map(url => [Math.random(), url])
+    .sort((a, b) => a[0] - b[0])
+    .map(pair => pair[1]);
+  }
+  // For each watchee:
+  for (const watchJobURL of watchJobURLs) {
+    const job = await new Promise(resolve => {
+      // Request a job from it.
+      const wholeURL = `${watchJobURL}?agent=${agent}`;
+      const client = wholeURL.startsWith('https://') ? httpsClient : httpClient;
+      const request = client.request(wholeURL, {timeout: 1000}, response => {
+        const chunks = [];
+        response.on('data', chunk => {
+          chunks.push(chunk);
+        })
+        // When response arrives:
+        .on('end', () => {
+          // If the response was JSON-formatted:
+          try {
+            const jobJSON = chunks.join('');
+            const job = JSON.parse(jobJSON);
+            // Make it the response of the watchee.
+            return resolve(job);
+          }
+          // Otherwise, i.e. if the response was not JSON-formatted:
+          catch(error) {
+            // Make an error report the response of the watchee.
+            const errorMessage = `ERROR: Response of ${watchJobURL} was not JSON`;
+            console.log(errorMessage);
+            return resolve({
+              error: errorMessage,
+              message: error.message,
+              status: response.statusCode
+            });
+          }
+        })
+        .on('error', error => {
+          return resolve({
+            error: 'ERROR getting network job',
             message: error.message,
             status: response.statusCode
           });
-        }
+        });
       });
+      // If the check threw an error:
+      request.on('error', error => {
+        // Make an error report the response of the watchee.
+        const errorMessage = `ERROR checking ${watchJobURL} for a network job`;
+        console.log(`${errorMessage} (${error.message})`);
+        return resolve({
+          error: errorMessage,
+          message: error.message
+        });
+      })
+      .on('timeout', () => {
+        const errorMessage = `ERROR: Request to ${watchJobURL} timed out`;
+        console.log(errorMessage);
+        return resolve({
+          error: errorMessage
+        });
+      });
+      request.end();
     });
-    request.on('error', error => {
-      console.log(`ERROR checking for a network job (${error.message})`);
-      resolve({});
-    });
-    request.end();
-  });
-  if (job.id) {
-    console.log(`Network job ${job.id} received (${nowString()})`);
+    // If the watchee sent a job:
+    if (job.id) {
+      // Stop checking and return it.
+      console.log(`Network job ${job.id} received from ${watchJobURL} (${nowString()})`);
+      return job;
+    }
+    // Otherwise, if the watchee sent a message:
+    else if (job.message) {
+      // Report it and continue checking.
+      console.log(job.message);
+    }
+    // Otherwise, i.e. if the watchee sent neither a job nor a message:
+    else {
+      // Report this and continue checking.
+      console.log(`No network job at ${watchJobURL} to do (${nowString()})`);
+    }
   }
-  else if (job.message) {
-    console.log(job.message);
-  }
-  else {
-    console.log(`No network job to do (${nowString()})`);
-  }
-  return job;
+  // If no watchee sent a job, return this.
+  return {};
 };
 // Writes a directory report.
 const writeDirReport = async report => {
@@ -121,49 +169,60 @@ const writeDirReport = async report => {
 const writeNetReport = async report => {
   const ack = await new Promise(resolve => {
     if (report.sources) {
-      // Get the report destination from the report or the environment.
+      // If the report specifies where to send it:
       const destination = report.sources.sendReportTo;
-      const wholeURL = destination || `${process.env.PROTOCOL}://${reportURL}`;
-      // Contact the server.
-      const request = client.request(wholeURL, {method: 'POST'}, response => {
-        const chunks = [];
-        response.on('data', chunk => {
-          chunks.push(chunk);
+      if (destination) {
+        // Send it.
+        const client = destination.startsWith('https://') ? https : http;
+        const request = client.request(destination, {method: 'POST'}, response => {
+          const chunks = [];
+          response.on('data', chunk => {
+            chunks.push(chunk);
+          });
+          response.on('end', () => {
+            const content = chunks.join('');
+            try {
+              resolve(JSON.parse(content));
+            }
+            catch(error) {
+              resolve({
+                error: 'ERROR: Response was not JSON',
+                message: error.message,
+                status: response.statusCode,
+                content: content.slice(0, 3000)
+              });
+            }
+          });
         });
-        response.on('end', () => {
-          const content = chunks.join('');
-          try {
-            resolve(JSON.parse(content));
-          }
-          catch(error) {
-            resolve({
-              error: 'ERROR: Response was not JSON',
-              message: error.message,
-              status: response.statusCode,
-              content: content.slice(0, 3000)
-            });
-          }
+        report.jobData.agent = agent;
+        request.on('error', error => {
+          console.log(`ERROR submitting job report (${error.message})`);
+          resolve({
+            error: 'ERROR: Job report submission failed',
+            message: error.message
+          });
         });
-      });
-      report.jobData.agent = agent;
-      request.on('error', error => {
-        console.log(`ERROR submitting job report (${error.message})`);
-        resolve({
-          error: 'ERROR: Job report submission failed',
-          message: error.message
-        });
-      });
-      // Send the report to the server.
-      const reportJSON = JSON.stringify(report, null, 2);
-      request.write(reportJSON);
-      request.end();
-      console.log(`Report ${report.id} submitted (${nowString()})`);
+        const reportJSON = JSON.stringify(report, null, 2);
+        request.end(reportJSON);
+        console.log(`Report ${report.id} submitted (${nowString()})`);
+      }
+      // Otherwise, i.e. if the report does not specify where to send it:
+      else {
+        // Report this.
+        console.log('ERROR: Report specifies no submission destination');
+      }
     }
     else {
       console.log('ERROR: Report has no sources property');
     }
   });
   // Return the server response.
+  if (ack) {
+    return ack.message || ack;
+  }
+  else {
+    return '';
+  }
   return ack;
 };
 // Archives a job.
@@ -198,7 +257,7 @@ const runJob = async (job, isDirWatch) => {
       else {
         // Send the report to the server.
         const ack = await writeNetReport(job);
-        console.log(JSON.stringify(ack, null, 2));
+        console.log(ack);
       }
     }
     // If the job failed:
