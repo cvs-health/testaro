@@ -141,7 +141,7 @@ exports.reporter = async (page, options) => {
           // Report the rule to the server.
           tellServer(
             options.report,
-            `act=test&which=testaro&rule=${rule}&what=${what}`,
+            `act=test&which=testaro&rule=${rule}&ruleWhat=${what}`,
             `>>>>>> ${rule} (${what})`
           );
         }
