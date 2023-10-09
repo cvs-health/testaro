@@ -65,7 +65,6 @@ exports.reporter = async (page, withItems) => {
       }
     }
     catch(error) {
-      console.log(`Hovering timed out (${error.message.replace(/[\n].+/s, '')})`);
     }
   }
   // Populate and return the result.
