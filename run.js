@@ -13,9 +13,6 @@ const {actSpecs} = require('./actSpecs');
 const {browserClose, getNonce, goTo, launch} = require('./procs/nav');
 // Module to standardize report formats.
 const {standardize} = require('./procs/standardize');
-// HTTP and HTTPS clients.
-const http = require('http');
-const https = require('https');
 
 // ########## CONSTANTS
 
@@ -118,7 +115,7 @@ const hasSubtype = (variable, subtype) => {
       return tests[variable];
     }
     else if (subtype === 'isWaitable') {
-      return waitables.includes(variable);
+      return ['url', 'title', 'body'].includes(variable);
     }
     else if (subtype === 'areNumbers') {
       return areNumbers(variable);
@@ -483,7 +480,7 @@ const doActs = async (report, actIndex, page) => {
         // If the notification threw an error:
         request.on('error', error => {
           // Report the error.
-          const errorMessage = `ERROR notifying the server of an act`;
+          const errorMessage = 'ERROR notifying the server of an act';
           console.log(`${errorMessage} (${error.message})`);
         });
         request.end();
@@ -582,12 +579,12 @@ const doActs = async (report, actIndex, page) => {
               addError(act, 'badRedirection', 'ERROR: Navigation illicitly redirected');
               await abortActs();
             }
-          }
-          // If the visit failed:
-          if (response.error) {
-            // Report this and quit.
-            addError(act, 'failure', 'ERROR: Visits failed');
-            await abortActs();
+            // Otherwise, i.e. if the visit failed:
+            else {
+              // Report this and quit.
+              addError(act, 'failure', 'ERROR: Visit failed');
+              await abortActs();
+            }
           }
         }
         // Otherwise, if the act is a wait for text:
