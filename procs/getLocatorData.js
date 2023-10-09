@@ -33,6 +33,9 @@ exports.getLocatorData = async loc => {
       if (! text) {
         text = element.outerHTML.replace(/\s+/g, ' ').trim();
       }
+      if (/^<[^<>]+>$/.test(text)) {
+        text = element.parentElement.outerHTML.replace(/\s+/g, ' ').trim();
+      }
       // Location.
       let location = {
         doc: 'dom',

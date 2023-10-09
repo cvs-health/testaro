@@ -15,29 +15,28 @@ const {init, report} = require('../procs/testaro');
 // Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
   // Initialize the locators and result.
-  const all = await init(page, 'body *', {has: page.locator('br + br')});
+  const all = await init(page, 'body br + br');
   // For each locator:
   for (const loc of all.allLocs) {
-    const isBad = await loc.evaluate(el => {
-      // Get whether it has 2 adjacent br elements with no non-space text between them.
-      const childNodes = Array.from(el.childNodes);
-      const realChildNodes = childNodes.filter(
-        node => node.nodeType !== Node.TEXT_NODE || node.nodeValue.replace(/\s/g, '').length
-      );
-      return realChildNodes.some(
-        (node, index) => node.nodeName === 'BR' && realChildNodes[index + 1].nodeName === 'BR'
-      );
+    // Return whether the second br element violates the rule.
+    const parentTagNameIfBad = await loc.evaluate(el => {
+      el.parentElement.normalize();
+      const previousSib = el.previousSibling;
+      return previousSib.nodeType === Node.ELEMENT_NODE
+      || previousSib.nodeType === Node.TEXT_NODE && /^\s+$/.test(previousSib)
+      ? el.parentElement.tagName
+      : false;
     });
     // If it does:
-    if (isBad) {
+    if (parentTagNameIfBad) {
       // Add the locator to the array of violators.
-      all.locs.push(loc);
+      all.locs.push([loc, parentTagNameIfBad]);
     }
-  }
+  };
   // Populate and return the result.
   const whats = [
-    'Element contains 2 or more adjacent br elements that may be a pseudo-paragraph',
+    'Adjacent br elements within a __param__ element may be pseudo-paragraphs',
     'Elements contain 2 or more adjacent br elements that may be pseudo-paragraphs'
   ];
-  return await report(withItems, all, 'pseudoP', whats, 0);
+  return await report(withItems, all, 'pseudoP', whats, 0, 'br');
 };
