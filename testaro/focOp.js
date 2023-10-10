@@ -22,7 +22,7 @@ const {isOperable} = require('../procs/operable');
 // Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
   // Initialize the locators and result.
-  const all = await init(page, 'body *');
+  const all = await init(100, page, 'body *');
   all.result.data.focusableCount = 0;
   // For each locator:
   for (const loc of all.allLocs) {

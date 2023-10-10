@@ -13,7 +13,7 @@ const {init, report} = require('../procs/testaro');
 // Runs the test and returns the result.
 exports.reporter = async (page, withItems, attributeName, areLicit, values) => {
   // Initialize the locators and result.
-  const all = await init(page, `[${attributeName}]`);
+  const all = await init(100, page, `[${attributeName}]`);
   // For each locator:
   for (const loc of all.allLocs) {
     // Get whether its element violates the rule.

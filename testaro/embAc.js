@@ -17,7 +17,9 @@ const {init, report} = require('../procs/testaro');
 exports.reporter = async (page, withItems) => {
   // Initialize the locators and result.
   const all = await init(
-    page, 'a a, a button, a input, a select, button a, button button, button input, button select'
+    100,
+    page,
+    'a a, a button, a input, a select, button a, button button, button input, button select'
   );
   // For each locator:
   for (const loc of all.allLocs) {

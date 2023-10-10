@@ -21,7 +21,7 @@ exports.reporter = async (
   emailLabels = ['email']
 ) => {
   // Initialize the locators and result.
-  const all = await init(page, 'input[type=text], input[type=email], input:not([type])');
+  const all = await init(100, page, 'input[type=text], input[type=email], input:not([type])');
   // For each locator:
   const autoValues = {
     'given-name': givenLabels,

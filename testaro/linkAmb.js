@@ -15,7 +15,7 @@ const {getLocatorData} = require('../procs/getLocatorData');
 // Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
   // Initialize the locators and result.
-  const all = await init(page, 'a[href]:visible');
+  const all = await init(100, page, 'a[href]:visible');
   const linkTexts = new Set();
   // For each locator:
   for (const loc of all.allLocs) {

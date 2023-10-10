@@ -88,7 +88,7 @@ const jsonTest = async (ruleID, ruleArgs) => {
   const ruleJSON = await fs.readFile(`${__dirname}/../testaro/${ruleID}.json`, 'utf8');
   const ruleObj = JSON.parse(ruleJSON);
   // Initialize the locators and result.
-  const all = await init(page, ruleObj.selector);
+  const all = await init(100, page, ruleObj.selector);
   all.locs = all.allLocs;
   // Populate and return the result.
   const whats = [

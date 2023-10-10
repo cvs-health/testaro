@@ -15,7 +15,7 @@ const {init, report} = require('../procs/testaro');
 // Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
   // Initialize the locators and result.
-  const all = await init(page, 'input[type=radio]');
+  const all = await init(100, page, 'input[type=radio]');
   const params = {
     nameLeak: 'shares a name with others outside its field set',
     fsMixed: 'shares a field set with others having different names',

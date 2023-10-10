@@ -13,7 +13,7 @@ const {init, report} = require('../procs/testaro');
 // Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
   // Initialize the locators and result.
-  const all = await init(page, 'body *:not(script, style):visible', {hasText: /[^\s]+/});
+  const all = await init(100, page, 'body *:not(script, style):visible', {hasText: /[^\s]+/});
   // For each locator:
   for (const loc of all.allLocs) {
     // Get the font size of its element if less than 11 pixels.

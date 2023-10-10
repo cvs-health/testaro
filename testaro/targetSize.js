@@ -16,7 +16,7 @@ const {isInlineLink} = require('../procs/isInlineLink');
 // Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
   // Initialize the locators and result.
-  const all = await init(page, 'a, button, input');
+  const all = await init(100, page, 'a, button, input');
   // For each locator:
   for (const loc of all.allLocs) {
     // Get the size of its element, if small.

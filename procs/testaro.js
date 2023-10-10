@@ -7,14 +7,10 @@ const {getSample} = require('../procs/sample');
 // Module to get locator data.
 const {getLocatorData} = require('../procs/getLocatorData');
 
-// ########## CONSTANTS
-
-const sampleMax = 100;
-
 // ########## FUNCTIONS
 
 // Initializes locators and a result.
-const init = async (page, locAllSelector, options = {}) => {
+const init = async (sampleMax, page, locAllSelector, options = {}) => {
   // Get locators for the specified elements.
   const locPop = page.locator(locAllSelector, options);
   const locPops = await locPop.all();
@@ -98,7 +94,7 @@ const simplify = async (page, withItems, ruleData) => {
     ruleID, selector, pruner, isDestructive, complaints, ordinalSeverity, summaryTagName
   } = ruleData;
   // Initialize the locators and result.
-  const all = await init(page, selector);
+  const all = await init(100, page, selector);
   // For each locator:
   for (const loc of all.allLocs) {
     // Get whether its element violates the rule.

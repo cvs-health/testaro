@@ -19,9 +19,10 @@ const {init, report} = require('../procs/testaro');
 exports.reporter = async (page, withItems) => {
   // Initialize the locators and result.
   const allTrigger = await init(
-    page, '[aria-controls], [aria-expanded], [aria-haspopup], [onmouseenter], [onmouseover]'
+    20, page, '[aria-controls], [aria-expanded], [aria-haspopup], [onmouseenter], [onmouseover]'
   );
   const allNonTrigger = await init(
+    30 - allTrigger.result.data.sampleSize,
     page,
     'body *:not([aria-controls], [aria-expanded], [aria-haspopup], [onmouseenter], [onmouseover])'
   );
@@ -64,8 +65,7 @@ exports.reporter = async (page, withItems) => {
         all.locs.push([loc, impact]);
       }
     }
-    catch(error) {
-    }
+    catch(error) {}
   }
   // Populate and return the result.
   const whats = [

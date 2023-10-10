@@ -13,7 +13,7 @@ const {init, report} = require('../procs/testaro');
 // Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
   // Initialize the locators and result.
-  const all = await init(page, 'button, input:not([type=hidden]), select, textarea');
+  const all = await init(100, page, 'button, input:not([type=hidden]), select, textarea');
   // For each locator:
   for (const loc of all.allLocs) {
     // Get the label types of its element.
