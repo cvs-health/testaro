@@ -221,7 +221,7 @@ Testaro helps overcome this format diversity by offering to represent the main f
 
 In the conceptual scheme underlying the format standardization of Testaro, each tool has its own set of _rules_, where a rule is an algorithm for evaluating a target and determining whether instances of some kind of problem exist in it. With standardization, Testaro reports, in a uniform way, the outcomes from the application of rules by tools to a target.
 
-If the `STANDARD` environment variable has the value `also` (which it has by default) or `only`, Testaro converts some data in each tool report to the standard format. That permits you to ignore the format idiosyncrasies of the tools. If `STANDARD` has the value `also`, the job report includes both formats. If the value is `only`, the job report includes only the standard format. If the value is `no`, the job report includes only the original format of each tool report.
+Each job can specify how Testaro is to handle report standardization. A job can contain a `standard` property. If the value of that property is `'also'` or `'only'`, Testaro converts some data in each tool report to the standard format. That permits you to ignore the format idiosyncrasies of the tools. If `standard` has the value `'also'`, the job report includes both formats. If the value is `'only'`, the job report includes only the standard format. If the value is `'no'` (or anything else, or there is no `standard` property), the job report includes only the original format of each tool report.
 
 The standard format of each tool report has these properties:
 - `prevented`: `true` if the tool failed to run on the page, or otherwise omitted.

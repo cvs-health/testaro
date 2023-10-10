@@ -22,8 +22,6 @@ const {tellServer} = require('./procs/tellServer');
 const debug = process.env.DEBUG === 'true';
 // Set WAITS environment variable to a positive number to insert delays (in ms).
 const waits = Number.parseInt(process.env.WAITS) || 0;
-// Set STANDARD environment variable to also if not set.
-process.env.STANDARD ??= 'also';
 // CSS selectors for targets of moves.
 const moves = {
   button: 'button, [role=button], input[type=submit]',
@@ -732,7 +730,7 @@ const doActs = async (report, actIndex, page) => {
             const resultCount = Object.keys(toolReport.result).length;
             act.result = resultCount ? toolReport.result : {success: false};
             // If a standard-format result is to be included in the report:
-            const standard = process.env.STANDARD;
+            const standard = report.standard || 'only';
             if (['also', 'only'].includes(standard)) {
               // Initialize it.
               act.standardResult = {
@@ -743,7 +741,11 @@ const doActs = async (report, actIndex, page) => {
               standardize(act);
               // If the original-format result is not to be included in the report:
               if (standard === 'only') {
-                // Remove it.
+                // Remove it, except any important property.
+                if (act.result.important) {
+                  act.data = act.result.important;
+                  console.log('>>>>>> Important result data protected from deletion');
+                }
                 delete act.result;
               }
               // If the test has expectations:

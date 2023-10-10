@@ -107,9 +107,11 @@ exports.reporter = async (page, options) => {
   // Initialize the data.
   const data = {
     rules: {},
-    preventions: [],
-    invalid: [],
-    testTimes: {}
+    important: {
+      preventions: [],
+      invalid: [],
+      testTimes: {}
+    }
   };
   // If the rule specification is valid:
   if (
@@ -163,7 +165,7 @@ exports.reporter = async (page, options) => {
           });
           data.rules[rule].totals = data.rules[rule].totals.map(total => Math.round(total));
           if (ruleReport.prevented) {
-            data.preventions.push(rule);
+            data.important.preventions.push(rule);
           }
           // If testing is to stop after a failure and the page failed the test:
           if (stopOnFail && ruleReport.totals.some(total => total)) {
@@ -174,19 +176,19 @@ exports.reporter = async (page, options) => {
         // If an error is thrown by the test:
         catch(error) {
           // Report this.
-          data.preventions.push(rule);
+          data.important.preventions.push(rule);
           console.log(`ERROR: Test of testaro rule ${rule} prevented (${error.message})`);
         }
       }
       // Otherwise, i.e. if the rule is undefined or doubly defined:
       else {
         // Report this.
-        data.invalid.push(rule);
+        data.important.invalid.push(rule);
         console.log(`ERROR: Rule ${rule} not validly defined`);
       }
     }
     testTimes.sort((a, b) => b[1] - a[1]).forEach(pair => {
-      data.testTimes[pair[0]] = pair[1];
+      data.important.testTimes[pair[0]] = pair[1];
     });
   }
   // Otherwise, i.e. if the rule specification is invalid:
