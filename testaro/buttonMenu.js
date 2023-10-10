@@ -253,7 +253,7 @@ exports.reporter = async (page, withItems, trialKeySpecs = []) => {
       excerpt: ''
     });
   }
-  // Reload the page.
+  // Reload the page, because attributes of elements were modified.
   try {
     await page.reload({timeout: 15000});
   }

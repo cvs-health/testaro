@@ -328,6 +328,13 @@ exports.reporter = async (page, withItems) => {
     };
     // FUNCTION DEFINITIONS END
     await testTabLists(tabLists);
+    // Reload the page, because keyboard navigation may have triggered content changes.
+    try {
+      await page.reload({timeout: 15000});
+    }
+    catch(error) {
+      console.log('ERROR: page reload timed out');
+    }
   }
   const totals = data.totals ? [
     data.totals.navigations.all.incorrect,
@@ -370,13 +377,6 @@ exports.reporter = async (page, withItems) => {
       },
       excerpt: ''
     });
-  }
-  // Reload the page.
-  try {
-    await page.reload({timeout: 15000});
-  }
-  catch(error) {
-    console.log('ERROR: page reload timed out');
   }
   return {
     data,

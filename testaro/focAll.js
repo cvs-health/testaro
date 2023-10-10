@@ -53,7 +53,7 @@ exports.reporter = async page => {
     tabFocused,
     discrepancy: tabFocused - focusableCount
   };
-  // Reload the page.
+  // Reload the page, because properties were added to elements.
   try {
     await page.reload({timeout: 15000});
   }

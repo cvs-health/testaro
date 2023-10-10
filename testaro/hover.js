@@ -72,7 +72,7 @@ exports.reporter = async (page, withItems) => {
     'Hovering over the element __param__',
     'Hovering over elements adds elements to or subtracts elements from the page'
   ];
-  // Reload the page.
+  // Reload the page, because hovering may have caused content changes.
   try {
     await page.reload({timeout: 15000});
   }
