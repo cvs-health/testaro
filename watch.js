@@ -59,90 +59,98 @@ const checkDirJob = async watchee => {
 };
 // Checks for and, if obtained, returns a network job.
 const checkNetJob = async watchee => {
+  // If no URL to watch is specified by the caller:
   let watchJobURLs = [watchee];
   if (! watchJobURLs[0]) {
+    // Get a randomized array of URLs to watch from the environment.
     watchJobURLs = jobURLs
     .split('+')
     .map(url => [Math.random(), url])
     .sort((a, b) => a[0] - b[0])
     .map(pair => pair[1]);
   }
-  // For each watchee:
+  // For each URL to watch:
   for (const watchJobURL of watchJobURLs) {
-    const job = await new Promise(resolve => {
-      // Request a job from it.
-      const wholeURL = `${watchJobURL}?agent=${agent}`;
-      const client = wholeURL.startsWith('https://') ? httpsClient : httpClient;
-      const request = client.request(wholeURL, {timeout: 1000}, response => {
-        const chunks = [];
-        response.on('data', chunk => {
-          chunks.push(chunk);
-        })
-        // When response arrives:
-        .on('end', () => {
-          // If the response was JSON-formatted:
-          try {
-            const jobJSON = chunks.join('');
-            const job = JSON.parse(jobJSON);
-            // Make it the response of the watchee.
-            return resolve(job);
-          }
-          // Otherwise, i.e. if the response was not JSON-formatted:
-          catch(error) {
-            // Make an error report the response of the watchee.
-            const errorMessage = `ERROR: Response of ${watchJobURL} was not JSON`;
-            console.log(errorMessage);
-            return resolve({
-              error: errorMessage,
-              message: error.message,
-              status: response.statusCode
-            });
-          }
-        })
-        .on('error', error => {
-          return resolve({
-            error: 'ERROR getting network job',
-            message: error.message,
-            status: response.statusCode
-          });
-        });
-      });
-      // If the check threw an error:
-      request.on('error', error => {
-        // Make an error report the response of the watchee.
-        const errorMessage = `ERROR checking ${watchJobURL} for a network job`;
-        console.log(`${errorMessage} (${error.message})`);
-        return resolve({
-          error: errorMessage,
-          message: error.message
-        });
+    // Request a job from it.
+    let job = null;
+    let errorData = null;
+    const wholeURL = `${watchJobURL}?agent=${agent}`;
+    console.log(`### About to make job request to ${wholeURL}`);
+    const client = wholeURL.startsWith('https://') ? httpsClient : httpClient;
+    const request = client.request(wholeURL, {timeout: 1000}, response => {
+      const chunks = [];
+      response.on('data', chunk => {
+        chunks.push(chunk);
       })
-      .on('timeout', () => {
-        const errorMessage = `ERROR: Request to ${watchJobURL} timed out`;
-        console.log(errorMessage);
-        return resolve({
-          error: errorMessage
-        });
+      // When response arrives:
+      .on('end', () => {
+        // If the response was JSON-formatted:
+        const responseJSON = chunks.join('');
+        console.log(`### Response was:\n${responseJSON}`);
+        try {
+          console.log('### About to try to parse it');
+          const responseObj = JSON.parse(responseJSON);
+          console.log('### Tried to parse it and threw no error');
+          request.end();
+          // If the watchee sent a job:
+          if (responseObj.id) {
+            // Accept it.
+            console.log(`Network job ${job.id} received from ${watchJobURL} (${nowString()})`);
+            job = responseObj;
+          }
+          // Otherwise, if the watchee sent a message:
+          else if (responseObj.message) {
+            // Report it.
+            console.log(job.message);
+          }
+          // Otherwise, i.e. if the watchee sent neither a job nor a message:
+          else {
+            // Report this.
+            console.log(
+              `Response from ${watchJobURL} at ${nowString()}:\n${responseJSON.slice(0, 1000)}`
+            );
+          }
+        }
+        // Otherwise, i.e. if the response was not JSON-formatted:
+        catch(error) {
+          // Make an error report the response of the watchee.
+          const errorMessage = `ERROR: Response of ${watchJobURL} was not JSON`;
+          errorData = {
+            error: errorMessage,
+            message: error.message,
+            response: jobJSON.slice(0, 1000),
+            status: response.statusCode
+          };
+          console.log(JSON.stringify(errorData, null, 2));
+        }
+      })
+      .on('error', error => {
+        errorData = {
+          error: 'ERROR getting network job',
+          message: error.message,
+          status: response.statusCode
+        };
       });
-      request.end();
     });
-    // If the watchee sent a job:
-    if (job.id) {
-      // Stop checking and return it.
-      console.log(`Network job ${job.id} received from ${watchJobURL} (${nowString()})`);
-      return job;
-    }
-    // Otherwise, if the watchee sent a message:
-    else if (job.message) {
-      // Report it and continue checking.
-      console.log(job.message);
-    }
-    // Otherwise, i.e. if the watchee sent neither a job nor a message:
-    else {
-      // Report this and continue checking.
-      console.log(`No network job at ${watchJobURL} to do (${nowString()})`);
-    }
+    // If the check threw an error:
+    request.on('error', error => {
+      // Make an error report the response of the watchee.
+      const errorMessage = `ERROR checking ${watchJobURL} for a network job`;
+      console.log(`${errorMessage} (${error.message})`);
+      errorData = {
+        error: errorMessage,
+        message: error.message
+      };
+    })
+    .on('timeout', () => {
+      const errorMessage = `ERROR: Request to ${watchJobURL} timed out`;
+      console.log(errorMessage);
+      errorData = {
+        error: errorMessage
+      };
+    });
   }
+  console.log('');
   // If no watchee sent a job, return this.
   return {};
 };
@@ -174,6 +182,7 @@ const writeNetReport = async report => {
       if (destination) {
         // Send it.
         const client = destination.startsWith('https://') ? https : http;
+        console.log(`Sending report to ${destination}`);
         const request = client.request(destination, {method: 'POST'}, response => {
           const chunks = [];
           response.on('data', chunk => {
@@ -182,14 +191,15 @@ const writeNetReport = async report => {
           response.on('end', () => {
             const content = chunks.join('');
             try {
-              resolve(JSON.parse(content));
+              const ack = JSON.parse(content);
+              resolve(ack);
             }
             catch(error) {
               resolve({
                 error: 'ERROR: Response was not JSON',
                 message: error.message,
                 status: response.statusCode,
-                content: content.slice(0, 3000)
+                content: content.slice(0, 1000)
               });
             }
           });
@@ -217,12 +227,9 @@ const writeNetReport = async report => {
     }
   });
   // Return the server response.
-  if (ack) {
-    return ack.message || ack;
-  }
-  else {
-    return '';
-  }
+  return ack || {
+    error: 'ERROR in server response'
+  };
 };
 // Archives a job.
 const archiveJob = async (job, watchee) => {
@@ -256,7 +263,7 @@ const runJob = async (job, isDirWatch) => {
       else {
         // Send the report to the server and report its response.
         const ack = await writeNetReport(job);
-        console.log(ack);
+        console.log(`Server response to report submission:\n${JSON.stringify(ack, null, 2)}`);
       }
     }
     // If the job failed:
