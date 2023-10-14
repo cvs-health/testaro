@@ -256,6 +256,6 @@ exports.watch = async (isDirWatch, interval = 300) => {
   const intervalSpec = interval > -1 ? `repeatedly, with ${interval}-second intervals ` : '';
   console.log(`Watching started ${intervalSpec}(${nowString()})\n`);
   // Start the checking.
-  await isDirWatch ? checkDirJob(jobDir, interval) : checkNetJob(0, interval);
+  await isDirWatch ? checkDirJob(interval) : checkNetJob(0, interval);
   console.log(`Watching ended (${nowString()})`);
 };
