@@ -34,112 +34,6 @@ const watchees = jobURLs
 
 // Returns a string representing the date and time.
 const nowString = () => (new Date()).toISOString().slice(0, 19);
-// Checks for a directory job.
-const checkDirJob = async watchee => {
-  try {
-    const watchJobDir = watchee || jobDir;
-    const toDoDirFileNames = await fs.readdir(`${watchJobDir}/todo`);
-    const jobFileNames = toDoDirFileNames.filter(fileName => fileName.endsWith('.json'));
-    if (jobFileNames.length) {
-      const jobJSON = await fs.readFile(`${watchJobDir}/todo/${jobFileNames[0]}`, 'utf8');
-      try {
-        const job = JSON.parse(jobJSON, null, 2);
-        return job;
-      }
-      catch(error) {
-        return {
-          error: `ERROR parsing job as JSON (${error.message})`,
-          message: error.message
-        };
-      }
-    }
-    else {
-      console.log(`No job to do (${nowString()})`);
-      return {};
-    }
-  }
-  catch(error) {
-    console.log('ERROR: Directory watching failed');
-    return {};
-  }
-};
-// Checks servers for a job and returns the job or a no-job report.
-const checkNetJob = watcheeIndex => {
-  if (watcheeIndex < watchees.length) {
-    let job = null;
-    // Request a job from the indexed server.
-    const watchee = watchees[watcheeIndex];
-    const logStart = `Asked ${watchee} for a job and got `;
-    const wholeURL = `${watchee}?agent=${agent}`;
-    const request = client.request(wholeURL, {timeout: 1000}, response => {
-      const chunks = [];
-      response.on('data', chunk => {
-        chunks.push(chunk);
-      })
-      // When the response is completed:
-      .on('end', () => {
-        // If the response was JSON-formatted:
-        const responseJSON = chunks.join('');
-        try {
-          const responseObj = JSON.parse(responseJSON);
-          // If the watchee sent a job:
-          if (responseObj.id) {
-            // Accept it.
-            console.log(`Network job ${job.id} received from ${watchJobURL} (${nowString()})`);
-            job = responseObj;
-          }
-          // Otherwise, if the watchee sent a message:
-          else if (responseObj.message) {
-            // Report it.
-            console.log(`${logStart} reply ${job.message}`);
-            // Check the next watchee.
-            checkNetJob(watcheeIndex + 1);
-          }
-          // Otherwise, i.e. if the watchee sent neither a job nor a message:
-          else {
-            // Report this.
-            console.log(`${logStart} reply ${responseJSON.slice(0, 1000)}`);
-            // Check the next watchee.
-            checkNetJob(watcheeIndex + 1);
-          }
-        }
-        // Otherwise, i.e. if the response was not JSON-formatted:
-        catch(error) {
-          // Report the response.
-          console.log(
-            `${logStart} status ${response.statusCode} and reply ${responseJSON.slice(0, 1000)}`
-          );
-          // Check the next watchee.
-          checkNetJob(watcheeIndex + 1);
-        }
-      })
-      // If the response throws an error:
-      .on('error', error => {
-        // Report this.
-        console.log(`${logStart} status code ${response.statusCode} and error ${error.message}`);
-        // Check the next watchee.
-        checkNetJob(watcheeIndex + 1);
-      });
-    });
-    // Close the request.
-    request.end();
-    // If the request throws an error:
-    request.on('error', error => {
-      // Report this.
-      console.log(`${logStart} error ${error.message}`);
-      // Check the next watchee.
-      checkNetJob(watcheeIndex + 1);
-    })
-    // If the request times out:
-    .on('timeout', () => {
-      // Report this.
-      console.log(`${logStart} a timeout`);
-      // Check the next watchee.
-      checkNetJob(watcheeIndex + 1);
-    });
-    return job;
-  }
-};
 // Writes a directory report.
 const writeDirReport = async report => {
   const jobID = report && report.id;
@@ -217,28 +111,13 @@ const writeNetReport = async report => {
     error: 'ERROR in server response'
   };
 };
-// Archives a job.
-const archiveJob = async (job, watchee) => {
-  const jobJSON = JSON.stringify(job, null, 2);
-  const watchJobDir = watchee || jobDir;
-  await fs.writeFile(`${watchJobDir}/done/${job.id}.json`, jobJSON);
-  await fs.rm(`${watchJobDir}/todo/${job.id}.json`);
-};
-// Waits.
-const wait = ms => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve('');
-    }, ms);
-  });
-};
-// Runs a job.
+// Runs and reports a job.
 const runJob = async (job, isDirWatch) => {
   // If the job has an ID:
   const {id} = job;
   if (id) {
     try {
-      // Run the job, adding to the report.
+      // Perform the job, adding to the report.
       await doJob(job);
       // If a directory was watched:
       if (isDirWatch) {
@@ -264,51 +143,172 @@ const runJob = async (job, isDirWatch) => {
     console.log('ERROR: Job has no id');
   }
 };
-// Checks for a job, performs it, and submits a report, once or repeatedly.
-exports.cycle = async (isDirWatch, isForever, interval = 300, watchee = null) => {
-  let statusOK = true;
-  // Prevent a wait before the first iteration.
-  let empty = false;
-  const intervalMS = 1000 * Number.parseInt(interval);
-  const intervalSpec = isForever ? `with intervals of ${interval} seconds when idle ` : '';
-  console.log(`Watching started ${intervalSpec}(${nowString()})\n`);
-  while (statusOK) {
-    if (empty) {
-      await wait(intervalMS);
-    }
-    // Check for a job.
-    let job;
-    // If a directory is to be checked:
-    if (isDirWatch) {
-      job = await checkDirJob(watchee);
-    }
-    // Otherwise, i.e. if servers are to be checked:
-    else {
-      job = checkNetJob(client, watchees);
-    }
-    // If there was one:
-    if (job.id) {
-      // Run it, save a report, and if applicable send the report to the job source.
-      console.log(`Running job ${job.id} (${nowString()})`);
-      await runJob(JSON.parse(JSON.stringify(job)), isDirWatch);
-      console.log(`Job ${job.id} finished (${nowString()})`);
-      // If a directory was watched:
-      if (isDirWatch) {
-        // Archive the job.
-        await archiveJob(job, watchee);
-        console.log(`Job ${job.id} archived (${nowString()})`);
+// Waits.
+const wait = ms => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve('');
+    }, ms);
+  });
+};
+// Archives a job.
+const archiveJob = async job => {
+  const {id} = job;
+  const jobJSON = JSON.stringify(job, null, 2);
+  await fs.writeFile(`${jobDir}/done/${id}.json`, jobJSON);
+  await fs.rm(`${jobDir}/todo/${id}.json`);
+};
+// Checks for a directory job and, if found, performs and reports it, once or repeatedly.
+const checkDirJob = async (interval) => {
+  try {
+    // If there are any jobs to do in the watched directory:
+    watchDir ??= jobDir;
+    const toDoFileNames = await fs.readdir(`${jobDir}/todo`);
+    const jobFileNames = toDoFileNames.filter(fileName => fileName.endsWith('.json'));
+    if (jobFileNames.length) {
+      // Get the first one.
+      const jobJSON = await fs.readFile(`${jobDir}/todo/${jobFileNames[0]}`, 'utf8');
+      try {
+        const job = JSON.parse(jobJSON, null, 2);
+        const {id} = job;
+        // Perform and report it.
+        console.log(`Directory job ${id} found (${nowString()})`);
+        await runJob(job, true);
+        console.log(`Job ${id} finished (${nowString()})`);
+        // Archive it.
+        await archiveJob(job);
+        console.log(`Job ${id} archived in ${watchDir} (${nowString()})`);
+        // If watching is repetitive:
+        if (interval > -1) {
+          // Wait for the specified interval.
+          await wait(1000 * interval);
+          // Check the servers again.
+          checkDirJob(watchDir, interval);
+        }
       }
-      // If watching was specified for only 1 job, quit.
-      statusOK = isForever;
-      // Prevent a wait before the next iteration.
-      empty = false;
+      catch(error) {
+        console.log(`ERROR processing directory job (${error.message})`);
+      }
     }
-    // Otherwise, i.e. if no job was found:
+    // Otherwise, i.e. if there are no more jobs to do in the watched directory:
     else {
-      // Cause a wait before the next check.
-      empty = true;
-      console.log('');
+      console.log(`No job to do in ${watchDir} (${nowString()})`);
+      // If checking is repetitive:
+      if (interval > -1) {
+        // Wait for the specified interval.
+        await wait(1000 * interval);
+        // Check the directory again.
+        checkDirJob(watchDir, interval);
+      }
     }
   }
+  catch(error) {
+    console.log(`ERROR: Directory watching failed (${error.message})`);
+  }
+};
+// Checks servers for a job and, if obtained, performs and reports it, once or repeatedly.
+const checkNetJob = async (watcheeIndex, interval) => {
+  // If any servers remain to be checked:
+  if (watcheeIndex < watchees.length) {
+    // Request a job from the indexed server.
+    const watchee = watchees[watcheeIndex];
+    const logStart = `Asked ${watchee} for a job and got `;
+    const wholeURL = `${watchee}?agent=${agent}`;
+    const request = client.request(wholeURL, {timeout: 1000}, response => {
+      const chunks = [];
+      response.on('data', chunk => {
+        chunks.push(chunk);
+      })
+      // When the response is completed:
+      .on('end', async () => {
+        // If the response was JSON-formatted:
+        const responseJSON = chunks.join('');
+        try {
+          const responseObj = JSON.parse(responseJSON);
+          // If the watchee sent a job:
+          if (responseObj.id) {
+            const {id} = responseObj;
+            // Perform and report it.
+            console.log(`Network job ${id} received from ${watchJobURL} (${nowString()})`);
+            await runJob(responseObj, false);
+            console.log(`Job ${id} finished (${nowString()})`);
+            // Archive it.
+            await archiveJob(responseObj);
+            console.log(`Job ${id} archived (${nowString()})`);
+            // If watching is repetitive:
+            if (interval > -1) {
+              // Wait for the specified interval.
+              await wait(1000 * interval);
+              // Check the servers again.
+              checkNetJob(0);
+            }
+          }
+          // Otherwise, if the watchee sent a message:
+          else if (responseObj.message) {
+            // Report it.
+            console.log(`${logStart} reply ${responseObj.message}`);
+            // Check the next watchee.
+            checkNetJob(watcheeIndex + 1);
+          }
+          // Otherwise, i.e. if the watchee sent neither a job nor a message:
+          else {
+            // Report this.
+            console.log(`${logStart} reply ${responseJSON.slice(0, 1000)}`);
+            // Check the next watchee.
+            checkNetJob(watcheeIndex + 1);
+          }
+        }
+        // Otherwise, i.e. if the response was not JSON-formatted:
+        catch(error) {
+          // Report the response.
+          console.log(
+            `${logStart} status ${response.statusCode} and reply ${responseJSON.slice(0, 1000)}`
+          );
+          // Check the next watchee.
+          checkNetJob(watcheeIndex + 1);
+        }
+      })
+      // If the response throws an error:
+      .on('error', error => {
+        // Report this.
+        console.log(`${logStart} status code ${response.statusCode} and error ${error.message}`);
+        // Check the next watchee.
+        checkNetJob(watcheeIndex + 1);
+      });
+    });
+    // Close the request.
+    request.end();
+    // If the request throws an error:
+    request.on('error', error => {
+      // Report this.
+      console.log(`${logStart} error ${error.message}`);
+      // Check the next watchee.
+      checkNetJob(watcheeIndex + 1);
+    })
+    // If the request times out:
+    .on('timeout', () => {
+      // Report this.
+      console.log(`${logStart} a timeout`);
+      // Check the next watchee.
+      checkNetJob(watcheeIndex + 1);
+    });
+  }
+  // Otherwise, i.e. if no servers remain to be checked:
+  else {
+    // If checking is repetitive:
+    if (interval > -1) {
+      // Wait for the specified interval.
+      await wait(1000 * interval);
+      // Check the servers again.
+      checkNetJob(0);
+    }
+  }
+};
+// Checks for a job, performs it, and submits a report, once or repeatedly.
+exports.watch = async (isDirWatch, interval = 300) => {
+  const intervalSpec = interval > -1 ? `repeatedly, with ${interval}-second intervals ` : '';
+  console.log(`Watching started ${intervalSpec}(${nowString()})\n`);
+  // Start the checking.
+  await isDirWatch ? checkDirJob(jobDir, interval) : checkNetJob(0, interval);
   console.log(`Watching ended (${nowString()})`);
 };
