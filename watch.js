@@ -70,11 +70,8 @@ const archiveJob = async job => {
 // Checks for a directory job and, if found, performs and reports it, once or repeatedly.
 const checkDirJob = async (interval) => {
   try {
-    console.log('Trying');
     // If there are any jobs to do in the watched directory:
-    console.log(jobDir);
     const toDoFileNames = await fs.readdir(`${jobDir}/todo`);
-    console.log(toDoFileNames);
     const jobFileNames = toDoFileNames.filter(fileName => fileName.endsWith('.json'));
     if (jobFileNames.length) {
       // Get the first one.
@@ -111,7 +108,7 @@ const checkDirJob = async (interval) => {
         // Wait for the specified interval.
         await wait(1000 * interval);
         // Check the directory again.
-        checkDirJob(interval);
+        await checkDirJob(interval);
       }
     }
   }
