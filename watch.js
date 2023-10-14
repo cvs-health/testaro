@@ -17,14 +17,12 @@ const httpsClient = require('https');
 
 // ########## CONSTANTS
 
-const protocol = process.env.PROTOCOL || 'http';
-const client = protocol === 'http' ? httpClient : httpsClient;
 const jobURLs = process.env.JOB_URLs;
 const agent = process.env.AGENT;
 const jobDir = process.env.JOBDIR;
 const reportDir = process.env.REPORTDIR;
 // Get a randomized array of servers to watch from the environment.
-const watchees = jobURLs
+const servers = jobURLs
 .split('+')
 .map(url => [Math.random(), url])
 .sort((a, b) => a[0] - b[0])
@@ -42,11 +40,12 @@ const writeDirReport = async report => {
       const reportJSON = JSON.stringify(report, null, 2);
       const reportName = `${jobID}.json`;
       const rawDir = `${reportDir}/raw`;
+      await fs.mkdir(rawDir, {recursive: true});
       await fs.writeFile(`${rawDir}/${reportName}`, reportJSON);
       console.log(`Report ${reportName} saved in ${rawDir}`);
     }
     catch(error) {
-      console.log(`ERROR: Failed to write report ${jobID} (${error.message})`);
+      console.log(`ERROR: Failed to write report ${jobID} in ${rawDir} (${error.message})`);
     }
   }
   else {
@@ -111,38 +110,6 @@ const writeNetReport = async report => {
     error: 'ERROR in server response'
   };
 };
-// Runs and reports a job.
-const runJob = async (job, isDirWatch) => {
-  // If the job has an ID:
-  const {id} = job;
-  if (id) {
-    try {
-      // Perform the job, adding to the report.
-      await doJob(job);
-      // If a directory was watched:
-      if (isDirWatch) {
-        // Save the report.
-        await writeDirReport(job);
-      }
-      // Otherwise, i.e. if the network was watched:
-      else {
-        // Send the report to the server and report its response.
-        const ack = await writeNetReport(job);
-        console.log(`Server response to report submission:\n${JSON.stringify(ack, null, 2)}`);
-      }
-    }
-    // If the job failed:
-    catch(error) {
-      // Report this.
-      console.log(`ERROR: ${error.message}\n${error.stack}`);
-    }
-  }
-  // Otherwise, i.e. if the job has no ID:
-  else {
-    // Report this.
-    console.log('ERROR: Job has no id');
-  }
-};
 // Waits.
 const wait = ms => {
   return new Promise(resolve => {
@@ -171,10 +138,12 @@ const checkDirJob = async (interval) => {
       try {
         const job = JSON.parse(jobJSON, null, 2);
         const {id} = job;
-        // Perform and report it.
+        // Perform it.
         console.log(`Directory job ${id} found (${nowString()})`);
-        await runJob(job, true);
+        await doJob(job);
         console.log(`Job ${id} finished (${nowString()})`);
+        // Report it.
+        await writeDirReport(job);
         // Archive it.
         await archiveJob(job);
         console.log(`Job ${id} archived in ${watchDir} (${nowString()})`);
@@ -207,13 +176,14 @@ const checkDirJob = async (interval) => {
   }
 };
 // Checks servers for a job and, if obtained, performs and reports it, once or repeatedly.
-const checkNetJob = async (watcheeIndex, interval) => {
+const checkNetJob = async (serverIndex, interval) => {
   // If any servers remain to be checked:
-  if (watcheeIndex < watchees.length) {
+  if (serverIndex < servers.length) {
     // Request a job from the indexed server.
-    const watchee = watchees[watcheeIndex];
-    const logStart = `Asked ${watchee} for a job and got `;
-    const wholeURL = `${watchee}?agent=${agent}`;
+    const server = servers[serverIndex];
+    const logStart = `Asked ${server} for a job and got `;
+    const wholeURL = `${server}?agent=${agent}`;
+    let client = server.startsWith('https://') ? httpsClient : httpClient;
     const request = client.request(wholeURL, {timeout: 1000}, response => {
       const chunks = [];
       response.on('data', chunk => {
@@ -225,56 +195,102 @@ const checkNetJob = async (watcheeIndex, interval) => {
         const responseJSON = chunks.join('');
         try {
           const responseObj = JSON.parse(responseJSON);
-          // If the watchee sent a job:
-          if (responseObj.id) {
-            const {id} = responseObj;
-            // Perform and report it.
-            console.log(`Network job ${id} received from ${watchJobURL} (${nowString()})`);
-            await runJob(responseObj, false);
-            console.log(`Job ${id} finished (${nowString()})`);
-            // Archive it.
-            await archiveJob(responseObj);
-            console.log(`Job ${id} archived (${nowString()})`);
-            // If watching is repetitive:
-            if (interval > -1) {
-              // Wait for the specified interval.
-              await wait(1000 * interval);
-              // Check the servers again.
-              checkNetJob(0);
+          // If the server sent a valid job:
+          const {id, sources} = responseObj;
+          if (id && sources) {
+            const {sendReportTo} = sources;
+            if (sendReportTo) {
+              console.log(`Network job ${id} received from ${server} (${nowString()})`);
+              // Perform it.
+              await doJob(responseObj);
+              console.log(`Job ${id} finished (${nowString()})`);
+              // Send the report to the server and report its response.
+              console.log(`Sending report to ${sendReportTo}`);
+              client = sendReportTo.startsWith('https://') ? httpsClient : httpClient;
+              const request = client.request(sendReportTo, {method: 'POST'}, response => {
+                const chunks = [];
+                response.on('data', chunk => {
+                  chunks.push(chunk);
+                });
+                // When the response arrives:
+                response.on('end', async () => {
+                  const content = chunks.join('');
+                  const logStart = `Sent report to ${sendReportTo} and got `;
+                  try {
+                    const ack = JSON.parse(content);
+                    console.log(`${logStart}${ack}`);
+                    // Archive the job.
+                    await archiveJob(responseObj);
+                    console.log(`Job ${id} archived (${nowString()})`);
+                    // If watching is repetitive:
+                    if (interval > -1) {
+                      // Wait for the specified interval.
+                      await wait(1000 * interval);
+                      // Check the servers again.
+                      checkNetJob(0, interval);
+                    }
+                  }
+                  catch(error) {
+                    console.log(
+                      `ERROR: ${logStart}status ${response.statusCode}, error message ${error.message}, and body ${content.slice(0,1000)}`
+                    );
+                  }
+                });
+              })
+              .on('error', error => {
+                console.log(`ERROR submitting job report (${error.message})`);
+              });
+              report.jobData.agent = agent;
+              const reportJSON = JSON.stringify(report, null, 2);
+              request.end(reportJSON);
+            }
+            // Otherwise, if the server sent a job without a report destination:
+            else {
+              // Report this.
+              console.log(`ERROR: ${logStart}a job with no report destination`);
             }
           }
-          // Otherwise, if the watchee sent a message:
+          // Otherwise, if the server sent a message:
           else if (responseObj.message) {
             // Report it.
-            console.log(`${logStart} reply ${responseObj.message}`);
-            // Check the next watchee.
-            checkNetJob(watcheeIndex + 1);
+            console.log(`${logStart}${responseObj.message}`);
           }
-          // Otherwise, i.e. if the watchee sent neither a job nor a message:
+          // Otherwise, if the server sent any other JSON response:
           else {
-            // Report this.
-            console.log(`${logStart} reply ${responseJSON.slice(0, 1000)}`);
-            // Check the next watchee.
-            checkNetJob(watcheeIndex + 1);
+            // Report it.
+            console.log(`${logStart} ${JSON.stringify(responseObj, null, 2)}`);
+            // Check the next server.
+            checkNetJob(serverIndex + 1);
           }
         }
-        // Otherwise, i.e. if the response was not JSON-formatted:
         catch(error) {
-          // Report the response.
+          // Report any error.
           console.log(
-            `${logStart} status ${response.statusCode} and reply ${responseJSON.slice(0, 1000)}`
+            `${logStart}status ${response.statusCode} and reply ${responseJSON.slice(0, 1000)}`
           );
-          // Check the next watchee.
-          checkNetJob(watcheeIndex + 1);
+          // Check the next server.
+          checkNetJob(serverIndex + 1);
+        }
+      })
+      .on('error', error => {
+        console.log(
+          `${logStart}status code ${response.statusCode} and error message ${error.message}`
+        );
+        // Check the next server.
+        checkNetJob(serverIndex + 1);
+      });
+      // Otherwise, i.e. if the server sent neither a job nor a message:
+      else {
+        // Report this.
+        console.log(`${logStart} reply ${responseJSON.slice(0, 1000)}`);
+        // Check the next server.
+        checkNetJob(serverIndex + 1);
+      }
+      }
+    }
         }
       })
       // If the response throws an error:
-      .on('error', error => {
-        // Report this.
-        console.log(`${logStart} status code ${response.statusCode} and error ${error.message}`);
-        // Check the next watchee.
-        checkNetJob(watcheeIndex + 1);
-      });
     });
     // Close the request.
     request.end();
@@ -282,15 +298,15 @@ const checkNetJob = async (watcheeIndex, interval) => {
     request.on('error', error => {
       // Report this.
       console.log(`${logStart} error ${error.message}`);
-      // Check the next watchee.
-      checkNetJob(watcheeIndex + 1);
+      // Check the next server.
+      checkNetJob(serverIndex + 1);
     })
     // If the request times out:
     .on('timeout', () => {
       // Report this.
       console.log(`${logStart} a timeout`);
-      // Check the next watchee.
-      checkNetJob(watcheeIndex + 1);
+      // Check the next server.
+      checkNetJob(serverIndex + 1);
     });
   }
   // Otherwise, i.e. if no servers remain to be checked:
