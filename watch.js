@@ -70,8 +70,11 @@ const archiveJob = async job => {
 // Checks for a directory job and, if found, performs and reports it, once or repeatedly.
 const checkDirJob = async (interval) => {
   try {
+    console.log('Trying');
     // If there are any jobs to do in the watched directory:
+    console.log(jobDir);
     const toDoFileNames = await fs.readdir(`${jobDir}/todo`);
+    console.log(toDoFileNames);
     const jobFileNames = toDoFileNames.filter(fileName => fileName.endsWith('.json'));
     if (jobFileNames.length) {
       // Get the first one.
@@ -93,7 +96,7 @@ const checkDirJob = async (interval) => {
           // Wait for the specified interval.
           await wait(1000 * interval);
           // Check the servers again.
-          checkDirJob(watchDir, interval);
+          checkDirJob(interval);
         }
       }
       catch(error) {
@@ -102,13 +105,13 @@ const checkDirJob = async (interval) => {
     }
     // Otherwise, i.e. if there are no more jobs to do in the watched directory:
     else {
-      console.log(`No job to do in ${watchDir} (${nowString()})`);
+      console.log(`No job to do in ${jobDir} (${nowString()})`);
       // If checking is repetitive:
       if (interval > -1) {
         // Wait for the specified interval.
         await wait(1000 * interval);
         // Check the directory again.
-        checkDirJob(watchDir, interval);
+        checkDirJob(interval);
       }
     }
   }
@@ -256,6 +259,11 @@ exports.watch = async (isDirWatch, interval = 300) => {
   const intervalSpec = interval > -1 ? `repeatedly, with ${interval}-second intervals ` : '';
   console.log(`Watching started ${intervalSpec}(${nowString()})\n`);
   // Start the checking.
-  await isDirWatch ? checkDirJob(interval) : checkNetJob(0, interval);
+  if (isDirWatch) {
+    await checkDirJob(interval);
+  }
+  else {
+    await checkNetJob(0, interval);
+  }
   console.log(`Watching ended (${nowString()})`);
 };
