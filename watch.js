@@ -12,17 +12,23 @@ const fs = require('fs/promises');
 // Module to perform tests.
 const {doJob} = require('./run');
 // HTTP and HTTPS clients.
-const http = require('http');
-const https = require('https');
+const httpClient = require('http');
+const httpsClient = require('https');
 
 // ########## CONSTANTS
 
-const httpClient = require('http');
-const httpsClient = require('https');
+const protocol = process.env.PROTOCOL || 'http';
+const client = protocol === 'http' ? httpClient : httpsClient;
 const jobURLs = process.env.JOB_URLs;
 const agent = process.env.AGENT;
 const jobDir = process.env.JOBDIR;
 const reportDir = process.env.REPORTDIR;
+// Get a randomized array of servers to watch from the environment.
+const watchees = jobURLs
+.split('+')
+.map(url => [Math.random(), url])
+.sort((a, b) => a[0] - b[0])
+.map(pair => pair[1]);
 
 // ########## FUNCTIONS
 
@@ -57,41 +63,25 @@ const checkDirJob = async watchee => {
     return {};
   }
 };
-// Checks for and, if obtained, returns a network job.
-const checkNetJob = async watchee => {
-  // If no URL to watch is specified by the caller:
-  let watchJobURLs = [watchee];
-  if (! watchJobURLs[0]) {
-    // Get a randomized array of URLs to watch from the environment.
-    watchJobURLs = jobURLs
-    .split('+')
-    .map(url => [Math.random(), url])
-    .sort((a, b) => a[0] - b[0])
-    .map(pair => pair[1]);
-  }
-  // For each URL to watch:
-  for (const watchJobURL of watchJobURLs) {
-    // Request a job from it.
+// Checks servers for a job and returns the job or a no-job report.
+const checkNetJob = watcheeIndex => {
+  if (watcheeIndex < watchees.length) {
     let job = null;
-    let errorData = null;
-    const wholeURL = `${watchJobURL}?agent=${agent}`;
-    console.log(`### About to make job request to ${wholeURL}`);
-    const client = wholeURL.startsWith('https://') ? httpsClient : httpClient;
+    // Request a job from the indexed server.
+    const watchee = watchees[watcheeIndex];
+    const logStart = `Asked ${watchee} for a job and got `;
+    const wholeURL = `${watchee}?agent=${agent}`;
     const request = client.request(wholeURL, {timeout: 1000}, response => {
       const chunks = [];
       response.on('data', chunk => {
         chunks.push(chunk);
       })
-      // When response arrives:
+      // When the response is completed:
       .on('end', () => {
         // If the response was JSON-formatted:
         const responseJSON = chunks.join('');
-        console.log(`### Response was:\n${responseJSON}`);
         try {
-          console.log('### About to try to parse it');
           const responseObj = JSON.parse(responseJSON);
-          console.log('### Tried to parse it and threw no error');
-          request.end();
           // If the watchee sent a job:
           if (responseObj.id) {
             // Accept it.
@@ -101,58 +91,54 @@ const checkNetJob = async watchee => {
           // Otherwise, if the watchee sent a message:
           else if (responseObj.message) {
             // Report it.
-            console.log(job.message);
+            console.log(`${logStart} reply ${job.message}`);
+            // Check the next watchee.
+            checkNetJob(watcheeIndex + 1);
           }
           // Otherwise, i.e. if the watchee sent neither a job nor a message:
           else {
             // Report this.
-            console.log(
-              `Response from ${watchJobURL} at ${nowString()}:\n${responseJSON.slice(0, 1000)}`
-            );
+            console.log(`${logStart} reply ${responseJSON.slice(0, 1000)}`);
+            // Check the next watchee.
+            checkNetJob(watcheeIndex + 1);
           }
         }
         // Otherwise, i.e. if the response was not JSON-formatted:
         catch(error) {
-          // Make an error report the response of the watchee.
-          const errorMessage = `ERROR: Response of ${watchJobURL} was not JSON`;
-          errorData = {
-            error: errorMessage,
-            message: error.message,
-            response: jobJSON.slice(0, 1000),
-            status: response.statusCode
-          };
-          console.log(JSON.stringify(errorData, null, 2));
+          // Report the response.
+          console.log(
+            `${logStart} status ${response.statusCode} and reply ${responseJSON.slice(0, 1000)}`
+          );
+          // Check the next watchee.
+          checkNetJob(watcheeIndex + 1);
         }
       })
+      // If the response throws an error:
       .on('error', error => {
-        errorData = {
-          error: 'ERROR getting network job',
-          message: error.message,
-          status: response.statusCode
-        };
+        // Report this.
+        console.log(`${logStart} status code ${response.statusCode} and error ${error.message}`);
+        // Check the next watchee.
+        checkNetJob(watcheeIndex + 1);
       });
     });
-    // If the check threw an error:
+    // Close the request.
+    request.end();
+    // If the request throws an error:
     request.on('error', error => {
-      // Make an error report the response of the watchee.
-      const errorMessage = `ERROR checking ${watchJobURL} for a network job`;
-      console.log(`${errorMessage} (${error.message})`);
-      errorData = {
-        error: errorMessage,
-        message: error.message
-      };
+      // Report this.
+      console.log(`${logStart} error ${error.message}`);
+      // Check the next watchee.
+      checkNetJob(watcheeIndex + 1);
     })
+    // If the request times out:
     .on('timeout', () => {
-      const errorMessage = `ERROR: Request to ${watchJobURL} timed out`;
-      console.log(errorMessage);
-      errorData = {
-        error: errorMessage
-      };
+      // Report this.
+      console.log(`${logStart} a timeout`);
+      // Check the next watchee.
+      checkNetJob(watcheeIndex + 1);
     });
+    return job;
   }
-  console.log('');
-  // If no watchee sent a job, return this.
-  return {};
 };
 // Writes a directory report.
 const writeDirReport = async report => {
@@ -292,11 +278,13 @@ exports.cycle = async (isDirWatch, isForever, interval = 300, watchee = null) =>
     }
     // Check for a job.
     let job;
+    // If a directory is to be checked:
     if (isDirWatch) {
       job = await checkDirJob(watchee);
     }
+    // Otherwise, i.e. if servers are to be checked:
     else {
-      job = await checkNetJob(watchee);
+      job = checkNetJob(client, watchees);
     }
     // If there was one:
     if (job.id) {
@@ -319,6 +307,7 @@ exports.cycle = async (isDirWatch, isForever, interval = 300, watchee = null) =>
     else {
       // Cause a wait before the next check.
       empty = true;
+      console.log('');
     }
   }
   console.log(`Watching ended (${nowString()})`);
