@@ -19,7 +19,7 @@ const fs = require('fs/promises');
 // Function to process a testing request.
 const {doJob} = require('./run');
 // Function to watch for jobs.
-const {cycle} = require('./watch');
+const {watch} = require('./watch');
 
 // ########## CONSTANTS
 
@@ -57,11 +57,11 @@ const callRun = async jobIDStart => {
   }
 };
 // Starts a watch.
-const callWatch = async (isDirWatch, isForever, interval, watchee = null) => {
-  const whenType = isForever === 'true' ? 'repeating' : 'one-time';
+const callWatch = async (isDirWatch, interval) => {
+  const whenType = interval > -1 ? 'repeating' : 'one-time';
   const whereType = isDirWatch === 'true' ? 'directory' : 'network';
   console.log(`Starting ${whenType} ${whereType} watch`);
-  await cycle(isDirWatch === 'true', isForever === 'true', Number.parseInt(interval, 10), watchee);
+  await watch(isDirWatch === 'true', Number.parseInt(interval, 10));
 };
 
 // ########## OPERATION
