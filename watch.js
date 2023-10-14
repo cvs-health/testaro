@@ -184,7 +184,7 @@ const checkNetJob = async (serverIndex, interval) => {
     const logStart = `Asked ${server} for a job and got `;
     const wholeURL = `${server}?agent=${agent}`;
     let client = server.startsWith('https://') ? httpsClient : httpClient;
-    const request = client.request(wholeURL, {timeout: 1000}, response => {
+    client.request(wholeURL, {timeout: 1000}, response => {
       const chunks = [];
       response.on('data', chunk => {
         chunks.push(chunk);
@@ -226,8 +226,8 @@ const checkNetJob = async (serverIndex, interval) => {
                     if (interval > -1) {
                       // Wait for the specified interval.
                       await wait(1000 * interval);
-                      // Check the servers again.
-                      checkNetJob(0, interval);
+                      // Check the next server.
+                      checkNetJob(serverIndex + 1, interval);
                     }
                   }
                   catch(error) {
@@ -250,7 +250,7 @@ const checkNetJob = async (serverIndex, interval) => {
               console.log(`ERROR: ${logStart}a job with no report destination`);
             }
           }
-          // Otherwise, if the server sent a message:
+          // Otherwise, if the server sent a message instead of a job:
           else if (responseObj.message) {
             // Report it.
             console.log(`${logStart}${responseObj.message}`);
@@ -260,7 +260,7 @@ const checkNetJob = async (serverIndex, interval) => {
             // Report it.
             console.log(`${logStart} ${JSON.stringify(responseObj, null, 2)}`);
             // Check the next server.
-            checkNetJob(serverIndex + 1);
+            checkNetJob(serverIndex + 1, interval);
           }
         }
         catch(error) {
@@ -269,45 +269,35 @@ const checkNetJob = async (serverIndex, interval) => {
             `${logStart}status ${response.statusCode} and reply ${responseJSON.slice(0, 1000)}`
           );
           // Check the next server.
-          checkNetJob(serverIndex + 1);
+          checkNetJob(serverIndex + 1, interval);
         }
       })
+      // If the response throws an error:
       .on('error', error => {
+        // Report it.
         console.log(
           `${logStart}status code ${response.statusCode} and error message ${error.message}`
         );
         // Check the next server.
-        checkNetJob(serverIndex + 1);
+        checkNetJob(serverIndex + 1, interval);
       });
-      // Otherwise, i.e. if the server sent neither a job nor a message:
-      else {
-        // Report this.
-        console.log(`${logStart} reply ${responseJSON.slice(0, 1000)}`);
-        // Check the next server.
-        checkNetJob(serverIndex + 1);
-      }
-      }
-    }
-        }
-      })
-      // If the response throws an error:
-    });
-    // Close the request.
-    request.end();
+    })
     // If the request throws an error:
-    request.on('error', error => {
-      // Report this.
+    .on('error', error => {
+      // Report it.
       console.log(`${logStart} error ${error.message}`);
       // Check the next server.
-      checkNetJob(serverIndex + 1);
+      checkNetJob(serverIndex + 1, interval);
     })
     // If the request times out:
     .on('timeout', () => {
       // Report this.
       console.log(`${logStart} a timeout`);
       // Check the next server.
-      checkNetJob(serverIndex + 1);
-    });
+      checkNetJob(serverIndex + 1, interval);
+    })
+    // Close the request.
+    .end();
   }
   // Otherwise, i.e. if no servers remain to be checked:
   else {
@@ -316,7 +306,7 @@ const checkNetJob = async (serverIndex, interval) => {
       // Wait for the specified interval.
       await wait(1000 * interval);
       // Check the servers again.
-      checkNetJob(0);
+      checkNetJob(0, interval);
     }
   }
 };
