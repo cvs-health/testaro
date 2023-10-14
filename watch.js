@@ -125,7 +125,14 @@ const checkNetJob = async (serverIndex, interval) => {
     const logStart = `Asked ${server} for a job and got `;
     const wholeURL = `${server}?agent=${agent}`;
     let client = server.startsWith('https://') ? httpsClient : httpClient;
-    client.request(wholeURL, {timeout: 1000}, response => {
+    console.log(`About to make request to ${wholeURL}`);
+    httpClient.request(
+      'http://localhost:8000', response => console.log(JSON.stringify(response, null, 2))
+    ).end();
+    /*
+    const jobRequest = client.request(wholeURL, {timeout: 1000}, response => {
+      console.log('Request made');
+      console.log(`Status: ${response.statusCode}`);
       const chunks = [];
       response.on('data', chunk => {
         chunks.push(chunk);
@@ -168,7 +175,7 @@ const checkNetJob = async (serverIndex, interval) => {
                       // Wait for the specified interval.
                       await wait(1000 * interval);
                       // Check the next server.
-                      checkNetJob(serverIndex + 1, interval);
+                      await checkNetJob(serverIndex + 1, interval);
                     }
                   }
                   catch(error) {
@@ -201,7 +208,7 @@ const checkNetJob = async (serverIndex, interval) => {
             // Report it.
             console.log(`${logStart} ${JSON.stringify(responseObj, null, 2)}`);
             // Check the next server.
-            checkNetJob(serverIndex + 1, interval);
+            await checkNetJob(serverIndex + 1, interval);
           }
         }
         catch(error) {
@@ -210,35 +217,36 @@ const checkNetJob = async (serverIndex, interval) => {
             `${logStart}status ${response.statusCode} and reply ${responseJSON.slice(0, 1000)}`
           );
           // Check the next server.
-          checkNetJob(serverIndex + 1, interval);
+          await checkNetJob(serverIndex + 1, interval);
         }
       })
       // If the response throws an error:
-      .on('error', error => {
+      .on('error', async error => {
         // Report it.
         console.log(
           `${logStart}status code ${response.statusCode} and error message ${error.message}`
         );
         // Check the next server.
-        checkNetJob(serverIndex + 1, interval);
+        await checkNetJob(serverIndex + 1, interval);
       });
     })
     // If the request throws an error:
-    .on('error', error => {
+    .on('error', async error => {
       // Report it.
       console.log(`${logStart} error ${error.message}`);
       // Check the next server.
-      checkNetJob(serverIndex + 1, interval);
+      await checkNetJob(serverIndex + 1, interval);
     })
     // If the request times out:
-    .on('timeout', () => {
+    .on('timeout', async () => {
       // Report this.
       console.log(`${logStart} a timeout`);
       // Check the next server.
-      checkNetJob(serverIndex + 1, interval);
-    })
+      await checkNetJob(serverIndex + 1, interval);
+    });
     // Close the request.
-    .end();
+    jobRequest.end();
+    console.log(`Request to ${server} ended`);
   }
   // Otherwise, i.e. if no servers remain to be checked:
   else {
@@ -247,8 +255,9 @@ const checkNetJob = async (serverIndex, interval) => {
       // Wait for the specified interval.
       await wait(1000 * interval);
       // Check the servers again.
-      checkNetJob(0, interval);
+      await checkNetJob(0, interval);
     }
+  */
   }
 };
 // Checks for a job, performs it, and submits a report, once or repeatedly.
