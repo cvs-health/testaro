@@ -52,64 +52,6 @@ const writeDirReport = async report => {
     console.log('ERROR: Job has no ID');
   }
 };
-// Submits a network report to a server and returns the server response.
-const writeNetReport = async report => {
-  const ack = await new Promise(resolve => {
-    if (report.sources) {
-      // If the report specifies where to send it:
-      const destination = report.sources.sendReportTo;
-      if (destination) {
-        // Send it.
-        const client = destination.startsWith('https://') ? https : http;
-        console.log(`Sending report to ${destination}`);
-        const request = client.request(destination, {method: 'POST'}, response => {
-          const chunks = [];
-          response.on('data', chunk => {
-            chunks.push(chunk);
-          });
-          response.on('end', () => {
-            const content = chunks.join('');
-            try {
-              const ack = JSON.parse(content);
-              resolve(ack);
-            }
-            catch(error) {
-              resolve({
-                error: 'ERROR: Response was not JSON',
-                message: error.message,
-                status: response.statusCode,
-                content: content.slice(0, 1000)
-              });
-            }
-          });
-        });
-        report.jobData.agent = agent;
-        request.on('error', error => {
-          console.log(`ERROR submitting job report (${error.message})`);
-          resolve({
-            error: 'ERROR: Job report submission failed',
-            message: error.message
-          });
-        });
-        const reportJSON = JSON.stringify(report, null, 2);
-        request.end(reportJSON);
-        console.log(`Report ${report.id} submitted (${nowString()})`);
-      }
-      // Otherwise, i.e. if the report does not specify where to send it:
-      else {
-        // Report this.
-        console.log('ERROR: Report specifies no submission destination');
-      }
-    }
-    else {
-      console.log('ERROR: Report has no sources property');
-    }
-  });
-  // Return the server response.
-  return ack || {
-    error: 'ERROR in server response'
-  };
-};
 // Waits.
 const wait = ms => {
   return new Promise(resolve => {
@@ -129,7 +71,6 @@ const archiveJob = async job => {
 const checkDirJob = async (interval) => {
   try {
     // If there are any jobs to do in the watched directory:
-    watchDir ??= jobDir;
     const toDoFileNames = await fs.readdir(`${jobDir}/todo`);
     const jobFileNames = toDoFileNames.filter(fileName => fileName.endsWith('.json'));
     if (jobFileNames.length) {
@@ -146,7 +87,7 @@ const checkDirJob = async (interval) => {
         await writeDirReport(job);
         // Archive it.
         await archiveJob(job);
-        console.log(`Job ${id} archived in ${watchDir} (${nowString()})`);
+        console.log(`Job ${id} archived in ${jobDir} (${nowString()})`);
         // If watching is repetitive:
         if (interval > -1) {
           // Wait for the specified interval.
