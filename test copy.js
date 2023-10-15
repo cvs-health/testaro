@@ -9,7 +9,16 @@ const httpClient = require('http');
 
 // ########## FUNCTIONS
 
-exports.checkNetJob = () => {
+// Waits.
+const wait = ms => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve('');
+    }, ms);
+  });
+};
+// Checks servers for a network job.
+const checkNetJob = () => {
   const request = httpClient.request('http://localhost:3008/testu', response => {
     const chunks = [];
     response.on('data', chunk => {
@@ -24,4 +33,6 @@ exports.checkNetJob = () => {
   });
   request.end();
 };
-exports.checkNetJob();
+exports.watch = () => {
+  checkNetJob();
+}
