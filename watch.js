@@ -117,7 +117,7 @@ const checkDirJob = async (interval) => {
   }
 };
 // Checks servers for a job and, if obtained, performs and reports it, once or repeatedly.
-const checkNetJob = (serverIndex, interval) => {
+const checkNetJob = async (serverIndex, interval) => {
   // If any servers remain to be checked:
   if (serverIndex < servers.length) {
     // Request a job from the indexed server.
@@ -269,7 +269,7 @@ exports.watch = async (isDirWatch, interval = 300) => {
     await checkDirJob(interval);
   }
   else {
-    checkNetJob(0, interval);
+    await checkNetJob(0, interval);
   }
   console.log(`Watching ended (${nowString()})`);
 };
