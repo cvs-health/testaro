@@ -102,15 +102,19 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
   const server = servers[serverIndex];
   const client = server.startsWith('https://') ? httpsClient : httpClient;
   const fullURL = `${servers[serverIndex]}?agent=${agent}`;
+  const logStart = `Requested job from server ${server} and got `;
   client.request(fullURL, response => {
     const chunks = [];
-    response.on('data', chunk => {
+    response
+    .on('error', error => {
+      console.log(`${logStart}error message ${error.message}`);
+    })
+    .on('data', chunk => {
       chunks.push(chunk);
     })
     // When the response arrives:
     .on('end', async () => {
       const content = chunks.join('');
-      const logStart = `Requested job from server ${server} and got `;
       try {
         // If the server sent a message:
         const contentObj = JSON.parse(content);
@@ -169,7 +173,14 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
         // Continue watching.
         await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
       }
-    });
+    })
+  })
+  // If the request threw an error:
+  .on('error', async error => {
+    // Report this.
+    console.log(`ERROR: ${logStart}error message ${error.message}`);
+    // Continue watching.
+    await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
   })
   .end();
 };
