@@ -762,58 +762,50 @@ The `call` module will find the first job file with a matching name, execute the
 
 #### Watch
 
-In watch mode, Testaro periodically checks for a job to run. When such a job exists, Testaro runs it and produces a report. Testaro may continue watching after the first report, or may quit.
-
-##### By a module
-
-```javaScript
-const {cycle} = require('./watch');
-cycle(true, true, 30);
-```
-
-##### By a user
-
-```javaScript
-node call watch true true 30
-```
-
-##### Arguments
-
-The arguments passed to `cycle` by a module or to `watch` by a user are:
-- whether to watch a directory (`true`) or the network (`false`)
-- whether to continue watching indefinitely after the first report (`true` or `false`)
-- how many seconds to wait after finding no job before checking again (a nonnegative number)
-- optionally, where the watched jobs are located
+In watch mode, Testaro periodically checks for a job to run and, when a job is obtained, performs it.
 
 ##### Directory watch
 
-With directory watch, Testaro checks whether the `todo` subdirectory of the job directory contains a job. The job directory is given by the fourth passed argument, if present, or, if not, then by `process.env.JOBDIR`.
+Testaro can watch for a job in a directory, with the `dirWatch` function, which can be executed by either a module or a user.
 
-When Testaro finds one or more jobs to do, the `watch` module runs the first job, saves the report in the `raw` subdirectory of the report directory. The report directory is given by `process.env.REPORTDIR`. Testaro also moves the job file from the `todo` subdirectory to the `done` subdirectory of the job directory.
+###### By a module
 
-Since Testaro runs the first job (i.e. the job whose file name is first in ASCII order), whoever populates the `todo` subdirectory of the job directory with job files has control over the order in which Testaro runs them. For example, to force a new job to be run before the already waiting jobs, one can give it a filename that comes before that of the first waiting job.
+```javaScript
+const {dirWatch} = require('./watch');
+dirWatch(true, 300);
+```
+
+In this example, a module asks Testaro to check a directory for a job every 300 seconds, to perform the jobs in the directory if any are found, and then to continue checking. If the first argument is `false`, Testaro will stop checking after performing 1 job.
+
+The directory where Testaro checks for jobs is specified by `process.env.JOBDIR`. Testaro checks for jobs in its `todo` subdirectory and, when it has performed a job, moves it into the `done` subdirectory.
+
+Testaro creates a report for each job and saves the report in the directory specified by `process.env.REPORTDIR`.
+
+###### By a user
+
+A user can choose between two methods:
+
+```javaScript
+node call dirWatch true 300
+```
+
+```javaScript
+node dirWatch true 300
+```
+
+The arguments and behaviors described above for execution by a module apply here, too.
+
+The second, shorter method spawns a new watch subprocess after each job performance, to decrease the risk of process corruption involving bogus timeout messages from Playwright during jobs. That method requires you to enter `CTRL-c` to stop the watching.
 
 ##### Network watch
 
-Network watching is designed for a situation in which:
-- A managing server may be able to give work to multiple workstations that run Testaro.
-- A workstation running Testaro can contact a managing server, but the server may not be able to contact a workstation.
+Testaro can poll servers for jobs to be performed.
 
-With network watch, the initiator of an interaction is Testaro, not the server. When Testaro is available, it requests a job from a server. If the response is a JSON representation of a job, Testaro runs the job and sends the report to the server.
+An instance of Testaro is an _agent_ and has an identifier specified by `process.env.AGENT`. A Testaro instance identifies itself when polling servers, allowing servers to decide whether to give the instance a job to do.
 
-If multiple workstations run Testaro and do work for the same server, the server can assign jobs to specific agents by requiring each instance of Testaro to have a distinct value of `process.env.AGENT`.
+The URLs polled by Testaro are specified by `process.env.JOB_URLS`. The format of that environment variable is a `+`-delimited list of URLs, including schemes. If one of the URLs is `https://testrunner.org/a11ytest/api/job`, and if a Testaro instance has the agent ID `tester3`, then a job request is a `GET` request to `https://testrunner.org/a11ytest/api/job?agent=tester3`.
 
-The URL from which Testaro requests jobs is given by the fourth passed argument, if present, or, if not, then by `process.env.JOB_URL`.
-
-The URL to which Testaro sends reports is given by the `sources.sendReportTo` property of each job, if the property exists, or, if not, by `process.env.REPORT_URL`.
-
-##### Job isolation
-
-If you execute a repeating watch and the watch process becomes corrupted, the corruption can damage an indefinite subsequent sequence of job performances. Under some conditions, for example, Playwright has been observed to throw errors with a message starting with “Navigation timeout of 30000 ms exceeded” and ending with the entire HTML content of the web page, even when page navigation has been subjected to shorter time limits. Thereafter, Playwright issues that error message again about every 15 seconds, even if the browser has been closed.
-
-To counteract such corruption, you can perform repeating directory watches with job isolation. To do this, use the statement `node dirWatch n`, where `n` is the number of seconds Testaro should wait after finding no job before looking again. The `dirWatch` module spawns a new process for each job, and also shrinks Playwright error messages before they are logged on the console.
-
-You can stop a repeating directory watch of this kind by entering `CTRL-c`.
+Once a Testaro instance obtains a network job, the report is sent in a `POST` request to the URL specified by the `sources.sendReportTo` property of the job.
 
 ### Environment variables
 

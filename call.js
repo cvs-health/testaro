@@ -1,16 +1,17 @@
+
 /*
   call.js
-  Invokes Testaro modules with arguments.
+  Invokes Testaro modules.
   This is the universal module for use of Testaro from a command line.
   Arguments:
     0. function to execute.
     1+. arguments to pass to the function.
   Usage examples:
-    node call run ts25
-    node call watch true true 30
+    node call run ts99
+    node call dirWatch true 30
 */
 
-// ########## IMPORTS
+// IMPORTS
 
 // Module to keep secrets.
 require('dotenv').config();
@@ -19,9 +20,9 @@ const fs = require('fs/promises');
 // Function to process a testing request.
 const {doJob} = require('./run');
 // Function to watch for jobs.
-const {watch} = require('./watch');
+const {dirWatch, netWatch} = require('./watch');
 
-// ########## CONSTANTS
+// CONSTANTS
 
 const fn = process.argv[2];
 const fnArgs = process.argv.slice(3);
@@ -30,7 +31,7 @@ const todoDir = `${jobDir}/todo`;
 const reportDir = process.env.REPORTDIR;
 const rawDir = `${reportDir}/raw`;
 
-// ########## FUNCTIONS
+// FUNCTIONS
 
 // Fulfills a testing request.
 const callRun = async jobIDStart => {
@@ -56,15 +57,16 @@ const callRun = async jobIDStart => {
     console.log(`ERROR: No to-do job ID starts with ${jobIDStart}`);
   }
 };
-// Starts a watch.
-const callWatch = async (isDirWatch, interval) => {
-  const whenType = interval > -1 ? 'repeating' : 'one-time';
-  const whereType = isDirWatch === 'true' ? 'directory' : 'network';
-  console.log(`Starting ${whenType} ${whereType} watch`);
-  await watch(isDirWatch === 'true', Number.parseInt(interval, 10));
+// Starts a directory watch, converting the interval argument to a number.
+const callDirWatch = async (isForever, interval) => {
+  await dirWatch(isForever === 'true', Number.parseInt(interval, 10));
+};
+// Starts a network watch, converting the interval argument to a number.
+const callNetWatch = async(isForever, interval) => {
+  netWatch(isForever === 'true', Number.parseInt(interval, 10));
 };
 
-// ########## OPERATION
+// OPERATION
 
 // Execute the requested function.
 if (fn === 'run' && fnArgs.length === 1) {
@@ -74,12 +76,11 @@ if (fn === 'run' && fnArgs.length === 1) {
     process.exit(0);
   });
 }
-else if (fn === 'watch' && fnArgs.length === 2) {
-  callWatch(... fnArgs)
-  .then(() => {
-    console.log('Execution completed\n');
-    process.exit(0);
-  });
+else if (fn === 'dirWatch' && fnArgs.length === 2) {
+  callDirWatch(... fnArgs);
+}
+else if (fn === 'netWatch' && fnArgs.length === 2) {
+  callNetWatch(... fnArgs);
 }
 else {
   console.log('ERROR: Invalid statement');

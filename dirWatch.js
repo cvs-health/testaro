@@ -18,7 +18,7 @@ const interval = process.argv[2];
 const spawnWatch = (command, args) => spawn(command, args, {stdio: ['inherit', 'inherit', 'pipe']});
 // Repeatedly spawns a one-time directory watch.
 const reWatch = () => {
-  const watcher = spawnWatch('node', ['call', 'watch', 'true', 'false', interval]);
+  const watcher = spawnWatch('node', ['call', 'watch', 'false', interval]);
   let error = '';
   watcher.stderr.on('data', data => {
     error += data.toString();
