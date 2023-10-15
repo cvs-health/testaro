@@ -62,8 +62,8 @@ const callDirWatch = async interval => {
   await dirWatch(Number.parseInt(interval, 10));
 };
 // Starts a network watch, converting the interval argument to a number.
-const callNetWatch = async interval => {
-  netWatch(Number.parseInt(interval, 10));
+const callNetWatch = async(isForever, interval) => {
+  netWatch(isForever === 'true', Number.parseInt(interval, 10));
 };
 
 // OPERATION
@@ -79,7 +79,7 @@ if (fn === 'run' && fnArgs.length === 1) {
 else if (fn === 'dirWatch' && fnArgs.length === 1) {
   callDirWatch(... fnArgs);
 }
-else if (fn === 'netWatch' && fnArgs.length === 1) {
+else if (fn === 'netWatch' && fnArgs.length === 2) {
   callNetWatch(... fnArgs);
 }
 else {

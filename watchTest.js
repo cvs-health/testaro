@@ -29,6 +29,11 @@ const wait = ms => {
     }, ms);
   });
 };
+// Serves an object in JSON format.
+const serveObject = (object, response) => {
+  response.setHeader('Content-Type', 'application/json; charset=utf-8');
+  response.end(JSON.stringify(object));
+};
 // Checks for a directory job and, if found, performs and reports it, once or repeatedly.
 const checkDirJob = async (interval) => {
   try {
@@ -79,31 +84,94 @@ const checkDirJob = async (interval) => {
   }
 };
 // Checks servers for a network job.
-const checkNetJob = async (servers, serverIndex, interval) => {
-  if (serverIndex < servers.length) {
-    const server = servers[serverIndex];
-    const client = server.startsWith('https://') ? httpsClient : httpClient;
-    const fullURL = `${servers[serverIndex]}?agent=${agent}`;
-    const request = client.request(fullURL, response => {
-      const chunks = [];
-      response.on('data', chunk => {
-        chunks.push(chunk);
-      })
-      // When response arrives:
-      .on('end', async () => {
-        // Report it.
-        const content = chunks.join('');
-        console.log(`Server ${server} replied:\n${content.slice(0, 500)}`);
-        await wait(2000);
-        checkNetJob(servers, serverIndex + 1, interval);
-      });
-    });
-    request.end();
+const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount) => {
+  // If all servers are jobless:
+  if (noJobCount === servers.length) {
+    // Wait for the specified interval.
+    await wait(1000 * interval);
+    // Reset the count of jobless servers.
+    noJobCount = 0;
   }
+  // Otherwise, i.e. if any server may still have a job:
   else {
-    await wait(1000* interval);
-    checkNetJob(servers, 0, interval);
+    // Wait 2 seconds.
+    await wait(2000);
   }
+  // Check the next server.
+  serverIndex = serverIndex % servers.length;
+  const server = servers[serverIndex];
+  const client = server.startsWith('https://') ? httpsClient : httpClient;
+  const fullURL = `${servers[serverIndex]}?agent=${agent}`;
+  client.request(fullURL, response => {
+    const chunks = [];
+    response.on('data', chunk => {
+      chunks.push(chunk);
+    })
+    // When the response arrives:
+    .on('end', async () => {
+      const content = chunks.join('');
+      const logStart = `Requested job from server ${server} and got `;
+      try {
+        // If the server sent a message:
+        const contentObj = JSON.parse(content);
+        const {message, id, sources} = contentObj;
+        if (message) {
+          // Report it.
+          console.log(`${logStart}${message}`);
+          // Check the next server.
+          await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
+        }
+        // Otherwise, if the server sent a valid job:
+        else if (id && sources) {
+          const {sendReportTo} = sources;
+          if (sendReportTo) {
+            // Perform it.
+            console.log(`${logStart}job ${id} for ${sendReportTo} (${nowString()})`);
+            await doJob(contentObj);
+            console.log(`Job ${id} finished (${nowString()})`);
+            // If watching is to be repeated:
+            if (isForever) {
+              // Resume watching.
+              await checkNetJob(servers, serverIndex + 1, true, interval, 0);
+            }
+            // Otherwise, i.e. if watching is to stop after 1 job is found:
+            else {
+              // Report its end and stop checking.
+              console.log('Network watching ended after 1 job');
+            }
+          }
+          // Otherwise, if the job specifies no report destination:
+          else {
+            // Report this.
+            const message = `ERROR: ${logStart}job with no report destination`;
+            serveObject(message);
+            console.log(message);
+            // Continue watching.
+            await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
+          }
+        }
+        // Otherwise, if the job has no ID or no sources property:
+        else {
+          // Report this.
+          const message = `ERROR: ${logStart}invalid response`;
+          serveObject(message);
+          console.log(message);
+          // Continue watching.
+          await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
+        }
+      }
+      // If processing the server response threw an error:
+      catch(error) {
+        // Report this.
+        console.log(
+          `ERROR: ${logStart}status ${response.statusCode}, error message ${error.message}, and response ${content.slice(0, 1000)}`
+        );
+        // Continue watching.
+        await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
+      }
+    });
+  })
+  .end();
 };
 // Composes an interval description.
 const intervalSpec = interval => {
@@ -121,7 +189,7 @@ exports.dirWatch = async (interval = 300) => {
   await checkDirJob(interval);
 };
 // Checks for a network job, performs it, and submits a report, once or repeatedly.
-exports.netWatch = (interval = 300) => {
+exports.netWatch = async (isForever, interval = 300) => {
   // If the servers to be checked are valid:
   const servers = jobURLs
   .split('+')
@@ -132,11 +200,11 @@ exports.netWatch = (interval = 300) => {
     servers
     && servers.length
     && servers
-    .every(server => ['http://', 'https://', 'file://'].some(prefix => server.startsWith(prefix)))
+    .every(server => ['http://', 'https://'].some(prefix => server.startsWith(prefix)))
   ) {
     console.log(`Network watching started ${intervalSpec(interval)}(${nowString()})\n`);
-    // Start the checking.
-    checkNetJob(servers, 0, interval);
+    // Start checking.
+    await checkNetJob(servers, 0, isForever, interval, 0);
   }
   else {
     console.log('ERROR: List of job URLs invalid');
