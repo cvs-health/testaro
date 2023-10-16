@@ -59,7 +59,7 @@ const callRun = async jobIDStart => {
 };
 // Starts a directory watch, converting the interval argument to a number.
 const callDirWatch = async (isForever, interval) => {
-  await dirWatch(isForever === 'true', Number.parseInt(interval, 10));
+  await dirWatch(isForever === 'true', Math.max(5, Number.parseInt(interval, 10)));
 };
 // Starts a network watch, converting the interval argument to a number.
 const callNetWatch = async(isForever, interval) => {

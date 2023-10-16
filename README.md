@@ -775,7 +775,7 @@ const {dirWatch} = require('./watch');
 dirWatch(true, 300);
 ```
 
-In this example, a module asks Testaro to check a directory for a job every 300 seconds, to perform the jobs in the directory if any are found, and then to continue checking. If the first argument is `false`, Testaro will stop checking after performing 1 job.
+In this example, a module asks Testaro to check a directory for a job every 300 seconds, to perform the jobs in the directory if any are found, and then to continue checking. If the first argument is `false`, Testaro will stop checking after performing 1 job. If it is `true`, Testaro continues checking until the process is stopped.
 
 The directory where Testaro checks for jobs is specified by `process.env.JOBDIR`. Testaro checks for jobs in its `todo` subdirectory and, when it has performed a job, moves it into the `done` subdirectory.
 
@@ -819,7 +819,7 @@ In this example, a module asks Testaro to check the servers for a job every 300 
 ###### By a user
 
 ```javaScript
-node call dirWatch true 300
+node call netWatch true 300
 ```
 
 The arguments and behaviors described above for execution by a module apply here, too. If the first argument is `true`, you can terminate the process by entering `CTRL-c`.

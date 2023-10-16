@@ -43,16 +43,15 @@ const serveObject = (object, response) => {
 const writeDirReport = async report => {
   const jobID = report && report.id;
   if (jobID) {
-    report
     try {
       const reportJSON = JSON.stringify(report, null, 2);
       const reportName = `${jobID}.json`;
-      await fs.mkdir(rawDir, {recursive: true});
+      await fs.mkdir(reportDir, {recursive: true});
       await fs.writeFile(`${reportDir}/${reportName}`, reportJSON);
       console.log(`Report ${reportName} saved in ${reportDir}`);
     }
     catch(error) {
-      console.log(`ERROR: Failed to write report ${jobID} in ${rawDir} (${error.message})`);
+      console.log(`ERROR: Failed to write report ${jobID} in ${reportDir} (${error.message})`);
     }
   }
   else {
@@ -130,7 +129,7 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
   serverIndex = serverIndex % servers.length;
   const server = servers[serverIndex];
   const client = server.startsWith('https://') ? httpsClient : httpClient;
-  const fullURL = `${servers[serverIndex]}?agent=${agent}`;
+  const fullURL = `${server}?agent=${agent}`;
   const logStart = `Requested job from server ${server} and got `;
   client.request(fullURL, response => {
     const chunks = [];
@@ -148,114 +147,125 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
     // When the response arrives:
     .on('end', async () => {
       const content = chunks.join('');
+      // If there was no job to do:
       try {
-        // If the server sent a message, not a job:
         const contentObj = JSON.parse(content);
-        const {message, id, sources} = contentObj;
-        if (message) {
-          // Report it.
-          console.log(`${logStart}${message}`);
+        if (! Object.keys(contentObj).length) {
+          // Report this.
+          console.log(`No job to do at ${server}`);
           // Check the next server.
           await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
         }
-        // Otherwise, if the server sent a valid job:
-        else if (id && sources) {
-          // Add the agent to it.
-          sources.agent = agent;
-          const {sendReportTo} = sources;
-          if (sendReportTo) {
-            // Perform it, adding result data to the job.
-            console.log(`${logStart}job ${id} for ${sendReportTo} (${nowString()})`);
-            await doJob(contentObj);
-            const reportJSON = JSON.stringify(contentObj, null, 2);
-            console.log(`Job ${id} finished (${nowString()})`);
-            // Send the report to the specified server.
-            console.log(`Sending report ${id} to ${sendReportTo}`);
-            const reportClient = sendReportTo.startsWith('https://') ? httpsClient : httpClient;
-            const reportLogStart = `Sent report ${id} to ${sendReportTo} and got `;
-            reportClient.request(sendReportTo, {method: 'POST'}, response => {
-              const chunks = [];
-              response
-              // If the response to the report threw an error:
-              .on('error', async error => {
-                // Report this.
-                console.log(`${reportLogStart}error message ${error.message}`);
-                // Check the next server.
-                await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
-              })
-              .on('data', chunk => {
-                chunks.push(chunk);
-              })
-              // When the response arrives:
-              .on('end', async () => {
-                const content = chunks.join('');
-                try {
-                  // If the server sent a message, as expected:
-                  const ackObj = JSON.parse(content);
-                  const {message} = ackObj;
-                  if (message) {
-                    // Report it.
-                    console.log(`${reportLogStart}${message}`);
-                    // Archive the job.
-                    await archiveJob(Obj);
-                    console.log(`Job ${id} archived (${nowString()})`);
-                    // Check the next server.
-                    await checkNetJob(servers, serverIndex + 1, isForever, interval, 0);
+        // Otherwise, i.e. if there was a job or a message:
+        else {
+          const {message, id, sources} = contentObj;
+          // If the server sent a message, not a job:
+          if (message) {
+            // Report it.
+            console.log(`${logStart}${message}`);
+            // Check the next server.
+            await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
+          }
+          // Otherwise, if the server sent a valid job:
+          else if (id && sources) {
+            // Add the agent to it.
+            sources.agent = agent;
+            const {sendReportTo} = sources;
+            // If the job specifies a report destination:
+            if (sendReportTo) {
+              // Perform it, adding result data to the job.
+              console.log(`${logStart}job ${id} for ${sendReportTo} (${nowString()})`);
+              await doJob(contentObj);
+              const reportJSON = JSON.stringify(contentObj, null, 2);
+              console.log(`Job ${id} finished (${nowString()})`);
+              // Send the report to the specified server.
+              console.log(`Sending report ${id} to ${sendReportTo}`);
+              const reportClient = sendReportTo.startsWith('https://') ? httpsClient : httpClient;
+              const reportLogStart = `Sent report ${id} to ${sendReportTo} and got `;
+              reportClient.request(sendReportTo, {method: 'POST'}, response => {
+                const chunks = [];
+                response
+                // If the response to the report threw an error:
+                .on('error', async error => {
+                  // Report this.
+                  console.log(`${reportLogStart}error message ${error.message}`);
+                  // Check the next server.
+                  await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
+                })
+                .on('data', chunk => {
+                  chunks.push(chunk);
+                })
+                // When the response arrives:
+                .on('end', async () => {
+                  const content = chunks.join('');
+                  try {
+                    // If the server sent a message, as expected:
+                    const ackObj = JSON.parse(content);
+                    const {message} = ackObj;
+                    if (message) {
+                      // Report it.
+                      console.log(`${reportLogStart}${message}`);
+                      // Archive the job.
+                      await archiveJob(contentObj);
+                      console.log(`Job ${id} archived (${nowString()})`);
+                      // Check the next server.
+                      await checkNetJob(servers, serverIndex + 1, isForever, interval, 0);
+                    }
+                    // Otherwise, i.e. if the server sent anything else:
+                    else {
+                      // Report it.
+                      console.log(
+                        `ERROR: ${reportLogStart}status ${response.statusCode} and error message ${JSON.stringify(ackObj, null, 2)}`
+                      );
+                      // Check the next server, disregarding the failed job.
+                      await checkNetJob(
+                        servers, serverIndex + 1, isForever, interval, noJobCount + 1
+                      );
+                    }
                   }
-                  // Otherwise, i.e. if the server sent anything else:
-                  else {
+                  // If processing the report threw an error:
+                  catch(error) {
                     // Report it.
                     console.log(
-                      `ERROR: ${reportLogStart}status ${response.statusCode} and error message ${JSON.stringify(ackObj, null, 2)}`
+                      `ERROR: ${reportLogStart}status ${response.statusCode} and response ${content.slice(0, 1000)}`
                     );
                     // Check the next server, disregarding the failed job.
                     await checkNetJob(
                       servers, serverIndex + 1, isForever, interval, noJobCount + 1
                     );
                   }
-                }
-                // If processing the report threw an error:
-                catch(error) {
-                  // Report it.
-                  console.log(
-                    `ERROR: ${reportLogStart}status ${response.statusCode} and response ${content.slice(0, 1000)}`
-                  );
-                  // Continue watching, disregarding the failed job.
-                  await checkNetJob(
-                    servers, serverIndex + 1, isForever, interval, noJobCount + 1
-                  );
-                }
-              });
-            })
-            // If the report submission throws an error:
-            .on('error', async error => {
+                });
+              })
+              // If the report submission throws an error:
+              .on('error', async error => {
+                // Report this.
+                console.log(`ERROR: ${reportLogStart}error message ${error.message}`);
+                // Check the next server, disregarding the failed job.
+                await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
+              })
+              // Finish submitting the report.
+              .end(reportJSON);
+            }
+            // Otherwise, i.e. if the job specifies no report destination:
+            else {
               // Report this.
-              console.log(`ERROR: ${reportLogStart}error message ${error.message}`);
-              // Continue watching, disregarding the failed job.
+              const message = `ERROR: ${logStart}job with no report destination`;
+              serveObject({message}, response);
+              console.log(message);
+              // Check the next server, disregarding the defective job.
               await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
-            })
-            // Finish submitting the report.
-            .end(reportJSON);
+            }
           }
-          // Otherwise, if the job specifies no report destination:
+          // Otherwise, if the server sent an invalid job:
           else {
             // Report this.
-            const message = `ERROR: ${logStart}job with no report destination`;
-            serveObject(message);
+            const message
+            = `ERROR: ${logStart}invalid job:\n${JSON.stringify(contentObj, null, 2)}`;
             console.log(message);
+            serveObject({message}, response);
             // Check the next server, disregarding the defective job.
             await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
           }
-        }
-        // Otherwise, if the server sent an invalid job:
-        else {
-          // Report this.
-          const message
-          = `ERROR: ${logStart}invalid job:\n(${JSON.stringify(contentObj, null, 2)})`;
-          serveObject(message);
-          console.log(message);
-          // Check the next server, disregarding the defective job.
-          await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
         }
       }
       // If the response to the job request threw an error:
@@ -289,10 +299,10 @@ const intervalSpec = interval => {
   }
 };
 // Checks for a directory job, performs it, and submits a report, once or repeatedly.
-exports.dirWatch = async (interval = 300) => {
+exports.dirWatch = async (isForever, interval = 300) => {
   console.log(`Directory watching started ${intervalSpec(interval)}(${nowString()})\n`);
   // Start the checking.
-  await checkDirJob(interval);
+  await checkDirJob(isForever, interval);
 };
 // Checks for a network job, performs it, and submits a report, once or repeatedly.
 exports.netWatch = async (isForever, interval = 300) => {
