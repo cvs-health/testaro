@@ -814,23 +814,15 @@ const {netWatch} = require('./watch');
 netWatch(true, 300);
 ```
 
-In this example, a module asks Testaro to check the servers for a job every 300 seconds, to perform any jobs obtained from the servers, and then to continue checking. If the first argument is `false`, Testaro will stop checking after performing 1 job.
+In this example, a module asks Testaro to check the servers for a job every 300 seconds, to perform any jobs obtained from the servers, and then to continue checking until the process is stopped. If the first argument is `false`, Testaro will stop checking after performing 1 job.
 
 ###### By a user
-
-A user can choose between two methods:
 
 ```javaScript
 node call dirWatch true 300
 ```
 
-```javaScript
-node dirWatch true 300
-```
-
-The arguments and behaviors described above for execution by a module apply here, too.
-
-The second, shorter method spawns a new watch subprocess after each job performance, to decrease the risk of process corruption involving bogus timeout messages from Playwright during jobs. That method requires you to enter `CTRL-c` to stop the watching.
+The arguments and behaviors described above for execution by a module apply here, too. If the first argument is `true`, you can terminate the process by entering `CTRL-c`.
 
 ### Environment variables
 
@@ -841,7 +833,6 @@ Before making Testaro run a job, you can optionally also set `process.env.DEBUG`
 You may store environment variables in an untracked `.env` file if you wish, and Testaro will recognize them. Here is a template for a `.env` file:
 
 ```conf
-URL_INJECT=yes
 WAVE_KEY=yourwavekey
 JOB_URLs=https://yourserver.tld/job+http://localhost:3004/testapp
 JOBDIR=../testing/jobs/ThisWorkstation
