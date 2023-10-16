@@ -11,6 +11,7 @@ const agent = process.env.AGENT;
 
 // FUNCTIONS
 
+// Send a notification to an observer.
 exports.tellServer = (report, messageParams, logMessage) => {
   const observer = report.sources.sendReportTo.replace(/report$/, 'granular');
   const whoParams = `agent=${agent}&jobID=${report.id || ''}`;

@@ -464,7 +464,7 @@ const doActs = async (report, actIndex, page) => {
       }
       // If granular reporting has been specified:
       if (report.observe) {
-        // Notify the server of the act.
+        // Notify the observer of the act.
         const whichParam = act.which ? `&which=${act.which}` : '';
         const messageParams = `act=${act.type}${whichParam}`;
         tellServer(report, messageParams, `>>>> ${act.type}: ${actInfo}`);
@@ -744,7 +744,7 @@ const doActs = async (report, actIndex, page) => {
                 // Remove it, except any important property.
                 if (act.result.important) {
                   act.data = act.result.important;
-                  console.log('>>>>>> Important result data protected from deletion');
+                  console.log(`>>>>>> Important ${act.which} data included in report`);
                 }
                 delete act.result;
               }
