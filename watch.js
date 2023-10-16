@@ -113,6 +113,7 @@ const checkDirJob = async (isForever, interval) => {
 };
 // Checks servers for a network job.
 const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount) => {
+  console.log('');
   // If all servers are jobless:
   if (noJobCount === servers.length) {
     // Wait for the specified interval.
@@ -170,10 +171,10 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
           else if (id && sources) {
             // Add the agent to it.
             sources.agent = agent;
-            const {sendReportTo} = sources;
             // If the job specifies a report destination:
+            const {sendReportTo} = sources;
             if (sendReportTo) {
-              // Perform it, adding result data to the job.
+              // Perform the job, adding result data to it.
               console.log(`${logStart}job ${id} for ${sendReportTo} (${nowString()})`);
               await doJob(contentObj);
               const reportJSON = JSON.stringify(contentObj, null, 2);
@@ -182,9 +183,9 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
               console.log(`Sending report ${id} to ${sendReportTo}`);
               const reportClient = sendReportTo.startsWith('https://') ? httpsClient : httpClient;
               const reportLogStart = `Sent report ${id} to ${sendReportTo} and got `;
-              reportClient.request(sendReportTo, {method: 'POST'}, response => {
+              reportClient.request(sendReportTo, {method: 'POST'}, repResponse => {
                 const chunks = [];
-                response
+                repResponse
                 // If the response to the report threw an error:
                 .on('error', async error => {
                   // Report this.
@@ -215,7 +216,7 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
                     else {
                       // Report it.
                       console.log(
-                        `ERROR: ${reportLogStart}status ${response.statusCode} and error message ${JSON.stringify(ackObj, null, 2)}`
+                        `ERROR: ${reportLogStart}status ${repResponse.statusCode} and error message ${JSON.stringify(ackObj, null, 2)}`
                       );
                       // Check the next server, disregarding the failed job.
                       await checkNetJob(
@@ -227,7 +228,7 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
                   catch(error) {
                     // Report it.
                     console.log(
-                      `ERROR: ${reportLogStart}status ${response.statusCode} and response ${content.slice(0, 1000)}`
+                      `ERROR: ${reportLogStart}status ${repResponse.statusCode} and response ${content.slice(0, 1000)}`
                     );
                     // Check the next server, disregarding the failed job.
                     await checkNetJob(
@@ -281,10 +282,28 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
   })
   // If the job request throws an error:
   .on('error', async error => {
-    // Report this.
-    console.log(`ERROR: ${logStart}error message ${error.message}`);
-    // Check the next server.
-    await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
+    // If it was a refusal to connect:
+    const {message} = error;
+    if (message.includes('ECONNREFUSED')) {
+      // Report this.
+      console.log(`${logStart}no connection`);
+      // Check the next server.
+      await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
+    }
+    // Otherwise, if it was a DNS failure:
+    else if (message.includes('ENOTFOUND')) {
+      // Report this.
+      console.log(`${logStart}no domain name resolution`);
+      // Check the next server.
+      await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
+    }
+    // Otherwise, i.e. if it was any other error:
+    else {
+      // Report this.
+      console.log(`ERROR: ${logStart}no response, but got error message ${error.message}`);
+      // Check the next server.
+      await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
+    }
   })
   // Finish sending the request.
   .end();
