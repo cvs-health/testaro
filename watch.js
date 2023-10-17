@@ -59,11 +59,16 @@ const writeDirReport = async report => {
   }
 };
 // Archives a job.
-const archiveJob = async job => {
+const archiveJob = async (job, isFile) => {
+  // Save the job in the done subdirectory.
   const {id} = job;
   const jobJSON = JSON.stringify(job, null, 2);
   await fs.writeFile(`${jobDir}/done/${id}.json`, jobJSON);
-  await fs.rm(`${jobDir}/todo/${id}.json`);
+  // If the job had been saved as a file in the todo subdirectory:
+  if (isFile) {
+    // Delete the file.
+    await fs.rm(`${jobDir}/todo/${id}.json`);
+  }
 };
 // Checks for a directory job and, if found, performs and reports it, once or repeatedly.
 const checkDirJob = async (isForever, interval) => {
@@ -84,7 +89,7 @@ const checkDirJob = async (isForever, interval) => {
         // Report it.
         await writeDirReport(job);
         // Archive it.
-        await archiveJob(job);
+        await archiveJob(job, true);
         console.log(`Job ${id} archived in ${jobDir} (${nowString()})`);
         // If watching is repetitive:
         if (isForever) {
@@ -207,7 +212,7 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
                       // Report it.
                       console.log(`${reportLogStart}${message}`);
                       // Archive the job.
-                      await archiveJob(contentObj);
+                      await archiveJob(contentObj, false);
                       console.log(`Job ${id} archived (${nowString()})`);
                       // Check the next server.
                       await checkNetJob(servers, serverIndex + 1, isForever, interval, 0);
@@ -228,7 +233,7 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
                   catch(error) {
                     // Report it.
                     console.log(
-                      `ERROR: ${reportLogStart}status ${repResponse.statusCode} and response ${content.slice(0, 1000)}`
+                      `ERROR: ${reportLogStart}status ${repResponse.statusCode}, error message ${error.message}, and response ${content.slice(0, 1000)}`
                     );
                     // Check the next server, disregarding the failed job.
                     await checkNetJob(
