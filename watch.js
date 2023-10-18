@@ -63,6 +63,7 @@ const archiveJob = async (job, isFile) => {
   // Save the job in the done subdirectory.
   const {id} = job;
   const jobJSON = JSON.stringify(job, null, 2);
+  await fs.mkdir(`${jobDir}/done`, {recursive: true});
   await fs.writeFile(`${jobDir}/done/${id}.json`, jobJSON);
   // If the job had been saved as a file in the todo subdirectory:
   if (isFile) {

@@ -17,13 +17,13 @@ exports.tellServer = (report, messageParams, logMessage) => {
   const whoParams = `agent=${agent}&jobID=${report.id || ''}`;
   const wholeURL = `${observer}?${whoParams}&${messageParams}`;
   const client = wholeURL.startsWith('https://') ? httpsClient : httpClient;
-  const request = client.request(wholeURL);
+  client.request(wholeURL)
   // If the notification threw an error:
-  request.on('error', error => {
+  .on('error', error => {
     // Report the error.
     const errorMessage = 'ERROR notifying the server';
     console.log(`${errorMessage} (${error.message})`);
-  });
-  request.end();
+  })
+  .end();
   console.log(`${logMessage} (server notified)`);
 };

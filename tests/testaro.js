@@ -99,6 +99,14 @@ const jsonTest = async (ruleID, ruleArgs) => {
     withItems, all, ruleObj.ruleID, whats, ruleObj.ordinalSeverity, ruleObj.summaryTagName
   );
 };
+// Waits.
+const wait = ms => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve('');
+    }, ms);
+  });
+};
 // Conducts and reports Testaro tests.
 exports.reporter = async (page, options) => {
   const {withItems, stopOnFail, granular, args} = options;
@@ -119,6 +127,8 @@ exports.reporter = async (page, options) => {
     && ['y', 'n'].includes(rules[0])
     && rules.slice(1).every(rule => evalRules[rule] || etcRules[rule])
   ) {
+    // Wait 1 second to prevent out-of-order logging with granular reporting.
+    await wait(1000);
     // For each rule invoked:
     const calledRules = rules[0] === 'y'
       ? rules.slice(1)
