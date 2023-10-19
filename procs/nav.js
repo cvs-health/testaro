@@ -119,7 +119,6 @@ const goTo = async (report, page, url, timeout, waitUntil) => {
 // Closes the current browser.
 const browserClose = async () => {
   if (browser) {
-    const browserType = browser.browserType().name();
     let contexts = browser.contexts();
     for (const context of contexts) {
       await context.close();
@@ -152,7 +151,6 @@ const launch = async (report, typeName, url, debug, waits, isLowMotion = false) 
     browser = await browserType.launch(browserOptions)
     // If the launch failed:
     .catch(async error => {
-      healthy = false;
       console.log(`ERROR launching browser (${error.message.slice(0, 200)})`);
       // Return this.
       return {
@@ -162,11 +160,9 @@ const launch = async (report, typeName, url, debug, waits, isLowMotion = false) 
     });
     // Open a context (i.e. browser tab), with reduced motion if specified.
     const options = {reduceMotion: isLowMotion ? 'reduce' : 'no-preference'};
-    browserContext = await browser.newContext(options);
+    const browserContext = await browser.newContext(options);
     // When a page (i.e. browser tab) is added to the browser context (i.e. browser window):
     browserContext.on('page', async page => {
-      // Make the page current.
-      currentPage = page;
       // If it emits a message:
       page.on('console', msg => {
         const msgText = msg.text();
@@ -210,22 +206,22 @@ const launch = async (report, typeName, url, debug, waits, isLowMotion = false) 
       });
     });
     // Open the first page of the context.
-    currentPage = await browserContext.newPage();
+    const page = await browserContext.newPage();
     try {
       // Wait until it is stable.
-      await currentPage.waitForLoadState('domcontentloaded', {timeout: 5000});
+      await page.waitForLoadState('domcontentloaded', {timeout: 5000});
       // Navigate to the specified URL.
-      const navResult = await goTo(report, currentPage, url, 15000, 'domcontentloaded');
+      const navResult = await goTo(report, page, url, 15000, 'domcontentloaded');
       // If the navigation succeeded:
       if (navResult.success) {
         // Update the name of the current browser type and store it in the page.
-        currentPage.browserTypeName = typeName;
+        page.browserTypeName = typeName;
         // Return the response, the browser context, and the page.
         return {
           success: true,
           response: navResult.response,
           browserContext,
-          currentPage
+          page
         };
       }
       // If the navigation failed:
@@ -237,7 +233,7 @@ const launch = async (report, typeName, url, debug, waits, isLowMotion = false) 
         };
       }
     }
-    // If it fails to become stable by the deadline:
+    // If it fails to become stable after load:
     catch(error) {
       // Return this.
       console.log(`ERROR: Blank page load in new tab timed out (${error.message})`);

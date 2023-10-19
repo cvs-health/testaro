@@ -529,6 +529,8 @@ const doActs = async (report, actIndex, page) => {
         }
         // Otherwise, i.e. if the launch or navigation failed:
         else {
+          // Add an error result to the act.
+          addError(act, 'badLaunch', `ERROR: Launch failed (${launchResult.error})`);
           // Abort the job.
           await abortActs();
         }
@@ -865,11 +867,9 @@ const doActs = async (report, actIndex, page) => {
                 }
                 // If the move fails:
                 catch(error) {
-                  // Quit and add failure data to the report.
-                  act.result.success = false;
-                  act.result.error = 'moveFailure';
-                  act.result.message = `ERROR: ${move} failed`;
-                  console.log(`ERROR: ${move} failed (${errorStart(error)})`);
+                  // Add the error result to the act.
+                  addError(act, 'moveFailure', `ERROR: ${move} failed`);
+                  // Abort.
                   await abortActs();
                 }
                 if (act.result.success) {
@@ -1208,18 +1208,24 @@ const doActs = async (report, actIndex, page) => {
           else {
             // Add the error result to the act.
             addError(act, 'badType', 'ERROR: Invalid act type');
+            // Abort.
+            await abortActs();
           }
         }
         // Otherwise, a page URL is required but does not exist, so:
         else {
           // Add an error result to the act.
           addError(act, 'noURL', 'ERROR: Page has no URL');
+          // Abort.
+          await abortActs();
         }
       }
       // Otherwise, i.e. if no page exists:
       else {
         // Add an error result to the act.
         addError(act, 'noPage', 'ERROR: No page identified');
+        // Abort.
+        await abortActs();
       }
       act.endTime = Date.now();
     }
@@ -1229,6 +1235,7 @@ const doActs = async (report, actIndex, page) => {
       const errorMsg = `ERROR: Invalid act of type ${act.type}`;
       console.log(errorMsg);
       addError(act, 'badAct', errorMsg);
+      // Abort.
       await abortActs();
     }
     // Perform any remaining acts if not aborted.
