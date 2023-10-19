@@ -119,7 +119,6 @@ const checkDirJob = async (isForever, interval) => {
 };
 // Checks servers for a network job.
 const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount) => {
-  console.log('');
   // If all servers are jobless:
   if (noJobCount === servers.length) {
     // Wait for the specified interval.
@@ -132,8 +131,13 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
     // Wait 2 seconds.
     await wait(2000);
   }
-  // Check the next server.
+  // If the last server has been checked:
   serverIndex = serverIndex % servers.length;
+  if (serverIndex === 0) {
+    // Report this.
+    console.log('--');
+  }
+  // Check the next server.
   const server = servers[serverIndex];
   const client = server.startsWith('https://') ? httpsClient : httpClient;
   const fullURL = `${server}?agent=${agent}`;
@@ -156,7 +160,7 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
       const content = chunks.join('');
       // If there was no job to do:
       try {
-        const contentObj = JSON.parse(content);
+        let contentObj = JSON.parse(content);
         if (! Object.keys(contentObj).length) {
           // Report this.
           console.log(`No job to do at ${server}`);
@@ -183,7 +187,7 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
               // Perform the job, adding result data to it.
               console.log(`${logStart}job ${id} for ${sendReportTo} (${nowString()})`);
               await doJob(contentObj);
-              const reportJSON = JSON.stringify(contentObj, null, 2);
+              let reportJSON = JSON.stringify(contentObj, null, 2);
               console.log(`Job ${id} finished (${nowString()})`);
               // Send the report to the specified server.
               console.log(`Sending report ${id} to ${sendReportTo}`);
@@ -212,9 +216,9 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
                     if (message) {
                       // Report it.
                       console.log(`${reportLogStart}${message}`);
-                      // Archive the job.
-                      await archiveJob(contentObj, false);
-                      console.log(`Job ${id} archived (${nowString()})`);
+                      // Free the memory used by the report.
+                      reportJSON = '';
+                      contentObj = {};
                       // Check the next server.
                       await checkNetJob(servers, serverIndex + 1, isForever, interval, 0);
                     }
