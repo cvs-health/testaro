@@ -178,14 +178,17 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
             await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
           }
           // Otherwise, if the server sent a valid job:
-          else if (id && sources) {
+          else if (id && sources && sources.target && sources.target.which) {
             // Add the agent to it.
             sources.agent = agent;
             // If the job specifies a report destination:
             const {sendReportTo} = sources;
             if (sendReportTo) {
               // Perform the job, adding result data to it.
-              console.log(`${logStart}job ${id} for ${sendReportTo} (${nowString()})`);
+              const testee = sources.target.which;
+              console.log(
+                `${logStart}job ${id} (${nowString()})\n>> It will test ${testee}\n>> It will send report to ${sendReportTo}`
+              );
               await doJob(contentObj);
               let reportJSON = JSON.stringify(contentObj, null, 2);
               console.log(`Job ${id} finished (${nowString()})`);
