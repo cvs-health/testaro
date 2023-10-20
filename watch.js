@@ -158,8 +158,8 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
     // When the response arrives:
     .on('end', async () => {
       const content = chunks.join('');
-      // If there was no job to do:
       try {
+        // If there was no job to do:
         let contentObj = JSON.parse(content);
         if (! Object.keys(contentObj).length) {
           // Report this.
@@ -282,12 +282,10 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
           }
         }
       }
-      // If the response to the job request threw an error:
+      // If an error is thrown:
       catch(error) {
         // Report this.
-        console.log(
-          `ERROR: ${logStart}status ${response.statusCode}, error message ${error.message}, and response ${content.slice(0, 1000)}`
-        );
+        console.log(`ERROR: ${error.message} (response ${content.slice(0, 1000)})`);
         // Check the next server.
         await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
       }

@@ -128,7 +128,7 @@ const browserClose = async () => {
     browser = null;
   }
 };
-// Launches a browser, navigates to a URL, and returns the status.
+// Launches a browser, navigates to a URL, and returns browser data.
 const launch = async (report, typeName, url, debug, waits, isLowMotion = false) => {
   // If the specified browser type exists:
   const browserType = playwright[typeName];
@@ -216,7 +216,7 @@ const launch = async (report, typeName, url, debug, waits, isLowMotion = false) 
       if (navResult.success) {
         // Update the name of the current browser type and store it in the page.
         page.browserTypeName = typeName;
-        // Return the response, the browser context, and the page.
+        // Return the response of the target server, the browser context, and the page.
         return {
           success: true,
           response: navResult.response,

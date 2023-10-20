@@ -422,7 +422,10 @@ const wait = ms => {
   });
 };
 // Adds an error result to an act.
-const addError = (act, error, message) => {
+const addError = (alsoLog, act, error, message) => {
+  if (alsoLog) {
+    console.log(`${message} (${error})`);
+  }
   if (! act.result) {
     act.result = {};
   }
@@ -516,12 +519,13 @@ const doActs = async (report, actIndex, page) => {
         );
         // If the launch and navigation succeeded:
         if (launchResult && launchResult.success) {
-          // Save the browser data.
-          const {response, currentPage} = launchResult;
-          page = currentPage;
+          // Get the response of the target server.
+          const {response} = launchResult;
+          // Get the target page.
+          page = launchResult.page;
           // Add the actual URL to the act.
           act.actualURL = page.url();
-          // Add any nonce to the Act.
+          // Add the script nonce, if any, to the act.
           const scriptNonce = await getNonce(response);
           if (scriptNonce) {
             report.jobData.lastScriptNonce = scriptNonce;
@@ -530,7 +534,7 @@ const doActs = async (report, actIndex, page) => {
         // Otherwise, i.e. if the launch or navigation failed:
         else {
           // Add an error result to the act.
-          addError(act, 'badLaunch', `ERROR: Launch failed (${launchResult.error})`);
+          addError(true, act, 'badLaunch', `ERROR: Launch failed (${launchResult.error})`);
           // Abort the job.
           await abortActs();
         }
@@ -560,13 +564,13 @@ const doActs = async (report, actIndex, page) => {
             // If a prohibited redirection occurred:
             if (response.exception === 'badRedirection') {
               // Report this and quit.
-              addError(act, 'badRedirection', 'ERROR: Navigation illicitly redirected');
+              addError(true, act, 'badRedirection', 'ERROR: Navigation illicitly redirected');
               await abortActs();
             }
             // Otherwise, i.e. if the visit failed:
             else {
               // Report this and quit.
-              addError(act, 'failure', 'ERROR: Visit failed');
+              addError(true, act, 'failure', 'ERROR: Visit failed');
               await abortActs();
             }
           }
@@ -650,7 +654,7 @@ const doActs = async (report, actIndex, page) => {
           .catch(async error => {
             // Quit.
             console.log(`ERROR waiting for page to be ${act.which} (${error.message})`);
-            addError(act, 'timeout', `ERROR waiting for page to be ${act.which}`);
+            addError(true, act, 'timeout', `ERROR waiting for page to be ${act.which}`);
             await abortActs();
           });
           // If the wait succeeded:
@@ -868,7 +872,7 @@ const doActs = async (report, actIndex, page) => {
                 // If the move fails:
                 catch(error) {
                   // Add the error result to the act.
-                  addError(act, 'moveFailure', `ERROR: ${move} failed`);
+                  addError(true, act, 'moveFailure', `ERROR: ${move} failed`);
                   // Abort.
                   await abortActs();
                 }
@@ -1207,7 +1211,7 @@ const doActs = async (report, actIndex, page) => {
           // Otherwise, i.e. if the act type is unknown:
           else {
             // Add the error result to the act.
-            addError(act, 'badType', 'ERROR: Invalid act type');
+            addError(true, act, 'badType', 'ERROR: Invalid act type');
             // Abort.
             await abortActs();
           }
@@ -1215,7 +1219,7 @@ const doActs = async (report, actIndex, page) => {
         // Otherwise, a page URL is required but does not exist, so:
         else {
           // Add an error result to the act.
-          addError(act, 'noURL', 'ERROR: Page has no URL');
+          addError(true, act, 'noURL', 'ERROR: Page has no URL');
           // Abort.
           await abortActs();
         }
@@ -1223,7 +1227,7 @@ const doActs = async (report, actIndex, page) => {
       // Otherwise, i.e. if no page exists:
       else {
         // Add an error result to the act.
-        addError(act, 'noPage', 'ERROR: No page identified');
+        addError(true, act, 'noPage', 'ERROR: No page identified');
         // Abort.
         await abortActs();
       }
@@ -1234,7 +1238,7 @@ const doActs = async (report, actIndex, page) => {
       // Quit and add error data to the report.
       const errorMsg = `ERROR: Invalid act of type ${act.type}`;
       console.log(errorMsg);
-      addError(act, 'badAct', errorMsg);
+      addError(true, act, 'badAct', errorMsg);
       // Abort.
       await abortActs();
     }
