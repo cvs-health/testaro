@@ -224,8 +224,8 @@ const launch = async (report, typeName, url, debug, waits, isLowMotion = false) 
           page
         };
       }
-      // If the navigation failed:
-      if (navResult.error) {
+      // Otherwise, if the navigation failed:
+      else if (navResult.error) {
         // Return this.
         return {
           success: false,

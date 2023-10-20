@@ -142,7 +142,9 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
   const client = server.startsWith('https://') ? httpsClient : httpClient;
   const fullURL = `${server}?agent=${agent}`;
   const logStart = `Requested job from server ${server} and got `;
-  client.request(fullURL, response => {
+  // Tolerate unrecognized certificate authorities if the environment specifies.
+  const ruOpt = process.env.REJECT_UNAUTHORIZED === 'false' ? {rejectUnauthorized: false} : {};
+  client.request(fullURL, ruOpt, response => {
     const chunks = [];
     response
     // If the response to the job request threw an error:
