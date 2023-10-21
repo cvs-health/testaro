@@ -434,6 +434,15 @@ const addError = (alsoLog, act, error, message) => {
   act.result.message = message;
   if (act.type === 'test') {
     act.result.prevented = true;
+    if (standard === 'only') {
+      if (! act.result.important) {
+        act.result.important = {
+          preventions: []
+        };
+      }
+      act.result.important.preventions.push(act.which);
+      act.result.important.preventionError = message;
+    }
   }
 };
 // Recursively performs the acts in a report.

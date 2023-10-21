@@ -112,13 +112,14 @@ exports.reporter = async (page, options) => {
   const {withItems, stopOnFail, granular, args} = options;
   const argRules = args ? Object.keys(args) : null;
   const rules = options.rules || ['y', ... Object.keys(evalRules)];
-  // Initialize the data.
+  // Initialize the result data and the important data.
   const data = {
-    rules: {},
+    rules:{},
     important: {
-      preventions: [],
-      invalid: [],
-      testTimes: {}
+      rulePreventions: [],
+      rulePreventionMessages: {},
+      rulesInvalid: [],
+      ruleTestTimes: {}
     }
   };
   // If the rule specification is valid:
@@ -187,6 +188,7 @@ exports.reporter = async (page, options) => {
         catch(error) {
           // Report this.
           data.important.preventions.push(rule);
+          data.important.preventionMessages[rule] = error.message;
           console.log(`ERROR: Test of testaro rule ${rule} prevented (${error.message})`);
         }
       }
