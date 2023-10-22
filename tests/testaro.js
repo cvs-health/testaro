@@ -109,19 +109,19 @@ const wait = ms => {
 };
 // Conducts and reports Testaro tests.
 exports.reporter = async (page, options) => {
-  const {report, act, withItems, stopOnFail, args} = options;
+  const {report, withItems, stopOnFail, args} = options;
   const argRules = args ? Object.keys(args) : null;
   const rules = options.rules || ['y', ... Object.keys(evalRules)];
-  // Initialize the result data and the important data.
+  // Initialize the act report.
   const data = {
-    rules:{},
-    important: {
-      rulePreventions: [],
-      rulePreventionMessages: {},
-      rulesInvalid: [],
-      ruleTestTimes: {}
-    }
+    prevented: false,
+    error: '',
+    rulePreventions: [],
+    rulePreventionMessages: {},
+    rulesInvalid: [],
+    ruleTestTimes: {}
   };
+  const result = {};
   // If the rule specification is valid:
   if (
     rules.length > 1
@@ -159,10 +159,10 @@ exports.reporter = async (page, options) => {
           );
         }
         // Test the page.
-        if (! data.rules[rule]) {
-          data.rules[rule] = {};
+        if (! result[rule]) {
+          result[rule] = {};
         }
-        data.rules[rule].what = what;
+        result[rule].what = what;
         try {
           const startTime = Date.now();
           const ruleReport = isJS
@@ -176,7 +176,7 @@ exports.reporter = async (page, options) => {
           });
           data.rules[rule].totals = data.rules[rule].totals.map(total => Math.round(total));
           if (ruleReport.prevented) {
-            data.important.preventions.push(rule);
+            data.rulePreventions.push(rule);
           }
           // If testing is to stop after a failure and the page failed the test:
           if (stopOnFail && ruleReport.totals.some(total => total)) {
@@ -187,27 +187,31 @@ exports.reporter = async (page, options) => {
         // If an error is thrown by the test:
         catch(error) {
           // Report this.
-          data.important.preventions.push(rule);
-          data.important.preventionMessages[rule] = error.message;
+          data.rulePreventions.push(rule);
+          data.rulePreventionMessages[rule] = error.message;
           console.log(`ERROR: Test of testaro rule ${rule} prevented (${error.message})`);
         }
       }
       // Otherwise, i.e. if the rule is undefined or doubly defined:
       else {
         // Report this.
-        data.important.invalid.push(rule);
+        data.invalid.push(rule);
         console.log(`ERROR: Rule ${rule} not validly defined`);
       }
     }
     testTimes.sort((a, b) => b[1] - a[1]).forEach(pair => {
-      data.important.testTimes[pair[0]] = pair[1];
+      data.testTimes[pair[0]] = pair[1];
     });
   }
   // Otherwise, i.e. if the rule specification is invalid:
   else {
-    console.log('ERROR: Testaro rule specification invalid');
+    const message = 'ERROR: Testaro rule specification invalid';
+    console.log(message);
     data.prevented = true;
-    data.error = 'ERROR: Rule specification invalid';
+    data.error = message;
   }
-  return {result: data};
+  return {
+    data,
+    result
+  };
 };

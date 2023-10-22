@@ -10,7 +10,8 @@ exports.reporter = async (page, options) => {
   const {reportType, rules} = options;
   const waveKey = process.env.WAVE_KEY;
   // Get the data from a WAVE test.
-  const data = await new Promise(resolve => {
+  const data = {};
+  const result = await new Promise(resolve => {
     https.get(
       {
         host: 'wave.webaim.org',
@@ -18,16 +19,16 @@ exports.reporter = async (page, options) => {
         protocol: 'https:'
       },
       response => {
-        let report = '';
+        let actReport = '';
         response.on('data', chunk => {
-          report += chunk;
+          actReport += chunk;
         });
         // When the data arrive:
         response.on('end', async () => {
           try {
             // Delete unnecessary properties.
-            const result = JSON.parse(report);
-            const {categories} = result;
+            const actResult = JSON.parse(actReport);
+            const {categories} = actResult;
             delete categories.feature;
             delete categories.structure;
             delete categories.aria;
@@ -60,18 +61,21 @@ exports.reporter = async (page, options) => {
                 items[issueName].wcag = guidelines;
               });
             });
-            return resolve(result);
+            return resolve(actResult);
           }
           catch (error) {
+            data.prevented = true;
+            data.error = error.message;
             return resolve({
-              prevented: true,
-              error: error.message,
-              report
+              actReport
             });
-          }
+          };
         });
       }
     );
   });
-  return {result: data};
+  return {
+    data,
+    result
+  };
 };

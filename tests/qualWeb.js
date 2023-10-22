@@ -19,6 +19,7 @@ const clusterOptions = {
 // Conducts and reports a QualWeb test.
 exports.reporter = async (page, options) => {
   const {withNewContent, rules} = options;
+  const data = {};
   // Start the QualWeb core engine.
   await qualWeb.start(clusterOptions);
   // Specify the invariant test options.
@@ -100,13 +101,13 @@ exports.reporter = async (page, options) => {
     qualWebOptions.execute.bp = false;
   }
   // Get the report.
-  let reports = await qualWeb.evaluate(qualWebOptions);
+  let actReports = await qualWeb.evaluate(qualWebOptions);
   // Remove the copy of the DOM from it.
-  let report = reports[withNewContent ? qualWebOptions.url : 'customHtml'];
-  if (report && report.system && report.system.page && report.system.page.dom) {
-    delete report.system.page.dom;
-    // For each test section of the report:
-    const {modules} = report;
+  const result = actReports[withNewContent ? qualWebOptions.url : 'customHtml'];
+  if (result && result.system && result.system.page && result.system.page.dom) {
+    delete result.system.page.dom;
+    // For each test section of the act report:
+    const {modules} = result;
     if (modules) {
       for (const section of ['act-rules', 'wcag-techniques', 'best-practices']) {
         if (qualWebOptions[section]) {
@@ -125,15 +126,15 @@ exports.reporter = async (page, options) => {
                   else {
                     if (ruleAssertions.results) {
                       ruleAssertions.results = ruleAssertions.results.filter(
-                        result => result.verdict !== 'passed'
+                        raResult => raResult.verdict !== 'passed'
                       );
                     }
                   }
                 }
                 // Shorten long HTML codes of elements.
                 const {results} = ruleAssertions;
-                results.forEach(result => {
-                  const {elements} = result;
+                results.forEach(raResult => {
+                  const {elements} = raResult;
                   if (elements && elements.length) {
                     elements.forEach(element => {
                       if (element.htmlCode && element.htmlCode.length > 700) {
@@ -145,38 +146,39 @@ exports.reporter = async (page, options) => {
               });
             }
             else {
-              report.prevented = true;
-              report.error = 'ERROR: No assertions';
+              data.prevented = true;
+              data.error = 'ERROR: No assertions';
             }
           }
           else {
-            report.prevented = true;
-            report.error = `ERROR: No ${section} section`;
+            data.prevented = true;
+            data.error = `ERROR: No ${section} section`;
           }
         }
       }
     }
     else {
-      report.prevented = true;
-      report.error = 'ERROR: No modules';
+      data.prevented = true;
+      data.error = 'ERROR: No modules';
     }
   }
   else {
-    report.prevented = true;
-    report.error = 'ERROR: No DOM';
+    data.prevented = true;
+    data.error = 'ERROR: No DOM';
   }
   // Stop the QualWeb core engine.
   await qualWeb.stop();
   // Return the result.
   try {
-    JSON.stringify(report);
+    JSON.stringify(result);
   }
   catch(error) {
-    console.log(`ERROR: qualWeb result cannot be made JSON (${error.message})`);
-    report = {
-      prevented: true,
-      error: `ERROR: qualWeb result cannot be made JSON (${error.message})`
-    };
-  }
-  return {result: report};
+    const message = `ERROR: qualWeb result cannot be made JSON (${error.message})`;
+    data.prevented = true;
+    data.error = message;
+  };
+  return {
+    data,
+    result
+  };
 };
