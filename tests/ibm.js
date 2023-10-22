@@ -66,6 +66,7 @@ const trimActReport = (data, actReport, withItems, rules) => {
     if (totals) {
       // If itemization is required:
       if (withItems) {
+        console.log(JSON.stringify(actReport.results, null, 2));
         // Trim the items.
         if (rules && Array.isArray(rules) && rules.length) {
           actReport.items = actReport.results.filter(item => rules.includes(item.ruleId));
@@ -86,7 +87,7 @@ const trimActReport = (data, actReport, withItems, rules) => {
       // Return the act report, trimmed.
       return {
         totals,
-        items
+        items: actReport.items
       };
     }
     // Otherwise, i.e. if it excludes totals:
@@ -151,6 +152,7 @@ const doTest = async (content, withItems, timeLimit, rules) => {
 // Performs ibm tests and returns an act report.
 exports.reporter = async (page, options) => {
   const {withItems, withNewContent, rules} = options;
+  console.log(`withItems is ${withItems}`);
   const contentType = withNewContent ? 'new' : 'existing';
   console.log(`>>>>>> Content type: ${contentType}`);
   const timeLimit = 30;
@@ -162,10 +164,16 @@ exports.reporter = async (page, options) => {
       const message = `ERROR: Act failed or timed out at ${timeLimit} seconds`;
       console.log(message);
       data.error = data.error ? `${data.error}; ${message}` : message;
+      return {
+        data,
+        result: {}
+      };
     }
-    return {
-      data,
-      result
+    else {
+      return {
+        data,
+        result
+      };
     };
   }
   catch(error) {

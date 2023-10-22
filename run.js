@@ -727,7 +727,6 @@ const doActs = async (report, actIndex, page) => {
             const startTime = Date.now();
             // Perform the specified tests of the tool and get a report.
             try {
-              console.log('About to run reporter');
               const actReport = await require(`./tests/${act.which}`).reporter(page, {
                 report,
                 act
