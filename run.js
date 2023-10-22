@@ -723,14 +723,20 @@ const doActs = async (report, actIndex, page) => {
           else if (act.type === 'test') {
             // Add a description of the tool to the act.
             act.what = tools[act.which];
-            // Initialize the tool report.
-            const startTime = Date.now();
+            // Initialize the options argument.
+            const options = {
+              report,
+              act
+            };
+            // Add any specified arguments to it.
+            Object.keys(act).forEach(key => {
+              if (! ['type', 'which'].includes(key)) {
+                options[key] = act[key];
+              }
+            });
             // Perform the specified tests of the tool and get a report.
             try {
-              const actReport = await require(`./tests/${act.which}`).reporter(page, {
-                report,
-                act
-              });
+              const actReport = await require(`./tests/${act.which}`).reporter(page, options);
               // Import its test results and process data into the act.
               act.result = actReport && actReport.result || {};
               act.data = actReport && actReport.data || {};
