@@ -80,6 +80,10 @@ exports.reporter = async (page, options) => {
           }
         }));
       }
+      return {
+        data,
+        result
+      }
     }
     catch (error) {
       const message = `ERROR: Act failed (${error.message})`;
@@ -93,5 +97,4 @@ exports.reporter = async (page, options) => {
       };
     };
   }
-  return {result: data};
 };

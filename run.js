@@ -734,6 +734,8 @@ const doActs = async (report, actIndex, page) => {
                 options[key] = act[key];
               }
             });
+            // Get the start time of the act.
+            const startTime = Date.now();
             // Perform the specified tests of the tool and get a report.
             try {
               const actReport = await require(`./tests/${act.which}`).reporter(page, options);

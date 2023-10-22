@@ -66,7 +66,6 @@ const trimActReport = (data, actReport, withItems, rules) => {
     if (totals) {
       // If itemization is required:
       if (withItems) {
-        console.log(JSON.stringify(actReport.results, null, 2));
         // Trim the items.
         if (rules && Array.isArray(rules) && rules.length) {
           actReport.items = actReport.results.filter(item => rules.includes(item.ruleId));
@@ -152,7 +151,6 @@ const doTest = async (content, withItems, timeLimit, rules) => {
 // Performs ibm tests and returns an act report.
 exports.reporter = async (page, options) => {
   const {withItems, withNewContent, rules} = options;
-  console.log(`withItems is ${withItems}`);
   const contentType = withNewContent ? 'new' : 'existing';
   console.log(`>>>>>> Content type: ${contentType}`);
   const timeLimit = 30;
