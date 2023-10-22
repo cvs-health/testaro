@@ -12,7 +12,7 @@ const fs = require('fs/promises');
 
 // Conducts and reports an ASLint test.
 exports.reporter = async (page, options) => {
-  // Initialize the report.
+  // Initialize the act report.
   const data = {};
   let result = {};
   // Get the ASLint runner and bundle scripts.
@@ -21,7 +21,9 @@ exports.reporter = async (page, options) => {
     `${__dirname}/../node_modules/aslint-testaro/aslint.bundle.js`, 'utf8'
   );
   // Get the nonce, if any.
-  const scriptNonce = report.jobData && report.jobData.lastScriptNonce;
+  const {report} = options;
+  const {jobData} = report;
+  const scriptNonce = jobData && jobData.lastScriptNonce;
   // Inject the ASLint bundle and runner into the page.
   await page.evaluate(args => {
     const {scriptNonce, aslintBundle, aslintRunner} = args;

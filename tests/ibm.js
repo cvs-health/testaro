@@ -12,7 +12,7 @@
 // Import required modules.
 const fs = require('fs').promises;
 // Scanner. Importing and executing 'close' crashed the Node process.
-const {getCompliance} = require('accessibility-checker');
+const {getCompliance, getDiffResults} = require('accessibility-checker');
 // Runs the IBM test and returns the result.
 const run = async (content, timeLimit) => {
   const nowLabel = (new Date()).toISOString().slice(0, 19);
@@ -51,21 +51,21 @@ const limitRuleTotals = (actReport, rules) => {
   }
 };
 // Trims an IBM report.
-const trimReport = (actReport, withItems, rules) => {
-  const data = {};
-  if (actReport && actReport.report && actReport.report.summary) {
-    limitRuleTotals(actReport, rules);
-    const totals = actReport.report.summary.counts;
+const trimResult = (actReport, withItems, rules) => {
+  const {result, data} = actReport;
+  if (result && result.report && result.report.summary) {
+    limitRuleTotals(result, rules);
+    const totals = result.report.summary.counts;
     if (totals) {
-      data.totals = totals;
+      result.totals = totals;
       if (withItems) {
         if (rules && Array.isArray(rules) && rules.length) {
-          data.items = report.report.results.filter(item => rules.includes(item.ruleId));
+          result.items = report.report.results.filter(item => rules.includes(item.ruleId));
         }
         else {
-          data.items = report.report.results;
+          result.items = report.report.results;
         }
-        data.items.forEach(item => {
+        result.items.forEach(item => {
           delete item.apiArgs;
           delete item.category;
           delete item.ignored;
@@ -78,29 +78,29 @@ const trimReport = (actReport, withItems, rules) => {
     }
     else {
       data.prevented = true;
-      data.error = 'ERROR: ibm test delivered no totals';
+      data.error = 'ERROR: No totals reported';
     }
   }
   else {
     data.prevented = true;
-    data.error = 'ERROR: ibm test delivered no report summary';
+    data.error = 'ERROR: No summary reported';
   }
-  return data;
+  // Return the result, trimmed.
+  return result;
 };
 // Performs the IBM tests and returns the result.
 const doTest = async (content, withItems, timeLimit, rules) => {
   // Conduct the test and get the result.
   const data = {};
-  let report;
+  let result = {};
   try {
-    report = await run(content, timeLimit);
+    result = await run(content, timeLimit);
   }
   catch(error) {
-    const message = `ibm test failed ${error.message.slice(0, 200)}`;
+    const message = `Act failed ${error.message.slice(0, 200)}`;
     console.log(message);
     data.prevented = true;
     data.error = message;
-    report = {};
   }
   // If the act crashed or timed out:
   if (data.prevented) {
@@ -108,7 +108,7 @@ const doTest = async (content, withItems, timeLimit, rules) => {
     return {
       data: {
         prevented: true,
-        error: 'ERROR: ibm test failed or timed out'
+        error: 'ERROR: Act failed or timed out'
       },
       result: {}
     };
@@ -123,13 +123,13 @@ const doTest = async (content, withItems, timeLimit, rules) => {
       }
     }
     catch(error) {
-      console.log('No ibm result files created');
+      console.log('No result files created');
     }
-    // Return the result.
-    const typeReport = trimReport(report, withItems, rules);
+    // Return the act report.
+    const trimmedResult = trimResult(report, withItems, rules);
     return {
       data,
-      result: typeReport
+      result: trimmedResult
     };
   }
 };
@@ -139,24 +139,33 @@ exports.reporter = async (page, options) => {
   const contentType = withNewContent ? 'new' : 'existing';
   console.log(`>>>>>> Content type: ${contentType}`);
   const data = {};
-  let result = {};
   const timeLimit = 30;
   const typeContent = contentType === 'existing' ? await page.content() : await page.url();
   try {
-    typeReport = await doTest(typeContent, withItems, timeLimit, rules);
-    if (typeReport.data.prevented) {
-      console.log(`ERROR: Getting ibm test report timed out at ${timeLimit} seconds`);
+    const actReport = await doTest(typeContent, withItems, timeLimit, rules);
+    const {data, result} = actReport;
+    if (data && data.prevented) {
+      const message = `ERROR: Act failed or timed out at ${timeLimit} seconds`;
+      console.log(message);
+      data.error = data.error ? `${data.error}; ${message}` : message;
+      return {
+        data,
+        result
+      }
+    }
+    else {
+      return actReport;
     }
   }
   catch(error) {
-    data.prevented = true;
-    const message = `ERROR: ibm test crashed with error ${error.message.slice(0, 200)}`;
-    data.error = message;
+    const message = `ERROR: Act crashed ${error.message.slice(0, 200)}`;
     console.log(message);
-  }
-  // Return the result. Execution of close() crashed the Node process.
-  return {
-    data,
-    result
+    return {
+      data: {
+        prevented: true,
+        error: message
+      },
+      result: {}
+    }
   };
 };
