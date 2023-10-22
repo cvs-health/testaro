@@ -145,7 +145,7 @@ exports.actSpecs = {
       }
     ]
   },
-  tests: {
+  tools: {
     axe: [
       'Perform Axe tests',
       {

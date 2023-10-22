@@ -192,6 +192,7 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
                 `${logStart}job ${id} (${nowString()})\n>> It will test ${testee}\n>> It will send report to ${sendReportTo}`
               );
               await doJob(contentObj);
+              console.log('Did job');
               let reportJSON = JSON.stringify(contentObj, null, 2);
               console.log(`Job ${id} finished (${nowString()})`);
               // Send the report to the specified server.
@@ -338,6 +339,7 @@ exports.dirWatch = async (isForever, interval = 300) => {
 };
 // Checks for a network job, performs it, and submits a report, once or repeatedly.
 exports.netWatch = async (isForever, interval = 300) => {
+  console.log('Starting netWatch');
   // If the servers to be checked are valid:
   const servers = jobURLs
   .split('+')

@@ -225,6 +225,7 @@ const isValidReport = report => {
     )) {
       return 'First or second act has no valid URL';
     }
+    console.log('About to validate acts');
     const invalidAct = acts.find(act => ! isValidAct(act));
     if (invalidAct) {
       return `Invalid act:\n${JSON.stringify(invalidAct, null, 2)}`;
@@ -233,7 +234,7 @@ const isValidReport = report => {
       return 'Bad report sources';
     }
     if (typeof sources.script !== 'string') {
-      return 'Bad sources script';
+      return 'Bad source script';
     }
     if (
       ! creationTime
@@ -1296,7 +1297,9 @@ exports.doJob = async report => {
       }
     });
     // Recursively perform the acts.
+    console.log('About to do acts');
     await doActs(report, 0, null);
+    console.log('Did acts');
     // Add the end time and duration to the report.
     const endTime = new Date();
     report.jobData.endTime = nowString();

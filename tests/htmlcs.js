@@ -3,7 +3,13 @@
   This test implements the HTML CodeSniffer ruleset.
 */
 
+// IMPORTS
+
+// Module to handle files.
+const fs = require('fs/promises');
+
 // FUNCTIONS
+
 // Runs HTML CodeSniffer on the page and returns an act report.
 exports.reporter = async (page, options) => {
   const {report, act, rules} = options;
