@@ -739,7 +739,9 @@ const doActs = async (report, actIndex, page) => {
               toolReport = await require(`./tests/${act.which}`).reporter(page, options);
               // If the page prevented the tool from operating:
               if (toolReport.result.prevented) {
-
+                // Add an error result to the act and abort the job.
+                const message = toolReport.result.error || `ERROR performing tests of ${act.which}`;
+                actIndex = await addError(true, true, report, actIndex, message);
               }
               toolReport.result.success = true;
             }
