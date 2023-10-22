@@ -189,10 +189,9 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
               // Perform the job, adding result data to it.
               const testee = sources.target.which;
               console.log(
-                `${logStart}job ${id} (${nowString()})\n>> It will test ${testee}\n>> It will send report to ${sendReportTo}`
+                `${logStart}job ${id} (${nowString()})\n>> It will test ${testee}\n>> It will send report to ${sendReportTo}\n`
               );
               await doJob(contentObj);
-              console.log('Did job');
               let reportJSON = JSON.stringify(contentObj, null, 2);
               console.log(`Job ${id} finished (${nowString()})`);
               // Send the report to the specified server.
