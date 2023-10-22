@@ -454,6 +454,7 @@ const addError = async(alsoLog, alsoAbort, report, actIndex, message) => {
   }
   // If the job is to be aborted:
   if (alsoAbort) {
+    console.log(`report:\n${JSON.stringify(report, null, 2)}`);
     // Return an abortive act index.
     return await abortActs(report, actIndex);
   }
@@ -745,10 +746,12 @@ const doActs = async (report, actIndex, page) => {
             };
             // Perform the specified tests of the tool and get a report.
             try {
-              act.result = await require(`./tests/${act.which}`).reporter(page, options);
+              const toolResult = await require(`./tests/${act.which}`).reporter(page, options);
+              act.result = toolResult.result;
+              console.log(`act.result is ${JSON.stringify(act.result, null, 2)}`);
               // If the page prevented the tool from operating:
               if (act.result.prevented) {
-                console.log(`act.result is ${JSON.stringify(act.result, null, 2)}`);
+                console.log('Prevented');
                 // Add an error result to the act and abort the job.
                 const message = toolReport.result.error || `ERROR performing tests of ${act.which}`;
                 console.log('About to add an error result');
