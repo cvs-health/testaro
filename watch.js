@@ -204,7 +204,7 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
                 // If the response to the report threw an error:
                 .on('error', async error => {
                   // Report this.
-                  console.log(`${reportLogStart}error message ${error.message}`);
+                  console.log(`${reportLogStart}error message ${error.message}\n`);
                   // Check the next server.
                   await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
                 })
@@ -220,7 +220,7 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
                     const {message} = ackObj;
                     if (message) {
                       // Report it.
-                      console.log(`${reportLogStart}${message}`);
+                      console.log(`${reportLogStart}${message}\n`);
                       // Free the memory used by the report.
                       reportJSON = '';
                       contentObj = {};
@@ -231,7 +231,7 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
                     else {
                       // Report it.
                       console.log(
-                        `ERROR: ${reportLogStart}status ${repResponse.statusCode} and error message ${JSON.stringify(ackObj, null, 2)}`
+                        `ERROR: ${reportLogStart}status ${repResponse.statusCode} and error message ${JSON.stringify(ackObj, null, 2)}\n`
                       );
                       // Check the next server, disregarding the failed job.
                       await checkNetJob(
@@ -243,7 +243,7 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
                   catch(error) {
                     // Report it.
                     console.log(
-                      `ERROR: ${reportLogStart}status ${repResponse.statusCode}, error message ${error.message}, and response ${content.slice(0, 1000)}`
+                      `ERROR: ${reportLogStart}status ${repResponse.statusCode}, error message ${error.message}, and response ${content.slice(0, 1000)}\n`
                     );
                     // Check the next server, disregarding the failed job.
                     await checkNetJob(
@@ -255,7 +255,7 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
               // If the report submission throws an error:
               .on('error', async error => {
                 // Report this.
-                console.log(`ERROR: ${reportLogStart}error message ${error.message}`);
+                console.log(`ERROR: ${reportLogStart}error message ${error.message}\n`);
                 // Check the next server, disregarding the failed job.
                 await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
               })
