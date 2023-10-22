@@ -421,28 +421,37 @@ const wait = ms => {
     }, ms);
   });
 };
+// Reports a job being aborted and returns an abortive act index.
+const abortActs = async (report, actIndex) => {
+  // Add data on the aborted act to the report.
+  report.jobData.abortTime = nowString();
+  report.jobData.abortedAct = actIndex;
+  report.jobData.aborted = true;
+  // Report the job being aborted.
+  console.log('ERROR: Job aborted');
+  // Return an abortive act index.
+  return -2;
+};
 // Adds an error result to an act.
-const addError = (alsoLog, act, error, message) => {
+const addError = async(alsoLog, alsoAbort, report, actIndex, message) => {
   if (alsoLog) {
-    console.log(`${message} (${error})`);
+    console.log(message);
   }
+  const act = report.acts[actIndex];
   if (! act.result) {
     act.result = {};
   }
   act.result.success = false;
-  act.result.error = error;
-  act.result.message = message;
+  act.result.error = message;
   if (act.type === 'test') {
-    act.result.prevented = true;
-    if (standard === 'only') {
-      if (! act.result.important) {
-        act.result.important = {
-          preventions: []
-        };
-      }
-      act.result.important.preventions.push(act.which);
-      act.result.important.preventionError = message;
-    }
+    act.result.important.prevented = true;
+    report.jobData.preventions[act.which] = message;
+  }
+  if (alsoAbort) {
+    return await abortActs(report, actIndex);
+  }
+  else {
+    return actIndex;
   }
 };
 // Recursively performs the acts in a report.
@@ -542,10 +551,10 @@ const doActs = async (report, actIndex, page) => {
         }
         // Otherwise, i.e. if the launch or navigation failed:
         else {
-          // Add an error result to the act.
-          addError(true, act, 'badLaunch', `ERROR: Launch failed (${launchResult.error})`);
-          // Abort the job.
-          await abortActs();
+          // Add an error result to the act and abort the job.
+          actIndex = await addError(
+            true, true, report, actIndex, `ERROR: Launch failed (${launchResult.error})`
+          );
         }
       }
       // Otherwise, if a current page exists:
@@ -572,15 +581,15 @@ const doActs = async (report, actIndex, page) => {
             act.result.url = page.url();
             // If a prohibited redirection occurred:
             if (response.exception === 'badRedirection') {
-              // Report this and quit.
-              addError(true, act, 'badRedirection', 'ERROR: Navigation illicitly redirected');
-              await abortActs();
+              // Report this and abort the job.
+              actIndex = await addError(
+                true, true, report, actIndex, 'ERROR: Navigation illicitly redirected'
+              );
             }
             // Otherwise, i.e. if the visit failed:
             else {
-              // Report this and quit.
-              addError(true, act, 'failure', 'ERROR: Visit failed');
-              await abortActs();
+              // Report this and abort the job.
+              actIndex = await addError(true, true, report, actIndex, 'ERROR: Visit failed');
             }
           }
         }
@@ -661,10 +670,11 @@ const doActs = async (report, actIndex, page) => {
           )
           // If the wait times out:
           .catch(async error => {
-            // Quit.
+            // Report this and abort the job.
             console.log(`ERROR waiting for page to be ${act.which} (${error.message})`);
-            addError(true, act, 'timeout', `ERROR waiting for page to be ${act.which}`);
-            await abortActs();
+            actIndex = await addError(
+              true, true, report, actIndex, `ERROR waiting for page to be ${act.which}`
+            );
           });
           // If the wait succeeded:
           if (actIndex > -2) {
@@ -727,6 +737,10 @@ const doActs = async (report, actIndex, page) => {
             // Perform the specified tests of the tool and get a report.
             try {
               toolReport = await require(`./tests/${act.which}`).reporter(page, options);
+              // If the page prevented the tool from operating:
+              if (toolReport.result.prevented) {
+
+              }
               toolReport.result.success = true;
             }
             // If the testing failed:
@@ -880,10 +894,8 @@ const doActs = async (report, actIndex, page) => {
                 }
                 // If the move fails:
                 catch(error) {
-                  // Add the error result to the act.
-                  addError(true, act, 'moveFailure', `ERROR: ${move} failed`);
-                  // Abort.
-                  await abortActs();
+                  // Add the error result to the act and abort the job.
+                  actIndex = await addError(true, true, report, actIndex, `ERROR: ${move} failed`);
                 }
                 if (act.result.success) {
                   try {
@@ -1219,37 +1231,27 @@ const doActs = async (report, actIndex, page) => {
           }
           // Otherwise, i.e. if the act type is unknown:
           else {
-            // Add the error result to the act.
-            addError(true, act, 'badType', 'ERROR: Invalid act type');
-            // Abort.
-            await abortActs();
+            // Add the error result to the act and abort the job.
+            actIndex = await addError(true, true, report, actIndex, 'ERROR: Invalid act type');
           }
         }
         // Otherwise, a page URL is required but does not exist, so:
         else {
-          // Add an error result to the act.
-          addError(true, act, 'noURL', 'ERROR: Page has no URL');
-          // Abort.
-          await abortActs();
+          // Add an error result to the act and abort the job.
+          actIndex = await addError(true, true, report, actIndex, 'ERROR: Page has no URL');
         }
       }
       // Otherwise, i.e. if no page exists:
       else {
-        // Add an error result to the act.
-        addError(true, act, 'noPage', 'ERROR: No page identified');
-        // Abort.
-        await abortActs();
+        // Add an error result to the act and abort the job.
+        actIndex = await addError(true, true, report, actIndex, 'ERROR: No page identified');
       }
       act.endTime = Date.now();
     }
     // Otherwise, i.e. if the act is invalid:
     else {
-      // Quit and add error data to the report.
-      const errorMsg = `ERROR: Invalid act of type ${act.type}`;
-      console.log(errorMsg);
-      addError(true, act, 'badAct', errorMsg);
-      // Abort.
-      await abortActs();
+      // Add error data to the act and abort the job.
+      addError(true, true, report, actIndex, `ERROR: Invalid act of type ${act.type}`);
     }
     // Perform any remaining acts if not aborted.
     await doActs(report, actIndex + 1, page);
@@ -1289,6 +1291,7 @@ exports.doJob = async report => {
     report.jobData.presses = 0;
     report.jobData.amountRead = 0;
     report.jobData.toolTimes = {};
+    report.jobData.preventions = {};
     process.on('message', message => {
       if (message === 'interrupt') {
         console.log('ERROR: Terminal interrupted the job');

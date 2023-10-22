@@ -13,9 +13,10 @@ exports.reporter = async (page, options) => {
     path: `${__dirname}/../htmlcs/HTMLCS.js`
   })
   .catch(error => {
-    console.log(`ERROR adding the htmlcs script to the page (${error.message})`);
+    const message = `ERROR adding the htmlcs script to the page (${error.message})`;
+    console.log(message);
     result.prevented = true;
-    result.error = 'ERROR adding the htmlcs script to the page';
+    result.error = message;
   });
   if (! result.prevented) {
     let messageStrings = [];
@@ -72,7 +73,7 @@ exports.reporter = async (page, options) => {
             Add the issue to an issueClass.issueCode.description array in the result.
             This saves space, because, although some descriptions are issue-specific, such as
             descriptions that state the contrast ratio of an element, most descriptions are
-            generic, so typically many issues share a description.
+            generic, so typically many violations share a description.
           */
           const issueCode = parts[1].replace(/^WCAG2|\.Principle\d\.Guideline[\d_]+/g, '');
           if (! result[parts[0]][issueCode]) {
