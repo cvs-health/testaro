@@ -434,23 +434,32 @@ const abortActs = async (report, actIndex) => {
 };
 // Adds an error result to an act.
 const addError = async(alsoLog, alsoAbort, report, actIndex, message) => {
+  // If the error is to be logged:
   if (alsoLog) {
+    // Log it.
     console.log(message);
   }
+  // Add error data to the result.
   const act = report.acts[actIndex];
-  if (! act.result) {
-    act.result = {};
-  }
-  act.result.success = false;
-  act.result.error = message;
+  act.result ??= {};
+  act.result.success ??= false;
+  act.result.error ??= message;
   if (act.type === 'test') {
+    act.result.important ??= {};
+    act.result.important.success = false;
     act.result.important.prevented = true;
+    act.result.important.error = message;
+    // Add prevention data to the job data.
     report.jobData.preventions[act.which] = message;
   }
+  // If the job is to be aborted:
   if (alsoAbort) {
+    // Return an abortive act index.
     return await abortActs(report, actIndex);
   }
+  // Otherwise, i.e. if the job is not to be aborted:
   else {
+    // Return the current act index.
     return actIndex;
   }
 };
@@ -736,12 +745,15 @@ const doActs = async (report, actIndex, page) => {
             };
             // Perform the specified tests of the tool and get a report.
             try {
-              toolReport = await require(`./tests/${act.which}`).reporter(page, options);
+              act.result = await require(`./tests/${act.which}`).reporter(page, options);
               // If the page prevented the tool from operating:
-              if (toolReport.result.prevented) {
+              if (act.result.prevented) {
+                console.log(`act.result is ${JSON.stringify(act.result, null, 2)}`);
                 // Add an error result to the act and abort the job.
                 const message = toolReport.result.error || `ERROR performing tests of ${act.which}`;
+                console.log('About to add an error result');
                 actIndex = await addError(true, true, report, actIndex, message);
+                console.log('Done');
               }
               toolReport.result.success = true;
             }

@@ -14,7 +14,6 @@ exports.reporter = async (page, options) => {
   })
   .catch(error => {
     const message = `ERROR adding the htmlcs script to the page (${error.message})`;
-    console.log(message);
     result.prevented = true;
     result.error = message;
   });
