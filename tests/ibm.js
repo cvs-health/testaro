@@ -45,8 +45,8 @@ const run = async (content, timeLimit) => {
 // Revises act-report totals for any rule limitation.
 const limitRuleTotals = (actReport, rules) => {
   if (rules && Array.isArray(rules) && rules.length) {
-    const totals = actReport.report.summary.counts;
-    const items = actReport.report.results;
+    const totals = actReport.summary.counts;
+    const items = actReport.results;
     totals.violation = totals.recommendation = 0;
     items.forEach(item => {
       if (rules.includes(item.ruleId)) {
@@ -56,18 +56,22 @@ const limitRuleTotals = (actReport, rules) => {
   }
 };
 // Trims an IBM report.
-const trimActReport = (actReport, withItems, rules) => {
-  if (actReport && actReport.report && actReport.report.summary) {
+const trimActReport = (data, actReport, withItems, rules) => {
+  // If the act report includes a summary:
+  if (actReport && actReport.summary) {
+    // Remove excluded rules from the act report.
     limitRuleTotals(actReport, rules);
-    const totals = actReport.report.summary.counts;
+    // If the act report includes totals:
+    const totals = actReport.summary.counts;
     if (totals) {
-      actReport.totals = totals;
+      // If itemization is required:
       if (withItems) {
+        // Trim the items.
         if (rules && Array.isArray(rules) && rules.length) {
-          actReport.items = actReport.report.results.filter(item => rules.includes(item.ruleId));
+          actReport.items = actReport.results.filter(item => rules.includes(item.ruleId));
         }
         else {
-          actReport.items = actReport.report.results;
+          actReport.items = actReport.results;
         }
         actReport.items.forEach(item => {
           delete item.apiArgs;
@@ -79,20 +83,37 @@ const trimActReport = (actReport, withItems, rules) => {
           delete item.value;
         });
       }
+      // Return the act report, trimmed.
+      return {
+        totals,
+        items
+      };
     }
+    // Otherwise, i.e. if it excludes totals:
     else {
+      // Report this.
       data.prevented = true;
       data.error = 'ERROR: No totals reported';
+      // Return an empty act report.
+      return {
+        totals: {},
+        items: []
+      };
     }
   }
+  // Otherwise, i.e. if it excludes a summary:
   else {
+    // Report this.
     data.prevented = true;
     data.error = 'ERROR: No summary reported';
+    // Return an empty act report.
+    return {
+      totals: {},
+      items: []
+    };
   }
-  // Return the act report, trimmed.
-  return actReport;
 };
-// Performs the IBM tests and returns the result.
+// Performs the IBM tests and returns an act report.
 const doTest = async (content, withItems, timeLimit, rules) => {
   // Conduct the test and get the result.
   const data = {};
@@ -110,14 +131,14 @@ const doTest = async (content, withItems, timeLimit, rules) => {
       console.log('No result files created');
     }
     // Return a trimmed act report.
-    const trimmedReport = trimActReport(actReport, withItems, rules);
+    const trimmedReport = trimActReport(data, actReport, withItems, rules);
     return {
       data,
       result: trimmedReport
     };
   }
   catch(error) {
-    const message = `Act failed ${error.message.slice(0, 200)}`;
+    const message = `Act failed (${error.message.slice(0, 200)})`;
     console.log(message);
     data.prevented = true;
     data.error = message;
