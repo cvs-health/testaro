@@ -3,7 +3,7 @@
   This test implements the IBM Equal Access ruleset for accessibility.
   The 'withNewContent' argument determines whether the test package should be
   given the URL of the page to be tested (true) or the page content (false).
-  
+
   This test depends on aceconfig.js.
 
   This tool is compatible with Windows only if the accessibility-checker package
@@ -13,7 +13,7 @@
 const fs = require('fs').promises;
 // Scanner. Importing and executing 'close' crashed the Node process.
 const {getCompliance} = require('accessibility-checker');
-// Runs the IBM test.
+// Runs the IBM test and returns the result.
 const run = async (content, timeLimit) => {
   const nowLabel = (new Date()).toISOString().slice(0, 19);
   // Start the timeout clock.
@@ -37,11 +37,11 @@ const run = async (content, timeLimit) => {
     return null;
   }
 };
-// Revises report totals for any rule limitation.
-const limitRuleTotals = (report, rules) => {
+// Revises act-report totals for any rule limitation.
+const limitRuleTotals = (actReport, rules) => {
   if (rules && Array.isArray(rules) && rules.length) {
-    const totals = report.report.summary.counts;
-    const items = report.report.results;
+    const totals = actReport.report.summary.counts;
+    const items = actReport.report.results;
     totals.violation = totals.recommendation = 0;
     items.forEach(item => {
       if (rules.includes(item.ruleId)) {
@@ -51,11 +51,11 @@ const limitRuleTotals = (report, rules) => {
   }
 };
 // Trims an IBM report.
-const trimReport = (report, withItems, rules) => {
+const trimReport = (actReport, withItems, rules) => {
   const data = {};
-  if (report && report.report && report.report.summary) {
-    limitRuleTotals(report, rules);
-    const totals = report.report.summary.counts;
+  if (actReport && actReport.report && actReport.report.summary) {
+    limitRuleTotals(actReport, rules);
+    const totals = actReport.report.summary.counts;
     if (totals) {
       data.totals = totals;
       if (withItems) {
@@ -90,16 +90,31 @@ const trimReport = (report, withItems, rules) => {
 // Performs the IBM tests and returns the result.
 const doTest = async (content, withItems, timeLimit, rules) => {
   // Conduct the test and get the result.
+  const data = {};
   let report;
   try {
     report = await run(content, timeLimit);
   }
   catch(error) {
-    console.log(`ibm test failed ${error.message.slice(0, 100)}...`);
-    report = null;
+    const message = `ibm test failed ${error.message.slice(0, 200)}`;
+    console.log(message);
+    data.prevented = true;
+    data.error = message;
+    report = {};
   }
-  // If the test did not crash or time out:
-  if (report) {
+  // If the act crashed or timed out:
+  if (data.prevented) {
+    // Report this.
+    return {
+      data: {
+        prevented: true,
+        error: 'ERROR: ibm test failed or timed out'
+      },
+      result: {}
+    };
+  }
+  // Otherwise, i.e. if the act succeeded:
+  else {
     // Delete any report files.
     try {
       const reportNames = await fs.readdir('results');
@@ -108,16 +123,13 @@ const doTest = async (content, withItems, timeLimit, rules) => {
       }
     }
     catch(error) {
-      console.log('ibm test created no result files.');
+      console.log('No ibm result files created');
     }
     // Return the result.
     const typeReport = trimReport(report, withItems, rules);
-    return typeReport;
-  }
-  else {
     return {
-      prevented: true,
-      error: 'ERROR: ibm test failed or timed out'
+      data,
+      result: typeReport
     };
   }
 };
@@ -126,19 +138,25 @@ exports.reporter = async (page, options) => {
   const {withItems, withNewContent, rules} = options;
   const contentType = withNewContent ? 'new' : 'existing';
   console.log(`>>>>>> Content type: ${contentType}`);
-  let result;
+  const data = {};
+  let result = {};
   const timeLimit = 30;
   const typeContent = contentType === 'existing' ? await page.content() : await page.url();
   try {
-    result = await doTest(typeContent, withItems, timeLimit, rules);
-    if (result.prevented) {
+    typeReport = await doTest(typeContent, withItems, timeLimit, rules);
+    if (typeReport.data.prevented) {
       console.log(`ERROR: Getting ibm test report timed out at ${timeLimit} seconds`);
     }
   }
   catch(error) {
-    result.prevented = true;
-    console.log(`ERROR: ibm test crashed with error ${error.message.slice(0, 200)}`);
+    data.prevented = true;
+    const message = `ERROR: ibm test crashed with error ${error.message.slice(0, 200)}`;
+    data.error = message;
+    console.log(message);
   }
   // Return the result. Execution of close() crashed the Node process.
-  return {result};
+  return {
+    data,
+    result
+  };
 };

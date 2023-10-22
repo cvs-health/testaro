@@ -28,8 +28,9 @@ const {injectAxe, getAxeResults} = require('axe-playwright');
 // Conducts and reports an Axe test.
 exports.reporter = async (page, options) => {
   const {detailLevel, rules} = options;
-  // Initialize the report.
-  let data = {};
+  // Initialize the act report.
+  const data = {};
+  let result = {};
   // Inject axe-core into the page.
   await injectAxe(page)
   .catch(error => {
@@ -58,7 +59,7 @@ exports.reporter = async (page, options) => {
     const {inapplicable, passes, incomplete, violations} = axeReport;
     if (violations) {
       // Initialize the result.
-      data.totals = {
+      result.totals = {
         rulesNA: 0,
         rulesPassed: 0,
         rulesWarned: 0,
@@ -76,9 +77,9 @@ exports.reporter = async (page, options) => {
           critical: 0
         }
       };
-      data.details = axeReport;
+      result.details = axeReport;
       // Populate the totals.
-      const {totals} = data;
+      const {totals} = result;
       totals.rulesNA = inapplicable.length;
       totals.rulesPassed = passes.length;
       incomplete.forEach(rule => {
@@ -104,8 +105,7 @@ exports.reporter = async (page, options) => {
     else {
       // Report this.
       data.prevented = true;
-      data.error = 'ERROR: axe failed';
-      console.log('ERROR: axe failed');
+      data.error = 'ERROR: Act failed';
     }
   }
   // Return the result.
@@ -113,11 +113,15 @@ exports.reporter = async (page, options) => {
     JSON.stringify(data);
   }
   catch(error) {
-    console.log(`ERROR: axe result cannot be made JSON (${error.message})`);
+    const message = `ERROR: Axe result cannot be made JSON (${error.message})`;
+    console.log(message);
     data = {
       prevented: true,
-      error: `ERROR: axe result cannot be made JSON (${error.message})`
+      error: message
     };
   }
-  return {result: data};
+  return {
+    data,
+    result
+  };
 };

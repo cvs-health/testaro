@@ -34,7 +34,7 @@ const moves = {
   text: 'input'
 };
 // Names and descriptions of tools.
-const tests = {
+const tools = {
   alfa: 'alfa',
   aslint: 'ASLint',
   axe: 'Axe',
@@ -108,7 +108,7 @@ const hasSubtype = (variable, subtype) => {
       return isFocusable(variable);
     }
     else if (subtype === 'isTest') {
-      return tests[variable];
+      return tools[variable];
     }
     else if (subtype === 'isWaitable') {
       return ['url', 'title', 'body'].includes(variable);
@@ -145,13 +145,13 @@ const isValidAct = act => {
     // If the type is test:
     if (type === 'test') {
       // Identify the test.
-      const testName = act.which;
+      const toolName = act.which;
       // If one was specified and is known:
-      if (testName && tests[testName]) {
+      if (toolName && tools[toolName]) {
         // If it has special properties:
-        if (actSpecs.tests[testName]) {
+        if (actSpecs.tools[toolName]) {
           // Expand the validator by adding them.
-          Object.assign(validator, actSpecs.tests[testName][1]);
+          Object.assign(validator, actSpecs.tools[toolName][1]);
         }
       }
       // Otherwise, i.e. if no or an unknown test was specified:
@@ -445,10 +445,9 @@ const addError = async(alsoLog, alsoAbort, report, actIndex, message) => {
   act.result.success ??= false;
   act.result.error ??= message;
   if (act.type === 'test') {
-    act.result.important ??= {};
-    act.result.important.success = false;
-    act.result.important.prevented = true;
-    act.result.important.error = message;
+    act.data.success = false;
+    act.data.prevented = true;
+    act.data.error = message;
     // Add prevention data to the job data.
     report.jobData.preventions[act.which] = message;
   }
@@ -722,22 +721,9 @@ const doActs = async (report, actIndex, page) => {
           }
           // Otherwise, if the act performs tests of a tool:
           else if (act.type === 'test') {
-            // Add a description of the test to the act.
-            act.what = tests[act.which];
-            // Initialize the options argument.
-            const options = {
-              report,
-              act,
-              granular: report.observe,
-              scriptNonce: report.jobData.lastScriptNonce || ''
-            };
-            // Add any specified arguments to it.
-            Object.keys(act).forEach(key => {
-              if (! ['type', 'which'].includes(key)) {
-                options[key] = act[key];
-              }
-            });
-            // Initialize the test report.
+            // Add a description of the tool to the act.
+            act.what = tools[act.which];
+            // Initialize the tool report.
             const startTime = Date.now();
             let toolReport = {
               result: {
@@ -746,35 +732,33 @@ const doActs = async (report, actIndex, page) => {
             };
             // Perform the specified tests of the tool and get a report.
             try {
-              const toolResult = await require(`./tests/${act.which}`).reporter(page, options);
-              act.result = toolResult.result;
-              console.log(`act.result is ${JSON.stringify(act.result, null, 2)}`);
+              const actReport = await require(`./tests/${act.which}`).reporter(page, {
+                report,
+                act
+              });
+              // Import its test results and process data into the act.
+              act.result = actReport && actReport.result || {};
+              act.data = actReport && actReport.data || {};
               // If the page prevented the tool from operating:
-              if (act.result.prevented) {
-                console.log('Prevented');
-                // Add an error result to the act and abort the job.
-                const message = toolReport.result.error || `ERROR performing tests of ${act.which}`;
-                console.log('About to add an error result');
-                actIndex = await addError(true, true, report, actIndex, message);
-                console.log('Done');
+              if (act.data.prevented) {
+                // Add prevention data to the job data.
+                report.jobData.preventions[act.which] = act.data.error;
               }
-              toolReport.result.success = true;
             }
             // If the testing failed:
             catch(error) {
-              // Report this but do not abort the job.
-              console.log(`ERROR: Test act ${act.which} failed (${error.message.slice(0, 400)})`);
+              // Report this.
+              const message = error.message.slice(0, 400);
+              console.log(`ERROR: Test act ${act.which} failed (${message})`);
+              act.data.error = act.data.error ? `${act.data.error}; ${message}` : message;
             }
-            // Add the elapsed time to the report.
+            // Add the elapsed time of the tool to the report.
             const time = Math.round((Date.now() - startTime) / 1000);
             const {toolTimes} = report.jobData;
             if (! toolTimes[act.which]) {
               toolTimes[act.which] = 0;
             }
             toolTimes[act.which] += time;
-            // Add the result object (possibly an array) to the act.
-            const resultCount = Object.keys(toolReport.result).length;
-            act.result = resultCount ? toolReport.result : {success: false};
             // If a standard-format result is to be included in the report:
             const standard = report.standard || 'only';
             if (['also', 'only'].includes(standard)) {
@@ -787,14 +771,10 @@ const doActs = async (report, actIndex, page) => {
               standardize(act);
               // If the original-format result is not to be included in the report:
               if (standard === 'only') {
-                // Remove it, except any important property.
-                if (act.result.important) {
-                  act.data = act.result.important;
-                  console.log(`>>>>>> Important ${act.which} data included in report`);
-                }
+                // Remove it.
                 delete act.result;
               }
-              // If the test has expectations:
+              // If the act has expectations:
               const expectations = act.expect;
               if (expectations) {
                 // Initialize whether they were fulfilled.

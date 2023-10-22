@@ -109,7 +109,7 @@ const wait = ms => {
 };
 // Conducts and reports Testaro tests.
 exports.reporter = async (page, options) => {
-  const {withItems, stopOnFail, granular, args} = options;
+  const {report, act, withItems, stopOnFail, args} = options;
   const argRules = args ? Object.keys(args) : null;
   const rules = options.rules || ['y', ... Object.keys(evalRules)];
   // Initialize the result data and the important data.
@@ -150,7 +150,7 @@ exports.reporter = async (page, options) => {
         }
         // If granular reporting is specified:
         const what = evalRules[rule] || etcRules[rule];
-        if (granular) {
+        if (report.observe) {
           // Report the rule to the server.
           tellServer(
             options.report,

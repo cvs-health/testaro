@@ -13,14 +13,15 @@ const fs = require('fs/promises');
 // Conducts and reports an ASLint test.
 exports.reporter = async (page, options) => {
   // Initialize the report.
-  let data = {};
+  const data = {};
+  let result = {};
   // Get the ASLint runner and bundle scripts.
   const aslintRunner = await fs.readFile(`${__dirname}/../procs/aslint.js`, 'utf8');
   const aslintBundle = await fs.readFile(
     `${__dirname}/../node_modules/aslint-testaro/aslint.bundle.js`, 'utf8'
   );
   // Get the nonce, if any.
-  const {scriptNonce} = options;
+  const scriptNonce = report.jobData && report.jobData.lastScriptNonce;
   // Inject the ASLint bundle and runner into the page.
   await page.evaluate(args => {
     const {scriptNonce, aslintBundle, aslintRunner} = args;
@@ -56,28 +57,31 @@ exports.reporter = async (page, options) => {
       timeout: 10000
     });
     // Get them.
-    const report = await reportLoc.textContent();
-    // Populate the tool report.
-    data = JSON.parse(report);
+    const actReport = await reportLoc.textContent();
+    // Populate the act report.
+    result = JSON.parse(actReport);
     // Delete irrelevant properties from the tool report details.
-    if (data.rules) {
-      Object.keys(data.rules).forEach(ruleID => {
-        if (['passed', 'skipped'].includes(data.rules[ruleID].status.type)) {
-          delete data.rules[ruleID];
+    if (result.rules) {
+      Object.keys(result.rules).forEach(ruleID => {
+        if (['passed', 'skipped'].includes(result.rules[ruleID].status.type)) {
+          delete result.rules[ruleID];
         }
       });
     }
   }
-  // Return the result.
+  // Return the act report.
   try {
     JSON.stringify(data);
   }
   catch(error) {
-    console.log(`ERROR: ASLint result cannot be made JSON (${error.message.slice(0, 200)})`);
+    const message = `ERROR: ASLint result cannot be made JSON (${error.message.slice(0, 200)})`;
     data = {
       prevented: true,
-      error: `ERROR: ASLint result cannot be made JSON (${error.message.slice(0, 200)})`
+      error: message
     };
   }
-  return {result: data};
+  return {
+    data,
+    result
+  };
 };

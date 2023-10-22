@@ -53,6 +53,7 @@ exports.reporter = async (page, options) => {
   };
   const nuURL = 'https://validator.w3.org/nu/?parser=html&out=json';
   const data = {};
+  const result = {};
   // For each page type:
   for (const page of [['pageContent', pageContent], ['rawPage', rawPage]]) {
     try {
@@ -62,11 +63,11 @@ exports.reporter = async (page, options) => {
       const nuData = await nuResult.json();
       // Delete left and right quotation marks and their erratic invalid replacements.
       const nuDataClean = JSON.parse(JSON.stringify(nuData).replace(/[\u{fffd}“”]/ug, ''));
-      data[page[0]] = nuDataClean;
+      result[page[0]] = nuDataClean;
       // If there is a report and rules were specified:
-      if (! data[page[0]].error && rules && Array.isArray(rules) && rules.length) {
+      if (! result[page[0]].error && rules && Array.isArray(rules) && rules.length) {
         // Remove all messages except those specified.
-        data[page[0]].messages = data[page[0]].messages.filter(message => rules.some(rule => {
+        result[page[0]].messages = result[page[0]].messages.filter(message => rules.some(rule => {
           if (rule[0] === '=') {
             return message.message === rule.slice(1);
           }
@@ -81,12 +82,16 @@ exports.reporter = async (page, options) => {
       }
     }
     catch (error) {
-      console.log(`ERROR: nuVal report validation failed (${error.message})`);
-      return {result: {
-        prevented: true,
-        error: 'nuVal report validation failed',
-      }};
-    }
+      const message = `ERROR: Act failed (${error.message})`;
+      console.log(message);
+      return {
+        data: {
+          prevented: true,
+          error: message,
+        },
+        result: {}
+      };
+    };
   }
   return {result: data};
 };
