@@ -9,10 +9,15 @@
   This tool is compatible with Windows only if the accessibility-checker package
   is revised. See README.md for details.
 */
-// Import required modules.
+
+// IMPORTS
+
 const fs = require('fs').promises;
 // Scanner. Importing and executing 'close' crashed the Node process.
-const {getCompliance, getDiffResults} = require('accessibility-checker');
+const {getCompliance} = require('accessibility-checker');
+
+// FUNCTIONS
+
 // Runs the IBM test and returns the result.
 const run = async (content, timeLimit) => {
   const nowLabel = (new Date()).toISOString().slice(0, 19);
@@ -51,21 +56,20 @@ const limitRuleTotals = (actReport, rules) => {
   }
 };
 // Trims an IBM report.
-const trimResult = (actReport, withItems, rules) => {
-  const {result, data} = actReport;
-  if (result && result.report && result.report.summary) {
-    limitRuleTotals(result, rules);
-    const totals = result.report.summary.counts;
+const trimActReport = (actReport, withItems, rules) => {
+  if (actReport && actReport.report && actReport.report.summary) {
+    limitRuleTotals(actReport, rules);
+    const totals = actReport.report.summary.counts;
     if (totals) {
-      result.totals = totals;
+      actReport.totals = totals;
       if (withItems) {
         if (rules && Array.isArray(rules) && rules.length) {
-          result.items = report.report.results.filter(item => rules.includes(item.ruleId));
+          actReport.items = actReport.report.results.filter(item => rules.includes(item.ruleId));
         }
         else {
-          result.items = report.report.results;
+          actReport.items = actReport.report.results;
         }
-        result.items.forEach(item => {
+        actReport.items.forEach(item => {
           delete item.apiArgs;
           delete item.category;
           delete item.ignored;
@@ -85,36 +89,16 @@ const trimResult = (actReport, withItems, rules) => {
     data.prevented = true;
     data.error = 'ERROR: No summary reported';
   }
-  // Return the result, trimmed.
-  return result;
+  // Return the act report, trimmed.
+  return actReport;
 };
 // Performs the IBM tests and returns the result.
 const doTest = async (content, withItems, timeLimit, rules) => {
   // Conduct the test and get the result.
   const data = {};
-  let result = {};
   try {
-    result = await run(content, timeLimit);
-  }
-  catch(error) {
-    const message = `Act failed ${error.message.slice(0, 200)}`;
-    console.log(message);
-    data.prevented = true;
-    data.error = message;
-  }
-  // If the act crashed or timed out:
-  if (data.prevented) {
-    // Report this.
-    return {
-      data: {
-        prevented: true,
-        error: 'ERROR: Act failed or timed out'
-      },
-      result: {}
-    };
-  }
-  // Otherwise, i.e. if the act succeeded:
-  else {
+    const runReport = await run(content, timeLimit);
+    const actReport = runReport && runReport.report;
     // Delete any report files.
     try {
       const reportNames = await fs.readdir('results');
@@ -125,20 +109,29 @@ const doTest = async (content, withItems, timeLimit, rules) => {
     catch(error) {
       console.log('No result files created');
     }
-    // Return the act report.
-    const trimmedResult = trimResult(report, withItems, rules);
+    // Return a trimmed act report.
+    const trimmedReport = trimActReport(actReport, withItems, rules);
     return {
       data,
-      result: trimmedResult
+      result: trimmedReport
     };
   }
+  catch(error) {
+    const message = `Act failed ${error.message.slice(0, 200)}`;
+    console.log(message);
+    data.prevented = true;
+    data.error = message;
+    return {
+      data,
+      result: {}
+    };
+  };
 };
-// Returns results of an IBM test.
+// Performs ibm tests and returns an act report.
 exports.reporter = async (page, options) => {
   const {withItems, withNewContent, rules} = options;
   const contentType = withNewContent ? 'new' : 'existing';
   console.log(`>>>>>> Content type: ${contentType}`);
-  const data = {};
   const timeLimit = 30;
   const typeContent = contentType === 'existing' ? await page.content() : await page.url();
   try {
@@ -148,17 +141,14 @@ exports.reporter = async (page, options) => {
       const message = `ERROR: Act failed or timed out at ${timeLimit} seconds`;
       console.log(message);
       data.error = data.error ? `${data.error}; ${message}` : message;
-      return {
-        data,
-        result
-      }
     }
-    else {
-      return actReport;
-    }
+    return {
+      data,
+      result
+    };
   }
   catch(error) {
-    const message = `ERROR: Act crashed ${error.message.slice(0, 200)}`;
+    const message = `ERROR: Act crashed (${error.message.slice(0, 200)})`;
     console.log(message);
     return {
       data: {
