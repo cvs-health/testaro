@@ -46,18 +46,28 @@ exports.reporter = async (page, options) => {
     document.body.insertAdjacentElement('beforeend', runnerEl);
   }, {scriptNonce, aslintBundle, aslintRunner})
   .catch(error => {
-    console.log(`ERROR: ASLint injection failed (${error.message.slice(0, 400)})`);
+    const message = `ERROR: ASLint injection failed (${error.message.slice(0, 400)})`;
+    console.log(message);
     data.prevented = true;
-    data.error = 'ERROR: ASLint injection failed';
+    data.error = message;
   });
   // If the injection succeeded:
+  const reportLoc = page.locator('#aslintResult');
   if (! data.prevented) {
     // Wait for the test results.
-    const reportLoc = page.locator('#aslintResult');
     await reportLoc.waitFor({
       state: 'attached',
-      timeout: 10000
+      timeout: 30000
+    })
+    .catch(error => {
+      const message = `ERROR: Results timed out (${error.message.slice(0, 400)})`;
+      console.log(message);
+      data.prevented = true;
+      data.error = message;
     });
+  }
+  // If the results arrived in time:
+  if (! data.prevented) {
     // Get them.
     const actReport = await reportLoc.textContent();
     // Populate the act report.

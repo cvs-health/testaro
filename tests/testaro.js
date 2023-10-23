@@ -172,9 +172,9 @@ exports.reporter = async (page, options) => {
           const endTime = Date.now();
           testTimes.push([rule, Math.round((endTime - startTime) / 1000)]);
           Object.keys(ruleReport).forEach(key => {
-            data.rules[rule][key] = ruleReport[key];
+            result[rule][key] = ruleReport[key];
           });
-          data.rules[rule].totals = data.rules[rule].totals.map(total => Math.round(total));
+          result[rule].totals = result[rule].totals.map(total => Math.round(total));
           if (ruleReport.prevented) {
             data.rulePreventions.push(rule);
           }
@@ -200,7 +200,7 @@ exports.reporter = async (page, options) => {
       }
     }
     testTimes.sort((a, b) => b[1] - a[1]).forEach(pair => {
-      data.testTimes[pair[0]] = pair[1];
+      data.ruleTestTimes[pair[0]] = pair[1];
     });
   }
   // Otherwise, i.e. if the rule specification is invalid:

@@ -511,10 +511,10 @@ const convert = (toolName, data, result, standardResult) => {
   }
   // testaro
   else if (toolName === 'testaro') {
-    const rules = result.rules ? Object.keys(result.rules) : [];
+    const rules = result ? Object.keys(result) : [];
     standardResult.totals = [0, 0, 0, 0];
     rules.forEach(rule => {
-      const ruleResult = result.rules[rule];
+      const ruleResult = result[rule];
       standardResult.totals.forEach((total, index) => {
         standardResult.totals[index] += ruleResult
         && ruleResult.totals ? ruleResult.totals[index] || 0 : 0;
