@@ -26,8 +26,9 @@ exports.reporter = async (page, options) => {
     const msgText = msg.text();
     console.log(msgText);
   });
-  // Initialize the result.
-  let data = {
+  // Initialize the act report.
+  const data = {};
+  const result = {
     totals: {
       failures: 0,
       warnings: 0
@@ -113,24 +114,23 @@ exports.reporter = async (page, options) => {
             outcomeData.etcTags = etcTags;
           }
           if (outcomeData.verdict === 'failed') {
-            data.totals.failures++;
+            result.totals.failures++;
           }
           else if (outcomeData.verdict === 'cantTell') {
-            data.totals.warnings++;
+            result.totals.warnings++;
           }
-          data.items.push(outcomeData);
+          result.items.push(outcomeData);
         }
       }
     });
   }
   catch(error) {
     console.log(`ERROR: navigation to URL timed out (${error})`);
-    data = {
-      result: {
-        prevented: true,
-        error: 'ERROR: navigation to URL timed out'
-      }
-    };
+    data.prevented = true;
+    data.error = 'ERROR: Act failed';
   }
-  return {result: data};
+  return {
+    data,
+    result
+  };
 };

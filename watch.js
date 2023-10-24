@@ -142,7 +142,9 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
   const client = server.startsWith('https://') ? httpsClient : httpClient;
   const fullURL = `${server}?agent=${agent}`;
   const logStart = `Requested job from server ${server} and got `;
-  client.request(fullURL, response => {
+  // Tolerate unrecognized certificate authorities if the environment specifies.
+  const ruOpt = process.env.REJECT_UNAUTHORIZED === 'false' ? {rejectUnauthorized: false} : {};
+  client.request(fullURL, ruOpt, response => {
     const chunks = [];
     response
     // If the response to the job request threw an error:
@@ -187,7 +189,7 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
               // Perform the job, adding result data to it.
               const testee = sources.target.which;
               console.log(
-                `${logStart}job ${id} (${nowString()})\n>> It will test ${testee}\n>> It will send report to ${sendReportTo}`
+                `${logStart}job ${id} (${nowString()})\n>> It will test ${testee}\n>> It will send report to ${sendReportTo}\n`
               );
               await doJob(contentObj);
               let reportJSON = JSON.stringify(contentObj, null, 2);
@@ -202,7 +204,7 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
                 // If the response to the report threw an error:
                 .on('error', async error => {
                   // Report this.
-                  console.log(`${reportLogStart}error message ${error.message}`);
+                  console.log(`${reportLogStart}error message ${error.message}\n`);
                   // Check the next server.
                   await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
                 })
@@ -218,7 +220,7 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
                     const {message} = ackObj;
                     if (message) {
                       // Report it.
-                      console.log(`${reportLogStart}${message}`);
+                      console.log(`${reportLogStart}${message}\n`);
                       // Free the memory used by the report.
                       reportJSON = '';
                       contentObj = {};
@@ -229,7 +231,7 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
                     else {
                       // Report it.
                       console.log(
-                        `ERROR: ${reportLogStart}status ${repResponse.statusCode} and error message ${JSON.stringify(ackObj, null, 2)}`
+                        `ERROR: ${reportLogStart}status ${repResponse.statusCode} and error message ${JSON.stringify(ackObj, null, 2)}\n`
                       );
                       // Check the next server, disregarding the failed job.
                       await checkNetJob(
@@ -241,7 +243,7 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
                   catch(error) {
                     // Report it.
                     console.log(
-                      `ERROR: ${reportLogStart}status ${repResponse.statusCode}, error message ${error.message}, and response ${content.slice(0, 1000)}`
+                      `ERROR: ${reportLogStart}status ${repResponse.statusCode}, error message ${error.message}, and response ${content.slice(0, 1000)}\n`
                     );
                     // Check the next server, disregarding the failed job.
                     await checkNetJob(
@@ -253,7 +255,7 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
               // If the report submission throws an error:
               .on('error', async error => {
                 // Report this.
-                console.log(`ERROR: ${reportLogStart}error message ${error.message}`);
+                console.log(`ERROR: ${reportLogStart}error message ${error.message}\n`);
                 // Check the next server, disregarding the failed job.
                 await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
               })
@@ -336,6 +338,7 @@ exports.dirWatch = async (isForever, interval = 300) => {
 };
 // Checks for a network job, performs it, and submits a report, once or repeatedly.
 exports.netWatch = async (isForever, interval = 300) => {
+  console.log('Starting netWatch');
   // If the servers to be checked are valid:
   const servers = jobURLs
   .split('+')

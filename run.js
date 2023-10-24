@@ -34,7 +34,7 @@ const moves = {
   text: 'input'
 };
 // Names and descriptions of tools.
-const tests = {
+const tools = {
   alfa: 'alfa',
   aslint: 'ASLint',
   axe: 'Axe',
@@ -108,7 +108,7 @@ const hasSubtype = (variable, subtype) => {
       return isFocusable(variable);
     }
     else if (subtype === 'isTest') {
-      return tests[variable];
+      return tools[variable];
     }
     else if (subtype === 'isWaitable') {
       return ['url', 'title', 'body'].includes(variable);
@@ -145,13 +145,13 @@ const isValidAct = act => {
     // If the type is test:
     if (type === 'test') {
       // Identify the test.
-      const testName = act.which;
+      const toolName = act.which;
       // If one was specified and is known:
-      if (testName && tests[testName]) {
+      if (toolName && tools[toolName]) {
         // If it has special properties:
-        if (actSpecs.tests[testName]) {
+        if (actSpecs.tools[toolName]) {
           // Expand the validator by adding them.
-          Object.assign(validator, actSpecs.tests[testName][1]);
+          Object.assign(validator, actSpecs.tools[toolName][1]);
         }
       }
       // Otherwise, i.e. if no or an unknown test was specified:
@@ -233,7 +233,7 @@ const isValidReport = report => {
       return 'Bad report sources';
     }
     if (typeof sources.script !== 'string') {
-      return 'Bad sources script';
+      return 'Bad source script';
     }
     if (
       ! creationTime
@@ -421,19 +421,46 @@ const wait = ms => {
     }, ms);
   });
 };
+// Reports a job being aborted and returns an abortive act index.
+const abortActs = async (report, actIndex) => {
+  // Add data on the aborted act to the report.
+  report.jobData.abortTime = nowString();
+  report.jobData.abortedAct = actIndex;
+  report.jobData.aborted = true;
+  // Report the job being aborted.
+  console.log('ERROR: Job aborted');
+  // Return an abortive act index.
+  return -2;
+};
 // Adds an error result to an act.
-const addError = (alsoLog, act, error, message) => {
+const addError = async(alsoLog, alsoAbort, report, actIndex, message) => {
+  // If the error is to be logged:
   if (alsoLog) {
-    console.log(`${message} (${error})`);
+    // Log it.
+    console.log(message);
   }
-  if (! act.result) {
-    act.result = {};
-  }
-  act.result.success = false;
-  act.result.error = error;
-  act.result.message = message;
+  // Add error data to the result.
+  const act = report.acts[actIndex];
+  act.result ??= {};
+  act.result.success ??= false;
+  act.result.error ??= message;
   if (act.type === 'test') {
-    act.result.prevented = true;
+    act.data.success = false;
+    act.data.prevented = true;
+    act.data.error = message;
+    // Add prevention data to the job data.
+    report.jobData.preventions[act.which] = message;
+  }
+  // If the job is to be aborted:
+  if (alsoAbort) {
+    console.log(`report:\n${JSON.stringify(report, null, 2)}`);
+    // Return an abortive act index.
+    return await abortActs(report, actIndex);
+  }
+  // Otherwise, i.e. if the job is not to be aborted:
+  else {
+    // Return the current act index.
+    return actIndex;
   }
 };
 // Recursively performs the acts in a report.
@@ -533,10 +560,10 @@ const doActs = async (report, actIndex, page) => {
         }
         // Otherwise, i.e. if the launch or navigation failed:
         else {
-          // Add an error result to the act.
-          addError(true, act, 'badLaunch', `ERROR: Launch failed (${launchResult.error})`);
-          // Abort the job.
-          await abortActs();
+          // Add an error result to the act and abort the job.
+          actIndex = await addError(
+            true, true, report, actIndex, `ERROR: Launch failed (${launchResult.error})`
+          );
         }
       }
       // Otherwise, if a current page exists:
@@ -563,15 +590,15 @@ const doActs = async (report, actIndex, page) => {
             act.result.url = page.url();
             // If a prohibited redirection occurred:
             if (response.exception === 'badRedirection') {
-              // Report this and quit.
-              addError(true, act, 'badRedirection', 'ERROR: Navigation illicitly redirected');
-              await abortActs();
+              // Report this and abort the job.
+              actIndex = await addError(
+                true, true, report, actIndex, 'ERROR: Navigation illicitly redirected'
+              );
             }
             // Otherwise, i.e. if the visit failed:
             else {
-              // Report this and quit.
-              addError(true, act, 'failure', 'ERROR: Visit failed');
-              await abortActs();
+              // Report this and abort the job.
+              actIndex = await addError(true, true, report, actIndex, 'ERROR: Visit failed');
             }
           }
         }
@@ -652,10 +679,11 @@ const doActs = async (report, actIndex, page) => {
           )
           // If the wait times out:
           .catch(async error => {
-            // Quit.
+            // Report this and abort the job.
             console.log(`ERROR waiting for page to be ${act.which} (${error.message})`);
-            addError(true, act, 'timeout', `ERROR waiting for page to be ${act.which}`);
-            await abortActs();
+            actIndex = await addError(
+              true, true, report, actIndex, `ERROR waiting for page to be ${act.which}`
+            );
           });
           // If the wait succeeded:
           if (actIndex > -2) {
@@ -693,14 +721,12 @@ const doActs = async (report, actIndex, page) => {
           }
           // Otherwise, if the act performs tests of a tool:
           else if (act.type === 'test') {
-            // Add a description of the test to the act.
-            act.what = tests[act.which];
+            // Add a description of the tool to the act.
+            act.what = tools[act.which];
             // Initialize the options argument.
             const options = {
               report,
-              act,
-              granular: report.observe,
-              scriptNonce: report.jobData.lastScriptNonce || ''
+              act
             };
             // Add any specified arguments to it.
             Object.keys(act).forEach(key => {
@@ -708,33 +734,34 @@ const doActs = async (report, actIndex, page) => {
                 options[key] = act[key];
               }
             });
-            // Initialize the test report.
+            // Get the start time of the act.
             const startTime = Date.now();
-            let toolReport = {
-              result: {
-                success: false
-              }
-            };
             // Perform the specified tests of the tool and get a report.
             try {
-              toolReport = await require(`./tests/${act.which}`).reporter(page, options);
-              toolReport.result.success = true;
+              const actReport = await require(`./tests/${act.which}`).reporter(page, options);
+              // Import its test results and process data into the act.
+              act.result = actReport && actReport.result || {};
+              act.data = actReport && actReport.data || {};
+              // If the page prevented the tool from operating:
+              if (act.data.prevented) {
+                // Add prevention data to the job data.
+                report.jobData.preventions[act.which] = act.data.error;
+              }
             }
             // If the testing failed:
             catch(error) {
-              // Report this but do not abort the job.
-              console.log(`ERROR: Test act ${act.which} failed (${error.message.slice(0, 400)})`);
+              // Report this.
+              const message = error.message.slice(0, 400);
+              console.log(`ERROR: Test act ${act.which} failed (${message})`);
+              act.data.error = act.data.error ? `${act.data.error}; ${message}` : message;
             }
-            // Add the elapsed time to the report.
+            // Add the elapsed time of the tool to the report.
             const time = Math.round((Date.now() - startTime) / 1000);
             const {toolTimes} = report.jobData;
             if (! toolTimes[act.which]) {
               toolTimes[act.which] = 0;
             }
             toolTimes[act.which] += time;
-            // Add the result object (possibly an array) to the act.
-            const resultCount = Object.keys(toolReport.result).length;
-            act.result = resultCount ? toolReport.result : {success: false};
             // If a standard-format result is to be included in the report:
             const standard = report.standard || 'only';
             if (['also', 'only'].includes(standard)) {
@@ -747,14 +774,10 @@ const doActs = async (report, actIndex, page) => {
               standardize(act);
               // If the original-format result is not to be included in the report:
               if (standard === 'only') {
-                // Remove it, except any important property.
-                if (act.result.important) {
-                  act.data = act.result.important;
-                  console.log(`>>>>>> Important ${act.which} data included in report`);
-                }
+                // Remove it.
                 delete act.result;
               }
-              // If the test has expectations:
+              // If the act has expectations:
               const expectations = act.expect;
               if (expectations) {
                 // Initialize whether they were fulfilled.
@@ -871,10 +894,8 @@ const doActs = async (report, actIndex, page) => {
                 }
                 // If the move fails:
                 catch(error) {
-                  // Add the error result to the act.
-                  addError(true, act, 'moveFailure', `ERROR: ${move} failed`);
-                  // Abort.
-                  await abortActs();
+                  // Add the error result to the act and abort the job.
+                  actIndex = await addError(true, true, report, actIndex, `ERROR: ${move} failed`);
                 }
                 if (act.result.success) {
                   try {
@@ -1210,37 +1231,27 @@ const doActs = async (report, actIndex, page) => {
           }
           // Otherwise, i.e. if the act type is unknown:
           else {
-            // Add the error result to the act.
-            addError(true, act, 'badType', 'ERROR: Invalid act type');
-            // Abort.
-            await abortActs();
+            // Add the error result to the act and abort the job.
+            actIndex = await addError(true, true, report, actIndex, 'ERROR: Invalid act type');
           }
         }
         // Otherwise, a page URL is required but does not exist, so:
         else {
-          // Add an error result to the act.
-          addError(true, act, 'noURL', 'ERROR: Page has no URL');
-          // Abort.
-          await abortActs();
+          // Add an error result to the act and abort the job.
+          actIndex = await addError(true, true, report, actIndex, 'ERROR: Page has no URL');
         }
       }
       // Otherwise, i.e. if no page exists:
       else {
-        // Add an error result to the act.
-        addError(true, act, 'noPage', 'ERROR: No page identified');
-        // Abort.
-        await abortActs();
+        // Add an error result to the act and abort the job.
+        actIndex = await addError(true, true, report, actIndex, 'ERROR: No page identified');
       }
       act.endTime = Date.now();
     }
     // Otherwise, i.e. if the act is invalid:
     else {
-      // Quit and add error data to the report.
-      const errorMsg = `ERROR: Invalid act of type ${act.type}`;
-      console.log(errorMsg);
-      addError(true, act, 'badAct', errorMsg);
-      // Abort.
-      await abortActs();
+      // Add error data to the act and abort the job.
+      addError(true, true, report, actIndex, `ERROR: Invalid act of type ${act.type}`);
     }
     // Perform any remaining acts if not aborted.
     await doActs(report, actIndex + 1, page);
@@ -1280,6 +1291,7 @@ exports.doJob = async report => {
     report.jobData.presses = 0;
     report.jobData.amountRead = 0;
     report.jobData.toolTimes = {};
+    report.jobData.preventions = {};
     process.on('message', message => {
       if (message === 'interrupt') {
         console.log('ERROR: Terminal interrupted the job');

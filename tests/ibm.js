@@ -3,17 +3,22 @@
   This test implements the IBM Equal Access ruleset for accessibility.
   The 'withNewContent' argument determines whether the test package should be
   given the URL of the page to be tested (true) or the page content (false).
-  
+
   This test depends on aceconfig.js.
 
   This tool is compatible with Windows only if the accessibility-checker package
   is revised. See README.md for details.
 */
-// Import required modules.
+
+// IMPORTS
+
 const fs = require('fs').promises;
 // Scanner. Importing and executing 'close' crashed the Node process.
 const {getCompliance} = require('accessibility-checker');
-// Runs the IBM test.
+
+// FUNCTIONS
+
+// Runs the IBM test and returns the result.
 const run = async (content, timeLimit) => {
   const nowLabel = (new Date()).toISOString().slice(0, 19);
   // Start the timeout clock.
@@ -37,11 +42,11 @@ const run = async (content, timeLimit) => {
     return null;
   }
 };
-// Revises report totals for any rule limitation.
-const limitRuleTotals = (report, rules) => {
+// Revises act-report totals for any rule limitation.
+const limitRuleTotals = (actReport, rules) => {
   if (rules && Array.isArray(rules) && rules.length) {
-    const totals = report.report.summary.counts;
-    const items = report.report.results;
+    const totals = actReport.summary.counts;
+    const items = actReport.results;
     totals.violation = totals.recommendation = 0;
     items.forEach(item => {
       if (rules.includes(item.ruleId)) {
@@ -51,21 +56,24 @@ const limitRuleTotals = (report, rules) => {
   }
 };
 // Trims an IBM report.
-const trimReport = (report, withItems, rules) => {
-  const data = {};
-  if (report && report.report && report.report.summary) {
-    limitRuleTotals(report, rules);
-    const totals = report.report.summary.counts;
+const trimActReport = (data, actReport, withItems, rules) => {
+  // If the act report includes a summary:
+  if (actReport && actReport.summary) {
+    // Remove excluded rules from the act report.
+    limitRuleTotals(actReport, rules);
+    // If the act report includes totals:
+    const totals = actReport.summary.counts;
     if (totals) {
-      data.totals = totals;
+      // If itemization is required:
       if (withItems) {
+        // Trim the items.
         if (rules && Array.isArray(rules) && rules.length) {
-          data.items = report.report.results.filter(item => rules.includes(item.ruleId));
+          actReport.items = actReport.results.filter(item => rules.includes(item.ruleId));
         }
         else {
-          data.items = report.report.results;
+          actReport.items = actReport.results;
         }
-        data.items.forEach(item => {
+        actReport.items.forEach(item => {
           delete item.apiArgs;
           delete item.category;
           delete item.ignored;
@@ -75,31 +83,43 @@ const trimReport = (report, withItems, rules) => {
           delete item.value;
         });
       }
+      // Return the act report, trimmed.
+      return {
+        totals,
+        items: actReport.items
+      };
     }
+    // Otherwise, i.e. if it excludes totals:
     else {
+      // Report this.
       data.prevented = true;
-      data.error = 'ERROR: ibm test delivered no totals';
+      data.error = 'ERROR: No totals reported';
+      // Return an empty act report.
+      return {
+        totals: {},
+        items: []
+      };
     }
   }
+  // Otherwise, i.e. if it excludes a summary:
   else {
+    // Report this.
     data.prevented = true;
-    data.error = 'ERROR: ibm test delivered no report summary';
+    data.error = 'ERROR: No summary reported';
+    // Return an empty act report.
+    return {
+      totals: {},
+      items: []
+    };
   }
-  return data;
 };
-// Performs the IBM tests and returns the result.
+// Performs the IBM tests and returns an act report.
 const doTest = async (content, withItems, timeLimit, rules) => {
   // Conduct the test and get the result.
-  let report;
+  const data = {};
   try {
-    report = await run(content, timeLimit);
-  }
-  catch(error) {
-    console.log(`ibm test failed ${error.message.slice(0, 100)}...`);
-    report = null;
-  }
-  // If the test did not crash or time out:
-  if (report) {
+    const runReport = await run(content, timeLimit);
+    const actReport = runReport && runReport.report;
     // Delete any report files.
     try {
       const reportNames = await fs.readdir('results');
@@ -108,37 +128,61 @@ const doTest = async (content, withItems, timeLimit, rules) => {
       }
     }
     catch(error) {
-      console.log('ibm test created no result files.');
+      console.log('No result files created');
     }
-    // Return the result.
-    const typeReport = trimReport(report, withItems, rules);
-    return typeReport;
-  }
-  else {
+    // Return a trimmed act report.
+    const trimmedReport = trimActReport(data, actReport, withItems, rules);
     return {
-      prevented: true,
-      error: 'ERROR: ibm test failed or timed out'
+      data,
+      result: trimmedReport
     };
   }
+  catch(error) {
+    const message = `Act failed (${error.message.slice(0, 200)})`;
+    console.log(message);
+    data.prevented = true;
+    data.error = message;
+    return {
+      data,
+      result: {}
+    };
+  };
 };
-// Returns results of an IBM test.
+// Performs ibm tests and returns an act report.
 exports.reporter = async (page, options) => {
   const {withItems, withNewContent, rules} = options;
   const contentType = withNewContent ? 'new' : 'existing';
   console.log(`>>>>>> Content type: ${contentType}`);
-  let result;
   const timeLimit = 30;
   const typeContent = contentType === 'existing' ? await page.content() : await page.url();
   try {
-    result = await doTest(typeContent, withItems, timeLimit, rules);
-    if (result.prevented) {
-      console.log(`ERROR: Getting ibm test report timed out at ${timeLimit} seconds`);
+    const actReport = await doTest(typeContent, withItems, timeLimit, rules);
+    const {data, result} = actReport;
+    if (data && data.prevented) {
+      const message = `ERROR: Act failed or timed out at ${timeLimit} seconds`;
+      console.log(message);
+      data.error = data.error ? `${data.error}; ${message}` : message;
+      return {
+        data,
+        result: {}
+      };
     }
+    else {
+      return {
+        data,
+        result
+      };
+    };
   }
   catch(error) {
-    result.prevented = true;
-    console.log(`ERROR: ibm test crashed with error ${error.message.slice(0, 200)}`);
-  }
-  // Return the result. Execution of close() crashed the Node process.
-  return {result};
+    const message = `ERROR: Act crashed (${error.message.slice(0, 200)})`;
+    console.log(message);
+    return {
+      data: {
+        prevented: true,
+        error: message
+      },
+      result: {}
+    }
+  };
 };

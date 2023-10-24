@@ -316,9 +316,9 @@ const doWAVE = (result, standardResult, categoryName) => {
   }
 };
 // Converts a result.
-const convert = (toolName, result, standardResult) => {
+const convert = (toolName, data, result, standardResult) => {
   // Prevention.
-  if (result.prevented) {
+  if (data.prevented) {
     standardResult.prevented = true;
   }
   // alfa
@@ -511,10 +511,10 @@ const convert = (toolName, result, standardResult) => {
   }
   // testaro
   else if (toolName === 'testaro') {
-    const rules = result.rules ? Object.keys(result.rules) : [];
+    const rules = result ? Object.keys(result) : [];
     standardResult.totals = [0, 0, 0, 0];
     rules.forEach(rule => {
-      const ruleResult = result.rules[rule];
+      const ruleResult = result[rule];
       standardResult.totals.forEach((total, index) => {
         standardResult.totals[index] += ruleResult
         && ruleResult.totals ? ruleResult.totals[index] || 0 : 0;
@@ -570,10 +570,9 @@ const convert = (toolName, result, standardResult) => {
 };
 // Converts the results.
 exports.standardize = act => {
-  const {which} = act;
-  const {result, standardResult} = act;
+  const {which, data, result, standardResult} = act;
   if (which && result && standardResult) {
-    convert(which, result, standardResult);
+    convert(which, data, result, standardResult);
   }
   else {
     console.log('ERROR: Result of incomplete act cannot be standardized');

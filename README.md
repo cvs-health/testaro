@@ -420,7 +420,7 @@ test: [
 
 That means that a test act (i.e. an act with a `type` property having the value `'test'`) must have a string-valued `which` property naming a tool and may optionally have an array-valued `rules` property restricting the tests to be reported and/or a string-valued `what` property describing the tool and/or the tests.
 
-If a particular test act either must have or may have any other properties, those properties are specified in the `tests` property in `actSpecs.js`.
+If a particular test act either must have or may have any other properties, those properties are specified in the `tools` property in `actSpecs.js`.
 
 When you include a `rules` property, you limit the tests of the tool that are performed or reported. For some tools (`alfa`, `axe`, `htmlcs`, `qualWeb`, and `testaro`), only the specified tests are performed. Other tools (`ibm`, `nuVal`, and `wave`) do not allow such a limitation, so, for those tools, all tests are performed but results are reported from only the specified tests.
 
@@ -664,7 +664,7 @@ The `actSpecs.js` file contains rules governing acts. The rules determine whethe
 
 ##### Rule format
 
-The rules in `actSpecs.js` are organized into two objects, `etc` and `tests`. The `etc` object contains rules for acts of all types. The `tests` object contains additional rules that apply to some acts of type `test`, depending on the values of their `which` properties, namely which tests they perform.
+The rules in `actSpecs.js` are organized into two objects, `etc` and `tests`. The `etc` object contains rules for acts of all types. The `tools` object contains additional rules that apply to some acts of type `test`, depending on the values of their `which` properties, namely which tools they perform tests of.
 
 Here is an example of an act:
 
