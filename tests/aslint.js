@@ -13,7 +13,7 @@ const fs = require('fs/promises');
 // Conducts and reports an ASLint test.
 exports.reporter = async (page, options) => {
   // Initialize the act report.
-  const data = {};
+  let data = {};
   let result = {};
   // Get the ASLint runner and bundle scripts.
   const aslintRunner = await fs.readFile(`${__dirname}/../procs/aslint.js`, 'utf8');
