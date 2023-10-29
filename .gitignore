@@ -4,6 +4,7 @@ node_modules/
 # Temporary files
 temp/
 ibmOutput/
+validation/done/
 
 # Secrets
 .env

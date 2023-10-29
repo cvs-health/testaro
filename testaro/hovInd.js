@@ -1,32 +1,29 @@
 /*
-  hover
-  This test reports unexpected impacts of hovering on the visible page. Impacts are measured by
-  pixel changes outside the hovered element and by unhoverability.
-  
-  The elements that are subjected to hovering (called “triggers”) are the Playwright-visible
-  elements that have 'A', 'BUTTON', or (if not with role=menuitem) 'LI' tag names or have
-  'onmouseenter' or 'onmouseover' attributes.
+  © 2023 CVS Health and/or one of its affiliates. All rights reserved.
 
-  Despite the delay, the test can make the execution time practical by randomly sampling triggers
-  instead of hovering over all of them. When sampling is performed, the results may vary from one
-  execution to another. Because hover impacts typically occur near the beginning of a page with
-  navigation menus, the probability of the inclusion of a trigger in a sample decreases with the
-  index of the trigger.
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
 
-  Pixel changes: If no pixel changes occur immediately after an element is hovered over, the page
-  is examined once more, after 0.5 second. The greater the fraction of changed pixels, the greater
-  the ordinal severity.
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
 
-  Unhoverability: An element is reported as unhoverable when it fails the Playwright actionability
-  checks for hovering, i.e. fails to be attached to the DOM, visible, stable (not or no longer
-  animating), and able to receive events. All triggers satisfy the first two conditions, so only the
-  last two might fail. Playwright defines the ability to receive events as being the target of an
-  action on the location where the center of the element is, rather than some other element with a
-  higher zIndex value in the same location being the target.
-
-  WARNING: This test uses the Playwright page.screenshot method, which is not implemented for the
-  firefox browser type.
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
 */
+
+/*
+  hovInd
+  This test reports nonstandard hover indication.
+  */
 
 // IMPORTS
 
