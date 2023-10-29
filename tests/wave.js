@@ -69,7 +69,7 @@ exports.reporter = async (page, options) => {
             return resolve({
               actReport
             });
-          };
+          }
         });
       }
     );

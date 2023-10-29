@@ -9,8 +9,8 @@
 const {init, report} = require('../procs/testaro');
 // Module to handle files.
 const fs = require('fs/promises');
-// Module to send a notice to the server.
-const {tellServer} = require('../procs/tellServer');
+const httpClient = require('http');
+const httpsClient = require('https');
 
 // ######## CONSTANTS
 
@@ -78,6 +78,7 @@ const etcRules = {
   textNodes: 'data on specified text nodes',
   title: 'page title',
 };
+const agent = process.env.AGENT;
 
 // ######## FUNCTIONS
 
@@ -106,6 +107,22 @@ const wait = ms => {
       resolve('');
     }, ms);
   });
+};
+// Send a notification to an observer.
+const tellServer = (report, messageParams, logMessage) => {
+  const observer = report.sources.sendReportTo.replace(/report$/, 'granular');
+  const whoParams = `agent=${agent}&jobID=${report.id || ''}`;
+  const wholeURL = `${observer}?${whoParams}&${messageParams}`;
+  const client = wholeURL.startsWith('https://') ? httpsClient : httpClient;
+  client.request(wholeURL)
+  // If the notification threw an error:
+  .on('error', error => {
+    // Report the error.
+    const errorMessage = 'ERROR notifying the server';
+    console.log(`${errorMessage} (${error.message})`);
+  })
+  .end();
+  console.log(`${logMessage} (server notified)`);
 };
 // Conducts and reports Testaro tests.
 exports.reporter = async (page, options) => {

@@ -25,7 +25,7 @@ exports.reporter = async (page, withItems, detailLevel, text = '') => {
       // Compacts a string.
       const compact = string => string.replace(/\s+/g, ' ').trim();
       // Compacts and lower-cases a string.
-      const standardize = string => compact(string).toLowerCase();
+      const toStandardString = string => compact(string).toLowerCase();
       /*
         Gets data (tagName, text if specified, attributes, refLabels, labels, and children)
         on an element.
@@ -80,7 +80,7 @@ exports.reporter = async (page, withItems, detailLevel, text = '') => {
         return data;
       };
       // FUNCTION DEFINITIONS END
-      const stdText = standardize(text);
+      const stdText = toStandardString(text);
       // Create a collection of the text nodes.
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
       // Get their count.
@@ -88,7 +88,7 @@ exports.reporter = async (page, withItems, detailLevel, text = '') => {
       let more = true;
       while(more) {
         if (walker.nextNode()) {
-          const stdCurrent = standardize(walker.currentNode.nodeValue);
+          const stdCurrent = toStandardString(walker.currentNode.nodeValue);
           if (stdCurrent.includes(stdText)) {
             data.nodeCount++;
             matchNodes.push(walker.currentNode);

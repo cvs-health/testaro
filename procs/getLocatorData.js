@@ -26,6 +26,7 @@
 */
 exports.getLocatorData = async loc => {
   const locCount = await loc.count();
+  // If the locator identifies exactly 1 element:
   if (locCount === 1) {
     // Get the facts obtainable from the browser.
     const data = await loc.evaluate(element => {
@@ -106,7 +107,9 @@ exports.getLocatorData = async loc => {
     // Return the data.
     return data;
   }
+  // Otherwise, i.e. if it does not identify exactly 1 element:
   else {
+    // Report this.
     console.log(`ERROR: Locator count to get data from is ${locCount} instead of 1`);
     return null;
   }
