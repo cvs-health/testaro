@@ -325,7 +325,7 @@ const goTo = async (report, page, url, timeout, waitUntil) => {
   // If the URL is a file path:
   if (url.startsWith('file://')) {
     // Make it absolute.
-    url = url.replace('file://', `file://${__dirname.replace(/procs$/, '')}`);
+    url = url.replace('file://', `file://${__dirname}/`);
   }
   // Visit the URL.
   const startTime = Date.now();
@@ -725,6 +725,7 @@ const addError = async(alsoLog, alsoAbort, report, actIndex, message) => {
 };
 // Recursively performs the acts in a report.
 const doActs = async (report, actIndex, page) => {
+  // FUNCTION DEFINITION START
   // Quits and reports the job being aborted.
   const abortActs = async () => {
     // Add data on the aborted act to the report.
@@ -736,6 +737,7 @@ const doActs = async (report, actIndex, page) => {
     // Report this.
     console.log('ERROR: Job aborted');
   };
+  // FUNCTION DEFINITION END
   const {acts} = report;
   // If any more acts are to be performed:
   if (actIndex > -1 && actIndex < acts.length) {

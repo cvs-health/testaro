@@ -36,11 +36,14 @@ const {doJob} = require('../run');
 
 // Validates a test.
 exports.validateTest = async testID => {
+  // Get the job that validates the test.
   const jobFileNames = await fs.readdir(`${__dirname}/tests/jobs`);
   for (const jobFileName of jobFileNames.filter(fileName => fileName === `${testID}.json`)) {
     const jobJSON = await fs.readFile(`${__dirname}/tests/jobs/${jobFileName}`, 'utf8');
     const report = JSON.parse(jobJSON);
+    // Perform it.
     await doJob(report);
+    // Report whether the end time was reported.
     const {acts, jobData} = report;
     if (jobData.endTime && /^\d{4}-.+$/.test(jobData.endTime)) {
       console.log('Success: End time has been correctly populated');
@@ -48,19 +51,28 @@ exports.validateTest = async testID => {
     else {
       console.log('Failure: End time empty or invalid');
     }
+    // If the test acts were correctly reported:
     const testActs = acts.filter(act => act.type && act.type === 'test');
     if (
       testActs.length === report.acts.filter(act => act.type === 'test').length
-      && testActs.every(testAct => testAct.result && testAct.expectationFailures !== undefined)
+      && testActs.every(
+        testAct => testAct.standardResult && testAct.expectationFailures !== undefined
+      )
     ) {
+      // Report this.
       console.log('Success: Reports have been correctly populated');
+      // If all expectations were satisfied:
       if (testActs.every(testAct => testAct.expectationFailures === 0)) {
+        // Report this.
         console.log('######## Success: No failures\n');
       }
+      // Otherwise, i.e. if not all expectations were satisfied:
       else {
+        // Report this.
         console.log(
           '######## Failure: The test has at least one failure (see “"passed": false” below)\n'
         );
+        // Output the acts that had failures.
         console.log(
           JSON.stringify(
             acts.filter(act => act.type === 'test' && act.expectationFailures), null, 2
