@@ -857,11 +857,11 @@ const doActs = async (report, actIndex, page) => {
                 true, true, report, actIndex, 'ERROR: Navigation illicitly redirected'
               );
             }
-            // Otherwise, i.e. if the visit failed:
-            else {
-              // Report this and abort the job.
-              actIndex = await addError(true, true, report, actIndex, 'ERROR: Visit failed');
-            }
+          }
+          // Otherwise, i.e. if the visit failed:
+          else {
+            // Report this and abort the job.
+            actIndex = await addError(true, true, report, actIndex, 'ERROR: Visit failed');
           }
         }
         // Otherwise, if the act is a wait for text:
