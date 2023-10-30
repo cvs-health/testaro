@@ -33,7 +33,7 @@ require('dotenv').config();
 const {actSpecs} = require('./actSpecs');
 // Module to standardize report formats.
 const {standardize} = require('./procs/standardize');
-// Module to send a notice to the server.
+// Module to send a notice to an observer.
 const {tellServer} = require('./procs/tellServer');
 
 // ########## CONSTANTS
