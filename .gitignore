@@ -5,6 +5,7 @@ node_modules/
 temp/
 ibmOutput/
 validation/done/
+vlidation/tests/old
 
 # Secrets
 .env
