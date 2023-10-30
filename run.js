@@ -1055,28 +1055,28 @@ const doActs = async (report, actIndex, page) => {
                 // Remove it.
                 delete act.result;
               }
-              // If the act has expectations:
-              const expectations = act.expect;
-              if (expectations) {
-                // Initialize whether they were fulfilled.
-                act.expectations = [];
-                let failureCount = 0;
-                // For each expectation:
-                expectations.forEach(spec => {
-                  const truth = isTrue(act, spec);
-                  act.expectations.push({
-                    property: spec[0],
-                    relation: spec[1],
-                    criterion: spec[2],
-                    actual: truth[0],
-                    passed: truth[1]
-                  });
-                  if (! truth[1]) {
-                    failureCount++;
-                  }
+            }
+            // If the act has expectations:
+            const expectations = act.expect;
+            if (expectations) {
+              // Initialize whether they were fulfilled.
+              act.expectations = [];
+              let failureCount = 0;
+              // For each expectation:
+              expectations.forEach(spec => {
+                const truth = isTrue(act, spec);
+                act.expectations.push({
+                  property: spec[0],
+                  relation: spec[1],
+                  criterion: spec[2],
+                  actual: truth[0],
+                  passed: truth[1]
                 });
-                act.expectationFailures = failureCount;
-              }
+                if (! truth[1]) {
+                  failureCount++;
+                }
+              });
+              act.expectationFailures = failureCount;
             }
           }
           // Otherwise, if the act is a move:

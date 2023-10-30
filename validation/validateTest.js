@@ -56,7 +56,7 @@ exports.validateTest = async testID => {
     if (
       testActs.length === report.acts.filter(act => act.type === 'test').length
       && testActs.every(
-        testAct => testAct.standardResult && testAct.expectationFailures !== undefined
+        testAct => testAct.expectationFailures !== undefined
       )
     ) {
       // Report this.
