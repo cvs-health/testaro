@@ -34,7 +34,7 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "contains 2 or more"
+          "Adjacent BR elements within"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
@@ -44,12 +44,7 @@
         [
           "standardResult.instances.0.tagName",
           "=",
-          "P"
-        ],
-        [
-          "standardResult.instances.0.id",
-          "=",
-          "bad"
+          "BR"
         ],
         [
           "standardResult.instances.0.location.doc",
@@ -59,12 +54,12 @@
         [
           "standardResult.instances.0.location.type",
           "=",
-          "selector"
+          "box"
         ],
         [
-          "standardResult.instances.0.location.spec",
-          "=",
-          "#bad"
+          "standardResult.instances.0.location.spec.y",
+          ">",
+          0
         ],
         [
           "standardResult.instances.0.excerpt",
@@ -101,7 +96,7 @@
         [
           "standardResult.instances.0.what",
           "i",
-          "contain 2 or more"
+          "Elements contain 2 or more"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",

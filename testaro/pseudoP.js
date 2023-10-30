@@ -57,7 +57,7 @@ exports.reporter = async (page, withItems) => {
   }
   // Populate and return the result.
   const whats = [
-    'Adjacent br elements within a __param__ element may be pseudo-paragraphs',
+    'Adjacent BR elements within a __param__ element may be pseudo-paragraphs',
     'Elements contain 2 or more adjacent br elements that may be pseudo-paragraphs'
   ];
   return await report(withItems, all, 'pseudoP', whats, 0, 'br');
