@@ -1,3 +1,25 @@
+/*
+  © 2023 CVS Health and/or one of its affiliates. All rights reserved.
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+*/
+
 # Contributing to Testaro
 
 ## Types of contributions
@@ -29,13 +51,13 @@ However, many other significant accessibility issues exist that are not covered 
 
 ### Step 1
 
-The first step in contributing a new rule to Testaro is to satisfy yourself that it will not duplicate existing rules. The `procs/score/tic36.js` file in the Testilo package should be helpful here.
+The first step in contributing a new rule to Testaro is to satisfy yourself that it will not duplicate existing rules. The latest `procs/score/tic….js` file in the Testilo package should be helpful here.
 
 ### Step 2
 
 The second step is to write a validator for the new rule. A validator is software that defines the correct behavior of the implementation of the rule.
 
-Every Testaro rule has a correspoding validator. A validator has two parts:
+Every Testaro rule (which means each of the approximately 50 rules of the Testaro tool) has a correspoding validator. A validator has two parts:
 - A job file, in the `validation/tests/jobs` directory. It tells Testaro what tests to perform and what the results should be.
 - A target directory, within the `validation/tests/targets` directory. The target directory contains one or more HTML files that will be tested by the job.
 
@@ -53,7 +75,7 @@ To optimize quality, it may be wise for one person to perform steps 1, 2, and 3,
 
 At any time after an implementation is attempted or revised, the developer can run the validation on it, simply by executing the statement `npm test xyz` (replacing `xyz` with the name of the new rule). When the implementation fails validation, diagnosis may find fault either with the implementation or with the validator.
 
-Whether a new rule should be implemented in JSON or JavaScript depends on the complexity of the rule. The JSON format is effective for simple rules,and JavaScript is needed for more complex rules.
+Whether a new rule should be implemented in JSON or JavaScript depends on the complexity of the rule. The JSON format is effective for simple rules, and JavaScript is needed for more complex rules.
 
 ### Simple rules
 
@@ -95,4 +117,4 @@ The `isDestructive` property should be set to `true` if your pruner modifies the
 
 Even more complex Testaro rules require analysis that cannot fit into the simple or simplifiable category. You can begin with existing JavaScript rules, or the `data/template.js` file, as an example.
 
-Some utility functions in modules in the `procs` directory are available for support of new rules. Among these modules are `testaro` (used in many tests), `isInlineLink`, `operable`, and `visChange`,
+Some utility functions in modules in the `procs` directory are available for support of new rules. Among these modules are `testaro` (used in many tests), `isInlineLink`, `operable`, and `visChange`.
