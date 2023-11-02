@@ -240,7 +240,7 @@ const doNuVal = (result, standardResult, docType) => {
         location: {
           doc: docType === 'pageContent' ? 'dom' : 'source',
           type: 'line',
-          spec: item.lastLine.toString()
+          spec: item && item.lastLine && item.lastLine.toString() || ''
         },
         excerpt: cap(item.extract)
       };
