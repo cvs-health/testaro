@@ -84,18 +84,18 @@ const getCursorData = hovStyles => {
     // If it is an input:
     if (tagName === 'INPUT') {
       // Get whether its hover cursor is standard.
-      data.ok = cursor === (standardCursor.INPUT[hovStyles.inputType] || 'default');
+      data.ok = [standardCursor.INPUT[hovStyles.inputType], 'default', 'auto'].includes(cursor);
     }
     // Otherwise, i.e. if it is a link:
     else {
       // Get whether its hover cursor is standard.
-      data.ok = cursor === 'pointer';
+      data.ok = [standardCursor.A, 'auto'].includes(cursor);
     }
   }
   // Otherwise, if it is a button:
   else if (tagName === 'BUTTON') {
     // Get whether its hover cursor is standard.
-    data.ok = cursor === 'default';
+    data.ok = ['default', 'auto'].includes(cursor);
   }
   // Otherwise, i.e. if it has another type and a hover listener:
   else {

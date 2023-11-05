@@ -41,11 +41,14 @@ exports.reporter = async (page, withItems) => {
     ruleID: 'allCaps',
     selector: 'body *:not(style, script, svg)',
     pruner: async loc => await loc.evaluate(el => {
+      // Get the concatenated and debloated text content of the element and its child text nodes.
       const elText = Array
       .from(el.childNodes)
       .filter(node => node.nodeType === Node.TEXT_NODE)
       .map(textNode => textNode.nodeValue)
-      .join(' ');
+      .join(' ')
+      .replace(/\s{2,}/g, ' ')
+      .replace(/-{2,}/g, '-');
       // If the element text includes 8 sequential upper-case letters, spaces, or hyphen-minuses:
       if (/[- A-Z]{8}/.test(elText)) {
         // Report this.
