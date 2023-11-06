@@ -335,7 +335,9 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
     // Otherwise, i.e. if it was any other error:
     else {
       // Report this.
-      console.log(`ERROR: ${logStart}no response, but got error message ${error.message}`);
+      console.log(
+        `ERROR: ${logStart}no response, but got error message ${error.message.slice(0, 200)}`
+      );
       // Check the next server.
       await checkNetJob(servers, serverIndex + 1, isForever, interval, noJobCount + 1);
     }

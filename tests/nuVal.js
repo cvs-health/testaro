@@ -33,8 +33,6 @@
 
 // ########## IMPORTS
 
-// Module to make HTTP requests.
-const fetch = require('node-fetch');
 // Module to process files.
 const fs = require('fs/promises');
 
@@ -48,14 +46,16 @@ exports.reporter = async (page, options) => {
   const url = page.url();
   const scheme = url.replace(/:.+/, '');
   let rawPage;
+  // If it is local.
   if (scheme === 'file') {
     const filePath = url.slice(7);
     rawPage = await fs.readFile(filePath, 'utf8');
   }
   else {
+    // If it is remote (15 seconds allowed).
     try {
-      const rawPageResponse = await fetch(url);
-      rawPage = await rawPageResponse.text();
+      const rawPageResponse = await fetch(url, {signal: AbortSignal.timeout(15000)});
+      rawPage = rawPageResponse.body;
     }
     catch(error) {
       console.log(`ERROR getting page for nuVal test (${error.message})`);

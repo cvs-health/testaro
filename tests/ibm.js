@@ -175,12 +175,14 @@ exports.reporter = async (page, options) => {
   const {withItems, withNewContent, rules} = options;
   const contentType = withNewContent ? 'new' : 'existing';
   console.log(`>>>>>> Content type: ${contentType}`);
-  const timeLimit = 30;
+  const timeLimit = 25;
   const typeContent = contentType === 'existing' ? await page.content() : await page.url();
   try {
     const actReport = await doTest(typeContent, withItems, timeLimit, rules);
     const {data, result} = actReport;
+    // If the act was prevented:
     if (data && data.prevented) {
+      // Report this.
       const message = `ERROR: Act failed or timed out at ${timeLimit} seconds`;
       console.log(message);
       data.error = data.error ? `${data.error}; ${message}` : message;
@@ -189,7 +191,9 @@ exports.reporter = async (page, options) => {
         result: {}
       };
     }
+    // Otherwise, i.e. if the act was not prevented:
     else {
+      // Return the result.
       return {
         data,
         result
