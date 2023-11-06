@@ -27,8 +27,6 @@
 
 // IMPORTS
 
-// Module to make HTTP requests.
-const fetch = require('node-fetch');
 // Module to process files.
 const fs = require('fs/promises');
 
