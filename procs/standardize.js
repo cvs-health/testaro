@@ -226,7 +226,7 @@ const doNuVal = (result, standardResult, docType) => {
         const tagNameLCArray = item.message.match(
           /^Element ([^ ]+)|^An (img) element| (meta|script) element| element (script)| tag (script)/
         );
-        if (tagNameLCArray && tagNameLCArray.length > 1) {
+        if (tagNameLCArray && tagNameLCArray[1]) {
           identifiers[0] = tagNameLCArray[1].toUpperCase();
         }
       }
