@@ -176,8 +176,8 @@ exports.reporter = async (page, options) => {
   const contentType = withNewContent ? 'new' : 'existing';
   console.log(`>>>>>> Content type: ${contentType}`);
   const timeLimit = 25;
-  const typeContent = contentType === 'existing' ? await page.content() : await page.url();
   try {
+    const typeContent = contentType === 'existing' ? await page.content() : await page.url();
     const actReport = await doTest(typeContent, withItems, timeLimit, rules);
     const {data, result} = actReport;
     // If the act was prevented:
