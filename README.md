@@ -200,7 +200,7 @@ Here is an example of a job:
     },
     requester: 'user@domain.org'
   },
-  jobCreationTime: '2023-05-26T14:28',
+  creationTime: '2023-05-26T14:28',
   timeStamp: 'be76p'
 }
 ```
