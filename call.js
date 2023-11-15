@@ -58,7 +58,9 @@ const rawDir = `${reportDir}/raw`;
 const callRun = async jobIDStart => {
   // Find the job.
   const jobDirFileNames = await fs.readdir(todoDir);
-  const jobFileName = jobDirFileNames.find(fileName => fileName.startsWith(jobIDStart));
+  const jobFileName = jobIDStart
+  ? jobDirFileNames.find(fileName => fileName.startsWith(jobIDStart))
+  : jobDirFileNames[0];
   // If it exists:
   if (jobFileName) {
     // Get it.
@@ -90,8 +92,8 @@ const callNetWatch = async(isForever, interval) => {
 // OPERATION
 
 // Execute the requested function.
-if (fn === 'run' && fnArgs.length === 1) {
-  callRun(fnArgs)
+if (fn === 'run' && fnArgs.length < 2) {
+  callRun(fnArgs[0])
   .then(() => {
     console.log('Execution completed\n');
     process.exit(0);

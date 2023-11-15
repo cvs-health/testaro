@@ -753,12 +753,13 @@ The Testilo package contains functions that can create jobs from scripts and add
 ##### By a user
 
 ```bash
+node call run
 node call run be76p
 ```
 
-In this example, `be76p` is the initial characters of the ID of a job saved as a JSON file in the `todo` subdirectory of the `process.env.JOBDIR` directory.
+In the second example, `be76p` is the initial characters of the ID of a job saved as a JSON file in the `todo` subdirectory of the `process.env.JOBDIR` directory.
 
-The `call` module will find the first job file with a matching name, execute the `doJob` function of the `run` module on the job, save the report in the `raw` subdirectory of the `process.env.REPORTDIR` directory, and archive the job file in the `done` subdirectory of the `process.env.JOBDIR` directory.
+The `call` module will find the first job file with a matching name if an argument is given, or the first job file if not. Then the module will execute the `doJob` function of the `run` module on the job, save the report in the `raw` subdirectory of the `process.env.REPORTDIR` directory, and archive the job file in the `done` subdirectory of the `process.env.JOBDIR` directory.
 
 #### Watch
 
