@@ -50,7 +50,7 @@ exports.reporter = async (page, options) => {
           try {
             // Delete unnecessary properties.
             const actResult = JSON.parse(actReport);
-            const {categories} = actResult;
+            const {categories, statistics} = actResult;
             delete categories.feature;
             delete categories.structure;
             delete categories.aria;
@@ -83,6 +83,16 @@ exports.reporter = async (page, options) => {
                 items[issueName].wcag = guidelines;
               });
             });
+            // Add important data to the result.
+            if (statistics) {
+              data.pageTitle = statistics.pagetitle || '';
+              data.pageURL = statistics.pageurl || '';
+              data.time = statistics.time || null;
+              data.creditsRemaining = statistics.creditsremaining || null;
+              data.allItemCount = statistics.allitemcount || null;
+              data.totalElements = statistics.totalelements || null;
+            }
+            // Return the result.
             return resolve(actResult);
           }
           catch (error) {
