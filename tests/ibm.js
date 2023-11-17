@@ -144,9 +144,9 @@ const doTest = async (content, withItems, timeLimit, rules) => {
     const actReport = runReport && runReport.report;
     // Delete any report files.
     try {
-      const reportNames = await fs.readdir('results');
+      const reportNames = await fs.readdir('ibmOutput');
       for (const reportName of reportNames) {
-        await fs.rm(`results/${reportName}`);
+        await fs.rm(`ibmOutput/${reportName}`);
       }
     }
     catch(error) {

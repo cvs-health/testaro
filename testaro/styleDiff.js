@@ -245,14 +245,18 @@ exports.reporter = async (page, withItems) => {
       h5: [3, 'Level-5 headings', 'H5'],
       h6: [3, 'Level-6 headings', 'H6'],
     };
+    // For each eligible element type:
     Object.keys(elementData).forEach(elementName => {
+      // If it has more than 1 style:
       const elementTotal = data.totals[elementName];
       if (elementTotal && elementTotal.subtotals) {
         const currentData = elementData[elementName];
         const severity = currentData[0];
         const elementSubtotals = elementTotal.subtotals;
+        // Treat the count of its styles in excess of 1 as the instance count for that element type.
         const extraCount = elementSubtotals.length - 1;
         totals[severity] += extraCount;
+        // Add a summary standard instance for that element type.
         standardInstances.push({
           ruleID: 'styleDiff',
           what: `${currentData[1]} have ${elementSubtotals.length} different styles`,
