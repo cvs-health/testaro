@@ -61,143 +61,149 @@ exports.reporter = async (page, options) => {
     }
   };
   // Specify a URL or provide the content.
-  if (withNewContent) {
-    qualWebOptions.url = page.url();
-  }
-  else {
-    qualWebOptions.html = await page.content();
-  }
-  // Specify which rules to test for.
-  const actSpec = rules ? rules.find(typeRules => typeRules.startsWith('act:')) : null;
-  const wcagSpec = rules ? rules.find(typeRules => typeRules.startsWith('wcag:')) : null;
-  const bestSpec = rules ? rules.find(typeRules => typeRules.startsWith('best:')) : null;
-  if (actSpec) {
-    if (actSpec === 'act:') {
-      qualWebOptions.execute.act = false;
+  try {
+    if (withNewContent) {
+      qualWebOptions.url = page.url();
     }
     else {
-      const actRules = actSpec.slice(4).split(',').map(num => `QW-ACT-R${num}`);
-      qualWebOptions['act-rules'] = {rules: actRules};
+      qualWebOptions.html = await page.content();
+    }
+    // Specify which rules to test for.
+    const actSpec = rules ? rules.find(typeRules => typeRules.startsWith('act:')) : null;
+    const wcagSpec = rules ? rules.find(typeRules => typeRules.startsWith('wcag:')) : null;
+    const bestSpec = rules ? rules.find(typeRules => typeRules.startsWith('best:')) : null;
+    if (actSpec) {
+      if (actSpec === 'act:') {
+        qualWebOptions.execute.act = false;
+      }
+      else {
+        const actRules = actSpec.slice(4).split(',').map(num => `QW-ACT-R${num}`);
+        qualWebOptions['act-rules'] = {rules: actRules};
+        qualWebOptions.execute.act = true;
+      }
+    }
+    else {
+      qualWebOptions['act-rules'] = {
+        levels: ['A', 'AA', 'AAA'],
+        principles: ['Perceivable', 'Operable', 'Understandable', 'Robust']
+      };
       qualWebOptions.execute.act = true;
     }
-  }
-  else {
-    qualWebOptions['act-rules'] = {
-      levels: ['A', 'AA', 'AAA'],
-      principles: ['Perceivable', 'Operable', 'Understandable', 'Robust']
-    };
-    qualWebOptions.execute.act = true;
-  }
-  if (wcagSpec) {
-    if (wcagSpec === 'wcag:') {
-      qualWebOptions.execute.wcag = false;
+    if (wcagSpec) {
+      if (wcagSpec === 'wcag:') {
+        qualWebOptions.execute.wcag = false;
+      }
+      else {
+        const wcagTechniques = wcagSpec.slice(5).split(',').map(num => `QW-WCAG-T${num}`);
+        qualWebOptions['wcag-techniques'] = {techniques: wcagTechniques};
+        qualWebOptions.execute.wcag = true;
+      }
     }
     else {
-      const wcagTechniques = wcagSpec.slice(5).split(',').map(num => `QW-WCAG-T${num}`);
-      qualWebOptions['wcag-techniques'] = {techniques: wcagTechniques};
+      qualWebOptions['wcag-techniques'] = {
+        levels: ['A', 'AA', 'AAA'],
+        principles: ['Perceivable', 'Operable', 'Understandable', 'Robust']
+      };
       qualWebOptions.execute.wcag = true;
     }
-  }
-  else {
-    qualWebOptions['wcag-techniques'] = {
-      levels: ['A', 'AA', 'AAA'],
-      principles: ['Perceivable', 'Operable', 'Understandable', 'Robust']
-    };
-    qualWebOptions.execute.wcag = true;
-  }
-  if (bestSpec) {
-    if (bestSpec === 'best:') {
-      qualWebOptions.execute.bp = false;
+    if (bestSpec) {
+      if (bestSpec === 'best:') {
+        qualWebOptions.execute.bp = false;
+      }
+      else {
+        const bestPractices = bestSpec.slice(5).split(',').map(num => `QW-BP${num}`);
+        qualWebOptions['best-practices'] = {bestPractices};
+        // qualWebOptions.execute.bp = true;
+        // Temporarily disable best practices, because they crash QualWeb.
+        qualWebOptions.execute.bp = false;
+      }
     }
     else {
-      const bestPractices = bestSpec.slice(5).split(',').map(num => `QW-BP${num}`);
-      qualWebOptions['best-practices'] = {bestPractices};
       // qualWebOptions.execute.bp = true;
       // Temporarily disable best practices, because they crash QualWeb.
       qualWebOptions.execute.bp = false;
     }
-  }
-  else {
-    // qualWebOptions.execute.bp = true;
-    // Temporarily disable best practices, because they crash QualWeb.
-    qualWebOptions.execute.bp = false;
-  }
-  // Get the report.
-  let actReports = await qualWeb.evaluate(qualWebOptions);
-  // Remove the copy of the DOM from it.
-  const result = actReports[withNewContent ? qualWebOptions.url : 'customHtml'];
-  if (result && result.system && result.system.page && result.system.page.dom) {
-    delete result.system.page.dom;
-    // For each test section of the act report:
-    const {modules} = result;
-    if (modules) {
-      for (const section of ['act-rules', 'wcag-techniques', 'best-practices']) {
-        if (qualWebOptions[section]) {
-          if (modules[section]) {
-            const {assertions} = modules[section];
-            if (assertions) {
-              const ruleIDs = Object.keys(assertions);
-              ruleIDs.forEach(ruleID => {
-                // Remove passing results.
-                const ruleAssertions = assertions[ruleID];
-                const {metadata} = ruleAssertions;
-                if (metadata) {
-                  if (metadata.warning === 0 && metadata.failed === 0) {
-                    delete assertions[ruleID];
-                  }
-                  else {
-                    if (ruleAssertions.results) {
-                      ruleAssertions.results = ruleAssertions.results.filter(
-                        raResult => raResult.verdict !== 'passed'
-                      );
+    // Get the report.
+    let actReports = await qualWeb.evaluate(qualWebOptions);
+    // Remove the copy of the DOM from it.
+    const result = actReports[withNewContent ? qualWebOptions.url : 'customHtml'];
+    if (result && result.system && result.system.page && result.system.page.dom) {
+      delete result.system.page.dom;
+      // For each test section of the act report:
+      const {modules} = result;
+      if (modules) {
+        for (const section of ['act-rules', 'wcag-techniques', 'best-practices']) {
+          if (qualWebOptions[section]) {
+            if (modules[section]) {
+              const {assertions} = modules[section];
+              if (assertions) {
+                const ruleIDs = Object.keys(assertions);
+                ruleIDs.forEach(ruleID => {
+                  // Remove passing results.
+                  const ruleAssertions = assertions[ruleID];
+                  const {metadata} = ruleAssertions;
+                  if (metadata) {
+                    if (metadata.warning === 0 && metadata.failed === 0) {
+                      delete assertions[ruleID];
+                    }
+                    else {
+                      if (ruleAssertions.results) {
+                        ruleAssertions.results = ruleAssertions.results.filter(
+                          raResult => raResult.verdict !== 'passed'
+                        );
+                      }
                     }
                   }
-                }
-                // Shorten long HTML codes of elements.
-                const {results} = ruleAssertions;
-                results.forEach(raResult => {
-                  const {elements} = raResult;
-                  if (elements && elements.length) {
-                    elements.forEach(element => {
-                      if (element.htmlCode && element.htmlCode.length > 700) {
-                        element.htmlCode = `${element.htmlCode.slice(0, 700)} …`;
-                      }
-                    });
-                  }
+                  // Shorten long HTML codes of elements.
+                  const {results} = ruleAssertions;
+                  results.forEach(raResult => {
+                    const {elements} = raResult;
+                    if (elements && elements.length) {
+                      elements.forEach(element => {
+                        if (element.htmlCode && element.htmlCode.length > 700) {
+                          element.htmlCode = `${element.htmlCode.slice(0, 700)} …`;
+                        }
+                      });
+                    }
+                  });
                 });
-              });
+              }
+              else {
+                data.prevented = true;
+                data.error = 'ERROR: No assertions';
+              }
             }
             else {
               data.prevented = true;
-              data.error = 'ERROR: No assertions';
+              data.error = `ERROR: No ${section} section`;
             }
           }
-          else {
-            data.prevented = true;
-            data.error = `ERROR: No ${section} section`;
-          }
         }
+      }
+      else {
+        data.prevented = true;
+        data.error = 'ERROR: No modules';
       }
     }
     else {
       data.prevented = true;
-      data.error = 'ERROR: No modules';
+      data.error = 'ERROR: No DOM';
     }
-  }
-  else {
-    data.prevented = true;
-    data.error = 'ERROR: No DOM';
-  }
-  // Stop the QualWeb core engine.
-  await qualWeb.stop();
-  // Return the result.
-  try {
-    JSON.stringify(result);
+    // Stop the QualWeb core engine.
+    await qualWeb.stop();
+    // Return the result.
+    try {
+      JSON.stringify(result);
+    }
+    catch(error) {
+      const message = `ERROR: qualWeb result cannot be made JSON (${error.message})`;
+      data.prevented = true;
+      data.error = message;
+    };
   }
   catch(error) {
-    const message = `ERROR: qualWeb result cannot be made JSON (${error.message})`;
     data.prevented = true;
-    data.error = message;
+    data.error = error.message.slice(0, 200);
   };
   return {
     data,
