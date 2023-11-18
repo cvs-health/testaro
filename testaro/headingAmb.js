@@ -23,8 +23,7 @@
 /*
   headingAmb
   Related to ASLint rule headings-sibling-unique.
-  This test reports same-level heading siblings in the heading hierarchy that have identical text
-  contents.
+  This test reports adjacent headings with the same levels and text contents.
 */
 
 // ########## IMPORTS
@@ -49,21 +48,24 @@ exports.reporter = async (page, withItems) => {
     const badIndexes = [];
     // For each heading:
     headings.forEach((heading, index) => {
-      // If any same-level and same-text heading precedes it:
-      const priors = headings.slice(0, index);
-      priors.forEach((prior, priorIndex) => {
+      // Get its level.
+      const level = heading.level;
+      // If there are prior non-inferior headings and the last one has the same-level and text:
+      // Get the prior headings.
+      const priorHeadings = headings.slice(0, index);
+      // Get the non-inferior ones among them.
+      const nonInferiors = priorHeadings.filter(priorHeading => priorHeading.level <= level);
+      // If there are any:
+      const nonInferiorCount = nonInferiors.length;
+      if (nonInferiorCount) {
+        // Get the last of them.
+        const prior = nonInferiors[nonInferiorCount - 1];
+        // If they have the same level and text:
         if (['tagName', 'textContent'].every(property => prior[property] === heading[property])) {
-          // If no superior heading exists between them:
-          if (
-            headings
-            .slice(priorIndex + 1, index)
-            .every(betweenHeading => betweenHeading.tagName[1] >= heading.tagName[1])
-          ) {
-            // Add the index of the later heading to the index of violating headings.
-            badIndexes.push(headings.indexOf(heading));
-          }
+          // Add the index of the later heading to the index of violating headings.
+          badIndexes.push(index);
         }
-      });
+      }
     });
     return badIndexes;
   });
