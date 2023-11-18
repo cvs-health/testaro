@@ -42,6 +42,7 @@ const clusterOptions = {
 exports.reporter = async (page, options) => {
   const {withNewContent, rules} = options;
   const data = {};
+  let result = {};
   // Start the QualWeb core engine.
   await qualWeb.start(clusterOptions);
   // Specify the invariant test options.
@@ -126,7 +127,7 @@ exports.reporter = async (page, options) => {
     // Get the report.
     let actReports = await qualWeb.evaluate(qualWebOptions);
     // Remove the copy of the DOM from it.
-    const result = actReports[withNewContent ? qualWebOptions.url : 'customHtml'];
+    result = actReports[withNewContent ? qualWebOptions.url : 'customHtml'];
     if (result && result.system && result.system.page && result.system.page.dom) {
       delete result.system.page.dom;
       // For each test section of the act report:
@@ -202,8 +203,13 @@ exports.reporter = async (page, options) => {
     };
   }
   catch(error) {
+    const message = error.message.slice(0, 200);
     data.prevented = true;
-    data.error = error.message.slice(0, 200);
+    data.error = message;
+    result = {
+      prevented: true,
+      error: message
+    };
   };
   return {
     data,
