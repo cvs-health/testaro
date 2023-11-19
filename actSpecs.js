@@ -184,7 +184,7 @@ exports.actSpecs = {
       {
         withItems: [true, 'boolean', '', 'itemize'],
         withNewContent: [
-          true, 'boolean', '', 'true: use a URL; false: use page content'
+          true, 'boolean', '', 'true: use a URL; false: use page content (risky)'
         ]
       }
     ],

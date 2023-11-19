@@ -422,10 +422,19 @@ const launch = async (report, typeName, url, debug, waits, isLowMotion = false) 
     // Open a context (i.e. browser tab), with reduced motion if specified.
     const options = {reduceMotion: isLowMotion ? 'reduce' : 'no-preference'};
     const browserContext = await browser.newContext(options);
-    // Prevent default timeouts, including those arising from a Playwright bug.
+    // Prevent default timeouts.
     browserContext.setDefaultTimeout(0);
     // When a page (i.e. browser tab) is added to the browser context (i.e. browser window):
     browserContext.on('page', async page => {
+      page.on('crash', () => {
+        console.log('Page crashed');
+      });
+      page.on('pageerror', () => {
+        console.log('Page erred');
+      });
+      page.on('requestfailed', () => {
+        console.log('Request failed');
+      });
       // If it emits a message:
       page.on('console', msg => {
         const msgText = msg.text();

@@ -41,27 +41,18 @@ const {getCompliance} = require('accessibility-checker');
 // FUNCTIONS
 
 // Runs the IBM test and returns the result.
-const run = async (content, timeLimit) => {
+const run = async content => {
   const nowLabel = (new Date()).toISOString().slice(0, 19);
-  // Start the timeout clock.
-  let timeoutID;
-  const timeout = new Promise(resolve => {
-    timeoutID = setTimeout(() => {
-      resolve(null);
-    }, 1000 * timeLimit);
-  });
-  // Return the result of the test, or null if it timed out.
   try {
-    const ibmReport = getCompliance(content, nowLabel);
-    const result = await Promise.race([ibmReport, timeout]);
-    clearTimeout(timeoutID);
-    return result;
+    const ibmReport = await getCompliance(content, nowLabel);
+    return ibmReport;
   }
   catch(error) {
-    console.log(
-      `ERROR: getCompliance failed (${error.message.replace(/\s+/g, ' ').slice(0, 200)}).`
-    );
-    return null;
+    console.log('ibm getCompliance failed');
+    return {
+      prevented: true,
+      error: error.message.slice(0, 200)
+    };
   }
 };
 // Revises act-report totals for any rule limitation.
@@ -114,8 +105,10 @@ const trimActReport = (data, actReport, withItems, rules) => {
     // Otherwise, i.e. if it excludes totals:
     else {
       // Report this.
+      const error = 'ERROR: No totals reported';
+      console.log(error);
       data.prevented = true;
-      data.error = 'ERROR: No totals reported';
+      data.error = error;
       // Return an empty act report.
       return {
         totals: {},
@@ -126,8 +119,10 @@ const trimActReport = (data, actReport, withItems, rules) => {
   // Otherwise, i.e. if it excludes a summary:
   else {
     // Report this.
+    const error = 'ERROR: No summary reported';
+    console.log(error);
     data.prevented = true;
-    data.error = 'ERROR: No summary reported';
+    data.error = error;
     // Return an empty act report.
     return {
       totals: {},
@@ -137,27 +132,38 @@ const trimActReport = (data, actReport, withItems, rules) => {
 };
 // Performs the IBM tests and returns an act report.
 const doTest = async (content, withItems, timeLimit, rules) => {
-  // Conduct the test and get the result.
+  // Conduct the tests.
   const data = {};
   try {
     const runReport = await run(content, timeLimit);
-    const actReport = runReport && runReport.report;
-    // Delete any report files.
-    try {
-      const reportNames = await fs.readdir('ibmOutput');
-      for (const reportName of reportNames) {
-        await fs.rm(`ibmOutput/${reportName}`);
+    // If there were results:
+    if (runReport.report) {
+      // Delete any report files.
+      try {
+        const reportNames = await fs.readdir('ibmOutput');
+        for (const reportName of reportNames) {
+          await fs.rm(`ibmOutput/${reportName}`);
+        }
+      }
+      catch(error) {
+        console.log('No result files created');
+      };
+      // Return a trimmed act report.
+      const {report} = runReport;
+      const trimmedReport = trimActReport(data, report, withItems, rules);
+      return {
+        data,
+        result: trimmedReport
+      };
+    }
+    // Otherwise, i.e. if there were no results:
+    else {
+      // Return this.
+      return {
+        data: runReport,
+        result: {}
       }
     }
-    catch(error) {
-      console.log('No result files created');
-    }
-    // Return a trimmed act report.
-    const trimmedReport = trimActReport(data, actReport, withItems, rules);
-    return {
-      data,
-      result: trimmedReport
-    };
   }
   catch(error) {
     const message = `Act failed (${error.message.slice(0, 200)})`;
@@ -186,6 +192,7 @@ exports.reporter = async (page, options) => {
       const message = `ERROR: Act failed or timed out at ${timeLimit} seconds`;
       console.log(message);
       data.error = data.error ? `${data.error}; ${message}` : message;
+      // Return the failure.
       return {
         data,
         result: {}
