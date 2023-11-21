@@ -426,16 +426,23 @@ const launch = async (report, typeName, url, debug, waits, isLowMotion = false) 
     browserContext.setDefaultTimeout(0);
     // When a page (i.e. browser tab) is added to the browser context (i.e. browser window):
     browserContext.on('page', async page => {
+      // Ensure the report has a jobData property.
+      report.jobData ??= {};
+      report.jobData.logCount ??= 0;
+      report.jobData.logSize ??= 0;
+      report.jobData.errorLogCount ??= 0;
+      // Add any error events to the count of logging errors.
       page.on('crash', () => {
+        report.jobData.errorLogCount++;
         console.log('Page crashed');
       });
       page.on('pageerror', () => {
-        console.log('Page erred');
+        report.jobData.errorLogCount++;
       });
-      page.on('requestfailed', data => {
-        console.log(`Request failed:\n${JSON.stringify(data, null, 2)}`);
+      page.on('requestfailed', () => {
+        report.jobData.errorLogCount++;
       });
-      // If it emits a message:
+      // If the page emits a message:
       page.on('console', msg => {
         const msgText = msg.text();
         let indentedMsg = '';
