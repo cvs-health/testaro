@@ -432,8 +432,8 @@ const launch = async (report, typeName, url, debug, waits, isLowMotion = false) 
       page.on('pageerror', () => {
         console.log('Page erred');
       });
-      page.on('requestfailed', () => {
-        console.log('Request failed');
+      page.on('requestfailed', data => {
+        console.log(`Request failed:\n${JSON.stringify(data, null, 2)}`);
       });
       // If it emits a message:
       page.on('console', msg => {
