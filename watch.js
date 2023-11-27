@@ -96,39 +96,51 @@ const archiveJob = async (job, isFile) => {
 // Checks for a directory job and, if found, performs and reports it, once or repeatedly.
 const checkDirJob = async (isForever, interval) => {
   try {
-    // If there are any jobs to do in the watched directory:
+    // If there are any jobs in the watched directory:
     const toDoFileNames = await fs.readdir(`${jobDir}/todo`);
     const jobFileNames = toDoFileNames.filter(fileName => fileName.endsWith('.json'));
     if (jobFileNames.length) {
-      // Get the first one.
-      const jobJSON = await fs.readFile(`${jobDir}/todo/${jobFileNames[0]}`, 'utf8');
-      try {
-        const job = JSON.parse(jobJSON, null, 2);
-        const {id} = job;
+      // If the first one is ready to do:
+      const firstJobTime = jobFileNames[0].replace(/-.+$/, '');
+      if (Date.now() > dateOf(firstJobTime)) {
         // Perform it.
-        console.log(`Directory job ${id} found (${nowString()})`);
-        await doJob(job);
-        console.log(`Job ${id} finished (${nowString()})`);
-        // Report it.
-        await writeDirReport(job);
-        // Archive it.
-        await archiveJob(job, true);
-        console.log(`Job ${id} archived in ${jobDir} (${nowString()})`);
-        // If watching is repetitive:
-        if (isForever) {
-          // Wait 2 seconds.
-          await wait(2000);
-          // Check the directory again.
-          checkDirJob(true, interval);
+        const jobJSON = await fs.readFile(`${jobDir}/todo/${jobFileNames[0]}`, 'utf8');
+        try {
+          const job = JSON.parse(jobJSON, null, 2);
+          const {id} = job;
+          console.log(`Directory job ${id} found (${nowString()})`);
+          await doJob(job);
+          console.log(`Job ${id} finished (${nowString()})`);
+          // Report it.
+          await writeDirReport(job);
+          // Archive it.
+          await archiveJob(job, true);
+          console.log(`Job ${id} archived in ${jobDir} (${nowString()})`);
+          // If watching is repetitive:
+          if (isForever) {
+            // Wait 2 seconds.
+            await wait(2000);
+            // Check the directory again.
+            checkDirJob(true, interval);
+          }
+        }
+        catch(error) {
+          console.log(`ERROR processing directory job (${error.message})`);
         }
       }
-      catch(error) {
-        console.log(`ERROR processing directory job (${error.message})`);
+      // Otherwise, i.e. if the first one is not yet ready to do:
+      else {
+        // Report this.
+        console.log(`All jobs in ${jobDir} not yet ready to do (${nowString()})`);
+        // Wait for the specified interval.
+        await wait(1000 * interval);
+        // Check the directory again.
+        await checkDirJob(true, interval);
       }
     }
-    // Otherwise, i.e. if there are no more jobs to do in the watched directory:
+    // Otherwise, i.e. if there are no more jobs in the watched directory:
     else {
-      console.log(`No job to do in ${jobDir} (${nowString()})`);
+      console.log(`No job in ${jobDir} (${nowString()})`);
       // Wait for the specified interval.
       await wait(1000 * interval);
       // Check the directory again.

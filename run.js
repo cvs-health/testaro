@@ -772,12 +772,18 @@ const doActs = async (report, actIndex, page) => {
           actInfo = act.which;
         }
       }
+      const message = `>>>> ${act.type}: ${actInfo}`;
       // If granular reporting has been specified:
       if (report.observe) {
-        // Notify the observer of the act.
+        // Notify the observer of the act and log it.
         const whichParam = act.which ? `&which=${act.which}` : '';
         const messageParams = `act=${act.type}${whichParam}`;
-        tellServer(report, messageParams, `>>>> ${act.type}: ${actInfo}`);
+        tellServer(report, messageParams, message);
+      }
+      // Otherwise, i.e. if granular reporting has not been specified:
+      else {
+        // Log the act.
+        console.log(message);
       }
       // Increment the count of acts performed.
       actCount++;
