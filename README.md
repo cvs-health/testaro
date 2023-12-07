@@ -793,7 +793,7 @@ node call dirWatch true 300
 ```
 
 ```javaScript
-node dirWatch true 300
+node dirWatch 300
 ```
 
 The arguments and behaviors described above for execution by a module apply here, too.

@@ -27,14 +27,49 @@
     1: interval in seconds from a no-job check to the next check.
 */
 
+// ########## IMPORTS
+
+// Module to spawn a child process.
+const {spawn} = require('node:child_process');
+
 // ########## CONSTANTS
 
-const interval = process.argv[2];
+const repeat = process.argv[2];
+const interval = process.argv[3];
 
 // ########## FUNCTIONS
 
-// Repeatedly watches for a directory job until one is ready to do and does it.
+// Spawns a one-time directory watch.
+const spawnWatch = () => spawn(
+  'node', 'dirWatch', 'false', interval, {stdio: ['inherit', 'inherit', 'pipe']}
+);
+// Repeatedly spawns a one-time directory watch.
 const reWatch = () => {
+  const watcher = spawnWatch('node', ['call', 'dirWatch', 'false', interval]);
+  let error = '';
+  watcher.stderr.on('data', data => {
+    error += data.toString();
+  });
+  watcher.on('close', async code => {
+    if (error) {
+      if (error.startsWith('Navigation timeout of 30000 ms exceeded')) {
+        console.log('ERROR: Playwright claims 30-second timeout exceeded');
+      }
+      else {
+        console.log(`ERROR watching: ${error.slice(0, 200)}`);
+      }
+    }
+    if (! error && code === 0) {
+      console.log('Watcher exited successfully\n');
+      reWatch();
+    }
+    else if (code) {
+      console.log(`Watcher exited with error code ${code}`);
+    }
+    else {
+      console.log('Watch aborted');
+    }
+  });
 };
 
 // ########## OPERATION

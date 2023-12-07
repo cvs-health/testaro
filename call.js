@@ -107,4 +107,5 @@ else if (fn === 'netWatch' && fnArgs.length === 2) {
 }
 else {
   console.log('ERROR: Invalid statement');
+  process.exit(1);
 }
