@@ -34,7 +34,7 @@ const interval = process.argv[2];
 // ########## FUNCTIONS
 
 // Repeatedly watches for a directory job until one is ready to do and does it.
-const reWatch = () => {
+const dirWatch = () => {
 };
 
 // ########## OPERATION
