@@ -22,21 +22,125 @@
 
 /*
   dirWatch.js
-  Module for launching a one-time directory watch.
-  Argument:
-    1: interval in seconds from a no-job check to the next check.
+  Module for watching a directory for jobs.
 */
+
+// ########## IMPORTS
+
+// Module to perform jobs.
+const {doJob} = require('./run');
 
 // ########## CONSTANTS
 
-const interval = process.argv[2];
+const jobDir = process.env.JOBDIR;
+const reportDir = process.env.REPORTDIR;
 
 // ########## FUNCTIONS
 
-// Repeatedly watches for a directory job until one is ready to do and does it.
-const dirWatch = () => {
+// Gets a segment of a timestamp.
+const tsPart = (timeStamp, startIndex) => timeStamp.slice(startIndex, startIndex + 2);
+// Gets date of a timestamp.
+const dateOf = ts => {
+  const dateString = `20${tsPart(ts, 0)}-${tsPart(ts, 2)}-${tsPart(ts, 4)}`;
+  const timeString = `${tsPart(ts, 7)}:${tsPart(ts, 9)}:00`;
+  const dateTimeString = `${dateString}T${timeString}Z`;
+  return new Date(dateTimeString);
 };
-
-// ########## OPERATION
-
-reWatch();
+// Writes a directory report.
+const writeDirReport = async report => {
+  const jobID = report && report.id;
+  if (jobID) {
+    try {
+      const reportJSON = JSON.stringify(report, null, 2);
+      const reportName = `${jobID}.json`;
+      await fs.mkdir(reportDir, {recursive: true});
+      await fs.writeFile(`${reportDir}/${reportName}`, reportJSON);
+      console.log(`Report ${reportName} saved in ${reportDir}`);
+    }
+    catch(error) {
+      console.log(`ERROR: Failed to write report ${jobID} in ${reportDir} (${error.message})`);
+    }
+  }
+  else {
+    console.log('ERROR: Job has no ID');
+  }
+};
+// Archives a job.
+const archiveJob = async (job, isFile) => {
+  // Save the job in the done subdirectory.
+  const {id} = job;
+  const jobJSON = JSON.stringify(job, null, 2);
+  await fs.mkdir(`${jobDir}/done`, {recursive: true});
+  await fs.writeFile(`${jobDir}/done/${id}.json`, jobJSON);
+  // If the job had been saved as a file in the todo subdirectory:
+  if (isFile) {
+    // Delete the file.
+    await fs.rm(`${jobDir}/todo/${id}.json`);
+  }
+};
+// Waits.
+const wait = ms => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve('');
+    }, ms);
+  });
+};
+/* 
+  Checks for a directory job and, when found, performs and reports it.
+  Arguments:
+  0. Whether to continue watching after a job is run.
+  1: interval in seconds from a no-job check to the next check.
+*/
+exports.dirWatch = async (isForever, intervalInSeconds) => {
+  let notYetRun = true;
+  // As long as watching as to continue:
+  while (isForever || notYetRun) {
+    try {
+      // If there are any jobs in the watched directory:
+      const toDoFileNames = await fs.readdir(`${jobDir}/todo`);
+      const jobFileNames = toDoFileNames.filter(fileName => fileName.endsWith('.json'));
+      if (jobFileNames.length) {
+        // If the first one is ready to do:
+        const firstJobTimeStamp = jobFileNames[0].replace(/-.+$/, '');
+        if (Date.now() > dateOf(firstJobTimeStamp)) {
+          // Get it.
+          const jobJSON = await fs.readFile(`${jobDir}/todo/${jobFileNames[0]}`, 'utf8');
+          try {
+            const job = JSON.parse(jobJSON, null, 2);
+            const {id} = job;
+            console.log(`Directory job ${id} ready to do (${nowString()})`);
+            // Perform it.
+            await doJob(job);
+            console.log(`Job ${id} finished (${nowString()})`);
+            // Report it.
+            await writeDirReport(job);
+            // Archive it.
+            await archiveJob(job, true);
+            console.log(`Job ${id} archived in ${jobDir} (${nowString()})`);
+          }
+          catch(error) {
+            console.log(`ERROR processing directory job (${error.message})`);
+          }
+          notYetRun = false;
+        }
+        // Otherwise, i.e. if the first one is not yet ready to do:
+        else {
+          // Report this.
+          console.log(`All jobs in ${jobDir} not yet ready to do (${nowString()})`);
+          // Wait for the specified interval.
+          await wait(1000 * intervalInSeconds);
+        }
+      }
+      // Otherwise, i.e. if there are no jobs in the watched directory:
+      else {
+        console.log(`No job in ${jobDir} (${nowString()})`);
+        // Wait for the specified interval.
+        await wait(1000 * intervalInSeconds);
+      }
+    }
+    catch(error) {
+      console.log(`ERROR: Directory watching failed (${error.message})`);
+    }
+  }
+};
