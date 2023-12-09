@@ -27,6 +27,10 @@
 
 // ########## IMPORTS
 
+// Module to keep secrets.
+require('dotenv').config();
+// Module to read and write files.
+const fs = require('fs/promises');
 // Module to perform jobs.
 const {doJob} = require('./run');
 
