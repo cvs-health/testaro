@@ -81,12 +81,16 @@ const callRun = async jobIDStart => {
   }
 };
 // Starts a directory watch, converting the interval argument to a number.
-const callDirWatch = async (isForever, interval) => {
-  await dirWatch(isForever === 'true', Math.max(5, Number.parseInt(interval, 10)));
+const callDirWatch = async (isForever, intervalInSeconds) => {
+  await dirWatch(isForever === 'true', Math.max(5, Number.parseInt(intervalInSeconds, 10)));
 };
 // Starts a network watch, converting the interval argument to a number.
-const callNetWatch = async(isForever, interval) => {
-  netWatch(isForever === 'true', Number.parseInt(interval, 10));
+const callNetWatch = async(isForever, intervalInSeconds, isCertTolerant) => {
+  netWatch(
+    isForever === 'true',
+    Number.parseInt(interval, 10),
+    isCertTolerant ? isCertTolerant === 'true' : null
+  );
 };
 
 // OPERATION
@@ -102,7 +106,7 @@ if (fn === 'run' && fnArgs.length < 2) {
 else if (fn === 'dirWatch' && fnArgs.length === 2) {
   callDirWatch(... fnArgs);
 }
-else if (fn === 'netWatch' && fnArgs.length === 2) {
+else if (fn === 'netWatch' && [2, 3].includes(fnArgs.length)) {
   callNetWatch(... fnArgs);
 }
 else {

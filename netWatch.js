@@ -65,7 +65,7 @@ const serveObject = (object, response) => {
   0. whether to continue watching after a job is run.
   1: interval in seconds from a cycle of no-job checks to the next cycle.
 */
-exports.netWatch = async (isForever, interval, isCertTolerant = true) => {
+exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) => {
   const urls = jobURLSpec
   .split('+')
   .map(url => [Math.random(), url])
@@ -75,25 +75,25 @@ exports.netWatch = async (isForever, interval, isCertTolerant = true) => {
   // If the job URLs exist and are valid:
   if (
     urls
-    && urls.length
+    && urlCount
     && urls.every(url => ['http://', 'https://'].some(prefix => url.startsWith(prefix)))
   ) {
     // Configure the watch.
     let tryCount = 0;
     let urlIndex = 0;
-    const urlCount = urls.length;
+    const urlCount = urlCount;
     const certOpt = isCertTolerant ? {rejectUnauthorized: false} : {};
     let abort = false;
     const certInfo = `Certificate-${isCertTolerant ? '' : 'in'}tolerant`;
     const foreverInfo = isForever ? 'repeating' : 'one-job';
-    const intervalInfo = `with ${interval}-second intervals`;
+    const intervalInfo = `with ${intervalInSeconds}-second intervals`;
     console.log(
       `${certInfo} ${foreverInfo} network watching started ${intervalInfo} (${nowString()})\n`
     );
     // As long as watching is to continue:
     while ((isForever || notYetRun) && ! abort) {
       // Wait for the specified interval if all URLs have been checked since the last job.
-      wait (1000 * (tryCount === urlCount ? interval : 1));
+      wait (1000 * (tryCount === urlCount ? intervalInSeconds : 1));
       // Configure the next check.
       const url = jobURLs[urlIndex];
       const logStart = `Requested job from server ${urls[urlIndex]} and got `;
