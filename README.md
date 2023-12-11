@@ -774,7 +774,7 @@ Testaro can watch for a job in a directory, with the `dirWatch` function, which 
 ###### By a module
 
 ```javaScript
-const {dirWatch} = require('./watch');
+const {dirWatch} = require('./dirWatch');
 dirWatch(true, 300);
 ```
 
@@ -786,19 +786,11 @@ Testaro creates a report for each job and saves the report in the directory spec
 
 ###### By a user
 
-A user can choose between two methods:
-
 ```javaScript
 node call dirWatch true 300
 ```
 
-```javaScript
-node dirWatch 300
-```
-
 The arguments and behaviors described above for execution by a module apply here, too.
-
-The second, shorter method spawns a new watch subprocess after each job performance, to decrease the risk of process corruption involving bogus timeout messages from Playwright during jobs. That method requires you to enter `CTRL-c` to stop the watching.
 
 ##### Network watch
 
@@ -808,21 +800,27 @@ An instance of Testaro is an _agent_ and has an identifier specified by `process
 
 The URLs polled by Testaro are specified by `process.env.JOB_URLS`. The format of that environment variable is a `+`-delimited list of URLs, including schemes. If one of the URLs is `https://testrunner.org/a11ytest/api/job`, and if a Testaro instance has the agent ID `tester3`, then a job request is a `GET` request to `https://testrunner.org/a11ytest/api/job?agent=tester3`.
 
-Once a Testaro instance obtains a network job, the report is sent in a `POST` request to the URL specified by the `sources.sendReportTo` property of the job.
+Once a Testaro instance obtains a network job, Testaro performs it and adds the result data to the job, which then becomes the job report. Testaro sends the report in a `POST` request to the URL specified by the `sources.sendReportTo` property of the job.
+
+Network watching can be repeated or 1-job. One-job watching stops after 1 job has been performed.
+
+After checking all the URLs in succession without getting a job from any of them, Testaro waits for a prescribed time before continuing to check.
 
 ###### By a module
 
 ```javaScript
-const {netWatch} = require('./watch');
-netWatch(true, 300);
+const {netWatch} = require('./netWatch');
+netWatch(true, 300, true);
 ```
 
 In this example, a module asks Testaro to check the servers for a job every 300 seconds, to perform any jobs obtained from the servers, and then to continue checking until the process is stopped. If the first argument is `false`, Testaro will stop checking after performing 1 job.
 
+The third argument specifies whether Testaro should be certificate-tolerant. A `true` value makes Testaro accept SSL certificates that fail verification against a list of certificate authorities. This allows testing of `https` targets that, for example, use self-signed certificates. If the third argument is omitted, the default for that argument is implemented. The default is `true`.
+
 ###### By a user
 
 ```javaScript
-node call netWatch true 300
+node call netWatch true 300 true
 ```
 
 The arguments and behaviors described above for execution by a module apply here, too. If the first argument is `true`, you can terminate the process by entering `CTRL-c`.
