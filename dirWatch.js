@@ -60,7 +60,7 @@ const writeDirReport = async report => {
       const reportJSON = JSON.stringify(report, null, 2);
       const reportName = `${jobID}.json`;
       await fs.mkdir(reportDir, {recursive: true});
-      await fs.writeFile(`${reportDir}/${reportName}`, reportJSON);
+      await fs.writeFile(`${reportDir}/${reportName}`, `${reportJSON}\n`);
       console.log(`Report ${reportName} saved in ${reportDir}`);
     }
     catch(error) {
@@ -77,7 +77,7 @@ const archiveJob = async (job, isFile) => {
   const {id} = job;
   const jobJSON = JSON.stringify(job, null, 2);
   await fs.mkdir(`${jobDir}/done`, {recursive: true});
-  await fs.writeFile(`${jobDir}/done/${id}.json`, jobJSON);
+  await fs.writeFile(`${jobDir}/done/${id}.json`, `${jobJSON}\n`);
   // If the job had been saved as a file in the todo subdirectory:
   if (isFile) {
     // Delete the file.
@@ -113,14 +113,15 @@ exports.dirWatch = async (isForever, intervalInSeconds) => {
           // Get it.
           const jobJSON = await fs.readFile(`${jobDir}/todo/${jobFileNames[0]}`, 'utf8');
           try {
-            const job = JSON.parse(jobJSON, null, 2);
+            const job = JSON.parse(jobJSON);
+            const report = JSON.parse(jobJSON);
             const {id} = job;
             console.log(`Directory job ${id} ready to do (${nowString()})`);
             // Perform it.
-            await doJob(job);
+            await doJob(report);
             console.log(`Job ${id} finished (${nowString()})`);
             // Report it.
-            await writeDirReport(job);
+            await writeDirReport(report);
             // Archive it.
             await archiveJob(job, true);
             console.log(`Job ${id} archived in ${jobDir} (${nowString()})`);
