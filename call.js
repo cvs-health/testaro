@@ -41,7 +41,8 @@ const fs = require('fs/promises');
 // Function to process a testing request.
 const {doJob} = require('./run');
 // Function to watch for jobs.
-const {dirWatch, netWatch} = require('./watch');
+const {dirWatch} = require('./dirWatch');
+const {netWatch} = require('./netWatch');
 
 // CONSTANTS
 
@@ -88,7 +89,7 @@ const callDirWatch = async (isForever, intervalInSeconds) => {
 const callNetWatch = async(isForever, intervalInSeconds, isCertTolerant) => {
   netWatch(
     isForever === 'true',
-    Number.parseInt(interval, 10),
+    Number.parseInt(intervalInSeconds, 10),
     isCertTolerant ? isCertTolerant === 'true' : null
   );
 };
