@@ -89,11 +89,13 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
     console.log(
       `${certInfo} ${foreverInfo} network watching started ${intervalInfo} (${nowString()})\n`
     );
+    let noJobYet = true;
     // As long as watching is to continue:
-    while (isForever && ! abort) {
+    while ((isForever || noJobYet) && ! abort) {
       // Wait for the specified interval if all URLs have been checked since the last job.
       wait (1000 * (tryCount === urlCount ? intervalInSeconds : 1));
       // Configure the next check.
+      tryCount = ++tryCount % urlCount;
       const url = jobURLs[urlIndex];
       const logStart = `Requested job from server ${urls[urlIndex]} and got `;
       const fullURL = `${url}?agent=${agent}`;
@@ -136,6 +138,8 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                   }
                   // Otherwise, if the server sent a valid job:
                   else if (id && sources && sources.target && sources.target.which) {
+                    // Prevent further watching, if unwanted.
+                    noJobYet = false;
                     // Cyclically increment the server index.
                     urlIndex = ++urlIndex % urlCount;
                     // Add the agent to the job.
