@@ -90,7 +90,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
       `${certInfo} ${foreverInfo} network watching started ${intervalInfo} (${nowString()})\n`
     );
     // As long as watching is to continue:
-    while ((isForever || notYetRun) && ! abort) {
+    while (isForever && ! abort) {
       // Wait for the specified interval if all URLs have been checked since the last job.
       wait (1000 * (tryCount === urlCount ? intervalInSeconds : 1));
       // Configure the next check.
