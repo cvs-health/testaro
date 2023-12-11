@@ -59,12 +59,12 @@ const writeDirReport = async report => {
     try {
       const reportJSON = JSON.stringify(report, null, 2);
       const reportName = `${jobID}.json`;
-      await fs.mkdir(reportDir, {recursive: true});
-      await fs.writeFile(`${reportDir}/${reportName}`, `${reportJSON}\n`);
-      console.log(`Report ${reportName} saved in ${reportDir}`);
+      await fs.mkdir(`${reportDir}/raw`, {recursive: true});
+      await fs.writeFile(`${reportDir}/raw/${reportName}`, `${reportJSON}\n`);
+      console.log(`Report ${reportName} saved in ${reportDir}/raw`);
     }
     catch(error) {
-      console.log(`ERROR: Failed to write report ${jobID} in ${reportDir} (${error.message})`);
+      console.log(`ERROR: Failed to save report ${jobID} in ${reportDir}/raw (${error.message})`);
     }
   }
   else {
@@ -99,6 +99,7 @@ const wait = ms => {
   1: interval in seconds from a no-job check to the next check.
 */
 exports.dirWatch = async (isForever, intervalInSeconds) => {
+  console.log(`Starting to watch directory ${jobDir}/todo for jobs`);
   let notYetRun = true;
   // As long as watching as to continue:
   while (isForever || notYetRun) {
