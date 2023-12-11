@@ -25,7 +25,7 @@
   Module for watching for a network job and running it when found.
 */
 
-// ########## IMPORTS
+// IMPORTS
 
 // Module to keep secrets.
 require('dotenv').config();
@@ -42,7 +42,7 @@ const {doJob} = require('./run');
 const jobURLSpec = process.env.JOB_URLS;
 const agent = process.env.AGENT;
 
-// ########## FUNCTIONS
+// FUNCTIONS
 
 // Returns a string representing the date and time.
 const nowString = () => (new Date()).toISOString().slice(2, 15);
@@ -65,46 +65,38 @@ const serveObject = (object, response) => {
   0. whether to continue watching after a job is run.
   1: interval in seconds from a cycle of no-job checks to the next cycle.
 */
-exports.netWatch = async (isForever, interval, isCertTolerant) => {
-  const jobURLs = jobURLSpec
+exports.netWatch = async (isForever, interval, isCertTolerant = true) => {
+  const urls = jobURLSpec
   .split('+')
   .map(url => [Math.random(), url])
   .sort((a, b) => a[0] - b[0])
   .map(pair => pair[1]);
-  // If the job URLs are valid:
+  const urlCount = urls.length;
+  // If the job URLs exist and are valid:
   if (
-    jobURLs
-    && jobURLs.length
-    && jobURLs
-    .every(jobURL => ['http://', 'https://'].some(prefix => server.startsWith(prefix)))
+    urls
+    && urls.length
+    && urls.every(url => ['http://', 'https://'].some(prefix => url.startsWith(prefix)))
   ) {
     // Configure the watch.
-    let notYetRun = true;
-    let serverIndex = 0;
-    const urlCount = jobURLs.length;
-    let cycleIndex = 0;
-    let firstCheck = true;
-    const logStart = `Requested job from server ${url} and got `;
+    let tryCount = 0;
+    let urlIndex = 0;
+    const urlCount = urls.length;
     const certOpt = isCertTolerant ? {rejectUnauthorized: false} : {};
     let abort = false;
-    console.log(`Network watching started with ${interval}-second intervals (${nowString()})\n`);
-    // As long as watching as to continue:
+    const certInfo = `Certificate-${isCertTolerant ? '' : 'in'}tolerant`;
+    const foreverInfo = isForever ? 'repeating' : 'one-job';
+    const intervalInfo = `with ${interval}-second intervals`;
+    console.log(
+      `${certInfo} ${foreverInfo} network watching started ${intervalInfo} (${nowString()})\n`
+    );
+    // As long as watching is to continue:
     while ((isForever || notYetRun) && ! abort) {
-      // If a cycle is not starting or this is the first check:
-      if (cycleIndex || firstCheck) {
-        // Wait briefly.
-        wait (1000);
-        firstCheck === false;
-      }
-      // Otherwise, i.e. if a cycle is starting after the first check:
-      else {
-        // Log this.
-        console.log('--');
-        // Wait for the specified interval.
-        wait (1000 * interval);
-      }
+      // Wait for the specified interval if all URLs have been checked since the last job.
+      wait (1000 * (tryCount === urlCount ? interval : 1));
       // Configure the next check.
-      const url = jobURLs[serverIndex];
+      const url = jobURLs[urlIndex];
+      const logStart = `Requested job from server ${urls[urlIndex]} and got `;
       const fullURL = `${url}?agent=${agent}`;
       // Perform it.
       await new Promise(resolve => {
@@ -145,20 +137,17 @@ exports.netWatch = async (isForever, interval, isCertTolerant) => {
                   }
                   // Otherwise, if the server sent a valid job:
                   else if (id && sources && sources.target && sources.target.which) {
-                    // Increment the server index.
-                    serverIndex = ++serverIndex % urlCount;
-                    // Restart the cycle with the next server.
-                    cycleIndex = 0;
-                    firstCheck = true;
+                    // Cyclically increment the server index.
+                    urlIndex = ++urlIndex % urlCount;
                     // Add the agent to the job.
                     sources.agent = agent;
                     // If the job specifies a report destination:
                     const {sendReportTo} = sources;
                     if (sendReportTo) {
                       // Perform the job, adding result data to it.
-                      const testee = sources.target.which;
+                      const target = sources.target.which;
                       console.log(`${logStart}job ${id} (${nowString()}`);
-                      console.log(`>> It will test ${testee}`);
+                      console.log(`>> It will test ${target}`);
                       console.log(`>> It will send report to ${sendReportTo}`);
                       await doJob(contentObj);
                       let reportJSON = JSON.stringify(contentObj, null, 2);
@@ -188,7 +177,7 @@ exports.netWatch = async (isForever, interval, isCertTolerant) => {
                             const {message} = ackObj;
                             if (message) {
                               // Report it.
-                              console.log(`${reportLogStart}${message}\n`);
+                              console.log(`${reportLogStart}message ${message}\n`);
                               // Free the memory used by the report.
                               reportJSON = '';
                               contentObj = {};
@@ -231,7 +220,7 @@ exports.netWatch = async (isForever, interval, isCertTolerant) => {
                       resolve(true);
                     }
                   }
-                  // Otherwise, if the server sent an invalid job:
+                  // Otherwise, i.e. if the server sent an invalid job:
                   else {
                     // Report this.
                     const message
@@ -242,7 +231,7 @@ exports.netWatch = async (isForever, interval, isCertTolerant) => {
                   }
                 }
               }
-              // If an error is thrown:
+              // If processing the server response throws an error:
               catch(error) {
                 // Report this.
                 console.log(`ERROR: ${error.message} (response ${content.slice(0, 1000)})`);
@@ -254,12 +243,12 @@ exports.netWatch = async (isForever, interval, isCertTolerant) => {
           .on('error', async error => {
             // If it is a refusal to connect:
             const {message} = error;
-            if (message.includes('ECONNREFUSED')) {
+            if (message && message.includes('ECONNREFUSED')) {
               // Report this.
               console.log(`${logStart}no connection`);
             }
             // Otherwise, if it was a DNS failure:
-            else if (message.includes('ENOTFOUND')) {
+            else if (message && message.includes('ENOTFOUND')) {
               // Report this.
               console.log(`${logStart}no domain name resolution`);
             }
@@ -274,30 +263,22 @@ exports.netWatch = async (isForever, interval, isCertTolerant) => {
             }
             resolve(true);
           })
-          // Finish sending the request.
+          // Finish sending the job request.
           .end();
         }
+        // If requesting a job throws an error:
         catch(error) {
-          console.log(`ERROR watching for network jobs (${error.message})`);
+          // Report this.
+          console.log(`ERROR requesting a network job (${error.message})`);
           abort = true;
           resolve(true);
         }
       });
     }
   }
-  // Otherwise, i.e. if the job URLs are invalid:
+  // Otherwise, i.e. if the job URLs do not exist or are invalid:
   else {
     // Report this.
     console.log('ERROR: List of job URLs invalid');
   }
-};
-// Checks for a network job, performs it, and submits a report, once or repeatedly.
-exports.netWatch = async (isForever, interval = 300) => {
-  console.log('Starting netWatch');
-  // If the servers to be checked are valid:
-  const servers = jobURLs
-  .split('+')
-  .map(url => [Math.random(), url])
-  .sort((a, b) => a[0] - b[0])
-  .map(pair => pair[1]);
 };
