@@ -150,7 +150,7 @@ Here is an example of a job:
 
 ```javascript
 {
-  id: 'be76p-ts25-w3c',
+  id: '241213T1200-ts25-w3c',
   what: 'Test W3C with 2 alfa rules',
   strict: true,
   timeLimit: 65,
@@ -178,8 +178,8 @@ Here is an example of a job:
     },
     requester: 'user@domain.org'
   },
-  creationTime: '2023-05-26T14:28',
-  timeStamp: 'be76p'
+  creationTime: '2024-12-10T14:28Z',
+  timeStamp: '241213T1200'
 }
 ```
 
@@ -198,8 +198,8 @@ Job properties:
    - `batch` (optional): a set of targets (URLs) from which the target of this job was drawn.
    - `target` (optional): an object describing the target being tested by this job.
    - `requester` (optional): the email address that should receive a notice of completion of the job.
-- `creationTime`: the time when the job was created.
-- `timeStamp`: a string unique to this job.
+- `creationTime`: the time in ISO 8601 format when the job was created.
+- `timeStamp`: a string representing the date and time before which the job is not to be performed.
 
 ### Reports
 
