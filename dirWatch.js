@@ -43,6 +43,8 @@ const reportDir = process.env.REPORTDIR;
 
 // Gets a segment of a timestamp.
 const tsPart = (timeStamp, startIndex) => timeStamp.slice(startIndex, startIndex + 2);
+// Returns a string representing the date and time.
+const nowString = () => (new Date()).toISOString().slice(0, 14);
 // Gets date of a timestamp.
 const dateOf = ts => {
   const dateString = `20${tsPart(ts, 0)}-${tsPart(ts, 2)}-${tsPart(ts, 4)}`;
@@ -143,8 +145,12 @@ exports.dirWatch = async (isForever, intervalInSeconds) => {
         await wait(1000 * intervalInSeconds);
       }
     }
+    // If a fatal error was thrown:
     catch(error) {
-      console.log(`ERROR: Directory watching failed (${error.message})`);
+      // Report this.
+      console.log(`ERROR: Directory watching failed (${error.message}); watching aborted`);
+      // Quit watching.
+      break;
     }
   }
 };
