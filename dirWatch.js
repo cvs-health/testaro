@@ -61,7 +61,7 @@ const writeDirReport = async report => {
       const reportName = `${jobID}.json`;
       await fs.mkdir(`${reportDir}/raw`, {recursive: true});
       await fs.writeFile(`${reportDir}/raw/${reportName}`, `${reportJSON}\n`);
-      console.log(`Report ${reportName} saved in ${reportDir}/raw`);
+      console.log(`Report ${jobID} saved in ${reportDir}/raw`);
     }
     catch(error) {
       console.log(`ERROR: Failed to save report ${jobID} in ${reportDir}/raw (${error.message})`);
