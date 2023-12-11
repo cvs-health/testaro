@@ -81,7 +81,6 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
     // Configure the watch.
     let tryCount = 0;
     let urlIndex = 0;
-    const urlCount = urlCount;
     const certOpt = isCertTolerant ? {rejectUnauthorized: false} : {};
     let abort = false;
     const certInfo = `Certificate-${isCertTolerant ? '' : 'in'}tolerant`;
