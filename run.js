@@ -277,14 +277,10 @@ const isValidReport = report => {
     if (typeof sources.script !== 'string') {
       return 'Bad source script';
     }
-    if (
-      ! creationTime
-      || typeof creationTime !== 'string'
-      || ! /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(creationTime)
-    ) {
+    if (! (creationTime && typeof creationTime === 'string' && Date.parse(creationTime))) {
       return 'bad job creation time';
     }
-    if (! timeStamp || typeof timeStamp !== 'string') {
+    if (! (timeStamp && typeof timeStamp === 'string')) {
       return 'bad report timestamp';
     }
     return '';
