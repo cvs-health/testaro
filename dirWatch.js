@@ -44,7 +44,7 @@ const reportDir = process.env.REPORTDIR;
 // Gets a segment of a timestamp.
 const tsPart = (timeStamp, startIndex) => timeStamp.slice(startIndex, startIndex + 2);
 // Returns a string representing the date and time.
-const nowString = () => (new Date()).toISOString().slice(0, 14);
+const nowString = () => (new Date()).toISOString().slice(0, 16);
 // Gets date of a timestamp.
 const dateOf = ts => {
   const dateString = `20${tsPart(ts, 0)}-${tsPart(ts, 2)}-${tsPart(ts, 4)}`;
