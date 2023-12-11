@@ -83,6 +83,7 @@ const archiveJob = async (job, isFile) => {
     // Delete the file.
     await fs.rm(`${jobDir}/todo/${id}.json`);
   }
+  console.log(`Job ${id} archived in ${jobDir}/done (${nowString()})`);
 };
 // Waits.
 const wait = ms => {
@@ -125,7 +126,6 @@ exports.dirWatch = async (isForever, intervalInSeconds) => {
             await writeDirReport(report);
             // Archive it.
             await archiveJob(job, true);
-            console.log(`Job ${id} archived in ${jobDir} (${nowString()})`);
           }
           catch(error) {
             console.log(`ERROR processing directory job (${error.message})`);
