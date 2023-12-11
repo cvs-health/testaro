@@ -96,7 +96,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
       wait (1000 * (tryCount === urlCount ? intervalInSeconds : 1));
       // Configure the next check.
       tryCount = ++tryCount % urlCount;
-      const url = jobURLs[urlIndex];
+      const url = urls[urlIndex];
       const logStart = `Requested job from server ${urls[urlIndex]} and got `;
       const fullURL = `${url}?agent=${agent}`;
       // Perform it.
