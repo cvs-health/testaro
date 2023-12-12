@@ -289,6 +289,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
         }
       });
     }
+    console.log('Watching complete');
   }
   // Otherwise, i.e. if the job URLs do not exist or are invalid:
   else {

@@ -86,12 +86,13 @@ const callDirWatch = async (isForever, intervalInSeconds) => {
   await dirWatch(isForever === 'true', Math.max(5, Number.parseInt(intervalInSeconds, 10)));
 };
 // Starts a network watch, converting the interval argument to a number.
-const callNetWatch = async(isForever, intervalInSeconds, isCertTolerant) => {
-  netWatch(
+const callNetWatch = async (isForever, intervalInSeconds, isCertTolerant) => {
+  await netWatch(
     isForever === 'true',
     Number.parseInt(intervalInSeconds, 10),
     isCertTolerant ? isCertTolerant === 'true' : undefined
   );
+  console.log('netWatch run');
 };
 
 // OPERATION
@@ -105,10 +106,18 @@ if (fn === 'run' && fnArgs.length < 2) {
   });
 }
 else if (fn === 'dirWatch' && fnArgs.length === 2) {
-  callDirWatch(... fnArgs);
+  callDirWatch(... fnArgs)
+  .then(() => {
+    console.log('Directory watch ended');
+    process.exit(0);
+  });
 }
 else if (fn === 'netWatch' && [2, 3].includes(fnArgs.length)) {
-  callNetWatch(... fnArgs);
+  callNetWatch(... fnArgs)
+  .then(() => {
+    console.log('Network watch ended');
+    process.exit(0);
+  });
 }
 else {
   console.log('ERROR: Invalid statement');
