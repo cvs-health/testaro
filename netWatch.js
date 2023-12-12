@@ -104,7 +104,6 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
         // Wait briefly.
         await wait(1000);
       }
-      await wait (1000 * (cycleIndex === urlCount - 1 ? intervalInSeconds : 1));
       // Configure the next check.
       cycleIndex = ++cycleIndex % urlCount;
       urlIndex = ++urlIndex % urlCount;
