@@ -92,7 +92,18 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
     );
     // As long as watching is to continue:
     while ((isForever || noJobYet) && ! abort) {
-      // Wait for the specified interval if the cycle is complete.
+      // If the cycle is complete:
+      if (cycleIndex === urlCount - 1) {
+        // Wait for the specified interval.
+        await wait(1000 * intervalInSeconds);
+        // Log the start of a cycle.
+        console.log('--');
+      }
+      // Otherwise, i.e. if the cycle is incomplete:
+      else {
+        // Wait briefly.
+        await wait(1000);
+      }
       await wait (1000 * (cycleIndex === urlCount - 1 ? intervalInSeconds : 1));
       // Configure the next check.
       cycleIndex = ++cycleIndex % urlCount;
