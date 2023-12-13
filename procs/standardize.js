@@ -282,7 +282,7 @@ const doQualWeb = (result, standardResult, ruleClassName) => {
           const instance = {
             ruleID,
             what: item.description,
-            ordinalSeverity: severities[ruleClassName][item.verdict],
+            ordinalSeverity: severities[ruleClassName][item.verdict] || 0,
             tagName: identifiers[0],
             id: identifiers[1],
             location: {

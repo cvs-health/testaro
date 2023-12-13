@@ -114,15 +114,11 @@ exports.reporter = async (page, options) => {
       else {
         const bestPractices = bestSpec.slice(5).split(',').map(num => `QW-BP${num}`);
         qualWebOptions['best-practices'] = {bestPractices};
-        // qualWebOptions.execute.bp = true;
-        // Temporarily disable best practices, because they crash QualWeb.
-        qualWebOptions.execute.bp = false;
+        qualWebOptions.execute.bp = true;
       }
     }
     else {
-      // qualWebOptions.execute.bp = true;
-      // Temporarily disable best practices, because they crash QualWeb.
-      qualWebOptions.execute.bp = false;
+      qualWebOptions.execute.bp = true;
     }
     // Get the report.
     let actReports = await qualWeb.evaluate(qualWebOptions);
