@@ -59,7 +59,7 @@ const serveObject = (object, response) => {
   response.setHeader('Content-Type', 'application/json; charset=utf-8');
   response.end(JSON.stringify(object));
 };
-/* 
+/*
   Requests a network job and, when found, performs and reports it.
   Arguments:
   0. whether to continue watching after a job is run.
@@ -256,22 +256,26 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
           // If the job request throws an error:
           .on('error', async error => {
             // If it is a refusal to connect:
-            const {message} = error;
-            if (message && message.includes('ECONNREFUSED')) {
+            if (error.code && error.code.includes('ECONNREFUSED')) {
               // Report this.
               console.log(`${logStart}no connection`);
             }
             // Otherwise, if it was a DNS failure:
-            else if (message && message.includes('ENOTFOUND')) {
+            else if (error.code && error.code.includes('ENOTFOUND')) {
               // Report this.
               console.log(`${logStart}no domain name resolution`);
             }
-            // Otherwise, i.e. if it was any other error:
+            // Otherwise, if it was any other error with a message:
+            else if (error.message) {
+              // Report this.
+              console.log(`ERROR: ${logStart}got error message ${error.message.slice(0, 200)}`);
+              // Abort the watch.
+              abort = true;
+            }
+            // Otherwise, i.e. if it was any other error with no message:
             else {
               // Report this.
-              console.log(
-                `ERROR: ${logStart}no response, but got error message ${error.message.slice(0, 200)}`
-              );
+              console.log(`ERROR: ${logStart}got an error with no message`);
               // Abort the watch.
               abort = true;
             }
