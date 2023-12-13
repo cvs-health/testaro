@@ -64,6 +64,7 @@ const serveObject = (object, response) => {
   Arguments:
   0. whether to continue watching after a job is run.
   1: interval in seconds from a cycle of no-job checks to the next cycle.
+  2. whether to ignore unknown-certificate errors from watched servers.
 */
 exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) => {
   const urls = jobURLSpec

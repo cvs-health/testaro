@@ -154,6 +154,9 @@ Here is an example of a job:
   what: 'Test W3C with 2 alfa rules',
   strict: true,
   timeLimit: 65,
+  standard: 'only',
+  observe: false,
+  timeStamp: '231208T1200',
   acts: [
     {
       type: 'launch',
@@ -178,8 +181,7 @@ Here is an example of a job:
     },
     requester: 'user@domain.org'
   },
-  creationTime: '2024-12-10T14:28Z',
-  timeStamp: '241213T1200'
+  creationTime: '2024-12-10T14:28Z'
 }
 ```
 
@@ -192,14 +194,16 @@ Job properties:
 - `what`: a description of the job.
 - `strict`: `true` or `false`, indicating whether _substantive redirections_ should be treated as failures. These are redirections that do more than add or subtract a final slash.
 - `timeLimit`: the number of seconds allowed for the execution of the job.
+- `standard`: `'also'`, `'only'`, or `'no'`, indicating whether rule-violation instances are to be reported in tool-native formats and also in the Testaro standard format, only in the standard format, or only in the tool-native formats.
+- `observe`: `true` or `false`, indicating whether tool and Testaro-rule invocations are to be reported as they occur to the server.
+- `timeStamp`: a string in `yymmddThhMM` format, specifying a date and time before which the job is not to be performed.
 - `acts`: an array of the acts to be performed (documented below).
 - `sources`: an object describing where the job came from:
    - `script` (optional): the ID of the script from which the job was made.
    - `batch` (optional): a set of targets (URLs) from which the target of this job was drawn.
    - `target` (optional): an object describing the target being tested by this job.
    - `requester` (optional): the email address that should receive a notice of completion of the job.
-- `creationTime`: the time in ISO 8601 format when the job was created.
-- `timeStamp`: a string representing the date and time before which the job is not to be performed.
+- `creationTime`: the date and time in ISO 8601 format when the job was created.
 
 ### Reports
 
