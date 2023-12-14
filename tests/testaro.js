@@ -129,7 +129,7 @@ const wait = ms => {
     }, ms);
   });
 };
-// Conducts and reports Testaro tests.
+// Conducts and reports the Testaro tests.
 exports.reporter = async (page, options) => {
   const {report, withItems, stopOnFail, args} = options;
   const argRules = args ? Object.keys(args) : null;

@@ -38,7 +38,7 @@ const clusterOptions = {
 
 // FUNCTIONS
 
-// Conducts and reports a QualWeb test.
+// Conducts and reports the QualWeb tests.
 exports.reporter = async (page, options) => {
   const {withNewContent, rules} = options;
   const data = {};

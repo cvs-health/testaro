@@ -38,6 +38,7 @@ const fs = require('fs/promises');
 
 // ########## FUNCTIONS
 
+// Conducts and reports the Nu Html Checker tests.
 exports.reporter = async (page, options) => {
   const {rules} = options;
   // Get the browser-parsed page.

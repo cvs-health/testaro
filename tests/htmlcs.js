@@ -32,7 +32,7 @@ const fs = require('fs/promises');
 
 // FUNCTIONS
 
-// Runs HTML CodeSniffer on the page and returns an act report.
+// Conducts and reports the HTML CodeSniffer tests.
 exports.reporter = async (page, options) => {
   const {report, rules} = options;
   const data = {};

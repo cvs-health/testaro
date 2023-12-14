@@ -21,8 +21,8 @@
 */
 
 /*
-  aslint
-  This test implements the ASLint ruleset for accessibility.
+  ed11y
+  This test implements the Editoria11y ruleset for accessibility.
 */
 
 // IMPORTS
@@ -32,8 +32,29 @@ const fs = require('fs/promises');
 
 // FUNCTIONS
 
-// Conducts and reports the ASLint tests.
+// Conducts and reports the Editoria11y tests.
 exports.reporter = async (page, options) => {
+  // Add the ed11y script to the page.
+  const testScript = await fs.readFile('../ed11y/editoria11y.min.js', 'utf8');
+  const results = await page.evaluate(script => {
+    const testScript = document.createElement('script');
+    testScript.textContent = script;
+    document.body.insertAdjacentElement('beforeend', testScript);
+    const runScript = document.createElement('script');
+    runLines = [
+      'document.addEventListener("ed11yResults", () => {',
+      '  const resultObj = Ed11yResults();',
+      '  const resultJSON = JSON.stringify(resultObj);',
+      '  const container = document.createElement("pre");',
+      '  container.id = "resultContainer";',
+      '  container.textContent = resultJSON;',
+      '  document.body.insertAdjacentElement("beforeend", container);',
+      '}'
+    ];
+    runScript.textContent = runLines.join('\n');
+    document.body.insertAdjacentElement('beforeend', runScript);
+    return document.getElementById('resultContainer').textContent;
+  });
   // Initialize the act report.
   let data = {};
   let result = {};

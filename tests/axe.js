@@ -47,7 +47,7 @@ const {injectAxe, getAxeResults} = require('axe-playwright');
 
 // FUNCTIONS
 
-// Conducts and reports an Axe test.
+// Conducts and reports the Axe tests.
 exports.reporter = async (page, options) => {
   const {detailLevel, rules} = options;
   // Initialize the act report.

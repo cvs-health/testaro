@@ -176,7 +176,7 @@ const doTest = async (content, withItems, timeLimit, rules) => {
     };
   }
 };
-// Performs ibm tests and returns an act report.
+// Conducts and reports the IBM Equal Access tests.
 exports.reporter = async (page, options) => {
   const {withItems, withNewContent, rules} = options;
   const contentType = withNewContent ? 'new' : 'existing';

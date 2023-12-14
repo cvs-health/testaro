@@ -33,7 +33,7 @@ let alfaRules = require('@siteimprove/alfa-rules').default;
 
 // FUNCTIONS
 
-// Conducts and reports an alfa test.
+// Conducts and reports the alfa tests.
 exports.reporter = async (page, options) => {
   const {rules} = options;
   // If only some rules are to be employed:

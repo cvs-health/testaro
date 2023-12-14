@@ -26,8 +26,15 @@
   specifies a WAVE report type: 1, 2, 3, or 4. The larger the number, the more detailed (and
   expensive) the report.
 */
+
+// CONSTANTS
+
 const fs = require('fs/promises');
 const https = require('https');
+
+// FUNCTIONS
+
+// Conducts and reports the WAVE tests.
 exports.reporter = async (page, options) => {
   const {reportType, rules} = options;
   const waveKey = process.env.WAVE_KEY;
