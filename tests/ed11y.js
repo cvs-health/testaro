@@ -34,102 +34,31 @@ const fs = require('fs/promises');
 
 // Conducts and reports the Editoria11y tests.
 exports.reporter = async (page, options) => {
-  // Add the ed11y script to the page.
+  // Add the ed11y test script to the page.
   const testScript = await fs.readFile('../ed11y/editoria11y.min.js', 'utf8');
   const results = await page.evaluate(script => {
     const testScript = document.createElement('script');
     testScript.textContent = script;
     document.body.insertAdjacentElement('beforeend', testScript);
-    const runScript = document.createElement('script');
-    runLines = [
-      'document.addEventListener("ed11yResults", () => {',
-      '  const resultObj = Ed11yResults();',
-      '  const resultJSON = JSON.stringify(resultObj);',
-      '  const container = document.createElement("pre");',
-      '  container.id = "resultContainer";',
-      '  container.textContent = resultJSON;',
-      '  document.body.insertAdjacentElement("beforeend", container);',
-      '}'
-    ];
-    runScript.textContent = runLines.join('\n');
-    document.body.insertAdjacentElement('beforeend', runScript);
-    return document.getElementById('resultContainer').textContent;
-  });
+  }, testScript);
+  // Get the result of that script.
+  const rawResultJSON = await page.evaluate(async () => await new Promise(resolve => {
+    document.on('edd11yResults', () => {
+      const resultObj = Ed11yResults();
+      const resultJSON = JSON.stringify(resultObj);
+      resolve(resultJSON);
+    });
+  }));
+  const result = JSON.parse(rawResultJSON);
+  console.log(JSON.stringify(result, null, 2));
   // Initialize the act report.
   let data = {};
-  let result = {};
-  // Get the ASLint runner and bundle scripts.
-  const aslintRunner = await fs.readFile(`${__dirname}/../procs/aslint.js`, 'utf8');
-  const aslintBundle = await fs.readFile(
-    `${__dirname}/../node_modules/aslint-testaro/aslint.bundle.js`, 'utf8'
-  );
-  // Get the nonce, if any.
-  const {report} = options;
-  const {jobData} = report;
-  const scriptNonce = jobData && jobData.lastScriptNonce;
-  // Inject the ASLint bundle and runner into the page.
-  await page.evaluate(args => {
-    const {scriptNonce, aslintBundle, aslintRunner} = args;
-    // Bundle.
-    const bundleEl = document.createElement('script');
-    bundleEl.id = 'aslintBundle';
-    if (scriptNonce) {
-      bundleEl.nonce = scriptNonce;
-      console.log(`Added nonce ${scriptNonce} to bundle`);
-    }
-    bundleEl.textContent = aslintBundle;
-    document.head.insertAdjacentElement('beforeend', bundleEl);
-    // Runner.
-    const runnerEl = document.createElement('script');
-    if (scriptNonce) {
-      runnerEl.nonce = scriptNonce;
-      console.log(`Added nonce ${scriptNonce} to runner`);
-    }
-    runnerEl.textContent = aslintRunner;
-    document.body.insertAdjacentElement('beforeend', runnerEl);
-  }, {scriptNonce, aslintBundle, aslintRunner})
-  .catch(error => {
-    const message = `ERROR: ASLint injection failed (${error.message.slice(0, 400)})`;
-    console.log(message);
-    data.prevented = true;
-    data.error = message;
-  });
-  // If the injection succeeded:
-  const reportLoc = page.locator('#aslintResult');
-  if (! data.prevented) {
-    // Wait for the test results.
-    await reportLoc.waitFor({
-      state: 'attached',
-      timeout: 30000
-    })
-    .catch(error => {
-      const message = `ERROR: Results timed out (${error.message.slice(0, 400)})`;
-      console.log(message);
-      data.prevented = true;
-      data.error = message;
-    });
-  }
-  // If the results arrived in time:
-  if (! data.prevented) {
-    // Get them.
-    const actReport = await reportLoc.textContent();
-    // Populate the act report.
-    result = JSON.parse(actReport);
-    // Delete irrelevant properties from the tool report details.
-    if (result.rules) {
-      Object.keys(result.rules).forEach(ruleID => {
-        if (['passed', 'skipped'].includes(result.rules[ruleID].status.type)) {
-          delete result.rules[ruleID];
-        }
-      });
-    }
-  }
+  // Delete irrelevant properties from the tool report details.
   // Return the act report.
   try {
     JSON.stringify(data);
   }
   catch(error) {
-    const message = `ERROR: ASLint result cannot be made JSON (${error.message.slice(0, 200)})`;
     data = {
       prevented: true,
       error: message

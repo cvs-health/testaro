@@ -58,6 +58,7 @@ const tools = {
   alfa: 'alfa',
   aslint: 'ASLint',
   axe: 'Axe',
+  ed11y: 'Editoria11y',
   htmlcs: 'HTML CodeSniffer WCAG 2.1 AA ruleset',
   ibm: 'IBM Accessibility Checker',
   nuVal: 'Nu Html Checker',
