@@ -38,8 +38,30 @@ exports.reporter = async (page, options) => {
   const script = await fs.readFile(`${__dirname}/../ed11y/editoria11y.min.js`, 'utf8');
   const rawResultJSON = await page.evaluate(script => new Promise(resolve => {
     document.addEventListener('ed11yResults', () => {
-      const resultArray = Ed11y.results;
-      const resultJSON = JSON.stringify(resultArray, null, 2);
+      const resultObj = {};
+      [
+        'version',
+        'options',
+        'elements',
+        'results',
+        'mediaCount',
+        'roots',
+        'imageAlts',
+        'headingOutline',
+        'errorCount',
+        'warningCount',
+        'dismissedCount',
+        'totalCount'
+      ]
+      .forEach(key => {
+        resultObj[key] = Ed11y[key];
+      });
+      // Delete useless properties from the result.
+      resultObj.imageAlts = resultObj.imageAlts.filter(item => item[3] !== 'pass');
+      delete resultObj.options.sleekTheme;
+      delete resultObj.options.darkTheme;
+      delete resultObj.options.lightTheme;
+      const resultJSON = JSON.stringify(resultObj);
       resolve(resultJSON);
     });
     const testScript = document.createElement('script');
@@ -52,7 +74,6 @@ exports.reporter = async (page, options) => {
   }), script);
   const result = JSON.parse(rawResultJSON);
   let data = {};
-  // Delete irrelevant properties from the tool report details.
   // Return the act report.
   return {
     data,
