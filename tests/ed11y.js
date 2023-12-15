@@ -61,6 +61,29 @@ exports.reporter = async (page, options) => {
       delete resultObj.options.sleekTheme;
       delete resultObj.options.darkTheme;
       delete resultObj.options.lightTheme;
+      // Delete useless and add properties to the element results.
+      resultObj.results.forEach(elResult => {
+        delete elResult.position;
+        delete elResult.dismissalKey;
+        delete elResult.dismissalStatus;
+        if (elResult.element) {
+          elResult.tagName = elResult.element.tagName || '';
+          elResult.id = elResult.element.id || '';
+          const locRect = elResult.element.getBoundingClientRect();
+          elResult.loc = {};
+          ['x', 'y', 'width', 'height'].forEach(dim => {
+            elResult.loc[dim] = locRect[dim];
+          });
+          let elText = elResult.element.textContent.replace(/\s+/g, ' ').trim();
+          if (! elText) {
+            elText = elResult.element.outerHTML;
+          }
+          if (elText.length > 400) {
+            elText = `${elText.slice(0, 200)}…${elText.slice(-200)}`;
+          }
+          elResult.excerpt = elText.replace(/\s+/g, ' ');
+        }
+      });
       const resultJSON = JSON.stringify(resultObj);
       resolve(resultJSON);
     });
@@ -68,6 +91,7 @@ exports.reporter = async (page, options) => {
     testScript.id = 'testScript';
     testScript.textContent = script;
     document.body.insertAdjacentElement('beforeend', testScript);
+    console.log('Script inserted');
     new Ed11y({
       alertMode: 'headless'
     });

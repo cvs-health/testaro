@@ -440,6 +440,7 @@ const convert = (toolName, data, result, standardResult) => {
   // axe
   else if (
     toolName === 'axe'
+    && result
     && result.totals
     && (result.totals.rulesWarned || result.totals.rulesViolated)
   ) {
@@ -452,6 +453,23 @@ const convert = (toolName, data, result, standardResult) => {
     ];
     doAxe(result, standardResult, 'incomplete');
     doAxe(result, standardResult, 'violations');
+  }
+  // ed11y
+  else if (
+    toolName === 'ed11y'
+    && result
+    && ['results', 'errorCount', 'warningCount'].every(key => result[key] !== undefined)
+  ) {
+    const {results, errorCount, warningCount} = result;
+    standardResult.totals = [warningCount, 0, errorCount, 0];
+
+    const {instances} = standardResult;
+    standardResult.totals = [
+      instances.filter(instance => instance.ordinalSeverity === 0).length,
+      0,
+      0,
+      instances.filter(instance => instance.ordinalSeverity === 3).length
+    ];
   }
   // htmlcs
   else if (toolName === 'htmlcs' && result) {
