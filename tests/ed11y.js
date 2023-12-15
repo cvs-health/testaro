@@ -34,36 +34,26 @@ const fs = require('fs/promises');
 
 // Conducts and reports the Editoria11y tests.
 exports.reporter = async (page, options) => {
-  // Add the ed11y test script to the page.
-  const testScript = await fs.readFile('../ed11y/editoria11y.min.js', 'utf8');
-  const results = await page.evaluate(script => {
-    const testScript = document.createElement('script');
-    testScript.textContent = script;
-    document.body.insertAdjacentElement('beforeend', testScript);
-  }, testScript);
-  // Get the result of that script.
-  const rawResultJSON = await page.evaluate(async () => await new Promise(resolve => {
-    document.on('edd11yResults', () => {
-      const resultObj = Ed11yResults();
-      const resultJSON = JSON.stringify(resultObj);
+  // Get the result of the ed11y test script.
+  const script = await fs.readFile(`${__dirname}/../ed11y/editoria11y.min.js`, 'utf8');
+  const rawResultJSON = await page.evaluate(script => new Promise(resolve => {
+    document.addEventListener('ed11yResults', () => {
+      const resultArray = Ed11y.results;
+      const resultJSON = JSON.stringify(resultArray, null, 2);
       resolve(resultJSON);
     });
-  }));
+    const testScript = document.createElement('script');
+    testScript.id = 'testScript';
+    testScript.textContent = script;
+    document.body.insertAdjacentElement('beforeend', testScript);
+    new Ed11y({
+      alertMode: 'headless'
+    });
+  }), script);
   const result = JSON.parse(rawResultJSON);
-  console.log(JSON.stringify(result, null, 2));
-  // Initialize the act report.
   let data = {};
   // Delete irrelevant properties from the tool report details.
   // Return the act report.
-  try {
-    JSON.stringify(data);
-  }
-  catch(error) {
-    data = {
-      prevented: true,
-      error: message
-    };
-  }
   return {
     data,
     result
