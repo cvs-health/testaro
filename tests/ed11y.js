@@ -34,10 +34,18 @@ const fs = require('fs/promises');
 
 // Conducts and reports the Editoria11y tests.
 exports.reporter = async (page, options) => {
-  // Get the result of the ed11y test script.
+  // Get the nonce, if any.
+  const {report} = options;
+  const {jobData} = report;
+  const scriptNonce = jobData && jobData.lastScriptNonce;
+  // Get the test script.
   const script = await fs.readFile(`${__dirname}/../ed11y/editoria11y.min.js`, 'utf8');
-  const rawResultJSON = await page.evaluate(script => new Promise(resolve => {
+  const rawResultJSON = await page.evaluate(args => new Promise(async resolve => {
+    const {scriptNonce, script} = args;
+    // When the script is executed:
     document.addEventListener('ed11yResults', () => {
+      console.log('Event occurred');
+      // Get the result.
       const resultObj = {};
       [
         'version',
@@ -61,7 +69,7 @@ exports.reporter = async (page, options) => {
       delete resultObj.options.sleekTheme;
       delete resultObj.options.darkTheme;
       delete resultObj.options.lightTheme;
-      // Delete useless, compact verbose, and extend properties of the element results.
+      // Revise the properties of the element results.
       resultObj.results.forEach(elResult => {
         if (elResult.content) {
           elResult.content = elResult.content.replace(/\s+/g, ' ');
@@ -87,18 +95,33 @@ exports.reporter = async (page, options) => {
           elResult.excerpt = elText.replace(/\s+/g, ' ');
         }
       });
+      // Return the result.
       const resultJSON = JSON.stringify(resultObj);
+      console.log('About to return result');
       resolve(resultJSON);
+      console.log('Done');
     });
+    // Add the test script to the page.
     const testScript = document.createElement('script');
-    testScript.id = 'testScript';
+    if (scriptNonce) {
+      testScript.nonce = scriptNonce;
+      console.log(`Added nonce ${scriptNonce} to script`);
+    }
     testScript.textContent = script;
     document.body.insertAdjacentElement('beforeend', testScript);
-    console.log('Script inserted');
-    new Ed11y({
-      alertMode: 'headless'
-    });
-  }), script);
+    // Run the script.
+    try {
+      await new Ed11y({
+        alertMode: 'headless'
+      });
+      console.log(`Ran script by creating Ed11y`);
+    }
+    catch(error) {
+      console.log(`ERROR creating Ed11y (${error.message})`);
+      resolve(JSON.stringify({error: error.message}));
+    };
+  }), {scriptNonce, script});
+  console.log(`About to parse result`);
   const result = JSON.parse(rawResultJSON);
   let data = {};
   // Return the act report.

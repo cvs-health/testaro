@@ -47,6 +47,7 @@ Testaro performs tests of these tools:
 - [alfa](https://alfa.siteimprove.com/) (Siteimprove)
 - [aslint](https://www.npmjs.com/package/@essentialaccessibility/aslint) (eSSENTIAL Accessibility)
 - [axe-playwright](https://www.npmjs.com/package/axe-playwright) (Deque)
+- [Editoria11y](https://github.com/itmaybejj/editoria11y) (Princeton University)
 - [HTML CodeSniffer](https://www.npmjs.com/package/html_codesniffer) (Squiz Labs)
 - [Nu Html Checker](https://github.com/validator/validator) (World Wide Web Consortium)
 - [QualWeb core](https://www.npmjs.com/package/@qualweb/core) (University of Lisbon)
@@ -57,36 +58,23 @@ Some of the tests of Testaro are designed to act as approximate alternatives to 
 
 ## Rules
 
-Each tool accessed with Testaro defines _rules_ and tests _targets_ for compliance with its rules. In total, the nine tools define about 960 rules. The latest tabulation of tool rules is:
+Each tool accessed with Testaro defines _rules_ and tests _targets_ for compliance with its rules. In total, the nine tools define about a thousand rules. The latest tabulation of tool rules is:
 
 ```
 alfa: 59
 aslint: 136
 axe: 80
+ed11y: 24
 htmlcs: 115
 ibm: 132
 nuVal: 215
 qualWeb: 131
-testaro: 36
+testaro: 40
 wave: 58
-total: 962
+total: 990
 ```
 
 Some of the tools are under active development, and their rule counts change over time.
-
-When you ask Testaro to run tests of a tool, you may specify a subset of the rules of that tool, and the report will give you the results of only the tests for those rules. These tools will perform only those tests:
-- `alfa`
-- `axe`
-- `htmlcs`
-- `qualWeb`
-- `testaro`
-
-These tools always perform a fixed set of tests, and Testaro disregards irrelevant results when you specify a set of rules:
-- `ibm`
-- `nuVal`
-- `wave`
-
-The `aslint` tool does not yet allow rule specification.
 
 ## Job data
 
@@ -430,7 +418,7 @@ When you include a `rules` property, you limit the tests of the tool that are pe
 
 The `nuVal`, `qualWeb`, and `testaro` tools require specific formats for the `rules` property. Those formats are described below in the sections about those tools.
 
-The `aslint` tool does not yet allow rule specification.
+The `aslint` and `ed11y` tools do not yet allow rule specification.
 
 ###### Examples
 
@@ -508,11 +496,32 @@ A typical use for an `expect` property is checking the correctness of a Testaro 
 
 When a `test` act has an `expect` property, the result for that act has an `expectations` property reporting whether the expectations were satisfied. The value of `expectations` is an array of objects, one object per expectation. Each object includes a `property` property identifying the expectation, and a `passed` property with `true` or `false` value reporting whether the expectation was satisfied. If applicable, it also has other properties identifying what was expected and what was actually reported.
 
-###### ASLint
+##### Branching
+
+An example of a **branching** act is:
+
+```json
+{
+  "type": "next",
+  "if": ["totals.invalid", ">", 0],
+  "jump": -4,
+  "what": "redo search if any invalid elements"
+}
+```
+
+This act checks the result of the previous act to determine whether its `result.totals.invalid` property has a positive value. If so, it changes the next act to be performed, specifying the act 4 acts before this one.
+
+A `next` act can use a `next` property instead of a `jump` property. The value of the `next` property is an act name. It tells Testaro to continue performing acts starting with the act having that value as the value of its `name` property.
+
+#### Tools
+
+The tools whose tests Testaro performs have particularities described below.
+
+##### ASLint
 
 The `aslint` tool makes use of the [`aslint-testaro` fork](https://www.npmjs.com/package/aslint-testaro) of the [`aslint` repository](https://github.com/essentialaccessibility/aslint), which, unlike the published `aslint` package, contains the `aslint.bundle.js` file.
 
-###### HTML CodeSniffer
+##### HTML CodeSniffer
 
 The `htmlcs` tool makes use of the `htmlcs/HTMLCS.js` file. That file was created, and can be recreated if necessary, as follows:
 
@@ -544,7 +553,7 @@ The changes in `htmlcs/HTMLCS.js` are:
 >       );
 ```
 
-###### IBM Equal Access
+##### IBM Equal Access
 
 The `ibm` tests require the `aceconfig.js` file.
 
@@ -571,13 +580,13 @@ The `ibm` tool is one of two tools (`testaro` is the other) with a `withItems` p
 
 Experimentation indicates that the `ibm` tools emits untrappable errors for some targets when the content argument given to it is the page content rather than the page URL. Therefore, it is safer to use `true` as the value of `withNewContent` for the `ibm` tool.
 
-###### Nu Html Checker
+##### Nu Html Checker
 
 The `nuVal` tool performs the tests of the Nu Html Checker.
 
 Its `rules` argument is **not** an array of rule IDs, but instead is an array of rule _specifications_. A rule specification for `nuVal` is a string with the format `=ruleID` or `~ruleID`. The `=` prefix indicates that the rule ID is invariable. The `~` prefix indicates that the rule ID is variable, in which case the `ruleID` part of the specification is a matching regular expression, rather than the exact text of a message. This `rules` format arises from the fact that `nuVal` generates customized messages and does not accompany them with rule identifiers.
 
-###### QualWeb
+##### QualWeb
 
 The `qualWeb` tool performs the ACT rules, WCAG Techniques, and best-practices tests of QualWeb. Only failures and warnings are included in the report. The EARL report of QualWeb is not generated, because it is equivalent to the report of the ACT rules tests.
 
@@ -601,7 +610,7 @@ Thus, when the `rules` argument is omitted, QualWeb will test for all of the rul
 
 The target can be provided to QualWeb either as an existing page or as a URL. Experience indicates that the results can differ between these methods, with each method reporting some rule violations or some instances that the other method does not report.
 
-###### Testaro
+##### Testaro
 
 If you do not specify rules when using the `testaro` tool, Testaro will test for the rules listed in the `evalRules` object of the `tests/testaro.js` file.
 
@@ -617,30 +626,13 @@ Several Testaro tests make use of the `init()` function in the `procs/testaro` m
 
 You can add custom rules to the rules of any tool. Testaro provides a template, `data/template.js`, for the definition of a rule to be added. Once you have created a copy of the template with revisions, you can move the copy into the `testaro` directory and add an entry for your custom rule to the `evalRules` object in the `tests/testaro.js` file. Then your custom rule will act as a Testaro rule. Some `testaro` rules are simple enough to be fully specified in JSON files. You can use any of those as a template if you want to create a sufficiently simple custom rule, namely a rule whose prohibited elements are all and only the elements matching a CSS selector. More details about rule creation are in the `CONTRIBUTING.md` file.
 
-###### WAVE
+##### WAVE
 
 If a `wave` test act is included in the job, an environment variable named `WAVE_KEY` must exist, with your WAVE API key as its value. You can get it from [WebAIM](https://wave.webaim.org/api/).
 
 The `wave` API does not accept a transmitted document for testing. WAVE must be given only a URL, which it then visits to perform its tests. Therefore, you cannot manipulate a page and then have WAVE test it, or ask WAVE to test a page that cannot be reached directly with a URL.
 
 This limitation of WAVE may be overcome in a future version of Testaro by means of the invocation of the WAVE Chrome extension with Playwright.
-
-##### Branching
-
-An example of a **branching** act is:
-
-```json
-{
-  "type": "next",
-  "if": ["totals.invalid", ">", 0],
-  "jump": -4,
-  "what": "redo search if any invalid elements"
-}
-```
-
-This act checks the result of the previous act to determine whether its `result.totals.invalid` property has a positive value. If so, it changes the next act to be performed, specifying the act 4 acts before this one.
-
-A `next` act can use a `next` property instead of a `jump` property. The value of the `next` property is an act name. It tells Testaro to continue performing acts starting with the act having that value as the value of its `name` property.
 
 #### Browser types
 
@@ -887,6 +879,12 @@ On rare occasions a test throws an error that cannot be handled with a `try`-`ca
 Testing to determine what happens when a control or link is activated is straightforward, except in the context of a comprehensive set of tests of a single page. There, activating a control or link can change the page or navigate away from it, interfering with the remaining planned tests of the page.
 
 The Playwright “Receives Events” actionability check does **not** check whether an event is dispatched on an element. It checks only whether a click on the location of the element makes the element the target of that click, rather than some other element occupying the same location.
+
+### Test prevention
+
+Test targets employ mechanisms to prevent scraping, automated form submission, and other automated actions. These mechanisms may interfere with testing. When a test act is prevented by a target, Testaro reports this prevention.
+
+Some targets prohibit the execution of alien scripts unless the client can demonstrate that it is the requester of the page. Failure to provide that evidence results in the script being blocked and an error message being logged, saying “Refused to execute a script because its hash, its nonce, or unsafe-inline does not appear in the script-src directive of the Content Security Policy”. This mechanism affects tools that insert scripts into a target in order to test it. Those tools include `axe`, `asLint`, `ed11y`, and `htmlcs`. To comply with this requirement, Testaro obtains a _nonce_ from the response that serves the target. Then the file that runs the tool adds that nonce to the script as the value of a `nonce` attribute when it inserts its script into the target.
 
 ### Tool duplicativity
 
