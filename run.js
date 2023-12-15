@@ -1569,7 +1569,7 @@ exports.doJob = async report => {
   // If the report is valid:
   const reportInvalidity = isValidReport(report);
   if (reportInvalidity) {
-    console.log(reportInvalidity);
+    console.log(`ERROR: ${reportInvalidity}`);
   }
   else {
     // Add initialized job data to the report.

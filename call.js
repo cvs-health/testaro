@@ -59,9 +59,11 @@ const rawDir = `${reportDir}/raw`;
 const callRun = async jobIDStart => {
   // Find the job.
   const jobDirFileNames = await fs.readdir(todoDir);
-  const jobFileName = jobIDStart
-  ? jobDirFileNames.find(fileName => fileName.startsWith(jobIDStart))
-  : jobDirFileNames[0];
+  const jobFileNames = jobDirFileNames.filter(fileName => fileName.endsWith('.json'));
+  const specifiedJobFileNames = jobIDStart
+  ? jobFileNames.filter(fileName => fileName.startsWith(jobIDStart))
+  : jobFileNames;
+  const jobFileName = specifiedJobFileNames[0];
   // If it exists:
   if (jobFileName) {
     // Get it.
@@ -78,7 +80,7 @@ const callRun = async jobIDStart => {
   // Otherwise, i.e. if the job does not exist.
   else {
     // Report the error.
-    console.log(`ERROR: No to-do job ID starts with ${jobIDStart}`);
+    console.log('ERROR: No specified job exists');
   }
 };
 // Starts a directory watch, converting the interval argument to a number.
