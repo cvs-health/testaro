@@ -61,8 +61,11 @@ exports.reporter = async (page, options) => {
       delete resultObj.options.sleekTheme;
       delete resultObj.options.darkTheme;
       delete resultObj.options.lightTheme;
-      // Delete useless and add properties to the element results.
+      // Delete useless, compact verbose, and extend properties of the element results.
       resultObj.results.forEach(elResult => {
+        if (elResult.content) {
+          elResult.content = elResult.content.replace(/\s+/g, ' ');
+        }
         delete elResult.position;
         delete elResult.dismissalKey;
         delete elResult.dismissalStatus;
@@ -72,7 +75,7 @@ exports.reporter = async (page, options) => {
           const locRect = elResult.element.getBoundingClientRect();
           elResult.loc = {};
           ['x', 'y', 'width', 'height'].forEach(dim => {
-            elResult.loc[dim] = locRect[dim];
+            elResult.loc[dim] = Math.round(locRect[dim]);
           });
           let elText = elResult.element.textContent.replace(/\s+/g, ' ').trim();
           if (! elText) {

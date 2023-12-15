@@ -460,16 +460,37 @@ const convert = (toolName, data, result, standardResult) => {
     && result
     && ['results', 'errorCount', 'warningCount'].every(key => result[key] !== undefined)
   ) {
+    // Populate the totals of the standard result.
     const {results, errorCount, warningCount} = result;
     standardResult.totals = [warningCount, 0, errorCount, 0];
-
-    const {instances} = standardResult;
-    standardResult.totals = [
-      instances.filter(instance => instance.ordinalSeverity === 0).length,
-      0,
-      0,
-      instances.filter(instance => instance.ordinalSeverity === 3).length
-    ];
+    // For each result:
+    results.forEach(result => {
+      const {element, test, content, tagName, id, loc, excerpt} = result;
+      if (['element', 'test', 'content'].every(key => result[key])) {
+        // Standardize the what property.
+        let what = '';
+        if (content.includes('<p>This')) {
+          what = content.replace(/^.*?<p>(This.+?)<\/p> *<p>(.*?)<\/p>.*/, '$1 $2');
+        }
+        else {
+          what = content.replace(/^.*?<p>(.+?)<\/p>.*/, '$1');
+        }
+        // Add a standard instance to the standard result.
+        standardResult.instances.push({
+          ruleID: result.test,
+          what,
+          ordinalSeverity: 0,
+          tagName,
+          id,
+          location: {
+            doc: 'dom',
+            type: 'box',
+            spec: loc
+          },
+          excerpt
+        });
+      }
+    });
   }
   // htmlcs
   else if (toolName === 'htmlcs' && result) {
