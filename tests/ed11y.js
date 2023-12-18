@@ -44,62 +44,73 @@ exports.reporter = async (page, options) => {
     const {scriptNonce, script} = args;
     // When the script is executed:
     document.addEventListener('ed11yResults', () => {
-      console.log('Event occurred');
       // Get the result.
       const resultObj = {};
       [
         'version',
         'options',
-        'elements',
-        'results',
         'mediaCount',
-        'roots',
-        'imageAlts',
-        'headingOutline',
         'errorCount',
         'warningCount',
         'dismissedCount',
         'totalCount'
       ]
       .forEach(key => {
-        resultObj[key] = Ed11y[key];
+        try {
+          resultObj[key] = Ed11y[key];
+        }
+        catch(error) {
+          console.log(`ERROR: invalid value of ${key} property of Ed11y (${error.message})`);
+        }
       });
+      // Get data on the text alternatives of images from the result.
+      resultObj.imageAlts = Ed11y
+      .imageAlts
+      .filter(item => item[3] !== 'pass')
+      .map(item => item.slice(1));
       // Delete useless properties from the result.
-      resultObj.imageAlts = resultObj.imageAlts.filter(item => item[3] !== 'pass');
       delete resultObj.options.sleekTheme;
       delete resultObj.options.darkTheme;
       delete resultObj.options.lightTheme;
-      // Revise the properties of the element results.
-      resultObj.results.forEach(elResult => {
+      // Initialize the element results.
+      const results = resultObj.results = [];
+      // Populate them and add them to the result.
+      Ed11y.results.forEach(elResult => {
+        const result = {};
         if (elResult.content) {
-          elResult.content = elResult.content.replace(/\s+/g, ' ');
+          result.content = elResult.content.replace(/\s+/g, ' ');
         }
-        delete elResult.position;
-        delete elResult.dismissalKey;
-        delete elResult.dismissalStatus;
         if (elResult.element) {
-          elResult.tagName = elResult.element.tagName || '';
-          elResult.id = elResult.element.id || '';
-          const locRect = elResult.element.getBoundingClientRect();
-          elResult.loc = {};
-          ['x', 'y', 'width', 'height'].forEach(dim => {
-            elResult.loc[dim] = Math.round(locRect[dim]);
-          });
-          let elText = elResult.element.textContent.replace(/\s+/g, ' ').trim();
+          const{element} = elResult;
+          result.tagName = element.tagName || '';
+          result.id = element.id || '';
+          result.loc = {};
+          const locRect = element.getBoundingClientRect();
+          if (locRect) {
+            ['x', 'y', 'width', 'height'].forEach(dim => {
+              result.loc[dim] = Math.round(locRect[dim]);
+            });
+          }
+          let elText = element.textContent.replace(/\s+/g, ' ').trim();
           if (! elText) {
-            elText = elResult.element.outerHTML;
+            elText = element.outerHTML;
           }
           if (elText.length > 400) {
             elText = `${elText.slice(0, 200)}…${elText.slice(-200)}`;
           }
-          elResult.excerpt = elText.replace(/\s+/g, ' ');
+          result.excerpt = elText.replace(/\s+/g, ' ');
         }
+        results.push(result);
       });
       // Return the result.
-      const resultJSON = JSON.stringify(resultObj);
-      console.log('About to return result');
-      resolve(resultJSON);
-      console.log('Done');
+      try {
+        const resultJSON = JSON.stringify(resultObj);
+        resolve(resultJSON);
+      }
+      catch(error) {
+        console.log(`ERROR stringifying result object (${error.message})`);
+        resolve('{}');
+      }
     });
     // Add the test script to the page.
     const testScript = document.createElement('script');
@@ -114,14 +125,12 @@ exports.reporter = async (page, options) => {
       await new Ed11y({
         alertMode: 'headless'
       });
-      console.log(`Ran script by creating Ed11y`);
     }
     catch(error) {
       console.log(`ERROR creating Ed11y (${error.message})`);
       resolve(JSON.stringify({error: error.message}));
     };
   }), {scriptNonce, script});
-  console.log(`About to parse result`);
   const result = JSON.parse(rawResultJSON);
   let data = {};
   // Return the act report.
