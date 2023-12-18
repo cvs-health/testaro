@@ -77,6 +77,7 @@ exports.reporter = async (page, options) => {
       // Populate them and add them to the result.
       Ed11y.results.forEach(elResult => {
         const result = {};
+        result.test = elResult.test || '';
         if (elResult.content) {
           result.content = elResult.content.replace(/\s+/g, ' ');
         }

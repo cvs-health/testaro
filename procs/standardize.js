@@ -465,8 +465,8 @@ const convert = (toolName, data, result, standardResult) => {
     standardResult.totals = [warningCount, 0, errorCount, 0];
     // For each result:
     results.forEach(result => {
-      const {element, test, content, tagName, id, loc, excerpt} = result;
-      if (['element', 'test', 'content'].every(key => result[key])) {
+      const {test, content, tagName, id, loc, excerpt} = result;
+      if (['test', 'content'].every(key => result[key])) {
         // Standardize the what property.
         let what = '';
         if (content.includes('<p>This')) {
@@ -477,7 +477,7 @@ const convert = (toolName, data, result, standardResult) => {
         }
         // Add a standard instance to the standard result.
         standardResult.instances.push({
-          ruleID: result.test,
+          ruleID: test,
           what,
           ordinalSeverity: 0,
           tagName,
