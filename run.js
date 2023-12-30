@@ -1567,13 +1567,17 @@ const doActs = async (report, actIndex, page) => {
 */
 exports.doJob = async report => {
   // If the report is valid:
+  report.jobData = {};
+  const {jobData} = report;
   const reportInvalidity = isValidReport(report);
   if (reportInvalidity) {
     console.log(`ERROR: ${reportInvalidity}`);
+    jobData.aborted = true;
+    jobData.abortedAct = null;
+    jobData.abortError = reportInvalidity;
   }
   else {
     // Add initialized job data to the report.
-    report.jobData = {};
     const startTime = new Date();
     report.jobData.startTime = nowString();
     report.jobData.endTime = '';
