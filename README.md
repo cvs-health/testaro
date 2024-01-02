@@ -608,7 +608,7 @@ When no string pertains to a module, then QualWeb will test for all of the rules
 
 Thus, when the `rules` argument is omitted, QualWeb will test for all of the rules in all of these modules.
 
-The target can be provided to QualWeb either as an existing page or as a URL. Experience indicates that the results can differ between these methods, with each method reporting some rule violations or some instances that the other method does not report.
+The target can be provided to QualWeb either as an existing page or as a URL. Experience indicates that the results can differ between these methods, with each method reporting some rule violations or some instances that the other method does not report. For at least some cases, more rules are reported violated when an existing page is provided (`withNewItems: false`).
 
 ##### Testaro
 
