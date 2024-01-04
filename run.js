@@ -552,7 +552,7 @@ const launch = async (report, typeName, url, debug, waits, isLowMotion = false) 
   }
 };
 // Returns a string representing the date and time.
-const nowString = () => (new Date()).toISOString().slice(0, 19);
+const nowString = () => (new Date()).toISOString().slice(2, 16);
 // Returns the first line of an error message.
 const errorStart = error => error.message.replace(/\n.+/s, '');
 // Normalizes spacing characters and cases in a string.

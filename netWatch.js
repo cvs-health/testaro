@@ -45,7 +45,7 @@ const agent = process.env.AGENT;
 // FUNCTIONS
 
 // Returns a string representing the date and time.
-const nowString = () => (new Date()).toISOString().slice(2, 15);
+const nowString = () => (new Date()).toISOString().slice(2, 16);
 // Waits.
 const wait = ms => {
   return new Promise(resolve => {
@@ -160,7 +160,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                     if (sendReportTo) {
                       // Perform the job, adding result data to it.
                       const target = sources.target.which;
-                      console.log(`${logStart}job ${id} (${nowString()}`);
+                      console.log(`${logStart}job ${id} (${nowString()})`);
                       console.log(`>> It will test ${target}`);
                       console.log(`>> It will send report to ${sendReportTo}`);
                       await doJob(contentObj);
@@ -219,7 +219,9 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                       // If the report submission throws an error:
                       .on('error', async error => {
                         // Report this.
-                        console.log(`ERROR: ${reportLogStart}error message ${error.message}\n`);
+                        console.log(
+                          `ERROR in report submission: ${reportLogStart}error message ${error.message}\n`
+                        );
                         resolve(true);
                       })
                       // Finish submitting the report.
@@ -229,8 +231,8 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                     else {
                       // Report this.
                       const message = `ERROR: ${logStart}job with no report destination`;
-                      serveObject({message}, response);
                       console.log(message);
+                      serveObject({message}, response);
                       resolve(true);
                     }
                   }
@@ -248,7 +250,9 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
               // If processing the server response throws an error:
               catch(error) {
                 // Report this.
-                console.log(`ERROR: ${error.message} (response ${content.slice(0, 1000)})`);
+                console.log(
+                  `ERROR processing server response: ${error.message} (response ${content.slice(0, 1000)})`
+                );
                 resolve(true);
               }
             });

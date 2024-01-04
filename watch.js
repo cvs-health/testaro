@@ -47,7 +47,7 @@ const agent = process.env.AGENT;
 // ########## FUNCTIONS
 
 // Returns a string representing the date and time.
-const nowString = () => (new Date()).toISOString().slice(0, 19);
+const nowString = () => (new Date()).toISOString().slice(2, 16);
 // Waits.
 const wait = ms => {
   return new Promise(resolve => {
