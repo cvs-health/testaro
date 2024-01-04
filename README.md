@@ -144,7 +144,6 @@ Here is an example of a job:
   timeLimit: 65,
   standard: 'only',
   observe: false,
-  timeStamp: '231208T1200',
   acts: [
     {
       type: 'launch',
@@ -164,12 +163,14 @@ Here is an example of a job:
     batch: 'weborgs',
     target: {
       id: 'w3c',
-      which: 'https://www.w3c.org',
-      what: 'World Wide Web Consortium'
+      what: 'World Wide Web Consortium',
+      which: 'https://www.w3c.org'
     },
     requester: 'user@domain.org'
   },
-  creationTime: '2024-12-10T14:28Z'
+  timeStamp: '241208T1200',
+  creationTimeStamp: '241114T0328',
+  sendReportTo: 'https://localhost:3004/testapp/api/report'
 }
 ```
 
@@ -185,13 +186,16 @@ Job properties:
 - `standard`: `'also'`, `'only'`, or `'no'`, indicating whether rule-violation instances are to be reported in tool-native formats and also in the Testaro standard format, only in the standard format, or only in the tool-native formats.
 - `observe`: `true` or `false`, indicating whether tool and Testaro-rule invocations are to be reported as they occur to the server.
 - `timeStamp`: a string in `yymmddThhMM` format, specifying a date and time before which the job is not to be performed.
+- `creationTimeStamp`: a string in `yymmddThhMM` format, describing when the job was created.
 - `acts`: an array of the acts to be performed (documented below).
 - `sources`: an object describing where the job came from:
-   - `script` (optional): the ID of the script from which the job was made.
-   - `batch` (optional): a set of targets (URLs) from which the target of this job was drawn.
-   - `target` (optional): an object describing the target being tested by this job.
-   - `requester` (optional): the email address that should receive a notice of completion of the job.
-- `creationTime`: the date and time in ISO 8601 format when the job was created.
+   - `script`: the ID of the script from which the job was made, or an empty string if none.
+   - `batch` : the ID of the batch from which the target of this job was drawn, or an empty string if none.
+   - `target`: an object whose `id`, `what`, and `which` properties describe the target being tested by this job, or, if there was no batch, have empty strings as values.
+   - `requester`: the email address that should receive a notice of completion of the job, or an empty string if no notice is to be sent.
+- `creationTimeStamp`: the date and time in `yymmddThhMM` format when the job was created.
+- `timeStamp`: the date and time in `yymmddThhMM` format before which the job is not to be assigned.
+- `sendReportTo`: the URL to which the report of the job is to be sent, or an empty string if the report is not to be sent to a server.
 
 ### Reports
 
