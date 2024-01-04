@@ -224,11 +224,31 @@ const isValidAct = act => {
     return false;
   }
 };
+// Inserts a character periodically in a string.
+const punctuate = (string, insertion, chunkSize) => {
+  const segments = [];
+  let startIndex = 0;
+  while (startIndex < string.length) {
+    segments.push(string.slice(startIndex, startIndex + chunkSize));
+    startIndex += chunkSize;
+  }
+  return segments.join(insertion);
+};
+// Converts a compact timestamp to a date.
+const dateOf = timeStamp => {
+  if (/^\d{6}T\d{4}$/.test(timeStamp)) {
+    const dateString = punctuate(timeStamp.slice(0, 6), '-', 2);
+    const timeString = punctuate(timeStamp.slice(7, 11), ':', 2);
+    return new Date(`20${dateString}T${timeString}Z`);
+  } else {
+    return null;
+  }
+};
 // Validates a report object.
 const isValidReport = report => {
   if (report) {
     // Return whether the report is valid.
-    const {id, what, strict, timeLimit, acts, sources, creationTime, timeStamp} = report;
+    const {id, what, strict, timeLimit, acts, sources, creationTimeStamp, timeStamp} = report;
     if (! id || typeof id !== 'string') {
       return 'Bad report ID';
     }
@@ -278,11 +298,13 @@ const isValidReport = report => {
     if (typeof sources.script !== 'string') {
       return 'Bad source script';
     }
-    if (! (creationTime && typeof creationTime === 'string' && Date.parse(creationTime))) {
-      return 'bad job creation time';
+    if (
+      ! (creationTimeStamp && typeof creationTimeStamp === 'string' && dateOf(creationTimeStamp))
+    ) {
+      return 'bad job creation time stamp';
     }
     if (! (timeStamp && typeof timeStamp === 'string')) {
-      return 'bad report timestamp';
+      return 'bad report time stamp';
     }
     return '';
   }

@@ -395,7 +395,6 @@ const convert = (toolName, data, result, standardResult) => {
               && ruleResult.message.actual
               && ruleResult.message.actual.description
             ) {
-
               const what = ruleResult.message.actual.description;
               // Get its differentiated ID if any.
               const ruleData = aslintData[ruleID];
@@ -409,10 +408,16 @@ const convert = (toolName, data, result, standardResult) => {
                 }
               }
               const xpath = ruleResult.element && ruleResult.element.xpath || '';
-              const tagName = xpath
+              let tagName = xpath
               && xpath.replace(/^.*\//, '').replace(/[^-\w].*$/, '').toUpperCase()
               || '';
+              if (! tagName && finalRuleID.endsWith('_svg')) {
+                tagName = 'SVG';
+              }
               const excerpt = ruleResult.element && ruleResult.element.html || '';
+              if (! tagName && /^<[a-z]+[ >]/.test(excerpt)) {
+                tagName = excerpt.slice(1).replace(/[ >]+/, '').toUpperCase();
+              }
               const idDraft = excerpt && excerpt.replace(/^[^[>]+id="/, 'id=').replace(/".*$/, '');
               const id = idDraft && idDraft.length > 3 && idDraft.startsWith('id=')
                 ? idDraft.slice(3)

@@ -205,7 +205,7 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
         }
         // Otherwise, i.e. if there was a job or a message:
         else {
-          const {message, id, sources} = contentObj;
+          const {id, message, sendReportTo, sources} = contentObj;
           // If the server sent a message, not a job:
           if (message) {
             // Report it.
@@ -218,7 +218,6 @@ const checkNetJob = async (servers, serverIndex, isForever, interval, noJobCount
             // Add the agent to it.
             sources.agent = agent;
             // If the job specifies a report destination:
-            const {sendReportTo} = sources;
             if (sendReportTo) {
               // Perform the job, adding result data to it.
               const testee = sources.target.which;

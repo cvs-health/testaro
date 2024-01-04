@@ -141,7 +141,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                 }
                 // Otherwise, i.e. if there was a job or a message:
                 else {
-                  const {message, id, sources} = contentObj;
+                  const {id, message, sendReportTo, sources} = contentObj;
                   // If the server sent a message, not a job:
                   if (message) {
                     // Report it.
@@ -157,7 +157,6 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                     // Add the agent to the job.
                     sources.agent = agent;
                     // If the job specifies a report destination:
-                    const {sendReportTo} = sources;
                     if (sendReportTo) {
                       // Perform the job, adding result data to it.
                       const target = sources.target.which;

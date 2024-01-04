@@ -35,7 +35,7 @@ const agent = process.env.AGENT;
 
 // Sends a notification to an observer.
 exports.tellServer = (report, messageParams, logMessage) => {
-  const observer = report.sources.sendReportTo.replace(/report$/, 'granular');
+  const observer = report.sendReportTo.replace(/report$/, 'granular');
   const whoParams = `agent=${agent}&jobID=${report.id || ''}`;
   const wholeURL = `${observer}?${whoParams}&${messageParams}`;
   const client = wholeURL.startsWith('https://') ? httpsClient : httpClient;

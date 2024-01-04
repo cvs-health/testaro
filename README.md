@@ -170,7 +170,8 @@ Here is an example of a job:
   },
   timeStamp: '241208T1200',
   creationTimeStamp: '241114T0328',
-  sendReportTo: 'https://localhost:3004/testapp/api/report'
+  sendReportTo: 'https://localhost:3004/testapp/api/report',
+  mergeID: Q9
 }
 ```
 
@@ -189,13 +190,14 @@ Job properties:
 - `creationTimeStamp`: a string in `yymmddThhMM` format, describing when the job was created.
 - `acts`: an array of the acts to be performed (documented below).
 - `sources`: an object describing where the job came from:
-   - `script`: the ID of the script from which the job was made, or an empty string if none.
-   - `batch` : the ID of the batch from which the target of this job was drawn, or an empty string if none.
+   - `script`: the ID of the script (as used by Testilo) from which the job was made, or an empty string if none.
+   - `batch` : the ID of the batch (as used by Testilo) from which the target of this job was drawn, or an empty string if none.
    - `target`: an object whose `id`, `what`, and `which` properties describe the target being tested by this job, or, if there was no batch, have empty strings as values.
    - `requester`: the email address that should receive a notice of completion of the job, or an empty string if no notice is to be sent.
 - `creationTimeStamp`: the date and time in `yymmddThhMM` format when the job was created.
 - `timeStamp`: the date and time in `yymmddThhMM` format before which the job is not to be assigned.
 - `sendReportTo`: the URL to which the report of the job is to be sent, or an empty string if the report is not to be sent to a server.
+- `mergeID`: a randomly generated alphanumeric ID for the process (such as a merger, as performed by Testilo, of a script and a batch) that created the job, or an empty string if none.
 
 ### Reports
 
@@ -761,7 +763,7 @@ node call run be76p
 
 In the second example, `be76p` is the initial characters of the ID of a job saved as a JSON file in the `todo` subdirectory of the `process.env.JOBDIR` directory.
 
-The `call` module will find the first job file with a matching name if an argument is given, or the first job file if not. Then the module will execute the `doJob` function of the `run` module on the job, save the report in the `raw` subdirectory of the `process.env.REPORTDIR` directory, and archive the job file in the `done` subdirectory of the `process.env.JOBDIR` directory.
+The `call` module will find the first job file with a matching name if an argument is given, or the first job file if not. Then the module will execute the `doJob` function of the `run` module on the job, save the report in the `raw` subdirectory of the `REPORTDIR` directory, and archive the job file in the `done` subdirectory of the `JOBDIR` directory.
 
 #### Watch
 
@@ -800,7 +802,7 @@ An instance of Testaro is an _agent_ and has an identifier specified by `process
 
 The URLs polled by Testaro are specified by `process.env.JOB_URLS`. The format of that environment variable is a `+`-delimited list of URLs, including schemes. If one of the URLs is `https://testrunner.org/a11ytest/api/job`, and if a Testaro instance has the agent ID `tester3`, then a job request is a `GET` request to `https://testrunner.org/a11ytest/api/job?agent=tester3`.
 
-Once a Testaro instance obtains a network job, Testaro performs it and adds the result data to the job, which then becomes the job report. Testaro sends the report in a `POST` request to the URL specified by the `sources.sendReportTo` property of the job.
+Once a Testaro instance obtains a network job, Testaro performs it and adds the result data to the job, which then becomes the job report. Testaro sends the report in a `POST` request to the URL specified by the `sendReportTo` property of the job.
 
 Network watching can be repeated or 1-job. One-job watching stops after 1 job has been performed.
 
