@@ -63,15 +63,21 @@ exports.reporter = async (page, options) => {
             delete categories.aria;
             // If rules were specified:
             if (rules && rules.length) {
-              // Delete the results of tests for other rules.
+              // For each WAVE rule category:
               ['error', 'contrast', 'alert'].forEach(category => {
+                // If any violations were reported:
                 if (
                   categories[category]
                   && categories[category].items
                   && Object.keys(categories[category].items).length
                 ) {
+                  // For each rule violated:
                   Object.keys(categories[category].items).forEach(ruleID => {
+                    // If it was not a specified rule:
                     if (! rules.includes(ruleID)) {
+                      // Decrease the category violation count by the count of its violations.
+                      categories[category].count -= categories[category].items[ruleID].count;
+                      // Remove its violations from the report.
                       delete categories[category].items[ruleID];
                     }
                   });

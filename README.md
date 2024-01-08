@@ -890,7 +890,7 @@ The Playwright “Receives Events” actionability check does **not** check whet
 
 Test targets employ mechanisms to prevent scraping, automated form submission, and other automated actions. These mechanisms may interfere with testing. When a test act is prevented by a target, Testaro reports this prevention.
 
-Some targets prohibit the execution of alien scripts unless the client can demonstrate that it is the requester of the page. Failure to provide that evidence results in the script being blocked and an error message being logged, saying “Refused to execute a script because its hash, its nonce, or unsafe-inline does not appear in the script-src directive of the Content Security Policy”. This mechanism affects tools that insert scripts into a target in order to test it. Those tools include `axe`, `asLint`, `ed11y`, and `htmlcs`. To comply with this requirement, Testaro obtains a _nonce_ from the response that serves the target. Then the file that runs the tool adds that nonce to the script as the value of a `nonce` attribute when it inserts its script into the target.
+Some targets prohibit the execution of alien scripts unless the client can demonstrate that it is the requester of the page. Failure to provide that evidence results in the script being blocked and an error message being logged, saying “Refused to execute a script because its hash, its nonce, or unsafe-inline does not appear in the script-src directive of the Content Security Policy”. This mechanism affects tools that insert scripts into a target in order to test it. Those tools include `axe`, `aslint`, `ed11y`, and `htmlcs`. To comply with this requirement, Testaro obtains a _nonce_ from the response that serves the target. Then the file that runs the tool adds that nonce to the script as the value of a `nonce` attribute when it inserts its script into the target.
 
 ### Tool duplicativity
 
@@ -913,12 +913,12 @@ The files in the `temp` directory are presumed ephemeral and are not tracked by 
 ## Related packages
 
 [Testilo](https://www.npmjs.com/package/testilo) is an application that:
-- merges batches of targets and scripts to produce jobs
+- converts lists of targets and lists of issues into jobs
 - produces scores and adds them to the raw reports of Testaro
 - produces human-oriented HTML digests from scored reports
 - produces human-oriented HTML comparisons of the scores of targets
 
-Testilo contains procedures that reorganize report data by defect rather than tool, and that compensate for duplicative tests when computing scores.
+Testilo contains procedures that reorganize report data by issue rather than tool, and that compensate for duplicative tests when computing scores.
 
 Testaro is derived from [Autotest](https://github.com/jrpool/autotest). Autotest was created as a monolithic accessibility testing package, but that forced functionalities to be hosted on a workstation merely because it was impractical to host Playwright elsewhere. Testaro embodies an architectural decision to isolate workstation-dependent functionalities.
 
@@ -934,14 +934,14 @@ The JavaScript code in this project generally conforms to the ESLint configurati
 
 ## Origin
 
-Work on the custom tests in this package began in 2017, and work on the multi-package federation that Testaro implements began in early 2018. These two aspects were combined into the [Autotest](https://github.com/jrpool/autotest) package in early 2021 and into the more single-purpose packages, Testaro and Testilo, in January 2022.
+Work on the custom tests in this package began in 2017, and work on the multi-package ensemble that Testaro implements began in early 2018. These two aspects were combined into the [Autotest](https://github.com/jrpool/autotest) package in early 2021 and into the more single-purpose packages, Testaro and Testilo, in January 2022.
 
 ## Etymology
 
 “Testaro” means “collection of tests” in Esperanto.
 
 /*
-  © 2021–2023 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2021–2024 CVS Health and/or one of its affiliates. All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
