@@ -43,7 +43,7 @@ exports.reporter = async (page, options) => {
     `${__dirname}/../node_modules/aslint-testaro/aslint.bundle.js`, 'utf8'
   );
   // Get the nonce, if any.
-  const {report} = options;
+  const {act, report} = options;
   const {jobData} = report;
   const scriptNonce = jobData && jobData.lastScriptNonce;
   // Inject the ASLint bundle and runner into the page.
@@ -94,10 +94,16 @@ exports.reporter = async (page, options) => {
     const actReport = await reportLoc.textContent();
     // Populate the act report.
     result = JSON.parse(actReport);
-    // Delete irrelevant properties from the tool report details.
+    // If any rules were reported violated:
     if (result.rules) {
+      // For each such rule:
       Object.keys(result.rules).forEach(ruleID => {
-        if (['passed', 'skipped'].includes(result.rules[ruleID].status.type)) {
+        // If the rule was passed or skipped or rules to be tested were specified and exclude it:
+        if (
+          ['passed', 'skipped'].includes(result.rules[ruleID].status.type)
+          || act.rules && ! act.rules.includes(ruleID)
+        ) {
+          // Delete the rule report.
           delete result.rules[ruleID];
         }
       });
