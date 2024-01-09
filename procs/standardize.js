@@ -61,7 +61,12 @@ const getIdentifiers = code => {
   }
   return [tagName, id];
 };
-// Specifies conversions of rule IDs of aslint based on what substrings.
+/*
+  Differentiates some rule IDs of aslint.
+  If the purported rule ID is a key and the what property contains all of the strings except the
+  last of any array item of the value of that key, then the final rule ID is the last item of that
+  array item.
+*/
 const aslintData = {
   'misused_required_attribute': [
     ['not needed', 'misused_required_attributeR']
@@ -293,7 +298,6 @@ const doQualWeb = (result, standardResult, ruleClassName) => {
             excerpt: cap(htmlCode)
           };
           standardResult.instances.push(instance);
-          standardResult.totals[instance.ordinalSeverity]++;
         });
       });
     });
@@ -345,7 +349,6 @@ const convert = (toolName, data, result, standardResult) => {
   }
   // alfa
   else if (toolName === 'alfa' && result.totals) {
-    standardResult.totals = [result.totals.warnings, 0, 0, result.totals.failures];
     result.items.forEach(item => {
       const {codeLines} = item.target;
       const code = Array.isArray(codeLines) ? codeLines.join(' ') : '';
@@ -375,10 +378,6 @@ const convert = (toolName, data, result, standardResult) => {
   }
   // aslint
   else if (toolName === 'aslint' && result.summary && result.summary.byIssueType) {
-    // Get the totals.
-    standardResult.totals = [
-      result.summary.byIssueType.warning, 0, 0, result.summary.byIssueType.error
-    ];
     // For each rule:
     Object.keys(result.rules).forEach(ruleID => {
       // If it has a valid issue type:
@@ -407,7 +406,7 @@ const convert = (toolName, data, result, standardResult) => {
                   finalRuleID = changer[changer.length - 1];
                 }
               }
-              // If rules to be tested are specified and exclude this rule:
+              // Get the instance properties.
               const xpath = ruleResult.element && ruleResult.element.xpath || '';
               let tagName = xpath
               && xpath.replace(/^.*\//, '').replace(/[^-\w].*$/, '').toUpperCase()
@@ -450,13 +449,6 @@ const convert = (toolName, data, result, standardResult) => {
     && result.totals
     && (result.totals.rulesWarned || result.totals.rulesViolated)
   ) {
-    const {totals} = result;
-    standardResult.totals = [
-      totals.warnings.minor + totals.warnings.moderate,
-      totals.warnings.serious + totals.warnings.critical,
-      totals.violations.minor + totals.violations.moderate,
-      totals.violations.serious + totals.violations.critical
-    ];
     doAxe(result, standardResult, 'incomplete');
     doAxe(result, standardResult, 'violations');
   }
@@ -466,11 +458,8 @@ const convert = (toolName, data, result, standardResult) => {
     && result
     && ['results', 'errorCount', 'warningCount'].every(key => result[key] !== undefined)
   ) {
-    // Populate the totals of the standard result.
-    const {results, errorCount, warningCount} = result;
-    standardResult.totals = [warningCount, 0, errorCount, 0];
     // For each result:
-    results.forEach(result => {
+    result.results.forEach(result => {
       const {test, content, tagName, id, loc, excerpt} = result;
       if (['test', 'content'].every(key => result[key])) {
         // Standardize the what property.
@@ -502,17 +491,9 @@ const convert = (toolName, data, result, standardResult) => {
   else if (toolName === 'htmlcs' && result) {
     doHTMLCS(result, standardResult, 'Warning');
     doHTMLCS(result, standardResult, 'Error');
-    const {instances} = standardResult;
-    standardResult.totals = [
-      instances.filter(instance => instance.ordinalSeverity === 0).length,
-      0,
-      0,
-      instances.filter(instance => instance.ordinalSeverity === 3).length
-    ];
   }
   // ibm
   else if (toolName === 'ibm' && result.totals) {
-    standardResult.totals = [0, result.totals.recommendation, 0, result.totals.violation];
     if (result.items) {
       result.items.forEach(item => {
         const identifiers = getIdentifiers(item.snippet);
@@ -548,12 +529,6 @@ const convert = (toolName, data, result, standardResult) => {
       doNuVal(result, standardResult, 'rawPage');
     }
     const {instances} = standardResult;
-    standardResult.totals = [
-      instances.filter(instance => instance.ordinalSeverity === 0).length,
-      0,
-      instances.filter(instance => instance.ordinalSeverity === 2).length,
-      instances.filter(instance => instance.ordinalSeverity === 3).length,
-    ];
   }
   // qualWeb
   else if (
@@ -565,7 +540,6 @@ const convert = (toolName, data, result, standardResult) => {
       || result.modules['best-practices']
     )
   ) {
-    standardResult.totals = [0, 0, 0, 0];
     if (result.modules['act-rules']) {
       doQualWeb(result, standardResult, 'act-rules');
     }
@@ -578,14 +552,10 @@ const convert = (toolName, data, result, standardResult) => {
   }
   // testaro
   else if (toolName === 'testaro') {
+    // For each violated rule:
     const rules = result ? Object.keys(result) : [];
-    standardResult.totals = [0, 0, 0, 0];
     rules.forEach(rule => {
       const ruleResult = result[rule];
-      standardResult.totals.forEach((total, index) => {
-        standardResult.totals[index] += ruleResult
-        && ruleResult.totals ? ruleResult.totals[index] || 0 : 0;
-      });
       if (ruleResult.standardInstances) {
         standardResult.instances.push(... ruleResult.standardInstances);
       }
@@ -595,7 +565,6 @@ const convert = (toolName, data, result, standardResult) => {
     });
     const preventionCount = result.preventions && result.preventions.length;
     if (preventionCount) {
-      standardResult.totals[3] += preventionCount;
       standardResult.instances.push({
         ruleID: 'testPrevention',
         what: 'Page prevented tests from being performed',
@@ -607,7 +576,6 @@ const convert = (toolName, data, result, standardResult) => {
         excerpt: ''
       });
     }
-    standardResult.totals = standardResult.totals.map(total => Math.round(total));
   }
   // wave
   else if (
@@ -619,21 +587,15 @@ const convert = (toolName, data, result, standardResult) => {
       || result.categories.alert
     )
   ) {
-    const {categories} = result;
-    standardResult.totals = [
-      categories.alert.count || 0,
-      0,
-      0,
-      (categories.error.count || 0) + (categories.contrast.count || 0)
-    ];
     ['error', 'contrast', 'alert'].forEach(categoryName => {
       doWAVE(result, standardResult, categoryName);
     });
   }
-  // Any tool with no reported rule violations:
-  else {
-    standardResult.totals = [0, 0, 0, 0];
-  }
+  // Populate and round the totals of the standard result.
+  standardResult.instances.forEach(instance => {
+    standardResult.totals[instance.ordinalSeverity] += instance.count || 1;
+  });
+  standardResult.totals = standardResult.totals.map(total => Math.round(total));
 };
 // Converts the results.
 exports.standardize = act => {

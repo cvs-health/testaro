@@ -1088,7 +1088,7 @@ const doActs = async (report, actIndex, page) => {
             if (['also', 'only'].includes(standard)) {
               // Initialize it.
               act.standardResult = {
-                totals: [],
+                totals: [0, 0, 0, 0],
                 instances: []
               };
               // Populate it.
