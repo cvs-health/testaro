@@ -555,12 +555,22 @@ const convert = (toolName, data, result, standardResult) => {
     // For each violated rule:
     const rules = result ? Object.keys(result) : [];
     rules.forEach(rule => {
+      // Copy its instances to the standard result.
       const ruleResult = result[rule];
       if (ruleResult.standardInstances) {
         standardResult.instances.push(... ruleResult.standardInstances);
       }
       else {
         console.log(`ERROR: Testaro rule ${rule} result has no standardInstances property`);
+      }
+      // Add its (sample-ratio-weighted) totals to the totals of the standard result.
+      if (ruleResult.totals) {
+        for (const index in ruleResult.totals) {
+          standardResult.totals[index] += ruleResult.totals[index];
+        }
+      }
+      else {
+        console.log(`ERROR: Testaro rule ${rule} result has no totals property`);
       }
     });
     const preventionCount = result.preventions && result.preventions.length;
