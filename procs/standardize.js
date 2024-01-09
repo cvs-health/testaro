@@ -396,7 +396,7 @@ const convert = (toolName, data, result, standardResult) => {
               && ruleResult.message.actual.description
             ) {
               const what = ruleResult.message.actual.description;
-              // Get its differentiated ID if any.
+              // Get the differentiated ID of the rule if any.
               const ruleData = aslintData[ruleID];
               let finalRuleID = ruleID;
               if (ruleData) {
@@ -407,6 +407,7 @@ const convert = (toolName, data, result, standardResult) => {
                   finalRuleID = changer[changer.length - 1];
                 }
               }
+              // If rules to be tested are specified and exclude this rule:
               const xpath = ruleResult.element && ruleResult.element.xpath || '';
               let tagName = xpath
               && xpath.replace(/^.*\//, '').replace(/[^-\w].*$/, '').toUpperCase()

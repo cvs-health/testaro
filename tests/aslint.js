@@ -99,10 +99,10 @@ exports.reporter = async (page, options) => {
       // For each such rule:
       Object.keys(result.rules).forEach(ruleID => {
         // If the rule was passed or skipped or rules to be tested were specified and exclude it:
-        if (
-          ['passed', 'skipped'].includes(result.rules[ruleID].status.type)
-          || act.rules && ! act.rules.includes(ruleID)
-        ) {
+        const excluded = act.rules && ! act.rules.includes(ruleID);
+        const instanceType = result.rules[ruleID].status.type;
+        // If rules to be tested were specified and exclude it or the rule was passed or skipped:
+        if (excluded || ['passed', 'skipped'].includes(instanceType)) {
           // Delete the rule report.
           delete result.rules[ruleID];
         }
