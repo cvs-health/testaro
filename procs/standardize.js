@@ -601,10 +601,13 @@ const convert = (toolName, data, result, standardResult) => {
       doWAVE(result, standardResult, categoryName);
     });
   }
-  // Populate and round the totals of the standard result.
-  standardResult.instances.forEach(instance => {
-    standardResult.totals[instance.ordinalSeverity] += instance.count || 1;
-  });
+  // Populate the totals of the standard result if the tool is not Testaro.
+  if (toolName !== 'testaro') {
+    standardResult.instances.forEach(instance => {
+      standardResult.totals[instance.ordinalSeverity] += instance.count || 1;
+    });
+  }
+  // Round the totals of the standard result.
   standardResult.totals = standardResult.totals.map(total => Math.round(total));
 };
 // Converts the results.
