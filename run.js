@@ -363,7 +363,8 @@ const goTo = async (report, page, url, timeout, waitUntil) => {
         // Return an error.
         console.log(`ERROR: Visit to ${url} redirected to ${actualURL}`);
         return {
-          exception: 'badRedirection'
+          success: false,
+          error: 'badRedirection'
         };
       }
       // Otherwise, i.e. if no prohibited redirection occurred:
@@ -523,11 +524,11 @@ const launch = async (report, typeName, url, debug, waits, isLowMotion = false) 
         };
       }
       // Otherwise, if the navigation failed:
-      else if (navResult.error) {
-        // Return this.
+      else {
+        // Return the error.
         return {
           success: false,
-          error: 'Navigation failed'
+          error: navResult.error
         };
       }
     }
