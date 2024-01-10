@@ -35,7 +35,7 @@ const fs = require('fs/promises');
 // Conducts and reports the Editoria11y tests.
 exports.reporter = async (page, options) => {
   // Get the nonce, if any.
-  const {report} = options;
+  const {act, report} = options;
   const {jobData} = report;
   const scriptNonce = jobData && jobData.lastScriptNonce;
   // Get the test script.
@@ -74,34 +74,39 @@ exports.reporter = async (page, options) => {
       delete resultObj.options.lightTheme;
       // Initialize the element results.
       const results = resultObj.results = [];
-      // Populate them and add them to the result.
+      // For each rule violation:
       Ed11y.results.forEach(elResult => {
-        const result = {};
-        result.test = elResult.test || '';
-        if (elResult.content) {
-          result.content = elResult.content.replace(/\s+/g, ' ');
+        // If rules were not selected or they were and include this one:
+        if (! act.rules && act.rules.includes(elResult.test)) {
+          // Create a violation record.
+          const result = {};
+          result.test = elResult.test || '';
+          if (elResult.content) {
+            result.content = elResult.content.replace(/\s+/g, ' ');
+          }
+          if (elResult.element) {
+            const{element} = elResult;
+            result.tagName = element.tagName || '';
+            result.id = element.id || '';
+            result.loc = {};
+            const locRect = element.getBoundingClientRect();
+            if (locRect) {
+              ['x', 'y', 'width', 'height'].forEach(dim => {
+                result.loc[dim] = Math.round(locRect[dim]);
+              });
+            }
+            let elText = element.textContent.replace(/\s+/g, ' ').trim();
+            if (! elText) {
+              elText = element.outerHTML;
+            }
+            if (elText.length > 400) {
+              elText = `${elText.slice(0, 200)}…${elText.slice(-200)}`;
+            }
+            result.excerpt = elText.replace(/\s+/g, ' ');
+          }
+          // Add it to the result.
+          results.push(result);
         }
-        if (elResult.element) {
-          const{element} = elResult;
-          result.tagName = element.tagName || '';
-          result.id = element.id || '';
-          result.loc = {};
-          const locRect = element.getBoundingClientRect();
-          if (locRect) {
-            ['x', 'y', 'width', 'height'].forEach(dim => {
-              result.loc[dim] = Math.round(locRect[dim]);
-            });
-          }
-          let elText = element.textContent.replace(/\s+/g, ' ').trim();
-          if (! elText) {
-            elText = element.outerHTML;
-          }
-          if (elText.length > 400) {
-            elText = `${elText.slice(0, 200)}…${elText.slice(-200)}`;
-          }
-          result.excerpt = elText.replace(/\s+/g, ' ');
-        }
-        results.push(result);
       });
       // Return the result.
       try {
