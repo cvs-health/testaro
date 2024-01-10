@@ -424,8 +424,6 @@ When you include a `rules` property, you limit the tests of the tool that are pe
 
 The `nuVal`, `qualWeb`, and `testaro` tools require specific formats for the `rules` property. Those formats are described below in the sections about those tools.
 
-The `ed11y` tool does not yet allow rule specification.
-
 ###### Examples
 
 An example of a `test` act is:

@@ -41,7 +41,7 @@ exports.reporter = async (page, options) => {
   // Get the test script.
   const script = await fs.readFile(`${__dirname}/../ed11y/editoria11y.min.js`, 'utf8');
   const rawResultJSON = await page.evaluate(args => new Promise(async resolve => {
-    const {scriptNonce, script} = args;
+    const {scriptNonce, script, rulesToTest} = args;
     // When the script is executed:
     document.addEventListener('ed11yResults', () => {
       // Get the result.
@@ -77,7 +77,7 @@ exports.reporter = async (page, options) => {
       // For each rule violation:
       Ed11y.results.forEach(elResult => {
         // If rules were not selected or they were and include this one:
-        if (! act.rules && act.rules.includes(elResult.test)) {
+        if (! rulesToTest || rulesToTest.includes(elResult.test)) {
           // Create a violation record.
           const result = {};
           result.test = elResult.test || '';
@@ -136,7 +136,7 @@ exports.reporter = async (page, options) => {
       console.log(`ERROR creating Ed11y (${error.message})`);
       resolve(JSON.stringify({error: error.message}));
     };
-  }), {scriptNonce, script});
+  }), {scriptNonce, script, rulesToTest: act.rules});
   const result = JSON.parse(rawResultJSON);
   let data = {};
   // Return the act report.
