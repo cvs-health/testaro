@@ -157,8 +157,9 @@ Here is an example of a job:
     }
   ],
   sources: {
-    script: 'tp25',
-    batch: 'weborgs',
+    script: 'tp99',
+    batch: 'webOrgs',
+    lastTarget: false,
     target: {
       id: 'w3c',
       what: 'World Wide Web Consortium',
@@ -192,8 +193,9 @@ Job properties:
 - `sources`: an object describing where the job came from:
    - `script`: the ID of the script (as used by Testilo) from which the job was made, or an empty string if none.
    - `batch` : the ID of the batch (as used by Testilo) from which the target of this job was drawn, or an empty string if none.
+   - `lastTarget`: whether the the target was drawn from a batch and is the last target in the batch.
    - `target`: an object whose `id`, `what`, and `which` properties describe the target being tested by this job, or, if there was no batch, have empty strings as values.
-   - `requester`: the email address that should receive a notice of completion of the job, or an empty string if no notice is to be sent.
+   - `requester`: the email address that can receive a notice of completion of the job, or an empty string if no notice is to be sent.
 - `creationTimeStamp`: the date and time in `yymmddThhMM` format when the job was created.
 - `timeStamp`: the date and time in `yymmddThhMM` format before which the job is not to be assigned.
 - `sendReportTo`: the URL to which the report of the job is to be sent, or an empty string if the report is not to be sent to a server.
