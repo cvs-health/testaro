@@ -718,12 +718,6 @@ The validity criterion named in item 2 may be any of these:
 
 Testaro can be called by modules and by users.
 
-### Functions
-
-Testaro contains these modules that export executable functions:
-- `run.js` exports `doJob` for immediate execution.
-- `watch.js` exports `cycle` for watch-triggered execution.
-
 #### Imports
 
 Before a module can execute a Testaro function, it must import that function from the module that exports it. A Testaro module can import function `f` from module `m` with the statement
