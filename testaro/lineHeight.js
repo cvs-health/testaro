@@ -49,8 +49,8 @@ exports.reporter = async (page, withItems) => {
         lineHeight: Number.parseFloat(lineHeight)
       };
     });
-    // If it does:
-    const isBad = data.lineHeight < 1.5 * data.fontSize;
+    // If it does, after a grace margin for rounding:
+    const isBad = data.lineHeight < 1.49 * data.fontSize;
     if (isBad) {
       // Add the locator to the array of violators.
       all.locs.push([loc, `font size ${data.fontSize} px, line height ${data.lineHeight} px`]);
