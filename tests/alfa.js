@@ -1,5 +1,5 @@
 /*
-  © 2021–2023 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2021–2024 CVS Health and/or one of its affiliates. All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -123,6 +123,15 @@ exports.reporter = async (page, options) => {
               codeLines: codeLines.map(line => line.length > 300 ? `${line.slice(0, 300)}...` : line)
             }
           };
+          // If the rule summary is missing:
+          if (outcomeData.rule.ruleSummary === '') {
+            // If a first requirement title exists:
+            const {requirements} = outcomeData.rule;
+            if (requirements && requirements.length && requirements[0].title) {
+              // Make it the rule summary.
+              outcomeData.rule.ruleSummary = requirements[0].title;
+            }
+          }
           const etcTags = [];
           tags.forEach(tag => {
             if (tag.type === 'scope') {
