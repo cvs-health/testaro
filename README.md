@@ -755,7 +755,7 @@ node call run
 node call run be76p
 ```
 
-In the second example, `be76p` is the initial characters of the ID of a job saved as a JSON file in the `todo` subdirectory of the `process.env.JOBDIR` directory.
+In the second example, `be76p` is the initial characters of the ID of a job saved as a JSON file in the `todo` subdirectory of the `JOBDIR` directory.
 
 The `call` module will find the first job file with a matching name if an argument is given, or the first job file if not. Then the module will execute the `doJob` function of the `run` module on the job, save the report in the `raw` subdirectory of the `REPORTDIR` directory, and archive the job file in the `done` subdirectory of the `JOBDIR` directory.
 
@@ -776,9 +776,9 @@ dirWatch(true, 300);
 
 In this example, a module asks Testaro to check a directory for a job every 300 seconds, to perform the jobs in the directory if any are found, and then to continue checking. If the first argument is `false`, Testaro will stop checking after performing 1 job. If it is `true`, Testaro continues checking until the process is stopped.
 
-The directory where Testaro checks for jobs is specified by `process.env.JOBDIR`. Testaro checks for jobs in its `todo` subdirectory and, when it has performed a job, moves it into the `done` subdirectory.
+The directory where Testaro checks for jobs is specified by `JOBDIR`. Testaro checks for jobs in its `todo` subdirectory and, when it has performed a job, moves it into the `done` subdirectory.
 
-Testaro creates a report for each job and saves the report in the directory specified by `process.env.REPORTDIR`.
+Testaro creates a report for each job and saves the report in the directory specified by `REPORTDIR`.
 
 ###### By a user
 
@@ -792,9 +792,9 @@ The arguments and behaviors described above for execution by a module apply here
 
 Testaro can poll servers for jobs to be performed.
 
-An instance of Testaro is an _agent_ and has an identifier specified by `process.env.AGENT`. A Testaro instance identifies itself when polling servers, allowing servers to decide whether to give the instance a job to do.
+An instance of Testaro is an _agent_ and has an identifier specified by `AGENT`. A Testaro instance identifies itself when polling servers, allowing servers to decide whether to give the instance a job to do.
 
-The URLs polled by Testaro are specified by `process.env.JOB_URLS`. The format of that environment variable is a `+`-delimited list of URLs, including schemes. If one of the URLs is `https://testrunner.org/a11ytest/api/job`, and if a Testaro instance has the agent ID `tester3`, then a job request is a `GET` request to `https://testrunner.org/a11ytest/api/job?agent=tester3`.
+The URLs polled by Testaro are specified by `JOB_URLS`. The format of that environment variable is a `+`-delimited list of URLs, including schemes. If one of the URLs is `https://testrunner.org/a11ytest/api/job`, and if a Testaro instance has the agent ID `tester3`, then a job request is a `GET` request to `https://testrunner.org/a11ytest/api/job?agent=tester3`.
 
 Once a Testaro instance obtains a network job, Testaro performs it and adds the result data to the job, which then becomes the job report. Testaro sends the report in a `POST` request to the URL specified by the `sendReportTo` property of the job.
 
@@ -825,7 +825,7 @@ The arguments and behaviors described above for execution by a module apply here
 
 In addition to their uses described above, environment variables can be used by acts of type `text`, as documented in the `actSpecs.js` file.
 
-Before making Testaro run a job, you can optionally also set `process.env.DEBUG` (to `'true'` or anything else) and/or `process.env.WAITS` (to a non-negative integer). The effects of these variables are described in the `run.js` file.
+Before making Testaro run a job, you can optionally also set `DEBUG` (to `'true'` or anything else) and/or `WAITS` (to a non-negative integer). The effects of these variables are described in the `run.js` file.
 
 You may store environment variables in an untracked `.env` file if you wish, and Testaro will recognize them. Here is a template for a `.env` file:
 
