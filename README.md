@@ -862,7 +862,7 @@ The `tests` executor makes use of the jobs in the `validation/tests/jobs` direct
 
 You can define additional Testaro acts and functionality. Contributions are welcome.
 
-Please report any issues, including feature requests, at the [repository](https://github.com/jrpool/testaro/issues).
+Please report any issues, including feature requests, at the [repository](https://github.com/cvs-health/testaro/issues).
 
 ## Accessibility principles
 
