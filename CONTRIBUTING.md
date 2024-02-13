@@ -1,5 +1,5 @@
 /*
-  © 2023 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2023–2024 CVS Health and/or one of its affiliates. All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -118,3 +118,7 @@ The `isDestructive` property should be set to `true` if your pruner modifies the
 Even more complex Testaro rules require analysis that cannot fit into the simple or simplifiable category. You can begin with existing JavaScript rules, or the `data/template.js` file, as an example.
 
 Some utility functions in modules in the `procs` directory are available for support of new rules. Among these modules are `testaro` (used in many tests), `isInlineLink`, `operable`, and `visChange`.
+
+## License agreement
+
+As of 12 February 2024, upon the transfer of the repository ownership to CVS Health, contributors of code to Testaro are required to execute the [CVS Health OSS Project Contributor License Agreement](https://forms.office.com/pages/responsepage.aspx?id=uGG7-v46dU65NKR_eCuM1xbiih2MIwxBuRvO0D_wqVFUQ1k0OE5SVVJWWkY4MTVJMkY3Sk9GM1FHRC4u) for Testaro before any pull request will be approved and merged.
