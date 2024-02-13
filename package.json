@@ -1,6 +1,6 @@
 {
   "name": "testaro",
-  "version": "35.0.11",
+  "version": "36.0.0",
   "description": "Run 1000 web accessibility tests from 10 tools and get a standardized report",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jrpool/testaro.git"
+    "url": "git+https://github.com/cvs-health/testaro.git"
   },
   "keywords": [
     "accessibility",
@@ -20,12 +20,12 @@
     "testing",
     "automation"
   ],
-  "author": "Jonathan Pool <pool@jpdev.pro>",
+  "author": "Jonathan Pool <jonathan.pool@cvshealth.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jrpool/testaro/issues"
+    "url": "https://github.com/cvs-health/testaro/issues"
   },
-  "homepage": "https://github.com/jrpool/testaro#readme",
+  "homepage": "https://github.com/cvs-health/testaro#readme",
   "dependencies": {
     "@qualweb/core": "*",
     "@siteimprove/alfa-act": "*",
