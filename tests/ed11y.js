@@ -41,6 +41,13 @@ exports.reporter = async (page, options) => {
   // Get the test script.
   const script = await fs.readFile(`${__dirname}/../ed11y/editoria11y.min.js`, 'utf8');
   const rawResultJSON = await page.evaluate(args => new Promise(async resolve => {
+    // Impose a timeout on obtaining a result.
+    const timer = setTimeout(() => {
+      resolve(JSON.stringify({
+        prevented: true,
+        error: 'ed11y timed out'
+      }));
+    }, 20000);
     const {scriptNonce, script, rulesToTest} = args;
     // When the script is executed:
     document.addEventListener('ed11yResults', () => {
@@ -111,11 +118,15 @@ exports.reporter = async (page, options) => {
       // Return the result.
       try {
         const resultJSON = JSON.stringify(resultObj);
+        clearTimeout(timer);
         resolve(resultJSON);
       }
       catch(error) {
-        console.log(`ERROR stringifying result object (${error.message})`);
-        resolve('{}');
+        clearTimeout(timer);
+        resolve(JSON.stringify({
+          prevented: true,
+          error: `Result object not stringified (${error.message})`
+        }));
       }
     });
     // Add the test script to the page.
@@ -133,12 +144,21 @@ exports.reporter = async (page, options) => {
       });
     }
     catch(error) {
-      console.log(`ERROR creating Ed11y (${error.message})`);
-      resolve(JSON.stringify({error: error.message}));
+      resolve(JSON.stringify({
+        prevented: true,
+        error: error.message
+      }));
     };
   }), {scriptNonce, script, rulesToTest: act.rules});
   const result = JSON.parse(rawResultJSON);
   let data = {};
+  if (result.prevented) {
+    data.success = false;
+    data.prevented = true;
+    data.error = result.error;
+    delete result.prevented;
+    delete result.error;
+  }
   // Return the act report.
   return {
     data,
