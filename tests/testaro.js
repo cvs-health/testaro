@@ -52,6 +52,18 @@ const futureEvalRulesCleanRoom = {
   phOnly: 'input elements with placeholders but no accessible names'
 };
 */
+const futureRules = [
+  'altScheme',
+  'captionLoc',
+  'dataListRef',
+  'secHeading',
+  'textSem',
+  'adbID',
+  'imageLink',
+  'legendLoc',
+  'optRuleSel',
+  'phOnly'
+];
 const evalRules = {
   allCaps: 'leaf elements with entirely upper-case text longer than 7 characters',
   allHidden: 'page that is entirely or mostly hidden',
@@ -151,7 +163,7 @@ exports.reporter = async (page, options) => {
     rules.length > 1
     && ['y', 'n'].includes(rules[0])
     && rules.slice(1).every(rule => {
-      if (evalRules[rule] || etcRules[rule]) {
+      if (evalRules[rule] || etcRules[rule] || futureRules[rule]) {
         return true;
       }
       else {
@@ -162,12 +174,12 @@ exports.reporter = async (page, options) => {
   ) {
     // Wait 1 second to prevent out-of-order logging with granular reporting.
     await wait(1000);
-    // For each rule invoked:
+    // For each rule invoked except future rules:
     const calledRules = rules[0] === 'y'
       ? rules.slice(1)
       : Object.keys(evalRules).filter(ruleID => ! rules.slice(1).includes(ruleID));
     const testTimes = [];
-    for (const rule of calledRules) {
+    for (const rule of calledRules.filter(rule => ! futureRules[rule])) {
       // Initialize an argument array.
       const ruleArgs = [page, withItems];
       // If the rule is defined with JavaScript or JSON but not both:
