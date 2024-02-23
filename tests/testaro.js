@@ -162,7 +162,7 @@ exports.reporter = async (page, options) => {
     rules.length > 1
     && ['y', 'n'].includes(rules[0])
     && rules.slice(1).every(rule => {
-      if (evalRules[rule] || etcRules[rule] || futureRules[rule]) {
+      if (evalRules[rule] || etcRules[rule] || futureRules.includes(rule)) {
         return true;
       }
       else {
