@@ -154,7 +154,7 @@ exports.reporter = async (page, withItems, detailLevel, text = '') => {
     console.log(`ERROR performing test (${error.message.replace(/\n.+/s, '')})`);
     data = {
       prevented: true,
-      error: 'ERROR performing test'
+      error: 'Test failed'
     };
   }
   // Return the result.

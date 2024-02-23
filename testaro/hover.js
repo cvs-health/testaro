@@ -1,5 +1,5 @@
 /*
-  © 2021–2023 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2021–2024 CVS Health and/or one of its affiliates. All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -70,6 +70,7 @@ exports.reporter = async (page, withItems) => {
     await page.mouse.move(0, 0);
     const loc0 = page.locator('body *:visible');
     const elementCount0 = await loc0.count();
+    // Hover over the element, whether or not covered.
     try {
       await loc.hover({
         force: true,
@@ -78,16 +79,23 @@ exports.reporter = async (page, withItems) => {
       const loc1 = page.locator('body *:visible');
       const elementCount1 = await loc1.count();
       const additions = elementCount1 - elementCount0;
-      // If any elements are:
+      // If any elements are added or subtracted:
       if (additions !== 0) {
-        // Add the locator and the change of element count to the array of violators.
+        // Add the locator and the change of element count to the array of violation locators.
         const impact = additions > 0
           ? `added ${additions} elements to the page`
           : `subtracted ${- additions} from the page`;
         all.locs.push([loc, impact]);
       }
     }
-    catch(error) {}
+    // If hovering times out:
+    catch(error) {
+      // Report the test prevented.
+      const {data} = all.result;
+      data.prevented = true;
+      data.error = 'ERROR hovering over an element';
+      break;
+    }
   }
   // Populate and return the result.
   const whats = [

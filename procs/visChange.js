@@ -1,5 +1,5 @@
 /*
-  © 2023 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2023–2024 CVS Health and/or one of its affiliates. All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -71,7 +71,7 @@ exports.visChange = async (page, options = {}) => {
       }
     });
   }
-  // Make a screenshot, excluding an element if specified.
+  // Make and get a screenshot, excluding an element if specified.
   const shot0 = await shoot(page, exclusion);
   // If it succeeded:
   if (shot0.length) {
@@ -93,7 +93,7 @@ exports.visChange = async (page, options = {}) => {
     }
     // Wait as specified, or 3 seconds.
     await page.waitForTimeout(delayBetween || 3000);
-    // Make another screenshot.
+    // Make and get another screenshot.
     const shot1 = await shoot(page, exclusion);
     // If it succeeded:
     if (shot1.length) {
@@ -119,15 +119,17 @@ exports.visChange = async (page, options = {}) => {
       // Return this.
       return {
         success: false,
+        prevented: true,
         error: 'Second screenshot failed'
       };
     }
   }
-  // Otherwise, i.e. if the screenshot failed:
+  // Otherwise, i.e. if the first screenshot failed:
   else {
     // Return this.
     return {
       success: false,
+      prevented: true,
       error: 'First screenshot failed'
     };
   }

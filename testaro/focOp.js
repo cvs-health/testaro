@@ -1,5 +1,5 @@
 /*
-  © 2021–2023 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2021–2024 CVS Health and/or one of its affiliates. All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -67,7 +67,7 @@ exports.reporter = async (page, withItems) => {
   const whats = [
     'Element is Tab-focusable but not operable', 'Elements are Tab-focusable but not operable'
   ];
-  const testReport = await report(withItems, all, 'focOp', whats, 2);
+  const result = await report(withItems, all, 'focOp', whats, 2);
   // Reload the page, because isOperable() modified it.
   try {
     await page.reload({timeout: 15000});
@@ -75,5 +75,5 @@ exports.reporter = async (page, withItems) => {
   catch(error) {
     console.log('ERROR: page reload timed out');
   }
-  return testReport;
+  return result;
 };

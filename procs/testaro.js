@@ -1,5 +1,5 @@
 /*
-  © 2023 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2023–2024 CVS Health and/or one of its affiliates. All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -34,8 +34,8 @@ const {getLocatorData} = require('../procs/getLocatorData');
 
 // ########## FUNCTIONS
 
-// Initializes locators and a result.
-const init = async (sampleMax, page, locAllSelector, options = {}) => {
+// Initializes violation locators and a result and returns them in an object.
+const init = exports.init = async (sampleMax, page, locAllSelector, options = {}) => {
   // Get locators for the specified elements.
   const locPop = page.locator(locAllSelector, options);
   const locPops = await locPop.all();
@@ -60,11 +60,11 @@ const init = async (sampleMax, page, locAllSelector, options = {}) => {
   };
 };
 
-// Populates a result.
-const report = async (withItems, all, ruleID, whats, ordinalSeverity, tagName = '') => {
+// Populates and returns a result.
+const report = exports.report = async (withItems, all, ruleID, whats, ordinalSeverity, tagName = '') => {
   const {locs, result} = all;
   const {data, totals, standardInstances} = result;
-  // For each instance locator:
+  // For each violation locator:
   for (const locItem of locs) {
     // Get data on its element.
     let loc, whatParam;
@@ -76,7 +76,7 @@ const report = async (withItems, all, ruleID, whats, ordinalSeverity, tagName = 
       loc = locItem;
     }
     const elData = await getLocatorData(loc);
-    // Add to the totals.
+    // Increment the totals.
     totals[ordinalSeverity] += data.populationRatio;
     // If itemization is required:
     if (withItems) {
@@ -114,11 +114,11 @@ const report = async (withItems, all, ruleID, whats, ordinalSeverity, tagName = 
   return result;
 };
 // Performs a simplifiable test.
-const simplify = async (page, withItems, ruleData) => {
+exports.simplify = async (page, withItems, ruleData) => {
   const {
     ruleID, selector, pruner, isDestructive, complaints, ordinalSeverity, summaryTagName
   } = ruleData;
-  // Initialize the locators and result.
+  // Get an object with initialized violation locators and result as properties.
   const all = await init(100, page, selector);
   // For each locator:
   for (const loc of all.allLocs) {
@@ -126,7 +126,7 @@ const simplify = async (page, withItems, ruleData) => {
     const isBad = await pruner(loc);
     // If it does:
     if (isBad) {
-      // Add the locator to the array of violators.
+      // Add the locator of the element to the array of violation locators.
       all.locs.push(loc);
     }
   }
@@ -135,7 +135,7 @@ const simplify = async (page, withItems, ruleData) => {
     complaints.instance,
     complaints.summary
   ];
-  const testReport = await report(withItems, all, ruleID, whats, ordinalSeverity, summaryTagName);
+  const result = await report(withItems, all, ruleID, whats, ordinalSeverity, summaryTagName);
   // If the pruner modifies the page:
   if (isDestructive) {
     // Reload the page.
@@ -146,8 +146,6 @@ const simplify = async (page, withItems, ruleData) => {
       console.log('ERROR: page reload timed out');
     }
   }
-  return testReport;
+  // Return the result.
+  return result;
 };
-exports.init = init;
-exports.report = report;
-exports.simplify = simplify;

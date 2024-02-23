@@ -1,5 +1,5 @@
 /*
-  © 2023 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2023–2024 CVS Health and/or one of its affiliates. All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -54,6 +54,7 @@ exports.getSource = async page => {
     catch(error) {
       console.log(`ERROR getting source of page (${error.message})`);
       data.prevented = true;
+      data.error = 'ERROR getting source of page';
     }
   }
   return data;
