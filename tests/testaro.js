@@ -145,11 +145,20 @@ exports.reporter = async (page, options) => {
     ruleTestTimes: {}
   };
   const result = {};
+  console.log(rules);
   // If the rule specification is valid:
   if (
     rules.length > 1
     && ['y', 'n'].includes(rules[0])
-    && rules.slice(1).every(rule => evalRules[rule] || etcRules[rule])
+    && rules.slice(1).every(rule => {
+      if (evalRules[rule] || etcRules[rule]) {
+        return true;
+      }
+      else {
+        console.log(`ERROR: Testaro rule ${rule} invalid`);
+        return false;
+      }
+    })
   ) {
     // Wait 1 second to prevent out-of-order logging with granular reporting.
     await wait(1000);
