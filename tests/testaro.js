@@ -157,7 +157,6 @@ exports.reporter = async (page, options) => {
     ruleTestTimes: {}
   };
   const result = {};
-  console.log(rules);
   // If the rule specification is valid:
   if (
     rules.length > 1
