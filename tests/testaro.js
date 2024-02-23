@@ -61,7 +61,7 @@ const futureRules = [
   'adbID',
   'imageLink',
   'legendLoc',
-  'optRuleSel',
+  'optRoleSel',
   'phOnly'
 ];
 const evalRules = {
