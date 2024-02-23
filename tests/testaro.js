@@ -52,7 +52,7 @@ const futureEvalRulesCleanRoom = {
   phOnly: 'input elements with placeholders but no accessible names'
 };
 */
-const futureRules = [
+const futureRules = new Set([
   'altScheme',
   'captionLoc',
   'dataListRef',
@@ -63,7 +63,7 @@ const futureRules = [
   'legendLoc',
   'optRoleSel',
   'phOnly'
-];
+]);
 const evalRules = {
   allCaps: 'leaf elements with entirely upper-case text longer than 7 characters',
   allHidden: 'page that is entirely or mostly hidden',
@@ -162,7 +162,7 @@ exports.reporter = async (page, options) => {
     rules.length > 1
     && ['y', 'n'].includes(rules[0])
     && rules.slice(1).every(rule => {
-      if (evalRules[rule] || etcRules[rule] || futureRules.includes(rule)) {
+      if (evalRules[rule] || etcRules[rule] || futureRules.has(rule)) {
         return true;
       }
       else {
@@ -178,7 +178,7 @@ exports.reporter = async (page, options) => {
       ? rules.slice(1)
       : Object.keys(evalRules).filter(ruleID => ! rules.slice(1).includes(ruleID));
     const testTimes = [];
-    for (const rule of calledRules.filter(rule => ! futureRules[rule])) {
+    for (const rule of calledRules.filter(rule => ! futureRules.has(rule))) {
       // Initialize an argument array.
       const ruleArgs = [page, withItems];
       // If the rule is defined with JavaScript or JSON but not both:
@@ -238,7 +238,7 @@ exports.reporter = async (page, options) => {
       // Otherwise, i.e. if the rule is undefined or doubly defined:
       else {
         // Report this.
-        data.invalid.push(rule);
+        data.rulesInvalid.push(rule);
         console.log(`ERROR: Rule ${rule} not validly defined`);
       }
     }
