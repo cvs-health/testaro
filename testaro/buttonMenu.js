@@ -122,8 +122,8 @@ exports.reporter = async (page, withItems, trialKeySpecs = []) => {
     // Get a locator for its menu.
     const menuID = await mbLoc.getAttribute('aria-controls');
     const menuLoc = page.locator(`[id=${menuID}][role=menu], [id=${menuID}][role=menubar]`);
-    // If the button controls a menu:
-    if (menuLoc) {
+    // If the button controls exactly 1 menu:
+    if (menuLoc && await menuLoc.count() === 1) {
       // Get data on the menu.
       const elData = await getLocatorData(menuLoc);
       // If data were obtained:
@@ -251,10 +251,25 @@ exports.reporter = async (page, withItems, trialKeySpecs = []) => {
         console.log('ERROR: Menu data not obtained');
       }
     }
-    // Otherwise, i.e. if the menu was not identified:
+    // Otherwise, i.e. if it does not control exactly 1 menu:
     else {
-      // Report this.
-      console.log('ERROR: Menu controlled by menu button not found');
+      // Add to the totals.
+      totals[2]++;
+      // If itemization is required:
+      if (withItems) {
+        // Get data on the menu button.
+        const mbData = await getLocatorData(mbLoc);
+        // Add an instance to the result.
+        standardInstances.push({
+          ruleID: 'buttonMenu',
+          what: `Menu button does not control exactly 1 menu`,
+          ordinalSeverity: 2,
+          tagName: 'BUTTON',
+          id: await mbData.id,
+          location: mbData.location,
+          excerpt: mbData.excerpt
+        });
+      }
     }
   }
   // If itemization is not required and there are any instances:
@@ -262,7 +277,7 @@ exports.reporter = async (page, withItems, trialKeySpecs = []) => {
     // Add a summary instance to the result.
     standardInstances.push({
       ruleID: 'buttonMenu',
-      what: 'Menus respond nonstandardly to navigation keys',
+      what: 'Menu buttons and menus behave nonstandardly',
       count: totals[2],
       ordinalSeverity: 2,
       tagName: '',
