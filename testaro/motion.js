@@ -51,7 +51,6 @@ exports.reporter = async page => {
     delayBefore: 2000,
     delayBetween: 3000
   });
-  console.log(JSON.stringify(data, null, 2));
   // If the screenshots succeeded:
   if (data.success) {
     // If any pixels were changed:
