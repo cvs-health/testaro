@@ -84,7 +84,7 @@ exports.getLocatorData = async loc => {
     if (data.location.type === 'box') {
       // Define a bounding-box-based location.
       const rawSpec = await loc.boundingBox();
-      // If there is a bounding box:
+      // If there is a bounding box (i.e. the element is visible):
       if (rawSpec) {
         // Populate the location.
         Object.keys(rawSpec).forEach(specName => {
