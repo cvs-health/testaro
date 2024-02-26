@@ -142,7 +142,7 @@ const wait = ms => {
     }, ms);
   });
 };
-// Conducts and reports the Testaro tests.
+// Conducts and reports Testaro tests.
 exports.reporter = async (page, options) => {
   const {report, withItems, stopOnFail, args} = options;
   const argRules = args ? Object.keys(args) : null;
@@ -208,23 +208,37 @@ exports.reporter = async (page, options) => {
         result[rule].what = what;
         try {
           const startTime = Date.now();
-          const ruleReport = isJS
-            ? await require(`../testaro/${rule}`).reporter(... ruleArgs)
-            : await jsonTest(rule, ruleArgs);
-          // Add data from the test to the result.
-          const endTime = Date.now();
-          testTimes.push([rule, Math.round((endTime - startTime) / 1000)]);
-          Object.keys(ruleReport).forEach(key => {
-            result[rule][key] = ruleReport[key];
+          // Apply a time limit to the test. If it expires:
+          let timeout;
+          const timer = new Promise(resolve => {
+            timeout = setTimeout(() => {
+              // Add data about the test prevention to the result.
+              const endTime = Date.now();
+              testTimes.push([rule, Math.round((endTime - startTime) / 1000)]);
+              data.rulePreventions.push(rule);
+              console.log(`ERROR: Test of testaro rule ${rule} timed out`);
+              resolve({timedOut: true});
+            }, 3000);
           });
-          result[rule].totals = result[rule].totals.map(total => Math.round(total));
-          if (ruleReport.prevented) {
-            data.rulePreventions.push(rule);
-          }
-          // If testing is to stop after a failure and the page failed the test:
-          if (stopOnFail && ruleReport.totals.some(total => total)) {
-            // Stop testing.
-            break;
+          const ruleReport = isJS
+            ? require(`../testaro/${rule}`).reporter(... ruleArgs)
+            : jsonTest(rule, ruleArgs);
+          const timeoutResult = await Promise.race(timer, ruleReport);
+          clearTimeout(timeout);
+          // If the test was completed before the deadline:
+          if (! timeoutResult.timedOut) {
+            // Add data from the test to the result.
+            const endTime = Date.now();
+            testTimes.push([rule, Math.round((endTime - startTime) / 1000)]);
+            Object.keys(ruleReport).forEach(key => {
+              result[rule][key] = ruleReport[key];
+            });
+            result[rule].totals = result[rule].totals.map(total => Math.round(total));
+            // If testing is to stop after a failure and the page failed the test:
+            if (stopOnFail && ruleReport.totals.some(total => total)) {
+              // Stop testing.
+              break;
+            }
           }
         }
         // If an error is thrown by the test:
