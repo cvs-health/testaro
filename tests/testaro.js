@@ -208,11 +208,11 @@ exports.reporter = async (page, options) => {
         result[rule].what = what;
         try {
           const startTime = Date.now();
-          // Apply a time limit to the test. If it expires:
+          // Apply a 9-second time limit to the test. If it expires:
           let timeout;
           const timer = new Promise(resolve => {
             timeout = setTimeout(() => {
-              // Add data about the test prevention to the result.
+              // Add data about the test, including its prevention, to the result.
               const endTime = Date.now();
               testTimes.push([rule, Math.round((endTime - startTime) / 1000)]);
               data.rulePreventions.push(rule);
@@ -220,7 +220,7 @@ exports.reporter = async (page, options) => {
               result[rule].standardInstances = [];
               console.log(`ERROR: Test of testaro rule ${rule} timed out`);
               resolve({timedOut: true});
-            }, 2000);
+            }, 9000);
           });
           const ruleReport = isJS
             ? require(`../testaro/${rule}`).reporter(... ruleArgs)
