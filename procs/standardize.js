@@ -360,20 +360,38 @@ const convert = (toolName, data, result, standardResult) => {
         identifiers[0] = tagNameArray[1].toUpperCase();
       }
       const {rule, target} = item;
-      const instance = {
-        ruleID: rule.ruleID,
-        what: rule.ruleSummary,
-        ordinalSeverity: ['cantTell', '', '', 'failed'].indexOf(item.verdict),
-        tagName: identifiers[0],
-        id: identifiers[1],
-        location: {
-          doc: 'dom',
-          type: 'xpath',
-          spec: target.path
-        },
-        excerpt: cap(code)
-      };
-      standardResult.instances.push(instance);
+      if (item.verdict === 'failed') {
+        const instance = {
+          ruleID: rule.ruleID,
+          what: rule.ruleSummary,
+          ordinalSeverity: 3,
+          tagName: identifiers[0],
+          id: identifiers[1],
+          location: {
+            doc: 'dom',
+            type: 'xpath',
+            spec: target.path
+          },
+          excerpt: cap(code)
+        };
+        standardResult.instances.push(instance);
+      }
+      else if (item.verdict === 'cantTell') {
+        const instance = {
+          ruleID: 'cantTell',
+          what: `cannot test for rule ${rule.ruleID}: ${rule.ruleSummary}`,
+          ordinalSeverity: 0,
+          tagName: identifiers[0],
+          id: identifiers[1],
+          location: {
+            doc: 'dom',
+            type: 'xpath',
+            spec: target.path
+          },
+          excerpt: cap(code)
+        };
+        standardResult.instances.push(instance);
+      }
     });
   }
   // aslint
