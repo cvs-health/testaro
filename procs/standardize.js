@@ -360,8 +360,9 @@ const convert = (toolName, data, result, standardResult) => {
         identifiers[0] = tagNameArray[1].toUpperCase();
       }
       const {rule, target} = item;
+      let instance;
       if (item.verdict === 'failed') {
-        const instance = {
+        instance = {
           ruleID: rule.ruleID,
           what: rule.ruleSummary,
           ordinalSeverity: 3,
@@ -377,19 +378,36 @@ const convert = (toolName, data, result, standardResult) => {
         standardResult.instances.push(instance);
       }
       else if (item.verdict === 'cantTell') {
-        const instance = {
-          ruleID: 'cantTell',
-          what: `cannot test for rule ${rule.ruleID}: ${rule.ruleSummary}`,
-          ordinalSeverity: 0,
-          tagName: identifiers[0],
-          id: identifiers[1],
-          location: {
-            doc: 'dom',
-            type: 'xpath',
-            spec: target.path
-          },
-          excerpt: cap(code)
-        };
+        if (['r66', 'r69'].includes(rule.ruleID)) {
+          instance = {
+            ruleID: 'cantTellTextContrast',
+            what: `cannot test for rule ${rule.ruleID}: ${rule.ruleSummary}`,
+            ordinalSeverity: 0,
+            tagName: identifiers[0],
+            id: identifiers[1],
+            location: {
+              doc: 'dom',
+              type: 'xpath',
+              spec: target.path
+            },
+            excerpt: cap(code)
+          };
+        }
+        else {
+          instance = {
+            ruleID: 'cantTell',
+            what: `cannot test for rule ${rule.ruleID}: ${rule.ruleSummary}`,
+            ordinalSeverity: 0,
+            tagName: identifiers[0],
+            id: identifiers[1],
+            location: {
+              doc: 'dom',
+              type: 'xpath',
+              spec: target.path
+            },
+            excerpt: cap(code)
+          };
+        }
         standardResult.instances.push(instance);
       }
     });
