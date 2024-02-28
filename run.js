@@ -1360,8 +1360,8 @@ const doActs = async (report, actIndex, page) => {
                   what = what.replace(/__[A-Z]+__/, envValue);
                 }
                 // Enter the text.
-                await selection.type(act.what);
-                report.jobData.presses += act.what.length;
+                await selection.type(what);
+                report.jobData.presses += what.length;
                 act.result.success = true;
                 act.result.move = 'entered';
                 // If the input is a search input:
