@@ -588,6 +588,8 @@ const convert = (toolName, data, result, standardResult) => {
   }
   // testaro
   else if (toolName === 'testaro') {
+    // Initialize a record of sample-ratio-weighted totals.
+    data.ruleTotals = {};
     // For each violated rule:
     const rules = result ? Object.keys(result) : [];
     rules.forEach(rule => {
@@ -599,10 +601,14 @@ const convert = (toolName, data, result, standardResult) => {
       else {
         console.log(`ERROR: Testaro rule ${rule} result has no standardInstances property`);
       }
-      // Add its (sample-ratio-weighted) totals to the totals of the standard result.
+      // Initialize a record of its sample-ratio-weighted totals.
+      data.ruleTotals[rule] = [0, 0, 0, 0];
+      // Add those totals to the record and to the standard result.
       if (ruleResult.totals) {
         for (const index in ruleResult.totals) {
-          standardResult.totals[index] += ruleResult.totals[index];
+          const ruleTotal = ruleResult.totals[index];
+          data.ruleTotals[rule][index] += ruleTotal;
+          standardResult.totals[index] += ruleTotal;
         }
       }
       else {
