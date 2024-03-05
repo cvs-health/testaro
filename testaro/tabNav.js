@@ -26,6 +26,10 @@
   Standards are based on https://www.w3.org/TR/wai-aria-practices-1.1/#tabpanel.
 */
 
+// CONSTANTS
+
+const data = {};
+
 // FUNCTIONS
 
 // Returns the text associated with an element.
@@ -105,7 +109,7 @@ const allText = async (page, elementHandle) => await page.evaluate(element => {
   return textChain;
 }, elementHandle);
 // Returns the index of the focused tab in an array of tabs.
-const focusedTab = async tabs => await page.evaluate(tabs => {
+const focusedTab = async (tabs, page) => await page.evaluate(tabs => {
   const focus = document.activeElement;
   return tabs.indexOf(focus);
 }, tabs)
@@ -115,7 +119,7 @@ const focusedTab = async tabs => await page.evaluate(tabs => {
 });
 // Tests a navigation on a tab element.
 const testKey = async (
-  tabs, tabElement, keyName, keyProp, goodIndex, elementIsCorrect, itemData
+  tabs, tabElement, keyName, keyProp, goodIndex, elementIsCorrect, itemData, withItems, page
 ) => {
   let pressed = true;
   // Click the tab element, to make the focus on it effective.
@@ -153,7 +157,7 @@ const testKey = async (
     // If the refocus and keypress succeeded:
     if (pressed) {
       // Identify which tab element is now focused, if any.
-      const focusIndex = await focusedTab(tabs);
+      const focusIndex = await focusedTab(tabs, page);
       // If the focus is correct:
       if (focusIndex === goodIndex) {
         // Increment the counts of correct navigations and correct key navigations.
@@ -230,7 +234,7 @@ const arrowTarget = (startIndex, tabCount, orientation, direction) => {
   Recursively tests tablist tab elements (per
   https://www.w3.org/TR/wai-aria-practices-1.1/#tabpanel)
 */
-const testTabs = async (tabs, index, listOrientation, listIsCorrect) => {
+const testTabs = async (tabs, index, listOrientation, listIsCorrect, withItems, page) => {
   const tabCount = tabs.length;
   // If any tab elements remain to be tested:
   if (index < tabCount) {
@@ -263,7 +267,17 @@ const testTabs = async (tabs, index, listOrientation, listIsCorrect) => {
       }
     }
     // Test the element with each navigation key.
-    isCorrect = await testKey(tabs, currentTab, 'Tab', 'tab', -1, isCorrect, itemData);
+    isCorrect = await testKey(
+      tabs,
+      currentTab,
+      'Tab',
+      'tab',
+      -1,
+      isCorrect,
+      itemData,
+      withItems,
+      page
+    );
     isCorrect = await testKey(
       tabs,
       currentTab,
@@ -271,7 +285,9 @@ const testTabs = async (tabs, index, listOrientation, listIsCorrect) => {
       'left',
       arrowTarget(index, tabCount, listOrientation, 'left'),
       isCorrect,
-      itemData
+      itemData,
+      withItems,
+      page
     );
     isCorrect = await testKey(
       tabs,
@@ -280,7 +296,9 @@ const testTabs = async (tabs, index, listOrientation, listIsCorrect) => {
       'right',
       arrowTarget(index, tabCount, listOrientation, 'right'),
       isCorrect,
-      itemData
+      itemData,
+      withItems,
+      page
     );
     isCorrect = await testKey(
       tabs,
@@ -289,7 +307,9 @@ const testTabs = async (tabs, index, listOrientation, listIsCorrect) => {
       'up',
       arrowTarget(index, tabCount, listOrientation, 'up'),
       isCorrect,
-      itemData
+      itemData,
+      withItems,
+      page
     );
     isCorrect = await testKey(
       tabs,
@@ -298,11 +318,23 @@ const testTabs = async (tabs, index, listOrientation, listIsCorrect) => {
       'down',
       arrowTarget(index, tabCount, listOrientation, 'down'),
       isCorrect,
-      itemData
+      itemData,
+      withItems,
+      page
     );
-    isCorrect = await testKey(tabs, currentTab, 'Home', 'home', 0, isCorrect, itemData);
     isCorrect = await testKey(
-      tabs, currentTab, 'End', 'end', tabCount - 1, isCorrect, itemData
+      tabs,
+      currentTab,
+      'Home',
+      'home',
+      0,
+      isCorrect,
+      itemData,
+      withItems,
+      page
+    );
+    isCorrect = await testKey(
+      tabs, currentTab, 'End', 'end', tabCount - 1, isCorrect, itemData, withItems, page
     );
     // Update the tablist status (Node 14 does not support the ES 2021 &&= operator).
     listIsCorrect = listIsCorrect && isCorrect;
@@ -312,7 +344,7 @@ const testTabs = async (tabs, index, listOrientation, listIsCorrect) => {
       data.tabElements[isCorrect ? 'correct' : 'incorrect'].push(itemData);
     }
     // Process the next tab element.
-    return await testTabs(tabs, index + 1, listOrientation, listIsCorrect);
+    return await testTabs(tabs, index + 1, listOrientation, listIsCorrect, withItems, page);
   }
   // Otherwise, i.e. if all tab elements have been tested:
   else {
@@ -321,7 +353,7 @@ const testTabs = async (tabs, index, listOrientation, listIsCorrect) => {
   }
 };
 // Recursively tests tablists.
-const testTabLists = async tabLists => {
+const testTabLists = async (tabLists, withItems) => {
   // If any tablists remain to be tested:
   if (tabLists.length) {
     const firstTabList = tabLists[0];
@@ -341,12 +373,12 @@ const testTabLists = async tabLists => {
       // If the tablist contains at least 2 tab elements:
       if (tabs.length > 1) {
         // Test them.
-        const isCorrect = await testTabs(tabs, 0, orientation, true);
+        const isCorrect = await testTabs(tabs, 0, orientation, true, withItems, page);
         // Increment the data.
         data.totals.tabLists.total++;
         data.totals.tabLists[isCorrect ? 'correct' : 'incorrect']++;
         // Process the remaining tablists.
-        await testTabLists(tabLists.slice(1));
+        await testTabLists(tabLists.slice(1), withItems);
       }
     }
   }
@@ -354,62 +386,60 @@ const testTabLists = async tabLists => {
 // Tests tab-list navigation and reports results.
 exports.reporter = async (page, withItems) => {
   // Initialize the results.
-  const data = {
-    totals: {
-      navigations: {
-        all: {
+  data.totals = {
+    navigations: {
+      all: {
+        total: 0,
+        correct: 0,
+        incorrect: 0
+      },
+      specific: {
+        tab: {
           total: 0,
           correct: 0,
           incorrect: 0
         },
-        specific: {
-          tab: {
-            total: 0,
-            correct: 0,
-            incorrect: 0
-          },
-          left: {
-            total: 0,
-            correct: 0,
-            incorrect: 0
-          },
-          right: {
-            total: 0,
-            correct: 0,
-            incorrect: 0
-          },
-          up: {
-            total: 0,
-            correct: 0,
-            incorrect: 0
-          },
-          down: {
-            total: 0,
-            correct: 0,
-            incorrect: 0
-          },
-          home: {
-            total: 0,
-            correct: 0,
-            incorrect: 0
-          },
-          end: {
-            total: 0,
-            correct: 0,
-            incorrect: 0
-          }
+        left: {
+          total: 0,
+          correct: 0,
+          incorrect: 0
+        },
+        right: {
+          total: 0,
+          correct: 0,
+          incorrect: 0
+        },
+        up: {
+          total: 0,
+          correct: 0,
+          incorrect: 0
+        },
+        down: {
+          total: 0,
+          correct: 0,
+          incorrect: 0
+        },
+        home: {
+          total: 0,
+          correct: 0,
+          incorrect: 0
+        },
+        end: {
+          total: 0,
+          correct: 0,
+          incorrect: 0
         }
-      },
-      tabElements: {
-        total: 0,
-        correct: 0,
-        incorrect: 0
-      },
-      tabLists: {
-        total: 0,
-        correct: 0,
-        incorrect: 0
       }
+    },
+    tabElements: {
+      total: 0,
+      correct: 0,
+      incorrect: 0
+    },
+    tabLists: {
+      total: 0,
+      correct: 0,
+      incorrect: 0
     }
   };
   if (withItems) {
@@ -421,7 +451,7 @@ exports.reporter = async (page, withItems) => {
   // Get an array of element handles for the visible tablists.
   const tabLists = await page.$$('[role=tablist]:visible');
   if (tabLists.length) {
-    await testTabLists(tabLists);
+    await testTabLists(tabLists, withItems);
     // Reload the page, because keyboard navigation may have triggered content changes.
     try {
       await page.reload({timeout: 15000});

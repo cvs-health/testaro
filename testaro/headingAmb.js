@@ -1,5 +1,5 @@
 /*
-  © 2023 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2023–2024 CVS Health and/or one of its affiliates. All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -49,12 +49,11 @@ exports.reporter = async (page, withItems) => {
     // For each heading:
     headings.forEach((heading, index) => {
       // Get its level.
-      const level = heading.level;
-      // If there are prior non-inferior headings and the last one has the same-level and text:
+      const level = heading.tagName[1];
       // Get the prior headings.
       const priorHeadings = headings.slice(0, index);
       // Get the non-inferior ones among them.
-      const nonInferiors = priorHeadings.filter(priorHeading => priorHeading.level <= level);
+      const nonInferiors = priorHeadings.filter(priorHeading => priorHeading.tagName[1] <= level);
       // If there are any:
       const nonInferiorCount = nonInferiors.length;
       if (nonInferiorCount) {
@@ -85,7 +84,7 @@ exports.reporter = async (page, withItems) => {
           // Add a standard instance.
           standardInstances.push({
             ruleID: 'headingAmb',
-            what: 'Heading has the same text as a prior same-level sibling heading',
+            what: 'Heading has the same text as the prior same-level sibling heading',
             ordinalSeverity: 1,
             tagName: elData.tagName,
             id: elData.id,
@@ -96,7 +95,7 @@ exports.reporter = async (page, withItems) => {
         // Otherwise, i.e. if it does not exist:
         else {
           // Report this.
-          console.log('ERROR: Reportedly same-text sibling heading not found');
+          console.log('ERROR: Reportedly same-text adjacent sibling heading not found');
         }
       }
     }
@@ -105,7 +104,7 @@ exports.reporter = async (page, withItems) => {
       // Add a summary instance.
       standardInstances.push({
         ruleID: 'headingAmb',
-        what: 'Sibling same-level headings have the same text',
+        what: 'Adjacent sibling same-level headings have the same text',
         ordinalSeverity: 1,
         count: totals[1],
         tagName: '',
