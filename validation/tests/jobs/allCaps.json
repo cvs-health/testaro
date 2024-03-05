@@ -136,10 +136,10 @@
     }
   ],
   "sources": {
-    "script": "",
-    "host": {},
-    "requester": ""
+    "script": ""
   },
-  "creationTime": "2013-05-28T12:00:00",
-  "timeStamp": "00000"
+  "standard": "no",
+  "observe": false,
+  "timeStamp": "241201T1200",
+  "creationTimeStamp": "241201T1200"
 }

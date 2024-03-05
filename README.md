@@ -190,16 +190,12 @@ Job properties:
 - `observe`: `true` or `false`, indicating whether tool and Testaro-rule invocations are to be reported to the server as they occur, so that the server can update a waiting client.
 - `timeStamp`: a string in `yymmddThhMM` format, specifying a date and time before which the job is not to be performed.
 - `creationTimeStamp`: a string in `yymmddThhMM` format, describing when the job was created.
-- `sources`: an object describing where the job came from:
-   - `script`: the ID of the script (as used by Testilo) from which the job was made, or an empty string if none.
-   - `batch` : the ID of the batch (as used by Testilo) from which the target of this job was drawn, or an empty string if none.
-   - `lastTarget`: whether the the target was drawn from a batch and is the last target in the batch.
-   - `target`: an object whose `id`, `what`, and `which` properties describe the target being tested by this job, or, if there was no batch, have empty strings as values.
-   - `requester`: the email address that can receive a notice of completion of the job, or an empty string if no notice is to be sent.
+- `sources`: an object describing where the job came from. It may be an empty object, or an object containing any properties required by the job creator.
 - `creationTimeStamp`: the date and time in `yymmddThhMM` format when the job was created.
 - `timeStamp`: the date and time in `yymmddThhMM` format before which the job is not to be assigned.
 - `sendReportTo`: the URL to which the report of the job is to be sent, or an empty string if the report is not to be sent to a server.
-- `mergeID`: a randomly generated alphanumeric ID for the process (such as a Testilo merger of a script and a batch) that created the job, or an empty string if none.
+
+The job creator may add other properties (such as `mergeID` in this example) to a job.
 
 ### Reports
 

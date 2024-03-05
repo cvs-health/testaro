@@ -295,9 +295,6 @@ const isValidReport = report => {
     if (! sources || typeof sources !== 'object') {
       return 'Bad report sources';
     }
-    if (typeof sources.script !== 'string') {
-      return 'Bad source script';
-    }
     if (
       ! (creationTimeStamp && typeof creationTimeStamp === 'string' && dateOf(creationTimeStamp))
     ) {

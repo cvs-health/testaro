@@ -149,7 +149,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                     resolve(true);
                   }
                   // Otherwise, if the server sent a valid job:
-                  else if (id && sources && sources.target && sources.target.which) {
+                  else if (id && sources) {
                     // Restart the cycle.
                     cycleIndex = -1;
                     // Prevent further watching, if unwanted.
@@ -159,9 +159,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                     // If the job specifies a report destination:
                     if (sendReportTo) {
                       // Perform the job, adding result data to it.
-                      const target = sources.target.which;
                       console.log(`${logStart}job ${id} (${nowString()})`);
-                      console.log(`>> It will test ${target}`);
                       console.log(`>> It will send report to ${sendReportTo}`);
                       await doJob(contentObj);
                       let reportJSON = JSON.stringify(contentObj, null, 2);
