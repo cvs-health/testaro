@@ -1,5 +1,5 @@
 /*
-  © 2022–2023 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2022–2024 CVS Health and/or one of its affiliates. All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ exports.validateTest = async testID => {
     await doJob(report);
     // Report whether the end time was reported.
     const {acts, jobData} = report;
-    if (jobData.endTime && /^\d{4}-.+$/.test(jobData.endTime)) {
+    if (jobData.endTime && /^(?:\d{2}-){2}\d{2}T\d{2}:\d{2}$/.test(jobData.endTime)) {
       console.log('Success: End time has been correctly populated');
     }
     else {

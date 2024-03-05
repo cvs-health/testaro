@@ -136,10 +136,9 @@
     }
   ],
   "sources": {
-    "script": ""
   },
-  "standard": "no",
+  "standard": "only",
   "observe": false,
-  "timeStamp": "241201T1200",
-  "creationTimeStamp": "241201T1200"
+  "timeStamp": "240101T1500",
+  "creationTimeStamp": "240101T1200"
 }
