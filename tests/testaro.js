@@ -225,13 +225,10 @@ exports.reporter = async (page, options) => {
           const ruleReport = isJS
             ? require(`../testaro/${rule}`).reporter(... ruleArgs)
             : jsonTest(rule, ruleArgs);
-          console.log('Declared ruleReport');
           const timeoutReport = await Promise.race([timer, ruleReport]);
-          console.log('Got report or timeout');
           clearTimeout(timeout);
           // If the test was completed before the deadline:
           if (! timeoutReport.timedOut) {
-            console.log('Did not time out');
             // Add data from the test to the result.
             const endTime = Date.now();
             testTimes.push([rule, Math.round((endTime - startTime) / 1000)]);

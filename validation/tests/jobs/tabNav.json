@@ -84,9 +84,7 @@
           1
         ],
         [
-          "standardResult.instances.0.count",
-          "=",
-          4
+          "standardResult.instances.0.count"
         ],
         [
           "standardResult.instances.0.tagName",
@@ -112,11 +110,6 @@
           "standardResult.instances.1.ordinalSeverity",
           "=",
           1
-        ],
-        [
-          "standardResult.instances.1.count",
-          "=",
-          5
         ],
         [
           "standardResult.instances.1.id",

@@ -353,7 +353,7 @@ const testTabs = async (tabs, index, listOrientation, listIsCorrect, withItems, 
   }
 };
 // Recursively tests tablists.
-const testTabLists = async (tabLists, withItems) => {
+const testTabLists = async (tabLists, withItems, page) => {
   // If any tablists remain to be tested:
   if (tabLists.length) {
     const firstTabList = tabLists[0];
@@ -378,7 +378,7 @@ const testTabLists = async (tabLists, withItems) => {
         data.totals.tabLists.total++;
         data.totals.tabLists[isCorrect ? 'correct' : 'incorrect']++;
         // Process the remaining tablists.
-        await testTabLists(tabLists.slice(1), withItems);
+        await testTabLists(tabLists.slice(1), withItems, page);
       }
     }
   }
@@ -451,7 +451,7 @@ exports.reporter = async (page, withItems) => {
   // Get an array of element handles for the visible tablists.
   const tabLists = await page.$$('[role=tablist]:visible');
   if (tabLists.length) {
-    await testTabLists(tabLists, withItems);
+    await testTabLists(tabLists, withItems, page);
     // Reload the page, because keyboard navigation may have triggered content changes.
     try {
       await page.reload({timeout: 15000});
@@ -460,21 +460,24 @@ exports.reporter = async (page, withItems) => {
       console.log('ERROR: page reload timed out');
     }
   }
+  // Get the totals of navigation errors, bad tabs, and bad tab lists.
   const totals = data.totals ? [
     data.totals.navigations.all.incorrect,
     data.totals.tabElements.incorrect,
     data.totals.tabLists.incorrect,
     0
   ] : [];
+  // Initialize the standard instances.
   const standardInstances = [];
-  if (data.tabElements && data.tabElements.incorrect) {
+  // If itemization is required:
+  if (withItems) {
+    // For each bad tab:
     data.tabElements.incorrect.forEach(item => {
+      // Create a standard instance.
       standardInstances.push({
         ruleID: 'tabNav',
-        what:
-        `Tab responds nonstandardly to ${item.navigationErrors.join(', ')}`,
+        what: `Tab responds nonstandardly to ${item.navigationErrors.join(', ')}`,
         ordinalSeverity: 1,
-        count: item.navigationErrors.length,
         tagName: item.tagName,
         id: item.id,
         location: {
@@ -486,7 +489,9 @@ exports.reporter = async (page, withItems) => {
       });
     });
   }
+  // Otherwise, if navigation is not required and any navigations are bad:
   else if (data.totals.navigations.all.incorrect) {
+    // Create a standard instance.
     standardInstances.push({
       ruleID: 'tabNav',
       what: 'Tab lists have nonstandard navigation',
@@ -502,6 +507,7 @@ exports.reporter = async (page, withItems) => {
       excerpt: ''
     });
   }
+  // Return the result.
   return {
     data,
     totals,
