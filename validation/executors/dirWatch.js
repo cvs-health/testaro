@@ -1,5 +1,5 @@
 /*
-  © 2022–2023 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2022–2024 CVS Health and/or one of its affiliates. All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
 */
 
 /*
-  watchDir.js
+  dirWatch.js
   Validator for directory watching.
 */
 
@@ -31,14 +31,14 @@ const fs = require('fs/promises');
 
 // CONSTANTS
 
-// Override cycle environment variables with validation-specific ones.
+// Override dirWatch environment variables with validation-specific ones.
 process.env.JOBDIR = `${__dirname}/../watch`;
 process.env.REPORTDIR = `${__dirname}/../../temp`;
-const jobID = '00000-simple-example';
-const {cycle} = require('../../watch');
+const jobID = '240101T1200-simple-example';
+const {dirWatch} = require('../../dirWatch');
 
 // Start checking for jobs every 5 seconds.
-cycle(true, false, 5)
+dirWatch(false, 5)
 .then(() => {
   console.log('Success: Watch validation ended');
 });

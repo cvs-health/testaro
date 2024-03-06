@@ -1,5 +1,5 @@
 /*
-  © 2022–2023 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2022–2024 CVS Health and/or one of its affiliates. All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -31,13 +31,13 @@ const fs = require('fs/promises');
 
 // CONSTANTS
 
-// Override cycle environment variables with validation-specific ones.
+// Override netWatch environment variables with validation-specific ones.
 const jobDir = `${__dirname}/../jobs/todo`;
-process.env.JOB_URL = 'http://localhost:3007/api/job';
+process.env.JOB_URLS = 'http://localhost:3007/api/job';
 process.env.AGENT = 'testarauth';
-const {cycle} = require('../../watch');
+const {netWatch} = require('../../netWatch');
 const client = require('http');
-const jobID = '00000-simple-example';
+const jobID = '240101T1200-simple-example';
 
 // OPERATION
 
@@ -47,7 +47,7 @@ const startTime = Date.now();
 let jobGiven = false;
 // Start checking for jobs every 5 seconds in 5 seconds.
 setTimeout(() => {
-  cycle(false, false, 5);
+  netWatch(false, 5, false);
 }, 5000);
 let server;
 // Handles Testaro requests to the server.
@@ -104,27 +104,27 @@ const requestHandler = (request, response) => {
             const body = JSON.parse(bodyJSON);
             if (
               body.acts
-              && body.jobData
-              && body.jobData.agent
-              && body.jobData.agent === process.env.AGENT
+              && body.sources
+              && body.sources.agent
+              && body.sources.agent === process.env.AGENT
             ) {
-              ack.result = 'Success: Valid report submitted';
+              ack.message = 'Success: Valid report submitted';
             }
             else {
-              ack.result = 'Failure: Report invalid';
+              ack.message = 'Failure: Report invalid';
             }
           }
           catch(error) {
-            ack.result = `ERROR: ${error.message}`;
+            ack.message = `ERROR: ${error.message}`;
           }
         }
       }
       else {
-        ack.result = 'ERROR: Report submission invalid';
+        ack.message = 'ERROR: Report submission invalid';
       }
       const ackJSON = JSON.stringify(ack);
       response.end(ackJSON);
-      console.log(`Server responded: ${ack.result}`);
+      console.log(`Server responded: ${ack.message}`);
       // This ends the validation, so stop the server.
       server.close();
       console.log('Server closed');

@@ -1,5 +1,5 @@
 /*
-  © 2022–2023 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2022–2024 CVS Health and/or one of its affiliates. All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ const fs = require('fs/promises');
 // ########## CONSTANTS
 
 const {doJob} = require('../../run');
-const jobID = '00000-simple-example';
+const jobID = '240101T1200-simple-example';
 
 // ########## OPERATION
 
@@ -45,8 +45,8 @@ fs.readFile(`${__dirname}/../jobs/todo/${jobID}.json`, 'utf8')
   try {
     // Check the report against expectations.
     const {acts, jobData} = report;
-    if (acts.length !== 3) {
-      console.log('Failure: Count of acts is not 3');
+    if (acts.length !== 2) {
+      console.log('Failure: Count of acts is not 2');
     }
     else if (! jobData) {
       console.log('Failure: Report omits jobData');

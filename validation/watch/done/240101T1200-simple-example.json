@@ -1,0 +1,30 @@
+{
+  "id": "240101T1200-simple-example",
+  "what": "Test example.edu with bulk",
+  "strict": true,
+  "timeLimit": 10,
+  "acts": [
+    {
+      "type": "launch",
+      "which": "chromium",
+      "url": "https://example.edu/",
+      "what": "Chromium browser"
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "stopOnFail": true,
+      "rules": [
+        "y",
+        "bulk"
+      ]
+    }
+  ],
+  "sources": {},
+  "standard": "only",
+  "observe": false,
+  "timeStamp": "240101T1500",
+  "creationTimeStamp": "240101T1200",
+  "sendReportTo": ""
+}

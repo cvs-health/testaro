@@ -1,14 +1,14 @@
 {
   "name": "testaro",
-  "version": "37.0.0",
+  "version": "37.1.0",
   "description": "Run 1000 web accessibility tests from 10 tools and get a standardized report",
   "main": "index.js",
   "scripts": {
     "tests": "node validation/executors/tests",
     "test": "node validation/executors/test",
     "run": "node validation/executors/run",
-    "watchDir": "node validation/executors/watchDir",
-    "watchNet": "node validation/executors/watchNet"
+    "dirWatch": "node validation/executors/dirWatch",
+    "netWatch": "node validation/executors/netWatch"
   },
   "repository": {
     "type": "git",
