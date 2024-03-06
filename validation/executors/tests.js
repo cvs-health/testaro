@@ -1,5 +1,5 @@
 /*
-  © 2022–2023 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2022–2024 CVS Health and/or one of its affiliates. All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -32,15 +32,16 @@ const {validateTest} = require('../validateTest');
 
 // OPERATION
 
-// Get the names of the Testaro validation test files.
-fs.readdir(`${__dirname}/../tests/jobs`)
+// Get the names of the Testaro tes files.
+fs.readdir(`${__dirname}/../../testaro/`)
 // When they arrive:
 .then(async fileNames => {
   // For each file name:
   for (const fileName of fileNames) {
-    // Get the test ID from it by disregarding its .json extension.
-    const testID = fileName.slice(0, -5);
+    // Get the test ID from it by disregarding its extension.
+    const testID = fileName.replace(/\..+$/, '');
     // Validate the test.
+    console.log(`### Validating Testaro test ${testID}`);
     await validateTest(testID);
   }
 });
