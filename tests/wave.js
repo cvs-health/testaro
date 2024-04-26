@@ -44,8 +44,7 @@ exports.reporter = async (page, options) => {
     https.get(
       {
         host: 'wave.webaim.org',
-        path: `/api/request?key=${waveKey}&url=${page.url()}&reporttype=${reportType}`,
-        protocol: 'https:'
+        path: `/api/request?key=${waveKey}&url=${page.url()}&reporttype=${reportType}`
       },
       response => {
         let actReport = '';

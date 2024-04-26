@@ -29,8 +29,6 @@
 
 // Module to keep secrets.
 require('dotenv').config();
-// Module to read and write files.
-const fs = require('fs/promises');
 // Modules to make requests to servers.
 const httpClient = require('http');
 const httpsClient = require('https');
@@ -166,7 +164,9 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                       console.log(`Job ${id} finished (${nowString()})`);
                       // Send the report to the specified server.
                       console.log(`Sending report ${id} to ${sendReportTo}`);
-                      const reportClient = sendReportTo.startsWith('https://') ? httpsClient : httpClient;
+                      const reportClient = sendReportTo.startsWith('https://')
+                        ? httpsClient
+                        : httpClient;
                       const reportLogStart = `Sent report ${id} to ${sendReportTo} and got `;
                       reportClient.request(sendReportTo, {method: 'POST'}, repResponse => {
                         const chunks = [];
