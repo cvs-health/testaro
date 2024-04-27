@@ -407,10 +407,12 @@ const browserClose = async () => {
   }
 };
 // Launches a browser, navigates to a URL, and returns browser data.
-const launch = async (report, typeName, url, debug, waits, isLowMotion = false) => {
+const launch = async (
+  report, typeName, url, debug, waits, deviceID = 'default', isLowMotion = false
+) => {
   // If the specified browser type exists:
   const browserType = require('playwright')[typeName];
-  if (browserType) {
+  if (browserType !== 'default') {
     // Close the current browser, if any.
     await browserClose();
     // Launch a browser of the specified type.
@@ -436,8 +438,23 @@ const launch = async (report, typeName, url, debug, waits, isLowMotion = false) 
         error: 'Browser launch failed'
       };
     });
+    // If a device was specified:
+    let options = {reduceMotion: isLowMotion ? 'reduce' : 'no-preference'};
+    if (deviceID) {
+      // Get its properties.
+      const {devices} = require('playwright');
+      const deviceProperties = devices[deviceID];
+      if (deviceProperties) {
+        options = {
+          ... options,
+          ... deviceProperties
+        };
+      }
+      else {
+        console.log(`ERROR: Device ${deviceID} does not exist`);
+      }
+    }
     // Open a context (i.e. browser tab), with reduced motion if specified.
-    const options = {reduceMotion: isLowMotion ? 'reduce' : 'no-preference'};
     const browserContext = await browser.newContext(options);
     // Prevent default timeouts.
     browserContext.setDefaultTimeout(0);
@@ -448,6 +465,8 @@ const launch = async (report, typeName, url, debug, waits, isLowMotion = false) 
       report.jobData.logCount ??= 0;
       report.jobData.logSize ??= 0;
       report.jobData.errorLogCount ??= 0;
+      report.jobData.deviceID ??= deviceID;
+      report.jobData.browserTabOptions ??= options;
       // Add any error events to the count of logging errors.
       page.on('crash', () => {
         report.jobData.errorLogCount++;
@@ -845,7 +864,13 @@ const doActs = async (report, actIndex, page) => {
       else if (act.type === 'launch') {
         // Launch the specified browser and navigate to the specified URL.
         const launchResult = await launch(
-          report, act.which, act.url, debug, waits, act.lowMotion ? 'reduce' : 'no-preference'
+          report,
+          act.which,
+          act.url,
+          debug,
+          waits,
+          act.deviceID || 'default',
+          act.lowMotion ? 'reduce' : 'no-preference'
         );
         // If the launch and navigation succeeded:
         if (launchResult && launchResult.success) {

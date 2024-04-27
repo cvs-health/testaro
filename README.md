@@ -147,6 +147,7 @@ Here is an example of a job:
       type: 'launch',
       which: 'chromium',
       url: 'https://www.w3c.org',
+      deviceID: 'iPhone 6',
       what: 'Chromium browser'
     },
     {
@@ -177,7 +178,7 @@ Here is an example of a job:
 ```
 
 This job contains two _acts_, telling Testaro to:
-1. open a page in the Chromium browser and navigate to a specified URL
+1. open a page in the Chromium browser with properties of an iPhone 6 and navigate to a specified URL
 1. perform two of the tests of the `alfa` tool (the tests for rules `r25` and `r71`) on that URL
 
 Job properties:
@@ -344,7 +345,7 @@ When the texts of multiple elements of the same type will contain the same `whic
 
 ##### Navigations
 
-An example of a **navigation** is the act of type `launch` above.
+An example of a **navigation** is the act of type `launch` above. The `deviceID` property of a `launch` act is optional. If not specified, it is set to `'default'`. It can be any of the device IDs recognized by Playwright, published at `https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json`.
 
 If any act alters the page, you can restore the page to its original state for the next act by inserting a new `launch` act (and, if necessary, additional page-specific acts) between them.
 
