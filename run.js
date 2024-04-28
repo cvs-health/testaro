@@ -408,7 +408,7 @@ const browserClose = async () => {
 };
 // Launches a browser, navigates to a URL, and returns browser data.
 const launch = async (
-  report, typeName, url, debug, waits, deviceID = 'default', isLowMotion = false
+  report, typeName, url, debug, waits, deviceID = 'default', device, motion = 'no-preference'
 ) => {
   // If the specified browser type exists:
   const browserType = require('playwright')[typeName];
@@ -438,9 +438,11 @@ const launch = async (
         error: 'Browser launch failed'
       };
     });
-    // If a device was specified:
-    let options = {reduceMotion: isLowMotion ? 'reduce' : 'no-preference'};
-    if (deviceID) {
+    // If a non-default device was specified:
+    let options = {
+      reduceMotion: motion
+    };
+    if (deviceID && deviceID !== 'default') {
       // Get its properties.
       const {devices} = require('playwright');
       const deviceProperties = devices[deviceID];
