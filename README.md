@@ -905,6 +905,12 @@ To deal with the above problems, you can:
 
 Some measures of these kinds are included in the scoring and reporting features of the Testilo package.
 
+### Tool malfunctions
+
+Tools can become faulty. For example, Alfa stopped reporting any rule violations in mid-April 2024 and resumed doing so at the end of April. In some cases, such as this, the tool maker corrects the fault. In others, the tool changes and forces Testaro to change its handling of the tool.
+
+Testaro would become more reliable if the behavior of its tools were monitored for suspect changes.
+
 ## Repository exclusions
 
 The files in the `temp` directory are presumed ephemeral and are not tracked by `git`.
