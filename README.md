@@ -235,6 +235,13 @@ The standard format of each tool report has these properties:
         - `spec`: the location information
     - `excerpt`: some or all of the code
 
+The most common location types reported by the tools are:
+- `line`: Nu Html Checker
+- `selector`: Axe, QualWeb, WAVE
+- `xpath`: Alfa, ASLint, Equal Access
+- `box`: Editoria11y, Testaro
+- none: HTML CodeSniffer
+
 The original result of a test act is recorded as the value of a `result` property of the act. The standard-format result is recorded as the value of the `standardResult` property of the act. Its format is shown by this example:
 
 ``` javascript
@@ -888,6 +895,7 @@ Tools sometimes do redundant testing, in that two or more tools test for the sam
 - One cannot be confident in excluding some tests of some tools on the assumption that they perfectly duplicate tests of other tools.
 - The Testaro report from a job documents each tool’s results separately, so a single defect may be documented in multiple locations within the report, making the direct consumption of the report inefficient.
 - An effort to aggregate the results into a single score may distort the scores by inflating the weights of defects that happen to be discovered by multiple tools.
+- It is difficult to identify duplicate instances, in part because, as described above, tools use four different methods for identifying the locations of elements that violate tool rules.
 
 To deal with the above problems, you can:
 - configure `test` acts for tools to exclude tests that you consider duplicative
