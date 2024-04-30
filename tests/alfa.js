@@ -35,7 +35,8 @@ let alfaRules = require('@siteimprove/alfa-rules').default;
 
 // Conducts and reports the alfa tests.
 exports.reporter = async (page, options) => {
-  const {rules} = options;
+  const {act} = options;
+  const {rules} = act;
   // If only some rules are to be employed:
   if (rules && rules.length) {
     // Remove the other rules.
