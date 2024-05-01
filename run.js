@@ -33,6 +33,8 @@ require('dotenv').config();
 const {actSpecs} = require('./actSpecs');
 // Module to standardize report formats.
 const {standardize} = require('./procs/standardize');
+// Module to identify element bounding boxes.
+const {identify} = require('./procs/identify');
 // Module to send a notice to an observer.
 const {tellServer} = require('./procs/tellServer');
 
@@ -1118,6 +1120,10 @@ const doActs = async (report, actIndex, page) => {
               };
               // Populate it.
               standardize(act);
+              // Add a bounding-box identifier to each of its standard instances.
+              for (const instance of act.standardResult.instances) {
+                instance.boxID = await identify(instance, page);
+              };
               // If the original-format result is not to be included in the report:
               if (standard === 'only') {
                 // Remove it.
