@@ -31,15 +31,22 @@
 const boxOf = async locator => {
   try {
     const box = await locator.boundingBox({
-      timeout: 20
+      timeout: 50
     });
-    Object.keys(box).forEach(dim => {
-      box[dim] = Math.round(box[dim], 0);
-    });
-    return box;
+    if (box) {
+      Object.keys(box).forEach(dim => {
+        box[dim] = Math.round(box[dim], 0);
+      });
+      console.log('Got box');
+      return box;
+    }
+    else {
+      console.log('No bounding box');
+      return null;
+    }
   }
   catch(error) {
-    console.log('ERROR getting bounding box of locator');
+    console.log(`ERROR getting box (${error.message})`);
     return null;
   }
 }
@@ -54,18 +61,11 @@ const boxToString = box => {
 };
 // Returns the bounding box of the element of a standard instance.
 exports.identify = async (instance, page) => {
-  const {tagName, id, location, excerpt} = instance;
+  const {tagName, location, excerpt} = instance;
   // If the instance specifies a bounding box:
   if (location.type === 'box') {
     // Return it.
     return boxToString(location.spec);
-  }
-  // Otherwise, if the instance specifies an ID:
-  else if (id) {
-    // Return the bounding box of the first element with it.
-    const locator = page.locator(`#${id}`).first();
-    const box = await boxOf(locator);
-    return boxToString(box);
   }
   // Otherwise, if the instance specifies a selector location:
   else if (location.type === 'selector') {
@@ -79,26 +79,37 @@ exports.identify = async (instance, page) => {
     // Remove any final text function.
     const elPath = location.spec.replace(/\/text\(\)\[\d+\]$/, '');
     // Return the bounding box of the first element matching the path.
-    const locator = page.locator(`xpath=/${elPath}`).first();
+    const locator = page.locator(`xpath=${elPath}`).first();
     const box = await boxOf(locator);
     return boxToString(box);
   }
   // Otherwise, if the instance specifies both a tag name and an excerpt:
   else if (tagName && excerpt) {
-    // Get the plain text parts of the excerpt.
+    // Get the plain text parts of the excerpt, converting ... to an empty string.
+    console.log(`excerpt: ${excerpt}`);
     const minTagExcerpt = excerpt.replace(/<[^>]+>/g, '<>');
-    const plainParts = minTagExcerpt.match(/[<>]+/g);
+    console.log(`minTagExcerpt: ${minTagExcerpt}`);
+    const plainParts = (minTagExcerpt.match(/[^<>]+/g) || [])
+    .map(part => part === '...' ? '' : part);
+    console.log(`plainParts length: ${plainParts.length}`);
+    console.log(`plainParts: ((${plainParts}))`);
     // Get the longest of them.
-    const mainPart = plainParts
-    .sort((a, b) => b.length - a.length)[0]
-    .trim()
-    .replace(/\s{2,}/g, ' ');
+    const sortedPlainParts = plainParts.sort((a, b) => b.length - a.length);
+    console.log(`sortedPlainParts: ((${sortedPlainParts}))`);
+    const mainPart = sortedPlainParts.length ? sortedPlainParts[0] : '';
+    console.log(`mainPart: ((${mainPart}))`);
+    const compactMainPart = mainPart.trim().replace(/\s{2,}/g, ' ');
     // Get locators for matching elements.
-    const locators = page.locator(tagName.toLowerCase(), {hasText: mainPart});
+    const locators = page.locator(tagName.toLowerCase(), {hasText: compactMainPart});
+    console.log(`tag name: ${tagName.toLowerCase()}`);
+    console.log(`compactMainPart: ${compactMainPart}`);
     // If there is exactly 1 of them:
-    if (locators.count === 1) {
+    const locatorCount = await locators.count();
+    console.log(`Tag name and excerpt match count: ${locatorCount}`);
+    if (locatorCount === 1) {
       // Return the bounding box of its element.
       const box = await boxOf(locators);
+      console.log(`box: ${JSON.stringify(box, null, 2)}`);
       return boxToString(box);
     }
   }
