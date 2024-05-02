@@ -22,7 +22,7 @@
 
 /*
   nuVal
-  This test subjects a page and its source to the Nu Html Checker, thereby testing scripted
+  This tool subjects a page and its source to the Nu Html Checker, thereby testing scripted
   content found only in the loaded page and erroneous content before the browser corrects it.
   The API erratically replaces left and right double quotation marks with invalid UTF-8, which
   appears as 2 or 3 successive instances of the replacement character (U+fffd). Therefore, this

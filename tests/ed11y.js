@@ -29,6 +29,10 @@
 
 // Module to handle files.
 const fs = require('fs/promises');
+// Module to get element IDs.
+const {boxToString} = require('../procs/identify');
+// Module to get the XPath of an element.
+const {xPath} = require('playwright-dompath');
 
 // FUNCTIONS
 
@@ -40,19 +44,25 @@ exports.reporter = async (page, options) => {
   const scriptNonce = jobData && jobData.lastScriptNonce;
   // Get the test script.
   const script = await fs.readFile(`${__dirname}/../ed11y/editoria11y.min.js`, 'utf8');
-  const rawResultJSON = await page.evaluate(args => new Promise(async resolve => {
+  // Run the tests and get the violating elements and violation facts.
+  const resultJSHandle = await page.evaluateHandle(args => new Promise(async resolve => {
     // Impose a timeout on obtaining a result.
     const timer = setTimeout(() => {
-      resolve(JSON.stringify({
+      resolve({
         prevented: true,
         error: 'ed11y timed out'
-      }));
+      });
     }, 20000);
     const {scriptNonce, script, rulesToTest} = args;
-    // When the script is executed:
+    // When the script has been executed:
     document.addEventListener('ed11yResults', () => {
-      // Get the result.
-      const resultObj = {};
+      // Initialize an array of violating elements and violation facts.
+      const reportObj = {
+        elements: [],
+        resultObj:  {}
+      };
+      // Populate the global facts.
+      const {elements, resultObj} = reportObj;
       [
         'version',
         'options',
@@ -70,7 +80,7 @@ exports.reporter = async (page, options) => {
           console.log(`ERROR: invalid value of ${key} property of Ed11y (${error.message})`);
         }
       });
-      // Get data on the text alternatives of images from the result.
+      // Get data on violating text alternatives of images from the results.
       resultObj.imageAlts = Ed11y
       .imageAlts
       .filter(item => item[3] !== 'pass')
@@ -80,22 +90,23 @@ exports.reporter = async (page, options) => {
       delete resultObj.options.darkTheme;
       delete resultObj.options.lightTheme;
       // Initialize the element results.
-      const results = resultObj.results = [];
-      // For each rule violation:
-      Ed11y.results.forEach(elResult => {
-        // If rules were not selected or they were and include this one:
-        if (! rulesToTest || rulesToTest.includes(elResult.test)) {
-          // Create a violation record.
-          const result = {};
-          result.test = elResult.test || '';
-          if (elResult.content) {
-            result.content = elResult.content.replace(/\s+/g, ' ');
+      const elResults = resultObj.elResults = [];
+      // For each rule violation by an element:
+      Ed11y.results.forEach(toolResult => {
+        // If rules were not selected or they were and include this rule:
+        if (! rulesToTest || rulesToTest.includes(toolResult.test)) {
+          // Create a record of the violation.
+          const elResult = {};
+          elResult.test = toolResult.test || '';
+          if (toolResult.content) {
+            elResult.content = toolResult.content.replace(/\s+/g, ' ');
           }
-          if (elResult.element) {
-            const{element} = elResult;
-            result.tagName = element.tagName || '';
-            result.id = element.id || '';
-            result.loc = {};
+          const {element} = toolResult;
+          if (element) {
+            elements.push(element);
+            elResult.tagName = element.tagName || '';
+            elResult.id = element.id || '';
+            elResult.loc = {};
             const locRect = element.getBoundingClientRect();
             if (locRect) {
               ['x', 'y', 'width', 'height'].forEach(dim => {
@@ -109,25 +120,15 @@ exports.reporter = async (page, options) => {
             if (elText.length > 400) {
               elText = `${elText.slice(0, 200)}…${elText.slice(-200)}`;
             }
-            result.excerpt = elText.replace(/\s+/g, ' ');
+            elResult.excerpt = elText.replace(/\s+/g, ' ');
+            elResult.boxID = boxToString(result.loc);
+            elResults.push(elResult);
           }
-          // Add it to the result.
-          results.push(result);
         }
       });
       // Return the result.
-      try {
-        const resultJSON = JSON.stringify(resultObj);
-        clearTimeout(timer);
-        resolve(resultJSON);
-      }
-      catch(error) {
-        clearTimeout(timer);
-        resolve(JSON.stringify({
-          prevented: true,
-          error: `Result object not stringified (${error.message})`
-        }));
-      }
+      clearTimeout(timer);
+      resolve(reportObj);
     });
     // Add the test script to the page.
     const testScript = document.createElement('script');
@@ -137,19 +138,25 @@ exports.reporter = async (page, options) => {
     }
     testScript.textContent = script;
     document.body.insertAdjacentElement('beforeend', testScript);
-    // Run the script.
+    // Execute the script.
     try {
       await new Ed11y({
         alertMode: 'headless'
       });
     }
     catch(error) {
-      resolve(JSON.stringify({
+      resolve({
         prevented: true,
         error: error.message
-      }));
+      });
     };
   }), {scriptNonce, script, rulesToTest: act.rules});
+  // Get the violating elements.
+  const elements = await resultJSHandle.getProperty('elements');
+  // If there are any:
+  if (elements && elements.length) {
+    
+  }
   const result = JSON.parse(rawResultJSON);
   let data = {};
   if (result.prevented) {
