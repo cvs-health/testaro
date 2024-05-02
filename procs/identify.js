@@ -25,28 +25,35 @@
   Identifies the element of a standard instance.
 */
 
-// ########## FUNCTIONS
+// IMPORTS
+
+const {xPath} = require('playwright-dompath');
+
+// FUNCTIONS
 
 // Returns the bounding box of a locator.
 const boxOf = async locator => {
   try {
-    const box = await locator.boundingBox({
-      timeout: 50
-    });
-    if (box) {
-      Object.keys(box).forEach(dim => {
-        box[dim] = Math.round(box[dim], 0);
+    const isVisible = await locator.isVisible();
+    if (isVisible) {
+      const box = await locator.boundingBox({
+        timeout: 50
       });
-      console.log('Got box');
-      return box;
+      if (box) {
+        Object.keys(box).forEach(dim => {
+          box[dim] = Math.round(box[dim], 0);
+        });
+        return box;
+      }
+      else {
+        return null;
+      }
     }
     else {
-      console.log('No bounding box');
       return null;
     }
   }
   catch(error) {
-    console.log(`ERROR getting box (${error.message})`);
     return null;
   }
 }
@@ -59,63 +66,59 @@ const boxToString = box => {
     return '';
   }
 };
-// Returns the bounding box of the element of a standard instance.
+// Returns the XPath and box ID of the element of a standard instance.
 exports.identify = async (instance, page) => {
+  // Initialize a result.
+  const elementID = {
+    boxID: '',
+    xPath: ''
+  };
   const {tagName, location, excerpt} = instance;
+  const {type, spec} = location;
   // If the instance specifies a bounding box:
-  if (location.type === 'box') {
-    // Return it.
-    return boxToString(location.spec);
+  if (type === 'box') {
+    // Add it to the result.
+    elementID.boxID = boxToString(spec);
   }
-  // Otherwise, if the instance specifies a selector location:
-  else if (location.type === 'selector') {
-    // Return the bounding box of the first element matching it.
-    const locator = page.locator(location.spec).first();
+  // Otherwise, if the instance specifies a selector or XPath location:
+  else if (['selector', 'xpath'].includes(type)) {
+    // Get a locator of the element.
+    const specifier = location.type === 'xpath'
+    ? `xpath=${spec.replace(/\/text\(\)\[\d+\]$/, '')}`
+    : spec;
+    const locator = page.locator(specifier).first();
+    // Add the bounding box of the element to the result.
     const box = await boxOf(locator);
-    return boxToString(box);
+    elementID.boxID = boxToString(box);
+    // Add the XPath of the element to the result.
+    elementID.pathID = await xPath(locator);
   }
-  // Otherwise, if the instance specifies an XPath location:
-  else if (location.type === 'xpath') {
-    // Remove any final text function.
-    const elPath = location.spec.replace(/\/text\(\)\[\d+\]$/, '');
-    // Return the bounding box of the first element matching the path.
-    const locator = page.locator(`xpath=${elPath}`).first();
-    const box = await boxOf(locator);
-    return boxToString(box);
-  }
-  // Otherwise, if the instance specifies both a tag name and an excerpt:
-  else if (tagName && excerpt) {
+  // If either ID remains undefined and the instance specifies both a tag name and an excerpt:
+  if (tagName && excerpt && ! (elementID.boxID && elementID.pathID)) {
     // Get the plain text parts of the excerpt, converting ... to an empty string.
-    console.log(`excerpt: ${excerpt}`);
     const minTagExcerpt = excerpt.replace(/<[^>]+>/g, '<>');
-    console.log(`minTagExcerpt: ${minTagExcerpt}`);
     const plainParts = (minTagExcerpt.match(/[^<>]+/g) || [])
     .map(part => part === '...' ? '' : part);
-    console.log(`plainParts length: ${plainParts.length}`);
-    console.log(`plainParts: ((${plainParts}))`);
     // Get the longest of them.
     const sortedPlainParts = plainParts.sort((a, b) => b.length - a.length);
-    console.log(`sortedPlainParts: ((${sortedPlainParts}))`);
     const mainPart = sortedPlainParts.length ? sortedPlainParts[0] : '';
-    console.log(`mainPart: ((${mainPart}))`);
     const compactMainPart = mainPart.trim().replace(/\s{2,}/g, ' ');
     // Get locators for matching elements.
     const locators = page.locator(tagName.toLowerCase(), {hasText: compactMainPart});
-    console.log(`tag name: ${tagName.toLowerCase()}`);
-    console.log(`compactMainPart: ${compactMainPart}`);
     // If there is exactly 1 of them:
     const locatorCount = await locators.count();
-    console.log(`Tag name and excerpt match count: ${locatorCount}`);
     if (locatorCount === 1) {
-      // Return the bounding box of its element.
-      const box = await boxOf(locators);
-      console.log(`box: ${JSON.stringify(box, null, 2)}`);
-      return boxToString(box);
+      // Add the box ID of the element to the result if none exists yet.
+      if (! elementID.boxID) {
+        const box = await boxOf(locators);
+        elementID.boxID = boxToString(box);
+      }
+      // Add the path ID of the element to the result if none exists yet.
+      if (! elementID.pathID) {
+        elementID.pathID = await xPath(locators);
+      }
     }
   }
-  // Otherwise, i.e. if the instance does not permit bounding-box identification:
-  else {
-    // Return this.
-    return '';
-  }
+  // Return the result.
+  return elementID;
 };

@@ -212,96 +212,63 @@ Testaro also generates some data about the job and adds those data to the job, i
 
 The tools listed above as dependencies write their tool reports in various formats. They differ in how they organize multiple instances of the same problem, how they classify severity and certainty, how they point to the locations of problems, how they name problems, etc.
 
-##### Standard format
+A Testaro report can include, for each tool, either or both of these properties:
+- `result`: the result in the native tool format.
+- `standardResult`: the result in a standard format identical for all tools.
 
-Testaro helps overcome this format diversity by offering to represent the main facts in each tool report in a single standardized format.
+##### Standard result
 
-In the conceptual scheme underlying the format standardization of Testaro, each tool has its own set of _rules_, where a rule is an algorithm for evaluating a target and determining whether instances of some kind of problem exist in it. With standardization, Testaro reports, in a uniform way, the outcomes from the application of rules by tools to a target.
+The standard result includes three properties:
+- `prevented`: a boolean (`true` or `false`) value, stating whether the page prevented the tool from performing its tests.
+- `totals`: an array of numbers representing how many instances of rule violations at each level of severity the tool reported. There are 4 ordinal severity levels. For example, the array `[3, 0, 14, 10]` would report that there were 3 violations at level 0, 0 at level 1, 14 at level 2, and 10 at level 3.
+- `instances`: an array of objects describing the rule violations. An instance can describe a single violation, usually by one element in the page, or can summarize multiple violations of the same rule.
 
-Each job can specify how Testaro is to handle report standardization. A job can contain a `standard` property. If the value of that property is `'also'` or `'only'`, Testaro converts some data in each tool report to the standard format. That permits you to ignore the format idiosyncrasies of the tools. If `standard` has the value `'also'`, the job report includes both formats. If the value is `'only'`, or there is no value, the job report includes only the standard format. If the value is `'no'`, the job report includes only the original format of each tool report.
+Here is an example of a standard instance:
 
-The standard format of each tool report has these properties:
-- `prevented`: `true` if the tool failed to run on the page, or otherwise omitted.
-- `totals`: an array of 4 integers, representing the counts of problem instances classified by the tool into 4 ordinal degrees of severity. For example, `[2, 13, 0, 5]` would mean that the tool reported 2 instances at the lowest severity, 13 at the next-lowest, none at the third-lowest, and 5 at the highest.
-- `instances`: an array of objects describing facts about issue instances reported by the tool. This object has these properties, some of which have empty strings as values when the tool does not provide values:
-    - `ruleID`: a code identifying a rule
-    - `what`: a description of the rule
-    - `count` (optional): the count of instances if this instance represents multiple instances
-    - `ordinalSeverity`: how the tool ranks the severity of the instance, on a 4-point ordinal scale from 0 to 3
-    - `tagName`: upper-case tagName of the affected element
-    - `id`: value of the `id` property of that element
-    - `location`: an object with three properties:
-        - `doc`: whether the source (`source`) or the browser rendition (`dom`) was tested
-        - `type`: the type of location information provided by the tool (`line`, `selector`, `xpath`, or `box`)
-        - `spec`: the location information
-    - `excerpt`: some or all of the code
-
-The most common location types reported by the tools are:
-- `line`: Nu Html Checker
-- `selector`: Axe, QualWeb, WAVE
-- `xpath`: Alfa, ASLint, Equal Access
-- `box`: Editoria11y, Testaro
-- none: HTML CodeSniffer
-
-The original result of a test act is recorded as the value of a `result` property of the act. The standard-format result is recorded as the value of the `standardResult` property of the act. Its format is shown by this example:
-
-``` javascript
-standardResult: {
-  totals: [2, 0, 17, 0],
-  instances: [
-    {
-      ruleID: 'rule01',
-      what: 'Button type invalid',
-      ordinalSeverity: 2,
-      tagName: 'BUTTON'
-      id: '',
-      location: {
-        doc: 'dom',
-        type: 'box',
-        spec: {
-          x: 12,
-          y: 340,
-          width: 46,
-          height: 50
-        }
-      },
-      excerpt: '<button type="link"></button>'
-    },
-    {
-      ruleID: 'rule01',
-      what: 'Button type invalid',
-      ordinalSeverity: 1,
-      tagName: 'BUTTON',
-      id: 'submitbutton',
-      location: {
-        doc: 'dom',
-        type: 'line',
-        spec: 145
-      },
-      excerpt: '<button type="important">Submit</button>'
-    },
-    {
-      ruleID: 'rule02',
-      what: 'Links have empty href attributes',
-      count: 17,
-      ordinalSeverity: 3,
-      tagName: 'A',
-      id: '',
-      location: {
-        doc: '',
-        type: '',
-        spec: ''
-      },
-      excerpt: ''
-    }
-  ]
+```javascript
+{
+  ruleID: 'rule01',
+  what: 'Button type invalid',
+  ordinalSeverity: 2,
+  count: 1,
+  tagName: 'BUTTON'
+  id: '',
+  location: {
+    doc: 'dom',
+    type: 'xpath',
+    spec: '/html[1]/body[1]/section[1]/div[1]/div[1]/ul[1]/li[1]/a[1]'
+  },
+  excerpt: '<button type="link"></button>',
+  boxID: '12:340:46:50',
+  pathID: '/html[1]/body[1]/section[1]/div[1]/div[1]/ul[1]/li[1]/a[1]'
 }
 ```
 
-If a tool has the option to be used without itemization and is being so used, the `instances` array may be empty, or, as shown above, may contain one or more summary instances. Summary instances disclose the numbers of instances that they summarize with a `count` property.
+This instance describes a violation of a rule named `rule01` by a `button` element.
+
+The element has no `id` attribute to distinguish it from other `button` elements, but the tool describes its location. This tool uses an XPath to do that. Tools use various methods for location description, namely:
+- `line` (line number in the code of the page): Nu Html Checker
+- `selector` (CSS selector): Axe, QualWeb, WAVE
+- `xpath`: Alfa, ASLint, Equal Access
+- `box` (coordinates, width, and height of the element box): Editoria11y, Testaro
+- none: HTML CodeSniffer
+The tool also reproduces an excerpt of the element code.
+
+While the above properties can help you find the offending element, Testaro makes this easier by adding, insofar as possible, two standard element identifiers to each standard instance:
+- `boxID`: a compact representation of the x, y, width, and height of the element bounding box, if the element can be identified and is visible.
+- `pathID`: the XPath of the element, if the element can be identified.
+
+These standard identifiers can help you determine whether violations reported by different tools belong to the same element or different elements. The `boxID` property can also support the making of images of the violating elements.
+
+Each job can specify how Testaro is to handle report standardization. A job can contain a `standard` property, with one of the following values to determine which results the report will include:
+- `'also'`: original and standard.
+- `'only'`: standard only.
+- `'no'`: original only.
+
+If a tool has the option to be used without itemization and is being so used, the `instances` array may be empty, or may contain one or more summary instances. Summary instances disclose the numbers of instances that they summarize with the `count` property. They typically summarize violations by multiple elements, in which case their `id`, `location`, `excerpt`, `boxID`, and `pathID` properties will have empty values.
 
 This standard format reflects some judgments. For example:
-- The `ordinalSeverity` property of an instance may have required interpretation. Tools may report severity, certainty, priority, or some combination of those. They may use ordinal or metric quantifications. If they quantify ordinally, their scales may have more or fewer than 4 ranks. Testaro coerces each tool’s severity, certainty, and/or priority classification into a 4-rank ordinal classification. This classification is deemed to express the most common pattern among the tools.
+- The `ordinalSeverity` property of an instance involves interpretation. Tools may report severity, certainty, priority, or some combination of those. They may use ordinal or metric quantifications. If they quantify ordinally, their scales may have more or fewer than 4 ranks. Testaro coerces each tool’s severity, certainty, and/or priority classification into a 4-rank ordinal classification. This classification is deemed to express the most common pattern among the tools.
 - The `tagName` property of an instance may not always be obvious, because in some cases the rule being tested for requires a relationship among more than one element (e.g., “An X element may not have a Y element as its parent”).
 - The `ruleID` property of an instance is a matching rule if the tool issues a message but no rule identifier for each instance. The `nuVal` tool does this. In this case, Testaro is classifying the messages into rules.
 - The `ruleID` property of an instance may reclassify tool rules. For example, if a tool rule covers multiple situations that are dissimilar, that rule may be split into multiple rules with distinct `ruleID` properties.

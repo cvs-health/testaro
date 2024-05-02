@@ -37,7 +37,8 @@
     "axe-playwright": "*",
     "dotenv": "*",
     "pixelmatch": "*",
-    "playwright": "*"
+    "playwright": "*",
+    "playwright-dompath": "*"
   },
   "devDependencies": {
     "eslint": "*"
