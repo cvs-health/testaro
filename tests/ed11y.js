@@ -129,10 +129,12 @@ exports.reporter = async (page, options) => {
       });
       console.log(`resultObj.imageAlts length is ${reportObj.resultObj.imageAlts.length}`);
       console.log(`resultObj.elResults length is ${reportObj.resultObj.elResults.length}`);
-      console.log(`resultObj.elResults is ${JSON.stringify(reportObj.resultObj.elResults, null, 2)}`);
       // Return the result.
       clearTimeout(timer);
-      console.log(`About to resolve with reportObj: ${JSON.stringify(reportObj, null, 2)}`);
+      console.log('About to resolve with reportObj');
+      console.log(`reportObj property names: ${Object.keys(reportObj)}`);
+      console.log(`reportObj.elements length: ${reportObj.elements.length}`);
+      console.log(`reportObj.resultObj property names: ${Object.keys(reportObj.resultObj)}`);
       resolve(reportObj);
     });
     // Add the test script to the page.
@@ -159,15 +161,28 @@ exports.reporter = async (page, options) => {
     };
   }), {scriptNonce, script, rulesToTest: act.rules});
   console.log('Script executed');
+  console.log(`resultJSHandle type: ${typeof resultJSHandle}`);
+  console.log(`resultJSHandle properties: ${Object.keys(resultJSHandle)}`);
   // If the page prevented the tool from performing tests:
   let result;
-  const JSHProps = await resultJSHandle.getProperties();
-  console.log(JSON.stringify(JSHProps, null, 2));
-  const prevented = await resultJSHandle.getProperty('prevented');
+  const resultObjJSHandle = await resultJSHandle.getProperty('resultObj');
+  const elementsJSHandle = await resultJSHandle.getProperty('elements');
+  const imageAltsJSHandle = await resultObjJSHandle.getProperty('imageAlts');
+  const imageAltsJSON = await imageAltsJSHandle.jsonValue();
+  console.log(`imageAltsJSON: ${imageAltsJSON}`);
+  const elResultsJSHandle = await resultObjJSHandle.getProperty('elResults');
+  const elResultsJSON = await elResultsJSHandle.jsonValue();
+  console.log(`elResultsJSON: ${elResultsJSON}`);
+  const preventedJSHandle = await resultJSHandle.getProperty('prevented');
+  const preventedJSON = await preventedJSHandle.jsonValue();
+  const prevented = JSON.parse(preventedJSON);
+  console.log(`prevented value is ${prevented}`);
   if (prevented) {
     // Populate the result.
-    const error = await resultJSHandle.getProperty('error');
-    console.log(`Error: ${JSON.stringify(error, null, 2)}`);
+    const errorJSHandle = await resultJSHandle.getProperty('error');
+    const errorJSON = await errorJSHandle.jsonValue();
+    const error = JSON.parse(errorJSON);
+    console.log(`Error: ${errorJSON, null, 2}`);
     result = {
       prevented,
       error
@@ -177,21 +192,21 @@ exports.reporter = async (page, options) => {
   else {
     // Get the violating elements.
     const elementsJSHandle = await resultJSHandle.getProperty('elements');
+    const elementJSHandles = await elementsJSHandle.getProperties();
     // If there are any:
-    if (elementsJSHandle && elementsJSHandle.length) {
+    if (elementJSHandles.size) {
       // Get the results.
       const resultObjJSHandle = await resultJSHandle.getProperty('resultObj');
       const resultJSON = await resultObjJSHandle.jsonValue();
       const result = JSON.parse(resultJSON);
       // For each violating element:
-      for (const elIndex in result.elResults) {
-        // Get its pathID.
-        const elementJSHandle = await elementsJSHandle.getProperty(elIndex);
-        const elementHandle = elementJSHandle.asElement();
+      for (const index of elementJSHandles.keys()) {
+        // Get its path ID.
+        const elementHandle = elementJSHandles.get(index).asElement();
         const pathID = await xPath(elementHandle);
         // Add it to the element violation record.
-        result.elResults[elIndex].pathID = pathID;
-      }
+        result.elResults[index].pathID = pathID;
+      };
     }
   }
   // Populate the tool report data.
