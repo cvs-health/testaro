@@ -151,13 +151,39 @@ exports.reporter = async (page, options) => {
       });
     };
   }), {scriptNonce, script, rulesToTest: act.rules});
-  // Get the violating elements.
-  const elements = await resultJSHandle.getProperty('elements');
-  // If there are any:
-  if (elements && elements.length) {
-    
+  // If the page prevented the tool from performing tests:
+  let result;
+  const prevented = await resultJSHandle.getProperty('prevented');
+  if (prevented) {
+    // Populate the result.
+    const error = await resultJSHandle.getProperty('error');
+    result = {
+      prevented,
+      error
+    };
   }
-  const result = JSON.parse(rawResultJSON);
+  // Otherwise, i.e. if the page did not prevent the tool from performing tests:
+  else {
+    // Get the violating elements.
+    const elementsJSHandle = await resultJSHandle.getProperty('elements');
+    // If there are any:
+    if (elementsJSHandle && elementsJSHandle.length) {
+      // Get the results.
+      const resultObjJSHandle = await resultJSHandle.getProperty('resultObj');
+      const resultJSON = await resultObjJSHandle.jsonValue();
+      const result = JSON.parse(resultJSON);
+      // For each violating element:
+      for (const elIndex in result.elResults) {
+        // Get its pathID.
+        const elementJSHandle = await elementsJSHandle.getProperty(elIndex);
+        const elementHandle = elementJSHandle.asElement();
+        const pathID = await xPath(elementHandle);
+        // Add it to the element violation record.
+        result.elResults[elIndex].pathID = pathID;
+      }
+    }
+  }
+  // Populate the tool report data.
   let data = {};
   if (result.prevented) {
     data.success = false;

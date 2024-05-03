@@ -78,35 +78,18 @@ exports.identify = async (instance, page) => {
     };
     const {tagName, location, excerpt} = instance;
     const {type, spec} = location;
-    // If the instance specifies a bounding box:
-    if (type === 'box') {
-      // Add a box ID to the result.
-      elementID.boxID = boxToString(spec);
-      // Get the XPath of the element.
-      const xPath = await 
-      // If the instance also specifies a tag name:
-      if (tagName) {
-
-
-    }
-    // Otherwise, if the instance specifies a selector or XPath location:
-    else if (['selector', 'xpath'].includes(type)) {
+    // If the instance specifies a CSS selector or XPath location:
+    if (['selector', 'xpath'].includes(type)) {
       // Get a locator of the element.
       const specifier = location.type === 'xpath'
       ? `xpath=${spec.replace(/\/text\(\)\[\d+\]$/, '')}`
       : spec;
       const locator = page.locator(specifier).first();
-      // Add the bounding box of the element to the result.
+      // Add the box ID of the element to the result.
       const box = await boxOf(locator);
       elementID.boxID = boxToString(box);
-      // Add the XPath of the element to the result.
+      // Add the path ID of the element to the result.
       elementID.pathID = await xPath(locator);
-    }
-    // Otherwise, if the instance specifies a line location and an excerpt:
-    else if (type === 'line') {
-      // Get the line of HTML.
-      const pageHTML = await page.content();
-      const lineHTML = pageHTML.split(/[\n\r]+/)[spec];
     }
     // If either ID remains undefined and the instance specifies both a tag name and an excerpt:
     if (tagName && excerpt && ! (elementID.boxID && elementID.pathID)) {
@@ -134,6 +117,7 @@ exports.identify = async (instance, page) => {
         }
       }
     }
-    // Return the result.
+    // Return the result (not yet getting IDs from Nu Html Checker lines and columns).
     return elementID;
+  }
 };

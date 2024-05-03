@@ -1120,9 +1120,15 @@ const doActs = async (report, actIndex, page) => {
               };
               // Populate it.
               standardize(act);
-              // Add a bounding-box identifier to each of its standard instances.
+              // Add a box ID and a path ID to each of its standard instances if missing.
               for (const instance of act.standardResult.instances) {
-                instance.boxID = await identify(instance, page);
+                const elementID = await identify(instance, page);
+                if (! instance.boxID) {
+                  instance.boxID = elementID.boxID;
+                }
+                if (! instance.pathID) {
+                  instance.pathID = elementID.pathID;
+                }
               };
               // If the original-format result is not to be included in the report:
               if (standard === 'only') {
