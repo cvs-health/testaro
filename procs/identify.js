@@ -61,6 +61,7 @@ const boxOf = async locator => {
 // Returns a string representation of a bounding box.
 const boxToString = exports.boxToString = box => {
   if (box) {
+    console.log(`About to stringify ${JSON.stringify(box, null, 2)}`);
     return ['x', 'y', 'width', 'height'].map(dim => box[dim]).join(':');
   }
   else {
@@ -81,24 +82,30 @@ exports.identify = async (instance, page) => {
     // If the instance specifies a CSS selector or XPath location:
     if (['selector', 'xpath'].includes(type)) {
       // Get a locator of the element.
-      const specifier = location.type === 'xpath'
-      ? `xpath=${spec.replace(/\/text\(\)\[\d+\]$/, '')}`
-      : spec;
-      const locators = page.locator(specifier);
-      const locatorCount = await locators.count();
-      // If the count of matching elements is 1:
-      if (locatorCount === 1) {
-        const locator = locators.first();
-        // Add the box ID of the element to the result.
-        const box = await boxOf(locator);
-        elementID.boxID = boxToString(box);
-        // Add the path ID of the element to the result.
-        elementID.pathID = await xPath(locator);
+      let specifier = spec;
+      if (type === 'xpath') {
+        specifier = spec.replace(/\/text\(\)\[\d+\]$/, '');
       }
-      // Otherwise, if the count is not 1 and the instance specifies an XPath location:
-      else if (type === 'xpath') {
-        // Use the XPath location as the path ID.
-        elementID.pathID = spec;
+      if (specifier) {
+        if (type === 'xpath') {
+          specifier = `xpath=${specifier}`;
+        }
+        const locators = page.locator(specifier);
+        const locatorCount = await locators.count();
+        // If the count of matching elements is 1:
+        if (locatorCount === 1) {
+          const locator = locators.first();
+          // Add the box ID of the element to the result.
+          const box = await boxOf(locator);
+          elementID.boxID = boxToString(box);
+          // Add the path ID of the element to the result.
+          elementID.pathID = await xPath(locator);
+        }
+        // Otherwise, if the count is not 1 and the instance specifies an XPath location:
+        else if (type === 'xpath') {
+          // Use the XPath location as the path ID.
+          elementID.pathID = spec;
+        }
       }
     }
     // If either ID remains undefined and the instance specifies both a tag name and an excerpt:

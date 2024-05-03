@@ -29,8 +29,6 @@
 
 // Module to handle files.
 const fs = require('fs/promises');
-// Module to get element IDs.
-const {boxToString} = require('../procs/identify');
 // Module to get the XPath of an element.
 const {xPath} = require('playwright-dompath');
 
@@ -49,8 +47,10 @@ exports.reporter = async (page, options) => {
     // Impose a timeout on obtaining a result.
     const timer = setTimeout(() => {
       resolve({
-        prevented: true,
-        error: 'ed11y timed out'
+        resultObj: {
+          prevented: true,
+          error: 'ed11y timed out'
+        }
       });
     }, 20000);
     const {scriptNonce, script, rulesToTest} = args;
@@ -85,6 +85,7 @@ exports.reporter = async (page, options) => {
       .imageAlts
       .filter(item => item[3] !== 'pass')
       .map(item => item.slice(1));
+      console.log(`resultObj.imageAlts length initially is ${resultObj.imageAlts.length}`);
       // Delete useless properties from the result.
       delete resultObj.options.sleekTheme;
       delete resultObj.options.darkTheme;
@@ -102,7 +103,7 @@ exports.reporter = async (page, options) => {
             elResult.content = toolResult.content.replace(/\s+/g, ' ');
           }
           const {element} = toolResult;
-          if (element) {
+          if (element.outerHTML) {
             elements.push(element);
             elResult.tagName = element.tagName || '';
             elResult.id = element.id || '';
@@ -110,7 +111,7 @@ exports.reporter = async (page, options) => {
             const locRect = element.getBoundingClientRect();
             if (locRect) {
               ['x', 'y', 'width', 'height'].forEach(dim => {
-                result.loc[dim] = Math.round(locRect[dim]);
+                elResult.loc[dim] = Math.round(locRect[dim], 0);
               });
             }
             let elText = element.textContent.replace(/\s+/g, ' ').trim();
@@ -121,13 +122,17 @@ exports.reporter = async (page, options) => {
               elText = `${elText.slice(0, 200)}…${elText.slice(-200)}`;
             }
             elResult.excerpt = elText.replace(/\s+/g, ' ');
-            elResult.boxID = boxToString(result.loc);
+            elResult.boxID = ['x', 'y', 'width', 'height'].map(dim => elResult.loc[dim]).join(':');
             elResults.push(elResult);
           }
         }
       });
+      console.log(`resultObj.imageAlts length is ${reportObj.resultObj.imageAlts.length}`);
+      console.log(`resultObj.elResults length is ${reportObj.resultObj.elResults.length}`);
+      console.log(`resultObj.elResults is ${JSON.stringify(reportObj.resultObj.elResults, null, 2)}`);
       // Return the result.
       clearTimeout(timer);
+      console.log(`About to resolve with reportObj: ${JSON.stringify(reportObj, null, 2)}`);
       resolve(reportObj);
     });
     // Add the test script to the page.
@@ -146,17 +151,23 @@ exports.reporter = async (page, options) => {
     }
     catch(error) {
       resolve({
-        prevented: true,
-        error: error.message
+        resultObj: {
+          prevented: true,
+          error: error.message
+        }
       });
     };
   }), {scriptNonce, script, rulesToTest: act.rules});
+  console.log('Script executed');
   // If the page prevented the tool from performing tests:
   let result;
+  const JSHProps = await resultJSHandle.getProperties();
+  console.log(JSON.stringify(JSHProps, null, 2));
   const prevented = await resultJSHandle.getProperty('prevented');
   if (prevented) {
     // Populate the result.
     const error = await resultJSHandle.getProperty('error');
+    console.log(`Error: ${JSON.stringify(error, null, 2)}`);
     result = {
       prevented,
       error
