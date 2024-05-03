@@ -84,12 +84,22 @@ exports.identify = async (instance, page) => {
       const specifier = location.type === 'xpath'
       ? `xpath=${spec.replace(/\/text\(\)\[\d+\]$/, '')}`
       : spec;
-      const locator = page.locator(specifier).first();
-      // Add the box ID of the element to the result.
-      const box = await boxOf(locator);
-      elementID.boxID = boxToString(box);
-      // Add the path ID of the element to the result.
-      elementID.pathID = await xPath(locator);
+      const locators = page.locator(specifier);
+      const locatorCount = await locators.count();
+      // If the count of matching elements is 1:
+      if (locatorCount === 1) {
+        const locator = locators.first();
+        // Add the box ID of the element to the result.
+        const box = await boxOf(locator);
+        elementID.boxID = boxToString(box);
+        // Add the path ID of the element to the result.
+        elementID.pathID = await xPath(locator);
+      }
+      // Otherwise, if the count is not 1 and the instance specifies an XPath location:
+      else if (type === 'xpath') {
+        // Use the XPath location as the path ID.
+        elementID.pathID = spec;
+      }
     }
     // If either ID remains undefined and the instance specifies both a tag name and an excerpt:
     if (tagName && excerpt && ! (elementID.boxID && elementID.pathID)) {
