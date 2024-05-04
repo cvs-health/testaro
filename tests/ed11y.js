@@ -180,7 +180,7 @@ exports.reporter = async (page, options) => {
   // Return the report.
   return {
     data: {
-      prevented
+      prevented: facts.prevented
     },
     result
   };
