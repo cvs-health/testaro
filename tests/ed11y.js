@@ -40,29 +40,30 @@ exports.reporter = async (page, options) => {
   const {act, report} = options;
   const {jobData} = report;
   const scriptNonce = jobData && jobData.lastScriptNonce;
-  // Get the test script.
+  // Get the tool script.
   const script = await fs.readFile(`${__dirname}/../ed11y/editoria11y.min.js`, 'utf8');
   // Run the tests and get the violating elements and violation facts.
-  const resultJSHandle = await page.evaluateHandle(args => new Promise(async resolve => {
-    // Impose a timeout on obtaining a result.
+  const reportJSHandle = await page.evaluateHandle(args => new Promise(async resolve => {
+    // If the report is incomplete after 20 seconds:
     const timer = setTimeout(() => {
+      // Return this as the report.
       resolve({
-        resultObj: {
+        facts: {
           prevented: true,
           error: 'ed11y timed out'
         }
       });
     }, 20000);
     const {scriptNonce, script, rulesToTest} = args;
-    // When the script has been executed:
+    // When the script has been executed, creating data in an Ed11y object:
     document.addEventListener('ed11yResults', () => {
-      // Initialize an array of violating elements and violation facts.
-      const reportObj = {
+      // Initialize a report containing violating elements and violation facts.
+      const report = {
         elements: [],
-        resultObj:  {}
+        facts:  {}
       };
+      const {elements, facts} = report;
       // Populate the global facts.
-      const {elements, resultObj} = reportObj;
       [
         'version',
         'options',
@@ -74,44 +75,45 @@ exports.reporter = async (page, options) => {
       ]
       .forEach(key => {
         try {
-          resultObj[key] = Ed11y[key];
+          facts[key] = Ed11y[key];
         }
         catch(error) {
           console.log(`ERROR: invalid value of ${key} property of Ed11y (${error.message})`);
         }
       });
-      // Get data on violating text alternatives of images from the results.
-      resultObj.imageAlts = Ed11y
+      // Get data on violating text alternatives of images from Ed11y.
+      facts.imageAlts = Ed11y
       .imageAlts
       .filter(item => item[3] !== 'pass')
       .map(item => item.slice(1));
-      console.log(`resultObj.imageAlts length initially is ${resultObj.imageAlts.length}`);
-      // Delete useless properties from the result.
-      delete resultObj.options.sleekTheme;
-      delete resultObj.options.darkTheme;
-      delete resultObj.options.lightTheme;
-      // Initialize the element results.
-      const elResults = resultObj.elResults = [];
+      // Delete useless facts.
+      delete facts.options.sleekTheme;
+      delete facts.options.darkTheme;
+      delete facts.options.lightTheme;
+      // Initialize the violation facts.
+      const violationsFacts = facts.violations = [];
       // For each rule violation by an element:
-      Ed11y.results.forEach(toolResult => {
-        // If rules were not selected or they were and include this rule:
-        if (! rulesToTest || rulesToTest.includes(toolResult.test)) {
-          // Create a record of the violation.
-          const elResult = {};
-          elResult.test = toolResult.test || '';
-          if (toolResult.content) {
-            elResult.content = toolResult.content.replace(/\s+/g, ' ');
+      Ed11y.results.forEach(violation => {
+        // If rules were not selected or they were and include the violated rule:
+        if (! rulesToTest || rulesToTest.includes(violation.test)) {
+          const violationFacts = {};
+          violationFacts.test = violation.test || '';
+          // If the element is in the page:
+          if (violation.content) {
+            violationFacts.content = violation.content.replace(/\s+/g, ' ');
           }
-          const {element} = toolResult;
+          const {element} = violation;
           if (element.outerHTML) {
+            // Add the element to the report.
             elements.push(element);
-            elResult.tagName = element.tagName || '';
-            elResult.id = element.id || '';
-            elResult.loc = {};
+            // Add its violation facts to the report.
+            violationFacts.tagName = element.tagName || '';
+            violationFacts.id = element.id || '';
+            violationFacts.loc = {};
             const locRect = element.getBoundingClientRect();
             if (locRect) {
               ['x', 'y', 'width', 'height'].forEach(dim => {
-                elResult.loc[dim] = Math.round(locRect[dim], 0);
+                violationFacts.loc[dim] = Math.round(locRect[dim], 0);
               });
             }
             let elText = element.textContent.replace(/\s+/g, ' ').trim();
@@ -121,31 +123,27 @@ exports.reporter = async (page, options) => {
             if (elText.length > 400) {
               elText = `${elText.slice(0, 200)}…${elText.slice(-200)}`;
             }
-            elResult.excerpt = elText.replace(/\s+/g, ' ');
-            elResult.boxID = ['x', 'y', 'width', 'height'].map(dim => elResult.loc[dim]).join(':');
-            elResults.push(elResult);
+            violationFacts.excerpt = elText.replace(/\s+/g, ' ');
+            violationFacts.boxID = ['x', 'y', 'width', 'height']
+            .map(dim => violationFacts.loc[dim])
+            .join(':');
+            violationsFacts.push(violationFacts);
           }
         }
       });
-      console.log(`resultObj.imageAlts length is ${reportObj.resultObj.imageAlts.length}`);
-      console.log(`resultObj.elResults length is ${reportObj.resultObj.elResults.length}`);
-      // Return the result.
+      // Return the report.
       clearTimeout(timer);
-      console.log('About to resolve with reportObj');
-      console.log(`reportObj property names: ${Object.keys(reportObj)}`);
-      console.log(`reportObj.elements length: ${reportObj.elements.length}`);
-      console.log(`reportObj.resultObj property names: ${Object.keys(reportObj.resultObj)}`);
-      resolve(reportObj);
+      resolve(report);
     });
-    // Add the test script to the page.
-    const testScript = document.createElement('script');
+    // Add the tool script to the page.
+    const toolScript = document.createElement('script');
     if (scriptNonce) {
-      testScript.nonce = scriptNonce;
-      console.log(`Added nonce ${scriptNonce} to script`);
+      toolScript.nonce = scriptNonce;
+      console.log(`Added nonce ${scriptNonce} to tool script`);
     }
-    testScript.textContent = script;
-    document.body.insertAdjacentElement('beforeend', testScript);
-    // Execute the script.
+    toolScript.textContent = script;
+    document.body.insertAdjacentElement('beforeend', toolScript);
+    // Execute the tool script, creating Ed11y.
     try {
       await new Ed11y({
         alertMode: 'headless'
@@ -153,50 +151,35 @@ exports.reporter = async (page, options) => {
     }
     catch(error) {
       resolve({
-        resultObj: {
+        facts: {
           prevented: true,
           error: error.message
         }
       });
     };
   }), {scriptNonce, script, rulesToTest: act.rules});
-  console.log('Script executed');
-  console.log(`resultJSHandle type: ${typeof resultJSHandle}`);
-  console.log(`resultJSHandle properties: ${Object.keys(resultJSHandle)}`);
+  // Get the violating elements.
+  const elementsJSHandle = await reportJSHandle.getProperty('elements');
+  // Get the violation facts.
+  const factsJSHandle = await reportJSHandle.getProperty('facts');
+  const facts = await factsJSHandle.jsonValue();
+  const {imageAlts, violations, prevented, error} = facts;
+  const result = {};
   // If the page prevented the tool from performing tests:
-  let result;
-  const resultObjJSHandle = await resultJSHandle.getProperty('resultObj');
-  const elementsJSHandle = await resultJSHandle.getProperty('elements');
-  const imageAltsJSHandle = await resultObjJSHandle.getProperty('imageAlts');
-  const imageAltsJSON = await imageAltsJSHandle.jsonValue();
-  console.log(`imageAltsJSON: ${imageAltsJSON}`);
-  const elResultsJSHandle = await resultObjJSHandle.getProperty('elResults');
-  const elResultsJSON = await elResultsJSHandle.jsonValue();
-  console.log(`elResultsJSON: ${elResultsJSON}`);
-  const preventedJSHandle = await resultJSHandle.getProperty('prevented');
-  const preventedJSON = await preventedJSHandle.jsonValue();
-  const prevented = JSON.parse(preventedJSON);
-  console.log(`prevented value is ${prevented}`);
   if (prevented) {
     // Populate the result.
-    const errorJSHandle = await resultJSHandle.getProperty('error');
-    const errorJSON = await errorJSHandle.jsonValue();
-    const error = JSON.parse(errorJSON);
-    console.log(`Error: ${errorJSON, null, 2}`);
-    result = {
-      prevented,
-      error
-    };
+    result.prevented = true;
+    result.error = error;
   }
   // Otherwise, i.e. if the page did not prevent the tool from performing tests:
   else {
     // Get the violating elements.
-    const elementsJSHandle = await resultJSHandle.getProperty('elements');
+    const elementsJSHandle = await reportJSHandle.getProperty('elements');
     const elementJSHandles = await elementsJSHandle.getProperties();
     // If there are any:
     if (elementJSHandles.size) {
       // Get the results.
-      const resultObjJSHandle = await resultJSHandle.getProperty('resultObj');
+      const resultObjJSHandle = await reportJSHandle.getProperty('resultObj');
       const resultJSON = await resultObjJSHandle.jsonValue();
       const result = JSON.parse(resultJSON);
       // For each violating element:
@@ -205,7 +188,7 @@ exports.reporter = async (page, options) => {
         const elementHandle = elementJSHandles.get(index).asElement();
         const pathID = await xPath(elementHandle);
         // Add it to the element violation record.
-        result.elResults[index].pathID = pathID;
+        result.violationFacts[index].pathID = pathID;
       };
     }
   }
