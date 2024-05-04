@@ -91,7 +91,7 @@ exports.reporter = async (page, options) => {
       delete facts.options.darkTheme;
       delete facts.options.lightTheme;
       // Initialize the violation facts.
-      const violationsFacts = facts.violations = [];
+      facts.violations = [];
       // For each rule violation by an element:
       Ed11y.results.forEach(violation => {
         // If rules were not selected or they were and include the violated rule:
@@ -127,7 +127,7 @@ exports.reporter = async (page, options) => {
             violationFacts.boxID = ['x', 'y', 'width', 'height']
             .map(dim => violationFacts.loc[dim])
             .join(':');
-            violationsFacts.push(violationFacts);
+            facts.violations.push(violationFacts);
           }
         }
       });
@@ -191,7 +191,9 @@ exports.reporter = async (page, options) => {
   }
   // Return the report.
   return {
-    data: {},
+    data: {
+      prevented
+    },
     result
   };
 };

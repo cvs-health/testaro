@@ -343,6 +343,7 @@ const doWAVE = (result, standardResult, categoryName) => {
 };
 // Converts a result.
 const convert = (toolName, data, result, standardResult) => {
+  console.log(Object.keys(result));
   // Prevention.
   if (data.prevented) {
     standardResult.prevented = true;
@@ -495,6 +496,7 @@ const convert = (toolName, data, result, standardResult) => {
     && ['imageAlts', 'violations', 'errorCount', 'warningCount']
     .every(key => result[key] !== undefined)
   ) {
+    console.log('About to convert ed11y');
     // For each violation:
     result.violations.forEach(violation => {
       const {test, content, tagName, id, loc, excerpt, boxID, pathID} = violation;
@@ -657,8 +659,10 @@ const convert = (toolName, data, result, standardResult) => {
 };
 // Converts the results.
 exports.standardize = act => {
+  console.log('About to standardize');
   const {which, data, result, standardResult} = act;
   if (which && result && standardResult) {
+    console.log('About to convert');
     convert(which, data, result, standardResult);
   }
   else {
