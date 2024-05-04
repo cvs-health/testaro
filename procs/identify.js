@@ -33,7 +33,7 @@ const {xPath} = require('playwright-dompath');
 // FUNCTIONS
 
 // Returns the bounding box of a locator.
-const boxOf = async locator => {
+const boxOf = exports.boxOf = async locator => {
   try {
     const isVisible = await locator.isVisible();
     if (isVisible) {
