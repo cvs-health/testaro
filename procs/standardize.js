@@ -496,7 +496,6 @@ const convert = (toolName, data, result, standardResult) => {
     && ['imageAlts', 'violations', 'errorCount', 'warningCount']
     .every(key => result[key] !== undefined)
   ) {
-    console.log('About to convert ed11y');
     // For each violation:
     result.violations.forEach(violation => {
       const {test, content, tagName, id, loc, excerpt, boxID, pathID} = violation;

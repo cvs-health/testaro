@@ -143,7 +143,7 @@ exports.reporter = async (page, options) => {
     }
     toolScript.textContent = script;
     document.body.insertAdjacentElement('beforeend', toolScript);
-    // Execute the tool script, creating Ed11y.
+    // Execute the tool script, creating Ed11y and triggering the event listener.
     try {
       await new Ed11y({
         alertMode: 'headless'
@@ -158,36 +158,24 @@ exports.reporter = async (page, options) => {
       });
     };
   }), {scriptNonce, script, rulesToTest: act.rules});
-  // Get the violation facts.
+  // Add the violation facts to the result.
   const factsJSHandle = await reportJSHandle.getProperty('facts');
   const facts = await factsJSHandle.jsonValue();
-  const {imageAlts, violations, prevented, error} = facts;
-  const result = {};
-  // If the page prevented the tool from performing tests:
-  if (prevented) {
-    // Populate the result.
-    result.prevented = true;
-    result.error = error;
-  }
-  // Otherwise, i.e. if the page did not prevent the tool from performing tests:
-  else {
+  const result = facts;
+  // If there were any violations:
+  const {violations} = facts;
+  if (violations && violations.length) {
     // Get the violating elements.
     const elementsJSHandle = await reportJSHandle.getProperty('elements');
     const elementJSHandles = await elementsJSHandle.getProperties();
-    // If there are any:
-    if (elementJSHandles.size) {
-      // For each violation:
-      for (const index of elementJSHandles.keys()) {
-        // Get its path ID.
-        const elementHandle = elementJSHandles.get(index).asElement();
-        const pathID = await xPath(elementHandle);
-        // Add it to the violation facts.
-        violations[index].pathID = pathID;
-      };
-    }
-    // Populate the result.
-    result.imageAlts = imageAlts;
-    result.violations = violations;
+    // For each violation:
+    for (const index in violations) {
+      // Get its path ID.
+      const elementHandle = elementJSHandles.get(index).asElement();
+      const pathID = await xPath(elementHandle);
+      // Add it to the violation facts.
+      violations[index].pathID = pathID;
+    };
   }
   // Return the report.
   return {
