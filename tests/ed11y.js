@@ -191,7 +191,7 @@ exports.reporter = async (page, options) => {
   }
   // Return the report.
   return {
-    data,
+    data: {},
     result
   };
 };
