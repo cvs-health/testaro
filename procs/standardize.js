@@ -30,8 +30,8 @@
 // Limits the length of and unilinearizes a string.
 const cap = rawString => {
   const string = (rawString || '').replace(/[\s\u2028\u2029]+/g, ' ');
-  if (string && string.length > 400) {
-    return `${string.slice(0, 200)} ... ${string.slice(-200)}`;
+  if (string && string.length > 600) {
+    return `${string.slice(0, 300)} … ${string.slice(-300)}`;
   }
   else if (string) {
     return string;

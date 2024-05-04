@@ -67,6 +67,30 @@ const boxToString = exports.boxToString = box => {
     return '';
   }
 };
+// Adds a box ID and a path ID to an object.
+const addIDs = async (locators, recipient) => {
+  // If there is exactly 1 of them:
+  const locatorCount = await locators.count();
+  if (locatorCount === 1) {
+    // Add the box ID of the element to the result if none exists yet.
+    if (! recipient.boxID) {
+      const box = await boxOf(locators);
+      recipient.boxID = boxToString(box);
+      if (recipient.boxID.length) {
+        console.log(recipient.boxID);
+      }
+    }
+    // Add the path ID of the element to the result if none exists yet.
+    if (! recipient.pathID) {
+      recipient.pathID = await xPath(locators);
+      if (recipient.pathID.length) {
+        console.log(recipient.pathID);
+      }
+    }
+  }
+};
+// Returns a CSS-safe ID value with a # prefix.
+const cssEscape = id => `#${id.replace(/&/g, '\&')}`;
 // Returns the XPath and box ID of the element of a standard instance.
 exports.identify = async (instance, page) => {
   // If the instance does not yet have both boxID and pathID properties:
@@ -76,7 +100,7 @@ exports.identify = async (instance, page) => {
       boxID: '',
       pathID: ''
     };
-    const {tagName, location, excerpt} = instance;
+    const {excerpt, id, location, tagName} = instance;
     const {type, spec} = location;
     // If the instance specifies a CSS selector or XPath location:
     if (['selector', 'xpath'].includes(type)) {
@@ -93,12 +117,8 @@ exports.identify = async (instance, page) => {
         const locatorCount = await locators.count();
         // If the count of matching elements is 1:
         if (locatorCount === 1) {
-          const locator = locators.first();
-          // Add the box ID of the element to the result.
-          const box = await boxOf(locator);
-          elementID.boxID = boxToString(box);
-          // Add the path ID of the element to the result.
-          elementID.pathID = await xPath(locator);
+          // Add a box ID and a path ID to the result.
+          await addIDs(locators, elementID);
         }
         // Otherwise, if the count is not 1 and the instance specifies an XPath location:
         else if (type === 'xpath') {
@@ -107,29 +127,51 @@ exports.identify = async (instance, page) => {
         }
       }
     }
-    // If either ID remains undefined and the instance specifies both a tag name and an excerpt:
-    if (tagName && excerpt && ! (elementID.boxID && elementID.pathID)) {
-      // Get the plain text parts of the excerpt, converting ... to an empty string.
-      const minTagExcerpt = excerpt.replace(/<[^>]+>/g, '<>');
-      const plainParts = (minTagExcerpt.match(/[^<>]+/g) || [])
-      .map(part => part === '...' ? '' : part);
-      // Get the longest of them.
-      const sortedPlainParts = plainParts.sort((a, b) => b.length - a.length);
-      const mainPart = sortedPlainParts.length ? sortedPlainParts[0] : '';
-      const compactMainPart = mainPart.trim().replace(/\s{2,}/g, ' ');
-      // Get locators for matching elements.
-      const locators = page.locator(tagName.toLowerCase(), {hasText: compactMainPart});
-      // If there is exactly 1 of them:
-      const locatorCount = await locators.count();
-      if (locatorCount === 1) {
-        // Add the box ID of the element to the result if none exists yet.
-        if (! elementID.boxID) {
-          const box = await boxOf(locators);
-          elementID.boxID = boxToString(box);
+    // If either ID remains undefined and the instance specifies an element ID:
+    if (id && ! (elementID.boxID && elementID.pathID)) {
+      // Get locators for elements with the ID.
+      try {
+        let locators = page.locator(cssEscape(id));
+        // If there is exactly 1 of them:
+        let locatorCount = await locators.count();
+        if (locatorCount === 1) {
+          // Add a box ID and a path ID to the result.
+          await addIDs(locators, elementID);
         }
-        // Add the path ID of the element to the result if none exists yet.
-        if (! elementID.pathID) {
-          elementID.pathID = await xPath(locators);
+      }
+      catch(error) {
+        console.log(`ERROR locating element by ID (${error.message})`);
+      }
+    }
+    // If either ID remains undefined and the instance specifies a tag name:
+    if (tagName && ! (elementID.boxID && elementID.pathID)) {
+      // Get locators for elements with the tag name.
+      let locators = page.locator(tagName.toLowerCase());
+      // If there is exactly 1 of them:
+      let locatorCount = await locators.count();
+      if (locatorCount === 1) {
+        // Add a box ID and a path ID to the result.
+        await addIDs(locators, elementID);
+      }
+      // If either ID remains undefined an the instance also specifies an excerpt:
+      if (excerpt && ! (elementID.boxID && elementID.pathID)) {
+        // Get the plain text parts of the excerpt, converting ... to an empty string.
+        const minTagExcerpt = excerpt.replace(/<[^>]+>/g, '<>');
+        const plainParts = (minTagExcerpt.match(/[^<>]+/g) || [])
+        .map(part => part === '...' ? '' : part);
+        // Get the longest of them.
+        const sortedPlainParts = plainParts.sort((a, b) => b.length - a.length);
+        const mainPart = sortedPlainParts.length ? sortedPlainParts[0] : '';
+        // If there is one:
+        if (mainPart.trim().replace(/\s+/g, '').length) {
+          // Get locators for elements with the tag name and the text.
+          const locators = page.locator(tagName.toLowerCase(), {hasText: mainPart});
+          // If there is exactly 1 of them:
+          const locatorCount = await locators.count();
+          if (locatorCount === 1) {
+            // Add a box ID and a path ID to the result.
+            await addIDs(locators, elementID);
+          }
         }
       }
     }

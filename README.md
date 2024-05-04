@@ -218,10 +218,14 @@ A Testaro report can include, for each tool, either or both of these properties:
 
 ##### Standard result
 
+###### Properties
+
 The standard result includes three properties:
 - `prevented`: a boolean (`true` or `false`) value, stating whether the page prevented the tool from performing its tests.
 - `totals`: an array of numbers representing how many instances of rule violations at each level of severity the tool reported. There are 4 ordinal severity levels. For example, the array `[3, 0, 14, 10]` would report that there were 3 violations at level 0, 0 at level 1, 14 at level 2, and 10 at level 3.
 - `instances`: an array of objects describing the rule violations. An instance can describe a single violation, usually by one element in the page, or can summarize multiple violations of the same rule.
+
+###### Instances
 
 Here is an example of a standard instance:
 
@@ -254,11 +258,19 @@ The element has no `id` attribute to distinguish it from other `button` elements
 - none: HTML CodeSniffer
 The tool also reproduces an excerpt of the element code.
 
-While the above properties can help you find the offending element, Testaro makes this easier by adding, insofar as possible, two standard element identifiers to each standard instance:
+###### Element identification
+
+While the above properties can help you find the offending element, Testaro makes this easier by adding, where practical, two standard element identifiers to each standard instance:
 - `boxID`: a compact representation of the x, y, width, and height of the element bounding box, if the element can be identified and is visible.
 - `pathID`: the XPath of the element, if the element can be identified.
 
 These standard identifiers can help you determine whether violations reported by different tools belong to the same element or different elements. The `boxID` property can also support the making of images of the violating elements.
+
+Some tools limit the efficacy of the current algorithm for standard identifiers:
+- HTML CodeSniffer does not report element locations, and the reported code excerpts exclude all text content.
+- Nu Html Checker reports line and column boundaries of element start tags and truncates element text content in reported code excerpts.
+
+###### Standardization configuration
 
 Each job can specify how Testaro is to handle report standardization. A job can contain a `standard` property, with one of the following values to determine which results the report will include:
 - `'also'`: original and standard.
@@ -266,6 +278,8 @@ Each job can specify how Testaro is to handle report standardization. A job can 
 - `'no'`: original only.
 
 If a tool has the option to be used without itemization and is being so used, the `instances` array may be empty, or may contain one or more summary instances. Summary instances disclose the numbers of instances that they summarize with the `count` property. They typically summarize violations by multiple elements, in which case their `id`, `location`, `excerpt`, `boxID`, and `pathID` properties will have empty values.
+
+###### Standardization opinionation
 
 This standard format reflects some judgments. For example:
 - The `ordinalSeverity` property of an instance involves interpretation. Tools may report severity, certainty, priority, or some combination of those. They may use ordinal or metric quantifications. If they quantify ordinally, their scales may have more or fewer than 4 ranks. Testaro coerces each tool’s severity, certainty, and/or priority classification into a 4-rank ordinal classification. This classification is deemed to express the most common pattern among the tools.
