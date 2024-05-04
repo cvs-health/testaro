@@ -492,12 +492,13 @@ const convert = (toolName, data, result, standardResult) => {
   else if (
     toolName === 'ed11y'
     && result
-    && ['results', 'errorCount', 'warningCount'].every(key => result[key] !== undefined)
+    && ['imageAlts', 'violations', 'errorCount', 'warningCount']
+    .every(key => result[key] !== undefined)
   ) {
-    // For each result:
-    result.results.forEach(result => {
-      const {test, content, tagName, id, loc, excerpt} = result;
-      if (['test', 'content'].every(key => result[key])) {
+    // For each violation:
+    result.violations.forEach(violation => {
+      const {test, content, tagName, id, loc, excerpt, boxID, pathID} = violation;
+      if (['test', 'content'].every(key => key)) {
         // Standardize the what property.
         let what = '';
         if (content.includes('<p>This')) {
@@ -518,7 +519,9 @@ const convert = (toolName, data, result, standardResult) => {
             type: 'box',
             spec: loc
           },
-          excerpt
+          excerpt,
+          boxID,
+          pathID
         });
       }
     });

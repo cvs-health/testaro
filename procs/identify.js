@@ -61,7 +61,6 @@ const boxOf = async locator => {
 // Returns a string representation of a bounding box.
 const boxToString = exports.boxToString = box => {
   if (box) {
-    console.log(`About to stringify ${JSON.stringify(box, null, 2)}`);
     return ['x', 'y', 'width', 'height'].map(dim => box[dim]).join(':');
   }
   else {

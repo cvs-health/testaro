@@ -158,8 +158,6 @@ exports.reporter = async (page, options) => {
       });
     };
   }), {scriptNonce, script, rulesToTest: act.rules});
-  // Get the violating elements.
-  const elementsJSHandle = await reportJSHandle.getProperty('elements');
   // Get the violation facts.
   const factsJSHandle = await reportJSHandle.getProperty('facts');
   const facts = await factsJSHandle.jsonValue();
@@ -178,30 +176,20 @@ exports.reporter = async (page, options) => {
     const elementJSHandles = await elementsJSHandle.getProperties();
     // If there are any:
     if (elementJSHandles.size) {
-      // Get the results.
-      const resultObjJSHandle = await reportJSHandle.getProperty('resultObj');
-      const resultJSON = await resultObjJSHandle.jsonValue();
-      const result = JSON.parse(resultJSON);
-      // For each violating element:
+      // For each violation:
       for (const index of elementJSHandles.keys()) {
         // Get its path ID.
         const elementHandle = elementJSHandles.get(index).asElement();
         const pathID = await xPath(elementHandle);
-        // Add it to the element violation record.
-        result.violationFacts[index].pathID = pathID;
+        // Add it to the violation facts.
+        violations[index].pathID = pathID;
       };
     }
+    // Populate the result.
+    result.imageAlts = imageAlts;
+    result.violations = violations;
   }
-  // Populate the tool report data.
-  let data = {};
-  if (result.prevented) {
-    data.success = false;
-    data.prevented = true;
-    data.error = result.error;
-    delete result.prevented;
-    delete result.error;
-  }
-  // Return the act report.
+  // Return the report.
   return {
     data,
     result
