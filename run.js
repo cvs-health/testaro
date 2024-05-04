@@ -1124,10 +1124,10 @@ const doActs = async (report, actIndex, page) => {
               for (const instance of act.standardResult.instances) {
                 const elementID = await identify(instance, page);
                 if (! instance.boxID) {
-                  instance.boxID = elementID.boxID;
+                  instance.boxID = elementID ? elementID.boxID : '';
                 }
                 if (! instance.pathID) {
-                  instance.pathID = elementID.pathID;
+                  instance.pathID = elementID ? elementID.pathID : '';
                 }
               };
               // If the original-format result is not to be included in the report:
