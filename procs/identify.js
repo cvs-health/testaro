@@ -76,21 +76,13 @@ const addIDs = async (locators, recipient) => {
     if (! recipient.boxID) {
       const box = await boxOf(locators);
       recipient.boxID = boxToString(box);
-      if (recipient.boxID.length) {
-        console.log(recipient.boxID);
-      }
     }
     // Add the path ID of the element to the result if none exists yet.
     if (! recipient.pathID) {
       recipient.pathID = await xPath(locators);
-      if (recipient.pathID.length) {
-        console.log(recipient.pathID);
-      }
     }
   }
 };
-// Returns a CSS-safe ID value with a # prefix.
-const cssEscape = id => `#${id.replace(/&/g, '\&')}`;
 // Returns the XPath and box ID of the element of a standard instance.
 exports.identify = async (instance, page) => {
   // If the instance does not yet have both boxID and pathID properties:
@@ -113,31 +105,34 @@ exports.identify = async (instance, page) => {
         if (type === 'xpath') {
           specifier = `xpath=${specifier}`;
         }
-        const locators = page.locator(specifier);
-        const locatorCount = await locators.count();
-        // If the count of matching elements is 1:
-        if (locatorCount === 1) {
-          // Add a box ID and a path ID to the result.
-          await addIDs(locators, elementID);
+        console.log(`Specifier is ${specifier}`);
+        try {
+          const locators = page.locator(specifier);
+          const locatorCount = await locators.count();
+          console.log(`Locator count is ${locatorCount}`);
+          // If the count of matching elements is 1:
+          if (locatorCount === 1) {
+            // Add a box ID and a path ID to the result.
+            await addIDs(locators, elementID);
+          }
+          // Otherwise, if the count is not 1 and the instance specifies an XPath location:
+          else if (type === 'xpath') {
+            // Use the XPath location as the path ID.
+            elementID.pathID = spec;
+          }
         }
-        // Otherwise, if the count is not 1 and the instance specifies an XPath location:
-        else if (type === 'xpath') {
-          // Use the XPath location as the path ID.
-          elementID.pathID = spec;
+        catch(error) {
+          console.log(`ERROR locating element by CSS selector or XPath (${error.message})`);
         }
       }
     }
     // If either ID remains undefined and the instance specifies an element ID:
     if (id && ! (elementID.boxID && elementID.pathID)) {
-      // Get locators for elements with the ID.
+      // Get the first of the locators for elements with the ID.
       try {
-        let locators = page.locator(cssEscape(id));
-        // If there is exactly 1 of them:
-        let locatorCount = await locators.count();
-        if (locatorCount === 1) {
-          // Add a box ID and a path ID to the result.
-          await addIDs(locators, elementID);
-        }
+        let locator = page.locator(`#${id.replace(/([-&;/]|^\d)/g, '\\$1')}`).first();
+        // Add a box ID and a path ID to the result.
+        await addIDs(locator, elementID);
       }
       catch(error) {
         console.log(`ERROR locating element by ID (${error.message})`);

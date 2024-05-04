@@ -270,6 +270,8 @@ Some tools limit the efficacy of the current algorithm for standard identifiers:
 - HTML CodeSniffer does not report element locations, and the reported code excerpts exclude all text content.
 - Nu Html Checker reports line and column boundaries of element start tags and truncates element text content in reported code excerpts.
 
+Testing can change the pages being tested, and such changes can cause a particular element to change its physical or logical location. In such cases, an element may appear multiple times in a tool report with different `boxID` or `pathID` values, even though it is, for practical purposes, the same element.
+
 ###### Standardization configuration
 
 Each job can specify how Testaro is to handle report standardization. A job can contain a `standard` property, with one of the following values to determine which results the report will include:
