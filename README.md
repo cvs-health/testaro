@@ -40,6 +40,7 @@ One software product that performs some such functions is [Testilo](https://www.
 
 Testaro uses:
 - [Playwright](https://playwright.dev/) to launch browsers, perform user actions in them, and perform tests
+- [plywright-dompath](https://www.npmjs.com/package/playwright-dompath) to retrieve XPaths of elements
 - [pixelmatch](https://www.npmjs.com/package/pixelmatch) to measure motion
 
 Testaro performs tests of these tools:
