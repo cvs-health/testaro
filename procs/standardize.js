@@ -343,7 +343,6 @@ const doWAVE = (result, standardResult, categoryName) => {
 };
 // Converts a result.
 const convert = (toolName, data, result, standardResult) => {
-  console.log(Object.keys(result));
   // Prevention.
   if (data.prevented) {
     standardResult.prevented = true;
@@ -658,10 +657,8 @@ const convert = (toolName, data, result, standardResult) => {
 };
 // Converts the results.
 exports.standardize = act => {
-  console.log('About to standardize');
   const {which, data, result, standardResult} = act;
   if (which && result && standardResult) {
-    console.log('About to convert');
     convert(which, data, result, standardResult);
   }
   else {
