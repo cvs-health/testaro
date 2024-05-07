@@ -105,11 +105,9 @@ exports.identify = async (instance, page) => {
         if (type === 'xpath') {
           specifier = `xpath=${specifier}`;
         }
-        console.log(`Specifier is ${specifier}`);
         try {
           const locators = page.locator(specifier);
           const locatorCount = await locators.count();
-          console.log(`Locator count is ${locatorCount}`);
           // If the count of matching elements is 1:
           if (locatorCount === 1) {
             // Add a box ID and a path ID to the result.
