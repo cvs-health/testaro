@@ -100,7 +100,7 @@ const evalRules = {
   opFoc: 'operable elements that are not Tab-focusable',
   pseudoP: 'adjacent br elements suspected of nonsemantically simulating p elements',
   radioSet: 'radio buttons not grouped into standard field sets',
-  role: 'invalid and native-replacing explicit roles',
+  role: 'native-replacing explicit roles',
   styleDiff: 'style inconsistencies',
   tabNav: 'nonstandard keyboard navigation between elements with the tab role',
   targetSize: 'buttons, inputs, and non-inline links smaller than 44 pixels wide and high',
