@@ -34,7 +34,7 @@ const {xPath} = require('playwright-dompath');
 
 // FUNCTIONS
 
-// Conducts and reports the Editoria11y tests.
+// Performs and reports the Editoria11y tests.
 exports.reporter = async (page, options) => {
   // Get the nonce, if any.
   const {act, report} = options;
@@ -42,7 +42,7 @@ exports.reporter = async (page, options) => {
   const scriptNonce = jobData && jobData.lastScriptNonce;
   // Get the tool script.
   const script = await fs.readFile(`${__dirname}/../ed11y/editoria11y.min.js`, 'utf8');
-  // Run the tests and get the violating elements and violation facts.
+  // Perform the tests and get the violating elements and violation facts.
   const reportJSHandle = await page.evaluateHandle(args => new Promise(async resolve => {
     // If the report is incomplete after 20 seconds:
     const timer = setTimeout(() => {

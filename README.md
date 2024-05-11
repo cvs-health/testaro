@@ -139,17 +139,17 @@ Here is an example of a job:
 
 ```javascript
 {
-  id: '241213T1200-ts25-w3c',
+  id: '241213T1200-dy-0',
   what: 'Test W3C with 2 alfa rules',
   strict: true,
   timeLimit: 65,
+  deviceID: 'iPhone 11',
+  browserID: 'webkit',
   acts: [
     {
       type: 'launch',
-      which: 'chromium',
       url: 'https://www.w3c.org',
-      deviceID: 'iPhone 6',
-      what: 'Chromium browser'
+      what: 'World Wide Web Consortium'
     },
     {
       type: 'test',
@@ -159,7 +159,7 @@ Here is an example of a job:
     }
   ],
   sources: {
-    script: 'tp99',
+    script: 'ts99',
     batch: 'webOrgs',
     lastTarget: false,
     target: {
@@ -179,126 +179,29 @@ Here is an example of a job:
 ```
 
 This job contains two _acts_, telling Testaro to:
-1. open a page in the Chromium browser with properties of an iPhone 6 and navigate to a specified URL
-1. perform two of the tests of the `alfa` tool (the tests for rules `r25` and `r71`) on that URL
+1. Launch a browser, open a page, and navigate to a specified URL.
+1. Perform the tests for rules `r25` and `r71` of the `alfa` tool.
 
 Job properties:
 - `id`: a string uniquely identifying the job.
 - `what`: a description of the job.
 - `strict`: `true` or `false`, indicating whether _substantive redirections_ should be treated as failures. These are redirections that do more than add or subtract a final slash.
 - `timeLimit`: the number of seconds allowed for the execution of the job.
+- `deviceID`: the ID of the device that some browser properties will resemble, unless overridden. It must be `'default'` or the ID of one of the 125 devices recognized by Playwright, published at `https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json`.
+- `browserID`: the ID of the browser to be used, unless overridden. It must be `'chromium'`, `'firefox'`, or `'webkit`'.
 - `acts`: an array of the acts to be performed (documented below).
 - `standard`: `'also'`, `'only'`, or `'no'`, indicating whether rule-violation instances are to be reported in tool-native formats and also in the Testaro standard format, only in the standard format, or only in the tool-native formats.
 - `observe`: `true` or `false`, indicating whether tool and Testaro-rule invocations are to be reported to the server as they occur, so that the server can update a waiting client.
 - `timeStamp`: a string in `yymmddThhMM` format, specifying a date and time before which the job is not to be performed.
 - `creationTimeStamp`: a string in `yymmddThhMM` format, describing when the job was created.
 - `sources`: an object describing where the job came from. It may be an empty object, or an object containing any properties required by the job creator.
-- `creationTimeStamp`: the date and time in `yymmddThhMM` format when the job was created.
-- `timeStamp`: the date and time in `yymmddThhMM` format before which the job is not to be assigned.
 - `sendReportTo`: the URL to which the report of the job is to be sent, or an empty string if the report is not to be sent to a server.
 
 The job creator may add other properties (such as `mergeID` in this example) to a job.
 
-### Reports
-
-#### Introduction
-
-Each tool produces a _tool report_ of the results of its tests. Testaro prunes the tool reports for brevity, removing content that is judged unlikely to be useful. Testaro then appends each tool report to the test act that invoked the tool.
-
-Testaro also generates some data about the job and adds those data to the job, in a `jobData` property.
-
-#### Formats
-
-##### Tool-report formats
-
-The tools listed above as dependencies write their tool reports in various formats. They differ in how they organize multiple instances of the same problem, how they classify severity and certainty, how they point to the locations of problems, how they name problems, etc.
-
-A Testaro report can include, for each tool, either or both of these properties:
-- `result`: the result in the native tool format.
-- `standardResult`: the result in a standard format identical for all tools.
-
-##### Standard result
-
-###### Properties
-
-The standard result includes three properties:
-- `prevented`: a boolean (`true` or `false`) value, stating whether the page prevented the tool from performing its tests.
-- `totals`: an array of numbers representing how many instances of rule violations at each level of severity the tool reported. There are 4 ordinal severity levels. For example, the array `[3, 0, 14, 10]` would report that there were 3 violations at level 0, 0 at level 1, 14 at level 2, and 10 at level 3.
-- `instances`: an array of objects describing the rule violations. An instance can describe a single violation, usually by one element in the page, or can summarize multiple violations of the same rule.
-
-###### Instances
-
-Here is an example of a standard instance:
-
-```javascript
-{
-  ruleID: 'rule01',
-  what: 'Button type invalid',
-  ordinalSeverity: 2,
-  count: 1,
-  tagName: 'BUTTON'
-  id: '',
-  location: {
-    doc: 'dom',
-    type: 'xpath',
-    spec: '/html[1]/body[1]/section[1]/div[1]/div[1]/ul[1]/li[1]/a[1]'
-  },
-  excerpt: '<button type="link"></button>',
-  boxID: '12:340:46:50',
-  pathID: '/html[1]/body[1]/section[1]/div[1]/div[1]/ul[1]/li[1]/a[1]'
-}
-```
-
-This instance describes a violation of a rule named `rule01` by a `button` element.
-
-The element has no `id` attribute to distinguish it from other `button` elements, but the tool describes its location. This tool uses an XPath to do that. Tools use various methods for location description, namely:
-- `line` (line number in the code of the page): Nu Html Checker
-- `selector` (CSS selector): Axe, QualWeb, WAVE
-- `xpath`: Alfa, ASLint, Equal Access
-- `box` (coordinates, width, and height of the element box): Editoria11y, Testaro
-- none: HTML CodeSniffer
-The tool also reproduces an excerpt of the element code.
-
-###### Element identification
-
-While the above properties can help you find the offending element, Testaro makes this easier by adding, where practical, two standard element identifiers to each standard instance:
-- `boxID`: a compact representation of the x, y, width, and height of the element bounding box, if the element can be identified and is visible.
-- `pathID`: the XPath of the element, if the element can be identified.
-
-These standard identifiers can help you determine whether violations reported by different tools belong to the same element or different elements. The `boxID` property can also support the making of images of the violating elements.
-
-Some tools limit the efficacy of the current algorithm for standard identifiers:
-- HTML CodeSniffer does not report element locations, and the reported code excerpts exclude all text content.
-- Nu Html Checker reports line and column boundaries of element start tags and truncates element text content in reported code excerpts.
-
-Testing can change the pages being tested, and such changes can cause a particular element to change its physical or logical location. In such cases, an element may appear multiple times in a tool report with different `boxID` or `pathID` values, even though it is, for practical purposes, the same element.
-
-###### Standardization configuration
-
-Each job can specify how Testaro is to handle report standardization. A job can contain a `standard` property, with one of the following values to determine which results the report will include:
-- `'also'`: original and standard.
-- `'only'`: standard only.
-- `'no'`: original only.
-
-If a tool has the option to be used without itemization and is being so used, the `instances` array may be empty, or may contain one or more summary instances. Summary instances disclose the numbers of instances that they summarize with the `count` property. They typically summarize violations by multiple elements, in which case their `id`, `location`, `excerpt`, `boxID`, and `pathID` properties will have empty values.
-
-###### Standardization opinionation
-
-This standard format reflects some judgments. For example:
-- The `ordinalSeverity` property of an instance involves interpretation. Tools may report severity, certainty, priority, or some combination of those. They may use ordinal or metric quantifications. If they quantify ordinally, their scales may have more or fewer than 4 ranks. Testaro coerces each tool’s severity, certainty, and/or priority classification into a 4-rank ordinal classification. This classification is deemed to express the most common pattern among the tools.
-- The `tagName` property of an instance may not always be obvious, because in some cases the rule being tested for requires a relationship among more than one element (e.g., “An X element may not have a Y element as its parent”).
-- The `ruleID` property of an instance is a matching rule if the tool issues a message but no rule identifier for each instance. The `nuVal` tool does this. In this case, Testaro is classifying the messages into rules.
-- The `ruleID` property of an instance may reclassify tool rules. For example, if a tool rule covers multiple situations that are dissimilar, that rule may be split into multiple rules with distinct `ruleID` properties.
-
-You are not dependent on the judgments incorporated into the standard format, because Testaro can give you the original reports from the tools.
-
-The standard format does not express opinions on issue classification. A rule ID identifies something deemed to be an issue by a tool. Useful reporting from multi-tool testing still requires the classification of tool **rules** into **issues**. If tool `A` has `alt-incomplete` as a rule ID and tool `B` has `image_alt_stub` as a rule ID, Testaro does not decide whether those are really the same issue or different issues. That decision belongs to you. The standardization of tool reports by Testaro eliminates some of the drudgery in issue classification, but not any of the judgment required for issue classification.
-
 ### Acts
 
 #### Introduction
-
-The `acts` array was introduced above. This section provides more detail.
 
 Each act object has a `type` property and optionally has a `name` property (used in branching, described below). It must or may have other properties, depending on the value of `type`.
 
@@ -308,7 +211,7 @@ The first act in any job has the type `launch`, as shown in the example above. I
 
 #### Act types
 
-The subsequent acts can tell Testaro to perform any of:
+The acts after the first can tell Testaro to perform any of:
 - _moves_ (clicks, text inputs, hovers, etc.)
 - _navigations_ (browser launches, visits to URLs, waits for page conditions, etc.)
 - _alterations_ (changes to the page)
@@ -336,7 +239,7 @@ When the texts of multiple elements of the same type will contain the same `whic
 
 ##### Navigations
 
-An example of a **navigation** is the act of type `launch` above. The `deviceID` property of a `launch` act is optional. If not specified, it is set to `'default'`. It can be any of the device IDs recognized by Playwright, published at `https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json`.
+An example of a **navigation** is the act of type `launch` above. A `launch` act can optionally have a `deviceID` property, a `browserID` property, or both. If not specified, they inherits their values from the corresponding properties of the job.
 
 If any act alters the page, you can restore the page to its original state for the next act by inserting a new `launch` act (and, if necessary, additional page-specific acts) between them.
 
@@ -367,6 +270,23 @@ An example of an **alteration** is:
 
 This act causes Testaro to alter the `display` and `visibility` style properties of all elements, where necessary, so those properties do not make any element invisible.
 
+##### Branching
+
+An example of a **branching** act is:
+
+```json
+{
+  "type": "next",
+  "if": ["totals.invalid", ">", 0],
+  "jump": -4,
+  "what": "redo search if any invalid elements"
+}
+```
+
+This act checks the result of the previous act to determine whether its `result.totals.invalid` property has a positive value. If so, it changes the next act to be performed, specifying the act 4 acts before this one.
+
+A `next` act can use a `next` property instead of a `jump` property. The value of the `next` property is an act name. It tells Testaro to continue performing acts starting with the act having that value as the value of its `name` property.
+
 ##### Tests
 
 ###### Introduction
@@ -379,7 +299,7 @@ The `which` property of a `test` act identifies a tool, such as `alfa` or `testa
 
 Some tools modify the page, so isolation of tests from one another requires that a browser be relaunched or, at least, navigate to the URL again, after a test act running any of those tools before a test act running another tool.
 
-Of the 9 tools, 6 are target-modifying:
+Of the 10 tools, 6 are target-modifying:
 - `alfa`
 - `aslint`
 - `axe`
@@ -390,7 +310,7 @@ Of the 9 tools, 6 are target-modifying:
 ###### Configuration
 
 Every tool invoked by Testaro must have:
-- a property in the `tests` object defined in the `run.js` file, where the property name is the code representing the tool and the value is the name of the tool
+- a property in the `tests` object defined in the `run.js` file, where the property name is the ID representing the tool and the value is the name of the tool
 - a `.js` file, defining the operation of the tool, in the `tests` directory, whose name base is the name of the tool
 
 The `actSpecs.js` file (described in detail below) contains a specification for any `test` act, namely:
@@ -406,11 +326,11 @@ test: [
 ],
 ```
 
-That means that a test act (i.e. an act with a `type` property having the value `'test'`) must have a string-valued `which` property naming a tool and may optionally have an array-valued `rules` property restricting the tests to be reported and/or a string-valued `what` property describing the tool and/or the tests.
+That means that a test act (i.e. an act with a `type` property having the value `'test'`) must have a string-valued `which` property naming a tool and may optionally have an array-valued `rules` property restricting the rules to be reported on and/or a string-valued `what` property describing the tool and/or the tests.
 
 If a particular test act either must have or may have any other properties, those properties are specified in the `tools` property in `actSpecs.js`.
 
-When you include a `rules` property, you limit the tests of the tool that are performed or reported. For some tools (`alfa`, `axe`, `htmlcs`, `qualWeb`, and `testaro`), only the specified tests are performed. Other tools (`ibm`, `nuVal`, and `wave`) do not allow such a limitation, so, for those tools, all tests are performed but results are reported from only the specified tests.
+When you include a `rules` property, you limit the tests of the tool that are performed or reported. For some tools (`alfa`, `axe`, `htmlcs`, `qualWeb`, and `testaro`), only the specified tests are performed. Other tools (`aslint`, `ed11y`, `ibm`, `nuVal`, and `wave`) do not allow such a limitation, so, for those tools, all tests are performed but results are reported from only the specified tests.
 
 The `nuVal`, `qualWeb`, and `testaro` tools require specific formats for the `rules` property. Those formats are described below in the sections about those tools.
 
@@ -438,7 +358,7 @@ Most tools allow you to decide which of their rules to apply. In effect, this me
 }
 ```
 
-specifies that the tests for rules `r25` and `r71` of the `alfa` tool are to be run. If the `'y'` in the `rules` array were `'n'` instead, the act would specify that all the tests of the `alfa` tool **except** those for rules `r25` and `r71` are to be run.
+specifies that the tests for rules `r25` and `r71` of the `alfa` tool are to be performed. If the `'y'` in the `rules` array were `'n'` instead, the act would specify that all the tests of the `alfa` tool **except** those for rules `r25` and `r71` are to be run.
 
 One of the tools that allows rule selection, Testaro, has some rules that take additional arguments. As prescribed in `actSpecs.js`, you can pass such additional arguments to the `reporter` functions of those Testaro tests with an `args` property. Example:
 
@@ -455,7 +375,7 @@ One of the tools that allows rule selection, Testaro, has some rules that take a
 }
 ```
 
-This act specifies that the Testaro test `hover` is to be run with the additional argument `20`, and `focInd` is to be run with the additional arguments `false` and `300`.
+This act specifies that the Testaro test `hover` is to be performed with the additional argument `20`, and `focInd` is to be performed with the additional arguments `false` and `300`.
 
 ###### Expectations
 
@@ -489,23 +409,6 @@ The third item in each array, if there are 3 items in the array, is the criterio
 A typical use for an `expect` property is checking the correctness of a Testaro test. Thus, the validation jobs in the `validation/tests/jobs` directory all contain `test` acts with `expect` properties. See the “Validation” section below.
 
 When a `test` act has an `expect` property, the result for that act has an `expectations` property reporting whether the expectations were satisfied. The value of `expectations` is an array of objects, one object per expectation. Each object includes a `property` property identifying the expectation, and a `passed` property with `true` or `false` value reporting whether the expectation was satisfied. If applicable, it also has other properties identifying what was expected and what was actually reported.
-
-##### Branching
-
-An example of a **branching** act is:
-
-```json
-{
-  "type": "next",
-  "if": ["totals.invalid", ">", 0],
-  "jump": -4,
-  "what": "redo search if any invalid elements"
-}
-```
-
-This act checks the result of the previous act to determine whether its `result.totals.invalid` property has a positive value. If so, it changes the next act to be performed, specifying the act 4 acts before this one.
-
-A `next` act can use a `next` property instead of a `jump` property. The value of the `next` property is an act name. It tells Testaro to continue performing acts starting with the act having that value as the value of its `name` property.
 
 #### Tools
 
@@ -630,8 +533,6 @@ This limitation of WAVE may be overcome in a future version of Testaro by means 
 
 #### Browser types
 
-After any act in a job, you can change the browser type by inserting a `launch` act. One reason for specifying a particular browser type is that particular tests have different results with different browser types. Another is that you may wish to perform tests with more than a single browser type.
-
 The warning comments in the `testaro/hover.js` and `testaro/motion.js` files state that those tests operate correctly only with the `webkit` browser type. The warning comment in the `testaro/focInd.js` file states that that test operates incorrectly with the `firefox` browser type.
 
 When you want to run some tests of a tool with one browser type and other tests of the same tool with another browser type, you can do so by splitting the rules into two test acts. For example, one test act can specify the rules as
@@ -699,6 +600,101 @@ The validity criterion named in item 2 may be any of these:
 - `'isTest'`: is the name of a tool
 - `'isWaitable'`: is `'url'`, `'title'`, or `'body'`
 - `'areStrings'`: is an array of strings
+
+### Reports
+
+#### Introduction
+
+Each tool produces a _tool report_ of the results of its tests. Testaro prunes the tool reports for brevity, removing content that is judged unlikely to be useful. Testaro then appends each tool report to the test act that invoked the tool.
+
+Testaro also generates some data about the job and adds those data to the job, in a `jobData` property.
+
+#### Formats
+
+##### Tool-report formats
+
+The tools listed above as dependencies write their tool reports in various formats. They differ in how they organize multiple instances of the same problem, how they classify severity and certainty, how they point to the locations of problems, how they name problems, etc.
+
+A Testaro report can include, for each tool, either or both of these properties:
+- `result`: the result in the native tool format.
+- `standardResult`: the result in a standard format identical for all tools.
+
+##### Standard result
+
+###### Properties
+
+The standard result includes three properties:
+- `prevented`: a boolean (`true` or `false`) value, stating whether the page prevented the tool from performing its tests.
+- `totals`: an array of numbers representing how many instances of rule violations at each level of severity the tool reported. There are 4 ordinal severity levels. For example, the array `[3, 0, 14, 10]` would report that there were 3 violations at level 0, 0 at level 1, 14 at level 2, and 10 at level 3.
+- `instances`: an array of objects describing the rule violations. An instance can describe a single violation, usually by one element in the page, or can summarize multiple violations of the same rule.
+
+###### Instances
+
+Here is an example of a standard instance:
+
+```javascript
+{
+  ruleID: 'rule01',
+  what: 'Button type invalid',
+  ordinalSeverity: 2,
+  count: 1,
+  tagName: 'BUTTON'
+  id: '',
+  location: {
+    doc: 'dom',
+    type: 'xpath',
+    spec: '/html[1]/body[1]/section[3]/div[2]/div[1]/ul[1]/li[1]/button[1]'
+  },
+  excerpt: '<button type="link"></button>',
+  boxID: '12:340:46:50',
+  pathID: '/html/body/section[3]/div[2]/div/ul/li[1]/button[1]'
+}
+```
+
+This instance describes a violation of a rule named `rule01` by a `button` element.
+
+The element has no `id` attribute to distinguish it from other `button` elements, but the tool describes its location. This tool uses an XPath to do that. Tools use various methods for location description, namely:
+- `line` (line number in the code of the page): Nu Html Checker
+- `selector` (CSS selector): Axe, QualWeb, WAVE
+- `xpath`: Alfa, ASLint, Equal Access
+- `box` (coordinates, width, and height of the element box): Editoria11y, Testaro
+- none: HTML CodeSniffer
+The tool also reproduces an excerpt of the element code.
+
+###### Element identification
+
+While the above properties can help you find the offending element, Testaro makes this easier by adding, where practical, two standard element identifiers to each standard instance:
+- `boxID`: a compact representation of the x, y, width, and height of the element bounding box, if the element can be identified and is visible.
+- `pathID`: the XPath of the element, if the element can be identified.
+
+These standard identifiers can help you determine whether violations reported by different tools belong to the same element or different elements. The `boxID` property can also support the making of images of the violating elements.
+
+Some tools limit the efficacy of the current algorithm for standard identifiers:
+- HTML CodeSniffer does not report element locations, and the reported code excerpts exclude all text content.
+- Nu Html Checker reports line and column boundaries of element start tags and truncates element text content in reported code excerpts.
+
+Testing can change the pages being tested, and such changes can cause a particular element to change its physical or logical location. In such cases, an element may appear multiple times in a tool report with different `boxID` or `pathID` values, even though it is, for practical purposes, the same element.
+
+###### Standardization configuration
+
+Each job specifies how Testaro is to handle report standardization. A job contains a `standard` property, with one of the following values to determine which results the report will include:
+- `'also'`: original and standard.
+- `'only'`: standard only.
+- `'no'`: original only.
+
+If a tool has the option to be used without itemization and is being so used, the `instances` array may be empty, or may contain one or more summary instances. Summary instances disclose the numbers of instances that they summarize with the `count` property. They typically summarize violations by multiple elements, in which case their `id`, `location`, `excerpt`, `boxID`, and `pathID` properties will have empty values.
+
+###### Standardization opinionation
+
+This standard format reflects some judgments. For example:
+- The `ordinalSeverity` property of an instance involves interpretation. Tools may report severity, certainty, priority, or some combination of those. They may use ordinal or metric quantifications. If they quantify ordinally, their scales may have more or fewer than 4 ranks. Testaro coerces each tool’s severity, certainty, and/or priority classification into a 4-rank ordinal classification. This classification is deemed to express the most common pattern among the tools.
+- The `tagName` property of an instance may not always be obvious, because in some cases the rule being tested for requires a relationship among more than one element (e.g., “An X element may not have a Y element as its parent”).
+- The `ruleID` property of an instance is a matching rule if the tool issues a message but no rule identifier for each instance. The `nuVal` tool does this. In this case, Testaro is classifying the messages into rules.
+- The `ruleID` property of an instance may reclassify tool rules. For example, if a tool rule covers multiple situations that are dissimilar, that rule may be split into multiple rules with distinct `ruleID` properties.
+
+You are not dependent on the judgments incorporated into the standard format, because Testaro can give you the original reports from the tools.
+
+The standard format does not express opinions on issue classification. A rule ID identifies something deemed to be an issue by a tool. Useful reporting from multi-tool testing still requires the classification of tool **rules** into **issues**. If tool `A` has `alt-incomplete` as a rule ID and tool `B` has `image_alt_stub` as a rule ID, Testaro does not decide whether those are really the same issue or different issues. That decision belongs to you. The standardization of tool reports by Testaro eliminates some of the drudgery in issue classification, but not any of the judgment required for issue classification.
 
 ## Execution
 
@@ -907,21 +903,15 @@ The files in the `temp` directory are presumed ephemeral and are not tracked by 
 - produces human-oriented HTML digests from scored reports
 - produces human-oriented HTML comparisons of the scores of targets
 
-Testilo contains procedures that reorganize report data by issue rather than tool, and that compensate for duplicative tests when computing scores.
+Testilo contains procedures that reorganize report data by issue and by element, rather than tool, and that compensate for duplicative tests when computing scores.
 
-Testaro is derived from [Autotest](https://github.com/jrpool/autotest). Autotest was created as a monolithic accessibility testing package, but that forced functionalities to be hosted on a workstation merely because it was impractical to host Playwright elsewhere. Testaro embodies an architectural decision to isolate workstation-dependent functionalities.
-
-Testaro therefore omits some functionalities of Autotest, such as:
-- tests producing results intended to be human-inspected
-- scoring (now in Testilo)
-- file operations for score aggregation, report revision, and HTML reports (now in Testilo)
-- a web user interface
+Report standardization could be performed on a server rather than a workstation, but that would require sending the original reports to the server. They are generally much larger than standardized reports. Whenever users want only standardized reports, standardizing them on the workstation eliminates the need to send the original reports anywhere. For that reason, Testaro performs report standardization.
 
 ## Code style
 
 The JavaScript code in this project generally conforms to the ESLint configuration file `.eslintrc.json`. However, the `htmlcs/HTMLCS.js` file implements an older version of JavaScript. Its style is regulated by the `htmlcs/.eslintrc.json` file.
 
-## Origin
+## History
 
 Work on the custom tests in this package began in 2017, and work on the multi-package ensemble that Testaro implements began in early 2018. These two aspects were combined into the [Autotest](https://github.com/jrpool/autotest) package in early 2021 and into the more single-purpose packages, Testaro and Testilo, in January 2022.
 
