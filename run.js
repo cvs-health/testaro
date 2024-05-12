@@ -404,9 +404,12 @@ const browserClose = async () => {
   }
 };
 // Launches a browser, navigates to a URL, and returns browser data.
-const launch = async (
-  report, url, debug, waits, deviceID = null, browserID = null, motion = 'no-preference'
-) => {
+const launch = async (report, url, debug, waits, deviceID, browserID, lowMotion) => {
+  // Get the default arguments.
+  url ??= report.url;
+  deviceID ??= report.deviceID;
+  browserID ??= report.browserID;
+  lowMotion ??= report.lowMotion;
   // If the specified browser type exists:
   if (! browserID || ['chromium', 'firefox', 'webkit'].includes(browserID)) {
     // Create a browser of the specified or default type.
@@ -420,12 +423,8 @@ const launch = async (
         log: (name, severity, message) => console.log(message.slice(0, 100))
       }
     };
-    if (debug) {
-      browserOptions.headless = false;
-    }
-    if (waits) {
-      browserOptions.slowMo = waits;
-    }
+    browserOptions.headless = ! debug;
+    browserOptions.slowMo = waits || 0;
     // Launch the browser.
     browser = await browserType.launch(browserOptions)
     // If the launch failed:
@@ -438,7 +437,9 @@ const launch = async (
       };
     });
     // Get the device options for a new context.
-    const deviceOptions = getDeviceOptions(deviceID, motion);
+    const deviceOptions = getDeviceOptions(
+      deviceID || 'default', lowMotion ? 'reduce-motion' : 'no-preference'
+    );
     // If the device is valid:
     if (deviceOptions) {
       // Open a context (i.e. browser tab), with reduced motion if specified.
@@ -859,7 +860,7 @@ const doActs = async (report, actIndex, page) => {
           waits,
           act.deviceID || report.deviceID,
           act.browserID || report.browserID,
-          act.lowMotion ? 'reduce' : 'no-preference'
+          act.lowMotion || report.lowMotion
         );
         // If the launch and navigation succeeded:
         if (launchResult && launchResult.success) {
