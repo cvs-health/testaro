@@ -256,49 +256,77 @@ const isValidReport = report => {
   if (report) {
     // Return whether the report is valid.
     const {
-      id, what, strict, timeLimit, deviceID, browserID, acts, sources, creationTimeStamp, timeStamp
+      id,
+      strict,
+      isolate,
+      standard,
+      observe,
+      deviceID,
+      browserID,
+      lowMotion,
+      timeLimit,
+      creationTimeStamp,
+      executionTimeStamp,
+      sources,
+      acts
     } = report;
     if (! id || typeof id !== 'string') {
       return 'Bad report ID';
     }
-    if (! what || typeof what !== 'string') {
-      return 'Bad report what';
-    }
     if (typeof strict !== 'boolean') {
       return 'Bad report strict';
     }
-    if (typeof timeLimit !== 'number' || timeLimit < 1) {
-      return 'Bad report time limit';
+    if (typeof isolate !== 'boolean') {
+      return 'Bad report isolate';
+    }
+    if (! ['also', 'only', 'no'].includes(standard)) {
+      return 'Bad report standard';
+    }
+    if (typeof observe !== 'boolean') {
+      return 'Bad report observe';
     }
     if (! isDeviceID(deviceID)) {
-      return 'Bad device ID';
+      return 'Bad report deviceID';
     }
     if (! ['chromium', 'firefox', 'webkit'].includes(browserID)) {
-      return 'Bad default browser type';
+      return 'Bad report browserID';
     }
-    if (! acts || ! Array.isArray(acts) || ! acts.length) {
-      return 'Bad report acts';
+    if (typeof lowMotion !== 'boolean') {
+      return 'Bad report lowMotion';
     }
-    if (! acts.every(act => act.type && typeof act.type === 'string')) {
-      return 'Act with no type';
-    }
-    if (acts[0].type !== 'launch') {
-      return 'First act type not launch';
-    }
-    const invalidAct = acts.find(act => ! isValidAct(act));
-    if (invalidAct) {
-      return `Invalid act:\n${JSON.stringify(invalidAct, null, 2)}`;
-    }
-    if (! sources || typeof sources !== 'object') {
-      return 'Bad report sources';
+    if (typeof timeLimit !== 'number' || timeLimit < 1) {
+      return 'Bad report timeLimit';
     }
     if (
       ! (creationTimeStamp && typeof creationTimeStamp === 'string' && dateOf(creationTimeStamp))
     ) {
-      return 'bad job creation time stamp';
+      return 'bad job creationTimeStamp';
     }
-    if (! (timeStamp && typeof timeStamp === 'string') && dateOf(timeStamp)) {
-      return 'bad report time stamp';
+    if (
+      ! (executionTimeStamp && typeof executionTimeStamp === 'string') && dateOf(executionTimeStamp)
+    ) {
+      return 'bad report executionTimeStamp';
+    }
+    if (
+      ! sources
+      || typeof sources !== 'object'
+      || ! ['script', 'batch', 'target'].every(key => sources[key])
+      || ! ['what', 'url'].every(key => sources.target[key])
+    ) {
+      return 'Bad report sources';
+    }
+    if (
+      ! acts
+      || ! Array.isArray(acts)
+      || acts.length < 2
+      || ! acts.every(act => act.type && typeof act.type === 'string')
+      || acts[0].type !== 'launch'
+    ) {
+      return 'Bad report acts';
+    }
+    const invalidAct = acts.find(act => ! isValidAct(act));
+    if (invalidAct) {
+      return `Invalid act:\n${JSON.stringify(invalidAct, null, 2)}`;
     }
     return '';
   }
