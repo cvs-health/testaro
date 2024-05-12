@@ -105,7 +105,7 @@ let requestedURL = '';
 // ########## VALIDATORS
 
 // Validates a browser type.
-const isBrowserType = type => ['chromium', 'firefox', 'webkit'].includes(type);
+const isBrowserID = type => ['chromium', 'firefox', 'webkit'].includes(type);
 // Validates a load state.
 const isState = string => ['loaded', 'idle'].includes(string);
 // Validates a URL.
@@ -148,8 +148,11 @@ const hasSubtype = (variable, subtype) => {
     else if (subtype === 'isURL') {
       return isURL(variable);
     }
-    else if (subtype === 'isBrowserType') {
-      return isBrowserType(variable);
+    else if (subtype === 'isDeviceID') {
+      return isDeviceID(variable);
+    }
+    else if (subtype === 'isBrowserID') {
+      return isBrowserID(variable);
     }
     else if (subtype === 'isFocusable') {
       return isFocusable(variable);
@@ -181,7 +184,7 @@ const hasSubtype = (variable, subtype) => {
     return true;
   }
 };
-// Validates an act.
+// Validates an act by reference to actSpecs.js.
 const isValidAct = act => {
   // Identify the type of the act.
   const type = act.type;
@@ -282,24 +285,6 @@ const isValidReport = report => {
     if (acts[0].type !== 'launch') {
       return 'First act type not launch';
     }
-    if (! ['chromium', 'webkit', 'firefox'].includes(acts[0].which)) {
-      return 'Bad first act which';
-    }
-    if (acts[0].type !== 'launch' || (
-      (
-        ! acts[0].url
-        || typeof acts[0].url !== 'string'
-        || ! isURL(acts[0].url)
-      )
-      && (
-        acts[1].type !== 'url'
-        || ! acts[1].which
-        || typeof acts[1].which !== 'string'
-        || ! isURL(acts[1].which)
-      )
-    )) {
-      return 'First or second act has no valid URL';
-    }
     const invalidAct = acts.find(act => ! isValidAct(act));
     if (invalidAct) {
       return `Invalid act:\n${JSON.stringify(invalidAct, null, 2)}`;
@@ -312,7 +297,7 @@ const isValidReport = report => {
     ) {
       return 'bad job creation time stamp';
     }
-    if (! (timeStamp && typeof timeStamp === 'string')) {
+    if (! (timeStamp && typeof timeStamp === 'string') && dateOf(timeStamp)) {
       return 'bad report time stamp';
     }
     return '';
@@ -808,23 +793,16 @@ const doActs = async (report, actIndex, page) => {
   if (actIndex > -1 && actIndex < acts.length) {
     // Identify the act to be performed.
     const act = acts[actIndex];
+    const {type, which} = act;
     // If it is valid:
     if (isValidAct(act)) {
-      let actInfo = '';
-      if (act.which) {
-        if (act.type === 'launch' && act.url) {
-          actInfo = `${act.which} to ${act.url}`;
-        }
-        else {
-          actInfo = act.which;
-        }
-      }
-      const message = `>>>> ${act.type}: ${actInfo}`;
+      const actSuffix = type === 'test' ? ` ${which}` : '';
+      const message = `>>>> ${type}${actSuffix}`;
       // If granular reporting has been specified:
       if (report.observe) {
         // Notify the observer of the act and log it.
-        const whichParam = act.which ? `&which=${act.which}` : '';
-        const messageParams = `act=${act.type}${whichParam}`;
+        const whichParam = which ? `&which=${which}` : '';
+        const messageParams = `act=${type}${whichParam}`;
         tellServer(report, messageParams, message);
       }
       // Otherwise, i.e. if granular reporting has not been specified:
@@ -836,7 +814,7 @@ const doActs = async (report, actIndex, page) => {
       actCount++;
       act.startTime = Date.now();
       // If the act is an index changer:
-      if (act.type === 'next') {
+      if (type === 'next') {
         const condition = act.if;
         const logSuffix = condition.length === 3 ? ` ${condition[1]} ${condition[2]}` : '';
         console.log(`>> ${condition[0]}${logSuffix}`);
@@ -872,15 +850,15 @@ const doActs = async (report, actIndex, page) => {
         }
       }
       // Otherwise, if the act is a launch:
-      else if (act.type === 'launch') {
-        // Launch the specified browser and navigate to the specified URL.
+      else if (type === 'launch') {
+        // Launch the specified browser on the specified device and navigate to the specified URL.
         const launchResult = await launch(
           report,
-          act.url,
+          act.url || report.sources.target.url,
           debug,
           waits,
-          act.deviceID,
-          act.browserID,
+          act.deviceID || report.deviceID,
+          act.browserID || report.browserID,
           act.lowMotion ? 'reduce' : 'no-preference'
         );
         // If the launch and navigation succeeded:

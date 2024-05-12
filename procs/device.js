@@ -29,7 +29,7 @@ const {devices} = require('playwright');
 // FUNCTIONS
 
 // Returns whether a device ID is valid.
-exports.isDeviceID = deviceID => !! devices[deviceID];
+exports.isDeviceID = deviceID => deviceID === 'default' || !! devices[deviceID];
 
 // Returns options for the browser.newContext() function.
 exports.getDeviceOptions = (deviceID, motion) => {
