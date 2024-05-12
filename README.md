@@ -139,6 +139,7 @@ Here is an example of a job:
   observe: false,
   deviceID: 'Kindle Fire HDX',
   browserID: 'webkit',
+  lowMotion: false,
   timeLimit: 80,
   creationTimeStamp: '241229T0537',
   executionTimeStamp: '250110T1200',
