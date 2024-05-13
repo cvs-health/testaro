@@ -450,9 +450,10 @@ const convert = (toolName, data, result, standardResult) => {
               if (! tagName && finalRuleID.endsWith('_svg')) {
                 tagName = 'SVG';
               }
-              const excerpt = ruleResult.element && ruleResult.element.html || '';
+              const excerpt = ruleResult.element && ruleResult.element.html.replace(/\s+/g, ' ')
+              || '';
               if (! tagName && /^<[a-z]+[ >]/.test(excerpt)) {
-                tagName = excerpt.slice(1).replace(/[ >]+/, '').toUpperCase();
+                tagName = excerpt.slice(1).replace(/[ >].+/, '').toUpperCase();
               }
               const idDraft = excerpt && excerpt.replace(/^[^[>]+id="/, 'id=').replace(/".*$/, '');
               const id = idDraft && idDraft.length > 3 && idDraft.startsWith('id=')
@@ -567,7 +568,6 @@ const convert = (toolName, data, result, standardResult) => {
     if (result.rawPage) {
       doNuVal(result, standardResult, 'rawPage');
     }
-    const {instances} = standardResult;
   }
   // qualWeb
   else if (
