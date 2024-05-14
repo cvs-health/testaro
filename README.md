@@ -143,17 +143,16 @@ Here is an example of a job:
   timeLimit: 80,
   creationTimeStamp: '241229T0537',
   executionTimeStamp: '250110T1200',
+  sendReportTo: 'https://abccorp.com/api/report',
+  target: {
+    what: 'Real Estate Management',
+    url: 'https://abccorp.com/mgmt/realproperty.html'
+  },
   sources: {
     script: 'ts99',
     batch: 'departments',
     mergeID: '7f',
-    sendReportTo: 'https://abccorp.com/api/report',
     requester: 'malavu@abccorp.com'
-    target: {
-      what: 'Real Estate Management',
-      url: 'https://abccorp.com/mgmt/realproperty.html'
-    },
-    lastTarget: false,
   },
   acts: [
     {
@@ -194,7 +193,9 @@ Job properties:
 - `timeLimit`: the number of seconds allowed for the execution of the job.
 - `creationTimeStamp`: a string in `yymmddThhMM` format, describing when the job was created.
 - `executionTimeStamp`: a string in `yymmddThhMM` format, specifying a date and time before which the job is not to be performed.
-- `sources`: an object describing the source of the job.
+- `sendReportTo`: the URL to which the job report is to be sent, or `''` if not a `netWatch` job.
+- `target`: data about the target of the job, or `{}` if the job involves multiple targets.
+- `sources`: data optionally inserted into the job by the job creator for use by the job creator.
 - `acts`: an array of the acts to be performed (documented below).
 
 ## Acts
@@ -237,7 +238,7 @@ When the texts of multiple elements of the same type will contain the same `whic
 
 #### Navigations
 
-An example of a **navigation** is the act of type `launch` above. The launch configuration is inherited from properties of the job, except that the act may override any of those properties.
+An example of a **navigation** is the act of type `launch` above. The launch configuration is inherited from the `deviceID`, `browserID`, `lowMotion`, and `target` properties of the job, except that the act may override any of those properties.
 
 If any act alters the page, you can restore the page to its original state for the next act by inserting a new `launch` act (and, if necessary, additional page-specific acts) between them.
 

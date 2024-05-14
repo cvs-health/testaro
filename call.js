@@ -83,7 +83,7 @@ const callRun = async jobIDStart => {
   // Otherwise, i.e. if the job does not exist.
   else {
     // Report the error.
-    console.log('ERROR: No specified job exists');
+    console.log('ERROR: Specified job does not exist');
   }
 };
 // Starts a directory watch, converting the interval argument to a number.

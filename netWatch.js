@@ -142,8 +142,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                 }
                 // Otherwise, i.e. if there was a job or a message:
                 else {
-                  const {id, message, sources} = contentObj;
-                  const sendReportTo = sources ? sources.sendReportTo : '';
+                  const {id, message, sendReportTo, sources} = contentObj;
                   // If the server sent a message, not a job:
                   if (message) {
                     // Report it.
