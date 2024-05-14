@@ -29,6 +29,8 @@
 
 // Module to keep secrets.
 require('dotenv').config();
+// Module to validate jobs.
+const {isValidJob} = require('./procs/job');
 // Modules to make requests to servers.
 const httpClient = require('http');
 const httpsClient = require('https');
@@ -132,6 +134,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
               try {
                 // If there was no job to do:
                 let contentObj = JSON.parse(content);
+                let jobInvalidity = '';
                 if (! Object.keys(contentObj).length) {
                   // Report this.
                   console.log(`No job to do at ${url}`);
@@ -139,7 +142,8 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                 }
                 // Otherwise, i.e. if there was a job or a message:
                 else {
-                  const {id, message, sendReportTo, sources} = contentObj;
+                  const {id, message, sources} = contentObj;
+                  const sendReportTo = sources ? sources.sendReportTo : '';
                   // If the server sent a message, not a job:
                   if (message) {
                     // Report it.
@@ -147,98 +151,89 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                     resolve(true);
                   }
                   // Otherwise, if the server sent a valid job:
-                  else if (id && sources) {
+                  else if (
+                    id && sendReportTo && sources && ! (jobInvalidity = isValidJob(contentObj))
+                  ) {
                     // Restart the cycle.
                     cycleIndex = -1;
                     // Prevent further watching, if unwanted.
                     noJobYet = false;
                     // Add the agent to the job.
                     sources.agent = agent;
-                    // If the job specifies a report destination:
-                    if (sendReportTo) {
-                      // Perform the job, adding result data to it.
-                      console.log(`${logStart}job ${id} (${nowString()})`);
-                      console.log(`>> It will send report to ${sendReportTo}`);
-                      await doJob(contentObj);
-                      let reportJSON = JSON.stringify(contentObj, null, 2);
-                      console.log(`Job ${id} finished (${nowString()})`);
-                      // Send the report to the specified server.
-                      console.log(`Sending report ${id} to ${sendReportTo}`);
-                      const reportClient = sendReportTo.startsWith('https://')
-                        ? httpsClient
-                        : httpClient;
-                      const reportLogStart = `Sent report ${id} to ${sendReportTo} and got `;
-                      reportClient.request(sendReportTo, {method: 'POST'}, repResponse => {
-                        const chunks = [];
-                        repResponse
-                        // If the response to the report threw an error:
-                        .on('error', async error => {
-                          // Report this.
-                          console.log(`${reportLogStart}error message ${error.message}\n`);
-                          resolve(true);
-                        })
-                        .on('data', chunk => {
-                          chunks.push(chunk);
-                        })
-                        // When the response arrives:
-                        .on('end', async () => {
-                          const content = chunks.join('');
-                          try {
-                            // If the server sent a message, as expected:
-                            const ackObj = JSON.parse(content);
-                            const {message} = ackObj;
-                            if (message) {
-                              // Report it.
-                              console.log(`${reportLogStart}message ${message}\n`);
-                              // Free the memory used by the report.
-                              reportJSON = '';
-                              contentObj = {};
-                              resolve(true);
-                            }
-                            // Otherwise, i.e. if the server sent anything else:
-                            else {
-                              // Report it.
-                              console.log(
-                                `ERROR: ${reportLogStart}status ${repResponse.statusCode} and error message ${JSON.stringify(ackObj, null, 2)}\n`
-                              );
-                              resolve(true);
-                            }
+                    // Perform the job, adding result data to it.
+                    console.log(`${logStart}job ${id} (${nowString()})`);
+                    console.log(`>> It will send report to ${sendReportTo}`);
+                    await doJob(contentObj);
+                    let reportJSON = JSON.stringify(contentObj, null, 2);
+                    console.log(`Job ${id} finished (${nowString()})`);
+                    // Send the report to the specified server.
+                    console.log(`Sending report ${id} to ${sendReportTo}`);
+                    const reportClient = sendReportTo.startsWith('https://')
+                      ? httpsClient
+                      : httpClient;
+                    const reportLogStart = `Sent report ${id} to ${sendReportTo} and got `;
+                    reportClient.request(sendReportTo, {method: 'POST'}, repResponse => {
+                      const chunks = [];
+                      repResponse
+                      // If the response to the report threw an error:
+                      .on('error', async error => {
+                        // Report this.
+                        console.log(`${reportLogStart}error message ${error.message}\n`);
+                        resolve(true);
+                      })
+                      .on('data', chunk => {
+                        chunks.push(chunk);
+                      })
+                      // When the response arrives:
+                      .on('end', async () => {
+                        const content = chunks.join('');
+                        try {
+                          // If the server sent a message, as expected:
+                          const ackObj = JSON.parse(content);
+                          const {message} = ackObj;
+                          if (message) {
+                            // Report it.
+                            console.log(`${reportLogStart}message ${message}\n`);
+                            // Free the memory used by the report.
+                            reportJSON = '';
+                            contentObj = {};
+                            resolve(true);
                           }
-                          // If processing the server message throws an error:
-                          catch(error) {
+                          // Otherwise, i.e. if the server sent anything else:
+                          else {
                             // Report it.
                             console.log(
-                              `ERROR: ${reportLogStart}status ${repResponse.statusCode}, error message ${error.message}, and response ${content.slice(0, 1000)}\n`
+                              `ERROR: ${reportLogStart}status ${repResponse.statusCode} and error message ${JSON.stringify(ackObj, null, 2)}\n`
                             );
                             resolve(true);
                           }
-                        });
-                      })
-                      // If the report submission throws an error:
-                      .on('error', async error => {
-                        // Report this.
-                        console.log(
-                          `ERROR in report submission: ${reportLogStart}error message ${error.message}\n`
-                        );
-                        resolve(true);
-                      })
-                      // Finish submitting the report.
-                      .end(reportJSON);
-                    }
-                    // Otherwise, i.e. if the job specifies no report destination:
-                    else {
+                        }
+                        // If processing the server message throws an error:
+                        catch(error) {
+                          // Report it.
+                          console.log(
+                            `ERROR: ${reportLogStart}status ${repResponse.statusCode}, error message ${error.message}, and response ${content.slice(0, 1000)}\n`
+                          );
+                          resolve(true);
+                        }
+                      });
+                    })
+                    // If the report submission throws an error:
+                    .on('error', async error => {
                       // Report this.
-                      const message = `ERROR: ${logStart}job with no report destination`;
-                      console.log(message);
-                      serveObject({message}, response);
+                      console.log(
+                        `ERROR in report submission: ${reportLogStart}error message ${error.message}\n`
+                      );
                       resolve(true);
-                    }
+                    })
+                    // Finish submitting the report.
+                    .end(reportJSON);
                   }
                   // Otherwise, i.e. if the server sent an invalid job:
                   else {
                     // Report this.
-                    const message
-                    = `ERROR: ${logStart}invalid job:\n${JSON.stringify(contentObj, null, 2)}`;
+                    const errorSuffix = jobInvalidity ? ` (${jobInvalidity})` : '';
+                    const message = `ERROR: ${logStart}invalid job${errorSuffix}`;
                     console.log(message);
                     serveObject({message}, response);
                     resolve(true);
@@ -248,9 +243,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
               // If processing the server response throws an error:
               catch(error) {
                 // Report this.
-                console.log(
-                  `ERROR processing server response: ${error.message} (response ${content.slice(0, 1000)})`
-                );
+                console.log(`ERROR processing server response: ${error.message})`);
                 resolve(true);
               }
             });

@@ -33,6 +33,8 @@ require('dotenv').config();
 const fs = require('fs/promises');
 // Module to perform jobs.
 const {doJob} = require('./run');
+// Module to get dates from time stamps.
+const {dateOf} = require('./procs/dateOf');
 
 // ########## CONSTANTS
 
@@ -45,13 +47,6 @@ const reportDir = process.env.REPORTDIR;
 const tsPart = (timeStamp, startIndex) => timeStamp.slice(startIndex, startIndex + 2);
 // Returns a string representing the date and time.
 const nowString = () => (new Date()).toISOString().slice(2, 16);
-// Gets date of a timestamp.
-const dateOf = ts => {
-  const dateString = `20${tsPart(ts, 0)}-${tsPart(ts, 2)}-${tsPart(ts, 4)}`;
-  const timeString = `${tsPart(ts, 7)}:${tsPart(ts, 9)}:00`;
-  const dateTimeString = `${dateString}T${timeString}Z`;
-  return new Date(dateTimeString);
-};
 // Writes a directory report.
 const writeDirReport = async report => {
   const jobID = report && report.id;
