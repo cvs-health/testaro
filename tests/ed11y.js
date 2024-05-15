@@ -48,7 +48,7 @@ exports.reporter = async (page, options) => {
     const timer = setTimeout(() => {
       // Return this as the report.
       resolve({
-        facts: {
+        result: {
           prevented: true,
           error: 'ed11y timed out'
         }
@@ -151,37 +151,52 @@ exports.reporter = async (page, options) => {
     }
     catch(error) {
       resolve({
-        facts: {
+        result: {
           prevented: true,
           error: error.message
         }
       });
     };
   }), {scriptNonce, script, rulesToTest: act.rules});
-  // Add the violation facts to the result.
-  const factsJSHandle = await reportJSHandle.getProperty('facts');
-  const facts = await factsJSHandle.jsonValue();
-  const result = facts;
-  // If there were any violations:
-  const {violations} = facts;
-  if (violations && violations.length) {
-    // Get the violating elements.
-    const elementsJSHandle = await reportJSHandle.getProperty('elements');
-    const elementJSHandles = await elementsJSHandle.getProperties();
-    // For each violation:
-    for (const index in violations) {
-      // Get its path ID.
-      const elementHandle = elementJSHandles.get(index).asElement();
-      const pathID = await xPath(elementHandle);
-      // Add it to the violation facts.
-      violations[index].pathID = pathID;
+  // Initialize the result as the violation facts.
+  const resultJSHandle = await reportJSHandle.getProperty('result');
+  const result = await resultJSHandle.jsonValue();
+  // If there were any violation facts:
+  if (result) {
+    // Get the violations.
+    const {violations} = result;
+    // If any exist:
+    if (violations && violations.length) {
+      // Get the violating elements.
+      const elementsJSHandle = await reportJSHandle.getProperty('elements');
+      const elementJSHandles = await elementsJSHandle.getProperties();
+      // For each violation:
+      for (const index in violations) {
+        // Get its path ID.
+        const elementHandle = elementJSHandles.get(index).asElement();
+        const pathID = await xPath(elementHandle);
+        // Add it to the violation facts of the result.
+        violations[index].pathID = pathID;
+      };
+    }
+    // Return the report.
+    return {
+      data: {
+        prevented: result.prevented
+      },
+      result
     };
   }
-  // Return the report.
-  return {
-    data: {
-      prevented: facts.prevented
-    },
-    result
-  };
+  // Otherwise, i.e. if there were no violation facts:
+  else {
+    // Return this.
+    return {
+      data: {
+        prevented: false
+      },
+      result: {
+        prevented: false,
+      }
+    }
+  }
 };

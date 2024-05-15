@@ -96,7 +96,7 @@ exports.identify = async (instance, page) => {
     const {type, spec} = location;
     // If the instance specifies a CSS selector or XPath location:
     if (['selector', 'xpath'].includes(type)) {
-      // Get a locator of the element.
+      // Get locators for elements with that specifier.
       let specifier = spec;
       if (type === 'xpath') {
         specifier = spec.replace(/\/text\(\)\[\d+\]$/, '');
@@ -107,33 +107,50 @@ exports.identify = async (instance, page) => {
         }
         try {
           const locators = page.locator(specifier);
+          // Get their count, or throw an error if the specifier is invalid.
           const locatorCount = await locators.count();
-          // If the count of matching elements is 1:
+          // If the specifier is valid and the count is 1:
           if (locatorCount === 1) {
             // Add a box ID and a path ID to the result.
             await addIDs(locators, elementID);
           }
-          // Otherwise, if the count is not 1 and the instance specifies an XPath location:
+          /*
+            Otherwise, if the specifier is valid, the count is not 1, and the instance specifies
+            an XPath location:
+          */
           else if (type === 'xpath') {
             // Use the XPath location as the path ID.
             elementID.pathID = spec;
           }
         }
+        // If the specifier is invalid:
         catch(error) {
-          console.log(`ERROR locating element by CSS selector or XPath (${error.message})`);
+          // Add this to the instance.
+          instance.invalidity = {
+            badProperty: 'location',
+            validityError: error.message
+          };
         }
       }
     }
     // If either ID remains undefined and the instance specifies an element ID:
     if (id && ! (elementID.boxID && elementID.pathID)) {
-      // Get the first of the locators for elements with the ID.
+      /*
+        Get the first locator for an element with the ID, or throw an error if the identifier is
+        invalid.
+      */
       try {
         let locator = page.locator(`#${id.replace(/([-&;/]|^\d)/g, '\\$1')}`).first();
         // Add a box ID and a path ID to the result.
         await addIDs(locator, elementID);
       }
+      // If the identifier is invalid:
       catch(error) {
-        console.log(`ERROR locating element by ID (${error.message})`);
+        // Add this to the instance.
+        instance.invalidity = {
+          badProperty: 'id',
+          validityError: error.message
+        };
       }
     }
     // If either ID remains undefined and the instance specifies a tag name:

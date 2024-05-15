@@ -132,7 +132,6 @@ Here is an example of a job:
 ```javaScript
 {
   id: '250110T1200-7f-4',
-  what: 'aside mislocation',
   strict: true,
   isolate: true,
   standard: 'also',
