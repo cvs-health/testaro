@@ -30,7 +30,7 @@
 // Module to keep secrets.
 require('dotenv').config();
 // Module to validate jobs.
-const {isValidJob, tools} = require('./procs/job');
+const {isBrowserID, isValidJob, tools} = require('./procs/job');
 // Module to standardize report formats.
 const {standardize} = require('./procs/standardize');
 // Module to identify element bounding boxes.
@@ -186,14 +186,12 @@ const browserClose = async () => {
   }
 };
 // Launches a browser, navigates to a URL, and returns browser data.
-const launch = async (report, url, debug, waits, deviceID, browserID, lowMotion) => {
-  // Get the default arguments.
-  url ??= report.url;
-  deviceID ??= report.deviceID;
+const launch = async (report, debug, waits, browserID, target) => {
+  // Get the default arguments if not overridden.
   browserID ??= report.browserID;
-  lowMotion ??= report.lowMotion;
+  target ??= report.sources.target;
   // If the specified browser type exists:
-  if (! browserID || ['chromium', 'firefox', 'webkit'].includes(browserID)) {
+  if (isBrowserID(browserID)) {
     // Create a browser of the specified or default type.
     const browserType = require('playwright')[browserID || report.browserID];
     // Close the current browser, if any.

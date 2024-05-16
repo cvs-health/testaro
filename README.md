@@ -136,7 +136,21 @@ Here is an example of a job:
   isolate: true,
   standard: 'also',
   observe: false,
-  deviceID: 'Kindle Fire HDX',
+  device: {
+    id: 'iPhone 8',
+    browserTabOptions: {
+      reduceMotion: 'no-preference',
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/17.4 Mobile/15A372 Safari/604.1',
+      viewport: {
+        width: 375,
+        height: 667
+      },
+      deviceScaleFactor: 2,
+      isMobile: true,
+      hasTouch: true,
+      defaultBrowserType: 'webkit'
+    }
+  },
   browserID: 'webkit',
   lowMotion: false,
   timeLimit: 80,
@@ -186,9 +200,8 @@ Job properties:
 - `strict`: `true` or `false`, indicating whether _substantive redirections_ should be treated as failures. These are redirections that do more than add or subtract a final slash.
 - `standard`: `'also'`, `'only'`, or `'no'`, indicating whether rule-violation instances are to be reported in tool-native formats and also in the Testaro standard format, only in the standard format, or only in the tool-native formats.
 - `observe`: `true` or `false`, indicating whether tool and Testaro-rule invocations are to be reported to the server as they occur, so that the server can update a waiting client.
-- `deviceID`: the ID of the device that some browser properties will resemble, unless overridden by a `launch` act. It must be `'default'` or the ID of one of about 125 devices recognized by Playwright, published at `https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json`.
+- `device`: the ID of a device and the properties of each new browser tab (technically, “context”) that will be set for conformity to that device, unless overridden by a `launch` act. It must be `'default'` or the ID of one of about 125 devices recognized by Playwright, published at `https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json`.
 - `browserID`: the ID of the browser to be used, unless overridden by a `launch` act. It must be `'chromium'`, `'firefox'`, or `'webkit`'.
-- `lowMotion`: whether the browser is to create tabs with the `reduce-motion` option set to `reduce` instead of `no-preference`.
 - `timeLimit`: the number of seconds allowed for the execution of the job.
 - `creationTimeStamp`: a string in `yymmddThhMM` format, describing when the job was created.
 - `executionTimeStamp`: a string in `yymmddThhMM` format, specifying a date and time before which the job is not to be performed.
@@ -237,7 +250,7 @@ When the texts of multiple elements of the same type will contain the same `whic
 
 #### Navigations
 
-An example of a **navigation** is the act of type `launch` above. The launch configuration is inherited from the `deviceID`, `browserID`, `lowMotion`, and `target` properties of the job, except that the act may override any of those properties.
+An example of a **navigation** is the act of type `launch` in the job example above. That `launch` act has only a `type` property. If you want a particular `launch` act to use a different browser type or to navigate to a different target from the job defaults, the `launch` act can have a `browserID` and/or a `target` property.
 
 If any act alters the page, you can restore the page to its original state for the next act by inserting a new `launch` act (and, if necessary, additional page-specific acts) between them.
 

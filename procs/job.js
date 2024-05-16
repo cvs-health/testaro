@@ -119,7 +119,7 @@ const hasSubtype = (variable, subtype) => {
   }
 };
 // Validates a browser type.
-const isBrowserID = type => ['chromium', 'firefox', 'webkit'].includes(type);
+const isBrowserID = exports.isBrowserID = type => ['chromium', 'firefox', 'webkit'].includes(type);
 // Validates a load state.
 const isState = string => ['loaded', 'idle'].includes(string);
 // Validates a URL.
@@ -190,9 +190,8 @@ exports.isValidJob = job => {
       isolate,
       standard,
       observe,
-      deviceID,
+      device,
       browserID,
-      lowMotion,
       timeLimit,
       creationTimeStamp,
       executionTimeStamp,
@@ -217,10 +216,10 @@ exports.isValidJob = job => {
     if (typeof observe !== 'boolean') {
       return 'Bad job observe';
     }
-    if (! isDeviceID(deviceID)) {
+    if (! isDeviceID(device.id)) {
       return 'Bad job deviceID';
     }
-    if (! ['chromium', 'firefox', 'webkit'].includes(browserID)) {
+    if (! isBrowserID(browserID)) {
       return 'Bad job browserID';
     }
     if (typeof lowMotion !== 'boolean') {
