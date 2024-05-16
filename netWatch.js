@@ -132,9 +132,9 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
             .on('end', async () => {
               const content = chunks.join('');
               try {
-                // If there was no job to do:
                 let contentObj = JSON.parse(content);
                 let jobInvalidity = '';
+                // If there was no job to do:
                 if (! Object.keys(contentObj).length) {
                   // Report this.
                   console.log(`No job to do at ${url}`);

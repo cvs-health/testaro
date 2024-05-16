@@ -47,9 +47,14 @@ exports.reporter = async (page, options) => {
   const pageContent = await page.content();
   // Get the source.
   const sourceData = await getSource(page);
-  // If it was not obtained:
-  const data = {};
+  const data = {
+    docTypes: {
+      pageContent: {},
+      rawPage: {}
+    }
+  };
   const result = {};
+  // If it was not obtained:
   if (sourceData.prevented) {
     // Report this.
     data.prevented = true;
@@ -66,8 +71,9 @@ exports.reporter = async (page, options) => {
       }
     };
     const nuURL = 'https://validator.w3.org/nu/?parser=html&out=json';
+    const pageTypes = [['pageContent', pageContent], ['rawPage', sourceData.source]];
     // For each page type:
-    for (const page of [['pageContent', pageContent], ['rawPage', sourceData.source]]) {
+    for (const page of pageTypes) {
       try {
         // Get a Nu Html Checker report on it.
         fetchOptions.body = page[1];
@@ -96,10 +102,16 @@ exports.reporter = async (page, options) => {
       catch (error) {
         const message = `ERROR getting results for ${page[0]} (${error.message})`;
         console.log(message);
-        data.prevented = true;
-        data.error = message;
+        data.docTypes[page[0]].prevented = true;
+        data.docTypes[page[0]].error = message;
       };
     };
+    // If both page types prevented testing:
+    if (pageTypes.every(pageType => data.docTypes[pageType[0]].prevented)) {
+      // Report this.
+      data.prevented = true;
+      data.error = 'Both doc types prevented';
+    }
   }
   return {
     data,
