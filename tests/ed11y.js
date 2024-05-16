@@ -159,11 +159,11 @@ exports.reporter = async (page, options) => {
     };
   }), {scriptNonce, script, rulesToTest: act.rules});
   // Initialize the result as the violation facts.
-  const resultJSHandle = await reportJSHandle.getProperty('result');
+  const resultJSHandle = await reportJSHandle.getProperty('facts');
   const result = await resultJSHandle.jsonValue();
   // If there were any violation facts:
   if (result) {
-    // Get the violations.
+    // Get the violations from them.
     const {violations} = result;
     // If any exist:
     if (violations && violations.length) {
@@ -172,14 +172,14 @@ exports.reporter = async (page, options) => {
       const elementJSHandles = await elementsJSHandle.getProperties();
       // For each violation:
       for (const index in violations) {
-        // Get its path ID.
+        // Get its path ID from the identically indexed element.
         const elementHandle = elementJSHandles.get(index).asElement();
         const pathID = await xPath(elementHandle);
-        // Add it to the violation facts of the result.
+        // Add the path ID to the violation facts of the result.
         violations[index].pathID = pathID;
       };
     }
-    // Return the report.
+    // Return the data and result, discarding the separate element data.
     return {
       data: {
         prevented: result.prevented
