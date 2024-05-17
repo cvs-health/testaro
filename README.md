@@ -138,7 +138,7 @@ Here is an example of a job:
   observe: false,
   device: {
     id: 'iPhone 8',
-    browserTabOptions: {
+    windowOptions: {
       reduceMotion: 'no-preference',
       userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/17.4 Mobile/15A372 Safari/604.1',
       viewport: {
@@ -190,7 +190,7 @@ Here is an example of a job:
 ```
 
 This job contains three _acts_, telling Testaro to:
-1. Launch a Webkit browser without a reduced-motion setting, open a tab with the properties of a Kindle Fire HDX device, and navigate to `https://abccorp.com/mgmt/realproperty.html`.
+1. Launch a Webkit browser without a reduced-motion setting, open a window with the properties of an iPhone 8 device, create a page (tab), and navigate to `https://abccorp.com/mgmt/realproperty.html`.
 1. Perform the test for the `landmark-complementary-is-top-level` rule of the `axe` tool and report the test result with Axe detail level 2.
 1. Perform the tests for rules `QW-BP25` and `QW-BP26` of the `qualWeb` tool on the existing page.
 
@@ -200,7 +200,7 @@ Job properties:
 - `strict`: `true` or `false`, indicating whether _substantive redirections_ should be treated as failures. These are redirections that do more than add or subtract a final slash.
 - `standard`: `'also'`, `'only'`, or `'no'`, indicating whether rule-violation instances are to be reported in tool-native formats and also in the Testaro standard format, only in the standard format, or only in the tool-native formats.
 - `observe`: `true` or `false`, indicating whether tool and Testaro-rule invocations are to be reported to the server as they occur, so that the server can update a waiting client.
-- `device`: the ID of a device and the properties of each new browser tab (technically, “context”) that will be set for conformity to that device, unless overridden by a `launch` act. It must be `'default'` or the ID of one of about 125 devices recognized by Playwright, published at `https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json`.
+- `device`: the ID of a device and the properties of each new browser context (window) that will be set for conformity to that device, unless overridden by a `launch` act. It must be `'default'` or the ID of one of [about 125 devices recognized by Playwright](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json).
 - `browserID`: the ID of the browser to be used, unless overridden by a `launch` act. It must be `'chromium'`, `'firefox'`, or `'webkit`'.
 - `timeLimit`: the number of seconds allowed for the execution of the job.
 - `creationTimeStamp`: a string in `yymmddThhMM` format, describing when the job was created.

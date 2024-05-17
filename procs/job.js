@@ -29,8 +29,8 @@
 
 // Requirements for acts.
 const {actSpecs} = require('../actSpecs');
-// Module to validate device IDs.
-const {isDeviceID} = require('./device');
+// Data on devices.
+const {devices} = require('playwright');
 // Module to get dates from time stamps.
 const {dateOf} = require('./dateOf');
 
@@ -81,9 +81,6 @@ const hasSubtype = (variable, subtype) => {
     }
     else if (subtype === 'isURL') {
       return isURL(variable);
-    }
-    else if (subtype === 'isDeviceID') {
-      return isDeviceID(variable);
     }
     else if (subtype === 'isBrowserID') {
       return isBrowserID(variable);
@@ -179,6 +176,8 @@ const isValidAct = exports.isValidAct = act => {
     return false;
   }
 };
+// Returns whether a device ID is valid.
+const isDeviceID = deviceID => deviceID === 'default' || !! devices[deviceID];
 // Returns blank if a job is valid, or an error message.
 exports.isValidJob = job => {
   // If any job was provided:
@@ -216,7 +215,7 @@ exports.isValidJob = job => {
     if (typeof observe !== 'boolean') {
       return 'Bad job observe';
     }
-    if (! isDeviceID(device.id)) {
+    if (device.id !== 'default' && ! devices[device.id]) {
       return 'Bad job deviceID';
     }
     if (! isBrowserID(browserID)) {

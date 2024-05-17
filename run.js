@@ -37,8 +37,6 @@ const {standardize} = require('./procs/standardize');
 const {identify} = require('./procs/identify');
 // Module to send a notice to an observer.
 const {tellServer} = require('./procs/tellServer');
-// Module to get device options.
-const {getDeviceOptions, isDeviceID} = require('./procs/device');
 
 // CONSTANTS
 
@@ -186,14 +184,15 @@ const browserClose = async () => {
   }
 };
 // Launches a browser, navigates to a URL, and returns browser data.
-const launch = async (report, debug, waits, browserID, target) => {
+const launch = async (report, debug, waits, tempBrowserID, tempTarget) => {
+  const {browserID, device, target} = report;
   // Get the default arguments if not overridden.
-  browserID ??= report.browserID;
-  target ??= report.sources.target;
+  browserID ??= browserID;
+  const {url} = (tempTarget || target);
   // If the specified browser type exists:
   if (isBrowserID(browserID)) {
     // Create a browser of the specified or default type.
-    const browserType = require('playwright')[browserID || report.browserID];
+    const browserType = require('playwright')[tempBrowserID || browserID];
     // Close the current browser, if any.
     await browserClose();
     // Define browser options.
@@ -216,122 +215,106 @@ const launch = async (report, debug, waits, browserID, target) => {
         error: 'Browser launch failed'
       };
     });
-    // Get the device options for a new context.
-    const deviceOptions = getDeviceOptions(
-      deviceID || 'default', lowMotion ? 'reduce-motion' : 'no-preference'
-    );
-    // If the device is valid:
-    if (deviceOptions) {
-      // Open a context (i.e. browser tab), with reduced motion if specified.
-      const browserContext = await browser.newContext(deviceOptions);
-      // Prevent default timeouts.
-      browserContext.setDefaultTimeout(0);
-      // When a page (i.e. browser tab) is added to the browser context (i.e. browser window):
-      browserContext.on('page', async page => {
-        // Ensure the report has a jobData property.
-        report.jobData ??= {};
-        report.jobData.logCount ??= 0;
-        report.jobData.logSize ??= 0;
-        report.jobData.errorLogCount ??= 0;
-        report.jobData.browserTabOptions ??= deviceOptions;
-        // Add any error events to the count of logging errors.
-        page.on('crash', () => {
-          report.jobData.errorLogCount++;
-          console.log('Page crashed');
-        });
-        page.on('pageerror', () => {
-          report.jobData.errorLogCount++;
-        });
-        page.on('requestfailed', () => {
-          report.jobData.errorLogCount++;
-        });
-        // If the page emits a message:
-        page.on('console', msg => {
-          const msgText = msg.text();
-          let indentedMsg = '';
-          // If debugging is on:
-          if (debug) {
-            // Log a summary of the message on the console.
-            const parts = [msgText.slice(0, 75)];
-            if (msgText.length > 75) {
-              parts.push(msgText.slice(75, 150));
-              if (msgText.length > 150) {
-                const tail = msgText.slice(150).slice(-150);
-                if (msgText.length > 300) {
-                  parts.push('...');
-                }
-                parts.push(tail.slice(0, 75));
-                if (tail.length > 75) {
-                  parts.push(tail.slice(75));
-                }
+    // Open a context (i.e. browser tab).
+    const browserContext = await browser.newContext(device.windowOptions);
+    // Prevent default timeouts.
+    browserContext.setDefaultTimeout(0);
+    // When a page (i.e. browser tab) is added to the browser context (i.e. browser window):
+    browserContext.on('page', async page => {
+      // Ensure the report has a jobData property.
+      report.jobData ??= {};
+      const {jobData} = report;
+      jobData.logCount ??= 0;
+      jobData.logSize ??= 0;
+      jobData.errorLogCount ??= 0;
+      // Add any error events to the count of logging errors.
+      page.on('crash', () => {
+        jobData.errorLogCount++;
+        console.log('Page crashed');
+      });
+      page.on('pageerror', () => {
+        jobData.errorLogCount++;
+      });
+      page.on('requestfailed', () => {
+        jobData.errorLogCount++;
+      });
+      // If the page emits a message:
+      page.on('console', msg => {
+        const msgText = msg.text();
+        let indentedMsg = '';
+        // If debugging is on:
+        if (debug) {
+          // Log a summary of the message on the console.
+          const parts = [msgText.slice(0, 75)];
+          if (msgText.length > 75) {
+            parts.push(msgText.slice(75, 150));
+            if (msgText.length > 150) {
+              const tail = msgText.slice(150).slice(-150);
+              if (msgText.length > 300) {
+                parts.push('...');
+              }
+              parts.push(tail.slice(0, 75));
+              if (tail.length > 75) {
+                parts.push(tail.slice(75));
               }
             }
-            indentedMsg = parts.map(part => `    | ${part}`).join('\n');
-            console.log(`\n${indentedMsg}`);
           }
-          // Add statistics on the message to the report.
-          const msgTextLC = msgText.toLowerCase();
-          const msgLength = msgText.length;
-          report.jobData.logCount++;
-          report.jobData.logSize += msgLength;
-          if (errorWords.some(word => msgTextLC.includes(word))) {
-            report.jobData.errorLogCount++;
-            report.jobData.errorLogSize += msgLength;
-          }
-          const msgLC = msgText.toLowerCase();
-          if (
-            msgText.includes('403') && (msgLC.includes('status')
-            || msgLC.includes('prohibited'))
-          ) {
-            report.jobData.prohibitedCount++;
-          }
-        });
+          indentedMsg = parts.map(part => `    | ${part}`).join('\n');
+          console.log(`\n${indentedMsg}`);
+        }
+        // Add statistics on the message to the report.
+        const msgTextLC = msgText.toLowerCase();
+        const msgLength = msgText.length;
+        jobData.logCount++;
+        jobData.logSize += msgLength;
+        if (errorWords.some(word => msgTextLC.includes(word))) {
+          jobData.errorLogCount++;
+          jobData.errorLogSize += msgLength;
+        }
+        const msgLC = msgText.toLowerCase();
+        if (
+          msgText.includes('403') && (msgLC.includes('status')
+          || msgLC.includes('prohibited'))
+        ) {
+          jobData.prohibitedCount++;
+        }
       });
-      // Open the first page of the context.
-      const page = await browserContext.newPage();
-      try {
-        // Wait until it is stable.
-        await page.waitForLoadState('domcontentloaded', {timeout: 5000});
-        // Navigate to the specified URL.
-        const navResult = await goTo(report, page, url, 15000, 'domcontentloaded');
-        // If the navigation succeeded:
-        if (navResult.success) {
-          // Update the name of the current browser type and store it in the page.
-          page.browserTypeName = browserID;
-          // Return the response of the target server, the browser context, and the page.
-          return {
-            success: true,
-            response: navResult.response,
-            browserContext,
-            page
-          };
-        }
-        // Otherwise, if the navigation failed:
-        else {
-          // Return the error.
-          return {
-            success: false,
-            error: navResult.error
-          };
-        }
+    });
+    // Open the first page (tab) of the context (window).
+    const page = await browserContext.newPage();
+    try {
+      // Wait until it is stable.
+      await page.waitForLoadState('domcontentloaded', {timeout: 5000});
+      // Navigate to the specified URL.
+      const navResult = await goTo(report, page, url, 15000, 'domcontentloaded');
+      // If the navigation succeeded:
+      if (navResult.success) {
+        // Update the name of the current browser type and store it in the page.
+        page.browserID = browserID;
+        // Return the response of the target server, the browser context, and the page.
+        return {
+          success: true,
+          response: navResult.response,
+          browserContext,
+          page
+        };
       }
-      // If it fails to become stable after load:
-      catch(error) {
-        // Return this.
-        console.log(`ERROR: Blank page load in new tab timed out (${error.message})`);
+      // Otherwise, if the navigation failed:
+      else {
+        // Return the error.
         return {
           success: false,
-          error: 'Blank page load in new tab timed out'
+          error: navResult.error
         };
       }
     }
-    // Otherwise, i.e. if the device is invalid:
-    else {
+    // If it fails to become stable after load:
+    catch(error) {
       // Return this.
-      console.log(`ERROR: Device ${deviceID} invalid`);
+      console.log(`ERROR: Blank page load in new tab timed out (${error.message})`);
       return {
         success: false,
-        error: `${deviceID} device invalid`
+        error: 'Blank page load in new tab timed out'
       };
     }
   }
