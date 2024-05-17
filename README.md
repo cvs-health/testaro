@@ -132,6 +132,7 @@ Here is an example of a job:
 ```javaScript
 {
   id: '250110T1200-7f-4',
+  what: 'monthly health check',
   strict: true,
   isolate: true,
   standard: 'also',
