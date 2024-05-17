@@ -221,9 +221,6 @@ exports.isValidJob = job => {
     if (! isBrowserID(browserID)) {
       return 'Bad job browserID';
     }
-    if (typeof lowMotion !== 'boolean') {
-      return 'Bad job lowMotion';
-    }
     if (typeof timeLimit !== 'number' || timeLimit < 1) {
       return 'Bad job timeLimit';
     }
