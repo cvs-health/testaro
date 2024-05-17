@@ -603,12 +603,10 @@ const doActs = async (report, actIndex, page) => {
       // Launch the specified browser on the specified device and navigate to the specified URL.
       const launchResult = await launch(
         report,
-        act.url || report.target.url,
         debug,
         waits,
-        act.deviceID || report.deviceID,
         act.browserID || report.browserID,
-        act.lowMotion || report.lowMotion
+        act.target || report.target
       );
       // If the launch and navigation succeeded:
       if (launchResult && launchResult.success) {
