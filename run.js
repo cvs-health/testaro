@@ -502,7 +502,7 @@ const abortActs = async (report, actIndex) => {
   report.jobData.abortedAct = actIndex;
   report.jobData.aborted = true;
   // Report that the job is aborted.
-  console.log('ERROR: Job aborted');
+  console.log(`ERROR: Job aborted on act ${actIndex}`);
   // Return an abortive act index.
   return -2;
 };
@@ -527,7 +527,6 @@ const addError = async(alsoLog, alsoAbort, report, actIndex, message) => {
   }
   // If the job is to be aborted:
   if (alsoAbort) {
-    console.log(`report:\n${JSON.stringify(report, null, 2)}`);
     // Return an abortive act index.
     return await abortActs(report, actIndex);
   }
