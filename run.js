@@ -76,6 +76,13 @@ const errorWords = [
   'violates',
   'warning'
 ];
+// Time limits on tools.
+const timeLimits = {
+  alfa: 20,
+  ed11y: 30,
+  ibm: 30,
+  testaro: 60
+};
 
 // ########## VARIABLES
 
@@ -815,9 +822,15 @@ const doActs = async (report, actIndex, page) => {
           });
           // Get the start time of the act.
           const startTime = Date.now();
-          // Perform the specified tests of the tool and get a report.
           try {
+            // Impose a time limit on the act.
+            const timeLimit = timeLimits[act.which] || 15;
+            const timer = setTimeout(() => {
+              throw new Error(`Timed out at ${timeLimit} seconds`);
+            }, timeLimit);
+            // Perform the specified tests of the tool and get a report.
             const actReport = await require(`./tests/${act.which}`).reporter(page, options);
+            clearTimeout(timer);
             // Import its test results and process data into the act.
             act.result = actReport && actReport.result || {};
             act.data = actReport && actReport.data || {};
@@ -827,11 +840,12 @@ const doActs = async (report, actIndex, page) => {
               report.jobData.preventions[act.which] = act.data.error;
             }
           }
-          // If the testing failed:
+          // If the testing failed or timed out:
           catch(error) {
             // Report this.
             const message = error.message.slice(0, 400);
             console.log(`ERROR: Test act ${act.which} failed (${message})`);
+            act.data.prevented = true;
             act.data.error = act.data.error ? `${act.data.error}; ${message}` : message;
           }
           // Add the elapsed time of the tool to the report.
