@@ -836,8 +836,7 @@ const doActs = async (report, actIndex, page) => {
               const actReport = require(`./tests/${act.which}`).reporter(page, options);
               resolve(actReport);
             });
-            const resolvedPromise = await Promise.race([timeoutPromise, actReportPromise]);
-            clearTimeout(timer);
+            const resolvedPromise = Promise.race([timeoutPromise, actReportPromise]);
             resolvedPromise.then(value => {
               // If the act timed out:
               if (value === 'timeout') {
@@ -846,6 +845,7 @@ const doActs = async (report, actIndex, page) => {
               }
               // Otherwise, i.e. if it did not time out:
               else {
+                clearTimeout(timer);
                 // Import the test results and process data into the act.
                 act.result = actReport && actReport.result || {};
                 act.data = actReport && actReport.data || {};
