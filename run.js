@@ -824,7 +824,7 @@ const doActs = async (report, actIndex, page) => {
           const startTime = Date.now();
           try {
             // Impose a time limit on the act.
-            const timeLimit = timeLimits[act.which] || 15;
+            const timeLimit = 1000 * timeLimits[act.which] || 15000;
             const timer = setTimeout(() => {
               throw new Error(`Timed out at ${timeLimit} seconds`);
             }, timeLimit);
