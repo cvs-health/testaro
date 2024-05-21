@@ -206,8 +206,8 @@ exports.reporter = async (page, options) => {
           result[rule] = {};
         }
         result[rule].what = what;
+        const startTime = Date.now();
         try {
-          const startTime = Date.now();
           // Apply a 15-second time limit to the test. If it expires:
           let timeout;
           const timer = new Promise(resolve => {

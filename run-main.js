@@ -76,13 +76,6 @@ const errorWords = [
   'violates',
   'warning'
 ];
-// Time limits on tools.
-const timeLimits = {
-  alfa: 20,
-  ed11y: 30,
-  ibm: 30,
-  testaro: 60
-};
 
 // ########## VARIABLES
 
@@ -822,44 +815,23 @@ const doActs = async (report, actIndex, page) => {
           });
           // Get the start time of the act.
           const startTime = Date.now();
-          let timer;
+          // Perform the specified tests of the tool and get a report.
           try {
-            // Impose a time limit on the act.
-            let timeoutReport = 'onTime';
-            const timeLimit = 1000 * timeLimits[act.which] || 15000;
-            timeoutReport = new Promise(resolve => {
-              timer = setTimeout(() => {
-                act.data.prevented = true;
-                act.data.error = `Act timed out at ${timeLimit / 1000} seconds`;
-                console.log(`Timed out at ${timeLimit} seconds`)
-                resolve('timedOut');
-              }, timeLimit);
-            });
-            // Try to perform the specified tests of the tool and get a report.
-            const actReport = require(`./tests/${act.which}`).reporter(page, options);
-            const raceReport = await Promise.race([timeoutReport, actReport]);
-            // If the act was finished without timing out:
-            if (raceReport !== 'timedOut') {
-              // Disable the timer.
-              clearTimeout(timer);
-              // Import the test results and process data into the act.
-              act.result = actReport && actReport.result || {};
-              act.data = actReport && actReport.data || {};
-              // If the page prevented the tool from operating:
-              if (act.data.prevented) {
-                // Add prevention data to the job data.
-                report.jobData.preventions[act.which] = act.data.error;
-              }
+            const actReport = await require(`./tests/${act.which}`).reporter(page, options);
+            // Import its test results and process data into the act.
+            act.result = actReport && actReport.result || {};
+            act.data = actReport && actReport.data || {};
+            // If the page prevented the tool from operating:
+            if (act.data.prevented) {
+              // Add prevention data to the job data.
+              report.jobData.preventions[act.which] = act.data.error;
             }
           }
-          // If the testing failed other than by timing out:
+          // If the testing failed:
           catch(error) {
-            // Disable the timer.
-            clearTimeout(timer);
-            // Report the failure.
+            // Report this.
             const message = error.message.slice(0, 400);
             console.log(`ERROR: Test act ${act.which} failed (${message})`);
-            act.data.prevented = true;
             act.data.error = act.data.error ? `${act.data.error}; ${message}` : message;
           }
           // Add the elapsed time of the tool to the report.
