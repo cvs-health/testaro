@@ -825,20 +825,37 @@ const doActs = async (report, actIndex, page) => {
           try {
             // Impose a time limit on the act.
             const timeLimit = 1000 * timeLimits[act.which] || 15000;
-            const timer = setTimeout(() => {
-              throw new Error(`Timed out at ${timeLimit} seconds`);
-            }, timeLimit);
+            let timer, actReport;
+            const timeoutPromise = new Promise(resolve => {
+              timer = setTimeout(() => {
+                resolve('timeout');
+              }, timeLimit);
+            });
             // Perform the specified tests of the tool and get a report.
-            const actReport = await require(`./tests/${act.which}`).reporter(page, options);
+            const actReportPromise = new Promise(resolve => {
+              const actReport = require(`./tests/${act.which}`).reporter(page, options);
+              resolve(actReport);
+            });
+            const resolvedPromise = await Promise.race([timeoutPromise, actReportPromise]);
             clearTimeout(timer);
-            // Import its test results and process data into the act.
-            act.result = actReport && actReport.result || {};
-            act.data = actReport && actReport.data || {};
-            // If the page prevented the tool from operating:
-            if (act.data.prevented) {
-              // Add prevention data to the job data.
-              report.jobData.preventions[act.which] = act.data.error;
-            }
+            resolvedPromise.then(value => {
+              // If the act timed out:
+              if (value === 'timeout') {
+                // Report this.
+                throw new Error(`Timed out at ${timeLimit} seconds`);
+              }
+              // Otherwise, i.e. if it did not time out:
+              else {
+                // Import the test results and process data into the act.
+                act.result = actReport && actReport.result || {};
+                act.data = actReport && actReport.data || {};
+                // If the page prevented the tool from operating:
+                if (act.data.prevented) {
+                  // Add prevention data to the job data.
+                  report.jobData.preventions[act.which] = act.data.error;
+                }
+              }
+            });
           }
           // If the testing failed or timed out:
           catch(error) {
