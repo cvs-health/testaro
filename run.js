@@ -829,9 +829,11 @@ const doActs = async (report, actIndex, page) => {
             const timeLimit = 1000 * timeLimits[act.which] || 15000;
             timeoutReport = new Promise(resolve => {
               timer = setTimeout(() => {
-                act.data.prevented = true;
-                act.data.error = `Act timed out at ${timeLimit / 1000} seconds`;
-                console.log(`ERROR: Timed out at ${timeLimit} seconds`)
+                act.data = {
+                  prevented: true,
+                  error: `Act timed out at ${timeLimit / 1000} seconds`
+                };
+                console.log(`ERROR: Timed out at ${timeLimit / 1000} seconds`);
                 resolve('timedOut');
               }, timeLimit);
             });
@@ -869,9 +871,9 @@ const doActs = async (report, actIndex, page) => {
             toolTimes[act.which] = 0;
           }
           toolTimes[act.which] += time;
-          // If a standard-format result is to be included in the report:
+          // If the act was not prevented and standardization is required:
           const standard = report.standard || 'only';
-          if (['also', 'only'].includes(standard)) {
+          if (! act.data.prevented && ['also', 'only'].includes(standard)) {
             // Initialize it.
             act.standardResult = {
               totals: [0, 0, 0, 0],
@@ -895,9 +897,9 @@ const doActs = async (report, actIndex, page) => {
               delete act.result;
             }
           }
-          // If the act has expectations:
+          // If the act was not prevented and has expectations:
           const expectations = act.expect;
-          if (expectations) {
+          if (! act.data.prevented && expectations) {
             // Initialize whether they were fulfilled.
             act.expectations = [];
             let failureCount = 0;
