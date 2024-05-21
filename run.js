@@ -831,7 +831,7 @@ const doActs = async (report, actIndex, page) => {
               timer = setTimeout(() => {
                 act.data.prevented = true;
                 act.data.error = `Act timed out at ${timeLimit / 1000} seconds`;
-                console.log(`Timed out at ${timeLimit} seconds`)
+                console.log(`ERROR: Timed out at ${timeLimit} seconds`)
                 resolve('timedOut');
               }, timeLimit);
             });

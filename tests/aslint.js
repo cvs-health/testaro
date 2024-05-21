@@ -34,7 +34,6 @@ const fs = require('fs/promises');
 
 // Conducts and reports the ASLint tests.
 exports.reporter = async (page, options) => {
-  console.log('Starting aslint reporter');
   // Initialize the act report.
   let data = {};
   let result = {};
@@ -121,7 +120,6 @@ exports.reporter = async (page, options) => {
       error: message
     };
   }
-  console.log(`About to return data and result. data: ${JSON.stringify(data, null, 2)}`);
   return {
     data,
     result
