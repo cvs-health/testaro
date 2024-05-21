@@ -665,6 +665,7 @@ const convert = (toolName, data, result, standardResult) => {
 };
 // Converts the results.
 exports.standardize = act => {
+  console.log(`Act has keys ${Object.keys(act)}`);
   const {which, data, result, standardResult} = act;
   if (which && result && standardResult) {
     convert(which, data, result, standardResult);

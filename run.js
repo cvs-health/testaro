@@ -831,20 +831,28 @@ const doActs = async (report, actIndex, page) => {
                 resolve('timeout');
               }, timeLimit);
             });
+            console.log(`Type of timeoutPromise is ${typeof timeoutPromise}`);
+            console.log(`Keys: ${Object.keys(timeoutPromise)}`);
             // Perform the specified tests of the tool and get a report.
-            const actReportPromise = new Promise(resolve => {
-              const actReport = require(`./tests/${act.which}`).reporter(page, options);
+            const actReportPromise = new Promise(async resolve => {
+              console.log('About to run reporter');
+              const actReport = await require(`./tests/${act.which}`).reporter(page, options);
+              console.log(`Type of actReport is ${typeof actReport}`);
+              console.log(`Keys: ${Object.keys(actReport)}`);
               resolve(actReport);
+              console.log('Promise resolved with actReport');
             });
             const resolvedPromise = Promise.race([timeoutPromise, actReportPromise]);
             resolvedPromise.then(value => {
               // If the act timed out:
               if (value === 'timeout') {
+                console.log('Act timed out');
                 // Report this.
                 throw new Error(`Timed out at ${timeLimit} seconds`);
               }
               // Otherwise, i.e. if it did not time out:
               else {
+                console.log('Act did not time out');
                 clearTimeout(timer);
                 // Import the test results and process data into the act.
                 act.result = actReport && actReport.result || {};
