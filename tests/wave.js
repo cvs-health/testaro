@@ -35,27 +35,29 @@ const https = require('https');
 // FUNCTIONS
 
 // Conducts and reports the WAVE tests.
-exports.reporter = async (page, options) => {
-  const {reportType, rules} = options;
+exports.reporter = async (page, report, actIndex) => {
+  const act = report.acts[actIndex];
+  const {reportType, rules} = act;
   const waveKey = process.env.WAVE_KEY;
-  // Get the data from a WAVE test.
+  // Initialize the results.
   const data = {};
-  const result = await new Promise(resolve => {
-    https.get(
-      {
-        host: 'wave.webaim.org',
-        path: `/api/request?key=${waveKey}&url=${page.url()}&reporttype=${reportType}`
-      },
-      response => {
-        let actReport = '';
-        response.on('data', chunk => {
-          actReport += chunk;
-        });
-        // When the data arrive:
-        response.on('end', async () => {
-          try {
+  const result = {};
+  try {
+    result = await new Promise(resolve => {
+      https.get(
+        {
+          host: 'wave.webaim.org',
+          path: `/api/request?key=${waveKey}&url=${page.url()}&reporttype=${reportType}`
+        },
+        response => {
+          let rawReport = '';
+          response.on('data', chunk => {
+            rawReport += chunk;
+          });
+          // When the data arrive:
+          response.on('end', async () => {
             // Delete unnecessary properties.
-            const actResult = JSON.parse(actReport);
+            const actResult = JSON.parse(rawReport);
             const {categories, statistics} = actResult;
             delete categories.feature;
             delete categories.structure;
@@ -105,19 +107,16 @@ exports.reporter = async (page, options) => {
               data.totalElements = statistics.totalelements || null;
             }
             // Return the result.
-            return resolve(actResult);
-          }
-          catch (error) {
-            data.prevented = true;
-            data.error = error.message;
-            return resolve({
-              actReport
-            });
-          }
-        });
-      }
-    );
-  });
+            resolve(actResult);
+          });
+        }
+      );
+    });
+  }
+  catch (error) {
+    data.prevented = true;
+    data.error = error.message;
+  };
   return {
     data,
     result
