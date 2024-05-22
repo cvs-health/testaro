@@ -115,6 +115,8 @@ const hasSubtype = (variable, subtype) => {
     return true;
   }
 };
+// Validates a device ID.
+const isDeviceID = exports.isDeviceID = deviceID => deviceID === 'default' || !! devices[deviceID];
 // Validates a browser type.
 const isBrowserID = exports.isBrowserID = type => ['chromium', 'firefox', 'webkit'].includes(type);
 // Validates a load state.
@@ -176,8 +178,6 @@ const isValidAct = exports.isValidAct = act => {
     return false;
   }
 };
-// Returns whether a device ID is valid.
-const isDeviceID = deviceID => deviceID === 'default' || !! devices[deviceID];
 // Returns blank if a job is valid, or an error message.
 exports.isValidJob = job => {
   // If any job was provided:
@@ -215,7 +215,7 @@ exports.isValidJob = job => {
     if (typeof observe !== 'boolean') {
       return 'Bad job observe';
     }
-    if (device.id !== 'default' && ! devices[device.id]) {
+    if (! isDeviceID(device.id)) {
       return 'Bad job deviceID';
     }
     if (! isBrowserID(browserID)) {
@@ -263,4 +263,24 @@ exports.isValidJob = job => {
     // Return this.
     return 'no job';
   }
+};
+// Executes an asynchronous function with a time limit.
+exports.doBy = async (timeLimit, fn, fnArgs, noticePrefix) => {
+  let timer;
+  // Start a timer.
+  const timerPromise = new Promise(resolve => {
+    timer = setTimeout(() => {
+      console.log(`ERROR: ${noticePrefix} timed out at ${timeLimit} seconds`);
+      resolve('timedOut');
+    }, 1000 * timeLimit);
+  });
+  // Start the function execution.
+  const fnPromise = new Promise(async resolve => {
+    resolve(await fn(... fnArgs));
+  });
+  // Get the timeout or the value returned by the function, whichever is first.
+  const result = await Promise.race([timerPromise, fnPromise]);
+  clearTimeout(timer);
+  // Return the result.
+  return result;
 };
