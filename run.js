@@ -845,8 +845,8 @@ const doActs = async (report, actIndex, page) => {
               // Disable the timer.
               clearTimeout(timer);
               // Import the test results and process data into the act.
-              act.result = actReport && actReport.result || {};
-              act.data = actReport && actReport.data || {};
+              act.result = raceReport && raceReport.result || {};
+              act.data = raceReport && raceReport.data || {};
               // If the page prevented the tool from operating:
               if (act.data.prevented) {
                 // Add prevention data to the job data.
