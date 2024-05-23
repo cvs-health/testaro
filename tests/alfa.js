@@ -62,7 +62,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
   try {
     // Get the Alfa rules.
     const response = await rulePage.goto(
-      'https://alfa.siteimprove.com/rules', {timeout: Math.round(timeLimit / 2)}
+      'https://alfa.siteimprove.com/rules', {timeout: Math.round(1000 * timeLimit / 2)}
     );
     let ruleData = {};
     // If they were obtained:

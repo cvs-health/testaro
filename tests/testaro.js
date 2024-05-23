@@ -143,7 +143,7 @@ const wait = ms => {
   });
 };
 // Conducts and reports Testaro tests.
-exports.reporter = async (page, report, actIndex, timeLimit) => {
+exports.reporter = async (page, report, actIndex) => {
   const act = report.acts[actIndex];
   const {report, withItems, stopOnFail, args} = act;
   const argRules = args ? Object.keys(args) : null;

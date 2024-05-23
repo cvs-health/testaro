@@ -43,11 +43,21 @@ const {doBy} = require('../procs/job');
 // FUNCTIONS
 
 // Runs the IBM test and returns the result.
-const run = async content => {
+const run = async (content, timeLimit) => {
   const nowLabel = (new Date()).toISOString().slice(0, 19);
   try {
-    const ibmReport = await getCompliance(content, nowLabel);
-    return ibmReport;
+    const ibmReport = await doBy(
+      timeLimit, getCompliance, [content, nowLabel], 'ibm getCompliance'
+    );
+    if (ibmReport !== 'timedOut') {
+      return ibmReport;
+    }
+    else {
+      return {
+        prevented: true,
+        error: `ibm getCompliance timed out at ${timeLimit} seconds`
+      };
+    }
   }
   catch(error) {
     console.log('ibm getCompliance failed');
@@ -187,9 +197,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
   try {
     const typeContent = contentType === 'existing' ? await page.content() : page.url();
     // Perform the tests.
-    const actReport = await doBy(
-      timeLimit, doTest, [typeContent, withItems, timeLimit, rules], 'ibm testing'
-    );
+    const actReport = await doTest(typeContent, withItems, timeLimit, rules);
     // If the testing was finished on time:
     if (actReport !== 'timedOut') {
       const {data, result} = actReport;

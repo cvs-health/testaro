@@ -50,7 +50,8 @@ const {doBy} = '../procs/job';
 
 // Conducts and reports the Axe tests.
 exports.reporter = async (page, report, actIndex, timeLimit) => {
-  const {detailLevel, rules} = options;
+  const act = report.acts[actIndex];
+  const {detailLevel, rules} = act;
   // Initialize the act report.
   let data = {};
   let result = {};
