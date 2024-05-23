@@ -145,9 +145,9 @@ const wait = ms => {
 // Conducts and reports Testaro tests.
 exports.reporter = async (page, report, actIndex) => {
   const act = report.acts[actIndex];
-  const {args, rules, stopOnFail, withItems} = act;
+  const {args, stopOnFail, withItems} = act;
   const argRules = args ? Object.keys(args) : null;
-  rules = rules || ['y', ... Object.keys(evalRules)];
+  const rules = act.rules || ['y', ... Object.keys(evalRules)];
   // Initialize the act report.
   const data = {
     prevented: false,
