@@ -815,11 +815,15 @@ const doActs = async (report, actIndex, page) => {
             // Get the time limit in milliseconds for the act.
             const timeLimit = 1000 * timeLimits[act.which] || 15000;
             // Perform the specified tests of the tool.
-            await require(`./tests/${act.which}`).reporter(page, report, actIndex, timeLimit);
-            // If the tool reported operation prevention by the page:
+            const actReport = await require(`./tests/${act.which}`)
+            .reporter(page, report, actIndex, timeLimit);
+            // Add the data and result to the act.
+            act.data = actReport.data;
+            act.result = actReport.result;
+            // If the tool reported that the page prevented testing:
             console.log('Ran reporter');
             console.log(JSON.stringify(act, null, 2));
-            if (act.data.prevented) {
+            if (actReport.data.prevented) {
               // Add prevention data to the job data.
               report.jobData.preventions[act.which] = act.data.error;
             }
