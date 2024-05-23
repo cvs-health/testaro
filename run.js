@@ -611,8 +611,8 @@ const doActs = async (report, actIndex, page) => {
         report,
         debug,
         waits,
-        act.browserID || report.browserID,
-        act.target || report.target
+        act.browserID || report.browserID || '',
+        act.url || report.target && report.target.url || ''
       );
       // If the launch and navigation succeeded:
       if (launchResult && launchResult.success) {
