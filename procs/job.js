@@ -275,16 +275,14 @@ exports.doBy = async function(timeLimit, obj, fnName, fnArgs, noticePrefix) {
     }, 1000 * timeLimit);
   });
   // Start the function execution.
-  /*
-  const fnPromise = new Promise(async resolve => {
-    resolve(await fn(... fnArgs));
-  });
-  */
+ console.log('About to declare fn promise');
   const fnPromise = new Promise(async function(resolve) {
     resolve(await obj[fnName](... fnArgs));
   });
   // Get the timeout or the value returned by the function, whichever is first.
+  console.log('Declared. About to race');
   const result = await Promise.race([timerPromise, fnPromise]);
+  console.log(`Raced, and result type is ${typeof result}`);
   clearTimeout(timer);
   // Return the result.
   return result;
