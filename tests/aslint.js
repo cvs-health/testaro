@@ -33,7 +33,7 @@ const fs = require('fs/promises');
 // FUNCTIONS
 
 // Conducts and reports the ASLint tests.
-exports.reporter = async (page, options) => {
+exports.reporter = async (page, report, actIndex, timeLimit) => {
   // Initialize the act report.
   let data = {};
   let result = {};
@@ -43,7 +43,7 @@ exports.reporter = async (page, options) => {
     `${__dirname}/../node_modules/aslint-testaro/aslint.bundle.js`, 'utf8'
   );
   // Get the nonce, if any.
-  const {act, report} = options;
+  const act = report.acts[actIndex];
   const {jobData} = report;
   const scriptNonce = jobData && jobData.lastScriptNonce;
   // Inject the ASLint bundle and runner into the page.
@@ -73,17 +73,18 @@ exports.reporter = async (page, options) => {
     data.prevented = true;
     data.error = message;
   });
-  // If the injection succeeded:
   const reportLoc = page.locator('#aslintResult');
+  // If the injection succeeded:
   if (! data.prevented) {
-    // Wait for the test results.
+    // Get the test results.
     await reportLoc.waitFor({
       state: 'attached',
-      timeout: 30000
+      timeout: 1000 * timeLimit
     })
     .catch(error => {
-      const message = `ERROR: Results timed out (${error.message.slice(0, 400)})`;
-      console.log(message);
+      const message
+      = `aslint testing timed out at ${timeLimit} seconds (${error.message.slice(0, 400)})`;
+      console.log(`ERROR: ${message}`);
       data.prevented = true;
       data.error = message;
     });

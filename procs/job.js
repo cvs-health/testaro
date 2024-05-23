@@ -115,12 +115,14 @@ const hasSubtype = (variable, subtype) => {
     return true;
   }
 };
+// Validates a device ID.
+const isDeviceID = exports.isDeviceID = deviceID => deviceID === 'default' || !! devices[deviceID];
 // Validates a browser type.
 const isBrowserID = exports.isBrowserID = type => ['chromium', 'firefox', 'webkit'].includes(type);
 // Validates a load state.
 const isState = string => ['loaded', 'idle'].includes(string);
 // Validates a URL.
-const isURL = string => /^(?:https?|file):\/\/[^\s]+$/.test(string);
+const isURL = exports.isURL = string => /^(?:https?|file):\/\/[^\s]+$/.test(string);
 // Validates a focusable tag name.
 const isFocusable = string => ['a', 'button', 'input', 'select'].includes(string);
 // Returns whether all elements of an array are numbers.
@@ -176,8 +178,6 @@ const isValidAct = exports.isValidAct = act => {
     return false;
   }
 };
-// Returns whether a device ID is valid.
-const isDeviceID = deviceID => deviceID === 'default' || !! devices[deviceID];
 // Returns blank if a job is valid, or an error message.
 exports.isValidJob = job => {
   // If any job was provided:
@@ -215,7 +215,7 @@ exports.isValidJob = job => {
     if (typeof observe !== 'boolean') {
       return 'Bad job observe';
     }
-    if (device.id !== 'default' && ! devices[device.id]) {
+    if (! isDeviceID(device.id)) {
       return 'Bad job deviceID';
     }
     if (! isBrowserID(browserID)) {
@@ -263,4 +263,29 @@ exports.isValidJob = job => {
     // Return this.
     return 'no job';
   }
+};
+// Executes an asynchronous function with a time limit.
+exports.doBy = async function(timeLimit, obj, fnName, fnArgs, noticePrefix) {
+  let timer;
+  // Start a timer.
+  const timerPromise = new Promise(resolve => {
+    timer = setTimeout(() => {
+      console.log(`ERROR: ${noticePrefix} timed out at ${timeLimit} seconds`);
+      resolve('timedOut');
+    }, 1000 * timeLimit);
+  });
+  // Start the function execution.
+  /*
+  const fnPromise = new Promise(async resolve => {
+    resolve(await fn(... fnArgs));
+  });
+  */
+  const fnPromise = new Promise(async function(resolve) {
+    resolve(await obj[fnName](... fnArgs));
+  });
+  // Get the timeout or the value returned by the function, whichever is first.
+  const result = await Promise.race([timerPromise, fnPromise]);
+  clearTimeout(timer);
+  // Return the result.
+  return result;
 };

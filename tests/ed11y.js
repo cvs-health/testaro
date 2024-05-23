@@ -35,26 +35,26 @@ const {xPath} = require('playwright-dompath');
 // FUNCTIONS
 
 // Performs and reports the Editoria11y tests.
-exports.reporter = async (page, options) => {
+exports.reporter = async (page, report, actIndex, timeLimit) => {
   // Get the nonce, if any.
-  const {act, report} = options;
+  const act = report.acts[actIndex];
   const {jobData} = report;
   const scriptNonce = jobData && jobData.lastScriptNonce;
   // Get the tool script.
   const script = await fs.readFile(`${__dirname}/../ed11y/editoria11y.min.js`, 'utf8');
   // Perform the tests and get the violating elements and violation facts.
   const reportJSHandle = await page.evaluateHandle(args => new Promise(async resolve => {
-    // If the report is incomplete after 20 seconds:
+    const {scriptNonce, script, rulesToTest, timeLimit} = args;
+    // If the report is incomplete after the time limit:
     const timer = setTimeout(() => {
       // Return this as the report.
       resolve({
         result: {
           prevented: true,
-          error: 'ed11y timed out'
+          error: `ed11y timed out at ${timeLimit} seconds`
         }
       });
-    }, 20000);
-    const {scriptNonce, script, rulesToTest} = args;
+    }, 1000 * timeLimit);
     // When the script has been executed, creating data in an Ed11y object:
     document.addEventListener('ed11yResults', () => {
       // Initialize a report containing violating elements and violation facts.
@@ -157,7 +157,12 @@ exports.reporter = async (page, options) => {
         }
       });
     };
-  }), {scriptNonce, script, rulesToTest: act.rules});
+  }), {
+    scriptNonce,
+    script,
+    rulesToTest: act.rules,
+    timeLimit
+  });
   // Initialize the result as the violation facts.
   const resultJSHandle = await reportJSHandle.getProperty('facts');
   const result = await resultJSHandle.jsonValue();

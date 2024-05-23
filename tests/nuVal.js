@@ -41,8 +41,9 @@ const {getSource} = require('../procs/getSource');
 // FUNCTIONS
 
 // Conducts and reports the Nu Html Checker tests.
-exports.reporter = async (page, options) => {
-  const {rules} = options;
+exports.reporter = async (page, report, actIndex) => {
+  const act = report.acts[actIndex];
+  const {rules} = act;
   // Get the browser-parsed page.
   const pageContent = await page.content();
   // Get the source.

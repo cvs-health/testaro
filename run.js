@@ -30,7 +30,7 @@
 // Module to keep secrets.
 require('dotenv').config();
 // Module to validate jobs.
-const {isBrowserID, isValidJob, tools} = require('./procs/job');
+const {isBrowserID, isDeviceID, isURL, isValidJob, tools} = require('./procs/job');
 // Module to standardize report formats.
 const {standardize} = require('./procs/standardize');
 // Module to identify element bounding boxes.
@@ -191,15 +191,15 @@ const browserClose = async () => {
   }
 };
 // Launches a browser, navigates to a URL, and returns browser data.
-const launch = async (report, debug, waits, tempBrowserID, tempTarget) => {
-  const {browserID, device, target} = report;
-  // Get the default arguments if not overridden.
-  browserID ??= browserID;
-  const {url} = (tempTarget || target);
-  // If the specified browser type exists:
-  if (isBrowserID(browserID)) {
+const launch = async (report, debug, waits, tempBrowserID, tempURL) => {
+  const {device} = report;
+  const deviceID = device && device.id;
+  const browserID = tempBrowserID || report.browserID || '';
+  const url = tempURL || report.target && report.target.url || '';
+  // If the specified browser and device types and URL exist:
+  if (isBrowserID(browserID) && isDeviceID(deviceID) && isURL(url)) {
     // Create a browser of the specified or default type.
-    const browserType = require('playwright')[tempBrowserID || browserID];
+    const browserType = require('playwright')[browserID];
     // Close the current browser, if any.
     await browserClose();
     // Define browser options.
@@ -222,7 +222,7 @@ const launch = async (report, debug, waits, tempBrowserID, tempTarget) => {
         error: 'Browser launch failed'
       };
     });
-    // Open a context (i.e. browser tab).
+    // Open a context (i.e. browser window).
     const browserContext = await browser.newContext(device.windowOptions);
     // Prevent default timeouts.
     browserContext.setDefaultTimeout(0);
@@ -325,13 +325,13 @@ const launch = async (report, debug, waits, tempBrowserID, tempTarget) => {
       };
     }
   }
-  // Otherwise, i.e. if it does not exist:
+  // Otherwise, i.e. if the browser or device ID is invalid:
   else {
     // Return this.
-    console.log(`ERROR: Browser of type ${browserID} could not be launched`);
+    console.log(`ERROR: Browser ${browserID}, device ${deviceID}, or URL ${url} invalid`);
     return {
       success: false,
-      error: `${browserID} browser launch failed`
+      error: `${browserID} browser launch with ${deviceID} device and navigation to ${url} failed`
     };
   }
 };
@@ -611,8 +611,8 @@ const doActs = async (report, actIndex, page) => {
         report,
         debug,
         waits,
-        act.browserID || report.browserID,
-        act.target || report.target
+        act.browserID || report.browserID || '',
+        act.url || report.target && report.target.url || ''
       );
       // If the launch and navigation succeeded:
       if (launchResult && launchResult.success) {
@@ -809,55 +809,25 @@ const doActs = async (report, actIndex, page) => {
         else if (act.type === 'test') {
           // Add a description of the tool to the act.
           act.what = tools[act.which];
-          // Initialize the options argument.
-          const options = {
-            report,
-            act
-          };
-          // Add any specified arguments to it.
-          Object.keys(act).forEach(key => {
-            if (! ['type', 'which'].includes(key)) {
-              options[key] = act[key];
-            }
-          });
           // Get the start time of the act.
           const startTime = Date.now();
-          let timer;
           try {
-            // Impose a time limit on the act.
-            let timeoutReport = 'onTime';
+            // Get the time limit in milliseconds for the act.
             const timeLimit = 1000 * timeLimits[act.which] || 15000;
-            timeoutReport = new Promise(resolve => {
-              timer = setTimeout(() => {
-                act.data = {
-                  prevented: true,
-                  error: `Act timed out at ${timeLimit / 1000} seconds`
-                };
-                console.log(`ERROR: Timed out at ${timeLimit / 1000} seconds`);
-                resolve('timedOut');
-              }, timeLimit);
-            });
-            // Try to perform the specified tests of the tool and get a report.
-            const actReport = require(`./tests/${act.which}`).reporter(page, options);
-            const raceReport = await Promise.race([timeoutReport, actReport]);
-            // If the act was finished without timing out:
-            if (raceReport !== 'timedOut') {
-              // Disable the timer.
-              clearTimeout(timer);
-              // Import the test results and process data into the act.
-              act.result = raceReport && raceReport.result || {};
-              act.data = raceReport && raceReport.data || {};
-              // If the page prevented the tool from operating:
-              if (act.data.prevented) {
-                // Add prevention data to the job data.
-                report.jobData.preventions[act.which] = act.data.error;
-              }
+            // Perform the specified tests of the tool.
+            const actReport = await require(`./tests/${act.which}`)
+            .reporter(page, report, actIndex, timeLimit);
+            // Add the data and result to the act.
+            act.data = actReport.data;
+            act.result = actReport.result;
+            // If the tool reported that the page prevented testing:
+            if (actReport.data.prevented) {
+              // Add prevention data to the job data.
+              report.jobData.preventions[act.which] = act.data.error;
             }
           }
-          // If the testing failed other than by timing out:
+          // If the tool invocation failed:
           catch(error) {
-            // Disable the timer.
-            clearTimeout(timer);
             // Report the failure.
             const message = error.message.slice(0, 400);
             console.log(`ERROR: Test act ${act.which} failed (${message})`);

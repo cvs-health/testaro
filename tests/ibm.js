@@ -36,16 +36,29 @@
 
 const fs = require('fs').promises;
 // Scanner. Importing and executing 'close' crashed the Node process.
-const {getCompliance} = require('accessibility-checker');
+const accessibilityChecker = require('accessibility-checker');
+const {getCompliance} = accessibilityChecker;
+// Utility module.
+const {doBy} = require('../procs/job');
 
 // FUNCTIONS
 
 // Runs the IBM test and returns the result.
-const run = async content => {
+const run = async (content, timeLimit) => {
   const nowLabel = (new Date()).toISOString().slice(0, 19);
   try {
-    const ibmReport = await getCompliance(content, nowLabel);
-    return ibmReport;
+    const ibmReport = await doBy(
+      timeLimit, accessibilityChecker, 'getCompliance', [content, nowLabel], 'ibm getCompliance'
+    );
+    if (ibmReport !== 'timedOut') {
+      return ibmReport;
+    }
+    else {
+      return {
+        prevented: true,
+        error: `ibm getCompliance timed out at ${timeLimit} seconds`
+      };
+    }
   }
   catch(error) {
     console.log('ibm getCompliance failed');
@@ -177,39 +190,54 @@ const doTest = async (content, withItems, timeLimit, rules) => {
   }
 };
 // Conducts and reports the IBM Equal Access tests.
-exports.reporter = async (page, options) => {
-  const {withItems, withNewContent, rules} = options;
+exports.reporter = async (page, report, actIndex, timeLimit) => {
+  const act = report.acts[actIndex];
+  const {withItems, withNewContent, rules} = act;
   const contentType = withNewContent ? 'new' : 'existing';
   console.log(`>>>>>> Content type: ${contentType}`);
-  const timeLimit = 25;
   try {
-    const typeContent = contentType === 'existing' ? await page.content() : await page.url();
+    const typeContent = contentType === 'existing' ? await page.content() : page.url();
+    // Perform the tests.
     const actReport = await doTest(typeContent, withItems, timeLimit, rules);
-    const {data, result} = actReport;
-    // If the act was prevented:
-    if (data && data.prevented) {
-      // Report this.
-      const message = `ERROR: Act failed or timed out at ${timeLimit} seconds`;
-      console.log(message);
-      data.error = data.error ? `${data.error}; ${message}` : message;
-      // Return the failure.
-      return {
-        data,
-        result: {}
-      };
+    // If the testing was finished on time:
+    if (actReport !== 'timedOut') {
+      const {data, result} = actReport;
+      // If the act was prevented:
+      if (data && data.prevented) {
+        // Report this.
+        const message = `ERROR: Act failed or timed out at ${timeLimit} seconds`;
+        console.log(message);
+        data.error = data.error ? `${data.error}; ${message}` : message;
+        // Return the failure.
+        return {
+          data,
+          result: {}
+        };
+      }
+      // Otherwise, i.e. if the act was not prevented:
+      else {
+        // Return the result.
+        return {
+          data,
+          result
+        };
+      }
     }
-    // Otherwise, i.e. if the act was not prevented:
+    // Otherwise, i.e. if the testing timed out:
     else {
-      // Return the result.
+      // Report this.
       return {
-        data,
-        result
+        data: {
+          prevented: true,
+          error: message
+        },
+        result: {}
       };
     }
   }
   catch(error) {
-    const message = `ERROR: Act crashed (${error.message.slice(0, 200)})`;
-    console.log(message);
+    const message = `Act crashed (${error.message.slice(0, 200)})`;
+    console.log(`ERROR: ${message}`);
     return {
       data: {
         prevented: true,
