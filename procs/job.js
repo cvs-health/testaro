@@ -122,7 +122,7 @@ const isBrowserID = exports.isBrowserID = type => ['chromium', 'firefox', 'webki
 // Validates a load state.
 const isState = string => ['loaded', 'idle'].includes(string);
 // Validates a URL.
-const isURL = string => /^(?:https?|file):\/\/[^\s]+$/.test(string);
+const isURL = exports.isURL = string => /^(?:https?|file):\/\/[^\s]+$/.test(string);
 // Validates a focusable tag name.
 const isFocusable = string => ['a', 'button', 'input', 'select'].includes(string);
 // Returns whether all elements of an array are numbers.
