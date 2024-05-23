@@ -821,13 +821,10 @@ const doActs = async (report, actIndex, page) => {
             act.data = actReport.data;
             act.result = actReport.result;
             // If the tool reported that the page prevented testing:
-            console.log('Ran reporter');
-            console.log(JSON.stringify(act, null, 2));
             if (actReport.data.prevented) {
               // Add prevention data to the job data.
               report.jobData.preventions[act.which] = act.data.error;
             }
-            console.log('Checked prevention');
           }
           // If the tool invocation failed:
           catch(error) {
