@@ -83,6 +83,15 @@ const addIDs = async (locators, recipient) => {
     }
   }
 };
+// Sanitizes a tag name.
+const tagify = tagName => {
+  const lcTagName = tagName.toLowerCase();
+  const safeTagName = lcTagName.replace(/[^a-z0-9]/g, '');
+  if (safeTagName !== lcTagName) {
+    console.log(`ERROR: Tag name ${tagName} invalid`);
+  }
+  return safeTagName;
+};
 // Returns the XPath and box ID of the element of a standard instance.
 exports.identify = async (instance, page) => {
   // If the instance does not yet have both boxID and pathID properties:
@@ -92,7 +101,8 @@ exports.identify = async (instance, page) => {
       boxID: '',
       pathID: ''
     };
-    const {excerpt, id, location, tagName} = instance;
+    const {excerpt, id, location} = instance;
+    const tagName = tagify(instance.tagName);
     const {type, spec} = location;
     // If the instance specifies a CSS selector or XPath location:
     if (['selector', 'xpath'].includes(type)) {
@@ -156,14 +166,14 @@ exports.identify = async (instance, page) => {
     // If either ID remains undefined and the instance specifies a tag name:
     if (tagName && ! (elementID.boxID && elementID.pathID)) {
       // Get locators for elements with the tag name.
-      let locators = page.locator(tagName.toLowerCase());
+      let locators = page.locator(tagName);
       // If there is exactly 1 of them:
       let locatorCount = await locators.count();
       if (locatorCount === 1) {
         // Add a box ID and a path ID to the result.
         await addIDs(locators, elementID);
       }
-      // If either ID remains undefined an the instance also specifies an excerpt:
+      // If either ID remains undefined and the instance also specifies an excerpt:
       if (excerpt && ! (elementID.boxID && elementID.pathID)) {
         // Get the plain text parts of the excerpt, converting ... to an empty string.
         const minTagExcerpt = excerpt.replace(/<[^>]+>/g, '<>');
