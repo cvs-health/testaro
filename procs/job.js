@@ -265,7 +265,7 @@ exports.isValidJob = job => {
   }
 };
 // Executes an asynchronous function with a time limit.
-exports.doBy = async (timeLimit, fn, fnArgs, noticePrefix) => {
+exports.doBy = async function(timeLimit, obj, fnName, fnArgs, noticePrefix) {
   let timer;
   // Start a timer.
   const timerPromise = new Promise(resolve => {
@@ -275,8 +275,13 @@ exports.doBy = async (timeLimit, fn, fnArgs, noticePrefix) => {
     }, 1000 * timeLimit);
   });
   // Start the function execution.
+  /*
   const fnPromise = new Promise(async resolve => {
     resolve(await fn(... fnArgs));
+  });
+  */
+  const fnPromise = new Promise(async function(resolve) {
+    resolve(await obj[fnName](... fnArgs));
   });
   // Get the timeout or the value returned by the function, whichever is first.
   const result = await Promise.race([timerPromise, fnPromise]);
