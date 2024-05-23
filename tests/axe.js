@@ -59,7 +59,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
   // Inject axe-core into the page.
   await injectAxe(page)
   .catch(error => {
-    console.log(`ERROR: Axe injection failed (${error.message})`);
+    console.trace(`ERROR: Axe injection failed (${error.message})`);
     data.prevented = true;
     data.error = 'ERROR: axe injection failed';
   });
@@ -146,7 +146,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
   }
   catch(error) {
     const message = `ERROR: Axe result cannot be made JSON (${error.message})`;
-    console.log(message);
+    console.trace(message);
     data = {
       prevented: true,
       error: message

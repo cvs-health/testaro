@@ -88,7 +88,7 @@ const tagify = tagName => {
   const lcTagName = tagName.toLowerCase();
   const safeTagName = lcTagName.replace(/[^a-z0-9]/g, '');
   if (safeTagName !== lcTagName) {
-    console.log(`ERROR: Tag name ${tagName} invalid`);
+    console.trace(`ERROR: Tag name ${tagName} invalid`);
   }
   return safeTagName;
 };

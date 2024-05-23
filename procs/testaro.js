@@ -154,7 +154,7 @@ exports.simplify = async (page, withItems, ruleData) => {
       await page.reload({timeout: 15000});
     }
     catch(error) {
-      console.log('ERROR: page reload timed out');
+      console.trace('ERROR: page reload timed out');
     }
   }
   // Return the result.

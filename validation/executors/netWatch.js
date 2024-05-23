@@ -66,14 +66,14 @@ const requestHandler = (request, response) => {
     // If the request method is GET:
     if (method === 'GET') {
       // If a job is validly requested:
-      console.log('Server got a job request from Testaro');
+      console.trace('Server got a job request from Testaro');
       if (requestURL === `/api/job?agent=${process.env.AGENT}`) {
         // If at least 7 seconds has elapsed since timing started:
         if (Date.now() > startTime + 7000) {
           // Respond with a job.
           const jobJSON = await fs.readFile(`${jobDir}/${jobID}.json`);
           await response.end(jobJSON);
-          console.log('Server sent job to Testaro');
+          console.trace('Server sent job to Testaro');
           jobGiven = true;
         }
         // Otherwise, i.e. if timing started less than 7 seconds ago:
@@ -92,7 +92,7 @@ const requestHandler = (request, response) => {
     }
     // Otherwise, if the request method is POST:
     else if (method === 'POST') {
-      console.log('Server got report from Testaro');
+      console.trace('Server got report from Testaro');
       const ack = {};
       // If a report is validly submitted:
       if (requestURL === '/api') {
@@ -124,10 +124,10 @@ const requestHandler = (request, response) => {
       }
       const ackJSON = JSON.stringify(ack);
       response.end(ackJSON);
-      console.log(`Server responded: ${ack.message}`);
+      console.trace(`Server responded: ${ack.message}`);
       // This ends the validation, so stop the server.
       server.close();
-      console.log('Server closed');
+      console.trace('Server closed');
     }
   });
 };
@@ -135,5 +135,5 @@ const requestHandler = (request, response) => {
 server = client.createServer({}, requestHandler);
 // Start a server listening for Testaro requests.
 server.listen(3007, () => {
-  console.log('Job and report server listening on port 3007');
+  console.trace('Job and report server listening on port 3007');
 });

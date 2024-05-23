@@ -107,7 +107,7 @@ exports.reporter = async (page, withItems) => {
     await page.reload({timeout: 15000});
   }
   catch(error) {
-    console.log('ERROR: page reload timed out');
+    console.trace('ERROR: page reload timed out');
   }
   return await report(withItems, all, 'hover', whats, 0);
 };

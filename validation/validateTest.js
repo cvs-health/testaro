@@ -46,10 +46,10 @@ exports.validateTest = async testID => {
     // Report whether the end time was reported.
     const {acts, jobData} = report;
     if (jobData.endTime && /^(?:\d{2}-){2}\d{2}T\d{2}:\d{2}$/.test(jobData.endTime)) {
-      console.log('Success: End time has been correctly populated');
+      console.trace('Success: End time has been correctly populated');
     }
     else {
-      console.log('Failure: End time empty or invalid');
+      console.trace('Failure: End time empty or invalid');
     }
     // If the test acts were correctly reported:
     const testActs = acts.filter(act => act.type && act.type === 'test');
@@ -60,20 +60,20 @@ exports.validateTest = async testID => {
       )
     ) {
       // Report this.
-      console.log('Success: Reports have been correctly populated');
+      console.trace('Success: Reports have been correctly populated');
       // If all expectations were satisfied:
       if (testActs.every(testAct => testAct.expectationFailures === 0)) {
         // Report this.
-        console.log('######## Success: No failures\n');
+        console.trace('######## Success: No failures\n');
       }
       // Otherwise, i.e. if not all expectations were satisfied:
       else {
         // Report this.
-        console.log(
+        console.trace(
           '######## Failure: The test has at least one failure (see “"passed": false” below)\n'
         );
         // Output the acts that had failures.
-        console.log(
+        console.trace(
           JSON.stringify(
             acts.filter(act => act.type === 'test' && act.expectationFailures), null, 2
           )
@@ -81,8 +81,8 @@ exports.validateTest = async testID => {
       }
     }
     else {
-      console.log('Failure: Reports empty or invalid');
-      console.log(JSON.stringify(acts, null, 2));
+      console.trace('Failure: Reports empty or invalid');
+      console.trace(JSON.stringify(acts, null, 2));
     }
   }
   return Promise.resolve('');

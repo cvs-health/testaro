@@ -95,7 +95,7 @@ exports.reporter = async (page, withItems) => {
         // Otherwise, i.e. if it does not exist:
         else {
           // Report this.
-          console.log('ERROR: Reportedly same-text adjacent sibling heading not found');
+          console.trace('ERROR: Reportedly same-text adjacent sibling heading not found');
         }
       }
     }

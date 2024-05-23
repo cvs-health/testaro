@@ -68,7 +68,7 @@ exports.reporter = async (page, report, actIndex) => {
         issues = window.HTMLCS_RUNNER.run(actStandard);
       }
       catch(error) {
-        console.log(`ERROR executing HTMLCS_RUNNER on ${document.URL} (${error.message})`);
+        console.trace(`ERROR executing HTMLCS_RUNNER on ${document.URL} (${error.message})`);
       }
       return issues;
     }, [actStandard, rules, scriptText, scriptNonce]);
@@ -94,7 +94,7 @@ exports.reporter = async (page, report, actIndex) => {
       const parts = string.split(/\|/, 6);
       const partCount = parts.length;
       if (partCount < 6) {
-        console.log(`ERROR: Issue string ${string} has too few parts`);
+        console.trace(`ERROR: Issue string ${string} has too few parts`);
       }
       // If it is an error or a warning (not a notice):
       else if (['Error', 'Warning'].includes(parts[0])) {

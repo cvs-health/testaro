@@ -57,14 +57,14 @@ const writeDirReport = async report => {
       const rawDir = `${reportDir}/raw`;
       await fs.mkdir(rawDir, {recursive: true});
       await fs.writeFile(`${rawDir}/${reportName}`, `${reportJSON}\n`);
-      console.log(`Report ${jobID} saved in ${rawDir}`);
+      console.trace(`Report ${jobID} saved in ${rawDir}`);
     }
     catch(error) {
-      console.log(`ERROR: Failed to save report ${jobID} in ${rawDir} (${error.message})`);
+      console.trace(`ERROR: Failed to save report ${jobID} in ${rawDir} (${error.message})`);
     }
   }
   else {
-    console.log('ERROR: Job has no ID');
+    console.trace('ERROR: Job has no ID');
   }
 };
 // Archives a job.
@@ -80,7 +80,7 @@ const archiveJob = async (job, isFile) => {
     // Delete the file.
     await fs.rm(`${jobDir}/todo/${id}.json`);
   }
-  console.log(`Job ${id} archived in ${doneDir} (${nowString()})`);
+  console.trace(`Job ${id} archived in ${doneDir} (${nowString()})`);
 };
 // Waits.
 const wait = ms => {
@@ -97,7 +97,7 @@ const wait = ms => {
   1: interval in seconds from a no-job check to the next check.
 */
 exports.dirWatch = async (isForever, intervalInSeconds) => {
-  console.log(`Starting to watch directory ${jobDir}/todo for jobs`);
+  console.trace(`Starting to watch directory ${jobDir}/todo for jobs`);
   let notYetRun = true;
   // As long as watching as to continue:
   while (isForever || notYetRun) {
@@ -120,31 +120,31 @@ exports.dirWatch = async (isForever, intervalInSeconds) => {
             report.observe = false;
             report.sendReportTo = '';
             const {id} = job;
-            console.log(`Directory job ${id} ready to do (${nowString()})`);
+            console.trace(`Directory job ${id} ready to do (${nowString()})`);
             // Perform it.
             await doJob(report);
-            console.log(`Job ${id} finished (${nowString()})`);
+            console.trace(`Job ${id} finished (${nowString()})`);
             // Report it.
             await writeDirReport(report);
             // Archive it.
             await archiveJob(job, true);
           }
           catch(error) {
-            console.log(`ERROR processing directory job (${error.message})`);
+            console.trace(`ERROR processing directory job (${error.message})`);
           }
           notYetRun = false;
         }
         // Otherwise, i.e. if the first one is not yet ready to do:
         else {
           // Report this.
-          console.log(`All jobs in ${jobDir} not yet ready to do (${nowString()})`);
+          console.trace(`All jobs in ${jobDir} not yet ready to do (${nowString()})`);
           // Wait for the specified interval.
           await wait(1000 * intervalInSeconds);
         }
       }
       // Otherwise, i.e. if there are no jobs in the watched directory:
       else {
-        console.log(`No job in ${jobDir} (${nowString()})`);
+        console.trace(`No job in ${jobDir} (${nowString()})`);
         // Wait for the specified interval.
         await wait(1000 * intervalInSeconds);
       }
@@ -152,7 +152,7 @@ exports.dirWatch = async (isForever, intervalInSeconds) => {
     // If a fatal error was thrown:
     catch(error) {
       // Report this.
-      console.log(`ERROR: Directory watching failed (${error.message}); watching aborted`);
+      console.trace(`ERROR: Directory watching failed (${error.message}); watching aborted`);
       // Quit watching.
       break;
     }

@@ -37,10 +37,10 @@ window
 .aslint
 .config(options)
 .addListener('onValidatorStarted', function () {
-  console.log('@ Validator started');
+  console.trace('@ Validator started');
 })
 .addListener('onValidatorComplete', function () {
-  console.log('@ Validator Complete');
+  console.trace('@ Validator Complete');
 })
 .addFilter('onBeforeRuleReport', function (report) {
   return report;
@@ -91,7 +91,7 @@ window
         JSON.stringify(result.rules[ruleID]);
       }
       catch(error) {
-        console.log(`ERROR: Rule ${ruleID} result not stringifiable so its results deleted`);
+        console.trace(`ERROR: Rule ${ruleID} result not stringifiable so its results deleted`);
         delete result.rules[ruleID].results;
         result.rules[ruleID].success = false;
         result.rules[ruleID].error = 'Result property not stringifiable so deleted';

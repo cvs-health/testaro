@@ -54,7 +54,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
     bundleEl.id = 'aslintBundle';
     if (scriptNonce) {
       bundleEl.nonce = scriptNonce;
-      console.log(`Added nonce ${scriptNonce} to bundle`);
+      console.trace(`Added nonce ${scriptNonce} to bundle`);
     }
     bundleEl.textContent = aslintBundle;
     document.head.insertAdjacentElement('beforeend', bundleEl);
@@ -62,14 +62,14 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
     const runnerEl = document.createElement('script');
     if (scriptNonce) {
       runnerEl.nonce = scriptNonce;
-      console.log(`Added nonce ${scriptNonce} to runner`);
+      console.trace(`Added nonce ${scriptNonce} to runner`);
     }
     runnerEl.textContent = aslintRunner;
     document.body.insertAdjacentElement('beforeend', runnerEl);
   }, {scriptNonce, aslintBundle, aslintRunner})
   .catch(error => {
     const message = `ERROR: ASLint injection failed (${error.message.slice(0, 400)})`;
-    console.log(message);
+    console.trace(message);
     data.prevented = true;
     data.error = message;
   });
@@ -84,7 +84,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
     .catch(error => {
       const message
       = `aslint testing timed out at ${timeLimit} seconds (${error.message.slice(0, 400)})`;
-      console.log(`ERROR: ${message}`);
+      console.trace(`ERROR: ${message}`);
       data.prevented = true;
       data.error = message;
     });

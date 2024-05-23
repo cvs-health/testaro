@@ -41,7 +41,7 @@ fs.readdir(`${__dirname}/../../testaro/`)
     // Get the test ID from it by disregarding its extension.
     const testID = fileName.replace(/\..+$/, '');
     // Validate the test.
-    console.log(`### Validating Testaro test ${testID}`);
+    console.trace(`### Validating Testaro test ${testID}`);
     await validateTest(testID);
   }
 });

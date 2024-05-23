@@ -78,7 +78,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
           facts[key] = Ed11y[key];
         }
         catch(error) {
-          console.log(`ERROR: invalid value of ${key} property of Ed11y (${error.message})`);
+          console.trace(`ERROR: invalid value of ${key} property of Ed11y (${error.message})`);
         }
       });
       // Get data on violating text alternatives of images from Ed11y.
@@ -139,7 +139,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
     const toolScript = document.createElement('script');
     if (scriptNonce) {
       toolScript.nonce = scriptNonce;
-      console.log(`Added nonce ${scriptNonce} to tool script`);
+      console.trace(`Added nonce ${scriptNonce} to tool script`);
     }
     toolScript.textContent = script;
     document.body.insertAdjacentElement('beforeend', toolScript);

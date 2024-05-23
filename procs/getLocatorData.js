@@ -110,7 +110,7 @@ exports.getLocatorData = async loc => {
   // Otherwise, i.e. if it does not identify exactly 1 element:
   else {
     // Report this.
-    console.log(`ERROR: Locator count to get data from is ${locCount} instead of 1`);
+    console.trace(`ERROR: Locator count to get data from is ${locCount} instead of 1`);
     return null;
   }
 };

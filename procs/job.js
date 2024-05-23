@@ -107,7 +107,7 @@ const hasSubtype = (variable, subtype) => {
       return isState(variable);
     }
     else {
-      console.log(`ERROR: ${subtype} not a known subtype`);
+      console.trace(`ERROR: ${subtype} not a known subtype`);
       return false;
     }
   }
@@ -270,7 +270,7 @@ exports.doBy = async function(timeLimit, obj, fnName, fnArgs, noticePrefix) {
   // Start a timer.
   const timerPromise = new Promise(resolve => {
     timer = setTimeout(() => {
-      console.log(`ERROR: ${noticePrefix} timed out at ${timeLimit} seconds`);
+      console.trace(`ERROR: ${noticePrefix} timed out at ${timeLimit} seconds`);
       resolve('timedOut');
     }, 1000 * timeLimit);
   });

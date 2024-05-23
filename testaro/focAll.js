@@ -80,7 +80,7 @@ exports.reporter = async page => {
     await page.reload({timeout: 15000});
   }
   catch(error) {
-    console.log('ERROR: page reload timed out');
+    console.trace('ERROR: page reload timed out');
   }
   const count = Math.abs(data.discrepancy);
   // Return the result.

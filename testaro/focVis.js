@@ -63,7 +63,7 @@ exports.reporter = async (page, withItems) => {
       }
     }
     catch(error) {
-      console.log(`ERROR analyzing locator for focVis (${error.message})`);
+      console.trace(`ERROR analyzing locator for focVis (${error.message})`);
     }
   }
   // Populate and return the result.

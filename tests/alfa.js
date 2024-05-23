@@ -48,7 +48,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
   const rulePage = await context.newPage();
   rulePage.on('console', msg => {
     const msgText = msg.text();
-    console.log(msgText);
+    console.trace(msgText);
   });
   // Initialize the act report.
   const data = {};
@@ -171,7 +171,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
     }
   }
   catch(error) {
-    console.log(`ERROR: navigation to URL timed out (${error})`);
+    console.trace(`ERROR: navigation to URL timed out (${error})`);
     data.prevented = true;
     data.error = 'ERROR: Act failed';
   }

@@ -33,7 +33,7 @@ exports.reporter = async page => {
   const data = {};
   await page.waitForSelector('body', {timeout: 10000})
   .catch(error => {
-    console.log(`ERROR (${error.message})`);
+    console.trace(`ERROR (${error.message})`);
     data.prevented = true;
     data.error = 'ERROR: bulk timed out';
     return {result: data};

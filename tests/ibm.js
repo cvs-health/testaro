@@ -61,7 +61,7 @@ const run = async (content, timeLimit) => {
     }
   }
   catch(error) {
-    console.log('ibm getCompliance failed');
+    console.trace('ibm getCompliance failed');
     return {
       prevented: true,
       error: error.message.slice(0, 200)
@@ -119,7 +119,7 @@ const trimActReport = (data, actReport, withItems, rules) => {
     else {
       // Report this.
       const error = 'ERROR: No totals reported';
-      console.log(error);
+      console.trace(error);
       data.prevented = true;
       data.error = error;
       // Return an empty act report.
@@ -133,7 +133,7 @@ const trimActReport = (data, actReport, withItems, rules) => {
   else {
     // Report this.
     const error = 'ERROR: No summary reported';
-    console.log(error);
+    console.trace(error);
     data.prevented = true;
     data.error = error;
     // Return an empty act report.
@@ -159,7 +159,7 @@ const doTest = async (content, withItems, timeLimit, rules) => {
         }
       }
       catch(error) {
-        console.log('No result files created');
+        console.trace('No result files created');
       };
       // Return a trimmed act report.
       const {report} = runReport;
@@ -180,7 +180,7 @@ const doTest = async (content, withItems, timeLimit, rules) => {
   }
   catch(error) {
     const message = `Act failed (${error.message.slice(0, 200)})`;
-    console.log(message);
+    console.trace(message);
     data.prevented = true;
     data.error = message;
     return {
@@ -194,7 +194,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
   const act = report.acts[actIndex];
   const {withItems, withNewContent, rules} = act;
   const contentType = withNewContent ? 'new' : 'existing';
-  console.log(`>>>>>> Content type: ${contentType}`);
+  console.trace(`>>>>>> Content type: ${contentType}`);
   try {
     const typeContent = contentType === 'existing' ? await page.content() : page.url();
     // Perform the tests.
@@ -206,7 +206,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
       if (data && data.prevented) {
         // Report this.
         const message = `ERROR: Act failed or timed out at ${timeLimit} seconds`;
-        console.log(message);
+        console.trace(message);
         data.error = data.error ? `${data.error}; ${message}` : message;
         // Return the failure.
         return {
@@ -237,7 +237,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
   }
   catch(error) {
     const message = `Act crashed (${error.message.slice(0, 200)})`;
-    console.log(`ERROR: ${message}`);
+    console.trace(`ERROR: ${message}`);
     return {
       data: {
         prevented: true,

@@ -78,12 +78,12 @@ const callRun = async jobIDStart => {
     await fs.rename(`${todoDir}/${jobFileName}`, `${jobDir}/done/${jobFileName}`);
     // Save the report.
     await fs.writeFile(`${rawDir}/${jobFileName}`, JSON.stringify(report, null, 2));
-    console.log(`Job completed and report ${report.id}.json saved in ${rawDir}`);
+    console.trace(`Job completed and report ${report.id}.json saved in ${rawDir}`);
   }
   // Otherwise, i.e. if the job does not exist.
   else {
     // Report the error.
-    console.log('ERROR: Specified job does not exist');
+    console.trace('ERROR: Specified job does not exist');
   }
 };
 // Starts a directory watch, converting the interval argument to a number.
@@ -97,7 +97,7 @@ const callNetWatch = async (isForever, intervalInSeconds, isCertTolerant) => {
     Number.parseInt(intervalInSeconds, 10),
     isCertTolerant ? isCertTolerant === 'true' : undefined
   );
-  console.log('netWatch run');
+  console.trace('netWatch run');
 };
 
 // OPERATION
@@ -106,25 +106,25 @@ const callNetWatch = async (isForever, intervalInSeconds, isCertTolerant) => {
 if (fn === 'run' && fnArgs.length < 2) {
   callRun(fnArgs[0])
   .then(() => {
-    console.log('Execution completed\n');
+    console.trace('Execution completed\n');
     process.exit(0);
   });
 }
 else if (fn === 'dirWatch' && fnArgs.length === 2) {
   callDirWatch(... fnArgs)
   .then(() => {
-    console.log('Directory watch ended');
+    console.trace('Directory watch ended');
     process.exit(0);
   });
 }
 else if (fn === 'netWatch' && [2, 3].includes(fnArgs.length)) {
   callNetWatch(... fnArgs)
   .then(() => {
-    console.log('Network watch ended');
+    console.trace('Network watch ended');
     process.exit(0);
   });
 }
 else {
-  console.log('ERROR: Invalid statement');
+  console.trace('ERROR: Invalid statement');
   process.exit(1);
 }

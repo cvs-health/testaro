@@ -44,8 +44,8 @@ exports.tellServer = (report, messageParams, logMessage) => {
   .on('error', error => {
     // Report the error.
     const errorMessage = 'ERROR notifying the server';
-    console.log(`${errorMessage} (${error.message})`);
+    console.trace(`${errorMessage} (${error.message})`);
   })
   .end();
-  console.log(`${logMessage} (server notified)`);
+  console.trace(`${logMessage} (server notified)`);
 };

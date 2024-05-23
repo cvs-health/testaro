@@ -46,19 +46,19 @@ fs.readFile(`${__dirname}/../jobs/todo/${jobID}.json`, 'utf8')
     // Check the report against expectations.
     const {acts, jobData} = report;
     if (acts.length !== 2) {
-      console.log('Failure: Count of acts is not 2');
+      console.trace('Failure: Count of acts is not 2');
     }
     else if (! jobData) {
-      console.log('Failure: Report omits jobData');
+      console.trace('Failure: Report omits jobData');
     }
     else if (jobData.endTime < jobData.startTime) {
-      console.log('Failure: End time precedes start time');
+      console.trace('Failure: End time precedes start time');
     }
     else {
-      console.log('Success');
+      console.trace('Success');
     }
   }
   catch(error) {
-    console.log(`ERROR: ${error.message}`);
+    console.trace(`ERROR: ${error.message}`);
   }
 });
