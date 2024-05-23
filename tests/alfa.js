@@ -91,15 +91,10 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
     const doc = await page.evaluateHandle('document');
     const alfaPage = await Playwright.toPage(doc);
     const audit = Audit.of(alfaPage, alfaRules);
-    // const outcomes = await doBy(timeLimit, audit, 'evaluate', [], 'alfa testing');
-    const outcomes = await audit.evaluate();
+    const outcomes = Array.from(await doBy(timeLimit, audit, 'evaluate', [], 'alfa testing'));
     // If the testing finished on time:
     if (outcomes !== 'timedOut') {
       // For each failure or warning:
-      console.log(typeof outcomes);
-      console.log(Object.keys(outcomes));
-      console.log(JSON.stringify(outcomes, null, 2));
-      console.log(Array.isArray(outcomes));
       outcomes.forEach((outcome, index) => {
         const {target} = outcome;
         if (target && ! target._members) {

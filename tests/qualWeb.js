@@ -123,7 +123,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
       qualWebOptions.execute.bp = true;
     }
     // Get the report.
-    let actReports = await doBy(timeLimit, qualWeb.evaluate, [qualWebOptions], 'qualWeb testing');
+    let actReports = await doBy(timeLimit, qualWeb, 'evaluate', [qualWebOptions], 'qualWeb testing');
     // If the testing finished on time:
     if (actReports !== 'timedOut') {
       // Remove the copy of the DOM from it.

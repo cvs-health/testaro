@@ -43,7 +43,8 @@
 
 // IMPORTS
 
-const {injectAxe, getAxeResults} = require('axe-playwright');
+const axePlaywright = require('axe-playwright');
+const {injectAxe} = axePlaywright;
 const {doBy} = require('../procs/job');
 
 // FUNCTIONS
@@ -74,7 +75,9 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
     else {
       axeOptions.runOnly = ['experimental', 'best-practice', 'wcag2a', 'wcag2aa', 'wcag2aaa', 'wcag21a', 'wcag21aa', 'wcag21aaa'];
     }
-    const axeReport = await doBy(timeLimit, getAxeResults, [page, null, axeOptions], 'axe testing');
+    const axeReport = await doBy(
+      timeLimit, axePlaywright, 'getAxeResults', [page, null, axeOptions], 'axe testing'
+    );
     // If the testing finished on time:
     if (axeReport !== 'timedOut') {
       const {inapplicable, passes, incomplete, violations} = axeReport;

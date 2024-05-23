@@ -36,7 +36,8 @@
 
 const fs = require('fs').promises;
 // Scanner. Importing and executing 'close' crashed the Node process.
-const {getCompliance} = require('accessibility-checker');
+const accessibilityChecker = require('accessibility-checker');
+const {getCompliance} = accessibilityChecker;
 // Utility module.
 const {doBy} = require('../procs/job');
 
@@ -47,7 +48,7 @@ const run = async (content, timeLimit) => {
   const nowLabel = (new Date()).toISOString().slice(0, 19);
   try {
     const ibmReport = await doBy(
-      timeLimit, getCompliance, [content, nowLabel], 'ibm getCompliance'
+      timeLimit, accessibilityChecker, 'getCompliance', [content, nowLabel], 'ibm getCompliance'
     );
     if (ibmReport !== 'timedOut') {
       return ibmReport;
