@@ -92,6 +92,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
     console.log('OK');
     // Get them.
     const actReport = await reportLoc.textContent();
+    console.log('Got actReport');
     // Populate the act report.
     result = JSON.parse(actReport);
     // If any rules were reported violated:
