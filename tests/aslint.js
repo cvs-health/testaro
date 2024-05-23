@@ -29,6 +29,8 @@
 
 // Module to handle files.
 const fs = require('fs/promises');
+// Utility module.
+const {doBy} = require('../procs/job');
 
 // FUNCTIONS
 
@@ -77,17 +79,11 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
   // If the injection succeeded:
   if (! data.prevented) {
     // Get the test results.
-    await reportLoc.waitFor({
+    const waitArg = {
       state: 'attached',
       timeout: 1000 * timeLimit
-    })
-    .catch(error => {
-      const message
-      = `aslint testing timed out at ${timeLimit} seconds (${error.message.slice(0, 400)})`;
-      console.trace(`ERROR: ${message}`);
-      data.prevented = true;
-      data.error = message;
-    });
+    };
+    await doBy(timeLimit, reportLoc, 'waitFor', [waitArg], 'aslint testing');
   }
   // If the results arrived in time:
   if (! data.prevented) {
