@@ -83,10 +83,13 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
       state: 'attached',
       timeout: 1000 * timeLimit
     };
+    console.log('About to wait for attachment');
     await doBy(timeLimit, reportLoc, 'waitFor', [waitArg], 'aslint testing');
+    console.log('Waited');
   }
   // If the results arrived in time:
   if (! data.prevented) {
+    console.log('OK');
     // Get them.
     const actReport = await reportLoc.textContent();
     // Populate the act report.
