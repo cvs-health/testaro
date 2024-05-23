@@ -44,7 +44,7 @@
 // IMPORTS
 
 const {injectAxe, getAxeResults} = require('axe-playwright');
-const {doBy} = '../procs/job';
+const {doBy} = require('../procs/job');
 
 // FUNCTIONS
 
