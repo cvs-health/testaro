@@ -817,10 +817,13 @@ const doActs = async (report, actIndex, page) => {
             // Perform the specified tests of the tool.
             await require(`./tests/${act.which}`).reporter(page, report, actIndex, timeLimit);
             // If the tool reported operation prevention by the page:
+            console.log('Ran reporter');
+            console.log(JSON.stringify(act, null, 2));
             if (act.data.prevented) {
               // Add prevention data to the job data.
               report.jobData.preventions[act.which] = act.data.error;
             }
+            console.log('Checked prevention');
           }
           // If the tool invocation failed:
           catch(error) {
