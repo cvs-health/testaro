@@ -30,7 +30,7 @@
 // Module to keep secrets.
 require('dotenv').config();
 // Module to validate jobs.
-const {isBrowserID, isDeviceID, isValidJob, tools} = require('./procs/job');
+const {isBrowserID, isDeviceID, isURL, isValidJob, tools} = require('./procs/job');
 // Module to standardize report formats.
 const {standardize} = require('./procs/standardize');
 // Module to identify element bounding boxes.
@@ -191,11 +191,13 @@ const browserClose = async () => {
   }
 };
 // Launches a browser, navigates to a URL, and returns browser data.
-const launch = async (report, debug, waits, browserID, target) => {
+const launch = async (report, debug, waits, tempBrowserID, tempURL) => {
   const {device} = report;
   const deviceID = device && device.id;
-  // If the specified browser type exists:
-  if (isBrowserID(browserID) && isDeviceID(deviceID)) {
+  const browserID = tempBrowserID || report.browserID || '';
+  const url = tempURL || report.target && report.target.url || '';
+  // If the specified browser and device types and URL exist:
+  if (isBrowserID(browserID) && isDeviceID(deviceID) && isURL(url)) {
     // Create a browser of the specified or default type.
     const browserType = require('playwright')[browserID];
     // Close the current browser, if any.
@@ -326,10 +328,10 @@ const launch = async (report, debug, waits, browserID, target) => {
   // Otherwise, i.e. if the browser or device ID is invalid:
   else {
     // Return this.
-    console.log(`ERROR: Browser ${browserID} or device ${deviceID} invalid`);
+    console.log(`ERROR: Browser ${browserID}, device ${deviceID}, or URL ${url} invalid`);
     return {
       success: false,
-      error: `${browserID} browser launch with ${deviceID} device failed`
+      error: `${browserID} browser launch with ${deviceID} device and navigation to ${url} failed`
     };
   }
 };

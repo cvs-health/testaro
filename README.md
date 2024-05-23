@@ -251,7 +251,7 @@ When the texts of multiple elements of the same type will contain the same `whic
 
 #### Navigations
 
-An example of a **navigation** is the act of type `launch` in the job example above. That `launch` act has only a `type` property. If you want a particular `launch` act to use a different browser type or to navigate to a different target from the job defaults, the `launch` act can have a `browserID` and/or a `target` property.
+An example of a **navigation** is the act of type `launch` in the job example above. That `launch` act has only a `type` property. If you want a particular `launch` act to use a different browser type or to navigate to a different target URL from the job defaults, the `launch` act can have a `browserID` and/or a `url` property.
 
 If any act alters the page, you can restore the page to its original state for the next act by inserting a new `launch` act (and, if necessary, additional page-specific acts) between them.
 
