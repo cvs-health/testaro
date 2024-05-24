@@ -812,8 +812,8 @@ const doActs = async (report, actIndex, page) => {
           // Get the start time of the act.
           const startTime = Date.now();
           try {
-            // Get the time limit in milliseconds for the act.
-            const timeLimit = 1000 * timeLimits[act.which] || 15000;
+            // Get the time limit in seconds for the act.
+            const timeLimit = timeLimits[act.which] || 15;
             // Perform the specified tests of the tool.
             const actReport = await require(`./tests/${act.which}`)
             .reporter(page, report, actIndex, timeLimit);
