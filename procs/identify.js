@@ -85,12 +85,17 @@ const addIDs = async (locators, recipient) => {
 };
 // Sanitizes a tag name.
 const tagify = tagName => {
-  const lcTagName = tagName.toLowerCase();
-  const safeTagName = lcTagName.replace(/[^a-z0-9]/g, '');
-  if (safeTagName !== lcTagName) {
-    console.log(`ERROR: Tag name ${tagName} invalid`);
+  if (tagName) {
+    const lcTagName = tagName.toLowerCase();
+    const safeTagName = lcTagName.replace(/[^a-z0-9]/g, '');
+    if (safeTagName !== lcTagName) {
+      console.log(`ERROR on page: Tag name ${tagName} invalid; treating it as ${safeTagName}`);
+    }
+    return safeTagName;
   }
-  return safeTagName;
+  else {
+    return '';
+  }
 };
 // Returns the XPath and box ID of the element of a standard instance.
 exports.identify = async (instance, page) => {

@@ -875,7 +875,7 @@ The rationales motivating the Testaro-defined tests can be found in comments wit
 
 ### Abnormal termination
 
-On some occasions a test throws an error that cannot be handled with a `try`-`catch` structure. It has been observed, for example, that the `ibm` test does this when the page content, rather than the page URL, is given to `getCompliance()` and the target is `https://globalsolutions.org` or `https://monsido.com`.
+On some occasions a test throws an error that cannot be handled with a `try`-`catch` structure. It has been observed, for example, that the `ibm` test does this when the page content, rather than the page URL, is given to `getCompliance()` and the target is `https://globalsolutions.org`, `https://monsido.com`, or `https://www.ambetterhealth.com/`.
 
 Some tools take apparently infinite time to perform their tests on some pages. To handle such stalling, Testaro subjects most tools to time limits. Further testing will be required before it can be determined whether this time limitation is robust. As currently implemented (without child processes), it may allow tool testing processes to continue and to write indefinitely to the response.
 
