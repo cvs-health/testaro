@@ -78,19 +78,27 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
   const reportLoc = page.locator('#aslintResult');
   // If the injection succeeded:
   if (! data.prevented) {
-    // Wait for the test results to be attached to the page.
-    const waitArg = {
-      state: 'attached',
-      timeout: 1000 * timeLimit
-    };
-    console.log('About to wait for attachment');
-    const timeResult = await doBy(timeLimit, reportLoc, 'waitFor', [waitArg], 'aslint testing');
-    console.log('Waited');
-    // If the result attachment timed out:
-    if (timeResult === 'timedOut') {
-      // Report this.
+    try {
+      // Wait for the test results to be attached to the page.
+      const waitArg = {
+        state: 'attached',
+        timeout: 1000 * timeLimit
+      };
+      console.log('About to wait for attachment');
+      const timeResult = await doBy(timeLimit, reportLoc, 'waitFor', [waitArg], 'aslint testing');
+      console.log('Waited');
+      // If the result attachment timed out:
+      if (timeResult === 'timedOut') {
+        // Report this.
+        data.prevented = true;
+        data.error = 'Attachment of results to page by aslint timed out';
+      }
+    }
+    catch(error) {
+      const message = 'Attachment of test results to page failed';
+      console.log(message);
       data.prevented = true;
-      data.error = 'Attachment of results to page by aslint timed out';
+      data.error = `${message} (${error.message})`;
     }
   }
   // If the injection and the result attachment both succeeded:
