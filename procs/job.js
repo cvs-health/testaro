@@ -273,7 +273,7 @@ exports.doBy = async function(timeLimit, obj, fnName, fnArgs, noticePrefix) {
     timer = setTimeout(() => {
       console.trace(`ERROR: ${noticePrefix} timed out at ${timeLimit} seconds`);
       resolve('timedOut');
-    }, 1 * timeLimit);
+    }, 1000 * timeLimit);
   });
   // Start the function execution.
   console.log('About to declare fn promise');
