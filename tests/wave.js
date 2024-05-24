@@ -41,9 +41,10 @@ exports.reporter = async (page, report, actIndex) => {
   const waveKey = process.env.WAVE_KEY;
   // Initialize the results.
   const data = {};
-  const result = {};
+  let result = {};
   try {
     result = await new Promise(resolve => {
+      // Get the test results.
       https.get(
         {
           host: 'wave.webaim.org',
@@ -54,7 +55,7 @@ exports.reporter = async (page, report, actIndex) => {
           response.on('data', chunk => {
             rawReport += chunk;
           });
-          // When the data arrive:
+          // When they arrive:
           response.on('end', async () => {
             // Delete unnecessary properties.
             const actResult = JSON.parse(rawReport);
@@ -114,6 +115,7 @@ exports.reporter = async (page, report, actIndex) => {
     });
   }
   catch (error) {
+    console.log(`ERROR: ${error.message}`);
     data.prevented = true;
     data.error = error.message;
   };
