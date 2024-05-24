@@ -40,12 +40,12 @@ const {dirWatch} = require('../../dirWatch');
 // Start checking for jobs every 5 seconds.
 dirWatch(false, 5)
 .then(() => {
-  console.trace('Success: Watch validation ended');
+  console.log('Success: Watch validation ended');
 });
 // Make a job available after 7 seconds.
 setTimeout(() => {
   fs.copyFile(
     `${__dirname}/../jobs/todo/${jobID}.json`, `${process.env.JOBDIR}/todo/${jobID}.json`
   );
-  console.trace('Job made available after 7 seconds');
+  console.log('Job made available after 7 seconds');
 }, 7000);

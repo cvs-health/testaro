@@ -172,7 +172,7 @@ exports.reporter = async (
     }, detailLevel);
   }
   catch(error) {
-    console.trace(`ERROR performing test (${error.message})`);
+    console.log(`ERROR performing test (${error.message})`);
     data = {
       prevented: true,
       error: 'ERROR performing test'

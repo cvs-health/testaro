@@ -167,7 +167,7 @@ exports.reporter = async (page, report, actIndex) => {
         return true;
       }
       else {
-        console.trace(`ERROR: Testaro rule ${rule} invalid`);
+        console.log(`ERROR: Testaro rule ${rule} invalid`);
         return false;
       }
     })
@@ -219,7 +219,7 @@ exports.reporter = async (page, report, actIndex) => {
               data.rulePreventions.push(rule);
               result[rule].totals = [0, 0, 0, 0];
               result[rule].standardInstances = [];
-              console.trace(`ERROR: Test of testaro rule ${rule} timed out`);
+              console.log(`ERROR: Test of testaro rule ${rule} timed out`);
               resolve({timedOut: true});
             }, 15000);
           });
@@ -249,14 +249,14 @@ exports.reporter = async (page, report, actIndex) => {
           // Report this.
           data.rulePreventions.push(rule);
           data.rulePreventionMessages[rule] = error.message;
-          console.trace(`ERROR: Test of testaro rule ${rule} prevented (${error.message})`);
+          console.log(`ERROR: Test of testaro rule ${rule} prevented (${error.message})`);
         }
       }
       // Otherwise, i.e. if the rule is undefined or doubly defined:
       else {
         // Report this.
         data.rulesInvalid.push(rule);
-        console.trace(`ERROR: Rule ${rule} not validly defined`);
+        console.log(`ERROR: Rule ${rule} not validly defined`);
       }
     }
     testTimes.sort((a, b) => b[1] - a[1]).forEach(pair => {
@@ -266,7 +266,7 @@ exports.reporter = async (page, report, actIndex) => {
   // Otherwise, i.e. if the rule specification is invalid:
   else {
     const message = 'ERROR: Testaro rule specification invalid';
-    console.trace(message);
+    console.log(message);
     data.prevented = true;
     data.error = message;
   }

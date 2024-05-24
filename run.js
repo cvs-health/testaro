@@ -142,7 +142,7 @@ const goTo = async (report, page, url, timeout, waitUntil) => {
       const actualURL = page.url();
       if (report.strict && deSlash(actualURL) !== deSlash(url)) {
         // Return an error.
-        console.trace(`ERROR: Visit to ${url} redirected to ${actualURL}`);
+        console.log(`ERROR: Visit to ${url} redirected to ${actualURL}`);
         return {
           success: false,
           error: 'badRedirection'
@@ -162,7 +162,7 @@ const goTo = async (report, page, url, timeout, waitUntil) => {
     // Otherwise, i.e. if the response status was abnormal:
     else {
       // Return an error.
-      console.trace(`ERROR: Visit to ${url} got status ${httpStatus}`);
+      console.log(`ERROR: Visit to ${url} got status ${httpStatus}`);
       report.jobData.visitRejectionCount++;
       return {
         success: false,
@@ -171,7 +171,7 @@ const goTo = async (report, page, url, timeout, waitUntil) => {
     }
   }
   catch(error) {
-    console.trace(`ERROR visiting ${url} (${error.message.slice(0, 200)})`);
+    console.log(`ERROR visiting ${url} (${error.message.slice(0, 200)})`);
     return {
       success: false,
       error: 'noVisit'
@@ -206,7 +206,7 @@ const launch = async (report, debug, waits, tempBrowserID, tempURL) => {
     const browserOptions = {
       logger: {
         isEnabled: () => false,
-        log: (name, severity, message) => console.trace(message.slice(0, 100))
+        log: (name, severity, message) => console.log(message.slice(0, 100))
       }
     };
     browserOptions.headless = ! debug;
@@ -215,7 +215,7 @@ const launch = async (report, debug, waits, tempBrowserID, tempURL) => {
     browser = await browserType.launch(browserOptions)
     // If the launch failed:
     .catch(async error => {
-      console.trace(`ERROR launching browser (${error.message.slice(0, 200)})`);
+      console.log(`ERROR launching browser (${error.message.slice(0, 200)})`);
       // Return this.
       return {
         success: false,
@@ -237,7 +237,7 @@ const launch = async (report, debug, waits, tempBrowserID, tempURL) => {
       // Add any error events to the count of logging errors.
       page.on('crash', () => {
         jobData.errorLogCount++;
-        console.trace('Page crashed');
+        console.log('Page crashed');
       });
       page.on('pageerror', () => {
         jobData.errorLogCount++;
@@ -267,7 +267,7 @@ const launch = async (report, debug, waits, tempBrowserID, tempURL) => {
             }
           }
           indentedMsg = parts.map(part => `    | ${part}`).join('\n');
-          console.trace(`\n${indentedMsg}`);
+          console.log(`\n${indentedMsg}`);
         }
         // Add statistics on the message to the report.
         const msgTextLC = msgText.toLowerCase();
@@ -318,7 +318,7 @@ const launch = async (report, debug, waits, tempBrowserID, tempURL) => {
     // If it fails to become stable after load:
     catch(error) {
       // Return this.
-      console.trace(`ERROR: Blank page load in new tab timed out (${error.message})`);
+      console.log(`ERROR: Blank page load in new tab timed out (${error.message})`);
       return {
         success: false,
         error: 'Blank page load in new tab timed out'
@@ -328,7 +328,7 @@ const launch = async (report, debug, waits, tempBrowserID, tempURL) => {
   // Otherwise, i.e. if the browser or device ID is invalid:
   else {
     // Return this.
-    console.trace(`ERROR: Browser ${browserID}, device ${deviceID}, or URL ${url} invalid`);
+    console.log(`ERROR: Browser ${browserID}, device ${deviceID}, or URL ${url} invalid`);
     return {
       success: false,
       error: `${browserID} browser launch with ${deviceID} device and navigation to ${url} failed`
@@ -488,7 +488,7 @@ const isTrue = (object, specs) => {
 };
 // Adds a wait error result to an act.
 const waitError = (page, act, error, what) => {
-  console.trace(`ERROR waiting for ${what} (${error.message})`);
+  console.log(`ERROR waiting for ${what} (${error.message})`);
   act.result.found = false;
   act.result.url = page.url();
   act.result.error = `ERROR waiting for ${what}`;
@@ -509,7 +509,7 @@ const abortActs = async (report, actIndex) => {
   report.jobData.abortedAct = actIndex;
   report.jobData.aborted = true;
   // Report that the job is aborted.
-  console.trace(`ERROR: Job aborted on act ${actIndex}`);
+  console.log(`ERROR: Job aborted on act ${actIndex}`);
   // Return an abortive act index.
   return -2;
 };
@@ -518,7 +518,7 @@ const addError = async(alsoLog, alsoAbort, report, actIndex, message) => {
   // If the error is to be logged:
   if (alsoLog) {
     // Log it.
-    console.trace(message);
+    console.log(message);
   }
   // Add error data to the result.
   const act = report.acts[actIndex];
@@ -563,7 +563,7 @@ const doActs = async (report, actIndex, page) => {
     // Otherwise, i.e. if granular reporting has not been specified:
     else {
       // Log the act.
-      console.trace(message);
+      console.log(message);
     }
     // Increment the count of acts performed.
     actCount++;
@@ -572,7 +572,7 @@ const doActs = async (report, actIndex, page) => {
     if (type === 'next') {
       const condition = act.if;
       const logSuffix = condition.length === 3 ? ` ${condition[1]} ${condition[2]}` : '';
-      console.trace(`>> ${condition[0]}${logSuffix}`);
+      console.log(`>> ${condition[0]}${logSuffix}`);
       // Identify the act to be checked.
       const ifActIndex = report.acts.map(act => act.type !== 'next').lastIndexOf(true);
       // Determine whether its jump condition is true.
@@ -675,7 +675,7 @@ const doActs = async (report, actIndex, page) => {
       // Otherwise, if the act is a wait for text:
       else if (act.type === 'wait') {
         const {what, which} = act;
-        console.trace(`>> ${what}`);
+        console.log(`>> ${what}`);
         const result = act.result = {};
         // If the text is to be the URL:
         if (what === 'url') {
@@ -750,7 +750,7 @@ const doActs = async (report, actIndex, page) => {
         // If the wait times out:
         .catch(async error => {
           // Report this and abort the job.
-          console.trace(`ERROR waiting for page to be ${act.which} (${error.message})`);
+          console.log(`ERROR waiting for page to be ${act.which} (${error.message})`);
           actIndex = await addError(
             true, true, report, actIndex, `ERROR waiting for page to be ${act.which}`
           );
@@ -799,7 +799,7 @@ const doActs = async (report, actIndex, page) => {
             };
           })
           .catch(error => {
-            console.trace(`ERROR making all elements visible (${error.message})`);
+            console.log(`ERROR making all elements visible (${error.message})`);
             act.result = {
               success: false
             };
@@ -830,7 +830,7 @@ const doActs = async (report, actIndex, page) => {
           catch(error) {
             // Report the failure.
             const message = error.message.slice(0, 400);
-            console.trace(`ERROR: Test act ${act.which} failed (${message})`);
+            console.log(`ERROR: Test act ${act.which} failed (${message})`);
             act.data.prevented = true;
             act.data.error = act.data.error ? `${act.data.error}; ${message}` : message;
           }
@@ -992,7 +992,7 @@ const doActs = async (report, actIndex, page) => {
                   act.result.idleTimely = true;
                 }
                 catch(error) {
-                  console.trace(`ERROR: Network busy after ${move} (${errorStart(error)})`);
+                  console.log(`ERROR: Network busy after ${move} (${errorStart(error)})`);
                   act.result.idleTimely = false;
                 }
                 // If the move created a new page, make it current.
@@ -1011,7 +1011,7 @@ const doActs = async (report, actIndex, page) => {
             else if (['checkbox', 'radio'].includes(act.type)) {
               await selection.waitForElementState('stable', {timeout: 2000})
               .catch(error => {
-                console.trace(`ERROR waiting for stable ${act.type} (${error.message})`);
+                console.log(`ERROR waiting for stable ${act.type} (${error.message})`);
                 act.result.success = false;
                 act.result.error = `ERROR waiting for stable ${act.type}`;
               });
@@ -1023,7 +1023,7 @@ const doActs = async (report, actIndex, page) => {
                     timeout: 2000
                   })
                   .catch(error => {
-                    console.trace(`ERROR checking ${act.type} (${error.message})`);
+                    console.log(`ERROR checking ${act.type} (${error.message})`);
                     act.result.success = false;
                     act.result.error = `ERROR checking ${act.type}`;
                   });
@@ -1034,7 +1034,7 @@ const doActs = async (report, actIndex, page) => {
                 }
                 else {
                   const report = `ERROR: could not check ${act.type} because disabled`;
-                  console.trace(report);
+                  console.log(report);
                   act.result.success = false;
                   act.result.error = report;
                 }
@@ -1071,7 +1071,7 @@ const doActs = async (report, actIndex, page) => {
                 // If the click or load failed:
                 catch(error) {
                   // Quit and add failure data to the report.
-                  console.trace(`ERROR clicking link (${errorStart(error)})`);
+                  console.log(`ERROR clicking link (${errorStart(error)})`);
                   act.result.success = false;
                   act.result.error = 'unclickable';
                   act.result.message = 'ERROR: click or load timed out';
@@ -1143,7 +1143,7 @@ const doActs = async (report, actIndex, page) => {
               const report = 'ERROR: move unknown';
               act.result.success = false;
               act.result.error = report;
-              console.trace(report);
+              console.log(report);
             }
           }
           // Otherwise, i.e. if no match was found:
@@ -1152,7 +1152,7 @@ const doActs = async (report, actIndex, page) => {
             act.result.success = false;
             act.result.error = 'absent';
             act.result.message = 'ERROR: specified element not found';
-            console.trace('ERROR: Specified element not found');
+            console.log('ERROR: Specified element not found');
             actIndex = await abortActs(report, actIndex);
           }
         }
@@ -1216,7 +1216,7 @@ const doActs = async (report, actIndex, page) => {
                   // If it was already reached within this act:
                   if (currentElement.dataset.pressesReached === actCount.toString(10)) {
                     // Report the error.
-                    console.trace(`ERROR: ${currentElement.tagName} element reached again`);
+                    console.log(`ERROR: ${currentElement.tagName} element reached again`);
                     status = 'ERROR';
                     return 'ERROR: locallyExhausted';
                   }
@@ -1341,7 +1341,7 @@ const doActs = async (report, actIndex, page) => {
   }
   // Otherwise, if all acts have been performed and the job succeeded:
   else if (! report.jobData.abortTime) {
-    console.trace('Acts completed');
+    console.log('Acts completed');
     await browserClose();
   }
 };
@@ -1355,7 +1355,7 @@ exports.doJob = async report => {
   const {jobData} = report;
   const reportInvalidity = isValidJob(report);
   if (reportInvalidity) {
-    console.trace(`ERROR: ${reportInvalidity}`);
+    console.log(`ERROR: ${reportInvalidity}`);
     jobData.aborted = true;
     jobData.abortedAct = null;
     jobData.abortError = reportInvalidity;
@@ -1381,7 +1381,7 @@ exports.doJob = async report => {
     report.jobData.preventions = {};
     process.on('message', message => {
       if (message === 'interrupt') {
-        console.trace('ERROR: Terminal interrupted the job');
+        console.log('ERROR: Terminal interrupted the job');
         process.exit();
       }
     });

@@ -107,7 +107,7 @@ const hasSubtype = (variable, subtype) => {
       return isState(variable);
     }
     else {
-      console.trace(`ERROR: ${subtype} not a known subtype`);
+      console.log(`ERROR: ${subtype} not a known subtype`);
       return false;
     }
   }
@@ -266,19 +266,14 @@ exports.isValidJob = job => {
 };
 // Executes an asynchronous function with a time limit.
 exports.doBy = async function(timeLimit, obj, fnName, fnArgs, noticePrefix) {
-  console.log(`fnArgs is ${JSON.stringify(fnArgs, null, 2)}`);
   let timer, fnResolver;
   // Start the function execution.
-  console.log('About to declare fn promise');
   const fnPromise = new Promise(async function(resolve) {
-    console.log('Defining fn promise');
     fnResolver = resolve;
     resolve(await obj[fnName](... fnArgs));
   });
   // Start a timer.
-  console.log('About to declare timer promise');
   const timerPromise = new Promise(resolve => {
-    console.log('Defining timer promise');
     timer = setTimeout(() => {
       console.log(`ERROR: ${noticePrefix} timed out at ${timeLimit} seconds`);
       setTimeout(() => {fnResolver('aborted')}, 100);
@@ -286,9 +281,7 @@ exports.doBy = async function(timeLimit, obj, fnName, fnArgs, noticePrefix) {
     }, 1000 * timeLimit);
   });
   // Get the timeout or the value returned by the function, whichever is first.
-  console.log('Declared and defined. About to race');
   const result = await Promise.race([timerPromise, fnPromise]);
-  console.log(`Raced, and result type is ${typeof result}`);
   clearTimeout(timer);
   // Return the result.
   return result;

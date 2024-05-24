@@ -52,7 +52,7 @@ exports.getSource = async page => {
       data.source = rawPage;
     }
     catch(error) {
-      console.trace(`ERROR getting source of ${url} (${error.message})`);
+      console.log(`ERROR getting source of ${url} (${error.message})`);
       data.prevented = true;
       data.error = `ERROR getting source of ${url}`;
     }

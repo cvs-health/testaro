@@ -446,13 +446,13 @@ The changes in `htmlcs/HTMLCS.js` are:
 6482a6484
 >     var messageStrings = new Set();
 6496d6497
-<         console.trace('done');
+<         console.log('done');
 6499d6499
-<         console.trace('done');
+<         console.log('done');
 6500a6501
 >       return Array.from(messageStrings);
 6531c6532,6534
-<       console.trace('[HTMLCS] ' + typeName + '|' + msg.code + '|' + nodeName + '|' + elementId + '|' + msg.msg + '|' + html);
+<       console.log('[HTMLCS] ' + typeName + '|' + msg.code + '|' + nodeName + '|' + elementId + '|' + msg.msg + '|' + html);
 ---
 >       messageStrings.add(
 >         typeName + '|' + msg.code + '|' + nodeName + '|' + elementId + '|' + msg.msg + '|' + html

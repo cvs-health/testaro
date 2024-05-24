@@ -51,7 +51,7 @@ exports.isInlineLink = async loc => await loc.evaluate(element => {
         linkTextRaw += link.textContent;
       });
       const linkText = linkTextRaw.replace(/\s/g, '');
-      console.trace(linkText);
+      console.log(linkText);
       if (listText === linkText && listText.length) {
         // Reclassify the link as non-inline.
         result = false;

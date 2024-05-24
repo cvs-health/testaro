@@ -50,7 +50,7 @@ const shoot = async (page, exclusion = null) => {
   }
   return await page.screenshot(options)
   .catch(error => {
-    console.trace(`ERROR: Screenshot failed (${error.message})`);
+    console.log(`ERROR: Screenshot failed (${error.message})`);
     return '';
   });
 };

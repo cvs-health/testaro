@@ -88,7 +88,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
     const certInfo = `Certificate-${isCertTolerant ? '' : 'in'}tolerant`;
     const foreverInfo = isForever ? 'repeating' : 'one-job';
     const intervalInfo = `with ${intervalInSeconds}-second intervals`;
-    console.trace(
+    console.log(
       `${certInfo} ${foreverInfo} network watching started ${intervalInfo} (${nowString()})\n`
     );
     // As long as watching is to continue:
@@ -98,7 +98,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
         // Wait for the specified interval.
         await wait(1000 * intervalInSeconds);
         // Log the start of a cycle.
-        console.trace('--');
+        console.log('--');
       }
       // Otherwise, i.e. if the cycle is incomplete:
       else {
@@ -122,7 +122,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
             // If the response throws an error:
             .on('error', async error => {
               // Report it.
-              console.trace(`${logStart}error message ${error.message}`);
+              console.log(`${logStart}error message ${error.message}`);
               resolve(true);
             })
             .on('data', chunk => {
@@ -137,7 +137,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                 // If there was no job to do:
                 if (! Object.keys(contentObj).length) {
                   // Report this.
-                  console.trace(`No job to do at ${url}`);
+                  console.log(`No job to do at ${url}`);
                   resolve(true);
                 }
                 // Otherwise, i.e. if there was a job or a message:
@@ -146,7 +146,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                   // If the server sent a message, not a job:
                   if (message) {
                     // Report it.
-                    console.trace(`${logStart}${message}`);
+                    console.log(`${logStart}${message}`);
                     resolve(true);
                   }
                   // Otherwise, if the server sent a valid job:
@@ -160,13 +160,13 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                     // Add the agent to the job.
                     sources.agent = agent;
                     // Perform the job, adding result data to it.
-                    console.trace(`${logStart}job ${id} (${nowString()})`);
-                    console.trace(`>> It will send report to ${sendReportTo}`);
+                    console.log(`${logStart}job ${id} (${nowString()})`);
+                    console.log(`>> It will send report to ${sendReportTo}`);
                     await doJob(contentObj);
                     let reportJSON = JSON.stringify(contentObj, null, 2);
-                    console.trace(`Job ${id} finished (${nowString()})`);
+                    console.log(`Job ${id} finished (${nowString()})`);
                     // Send the report to the specified server.
-                    console.trace(`Sending report ${id} to ${sendReportTo}`);
+                    console.log(`Sending report ${id} to ${sendReportTo}`);
                     const reportClient = sendReportTo.startsWith('https://')
                       ? httpsClient
                       : httpClient;
@@ -177,7 +177,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                       // If the response to the report threw an error:
                       .on('error', async error => {
                         // Report this.
-                        console.trace(`${reportLogStart}error message ${error.message}\n`);
+                        console.log(`${reportLogStart}error message ${error.message}\n`);
                         resolve(true);
                       })
                       .on('data', chunk => {
@@ -192,7 +192,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                           const {message} = ackObj;
                           if (message) {
                             // Report it.
-                            console.trace(`${reportLogStart}message ${message}\n`);
+                            console.log(`${reportLogStart}message ${message}\n`);
                             // Free the memory used by the report.
                             reportJSON = '';
                             contentObj = {};
@@ -201,7 +201,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                           // Otherwise, i.e. if the server sent anything else:
                           else {
                             // Report it.
-                            console.trace(
+                            console.log(
                               `ERROR: ${reportLogStart}status ${repResponse.statusCode} and error message ${JSON.stringify(ackObj, null, 2)}\n`
                             );
                             resolve(true);
@@ -210,7 +210,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                         // If processing the server message throws an error:
                         catch(error) {
                           // Report it.
-                          console.trace(
+                          console.log(
                             `ERROR: ${reportLogStart}status ${repResponse.statusCode}, error message ${error.message}, and response ${content.slice(0, 1000)}\n`
                           );
                           resolve(true);
@@ -220,7 +220,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                     // If the report submission throws an error:
                     .on('error', async error => {
                       // Report this.
-                      console.trace(
+                      console.log(
                         `ERROR in report submission: ${reportLogStart}error message ${error.message}\n`
                       );
                       resolve(true);
@@ -233,7 +233,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                     // Report this.
                     const errorSuffix = jobInvalidity ? ` (${jobInvalidity})` : '';
                     const message = `ERROR: ${logStart}invalid job${errorSuffix}`;
-                    console.trace(message);
+                    console.log(message);
                     serveObject({message}, response);
                     resolve(true);
                   }
@@ -242,7 +242,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
               // If processing the server response throws an error:
               catch(error) {
                 // Report this.
-                console.trace(`ERROR processing server response: ${error.message})`);
+                console.log(`ERROR processing server response: ${error.message})`);
                 resolve(true);
               }
             });
@@ -252,24 +252,24 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
             // If it is a refusal to connect:
             if (error.code && error.code.includes('ECONNREFUSED')) {
               // Report this.
-              console.trace(`${logStart}no connection`);
+              console.log(`${logStart}no connection`);
             }
             // Otherwise, if it was a DNS failure:
             else if (error.code && error.code.includes('ENOTFOUND')) {
               // Report this.
-              console.trace(`${logStart}no domain name resolution`);
+              console.log(`${logStart}no domain name resolution`);
             }
             // Otherwise, if it was any other error with a message:
             else if (error.message) {
               // Report this.
-              console.trace(`ERROR: ${logStart}got error message ${error.message.slice(0, 200)}`);
+              console.log(`ERROR: ${logStart}got error message ${error.message.slice(0, 200)}`);
               // Abort the watch.
               abort = true;
             }
             // Otherwise, i.e. if it was any other error with no message:
             else {
               // Report this.
-              console.trace(`ERROR: ${logStart}got an error with no message`);
+              console.log(`ERROR: ${logStart}got an error with no message`);
               // Abort the watch.
               abort = true;
             }
@@ -281,17 +281,17 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
         // If requesting a job throws an error:
         catch(error) {
           // Report this.
-          console.trace(`ERROR requesting a network job (${error.message})`);
+          console.log(`ERROR requesting a network job (${error.message})`);
           abort = true;
           resolve(true);
         }
       });
     }
-    console.trace('Watching complete');
+    console.log('Watching complete');
   }
   // Otherwise, i.e. if the job URLs do not exist or are invalid:
   else {
     // Report this.
-    console.trace('ERROR: List of job URLs invalid');
+    console.log('ERROR: List of job URLs invalid');
   }
 };

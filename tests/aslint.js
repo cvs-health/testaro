@@ -56,7 +56,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
     bundleEl.id = 'aslintBundle';
     if (scriptNonce) {
       bundleEl.nonce = scriptNonce;
-      console.trace(`Added nonce ${scriptNonce} to bundle`);
+      console.log(`Added nonce ${scriptNonce} to bundle`);
     }
     bundleEl.textContent = aslintBundle;
     document.head.insertAdjacentElement('beforeend', bundleEl);
@@ -64,14 +64,14 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
     const runnerEl = document.createElement('script');
     if (scriptNonce) {
       runnerEl.nonce = scriptNonce;
-      console.trace(`Added nonce ${scriptNonce} to runner`);
+      console.log(`Added nonce ${scriptNonce} to runner`);
     }
     runnerEl.textContent = aslintRunner;
     document.body.insertAdjacentElement('beforeend', runnerEl);
   }, {scriptNonce, aslintBundle, aslintRunner})
   .catch(error => {
     const message = `ERROR: ASLint injection failed (${error.message.slice(0, 400)})`;
-    console.trace(message);
+    console.log(message);
     data.prevented = true;
     data.error = message;
   });
@@ -84,10 +84,8 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
         state: 'attached',
         timeout: 1000 * timeLimit
       };
-      console.log('About to wait for attachment');
       await reportLoc.waitFor(waitOptions);
       // const timeResult = await doBy(timeLimit, reportLoc, 'waitFor', [waitArg], 'aslint testing');
-      console.log('Waited successfully');
       // console.log(`timeResult type is ${typeof timeResult}`);
       // If the result attachment timed out:
       /*
@@ -108,10 +106,8 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
   }
   // If the injection and the result attachment both succeeded:
   if (! data.prevented) {
-    console.log('OK');
     // Get their text.
     const actReport = await doBy(timeLimit, reportLoc, 'textContent', [], 'aslint report retrieval');
-    console.log('Got actReport or timeout');
     // If the text was obtained in time:
     if (actReport !== 'timedOut') {
       // Populate the act report.

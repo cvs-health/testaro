@@ -94,7 +94,7 @@ exports.reporter = async (page, report, actIndex) => {
               return new RegExp(rule.slice(1)).test(message.message);
             }
             else {
-              console.trace(`ERROR: Invalid nuVal rule ${rule}`);
+              console.log(`ERROR: Invalid nuVal rule ${rule}`);
               return false;
             }
           }));
@@ -102,7 +102,7 @@ exports.reporter = async (page, report, actIndex) => {
       }
       catch (error) {
         const message = `ERROR getting results for ${page[0]} (${error.message})`;
-        console.trace(message);
+        console.log(message);
         data.docTypes[page[0]].prevented = true;
         data.docTypes[page[0]].error = message;
       };

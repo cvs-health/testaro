@@ -610,7 +610,7 @@ const convert = (toolName, data, result, standardResult) => {
         standardResult.instances.push(... ruleResult.standardInstances);
       }
       else {
-        console.trace(`ERROR: Testaro rule ${rule} result has no standardInstances property`);
+        console.log(`ERROR: Testaro rule ${rule} result has no standardInstances property`);
       }
       // Initialize a record of its sample-ratio-weighted totals.
       data.ruleTotals[rule] = [0, 0, 0, 0];
@@ -623,7 +623,7 @@ const convert = (toolName, data, result, standardResult) => {
         }
       }
       else {
-        console.trace(`ERROR: Testaro rule ${rule} result has no totals property`);
+        console.log(`ERROR: Testaro rule ${rule} result has no totals property`);
       }
     });
     const preventionCount = result.preventions && result.preventions.length;
@@ -670,6 +670,6 @@ exports.standardize = act => {
     convert(which, data, result, standardResult);
   }
   else {
-    console.trace('ERROR: Result of incomplete act cannot be standardized');
+    console.log('ERROR: Result of incomplete act cannot be standardized');
   }
 };

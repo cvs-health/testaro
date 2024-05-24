@@ -6496,7 +6496,7 @@
           msgCount[messages[i].type]++;
         }
       }, function () {
-        console.trace('Something in HTML_CodeSniffer failed to parse. Cannot run.');
+        console.log('Something in HTML_CodeSniffer failed to parse. Cannot run.');
       }, 'en');
       return Array.from(messageStrings);
     };

@@ -242,13 +242,13 @@ exports.reporter = async (page, withItems, trialKeySpecs = []) => {
         // Otherwise, i.e. if the orientation and focus-management type were not obtained:
         else {
           // Report this.
-          console.trace('ERROR: Menu orientation and focus-management type not obtained');
+          console.log('ERROR: Menu orientation and focus-management type not obtained');
         }
       }
       // Otherwise, i.e. if the data were not obtained:
       else {
         // Report this.
-        console.trace('ERROR: Menu data not obtained');
+        console.log('ERROR: Menu data not obtained');
       }
     }
     // Otherwise, i.e. if it does not control exactly 1 menu:
@@ -295,7 +295,7 @@ exports.reporter = async (page, withItems, trialKeySpecs = []) => {
     await page.reload({timeout: 15000});
   }
   catch(error) {
-    console.trace('ERROR: page reload timed out');
+    console.log('ERROR: page reload timed out');
   }
   return {
     data,

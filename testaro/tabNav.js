@@ -114,7 +114,7 @@ const focusedTab = async (tabs, page) => await page.evaluate(tabs => {
   return tabs.indexOf(focus);
 }, tabs)
 .catch(error => {
-  console.trace(`ERROR: could not find focused tab (${error.message})`);
+  console.log(`ERROR: could not find focused tab (${error.message})`);
   return -1;
 });
 // Tests a navigation on a tab element.
@@ -127,7 +127,7 @@ const testKey = async (
     timeout: 500
   })
   .catch(async error => {
-    console.trace(
+    console.log(
       `ERROR clicking tab element ${itemData.text} (${error.message.replace(/\n.+/s, '')})`
     );
     await tabElement.click({
@@ -135,7 +135,7 @@ const testKey = async (
     });
   })
   .catch(error => {
-    console.trace(
+    console.log(
       `ERROR force-clicking tab element ${itemData.text} (${error.message.replace(/\n.+/s, '')})`
     );
     pressed = false;
@@ -151,7 +151,7 @@ const testKey = async (
       timeout: 1000
     })
     .catch(error => {
-      console.trace(`ERROR: could not press ${keyName} (${error.message})`);
+      console.log(`ERROR: could not press ${keyName} (${error.message})`);
       pressed = false;
     });
     // If the refocus and keypress succeeded:
@@ -254,7 +254,7 @@ const testTabs = async (tabs, index, listOrientation, listIsCorrect, withItems, 
         id: element.id
       }), currentTab)
       .catch(error => {
-        console.trace(`ERROR: could not get tag name (${error.message})`);
+        console.log(`ERROR: could not get tag name (${error.message})`);
         found = false;
         data.prevented = true;
         return 'ERROR: not found';
@@ -359,7 +359,7 @@ const testTabLists = async (tabLists, withItems, page) => {
     const firstTabList = tabLists[0];
     let orientation = await firstTabList.getAttribute('aria-orientation')
     .catch(error=> {
-      console.trace(`ERROR: could not get tab-list orientation (${error.message})`);
+      console.log(`ERROR: could not get tab-list orientation (${error.message})`);
       return 'ERROR';
     });
     if (! orientation) {
@@ -457,7 +457,7 @@ exports.reporter = async (page, withItems) => {
       await page.reload({timeout: 15000});
     }
     catch(error) {
-      console.trace('ERROR: page reload timed out');
+      console.log('ERROR: page reload timed out');
     }
   }
   // Get the totals of navigation errors, bad tabs, and bad tab lists.

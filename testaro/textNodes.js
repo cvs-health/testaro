@@ -151,7 +151,7 @@ exports.reporter = async (page, withItems, detailLevel, text = '') => {
     }, [detailLevel, text]);
   }
   catch(error) {
-    console.trace(`ERROR performing test (${error.message.replace(/\n.+/s, '')})`);
+    console.log(`ERROR performing test (${error.message.replace(/\n.+/s, '')})`);
     data = {
       prevented: true,
       error: 'Test failed'
