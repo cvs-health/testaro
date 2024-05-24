@@ -48,7 +48,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
   const act = report.acts[actIndex];
   const {jobData} = report;
   const scriptNonce = jobData && jobData.lastScriptNonce;
-  // Inject the ASLint bundle and runner into the page.
+  // Inject the ASLint bundle and runner into the head of the page.
   await page.evaluate(args => {
     const {scriptNonce, aslintBundle, aslintRunner} = args;
     // Bundle.
@@ -78,36 +78,51 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
   const reportLoc = page.locator('#aslintResult');
   // If the injection succeeded:
   if (! data.prevented) {
-    // Get the test results.
+    // Wait for the test results to be attached to the page.
     const waitArg = {
       state: 'attached',
       timeout: 1000 * timeLimit
     };
     console.log('About to wait for attachment');
-    await doBy(timeLimit, reportLoc, 'waitFor', [waitArg], 'aslint testing');
+    const timeResult = await doBy(timeLimit, reportLoc, 'waitFor', [waitArg], 'aslint testing');
     console.log('Waited');
+    // If the result attachment timed out:
+    if (timeResult === 'timedOut') {
+      // Report this.
+      data.prevented = true;
+      data.error = 'Attachment of results to page by aslint timed out';
+    }
   }
-  // If the results arrived in time:
+  // If the injection and the result attachment both succeeded:
   if (! data.prevented) {
     console.log('OK');
-    // Get them.
-    const actReport = await reportLoc.textContent();
-    console.log('Got actReport');
-    // Populate the act report.
-    result = JSON.parse(actReport);
-    // If any rules were reported violated:
-    if (result.rules) {
-      // For each such rule:
-      Object.keys(result.rules).forEach(ruleID => {
-        // If the rule was passed or skipped or rules to be tested were specified and exclude it:
-        const excluded = act.rules && ! act.rules.includes(ruleID);
-        const instanceType = result.rules[ruleID].status.type;
-        // If rules to be tested were specified and exclude it or the rule was passed or skipped:
-        if (excluded || ['passed', 'skipped'].includes(instanceType)) {
-          // Delete the rule report.
-          delete result.rules[ruleID];
-        }
-      });
+    // Get their text.
+    const actReport = await doBy(timeLimit, reportLoc, 'textContent', [], 'aslint report retrieval');
+    console.log('Got actReport or timeout');
+    // If the text was obtained in time:
+    if (actReport !== 'timedOut') {
+      // Populate the act report.
+      result = JSON.parse(actReport);
+      // If any rules were reported violated:
+      if (result.rules) {
+        // For each such rule:
+        Object.keys(result.rules).forEach(ruleID => {
+          // If the rule was passed or skipped or rules to be tested were specified and exclude it:
+          const excluded = act.rules && ! act.rules.includes(ruleID);
+          const instanceType = result.rules[ruleID].status.type;
+          // If rules to be tested were specified and exclude it or the rule was passed or skipped:
+          if (excluded || ['passed', 'skipped'].includes(instanceType)) {
+            // Delete the rule report.
+            delete result.rules[ruleID];
+          }
+        });
+      }
+    }
+    // Otherwise, i.e. if the text was not obtained in time:
+    else {
+      // Report this.
+      data.prevented = true;
+      data.error = 'Retrieval of result text timed out';
     }
   }
   // Return the act report.
