@@ -817,6 +817,7 @@ const doActs = async (report, actIndex, page) => {
             // Perform the specified tests of the tool.
             const actReport = await require(`./tests/${act.which}`)
             .reporter(page, report, actIndex, timeLimit);
+            console.log('Ran reporter');
             // Add the data and result to the act.
             act.data = actReport.data;
             act.result = actReport.result;

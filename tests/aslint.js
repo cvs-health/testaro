@@ -85,17 +85,6 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
         timeout: 1000 * timeLimit
       };
       await reportLoc.waitFor(waitOptions);
-      // const timeResult = await doBy(timeLimit, reportLoc, 'waitFor', [waitArg], 'aslint testing');
-      // console.log(`timeResult type is ${typeof timeResult}`);
-      // If the result attachment timed out:
-      /*
-      if (timeResult === 'timedOut') {
-        // Report this.
-        data.prevented = true;
-        data.error = 'Attachment of results to page by aslint timed out';
-        await page.close({runBeforeUnload: true});
-      }
-      */
     }
     catch(error) {
       const message = 'Attachment of test results to page failed';

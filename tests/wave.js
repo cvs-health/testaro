@@ -58,57 +58,65 @@ exports.reporter = async (page, report, actIndex) => {
           // When they arrive:
           response.on('end', async () => {
             // Delete unnecessary properties.
-            const actResult = JSON.parse(rawReport);
-            const {categories, statistics} = actResult;
-            delete categories.feature;
-            delete categories.structure;
-            delete categories.aria;
-            // If rules were specified:
-            if (rules && rules.length) {
-              // For each WAVE rule category:
-              ['error', 'contrast', 'alert'].forEach(category => {
-                // If any violations were reported:
-                if (
-                  categories[category]
-                  && categories[category].items
-                  && Object.keys(categories[category].items).length
-                ) {
-                  // For each rule violated:
-                  Object.keys(categories[category].items).forEach(ruleID => {
-                    // If it was not a specified rule:
-                    if (! rules.includes(ruleID)) {
-                      // Decrease the category violation count by the count of its violations.
-                      categories[category].count -= categories[category].items[ruleID].count;
-                      // Remove its violations from the report.
-                      delete categories[category].items[ruleID];
-                    }
-                  });
-                }
+            try {
+              const actResult = JSON.parse(rawReport);
+              const {categories, statistics} = actResult;
+              delete categories.feature;
+              delete categories.structure;
+              delete categories.aria;
+              // If rules were specified:
+              if (rules && rules.length) {
+                // For each WAVE rule category:
+                ['error', 'contrast', 'alert'].forEach(category => {
+                  // If any violations were reported:
+                  if (
+                    categories[category]
+                    && categories[category].items
+                    && Object.keys(categories[category].items).length
+                  ) {
+                    // For each rule violated:
+                    Object.keys(categories[category].items).forEach(ruleID => {
+                      // If it was not a specified rule:
+                      if (! rules.includes(ruleID)) {
+                        // Decrease the category violation count by the count of its violations.
+                        categories[category].count -= categories[category].items[ruleID].count;
+                        // Remove its violations from the report.
+                        delete categories[category].items[ruleID];
+                      }
+                    });
+                  }
+                });
+              }
+              // Add WCAG information from the WAVE documentation.
+              const waveDocJSON = await fs.readFile('procs/wavedoc.json');
+              const waveDoc = JSON.parse(waveDocJSON);
+              Object.keys(categories).forEach(categoryName => {
+                const category = categories[categoryName];
+                const {items} = category;
+                Object.keys(items).forEach(issueName => {
+                  const issueDoc = waveDoc.find((issue => issue.name === issueName));
+                  const {guidelines} = issueDoc;
+                  items[issueName].wcag = guidelines;
+                });
               });
+              // Add important data to the result.
+              if (statistics) {
+                data.pageTitle = statistics.pagetitle || '';
+                data.pageURL = statistics.pageurl || '';
+                data.time = statistics.time || null;
+                data.creditsRemaining = statistics.creditsremaining || null;
+                data.allItemCount = statistics.allitemcount || null;
+                data.totalElements = statistics.totalelements || null;
+              }
+              // Return the result.
+              resolve(actResult);
             }
-            // Add WCAG information from the WAVE documentation.
-            const waveDocJSON = await fs.readFile('procs/wavedoc.json');
-            const waveDoc = JSON.parse(waveDocJSON);
-            Object.keys(categories).forEach(categoryName => {
-              const category = categories[categoryName];
-              const {items} = category;
-              Object.keys(items).forEach(issueName => {
-                const issueDoc = waveDoc.find((issue => issue.name === issueName));
-                const {guidelines} = issueDoc;
-                items[issueName].wcag = guidelines;
-              });
-            });
-            // Add important data to the result.
-            if (statistics) {
-              data.pageTitle = statistics.pagetitle || '';
-              data.pageURL = statistics.pageurl || '';
-              data.time = statistics.time || null;
-              data.creditsRemaining = statistics.creditsremaining || null;
-              data.allItemCount = statistics.allitemcount || null;
-              data.totalElements = statistics.totalelements || null;
-            }
-            // Return the result.
-            resolve(actResult);
+            catch(error) {
+              console.log(`ERROR parsing tool report: ${error.message}`);
+              data.prevented = true;
+              data.error = error.message;
+              resolve(result);
+            };
           });
         }
       );
