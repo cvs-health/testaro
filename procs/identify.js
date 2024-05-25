@@ -170,34 +170,44 @@ exports.identify = async (instance, page) => {
     }
     // If either ID remains undefined and the instance specifies a tag name:
     if (tagName && ! (elementID.boxID && elementID.pathID)) {
-      // Get locators for elements with the tag name.
-      let locators = page.locator(tagName);
-      // If there is exactly 1 of them:
-      let locatorCount = await locators.count();
-      if (locatorCount === 1) {
-        // Add a box ID and a path ID to the result.
-        await addIDs(locators, elementID);
-      }
-      // If either ID remains undefined and the instance also specifies an excerpt:
-      if (excerpt && ! (elementID.boxID && elementID.pathID)) {
-        // Get the plain text parts of the excerpt, converting ... to an empty string.
-        const minTagExcerpt = excerpt.replace(/<[^>]+>/g, '<>');
-        const plainParts = (minTagExcerpt.match(/[^<>]+/g) || [])
-        .map(part => part === '...' ? '' : part);
-        // Get the longest of them.
-        const sortedPlainParts = plainParts.sort((a, b) => b.length - a.length);
-        const mainPart = sortedPlainParts.length ? sortedPlainParts[0] : '';
-        // If there is one:
-        if (mainPart.trim().replace(/\s+/g, '').length) {
-          // Get locators for elements with the tag name and the text.
-          const locators = page.locator(tagName.toLowerCase(), {hasText: mainPart});
-          // If there is exactly 1 of them:
-          const locatorCount = await locators.count();
-          if (locatorCount === 1) {
-            // Add a box ID and a path ID to the result.
-            await addIDs(locators, elementID);
+      try {
+        // Get locators for elements with the tag name.
+        let locators = page.locator(tagName);
+        // If there is exactly 1 of them:
+        let locatorCount = await locators.count();
+        if (locatorCount === 1) {
+          // Add a box ID and a path ID to the result.
+          await addIDs(locators, elementID);
+        }
+        // If either ID remains undefined and the instance also specifies an excerpt:
+        if (excerpt && ! (elementID.boxID && elementID.pathID)) {
+          // Get the plain text parts of the excerpt, converting ... to an empty string.
+          const minTagExcerpt = excerpt.replace(/<[^>]+>/g, '<>');
+          const plainParts = (minTagExcerpt.match(/[^<>]+/g) || [])
+          .map(part => part === '...' ? '' : part);
+          // Get the longest of them.
+          const sortedPlainParts = plainParts.sort((a, b) => b.length - a.length);
+          const mainPart = sortedPlainParts.length ? sortedPlainParts[0] : '';
+          // If there is one:
+          if (mainPart.trim().replace(/\s+/g, '').length) {
+            // Get locators for elements with the tag name and the text.
+            const locators = page.locator(tagName.toLowerCase(), {hasText: mainPart});
+            // If there is exactly 1 of them:
+            const locatorCount = await locators.count();
+            if (locatorCount === 1) {
+              // Add a box ID and a path ID to the result.
+              await addIDs(locators, elementID);
+            }
           }
         }
+      }
+      // If the tag name is invalid:
+      catch(error) {
+        // Add this to the instance.
+        instance.invalidity = {
+          badProperty: 'tagName',
+          validityError: error.message
+        };
       }
     }
     // Return the result (not yet getting IDs from Nu Html Checker lines and columns).
