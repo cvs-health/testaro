@@ -113,6 +113,7 @@ exports.reporter = async (page, report, actIndex) => {
             }
             catch(error) {
               console.log(`ERROR parsing tool report: ${error.message}`);
+              console.log(`rawReport: ${rawReport}`);
               data.prevented = true;
               data.error = error.message;
               resolve(result);
