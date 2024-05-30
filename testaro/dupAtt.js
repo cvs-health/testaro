@@ -59,7 +59,7 @@ exports.reporter = async (page, withItems) => {
     // Remove any escaped quotation marks from it.
     rawPage = rawPage.replace(/\\"|\\'/g, '');
     // Remove any script code from it.
-    rawPage = rawPage.replace(/<(script [^<>]+)>.*?<\/script>/g, '$1');
+    rawPage = rawPage.replace(/<script[^<>]+>.*?<\/script>/g, '');
     // Remove any comments from it.
     rawPage = rawPage.replace(/<!--.*?-->/g, '');
     // Extract the opening tags of its elements.
