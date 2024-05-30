@@ -59,13 +59,15 @@ exports.reporter = async (page, withItems) => {
     // Remove any escaped quotation marks from it.
     rawPage = rawPage.replace(/\\"|\\'/g, '');
     // Remove any script code from it.
-    rawPage = rawPage.replace(/<script[^<>]+>.*?<\/script>/g, '');
+    rawPage = rawPage.replace(/<script(?: [^<>]+)?>.*?<\/script>/g, '');
+    rawPage = rawPage.replace(/<script(?: [^<>]+)?>/g, '');
+    rawPage = rawPage.replace(/<\/script>/g, '');
     // Remove any comments from it.
     rawPage = rawPage.replace(/<!--.*?-->/g, '');
-    // Extract the opening tags of its elements.
-    let elements = rawPage.match(/<[a-zA-Z][^<>]+>/g);
-    // Delete their enclosing angle brackets.
-    elements = elements.map(element => element.replace(/< ?| ?>/g, ''));
+    // Extract the syntactically valid opening tags of its elements.
+    let elements = rawPage.match(/<[a-zA-Z]+(?: [^<>]+)?>/g);
+    // Delete their enclosing angle brackets and any closing slashes.
+    elements = elements.map(element => element.replace(/< ?| ?\/?>/g, ''));
     // Delete the values of any attributes in them.
     const nvElements = elements.map(element => element.replace(/="[^"]*"/g, ''));
     // For each element:
@@ -111,7 +113,7 @@ exports.reporter = async (page, withItems) => {
           location: {
             doc: item.id ? 'source' : '',
             type: item.id ? 'selector' : '',
-            spec: `#${item.id}`
+            spec: item.id ? `#${item.id}` : ''
           },
           excerpt: item.duplicatedAttribute
         });
