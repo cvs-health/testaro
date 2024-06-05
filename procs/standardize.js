@@ -640,6 +640,27 @@ const convert = (toolName, data, result, standardResult) => {
       });
     }
   }
+  // wax
+  else if (toolName === 'wax' && result.violations && result.violations.length) {
+    result.violations.forEach(violation => {
+      const element = violation.element.replace(/\s+/g, ' ');
+      const {message, description, severity} = violation;
+      const ordinalSeverity = ['Minor', 'Moderate', 'Major', 'Severe', 'Critical'].indexOf(severity);
+      const tagNameCandidate = element.replace(/^<| .*$/g, '');
+      const tagName = /^[a-zA-Z0-9]+$/.test(tagNameCandidate) ? tagNameCandidate.toUpperCase() : '';
+      const instance = {
+        ruleID: message,
+        what: description,
+        ordinalSeverity,
+        tagName,
+        id: '',
+        location: {},
+        excerpt: element
+      };
+      standardResult.totals[ordinalSeverity]++;
+      standardResult.instances.push(instance);
+    });
+  }
   // wave
   else if (
     toolName === 'wave'

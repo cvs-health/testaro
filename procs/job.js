@@ -47,6 +47,7 @@ const tools = exports.tools = {
   nuVal: 'Nu Html Checker',
   qualWeb: 'QualWeb',
   testaro: 'Testaro',
+  wax: 'WallyAX',
   wave: 'WAVE',
 };
 
@@ -270,7 +271,14 @@ exports.doBy = async function(timeLimit, obj, fnName, fnArgs, noticePrefix) {
   // Start the function execution.
   const fnPromise = new Promise(async function(resolve) {
     fnResolver = resolve;
-    resolve(await obj[fnName](... fnArgs));
+    let fnResult;
+    try {
+      fnResult = await obj[fnName](... fnArgs);
+    }
+    catch(error) {
+      fnResult = `failed (error: ${error.message})`;
+    };
+    resolve(fnResult);
   });
   // Start a timer.
   const timerPromise = new Promise(resolve => {

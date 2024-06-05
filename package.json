@@ -32,6 +32,7 @@
     "@siteimprove/alfa-playwright": "*",
     "@siteimprove/alfa-rules": "*",
     "@siteimprove/alfa-scraper": "*",
+    "@wally-ax/wax-dev": "*",
     "accessibility-checker": "*",
     "aslint-testaro": "*",
     "axe-playwright": "*",
