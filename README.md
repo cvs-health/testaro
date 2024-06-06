@@ -44,35 +44,37 @@ Testaro uses:
 - [pixelmatch](https://www.npmjs.com/package/pixelmatch) to measure motion
 
 Testaro performs tests of these _tools_:
-- [accessibility-checker](https://www.npmjs.com/package/accessibility-checker) (IBM)
-- [alfa](https://alfa.siteimprove.com/) (Siteimprove)
-- [aslint](https://www.npmjs.com/package/@essentialaccessibility/aslint) (eSSENTIAL Accessibility)
-- [axe-playwright](https://www.npmjs.com/package/axe-playwright) (Deque)
+- [Accessibility Checker](https://www.npmjs.com/package/accessibility-checker) (IBM)
+- [Alfa](https://alfa.siteimprove.com/) (Siteimprove)
+- [ASLint](https://www.npmjs.com/package/@essentialaccessibility/aslint) (eSSENTIAL Accessibility)
+- [Axe](https://www.npmjs.com/package/axe-playwright) (Deque)
 - [Editoria11y](https://github.com/itmaybejj/editoria11y) (Princeton University)
 - [HTML CodeSniffer](https://www.npmjs.com/package/html_codesniffer) (Squiz Labs)
 - [Nu Html Checker](https://github.com/validator/validator) (World Wide Web Consortium)
-- [QualWeb core](https://www.npmjs.com/package/@qualweb/core) (University of Lisbon)
+- [QualWeb](https://www.npmjs.com/package/@qualweb/core) (University of Lisbon)
 - [Testaro](https://www.npmjs.com/package/testaro) (CVS Health)
-- [WAVE API](https://wave.webaim.org/api/) (WebAIM)
+- [WallyAX](https://www.npmjs.com/package/@wally-ax/wax-dev) (Wally Solutions)
+- [WAVE](https://wave.webaim.org/api/) (WebAIM)
 
 Some of the tests of Testaro are designed to act as approximate alternatives to tests of vulnerable, restricted, or no longer available tools. In all such cases the Testaro rules are independently designed and implemented, without reference to the code of the tests that inspired them.
 
 ## Rules
 
-Each tool accessed with Testaro defines _rules_ and tests _targets_ for compliance with its rules. In total, the nine tools define about a thousand rules. The latest tabulation of tool rules is:
+Each tool accessed with Testaro defines _rules_ and tests _targets_ for compliance with its rules. In total, the eleven tools define about a thousand rules. The latest tabulation of tool rules is:
 
 ```
-alfa: 59
-aslint: 136
-axe: 80
-ed11y: 24
-htmlcs: 115
-ibm: 132
-nuVal: 215
-qualWeb: 131
-testaro: 40
-wave: 58
-total: 990
+Accessibility Checker: 132
+Alfa: 59
+ASLint: 136
+Axe: 80
+Editoria11y: 24
+HTML CodeSniffer: 115
+Nu Html Checker: 215
+QualWeb: 131
+Testaro: 40
+WallyAX: 4
+WAVE: 58
+total: 994
 ```
 
 Some of the tools are under active development, and their rule counts change over time.
@@ -119,7 +121,7 @@ To run Testaro after installation, provide the environment variables described b
 
 ## Payment
 
-All of the tests that Testaro can perform are free of cost, except those performed by the WAVE tool. The owner of that tool gives new registrants a free allowance of credits before it becomes necessary to pay for use of the API of the tool. The required environment variable for authentication and payment is described below under “Environment variables”.
+All of the tests that Testaro can perform are free of cost, except those performed by the WallyAX and WAVE tools. The owners of those tools issue API keys. A free initial allowance of usage may be granted to you with a new API key. Before using Testaro to perform their tests, get your API keys for [WallyAX](mailto:technology@wallyax.com) and [WAVE](https://wave.webaim.org/api/). Then use those API keys to define environment variables, as described below under “Environment variables”.
 
 ## Jobs
 
@@ -459,7 +461,7 @@ The changes in `htmlcs/HTMLCS.js` are:
 >       );
 ```
 
-#### IBM Equal Access
+#### Accessibility Checker
 
 The `ibm` tests require the `aceconfig.js` file.
 
@@ -531,6 +533,12 @@ Warnings in the `testaro/hover.js`, `testaro/motion.js`, and `procs/visChange.js
 Several Testaro tests make use of the `init()` function in the `procs/testaro` module. That function samples elements if the population of elements to be tested is larger than 100. The purpose is to achieve reasonable performance. The sampling overweights elements near the beginning of a page, because of the tendency of that location to have important and atypical elements.
 
 You can add custom rules to the rules of any tool. Testaro provides a template, `data/template.js`, for the definition of a rule to be added. Once you have created a copy of the template with revisions, you can move the copy into the `testaro` directory and add an entry for your custom rule to the `evalRules` object in the `tests/testaro.js` file. Then your custom rule will act as a Testaro rule. Some `testaro` rules are simple enough to be fully specified in JSON files. You can use any of those as a template if you want to create a sufficiently simple custom rule, namely a rule whose prohibited elements are all and only the elements matching a CSS selector. More details about rule creation are in the `CONTRIBUTING.md` file.
+
+#### WallyAX
+
+If a `wax` test act is included in the job, an environment variable named `WAX_KEY` must exist, with your WallyAX API key as its value. You can get it from [WallyAX](mailto:technology@wallyax.com).
+
+The `wax` tool imposes a limit on the size of a page to be tested. If the page exceeds the limit, Testaro treats the page as preventing `wax` from performing its tests. The limit is less than 500,000 characters.
 
 #### WAVE
 
