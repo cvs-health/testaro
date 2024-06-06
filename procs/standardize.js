@@ -648,12 +648,26 @@ const convert = (toolName, data, result, standardResult) => {
       const ordinalSeverity = ['Minor', 'Moderate', 'Major', 'Severe', 'Critical'].indexOf(severity);
       const tagNameCandidate = element.replace(/^<| .*$/g, '');
       const tagName = /^[a-zA-Z0-9]+$/.test(tagNameCandidate) ? tagNameCandidate.toUpperCase() : '';
+      let id = '';
+      const location = {};
+      if (tagName) {
+        const idTerm = element.split(' ').slice(1).find(term => term.startsWith('id="'));
+        if (idTerm) {
+          const idCandidate = idTerm.slice(4, -1);
+          if (! idCandidate.includes('"')) {
+            id = idCandidate;
+            location.doc = 'dom';
+            location.type = 'selector';
+            location.spec = `#${id}`;
+          }
+        }
+      }
       const instance = {
         ruleID: message,
         what: description,
         ordinalSeverity,
         tagName,
-        id: '',
+        id,
         location: {},
         excerpt: element
       };
