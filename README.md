@@ -60,7 +60,7 @@ Some of the tests of Testaro are designed to act as approximate alternatives to 
 
 ## Rules
 
-Each tool accessed with Testaro defines _rules_ and tests _targets_ for compliance with its rules. In total, the eleven tools define about a thousand rules. The latest tabulation of tool rules is:
+Each tool accessed with Testaro defines _rules_ and tests _targets_ for compliance with its rules. In total, the eleven tools define more than a thousand rules. The latest tabulation of tool rules is:
 
 ```
 Accessibility Checker: 132
@@ -72,9 +72,9 @@ HTML CodeSniffer: 115
 Nu Html Checker: 215
 QualWeb: 131
 Testaro: 40
-WallyAX: 4
+WallyAX: 27
 WAVE: 58
-total: 994
+total: 1017
 ```
 
 Some of the tools are under active development, and their rule counts change over time.
