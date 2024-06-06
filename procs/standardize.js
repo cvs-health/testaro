@@ -642,7 +642,9 @@ const convert = (toolName, data, result, standardResult) => {
   }
   // wax
   else if (toolName === 'wax' && result.violations && result.violations.length) {
+    // For each violation:
     result.violations.forEach(violation => {
+      // Get its standard instance properties.
       const element = violation.element.replace(/\s+/g, ' ');
       const {message, description, severity} = violation;
       const ordinalSeverity = ['Minor', 'Moderate', 'Major', 'Severe', 'Critical'].indexOf(severity);
@@ -651,7 +653,11 @@ const convert = (toolName, data, result, standardResult) => {
       let id = '';
       const location = {};
       if (tagName) {
-        const idTerm = element.split(' ').slice(1).find(term => term.startsWith('id="'));
+        const idTerm = element
+        .replace(/>.*$/, '')
+        .split(' ')
+        .slice(1)
+        .find(term => term.startsWith('id="'));
         if (idTerm) {
           const idCandidate = idTerm.slice(4, -1);
           if (! idCandidate.includes('"')) {
@@ -668,10 +674,12 @@ const convert = (toolName, data, result, standardResult) => {
         ordinalSeverity,
         tagName,
         id,
-        location: {},
+        location,
         excerpt: element
       };
+      // Add its ordinal severity to the standard result totals.
       standardResult.totals[ordinalSeverity]++;
+      // Add the instance to the standard result.
       standardResult.instances.push(instance);
     });
   }
