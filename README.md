@@ -136,7 +136,6 @@ Here is an example of a job:
   id: '250110T1200-7f-4',
   what: 'monthly health check',
   strict: true,
-  isolate: true,
   standard: 'also',
   observe: false,
   device: {
@@ -155,7 +154,6 @@ Here is an example of a job:
     }
   },
   browserID: 'webkit',
-  timeLimit: 80,
   creationTimeStamp: '241229T0537',
   executionTimeStamp: '250110T1200',
   sendReportTo: 'https://abccorp.com/api/report',
@@ -171,10 +169,8 @@ Here is an example of a job:
   },
   acts: [
     {
-      type: 'launch'
-    },
-    {
       type: 'test',
+      launch: {},
       which: 'axe',
       detailLevel: 2,
       rules: ['landmark-complementary-is-top-level'],
@@ -182,6 +178,7 @@ Here is an example of a job:
     },
     {
       type: 'test',
+      launch: {},
       which: 'qualWeb',
       withNewContent: false,
       rules: ['QW-BP25', 'QW-BP26']
@@ -191,20 +188,18 @@ Here is an example of a job:
 }
 ```
 
-This job contains three _acts_, telling Testaro to:
-1. Launch a Webkit browser without a reduced-motion setting, open a window with the properties of an iPhone 8 device, create a page (tab), and navigate to `https://abccorp.com/mgmt/realproperty.html`.
-1. Perform the test for the `landmark-complementary-is-top-level` rule of the `axe` tool and report the test result with Axe detail level 2.
-1. Perform the tests for rules `QW-BP25` and `QW-BP26` of the `qualWeb` tool on the existing page.
+This job tells Testaro to perform two acts. One performs one test of the Axe tool wih reporting at detail level 2, and the other performs two tests of the QualWeb tool.
+
+Each act includes a `launch` property with a default value. That instructs Testaro, before performing those tests, to launch a new Webkit browser, open a context (window) with some properties of an iPhone 8 and without a reduced-motion setting, create a page (tab), and navigate to a particular page of the `abccorp.com` website.
 
 Job properties:
 - `id`: a string uniquely identifying the job.
 - `what`: a description of the job.
 - `strict`: `true` or `false`, indicating whether _substantive redirections_ should be treated as failures. These are redirections that do more than add or subtract a final slash.
-- `standard`: `'also'`, `'only'`, or `'no'`, indicating whether rule-violation instances are to be reported in tool-native formats and also in the Testaro standard format, only in the standard format, or only in the tool-native formats.
+- `standard`: whether standardized versions of tool reports are to accompany the original versions (`'also'`), replace the original versions (`'only'`), or not be produced (`'no'`).
 - `observe`: `true` or `false`, indicating whether tool and Testaro-rule invocations are to be reported to the server as they occur, so that the server can update a waiting client.
-- `device`: the ID of a device and the properties of each new browser context (window) that will be set for conformity to that device, unless overridden by a `launch` act. It must be `'default'` or the ID of one of [about 125 devices recognized by Playwright](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json).
-- `browserID`: the ID of the browser to be used, unless overridden by a `launch` act. It must be `'chromium'`, `'firefox'`, or `'webkit`'.
-- `timeLimit`: the number of seconds allowed for the execution of the job.
+- `device`: the ID of a device and the properties of each new browser context (window) that will be set for conformity to that device, unless overridden by an act. It must be `'default'` or the ID of one of [about 125 devices recognized by Playwright](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json).
+- `browserID`: the ID of the browser to be used, unless overridden by an act. It must be `'chromium'`, `'firefox'`, or `'webkit`'.
 - `creationTimeStamp`: a string in `yymmddThhMM` format, describing when the job was created.
 - `executionTimeStamp`: a string in `yymmddThhMM` format, specifying a date and time before which the job is not to be performed.
 - `sendReportTo`: the URL to which the job report is to be sent, or `''` if not a `netWatch` job.
@@ -218,18 +213,30 @@ Job properties:
 
 Each act object has a `type` property and optionally has a `name` property (used in branching, described below). It must or may have other properties, depending on the value of `type`.
 
-### Act sequence
-
-The first act in any job has the type `launch`, as shown in the example above. It launches a browser and then uses it to visit a URL. 
-
 ### Act types
 
-The acts after the first can tell Testaro to perform any of:
-- _moves_ (clicks, text inputs, hovers, etc.)
+The acts can tell Testaro to perform any of:
 - _navigations_ (browser launches, visits to URLs, waits for page conditions, etc.)
+- _moves_ (clicks, text inputs, hovers, etc.)
 - _alterations_ (changes to the page)
 - _tests_ (one or more of the tests defined by a tool)
 - _branching_ (continuing from an act other than the next one)
+
+#### Navigations
+
+An example of a **navigation** is:
+
+```json
+{
+  "type": "wait",
+  "which": "travel",
+  "what": "title"
+}
+```
+
+In this case, Testaro waits until the page title contains the string “travel” (case-insensitively).
+
+There is also a `launch` act. You need it in any job before other acts can be performed, unless the acts are all `test` acts and they include `launch` properties, as in the job example above. That `launch` property is a compact alternative to a `launch` act.
 
 #### Moves
 
@@ -249,24 +256,6 @@ In this case, Testaro checks the third radio button whose text includes the stri
 In identifying the target element for a move, Testaro matches the `which` property with the texts of the elements of the applicable type (such as radio buttons). It defines the text of an `input` element as the concatenated texts of its implicit label or explicit labels, if any, plus, for the first input in a `fieldset` element, the text content of the `legend` element of that `fieldset` element. For any other element, Testaro defines the text as the text content of the element.
 
 When the texts of multiple elements of the same type will contain the same `which` value, you can include an `index` property to specify the index of the target element, among all those that will match.
-
-#### Navigations
-
-An example of a **navigation** is the act of type `launch` in the job example above. That `launch` act has only a `type` property. If you want a particular `launch` act to use a different browser type or to navigate to a different target URL from the job defaults, the `launch` act can have a `browserID` and/or a `url` property.
-
-If any act alters the page, you can restore the page to its original state for the next act by inserting a new `launch` act (and, if necessary, additional page-specific acts) between them.
-
-Another navigation example is:
-
-```json
-{
-  "type": "wait",
-  "which": "travel",
-  "what": "title"
-}
-```
-
-In this case, Testaro waits until the page title contains the string “travel” (case-insensitively).
 
 #### Alterations
 
@@ -306,18 +295,6 @@ An act of type `test` performs the tests of a tool and reports a result. The res
 
 The `which` property of a `test` act identifies a tool, such as `alfa` or `testaro`.
 
-#### Target modification
-
-Some tools modify the page, so isolation of tests from one another requires that a browser be relaunched or, at least, navigate to the URL again, after a test act running any of those tools before a test act running another tool.
-
-Of the 10 tools, 6 are target-modifying:
-- `alfa`
-- `aslint`
-- `axe`
-- `htmlcs`
-- `ibm`
-- `testaro`
-
 ##### Configuration
 
 Every tool invoked by Testaro must have:
@@ -331,17 +308,18 @@ test: [
   'Perform a test',
   {
     which: [true, 'string', 'isTest', 'test name'],
+    launch: [false, 'object', '', 'if new browser to be launched, properties different from target, browserID, and what of the job'],
     rules: [false, 'array', 'areStrings', 'rule IDs or specifications, if not all']
     what: [false, 'string', 'hasLength', 'comment']
   }
 ],
 ```
 
-That means that a test act (i.e. an act with a `type` property having the value `'test'`) must have a string-valued `which` property naming a tool and may optionally have an array-valued `rules` property restricting the rules to be reported on and/or a string-valued `what` property describing the tool and/or the tests.
+That means that a test act (i.e. an act with a `type` property having the value `'test'`) must have a string-valued `which` property naming a tool and may optionally have an object-valued `launch` property, an array-valued `rules` property, and/or a string-valued `what` property.
 
 If a particular test act either must have or may have any other properties, those properties are specified in the `tools` property in `actSpecs.js`.
 
-When you include a `rules` property, you limit the tests of the tool that are performed or reported. For some tools (`alfa`, `axe`, `htmlcs`, `qualWeb`, and `testaro`), only the specified tests are performed. Other tools (`aslint`, `ed11y`, `ibm`, `nuVal`, and `wave`) do not allow such a limitation, so, for those tools, all tests are performed but results are reported from only the specified tests.
+When you include a `rules` property, you limit the tests of the tool that are performed or reported. For some tools (`alfa`, `axe`, `htmlcs`, `qualWeb`, `testaro`, and `wax`), only the specified tests are performed. Other tools (`aslint`, `ed11y`, `ibm`, `nuVal`, and `wave`) do not allow such a limitation, so, for those tools, all tests are performed but results are reported from only the specified tests.
 
 The `nuVal`, `qualWeb`, and `testaro` tools require specific formats for the `rules` property. Those formats are described below in the sections about those tools.
 
@@ -358,7 +336,7 @@ An example of a `test` act is:
 }
 ```
 
-Most tools allow you to decide which of their rules to apply. In effect, this means deciding which of their tests to run, since each test is considered a test of some rule. The act example given above,
+Most tools allow you to decide which of their rules to apply. In effect, this means deciding which of their tests to run, since each test is considered a test of some rule. The act example
 
 ```javaScript
 {
@@ -536,7 +514,7 @@ You can add custom rules to the rules of any tool. Testaro provides a template, 
 
 #### WallyAX
 
-If a `wax` test act is included in the job, an environment variable named `WAX_KEY` must exist, with your WallyAX API key as its value. You can get it from [WallyAX](mailto:technology@wallyax.com).
+If a `wax` test act is included in the job, an environment variable named `WAX_KEY` must exist, with your WallyAX API key as its value. You can request it from [WallyAX](mailto:technology@wallyax.com).
 
 The `wax` tool imposes a limit on the size of a page to be tested. If the page exceeds the limit, Testaro treats the page as preventing `wax` from performing its tests. The limit is less than 500,000 characters.
 
@@ -629,8 +607,7 @@ Testaro also generates some data about the job and adds those data to the job, i
 ### Contents
 
 A report discloses:
-- raw results of tests conducted by tools
-- standardized results of tests conducted by tools
+- results of tests conducted by tools
 - process data, including statistics on:
     - latency (how long a time each tool takes to run its tests)
     - test prevention (the failure of tools to run on particular targets)
@@ -654,6 +631,8 @@ The standard result includes three properties:
 - `prevented`: a boolean (`true` or `false`) value, stating whether the page prevented the tool from performing its tests.
 - `totals`: an array of numbers representing how many instances of rule violations at each level of severity the tool reported. There are 4 ordinal severity levels. For example, the array `[3, 0, 14, 10]` would report that there were 3 violations at level 0, 0 at level 1, 14 at level 2, and 10 at level 3.
 - `instances`: an array of objects describing the rule violations. An instance can describe a single violation, usually by one element in the page, or can summarize multiple violations of the same rule.
+
+If the value of `prevented` is `true`, the standard result also includes an `error` property describing the reason for the failure.
 
 ##### Instances
 
@@ -686,6 +665,7 @@ The element has no `id` attribute to distinguish it from other `button` elements
 - `xpath`: Alfa, ASLint, Equal Access
 - `box` (coordinates, width, and height of the element box): Editoria11y, Testaro
 - none: HTML CodeSniffer
+
 The tool also reproduces an excerpt of the element code.
 
 ##### Element identification

@@ -88,10 +88,11 @@ const timeLimits = {
 
 // Facts about the current session.
 let actCount = 0;
-// Facts about the current browser.
+// Facts about the current act.
+let actIndex = 0;
 let browser;
 let browserContext;
-let currentPage;
+let page;
 let requestedURL = '';
 
 // FUNCTIONS
@@ -192,6 +193,7 @@ const browserClose = async () => {
 };
 // Launches a browser, navigates to a URL, and returns browser data.
 const launch = async (report, debug, waits, tempBrowserID, tempURL) => {
+  const act = report.acts[actIndex];
   const {device} = report;
   const deviceID = device && device.id;
   const browserID = tempBrowserID || report.browserID || '';
@@ -211,128 +213,124 @@ const launch = async (report, debug, waits, tempBrowserID, tempURL) => {
     };
     browserOptions.headless = ! debug;
     browserOptions.slowMo = waits || 0;
-    // Launch the browser.
-    browser = await browserType.launch(browserOptions)
-    // If the launch failed:
-    .catch(async error => {
-      console.log(`ERROR launching browser (${error.message.slice(0, 200)})`);
-      // Return this.
-      return {
-        success: false,
-        error: 'Browser launch failed'
-      };
-    });
-    // Open a context (i.e. browser window).
-    const browserContext = await browser.newContext(device.windowOptions);
-    // Prevent default timeouts.
-    browserContext.setDefaultTimeout(0);
-    // When a page (i.e. browser tab) is added to the browser context (i.e. browser window):
-    browserContext.on('page', async page => {
-      // Ensure the report has a jobData property.
-      report.jobData ??= {};
-      const {jobData} = report;
-      jobData.logCount ??= 0;
-      jobData.logSize ??= 0;
-      jobData.errorLogCount ??= 0;
-      // Add any error events to the count of logging errors.
-      page.on('crash', () => {
-        jobData.errorLogCount++;
-        console.log('Page crashed');
-      });
-      page.on('pageerror', () => {
-        jobData.errorLogCount++;
-      });
-      page.on('requestfailed', () => {
-        jobData.errorLogCount++;
-      });
-      // If the page emits a message:
-      page.on('console', msg => {
-        const msgText = msg.text();
-        let indentedMsg = '';
-        // If debugging is on:
-        if (debug) {
-          // Log a summary of the message on the console.
-          const parts = [msgText.slice(0, 75)];
-          if (msgText.length > 75) {
-            parts.push(msgText.slice(75, 150));
-            if (msgText.length > 150) {
-              const tail = msgText.slice(150).slice(-150);
-              if (msgText.length > 300) {
-                parts.push('...');
-              }
-              parts.push(tail.slice(0, 75));
-              if (tail.length > 75) {
-                parts.push(tail.slice(75));
+    try {
+      // Replace the browser with a new one.
+      browser = await browserType.launch(browserOptions);
+      // Open a context (i.e. browser window).
+      const browserContext = await browser.newContext(device.windowOptions);
+      // Prevent default timeouts.
+      browserContext.setDefaultTimeout(0);
+      // When a page (i.e. browser tab) is added to the browser context (i.e. browser window):
+      browserContext.on('page', async page => {
+        // Ensure the report has a jobData property.
+        report.jobData ??= {};
+        const {jobData} = report;
+        jobData.logCount ??= 0;
+        jobData.logSize ??= 0;
+        jobData.errorLogCount ??= 0;
+        // Add any error events to the count of logging errors.
+        page.on('crash', () => {
+          jobData.errorLogCount++;
+          console.log('Page crashed');
+        });
+        page.on('pageerror', () => {
+          jobData.errorLogCount++;
+        });
+        page.on('requestfailed', () => {
+          jobData.errorLogCount++;
+        });
+        // If the page emits a message:
+        page.on('console', msg => {
+          const msgText = msg.text();
+          let indentedMsg = '';
+          // If debugging is on:
+          if (debug) {
+            // Log a summary of the message on the console.
+            const parts = [msgText.slice(0, 75)];
+            if (msgText.length > 75) {
+              parts.push(msgText.slice(75, 150));
+              if (msgText.length > 150) {
+                const tail = msgText.slice(150).slice(-150);
+                if (msgText.length > 300) {
+                  parts.push('...');
+                }
+                parts.push(tail.slice(0, 75));
+                if (tail.length > 75) {
+                  parts.push(tail.slice(75));
+                }
               }
             }
+            indentedMsg = parts.map(part => `    | ${part}`).join('\n');
+            console.log(`\n${indentedMsg}`);
           }
-          indentedMsg = parts.map(part => `    | ${part}`).join('\n');
-          console.log(`\n${indentedMsg}`);
-        }
-        // Add statistics on the message to the report.
-        const msgTextLC = msgText.toLowerCase();
-        const msgLength = msgText.length;
-        jobData.logCount++;
-        jobData.logSize += msgLength;
-        if (errorWords.some(word => msgTextLC.includes(word))) {
-          jobData.errorLogCount++;
-          jobData.errorLogSize += msgLength;
-        }
-        const msgLC = msgText.toLowerCase();
-        if (
-          msgText.includes('403') && (msgLC.includes('status')
-          || msgLC.includes('prohibited'))
-        ) {
-          jobData.prohibitedCount++;
-        }
+          // Add statistics on the message to the report.
+          const msgTextLC = msgText.toLowerCase();
+          const msgLength = msgText.length;
+          jobData.logCount++;
+          jobData.logSize += msgLength;
+          if (errorWords.some(word => msgTextLC.includes(word))) {
+            jobData.errorLogCount++;
+            jobData.errorLogSize += msgLength;
+          }
+          const msgLC = msgText.toLowerCase();
+          if (
+            msgText.includes('403') && (msgLC.includes('status')
+            || msgLC.includes('prohibited'))
+          ) {
+            jobData.prohibitedCount++;
+          }
+        });
       });
-    });
-    // Open the first page (tab) of the context (window).
-    const page = await browserContext.newPage();
-    try {
+      // Replace the page with the first page (tab) of the context (window).
+      page = await browserContext.newPage();
       // Wait until it is stable.
       await page.waitForLoadState('domcontentloaded', {timeout: 5000});
       // Navigate to the specified URL.
       const navResult = await goTo(report, page, url, 15000, 'domcontentloaded');
       // If the navigation succeeded:
       if (navResult.success) {
+        // Get the target page.
+        page = navResult.page;
         // Update the name of the current browser type and store it in the page.
         page.browserID = browserID;
-        // Return the response of the target server, the browser context, and the page.
-        return {
-          success: true,
-          response: navResult.response,
-          browserContext,
-          page
-        };
+        // Add the actual URL to the act.
+        act.actualURL = page.url();
+        // Get the response of the target server.
+        const {response} = navResult;
+        // Add the script nonce, if any, to the act.
+        const scriptNonce = await getNonce(response);
+        if (scriptNonce) {
+          report.jobData.lastScriptNonce = scriptNonce;
+        }
       }
-      // Otherwise, if the navigation failed:
+      // Otherwise, i.e. if the launch or navigation failed:
       else {
-        // Return the error.
-        return {
-          success: false,
-          error: navResult.error
-        };
+        // Report this and abort the job.
+        actIndex = await addError(
+          true, true, report, actIndex, `ERROR: Launch failed (${navResult.error})`
+        );
+        page = null;
       }
     }
-    // If it fails to become stable after load:
+    // If an error occurred:
     catch(error) {
-      // Return this.
-      console.log(`ERROR: Blank page load in new tab timed out (${error.message})`);
-      return {
-        success: false,
-        error: 'Blank page load in new tab timed out'
-      };
-    }
+      // Report this and abort the job.
+      actIndex = await addError(
+        true, true, report, actIndex, `ERROR launching or navigating ${error.message}`
+      );
+      page = null;
+    };
   }
   // Otherwise, i.e. if the browser or device ID is invalid:
   else {
-    // Return this.
-    console.log(`ERROR: Browser ${browserID}, device ${deviceID}, or URL ${url} invalid`);
-    return {
-      success: false,
-      error: `${browserID} browser launch with ${deviceID} device and navigation to ${url} failed`
-    };
+    // Report this and abort the job.
+    actIndex = await addError(
+      true,
+      true,
+      report,
+      actIndex,
+      `ERROR: Browser ${browserID}, device ${deviceID}, or URL ${url} invalid`
+    );
   }
 };
 // Returns a string representing the date and time.
@@ -544,7 +542,7 @@ const addError = async(alsoLog, alsoAbort, report, actIndex, message) => {
   }
 };
 // Recursively performs the acts in a report.
-const doActs = async (report, actIndex, page) => {
+const doActs = async (report, actIndex) => {
   const {acts} = report;
   // If any more acts are to be performed:
   if (actIndex > -1 && actIndex < acts.length) {
@@ -606,34 +604,19 @@ const doActs = async (report, actIndex, page) => {
     }
     // Otherwise, if the act is a launch:
     else if (type === 'launch') {
-      // Launch the specified browser on the specified device and navigate to the specified URL.
-      const launchResult = await launch(
+      // Launch a browser, navigate to a page, and add the result to the act.
+      await launch(
         report,
         debug,
         waits,
         act.browserID || report.browserID || '',
-        act.url || report.target && report.target.url || ''
+        act.target && act.target.url || report.target && report.target.url || ''
       );
-      // If the launch and navigation succeeded:
-      if (launchResult && launchResult.success) {
-        // Get the response of the target server.
-        const {response} = launchResult;
-        // Get the target page.
-        page = launchResult.page;
-        // Add the actual URL to the act.
-        act.actualURL = page.url();
-        // Add the script nonce, if any, to the act.
-        const scriptNonce = await getNonce(response);
-        if (scriptNonce) {
-          report.jobData.lastScriptNonce = scriptNonce;
-        }
-      }
-      // Otherwise, i.e. if the launch or navigation failed:
-      else {
-        // Add an error result to the act and abort the job.
-        actIndex = await addError(
-          true, true, report, actIndex, `ERROR: Launch failed (${launchResult.error})`
-        );
+      // If this failed:
+      if (page.prevented) {
+        // Add this to the act.
+        act.prevented = true;
+        act.error = page.error || '';
       }
     }
     // Otherwise, if a current page exists:
@@ -814,16 +797,30 @@ const doActs = async (report, actIndex, page) => {
           try {
             // Get the time limit in seconds for the act.
             const timeLimit = timeLimits[act.which] || 15;
-            // Perform the specified tests of the tool.
-            const actReport = await require(`./tests/${act.which}`)
-            .reporter(page, report, actIndex, timeLimit);
-            // Add the data and result to the act.
-            act.data = actReport.data;
-            act.result = actReport.result;
-            // If the tool reported that the page prevented testing:
-            if (actReport.data.prevented) {
-              // Add prevention data to the job data.
-              report.jobData.preventions[act.which] = act.data.error;
+            // If a new browser is to be launched:
+            if (act.launch) {
+              // Launch it, navigate to a URL, and replace the page.
+              await launch(
+                report,
+                debug,
+                waits,
+                act.launch.browserID || report.browserID,
+                act.launch.target && act.launch.target.url || report.target.url
+              );
+            }
+            // If the page has not prevented the tool from testing:
+            if (! page.prevented) {
+              // Perform the specified tests of the tool.
+              const actReport = await require(`./tests/${act.which}`)
+              .reporter(page, report, actIndex, timeLimit);
+              // Add the data and result to the act.
+              act.data = actReport.data;
+              act.result = actReport.result;
+              // If the tool reported that the page prevented testing:
+              if (actReport.data.prevented) {
+                // Add prevention data to the job data.
+                report.jobData.preventions[act.which] = act.data.error;
+              }
             }
           }
           // If the tool invocation failed:
@@ -995,8 +992,7 @@ const doActs = async (report, actIndex, page) => {
                   console.log(`ERROR: Network busy after ${move} (${errorStart(error)})`);
                   act.result.idleTimely = false;
                 }
-                // If the move created a new page, make it current.
-                page = currentPage;
+                // Add the page URL to the result.
                 act.result.newURL = page.url();
               }
             };

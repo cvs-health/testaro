@@ -647,7 +647,7 @@ const convert = (toolName, data, result, standardResult) => {
       // Get its standard instance properties.
       const element = violation.element.replace(/\s+/g, ' ');
       const {message, description, severity} = violation;
-      const ordinalSeverity = ['Minor', 'Moderate', 'Major', 'Severe', 'Critical'].indexOf(severity);
+      const ordinalSeverity = ['Minor', 'Moderate', '', 'Severe'].indexOf(severity);
       const tagNameCandidate = element.replace(/^<| .*$/g, '');
       const tagName = /^[a-zA-Z0-9]+$/.test(tagNameCandidate) ? tagNameCandidate.toUpperCase() : '';
       let id = '';

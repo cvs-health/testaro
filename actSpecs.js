@@ -54,7 +54,7 @@ exports.actSpecs = {
     launch: [
       'Launch a Playwright browser',
       {
-        target: [false, 'object', '', 'target different from sources.target of the job'],
+        target: [false, 'object', '', 'target different from target of the job'],
         browserID: [false, 'string', 'isBrowserID', 'browser type different from browserID of the job'],
         what: [false, 'string', 'hasLength', 'comment']
       }
@@ -144,6 +144,7 @@ exports.actSpecs = {
       'Perform tests of a tool',
       {
         which: [true, 'string', 'isTest', 'tool name'],
+        launch: [false, 'object', '', 'if new browser to be launched, properties different from target, browserID, and what of the job'],
         rules: [false, 'array', 'areStrings', 'rule IDs or (for nuVal) specifications, if not all']
       }
     ],
