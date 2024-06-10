@@ -289,8 +289,6 @@ const launch = async (report, debug, waits, tempBrowserID, tempURL) => {
       const navResult = await goTo(report, page, url, 15000, 'domcontentloaded');
       // If the navigation succeeded:
       if (navResult.success) {
-        // Get the target page.
-        page = navResult.page;
         // Update the name of the current browser type and store it in the page.
         page.browserID = browserID;
         // Add the actual URL to the act.
@@ -619,6 +617,106 @@ const doActs = async (report, actIndex) => {
         act.error = page.error || '';
       }
     }
+    // Otherwise, if the act performs tests of a tool:
+    else if (act.type === 'test') {
+      // Add a description of the tool to the act.
+      act.what = tools[act.which];
+      // Get the start time of the act.
+      const startTime = Date.now();
+      try {
+        // Get the time limit in seconds for the act.
+        const timeLimit = timeLimits[act.which] || 15;
+        // If a new browser is to be launched:
+        if (act.launch) {
+          // Launch it, navigate to a URL, and replace the page.
+          await launch(
+            report,
+            debug,
+            waits,
+            act.launch.browserID || report.browserID,
+            act.launch.target && act.launch.target.url || report.target.url
+          );
+        }
+        // If the page has not prevented the tool from testing:
+        if (! page.prevented) {
+          // Perform the specified tests of the tool.
+          const actReport = await require(`./tests/${act.which}`)
+          .reporter(page, report, actIndex, timeLimit);
+          // Add the data and result to the act.
+          act.data = actReport.data;
+          act.result = actReport.result;
+          // If the tool reported that the page prevented testing:
+          if (actReport.data.prevented) {
+            // Add prevention data to the job data.
+            report.jobData.preventions[act.which] = act.data.error;
+          }
+        }
+      }
+      // If the tool invocation failed:
+      catch(error) {
+        // Report the failure.
+        const message = error.message.slice(0, 400);
+        console.log(`ERROR: Test act ${act.which} failed (${message})`);
+        act.data.prevented = true;
+        act.data.error = act.data.error ? `${act.data.error}; ${message}` : message;
+      }
+      // Add the elapsed time of the tool to the report.
+      const time = Math.round((Date.now() - startTime) / 1000);
+      const {toolTimes} = report.jobData;
+      if (! toolTimes[act.which]) {
+        toolTimes[act.which] = 0;
+      }
+      toolTimes[act.which] += time;
+      const standard = report.standard || 'only';
+      // If the act was not prevented and standardization is required:
+      if (! act.data.prevented && ['also', 'only'].includes(standard)) {
+        // Initialize the standard result.
+        act.standardResult = {
+          totals: [0, 0, 0, 0],
+          instances: []
+        };
+        // Populate it.
+        standardize(act);
+        // Add a box ID and a path ID to each of its standard instances if missing.
+        for (const instance of act.standardResult.instances) {
+          const elementID = await identify(instance, page);
+          if (! instance.boxID) {
+            instance.boxID = elementID ? elementID.boxID : '';
+          }
+          if (! instance.pathID) {
+            instance.pathID = elementID ? elementID.pathID : '';
+          }
+        };
+        // If the original-format result is not to be included in the report:
+        if (standard === 'only') {
+          // Remove it.
+          delete act.result;
+        }
+      }
+      const expectations = act.expect;
+      // If the act was not prevented and has expectations:
+      if (! act.data.prevented && expectations) {
+        // Initialize whether they were fulfilled.
+        act.expectations = [];
+        let failureCount = 0;
+        // For each expectation:
+        expectations.forEach(spec => {
+          // Add the its result to the act.
+          const truth = isTrue(act, spec);
+          act.expectations.push({
+            property: spec[0],
+            relation: spec[1],
+            criterion: spec[2],
+            actual: truth[0],
+            passed: truth[1]
+          });
+          if (! truth[1]) {
+            failureCount++;
+          }
+        });
+        act.expectationFailures = failureCount;
+      }
+    }
     // Otherwise, if a current page exists:
     else if (page) {
       // If the act is navigation to a url:
@@ -787,105 +885,6 @@ const doActs = async (report, actIndex) => {
               success: false
             };
           });
-        }
-        // Otherwise, if the act performs tests of a tool:
-        else if (act.type === 'test') {
-          // Add a description of the tool to the act.
-          act.what = tools[act.which];
-          // Get the start time of the act.
-          const startTime = Date.now();
-          try {
-            // Get the time limit in seconds for the act.
-            const timeLimit = timeLimits[act.which] || 15;
-            // If a new browser is to be launched:
-            if (act.launch) {
-              // Launch it, navigate to a URL, and replace the page.
-              await launch(
-                report,
-                debug,
-                waits,
-                act.launch.browserID || report.browserID,
-                act.launch.target && act.launch.target.url || report.target.url
-              );
-            }
-            // If the page has not prevented the tool from testing:
-            if (! page.prevented) {
-              // Perform the specified tests of the tool.
-              const actReport = await require(`./tests/${act.which}`)
-              .reporter(page, report, actIndex, timeLimit);
-              // Add the data and result to the act.
-              act.data = actReport.data;
-              act.result = actReport.result;
-              // If the tool reported that the page prevented testing:
-              if (actReport.data.prevented) {
-                // Add prevention data to the job data.
-                report.jobData.preventions[act.which] = act.data.error;
-              }
-            }
-          }
-          // If the tool invocation failed:
-          catch(error) {
-            // Report the failure.
-            const message = error.message.slice(0, 400);
-            console.log(`ERROR: Test act ${act.which} failed (${message})`);
-            act.data.prevented = true;
-            act.data.error = act.data.error ? `${act.data.error}; ${message}` : message;
-          }
-          // Add the elapsed time of the tool to the report.
-          const time = Math.round((Date.now() - startTime) / 1000);
-          const {toolTimes} = report.jobData;
-          if (! toolTimes[act.which]) {
-            toolTimes[act.which] = 0;
-          }
-          toolTimes[act.which] += time;
-          // If the act was not prevented and standardization is required:
-          const standard = report.standard || 'only';
-          if (! act.data.prevented && ['also', 'only'].includes(standard)) {
-            // Initialize it.
-            act.standardResult = {
-              totals: [0, 0, 0, 0],
-              instances: []
-            };
-            // Populate it.
-            standardize(act);
-            // Add a box ID and a path ID to each of its standard instances if missing.
-            for (const instance of act.standardResult.instances) {
-              const elementID = await identify(instance, page);
-              if (! instance.boxID) {
-                instance.boxID = elementID ? elementID.boxID : '';
-              }
-              if (! instance.pathID) {
-                instance.pathID = elementID ? elementID.pathID : '';
-              }
-            };
-            // If the original-format result is not to be included in the report:
-            if (standard === 'only') {
-              // Remove it.
-              delete act.result;
-            }
-          }
-          // If the act was not prevented and has expectations:
-          const expectations = act.expect;
-          if (! act.data.prevented && expectations) {
-            // Initialize whether they were fulfilled.
-            act.expectations = [];
-            let failureCount = 0;
-            // For each expectation:
-            expectations.forEach(spec => {
-              const truth = isTrue(act, spec);
-              act.expectations.push({
-                property: spec[0],
-                relation: spec[1],
-                criterion: spec[2],
-                actual: truth[0],
-                passed: truth[1]
-              });
-              if (! truth[1]) {
-                failureCount++;
-              }
-            });
-            act.expectationFailures = failureCount;
-          }
         }
         // Otherwise, if the act is a move:
         else if (moves[act.type]) {
@@ -1333,7 +1332,7 @@ const doActs = async (report, actIndex) => {
     }
     act.endTime = Date.now();
     // Perform any remaining acts if not aborted.
-    await doActs(report, actIndex + 1, page);
+    await doActs(report, actIndex + 1);
   }
   // Otherwise, if all acts have been performed and the job succeeded:
   else if (! report.jobData.abortTime) {

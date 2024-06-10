@@ -207,9 +207,6 @@ exports.isValidJob = job => {
     if (typeof strict !== 'boolean') {
       return 'Bad job strict';
     }
-    if (typeof isolate !== 'boolean') {
-      return 'Bad job isolate';
-    }
     if (! ['also', 'only', 'no'].includes(standard)) {
       return 'Bad job standard';
     }
@@ -247,9 +244,8 @@ exports.isValidJob = job => {
     if (
       ! acts
       || ! Array.isArray(acts)
-      || acts.length < 2
+      || ! acts.length
       || ! acts.every(act => act.type && typeof act.type === 'string')
-      || acts[0].type !== 'launch'
     ) {
       return 'Bad job acts';
     }

@@ -677,8 +677,6 @@ const convert = (toolName, data, result, standardResult) => {
         location,
         excerpt: element
       };
-      // Add its ordinal severity to the standard result totals.
-      standardResult.totals[ordinalSeverity]++;
       // Add the instance to the standard result.
       standardResult.instances.push(instance);
     });
