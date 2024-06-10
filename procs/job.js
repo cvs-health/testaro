@@ -187,7 +187,6 @@ exports.isValidJob = job => {
     const {
       id,
       strict,
-      isolate,
       standard,
       observe,
       device,
