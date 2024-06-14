@@ -120,33 +120,43 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
       }
     }
     else {
+      qualWebOptions['best-practices'] = {};
       qualWebOptions.execute.bp = true;
     }
     // Get the report.
     let actReports = await doBy(timeLimit, qualWeb, 'evaluate', [qualWebOptions], 'qualWeb testing');
     // If the testing finished on time:
     if (actReports !== 'timedOut') {
-      // Remove the copy of the DOM from it.
       result = actReports[withNewContent ? qualWebOptions.url : 'customHtml'];
+      // If it contains a copy of the DOM:
       if (result && result.system && result.system.page && result.system.page.dom) {
+        // Delete the copy.
         delete result.system.page.dom;
-        // For each test section of the act report:
         const {modules} = result;
+        // If the report contains a modules property:
         if (modules) {
+          // For each test section in it:
           for (const section of ['act-rules', 'wcag-techniques', 'best-practices']) {
+            // If testing in the section was specified:
             if (qualWebOptions[section]) {
+              // If the section exists:
               if (modules[section]) {
                 const {assertions} = modules[section];
+                // If it contains assertions (test results):
                 if (assertions) {
                   const ruleIDs = Object.keys(assertions);
+                  // For each rule:
                   ruleIDs.forEach(ruleID => {
-                    // Remove passing results.
                     const ruleAssertions = assertions[ruleID];
                     const {metadata} = ruleAssertions;
+                    // If result data exist for the rule:
                     if (metadata) {
+                      // If there were no warnings or failures:
                       if (metadata.warning === 0 && metadata.failed === 0) {
+                        // Delete the rule data.
                         delete assertions[ruleID];
                       }
+                      // Otherwise, i.e. if there was at least 1 warning or failure:
                       else {
                         if (ruleAssertions.results) {
                           ruleAssertions.results = ruleAssertions.results.filter(
@@ -192,7 +202,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
       }
       // Stop the QualWeb core engine.
       await qualWeb.stop();
-      // Return the result.
+      // Test whether the result is an object.
       try {
         JSON.stringify(result);
       }
