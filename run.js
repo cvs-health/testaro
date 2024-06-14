@@ -659,7 +659,7 @@ const doActs = async (report, actIndex) => {
         console.log(`ERROR: Test act ${act.which} failed (${message})`);
         act.data.prevented = true;
         act.data.error = act.data.error ? `${act.data.error}; ${message}` : message;
-      }
+      };
       // Add the elapsed time of the tool to the report.
       const time = Math.round((Date.now() - startTime) / 1000);
       const {toolTimes} = report.jobData;

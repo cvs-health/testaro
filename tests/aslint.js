@@ -91,7 +91,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
       console.log(message);
       data.prevented = true;
       data.error = `${message} (${error.message})`;
-    }
+    };
   }
   // If the injection and the result attachment both succeeded:
   if (! data.prevented) {
@@ -133,7 +133,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
       prevented: true,
       error: message
     };
-  }
+  };
   return {
     data,
     result

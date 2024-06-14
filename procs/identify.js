@@ -28,7 +28,11 @@
 // IMPORTS
 
 // Module to get the XPath of an element.
-const {xPath} = require('playwright-dompath');
+const getPath = {
+  xPath: require('playwright-dompath').xPath
+};
+// Utility module.
+const {doBy} = require('./job');
 
 // FUNCTIONS
 
@@ -79,7 +83,10 @@ const addIDs = async (locators, recipient) => {
     }
     // Add the path ID of the element to the result if none exists yet.
     if (! recipient.pathID) {
-      recipient.pathID = await xPath(locators);
+      const pathID = await doBy(1, getPath, 'xPath', [locators], 'xPath identification');
+      if (pathID !== 'timedOut') {
+        recipient.pathID = pathID;
+      }
     }
   }
 };
