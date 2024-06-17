@@ -49,7 +49,7 @@ const getIdentifiers = code => {
   // If the substring includes the start tag of an element:
   if (code && typeof code === 'string' && code.length && /<\s*[a-zA-Z]/.test(code)) {
     // Get the first start tag in the substring.
-    const startTag = code.replace(/^.*?<(?=[a-zA-Z])/s, '').replace(/[^a-zA-Z].*$/gs, '').trim();
+    const startTag = code.replace(/^.*?<(?=[a-zA-Z])/s, '').replace(/[^a-zA-Z0-9].*$/s, '').trim();
     // If it exists:
     if (startTag && startTag.length) {
       // Get its tag name, upper-cased.
