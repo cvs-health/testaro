@@ -205,7 +205,10 @@ exports.actSpecs = {
     wave: [
       'Perform WAVE tests',
       {
-        reportType: [true, 'number', '', 'WAVE report type (1, 2, 3, or 4)']
+        reportType: [true, 'number', '', 'WAVE report type (1, 2, 3, or 4)'],
+        url: [false, 'isURL', '', 'URL of stand-alone WAVE API'],
+        prescript: [false, 'string', '', 'content of pre-load script, if any'],
+        postscript: [false, 'string', '', 'content of post-load script, if any']
       }
     ]
   }

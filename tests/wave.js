@@ -23,8 +23,7 @@
 /*
   wave
   This test implements the WebAIM WAVE ruleset for accessibility. The 'reportType' argument
-  specifies a WAVE report type: 1, 2, 3, or 4. The larger the number, the more detailed (and
-  expensive) the report.
+  specifies a WAVE report type: 1, 2, 3, or 4.
 */
 
 // CONSTANTS
@@ -37,8 +36,27 @@ const https = require('https');
 // Conducts and reports the WAVE tests.
 exports.reporter = async (page, report, actIndex) => {
   const act = report.acts[actIndex];
-  const {reportType, rules} = act;
+  const {reportType, url, prescript, postscript, rules} = act;
   const waveKey = process.env.WAVE_KEY;
+  const waveKeyParam = waveKey ? `key=${waveKey}&` : '';
+  let host = 'wave.webaim.org';
+  let scheme = 'https';
+  if (url && url.startsWith('http')) {
+    if (url.startsWith('http://')) {
+      scheme = 'http';
+    }
+    host = url.replace(/^https?:\/\//, '');
+  }
+  let prescriptParam = prescript ? `prescript=${prescript}&` : '';
+  let postscriptParam = postscript ? `postscript=${postscript}&` : '';
+  const path = [
+    '/api/request?',
+    waveKeyParam,
+    `url=${page.url()}`,
+    `reportType=${reportType}`,
+    prescriptParam,
+    postscriptParam
+  ].join('');
   // Initialize the results.
   const data = {};
   let result = {};
@@ -47,8 +65,8 @@ exports.reporter = async (page, report, actIndex) => {
       // Get the test results.
       https.get(
         {
-          host: 'wave.webaim.org',
-          path: `/api/request?key=${waveKey}&url=${page.url()}&reporttype=${reportType}`
+          host,
+          path
         },
         response => {
           let rawReport = '';
