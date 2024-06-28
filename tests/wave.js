@@ -38,7 +38,7 @@ exports.reporter = async (page, report, actIndex) => {
   const act = report.acts[actIndex];
   const {reportType, url, prescript, postscript, rules} = act;
   const waveKey = process.env.WAVE_KEY;
-  const waveKeyParam = waveKey ? `key=${waveKey}&` : '';
+  const waveKeyParam = waveKey ? `key=${waveKey}` : '';
   let host = 'wave.webaim.org';
   let scheme = 'https';
   if (url && url.startsWith('http')) {
@@ -47,22 +47,26 @@ exports.reporter = async (page, report, actIndex) => {
     }
     host = url.replace(/^https?:\/\//, '');
   }
-  let prescriptParam = prescript ? `prescript=${prescript}&` : '';
+  let prescriptParam = prescript ? `prescript=${prescript}` : '';
   let postscriptParam = postscript ? `postscript=${postscript}` : '';
-  const path = [
-    '/api/request?',
+  const wavePath = '/api/request';
+  const queryParams = [
     waveKeyParam,
-    `url=${page.url()}&`,
-    `reportType=${reportType}&`,
+    `url=${page.url()}`,
+    `reportType=${reportType}`,
     prescriptParam,
     postscriptParam
-  ].join('');
+  ];
+  const query = queryParams.filter(param => param).join('&');
+  const path = [wavePath, query].join('?');
   // Initialize the results.
   const data = {};
   let result = {};
   try {
     result = await new Promise(resolve => {
       // Get the test results.
+      console.log(`host is ${host}`);
+      console.log(`path is ${path}`);
       https.get(
         {
           host,
@@ -75,6 +79,7 @@ exports.reporter = async (page, report, actIndex) => {
           });
           // When they arrive:
           response.on('end', async () => {
+            console.log(`rawReport is:\n${rawReport}`);
             // Delete unnecessary properties.
             try {
               const actResult = JSON.parse(rawReport);
@@ -92,6 +97,7 @@ exports.reporter = async (page, report, actIndex) => {
                     && categories[category].items
                     && Object.keys(categories[category].items).length
                   ) {
+                    console.log('Violations reported');
                     // For each rule violated:
                     Object.keys(categories[category].items).forEach(ruleID => {
                       // If it was not a specified rule:
@@ -106,10 +112,15 @@ exports.reporter = async (page, report, actIndex) => {
                 });
               }
               // Add WCAG information from the WAVE documentation.
+              console.log('f');
               const waveDocJSON = await fs.readFile('procs/wavedoc.json');
               const waveDoc = JSON.parse(waveDocJSON);
+              console.log('g');
+              console.log(`categories: ${JSON.stringify(categories)}`);
               Object.keys(categories).forEach(categoryName => {
+                console.log(categoryName);
                 const category = categories[categoryName];
+                console.log(category);
                 const {items} = category;
                 Object.keys(items).forEach(issueName => {
                   const issueDoc = waveDoc.find((issue => issue.name === issueName));
@@ -117,6 +128,7 @@ exports.reporter = async (page, report, actIndex) => {
                   items[issueName].wcag = guidelines;
                 });
               });
+              console.log('h');
               // Add important data to the result.
               if (statistics) {
                 data.pageTitle = statistics.pagetitle || '';
@@ -126,6 +138,7 @@ exports.reporter = async (page, report, actIndex) => {
                 data.allItemCount = statistics.allitemcount || null;
                 data.totalElements = statistics.totalelements || null;
               }
+              console.log('i');
               // Return the result.
               resolve(actResult);
             }
