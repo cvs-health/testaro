@@ -37,6 +37,7 @@ const https = require('https');
 exports.reporter = async (page, report, actIndex) => {
   const act = report.acts[actIndex];
   const {reportType, url, prescript, postscript, rules} = act;
+  console.log(`reportType is ${reportType}`);
   const waveKey = process.env.WAVE_KEY;
   const waveKeyParam = waveKey ? `key=${waveKey}` : '';
   let host = 'wave.webaim.org';
@@ -87,6 +88,8 @@ exports.reporter = async (page, report, actIndex) => {
               delete categories.feature;
               delete categories.structure;
               delete categories.aria;
+              console.log('e');
+              console.log(JSON.stringify(categories, null, 2));
               // If rules were specified:
               if (rules && rules.length) {
                 // For each WAVE rule category:
@@ -122,13 +125,18 @@ exports.reporter = async (page, report, actIndex) => {
                 const category = categories[categoryName];
                 console.log(category);
                 const {items} = category;
+                console.log('h')
+                console.log(Object.keys(items));
+                console.log('i')
                 Object.keys(items).forEach(issueName => {
+                  console.log(issueName);
                   const issueDoc = waveDoc.find((issue => issue.name === issueName));
                   const {guidelines} = issueDoc;
                   items[issueName].wcag = guidelines;
                 });
+                console.log('j')
               });
-              console.log('h');
+              console.log('k');
               // Add important data to the result.
               if (statistics) {
                 data.pageTitle = statistics.pagetitle || '';
