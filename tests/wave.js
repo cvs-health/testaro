@@ -48,12 +48,12 @@ exports.reporter = async (page, report, actIndex) => {
     host = url.replace(/^https?:\/\//, '');
   }
   let prescriptParam = prescript ? `prescript=${prescript}&` : '';
-  let postscriptParam = postscript ? `postscript=${postscript}&` : '';
+  let postscriptParam = postscript ? `postscript=${postscript}` : '';
   const path = [
     '/api/request?',
     waveKeyParam,
-    `url=${page.url()}`,
-    `reportType=${reportType}`,
+    `url=${page.url()}&`,
+    `reportType=${reportType}&`,
     prescriptParam,
     postscriptParam
   ].join('');
