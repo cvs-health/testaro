@@ -37,7 +37,6 @@ const https = require('https');
 exports.reporter = async (page, report, actIndex) => {
   const act = report.acts[actIndex];
   const {reportType, url, prescript, postscript, rules} = act;
-  console.log(`reportType is ${reportType}`);
   const waveKey = process.env.WAVE_KEY;
   const waveKeyParam = waveKey ? `key=${waveKey}` : '';
   let host = 'wave.webaim.org';
@@ -54,7 +53,7 @@ exports.reporter = async (page, report, actIndex) => {
   const queryParams = [
     waveKeyParam,
     `url=${page.url()}`,
-    `reportType=${reportType}`,
+    `reporttype=${reportType}`,
     prescriptParam,
     postscriptParam
   ];
@@ -66,8 +65,6 @@ exports.reporter = async (page, report, actIndex) => {
   try {
     result = await new Promise(resolve => {
       // Get the test results.
-      console.log(`host is ${host}`);
-      console.log(`path is ${path}`);
       https.get(
         {
           host,
@@ -80,7 +77,6 @@ exports.reporter = async (page, report, actIndex) => {
           });
           // When they arrive:
           response.on('end', async () => {
-            console.log(`rawReport is:\n${rawReport}`);
             // Delete unnecessary properties.
             try {
               const actResult = JSON.parse(rawReport);
@@ -88,8 +84,6 @@ exports.reporter = async (page, report, actIndex) => {
               delete categories.feature;
               delete categories.structure;
               delete categories.aria;
-              console.log('e');
-              console.log(JSON.stringify(categories, null, 2));
               // If rules were specified:
               if (rules && rules.length) {
                 // For each WAVE rule category:
@@ -100,7 +94,6 @@ exports.reporter = async (page, report, actIndex) => {
                     && categories[category].items
                     && Object.keys(categories[category].items).length
                   ) {
-                    console.log('Violations reported');
                     // For each rule violated:
                     Object.keys(categories[category].items).forEach(ruleID => {
                       // If it was not a specified rule:
@@ -115,28 +108,17 @@ exports.reporter = async (page, report, actIndex) => {
                 });
               }
               // Add WCAG information from the WAVE documentation.
-              console.log('f');
               const waveDocJSON = await fs.readFile('procs/wavedoc.json');
               const waveDoc = JSON.parse(waveDocJSON);
-              console.log('g');
-              console.log(`categories: ${JSON.stringify(categories)}`);
               Object.keys(categories).forEach(categoryName => {
-                console.log(categoryName);
                 const category = categories[categoryName];
-                console.log(category);
                 const {items} = category;
-                console.log('h')
-                console.log(Object.keys(items));
-                console.log('i')
                 Object.keys(items).forEach(issueName => {
-                  console.log(issueName);
                   const issueDoc = waveDoc.find((issue => issue.name === issueName));
                   const {guidelines} = issueDoc;
                   items[issueName].wcag = guidelines;
                 });
-                console.log('j')
               });
-              console.log('k');
               // Add important data to the result.
               if (statistics) {
                 data.pageTitle = statistics.pagetitle || '';
@@ -146,13 +128,11 @@ exports.reporter = async (page, report, actIndex) => {
                 data.allItemCount = statistics.allitemcount || null;
                 data.totalElements = statistics.totalelements || null;
               }
-              console.log('i');
               // Return the result.
               resolve(actResult);
             }
             catch(error) {
               console.log(`ERROR parsing tool report: ${error.message}`);
-              console.log(`rawReport: ${rawReport}`);
               data.prevented = true;
               data.error = error.message;
               resolve(result);
