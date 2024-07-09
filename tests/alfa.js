@@ -27,9 +27,6 @@
 
 // IMPORTS
 
-const {Audit} = require('@siteimprove/alfa-act');
-const {Playwright} = require('@siteimprove/alfa-playwright');
-let alfaRules = require('@siteimprove/alfa-rules').default;
 const {doBy} = require('../procs/job');
 
 // FUNCTIONS
@@ -38,6 +35,8 @@ const {doBy} = require('../procs/job');
 exports.reporter = async (page, report, actIndex, timeLimit) => {
   const act = report.acts[actIndex];
   const {rules} = act;
+  const alfaRulesModule = await import('@siteimprove/alfa-rules');
+  const alfaRules = alfaRulesModule.default;
   // If only some rules are to be employed:
   if (rules && rules.length) {
     // Remove the other rules.
@@ -89,7 +88,11 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
     }
     // Test the page content with the specified rules.
     const doc = await page.evaluateHandle('document');
+    const alfaPlaywrightModule = await import('@siteimprove/alfa-playwright');
+    const {Playwright} = alfaPlaywrightModule;
     const alfaPage = await Playwright.toPage(doc);
+    const alfaActModule = await import('@siteimprove/alfa-act');
+    const {Audit} = alfaActModule;
     const audit = Audit.of(alfaPage, alfaRules);
     const outcomes = Array.from(await doBy(timeLimit, audit, 'evaluate', [], 'alfa testing'));
     // If the testing finished on time:
