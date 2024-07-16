@@ -657,6 +657,7 @@ const doActs = async (report, actIndex) => {
         // Report the failure.
         const message = error.message.slice(0, 400);
         console.log(`ERROR: Test act ${act.which} failed (${message})`);
+        act.data ??= {};
         act.data.prevented = true;
         act.data.error = act.data.error ? `${act.data.error}; ${message}` : message;
       };
