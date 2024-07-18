@@ -934,7 +934,12 @@ As of 12 February 2024, upon the transfer of the repository ownership to CVS Hea
 
 “Testaro” means “collection of tests” in Esperanto.
 
+
+## License
+
 /*
+  MIT License
+
   © 2021–2024 CVS Health and/or one of its affiliates. All rights reserved.
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
