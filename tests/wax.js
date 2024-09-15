@@ -55,7 +55,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
   const actReport = await doBy(
     timeLimit, waxDev, 'runWax', [pageCode, waxOptions], 'wax report retrieval'
   );
-  // If WAX failed:
+  // If WAX failed with a string report:
   if (typeof actReport === 'string') {
     // If the failure was a timeout:
     if (actReport === 'timedOut') {
@@ -69,6 +69,12 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
       data.prevented = true;
       data.error = actReport;
     }
+  }
+  // Otherwise, if it failed with an object report:
+  else if (typeof actReport === 'object' && actReport.responseCode === 500) {
+    // Report this.
+    data.prevented = true;
+    data.error = actReport.message || 'response status code 500';
   }
   // Otherwise, i.e. if WAX succeeded:
   else {
