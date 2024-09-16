@@ -34,8 +34,7 @@ const {doBy} = require('../procs/job');
 // FUNCTIONS
 
 // Conducts and reports the alfa tests.
-exports.reporter = async (page, report, actIndex, timeLimit) => {
-  const act = report.acts[actIndex];
+exports.reporter = async (page, act) => {
   const {rules} = act;
   const alfaRulesModule = await import('@siteimprove/alfa-rules');
   const alfaRules = alfaRulesModule.default;
@@ -62,9 +61,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
   };
   try {
     // Get the Alfa rules.
-    const response = await rulePage.goto(
-      'https://alfa.siteimprove.com/rules', {timeout: Math.round(1000 * timeLimit / 2)}
-    );
+    const response = await rulePage.goto('https://alfa.siteimprove.com/rules', {timeout: 10000});
     let ruleData = {};
     // If they were obtained:
     if (response.status() === 200) {
@@ -96,7 +93,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
     const alfaActModule = await import('@siteimprove/alfa-act');
     const {Audit} = alfaActModule;
     const audit = Audit.of(alfaPage, alfaRules);
-    const outcomes = Array.from(await doBy(timeLimit, audit, 'evaluate', [], 'alfa testing'));
+    const outcomes = Array.from(await doBy(10, audit, 'evaluate', [], 'alfa testing'));
     // If the testing finished on time:
     if (outcomes !== 'timedOut') {
       // For each failure or warning:
