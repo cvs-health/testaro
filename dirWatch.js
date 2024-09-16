@@ -92,7 +92,7 @@ const wait = ms => {
     }, ms);
   });
 };
-/* 
+/*
   Checks for a directory job and, when found, performs and reports it.
   Arguments:
   0. Whether to continue watching after a job is run.
@@ -122,7 +122,7 @@ exports.dirWatch = async (isForever, intervalInSeconds) => {
             report.observe = false;
             report.sendReportTo = '';
             const {id} = job;
-            console.log(`Directory job ${id} ready to do (${nowString()})`);
+            console.log(`\n\nDirectory job ${id} ready to do (${nowString()})`);
             // Perform it.
             await doJob(report);
             console.log(`Job ${id} finished (${nowString()})`);
