@@ -40,15 +40,13 @@ const waits = Number.parseInt(process.env.WAITS) || 0;
 
 // VARIABLES
 
-let page;
-
 const report = JSON.parse(process.argv[2]);
 const actIndex = process.argv[3].toString();
 const act = report.acts[actIndex];
 const {which} = act;
 
 const doAct = async () => {
-  // Launch a browser, navigate to the URL, and create a page.
+  // Launch a browser, navigate to the URL, and modify the page of the run module.
   await launch(
     report,
     debug,
@@ -56,6 +54,8 @@ const doAct = async () => {
     act.launch.browserID || report.browserID,
     act.launch.target && act.launch.target.url || report.target.url
   );
+  // Get the modified page.
+  const {page} = require('../run');
   try {
     // If the page prevented the tool from testing:
     if (page.prevented) {
@@ -86,3 +86,5 @@ const doAct = async () => {
     process.send('ERROR performing the act');
   };
 };
+
+doAct();

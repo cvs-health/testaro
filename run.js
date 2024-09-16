@@ -334,6 +334,7 @@ const launch = exports.launch = async (report, debug, waits, tempBrowserID, temp
       `ERROR: Browser ${browserID}, device ${deviceID}, or URL ${url} invalid`
     );
   }
+  exports.page = page;
 };
 // Returns a string representing the date and time.
 const nowString = () => (new Date()).toISOString().slice(2, 16);
@@ -550,6 +551,7 @@ const doActs = async (report) => {
   for (const actIndex in acts) {
     const act = acts[actIndex];
     const {type, which} = act;
+    const actSuffix = type === 'test' ? ` ${which}` : '';
     const message = `>>>> ${type}${actSuffix}`;
     // If granular reporting has been specified:
     if (report.observe) {
@@ -704,9 +706,6 @@ const doActs = async (report) => {
           }
         }
       }
-    }
-    // Otherwise, if the act performs tests of a tool:
-    else if (act.type === 'test') {
     }
     // Otherwise, if a current page exists:
     else if (page) {
@@ -1321,9 +1320,8 @@ const doActs = async (report) => {
       // Add an error result to the act and abort the job.
       actIndex = await addError(true, true, report, actIndex, 'ERROR: No page identified');
     }
+    // Add the end time to the act.
     act.endTime = Date.now();
-    // Perform any remaining acts if not aborted.
-    await doActs(report, actIndex + 1);
   }
   console.log('Acts completed');
   await browserClose();
