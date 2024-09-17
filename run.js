@@ -547,6 +547,8 @@ const addError = async(alsoLog, alsoAbort, report, actIndex, message) => {
 // Performs the acts in a report.
 const doActs = async (report) => {
   const {acts} = report;
+  // Get the standardization specification.
+  const standard = report.standard || 'only';
   // For each act in the reeport.
   for (const actIndex in acts) {
     const act = acts[actIndex];
@@ -626,11 +628,14 @@ const doActs = async (report) => {
       const startTime = Date.now();
       // Add it to the act.
       act.startTime = startTime;
-      const reportString = JSON.stringify(report);
-      // Create a subprocess to performing the tests of the act and get the result.
+      const reportPath = 'temp/report.json';
+      // Save the report.
+      const reportJSON = JSON.stringify(report);
+      await fs.writeFile(reportPath, reportJSON);
+      // Create a process and wait for it to perform the act and add the result to the saved report.
       const actResult = await new Promise(resolve => {
         const child = fork(
-          'procs/test', [reportString, actIndex], {timeout: 1000 * timeLimits[act.which] || 15000}
+          'procs/doAct', [actIndex], {timeout: 1000 * timeLimits[act.which] || 15000}
         );
         child.on('message', message => {
           resolve(message);
@@ -639,24 +644,24 @@ const doActs = async (report) => {
           resolve(code);
         });
       });
+      // Get the revised report.
+      reportJSON = await fs.readFile(reportPath, 'utf8');
+      report = JSON.parse(reportJSON);
+      // Get the revised act.
+      const act = report.acts[actIndex];
       // If the result is an error code:
       if (typeof actResult === 'number') {
-        // Add the error data to the act of the existing report.
+        // Add the error data to the act.
         act.data.prevented = true;
         act.data.error = actResult;
       }
-      // Otherwise, i.e. if it is the revised report:
+      // Otherwise, i.e. if it is not an error code:
       else {
-        // Replace the report with it.
-        report = actResult;
         // Add the elapsed time of the tool to the report.
         const time = Math.round((Date.now() - startTime) / 1000);
         const {toolTimes} = report.jobData;
-        const {acts} = report;
-        const act = acts[actIndex];
         toolTimes[act.which] ??= 0;
         toolTimes[act.which] += time;
-        const standard = report.standard || 'only';
         // If the act was not prevented and standardization is required:
         if (! act.data.prevented && ['also', 'only'].includes(standard)) {
           // Initialize the standard result.

@@ -23,7 +23,7 @@
 */
 
 /*
-  test
+  doAct
   Performs the tests of a tool.
 */
 
@@ -40,13 +40,17 @@ const waits = Number.parseInt(process.env.WAITS) || 0;
 
 // VARIABLES
 
-const report = JSON.parse(process.argv[2]);
-const actIndex = process.argv[3].toString();
-const act = report.acts[actIndex];
-const {which} = act;
+const actIndex = Number.parseInt(process.argv[2]);
 
 const doAct = async () => {
-  // Launch a browser, navigate to the URL, and modify the page of the run module.
+  const reportPath = '../temp/report.json';
+  // Get the saved report.
+  const report = await fs.readFile(reportPath, 'utf8');
+  // Get the act.
+  const act = report.acts[actIndex];
+  // Get the tool name.
+  const {which} = act;
+  // Launch a browser, navigate to the URL, and redefine the page of the run module.
   await launch(
     report,
     debug,
@@ -54,17 +58,17 @@ const doAct = async () => {
     act.launch.browserID || report.browserID,
     act.launch.target && act.launch.target.url || report.target.url
   );
-  // Get the modified page.
+  // Get the redefined page.
   const {page} = require('../run');
   try {
-    // If the page prevented the tool from testing:
+    // If the page prevents the tool from testing:
     if (page.prevented) {
       // Report this.
       process.send('ERROR: Page prevented testing');
     }
     // Otherwise, i.e. if the page permits testing:
     else {
-      // Perform the specified tests of the tool.
+      // Wait for the act reporter to perform the specified tests of the tool.
       const actReport = await require(`../tests/${which}`).reporter(page, report, actIndex, 65);
       // Add the data and result to the act.
       act.data = actReport.data;
@@ -74,8 +78,11 @@ const doAct = async () => {
         // Add prevention data to the job data.
         report.jobData.preventions[which] = act.data.error;
       }
-      // Send the revised report.
-      process.send(report);
+      const reportJSON = JSON.stringify(report);
+      // Save the revised report.
+      await fs.writeFile(reportJSON);
+      // Send a completion message.
+      process.send('Act completed');
     }
   }
   // If the tool invocation failed:
