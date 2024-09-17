@@ -863,7 +863,7 @@ The rationales motivating the Testaro-defined tests can be found in comments wit
 
 On some occasions a test throws an error that cannot be handled with a `try`-`catch` structure. It has been observed, for example, that the `ibm` test does this when the page content, rather than the page URL, is given to `getCompliance()` and the target is `https://globalsolutions.org`, `https://monsido.com`, or `https://www.ambetterhealth.com/`.
 
-Some tools take apparently infinite time to perform their tests on some pages. To handle such stalling, Testaro subjects most tools to time limits. Further testing will be required before it can be determined whether this time limitation is robust. As currently implemented (without child processes), it may allow tool testing processes to continue and to write indefinitely to the response.
+Some tools take apparently infinite time to perform their tests on some pages. To handle such stalling, Testaro subjects all tools to time limits. The limitation is implemented with forked child processes. Specifically, the `procs/doTestAct.js` module is run as a forked process with a `timeout` option for each of the 11 tools.
 
 ### Activation
 
@@ -900,7 +900,7 @@ Testaro would become more reliable if the behavior of its tools were monitored f
 
 ## Repository exclusions
 
-The files in the `temp` directory are presumed ephemeral and are not tracked by `git`.
+The files in the `temp` directory are presumed ephemeral and are not tracked by `git`. The above-mentioned `procs/doTestAct.js` module stores temporary reports in that directory.
 
 ## Related packages
 
