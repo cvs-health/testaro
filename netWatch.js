@@ -164,7 +164,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                     // Perform the job, adding result data to it.
                     console.log(`${logStart}job ${id} (${nowString()})`);
                     console.log(`>> It will send report to ${sendReportTo}`);
-                    await doJob(contentObj);
+                    contentObj = await doJob(contentObj);
                     let reportJSON = JSON.stringify(contentObj, null, 2);
                     console.log(`Job ${id} finished (${nowString()})`);
                     // Send the report to the specified server.

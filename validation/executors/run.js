@@ -41,9 +41,9 @@ const jobID = '240101T1200-simple-example';
 // Get the simple job.
 fs.readFile(`${__dirname}/../jobs/todo/${jobID}.json`, 'utf8')
 .then(async jobJSON => {
-  const report = JSON.parse(jobJSON);
+  const job = JSON.parse(jobJSON);
   // Run it.
-  await doJob(report);
+  const report = await doJob(job);
   try {
     // Check the report against expectations.
     const {acts, jobData} = report;

@@ -45,8 +45,6 @@ const reportDir = process.env.REPORTDIR;
 
 // ########## FUNCTIONS
 
-// Gets a segment of a timestamp.
-const tsPart = (timeStamp, startIndex) => timeStamp.slice(startIndex, startIndex + 2);
 // Returns a string representing the date and time.
 const nowString = () => (new Date()).toISOString().slice(2, 16);
 // Writes a directory report.
@@ -115,7 +113,7 @@ exports.dirWatch = async (isForever, intervalInSeconds) => {
           const jobJSON = await fs.readFile(`${jobDir}/todo/${jobFileNames[0]}`, 'utf8');
           try {
             const job = JSON.parse(jobJSON);
-            const report = JSON.parse(jobJSON);
+            let report = JSON.parse(jobJSON);
             // Ensure it has no server properties.
             job.observe = false;
             job.sendReportTo = '';
@@ -123,12 +121,12 @@ exports.dirWatch = async (isForever, intervalInSeconds) => {
             report.sendReportTo = '';
             const {id} = job;
             console.log(`\n\nDirectory job ${id} ready to do (${nowString()})`);
-            // Perform it.
-            await doJob(report);
+            // Perform it, adding to the report.
+            report = await doJob(report);
             console.log(`Job ${id} finished (${nowString()})`);
-            // Report it.
+            // Save the report.
             await writeDirReport(report);
-            // Archive it.
+            // Archive the job.
             await archiveJob(job, true);
           }
           catch(error) {

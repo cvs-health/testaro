@@ -23,13 +23,15 @@
 */
 
 /*
-  doAct
-  Performs the tests of a tool.
+  doTestAct
+  Performs the tests of an act.
 */
 
 // IMPORTS
 
-const {launch} = require('../run');
+// Module to perform file operations.
+const fs = require('fs/promises');
+const {launch} = require(`${__dirname}/../run`);
 
 // CONSTANTS
 
@@ -42,10 +44,11 @@ const waits = Number.parseInt(process.env.WAITS) || 0;
 
 const actIndex = Number.parseInt(process.argv[2]);
 
-const doAct = async () => {
-  const reportPath = '../temp/report.json';
+const doTestAct = async () => {
+  const reportPath = `${__dirname}/../temp/report.json`;
   // Get the saved report.
-  const report = await fs.readFile(reportPath, 'utf8');
+  const reportJSON = await fs.readFile(reportPath, 'utf8');
+  const report = JSON.parse(reportJSON);
   // Get the act.
   const act = report.acts[actIndex];
   // Get the tool name.
@@ -80,7 +83,7 @@ const doAct = async () => {
       }
       const reportJSON = JSON.stringify(report);
       // Save the revised report.
-      await fs.writeFile(reportJSON);
+      await fs.writeFile(reportPath, reportJSON);
       // Send a completion message.
       process.send('Act completed');
     }
@@ -94,4 +97,4 @@ const doAct = async () => {
   };
 };
 
-doAct();
+doTestAct();

@@ -29,6 +29,8 @@
 
 // IMPORTS
 
+// Module to perform file operations.
+const fs = require('fs/promises');
 // Module to keep secrets.
 require('dotenv').config();
 // Module to validate jobs.
@@ -549,9 +551,10 @@ const doActs = async (report) => {
   const {acts} = report;
   // Get the standardization specification.
   const standard = report.standard || 'only';
+  const reportPath = 'temp/report.json';
   // For each act in the reeport.
   for (const actIndex in acts) {
-    const act = acts[actIndex];
+    let act = acts[actIndex];
     const {type, which} = act;
     const actSuffix = type === 'test' ? ` ${which}` : '';
     const message = `>>>> ${type}${actSuffix}`;
@@ -628,14 +631,13 @@ const doActs = async (report) => {
       const startTime = Date.now();
       // Add it to the act.
       act.startTime = startTime;
-      const reportPath = 'temp/report.json';
       // Save the report.
-      const reportJSON = JSON.stringify(report);
+      let reportJSON = JSON.stringify(report);
       await fs.writeFile(reportPath, reportJSON);
       // Create a process and wait for it to perform the act and add the result to the saved report.
       const actResult = await new Promise(resolve => {
         const child = fork(
-          'procs/doAct', [actIndex], {timeout: 1000 * timeLimits[act.which] || 15000}
+          'procs/doTestAct', [actIndex], {timeout: 1000 * timeLimits[act.which] || 15000}
         );
         child.on('message', message => {
           resolve(message);
@@ -648,7 +650,7 @@ const doActs = async (report) => {
       reportJSON = await fs.readFile(reportPath, 'utf8');
       report = JSON.parse(reportJSON);
       // Get the revised act.
-      const act = report.acts[actIndex];
+      act = report.acts[actIndex];
       // If the result is an error code:
       if (typeof actResult === 'number') {
         // Add the error data to the act.
@@ -1330,6 +1332,8 @@ const doActs = async (report) => {
   }
   console.log('Acts completed');
   await browserClose();
+  await fs.rm(reportPath, {force: true});
+  return report;
 };
 /*
   Returns whether an initialized job report is valid and, if so, runs the job and adds the results
@@ -1371,8 +1375,8 @@ exports.doJob = async report => {
         process.exit();
       }
     });
-    // Recursively perform the acts.
-    await doActs(report, 0, null);
+    // Perform the acts and get the revised report.
+    report = await doActs(report, 0, null);
     // Add the end time and duration to the report.
     const endTime = new Date();
     report.jobData.endTime = nowString();
@@ -1388,4 +1392,5 @@ exports.doJob = async report => {
       report.jobData.toolTimes[item[0]] = item[1];
     });
   }
+  return report;
 };

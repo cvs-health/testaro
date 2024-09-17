@@ -75,7 +75,7 @@ const callRun = async jobIDStart => {
     report.observe = false;
     report.sendReportTo = '';
     // Run it.
-    await doJob(report);
+    report = await doJob(report);
     // Archive it.
     await fs.rename(`${todoDir}/${jobFileName}`, `${jobDir}/done/${jobFileName}`);
     // Save the report.

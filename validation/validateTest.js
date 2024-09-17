@@ -44,7 +44,7 @@ exports.validateTest = async testID => {
     const jobJSON = await fs.readFile(`${__dirname}/tests/jobs/${jobFileName}`, 'utf8');
     const report = JSON.parse(jobJSON);
     // Perform it.
-    await doJob(report);
+    report = await doJob(report);
     // Report whether the end time was reported.
     const {acts, jobData} = report;
     if (jobData.endTime && /^(?:\d{2}-){2}\d{2}T\d{2}:\d{2}$/.test(jobData.endTime)) {
