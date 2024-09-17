@@ -52,13 +52,19 @@ const run = async (content, timeLimit) => {
     const ibmReport = await doBy(
       timeLimit, accessibilityChecker, 'getCompliance', [content, nowLabel], 'ibm getCompliance'
     );
-    if (ibmReport !== 'timedOut') {
+    if (typeof ibmReport === 'object' && ibmReport.report) {
       return ibmReport;
+    }
+    else if (ibmReport === 'timedOut') {
+      return {
+        prevented: true,
+        error: `ibm getCompliance timed out at ${timeLimit} seconds`
+      };
     }
     else {
       return {
         prevented: true,
-        error: `ibm getCompliance timed out at ${timeLimit} seconds`
+        error: 'ibm getCompliance produced no report'
       };
     }
   }
@@ -207,9 +213,8 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
       // If the act was prevented:
       if (data && data.prevented) {
         // Report this.
-        const message = `ERROR: Act failed or timed out at ${timeLimit} seconds`;
-        console.log(message);
-        data.error = data.error ? `${data.error}; ${message}` : message;
+        const message = 'ERROR: Act was prevented';
+        data.error ??= message;
         // Return the failure.
         return {
           data,

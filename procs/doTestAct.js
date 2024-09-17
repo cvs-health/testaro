@@ -61,40 +61,61 @@ const doTestAct = async () => {
     act.launch.browserID || report.browserID,
     act.launch.target && act.launch.target.url || report.target.url
   );
-  // Get the redefined page.
-  const {page} = require('../run');
-  try {
-    // If the page prevents the tool from testing:
-    if (page.prevented) {
-      // Report this.
-      process.send('ERROR: Page prevented testing');
-    }
-    // Otherwise, i.e. if the page permits testing:
-    else {
-      // Wait for the act reporter to perform the specified tests of the tool.
-      const actReport = await require(`../tests/${which}`).reporter(page, report, actIndex, 65);
-      // Add the data and result to the act.
-      act.data = actReport.data;
-      act.result = actReport.result;
-      // If the tool reported that the page prevented testing:
-      if (actReport.data.prevented) {
-        // Add prevention data to the job data.
-        report.jobData.preventions[which] = act.data.error;
+  // If the launch aborted the job:
+  if (report.jobData && report.jobData.aborted) {
+    // Save the revised report.
+    const reportJSON = JSON.stringify(report);
+    await fs.writeFile(reportPath, reportJSON);
+    // Report this.
+    process.send('ERROR: Job aborted');
+  }
+  // Otherwise, i.e. if the launch did not abort the job:
+  else {
+    // Get the redefined page.
+    const {page} = require('../run');
+    // If it exists:
+    if (page) {
+      try {
+        // If the page prevents the tool from testing:
+        if (page.prevented) {
+          // Report this.
+          process.send('ERROR: Page prevented testing');
+        }
+        // Otherwise, i.e. if the page permits testing:
+        else {
+          // Wait for the act reporter to perform the specified tests of the tool.
+          const actReport = await require(`../tests/${which}`).reporter(page, report, actIndex, 65);
+          // Add the data and result to the act.
+          act.data = actReport.data;
+          act.result = actReport.result;
+          // If the tool reported that the page prevented testing:
+          if (actReport.data && actReport.data.prevented) {
+            // Add prevention data to the job data.
+            report.jobData.preventions[which] = act.data.error;
+          }
+          const reportJSON = JSON.stringify(report);
+          // Save the revised report.
+          await fs.writeFile(reportPath, reportJSON);
+          // Send a completion message.
+          process.send('Act completed');
+        }
       }
-      const reportJSON = JSON.stringify(report);
-      // Save the revised report.
-      await fs.writeFile(reportPath, reportJSON);
-      // Send a completion message.
-      process.send('Act completed');
+      // If the tool invocation failed:
+      catch(error) {
+        // Save the revised report.
+        const reportJSON = JSON.stringify(report);
+        await fs.writeFile(reportPath, reportJSON);
+        // Report the failure.
+        const message = error.message.slice(0, 400);
+        console.log(`ERROR: Test act ${act.which} failed (${message})`);
+        process.send('ERROR performing the act');
+      };
+    }
+    // Otherwise, i.e. if the page does not exist:
+    else {
+      process.send('ERROR: No page');
     }
   }
-  // If the tool invocation failed:
-  catch(error) {
-    // Report the failure.
-    const message = error.message.slice(0, 400);
-    console.log(`ERROR: Test act ${act.which} failed (${message})`);
-    process.send('ERROR performing the act');
-  };
 };
 
 doTestAct();
