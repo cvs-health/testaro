@@ -10,7 +10,9 @@ The purposes of Testaro are to:
 - provide programmatic access to accessibility tests defined by several tools
 - facilitate the integration of the reports of the tools into a unified report
 
-Testaro is described in [Testaro: Efficient Ensemble Testing for Web Accessibility](https://arxiv.org/abs/2309.10167).
+Testaro is described in two papers:
+- [How to run a thousand accessibility tests](https://medium.com/cvs-health-tech-blog/how-to-run-a-thousand-accessibility-tests-63692ad120c3)
+- [Testaro: Efficient Ensemble Testing for Web Accessibility](https://arxiv.org/abs/2309.10167)
 
 The need for multi-tool integration, and its costs, are discussed in [Accessibility Metatesting: Comparing Nine Testing Tools](https://arxiv.org/abs/2304.07591).
 
