@@ -735,7 +735,7 @@ doJob(job)
 .then(report => …);
 ```
 
-Testaro will run the job and return a modified `report` object. When Testaro finishes, the `acts` and `jobData` properties of `report` will contain the results. The final statement can further process the `report` object as desired in the `then` callback.
+Testaro will run the job and return a `report` object, a copy of the job with the `acts` and `jobData` properties containing the results. The final statement can further process the `report` object as desired in the `then` callback.
 
 The Testilo package contains functions that can create jobs from scripts and add scores and explanations to reports.
 
