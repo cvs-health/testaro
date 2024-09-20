@@ -49,17 +49,9 @@ const {doBy} = require('../procs/job');
 const run = async (content, timeLimit) => {
   const nowLabel = (new Date()).toISOString().slice(0, 19);
   try {
-    const ibmReport = await doBy(
-      timeLimit, accessibilityChecker, 'getCompliance', [content, nowLabel], 'ibm getCompliance'
-    );
+    const ibmReport = await accessibilityChecker.getCompliance(content, nowLabel);
     if (typeof ibmReport === 'object' && ibmReport.report) {
       return ibmReport;
-    }
-    else if (ibmReport === 'timedOut') {
-      return {
-        prevented: true,
-        error: `ibm getCompliance timed out at ${timeLimit} seconds`
-      };
     }
     else {
       return {

@@ -52,23 +52,12 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
     rules,
     apiKey: process.env.WAX_KEY || ''
   };
-  const actReport = await doBy(
-    timeLimit, waxDev, 'runWax', [pageCode, waxOptions], 'wax report retrieval'
-  );
+  const actReport = await waxDev.runWax(pageCode, waxOptions);
   // If WAX failed with a string report:
   if (typeof actReport === 'string') {
-    // If the failure was a timeout:
-    if (actReport === 'timedOut') {
-      // Report this.
-      data.prevented = true;
-      data.error = 'Retrieval of result timed out';
-    }
-    // Otherwise, i.e. if the failure was not a timeout:
-    else {
-      // Report this.
-      data.prevented = true;
-      data.error = actReport;
-    }
+    // Report this.
+    data.prevented = true;
+    data.error = actReport;
   }
   // Otherwise, if it failed with an object report:
   else if (typeof actReport === 'object' && actReport.responseCode === 500) {

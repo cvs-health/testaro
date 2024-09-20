@@ -262,32 +262,3 @@ exports.isValidJob = job => {
     return 'no job';
   }
 };
-// Executes an asynchronous function with a time limit.
-exports.doBy = async function(timeLimit, obj, fnName, fnArgs, noticePrefix) {
-  let timer, fnResolver;
-  // Start the function execution.
-  const fnPromise = new Promise(async function(resolve) {
-    fnResolver = resolve;
-    let fnResult;
-    try {
-      fnResult = await obj[fnName](... fnArgs);
-    }
-    catch(error) {
-      fnResult = `failed (error: ${error.message})`;
-    };
-    resolve(fnResult);
-  });
-  // Start a timer.
-  const timerPromise = new Promise(resolve => {
-    timer = setTimeout(() => {
-      console.log(`ERROR: ${noticePrefix} timed out at ${timeLimit} seconds`);
-      setTimeout(() => {fnResolver('aborted')}, 100);
-      resolve('timedOut');
-    }, 1000 * timeLimit);
-  });
-  // Get the timeout or the value returned by the function, whichever is first.
-  const result = await Promise.race([timerPromise, fnPromise]);
-  clearTimeout(timer);
-  // Return the result.
-  return result;
-};

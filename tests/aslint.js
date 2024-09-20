@@ -31,8 +31,6 @@
 
 // Module to handle files.
 const fs = require('fs/promises');
-// Utility module.
-const {doBy} = require('../procs/job');
 
 // FUNCTIONS
 
@@ -98,31 +96,22 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
   // If the injection and the result attachment both succeeded:
   if (! data.prevented) {
     // Get their text.
-    const actReport = await doBy(timeLimit, reportLoc, 'textContent', [], 'aslint report retrieval');
-    // If the text was obtained in time:
-    if (actReport !== 'timedOut') {
-      // Populate the act report.
-      result = JSON.parse(actReport);
-      // If any rules were reported violated:
-      if (result.rules) {
-        // For each such rule:
-        Object.keys(result.rules).forEach(ruleID => {
-          // If the rule was passed or skipped or rules to be tested were specified and exclude it:
-          const excluded = act.rules && ! act.rules.includes(ruleID);
-          const instanceType = result.rules[ruleID].status.type;
-          // If rules to be tested were specified and exclude it or the rule was passed or skipped:
-          if (excluded || ['passed', 'skipped'].includes(instanceType)) {
-            // Delete the rule report.
-            delete result.rules[ruleID];
-          }
-        });
-      }
-    }
-    // Otherwise, i.e. if the text was not obtained in time:
-    else {
-      // Report this.
-      data.prevented = true;
-      data.error = 'Retrieval of result text timed out';
+    const actReport = reportLoc.textContent;
+    // Populate the act report.
+    result = JSON.parse(actReport);
+    // If any rules were reported violated:
+    if (result.rules) {
+      // For each such rule:
+      Object.keys(result.rules).forEach(ruleID => {
+        // If the rule was passed or skipped or rules to be tested were specified and exclude it:
+        const excluded = act.rules && ! act.rules.includes(ruleID);
+        const instanceType = result.rules[ruleID].status.type;
+        // If rules to be tested were specified and exclude it or the rule was passed or skipped:
+        if (excluded || ['passed', 'skipped'].includes(instanceType)) {
+          // Delete the rule report.
+          delete result.rules[ruleID];
+        }
+      });
     }
   }
   // Return the act report.

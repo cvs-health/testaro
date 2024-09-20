@@ -77,69 +77,58 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
     else {
       axeOptions.runOnly = ['experimental', 'best-practice', 'wcag2a', 'wcag2aa', 'wcag2aaa', 'wcag21a', 'wcag21aa', 'wcag21aaa'];
     }
-    const axeReport = await doBy(
-      timeLimit, axePlaywright, 'getAxeResults', [page, null, axeOptions], 'axe testing'
-    );
-    // If the testing finished on time:
-    if (axeReport !== 'timedOut') {
-      const {inapplicable, passes, incomplete, violations} = axeReport;
-      // If the test succeeded:
-      if (violations) {
-        // Initialize the result.
-        result.totals = {
-          rulesNA: 0,
-          rulesPassed: 0,
-          rulesWarned: 0,
-          rulesViolated: 0,
-          warnings: {
-            minor: 0,
-            moderate: 0,
-            serious: 0,
-            critical: 0
-          },
-          violations: {
-            minor: 0,
-            moderate: 0,
-            serious: 0,
-            critical: 0
-          }
-        };
-        result.details = axeReport;
-        // Populate the totals.
-        const {totals} = result;
-        totals.rulesNA = inapplicable.length;
-        totals.rulesPassed = passes.length;
-        incomplete.forEach(rule => {
-          totals.rulesWarned++;
-          rule.nodes.forEach(node => {
-            totals.warnings[node.impact]++;
-          });
+    const axeReport = await axePlaywright.getAxeResults(page, null, axeOptions);
+    const {inapplicable, passes, incomplete, violations} = axeReport;
+    // If the test succeeded:
+    if (violations) {
+      // Initialize the result.
+      result.totals = {
+        rulesNA: 0,
+        rulesPassed: 0,
+        rulesWarned: 0,
+        rulesViolated: 0,
+        warnings: {
+          minor: 0,
+          moderate: 0,
+          serious: 0,
+          critical: 0
+        },
+        violations: {
+          minor: 0,
+          moderate: 0,
+          serious: 0,
+          critical: 0
+        }
+      };
+      result.details = axeReport;
+      // Populate the totals.
+      const {totals} = result;
+      totals.rulesNA = inapplicable.length;
+      totals.rulesPassed = passes.length;
+      incomplete.forEach(rule => {
+        totals.rulesWarned++;
+        rule.nodes.forEach(node => {
+          totals.warnings[node.impact]++;
         });
-        violations.forEach(rule => {
-          totals.rulesViolated++;
-          rule.nodes.forEach(node => {
-            totals.violations[node.impact]++;
-          });
+      });
+      violations.forEach(rule => {
+        totals.rulesViolated++;
+        rule.nodes.forEach(node => {
+          totals.violations[node.impact]++;
         });
-        // Delete irrelevant properties from the report details.
-        const irrelevants = ['inapplicable', 'passes', 'incomplete', 'violations']
-        .slice(0, 4 - detailLevel);
-        irrelevants.forEach(irrelevant => {
-          delete axeReport[irrelevant];
-        });
-      }
-      // Otherwise, i.e. if the test failed:
-      else {
-        // Report this.
-        data.prevented = true;
-        data.error = 'ERROR: Act failed';
-      }
+      });
+      // Delete irrelevant properties from the report details.
+      const irrelevants = ['inapplicable', 'passes', 'incomplete', 'violations']
+      .slice(0, 4 - detailLevel);
+      irrelevants.forEach(irrelevant => {
+        delete axeReport[irrelevant];
+      });
     }
-    // Otherwise, i.e. if the testing timed out:
+    // Otherwise, i.e. if the test failed:
     else {
       // Report this.
       data.prevented = true;
-      data.error = 'ERROR: Act timed out';
+      data.error = 'ERROR: Act failed';
     }
   }
   // Return the result.

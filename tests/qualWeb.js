@@ -126,94 +126,91 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
       qualWebOptions.execute.bp = true;
     }
     // Get the report.
-    let actReports = await doBy(timeLimit, qualWeb, 'evaluate', [qualWebOptions], 'qualWeb testing');
-    // If the testing finished on time:
-    if (actReports !== 'timedOut') {
-      result = actReports[withNewContent ? qualWebOptions.url : 'customHtml'];
-      // If it contains a copy of the DOM:
-      if (result && result.system && result.system.page && result.system.page.dom) {
-        // Delete the copy.
-        delete result.system.page.dom;
-        const {modules} = result;
-        // If the report contains a modules property:
-        if (modules) {
-          // For each test section in it:
-          for (const section of ['act-rules', 'wcag-techniques', 'best-practices']) {
-            // If testing in the section was specified:
-            if (qualWebOptions[section]) {
-              // If the section exists:
-              if (modules[section]) {
-                const {assertions} = modules[section];
-                // If it contains assertions (test results):
-                if (assertions) {
-                  const ruleIDs = Object.keys(assertions);
-                  // For each rule:
-                  ruleIDs.forEach(ruleID => {
-                    const ruleAssertions = assertions[ruleID];
-                    const {metadata} = ruleAssertions;
-                    // If result data exist for the rule:
-                    if (metadata) {
-                      // If there were no warnings or failures:
-                      if (metadata.warning === 0 && metadata.failed === 0) {
-                        // Delete the rule data.
-                        delete assertions[ruleID];
-                      }
-                      // Otherwise, i.e. if there was at least 1 warning or failure:
-                      else {
-                        if (ruleAssertions.results) {
-                          ruleAssertions.results = ruleAssertions.results.filter(
-                            raResult => raResult.verdict !== 'passed'
-                          );
-                        }
+    let actReports = await qualWeb.evaluate(qualWebOptions);
+    result = actReports[withNewContent ? qualWebOptions.url : 'customHtml'];
+    // If it contains a copy of the DOM:
+    if (result && result.system && result.system.page && result.system.page.dom) {
+      // Delete the copy.
+      delete result.system.page.dom;
+      const {modules} = result;
+      // If the report contains a modules property:
+      if (modules) {
+        // For each test section in it:
+        for (const section of ['act-rules', 'wcag-techniques', 'best-practices']) {
+          // If testing in the section was specified:
+          if (qualWebOptions[section]) {
+            // If the section exists:
+            if (modules[section]) {
+              const {assertions} = modules[section];
+              // If it contains assertions (test results):
+              if (assertions) {
+                const ruleIDs = Object.keys(assertions);
+                // For each rule:
+                ruleIDs.forEach(ruleID => {
+                  const ruleAssertions = assertions[ruleID];
+                  const {metadata} = ruleAssertions;
+                  // If result data exist for the rule:
+                  if (metadata) {
+                    // If there were no warnings or failures:
+                    if (metadata.warning === 0 && metadata.failed === 0) {
+                      // Delete the rule data.
+                      delete assertions[ruleID];
+                    }
+                    // Otherwise, i.e. if there was at least 1 warning or failure:
+                    else {
+                      if (ruleAssertions.results) {
+                        ruleAssertions.results = ruleAssertions.results.filter(
+                          raResult => raResult.verdict !== 'passed'
+                        );
                       }
                     }
-                    // Shorten long HTML codes of elements.
-                    const {results} = ruleAssertions;
-                    results.forEach(raResult => {
-                      const {elements} = raResult;
-                      if (elements && elements.length) {
-                        elements.forEach(element => {
-                          if (element.htmlCode && element.htmlCode.length > 700) {
-                            element.htmlCode = `${element.htmlCode.slice(0, 700)} …`;
-                          }
-                        });
-                      }
-                    });
+                  }
+                  // Shorten long HTML codes of elements.
+                  const {results} = ruleAssertions;
+                  results.forEach(raResult => {
+                    const {elements} = raResult;
+                    if (elements && elements.length) {
+                      elements.forEach(element => {
+                        if (element.htmlCode && element.htmlCode.length > 700) {
+                          element.htmlCode = `${element.htmlCode.slice(0, 700)} …`;
+                        }
+                      });
+                    }
                   });
-                }
-                else {
-                  data.prevented = true;
-                  data.error = 'ERROR: No assertions';
-                }
+                });
               }
               else {
                 data.prevented = true;
-                data.error = `ERROR: No ${section} section`;
+                data.error = 'ERROR: No assertions';
               }
             }
+            else {
+              data.prevented = true;
+              data.error = `ERROR: No ${section} section`;
+            }
           }
-        }
-        else {
-          data.prevented = true;
-          data.error = 'ERROR: No modules';
         }
       }
       else {
         data.prevented = true;
-        data.error = 'ERROR: No DOM';
+        data.error = 'ERROR: No modules';
       }
-      // Stop the QualWeb core engine.
-      await qualWeb.stop();
-      // Test whether the result is an object.
-      try {
-        JSON.stringify(result);
-      }
-      catch(error) {
-        const message = `ERROR: qualWeb result cannot be made JSON (${error.message})`;
-        data.prevented = true;
-        data.error = message;
-      };
     }
+    else {
+      data.prevented = true;
+      data.error = 'ERROR: No DOM';
+    }
+    // Stop the QualWeb core engine.
+    await qualWeb.stop();
+    // Test whether the result is an object.
+    try {
+      JSON.stringify(result);
+    }
+    catch(error) {
+      const message = `ERROR: qualWeb result cannot be made JSON (${error.message})`;
+      data.prevented = true;
+      data.error = message;
+    };
   }
   catch(error) {
     const message = error.message.slice(0, 200);

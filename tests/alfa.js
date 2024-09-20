@@ -27,10 +27,6 @@
   This test implements the alfa ruleset for accessibility.
 */
 
-// IMPORTS
-
-const {doBy} = require('../procs/job');
-
 // FUNCTIONS
 
 // Conducts and reports the alfa tests.
@@ -94,84 +90,75 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
     const alfaActModule = await import('@siteimprove/alfa-act');
     const {Audit} = alfaActModule;
     const audit = Audit.of(alfaPage, alfaRules);
-    const outcomes = Array.from(await doBy(timeLimit, audit, 'evaluate', [], 'alfa testing'));
-    // If the testing finished on time:
-    if (outcomes !== 'timedOut') {
-      // For each failure or warning:
-      outcomes.forEach((outcome, index) => {
-        const {target} = outcome;
-        if (target && ! target._members) {
-          const outcomeJ = outcome.toJSON();
-          const verdict = outcomeJ.outcome;
-          if (verdict !== 'passed') {
-            // Add to the result.
-            const {rule} = outcomeJ;
-            const {tags, uri, requirements} = rule;
-            const ruleID = uri.replace(/^.+-/, '');
-            const ruleSummary = ruleData[ruleID] || '';
-            const targetJ = outcomeJ.target;
-            const codeLines = target.toString().split('\n');
-            if (codeLines[0] === '#document') {
-              codeLines.splice(2, codeLines.length - 3, '...');
-            }
-            else if (codeLines[0].startsWith('<html')) {
-              codeLines.splice(1, codeLines.length - 2, '...');
-            }
-            const outcomeData = {
-              index,
-              verdict,
-              rule: {
-                ruleID,
-                ruleSummary,
-                scope: '',
-                uri,
-                requirements
-              },
-              target: {
-                type: targetJ.type,
-                tagName: targetJ.name || '',
-                path: target.path(),
-                codeLines: codeLines.map(line => line.length > 300 ? `${line.slice(0, 300)}...` : line)
-              }
-            };
-            // If the rule summary is missing:
-            if (outcomeData.rule.ruleSummary === '') {
-              // If a first requirement title exists:
-              const {requirements} = outcomeData.rule;
-              if (requirements && requirements.length && requirements[0].title) {
-                // Make it the rule summary.
-                outcomeData.rule.ruleSummary = requirements[0].title;
-              }
-            }
-            const etcTags = [];
-            tags.forEach(tag => {
-              if (tag.type === 'scope') {
-                outcomeData.rule.scope = tag.scope;
-              }
-              else {
-                etcTags.push(tag);
-              }
-            });
-            if (etcTags.length) {
-              outcomeData.etcTags = etcTags;
-            }
-            if (outcomeData.verdict === 'failed') {
-              result.totals.failures++;
-            }
-            else if (outcomeData.verdict === 'cantTell') {
-              result.totals.warnings++;
-            }
-            result.items.push(outcomeData);
+    const outcomes = Array.from(audit.evaluate());
+    // For each failure or warning:
+    outcomes.forEach((outcome, index) => {
+      const {target} = outcome;
+      if (target && ! target._members) {
+        const outcomeJ = outcome.toJSON();
+        const verdict = outcomeJ.outcome;
+        if (verdict !== 'passed') {
+          // Add to the result.
+          const {rule} = outcomeJ;
+          const {tags, uri, requirements} = rule;
+          const ruleID = uri.replace(/^.+-/, '');
+          const ruleSummary = ruleData[ruleID] || '';
+          const targetJ = outcomeJ.target;
+          const codeLines = target.toString().split('\n');
+          if (codeLines[0] === '#document') {
+            codeLines.splice(2, codeLines.length - 3, '...');
           }
+          else if (codeLines[0].startsWith('<html')) {
+            codeLines.splice(1, codeLines.length - 2, '...');
+          }
+          const outcomeData = {
+            index,
+            verdict,
+            rule: {
+              ruleID,
+              ruleSummary,
+              scope: '',
+              uri,
+              requirements
+            },
+            target: {
+              type: targetJ.type,
+              tagName: targetJ.name || '',
+              path: target.path(),
+              codeLines: codeLines.map(line => line.length > 300 ? `${line.slice(0, 300)}...` : line)
+            }
+          };
+          // If the rule summary is missing:
+          if (outcomeData.rule.ruleSummary === '') {
+            // If a first requirement title exists:
+            const {requirements} = outcomeData.rule;
+            if (requirements && requirements.length && requirements[0].title) {
+              // Make it the rule summary.
+              outcomeData.rule.ruleSummary = requirements[0].title;
+            }
+          }
+          const etcTags = [];
+          tags.forEach(tag => {
+            if (tag.type === 'scope') {
+              outcomeData.rule.scope = tag.scope;
+            }
+            else {
+              etcTags.push(tag);
+            }
+          });
+          if (etcTags.length) {
+            outcomeData.etcTags = etcTags;
+          }
+          if (outcomeData.verdict === 'failed') {
+            result.totals.failures++;
+          }
+          else if (outcomeData.verdict === 'cantTell') {
+            result.totals.warnings++;
+          }
+          result.items.push(outcomeData);
         }
-      });
-    }
-    // Otherwise, i.e. if the testing timed out:
-    else {
-      // Report this.
-      data.prevented = true;
-      data.error = 'ERROR: Act timed out';
-    }
+      }
+    });
   }
   catch(error) {
     console.log(`ERROR: navigation to URL timed out (${error})`);
