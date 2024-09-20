@@ -121,7 +121,7 @@ exports.dirWatch = async (isForever, intervalInSeconds) => {
             report.sendReportTo = '';
             const {id} = job;
             console.log(`\n\nDirectory job ${id} ready to do (${nowString()})`);
-            // Perform it, adding to the report.
+            // Perform it and get a report.
             report = await doJob(report);
             console.log(`Job ${id} finished (${nowString()})`);
             // Save the report.
