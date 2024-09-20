@@ -34,7 +34,8 @@ const {doBy} = require('../procs/job');
 // FUNCTIONS
 
 // Conducts and reports the alfa tests.
-exports.reporter = async (page, act) => {
+exports.reporter = async (page, report, actIndex, timeLimit) => {
+  const act = report.acts[actIndex];
   const {rules} = act;
   const alfaRulesModule = await import('@siteimprove/alfa-rules');
   const alfaRules = alfaRulesModule.default;
@@ -93,7 +94,7 @@ exports.reporter = async (page, act) => {
     const alfaActModule = await import('@siteimprove/alfa-act');
     const {Audit} = alfaActModule;
     const audit = Audit.of(alfaPage, alfaRules);
-    const outcomes = Array.from(await doBy(10, audit, 'evaluate', [], 'alfa testing'));
+    const outcomes = Array.from(await doBy(timeLimit, audit, 'evaluate', [], 'alfa testing'));
     // If the testing finished on time:
     if (outcomes !== 'timedOut') {
       // For each failure or warning:
