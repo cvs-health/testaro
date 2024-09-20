@@ -42,7 +42,6 @@ const {doJob} = require('./run');
 // CONSTANTS
 
 const jobURLSpec = process.env.JOB_URLS;
-const agent = process.env.AGENT;
 
 // FUNCTIONS
 
@@ -111,14 +110,14 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
       cycleIndex = ++cycleIndex % urlCount;
       urlIndex = ++urlIndex % urlCount;
       const url = urls[urlIndex];
-      const logStart = `Requested job from server ${url} and got `;
-      const fullURL = `${url}?agent=${agent}`;
+      const publicURL = url.replace(/[?/][^?/.]+$/, '');
+      const logStart = `Requested job from ${publicURL} and got `;
       // Perform it.
       await new Promise(resolve => {
         try {
           const client = url.startsWith('https://') ? httpsClient : httpClient;
           // Request a job.
-          client.request(fullURL, certOpt, response => {
+          client.request(url, certOpt, response => {
             const chunks = [];
             response
             // If the response throws an error:
@@ -139,7 +138,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                 // If there was no job to do:
                 if (! Object.keys(contentObj).length) {
                   // Report this.
-                  console.log(`No job to do at ${url}`);
+                  console.log(`No job to do at ${publicURL}`);
                   resolve(true);
                 }
                 // Otherwise, i.e. if there was a job or a message:
@@ -160,12 +159,12 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                     // Prevent further watching, if unwanted.
                     noJobYet = false;
                     // Add the agent to the job.
-                    sources.agent = agent;
+                    sources.agent = process.env.AGENT || '';
                     // Perform the job, adding result data to it.
                     console.log(`${logStart}job ${id} (${nowString()})`);
                     console.log(`>> It will send report to ${sendReportTo}`);
-                    contentObj = await doJob(contentObj);
-                    let reportJSON = JSON.stringify(contentObj, null, 2);
+                    const report = await doJob(contentObj);
+                    let reportJSON = JSON.stringify(report, null, 2);
                     console.log(`Job ${id} finished (${nowString()})`);
                     // Send the report to the specified server.
                     console.log(`Sending report ${id} to ${sendReportTo}`);
@@ -173,7 +172,15 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                       ? httpsClient
                       : httpClient;
                     const reportLogStart = `Sent report ${id} to ${sendReportTo} and got `;
-                    reportClient.request(sendReportTo, {method: 'POST'}, repResponse => {
+                    // Initialize the report destination as the sendReportTo property of the job.
+                    let reportDest = sendReportTo;
+                    // If it contains a placeholder:
+                    if (/\[A-Z_]+\]$/.test(sendReportTo)) {
+                      // Replace the placeholder with the value of the environment variable it names.
+                      reportDest = `${sendReportTo.replace(/\[([^]]+\])/, process.env[$1])}`;
+                    }
+                    // Send the report there.
+                    reportClient.request(reportDest, {method: 'POST'}, repResponse => {
                       const chunks = [];
                       repResponse
                       // If the response to the report threw an error:
