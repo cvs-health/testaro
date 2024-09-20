@@ -814,7 +814,7 @@ The arguments and behaviors described above for execution by a module apply here
 
 ### Environment variables
 
-In addition to their uses described above, environment variables can be used by acts of type `text`, as documented in the `actSpecs.js` file.
+In addition to their uses described above, environment variables can be used by acts of type `test`, as documented in the `actSpecs.js` file.
 
 Before making Testaro run a job, you can optionally also set `DEBUG` (to `'true'` or anything else) and/or `WAITS` (to a non-negative integer). The effects of these variables are described in the `run.js` file.
 
@@ -828,6 +828,7 @@ REPORTDIR=../testing/reports
 AGENT=ThisWorkstation
 DEBUG=false
 WAITS=0
+PUPPETEER_DISABLE_HEADLESS_WARNING=true
 ```
 
 ## Validation
