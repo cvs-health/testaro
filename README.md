@@ -783,13 +783,15 @@ The arguments and behaviors described above for execution by a module apply here
 
 Testaro can poll servers for jobs to be performed.
 
-An instance of Testaro is an _agent_ and has an identifier specified by `AGENT`. A Testaro instance identifies itself when polling servers, allowing servers to decide whether to give the instance a job to do.
+An instance of Testaro is an _agent_. A Testaro instance identifies itself when polling servers, allowing servers to decide whether to give the instance a job to do and whether to accept a report from the instance. It also identifies itself in any report that it creates.
 
-The URLs polled by Testaro are specified by `JOB_URLS`. The format of that environment variable is a `+`-delimited list of URLs, including schemes. If one of the URLs is `https://testrunner.org/a11ytest/api/job`, and if a Testaro instance has the agent ID `tester3`, then a job request is a `GET` request to `https://testrunner.org/a11ytest/api/job?agent=tester3`.
+The URLs polled by Testaro are specified by `JOB_URLS`. The format of that environment variable is a `+`-delimited list of URLs, including schemes and agent authentications. One of the URLs might be `https://testrunner.org/a11ytest/api/job/tester3:secretsauce` or `https://testrunner.org/a11ytest/api/job?agent=tester3:secretsauce`. In these examples, the final URL segment or the query parameter is an agent authentication agreed to between the agent and a server. Such a URL can then be the requested resource in a `GET` request asking the server to assign a job to the instance.
 
-Once a Testaro instance obtains a network job, Testaro performs it and adds the result data to the job, which then becomes the job report. Testaro sends the report in a `POST` request to the URL specified by the `sendReportTo` property of the job.
+Once a Testaro instance obtains a network job, Testaro performs it and adds the result data to the job, which then becomes the job report. Testaro also makes its `AGENT` value the value of the `sources.agent` property of the report. Testaro then sends the report in a `POST` request to the URL specified by the `sendReportTo` property of the job.
 
-Network watching can be repeated or 1-job. One-job watching stops after 1 job has been performed.
+That `sendReportTo` property may contain a substring bounded by brackets, as in `https://serverx.org/[SERVERXAGENT]`. If it does, Testaro substitutes the value of its `SERVERXAGENT` environment variable for the brackets and the substring they enclose. That potentially modified `sendReportTo` property is the URL of the `POST` request. That environment variable has a value agreed to between the agent and the server.
+
+Network watching can be repeated or 1-job. 1-job watching stops after 1 job has been performed.
 
 After checking all the URLs in succession without getting a job from any of them, Testaro waits for a prescribed time before continuing to check.
 
@@ -822,13 +824,12 @@ You may store environment variables in an untracked `.env` file if you wish, and
 
 ```conf
 WAVE_KEY=yourwavekey
-JOB_URLs=https://yourserver.tld/job+http://localhost:3004/testapp
+JOB_URLs=https://yourserver.tld/job/AgentABC:abcSecretX+http://localhost:3004/testapp?agent=AgentABC:AuthABC33
 JOBDIR=../testing/jobs/ThisWorkstation
 REPORTDIR=../testing/reports
-AGENT=ThisWorkstation
+AGENT=AgentABC
 DEBUG=false
 WAITS=0
-PUPPETEER_DISABLE_HEADLESS_WARNING=true
 ```
 
 ## Validation
