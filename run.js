@@ -1331,20 +1331,23 @@ const doActs = async (report) => {
   return report;
 };
 /*
-  Returns whether an initialized job report is valid and, if so, runs the job and adds the results
-  to the report.
+  Runs job and returns a report.
 */
-exports.doJob = async report => {
-  // If the report is valid:
-  report.jobData = {};
-  const {jobData} = report;
-  const reportInvalidity = isValidJob(report);
-  if (reportInvalidity) {
-    console.log(`ERROR: ${reportInvalidity}`);
+exports.doJob = async job => {
+  // Make a report as a copy of the job.
+  const report = JSON.parse(JSON.stringify(job));
+  const jobData = report.jobData = {};
+  // Get whether the job is valid and, if not, why.
+  const jobInvalidity = isValidJob(job);
+  // If it is invalid:
+  if (jobInvalidity) {
+    // Report this.
+    console.log(`ERROR: ${jobInvalidity}`);
     jobData.aborted = true;
     jobData.abortedAct = null;
     jobData.abortError = reportInvalidity;
   }
+  // Otherwise, i.e. if it is valid:
   else {
     // Add initialized job data to the report.
     const startTime = new Date();
@@ -1387,5 +1390,6 @@ exports.doJob = async report => {
       report.jobData.toolTimes[item[0]] = item[1];
     });
   }
+  // Return the report.
   return report;
 };
