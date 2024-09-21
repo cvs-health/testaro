@@ -42,11 +42,7 @@ exports.reporter = async (page, report, actIndex) => {
   const waveKey = process.env.WAVE_KEY;
   const waveKeyParam = waveKey ? `key=${waveKey}` : '';
   let host = 'wave.webaim.org';
-  let scheme = 'https';
   if (url && url.startsWith('http')) {
-    if (url.startsWith('http://')) {
-      scheme = 'http';
-    }
     host = url.replace(/^https?:\/\//, '');
   }
   let prescriptParam = prescript ? `prescript=${prescript}` : '';
@@ -89,37 +85,46 @@ exports.reporter = async (page, report, actIndex) => {
               // If rules were specified:
               if (rules && rules.length) {
                 // For each WAVE rule category:
-                ['error', 'contrast', 'alert'].forEach(category => {
+                ['error', 'contrast', 'alert'].forEach(categoryName => {
+                  const category = categories[categoryName];
                   // If any violations were reported:
                   if (
-                    categories[category]
-                    && categories[category].items
-                    && Object.keys(categories[category].items).length
+                    category
+                    && category.items
+                    && Object.keys(category.items).length
                   ) {
+                    const {items} = category;
                     // For each rule violated:
-                    Object.keys(categories[category].items).forEach(ruleID => {
+                    Object.keys(items).forEach(ruleID => {
                       // If it was not a specified rule:
                       if (! rules.includes(ruleID)) {
                         // Decrease the category violation count by the count of its violations.
-                        categories[category].count -= categories[category].items[ruleID].count;
+                        category.count -= items[ruleID].count;
                         // Remove its violations from the report.
-                        delete categories[category].items[ruleID];
+                        delete items[ruleID];
                       }
                     });
                   }
                 });
               }
               // Add WCAG information from the WAVE documentation.
-              const waveDocJSON = await fs.readFile('procs/wavedoc.json');
+              const waveDocJSON = await fs.readFile('procs/wavedoc.json', 'utf8');
               const waveDoc = JSON.parse(waveDocJSON);
               Object.keys(categories).forEach(categoryName => {
                 const category = categories[categoryName];
-                const {items} = category;
-                Object.keys(items).forEach(issueName => {
-                  const issueDoc = waveDoc.find((issue => issue.name === issueName));
-                  const {guidelines} = issueDoc;
-                  items[issueName].wcag = guidelines;
-                });
+                // If any violations were reported:
+                if (
+                  category
+                  && category.items
+                  && Object.keys(category.items).length
+                ) {
+                  const {items} = category;
+                  Object.keys(items).forEach(issueName => {
+                    const issueDoc = waveDoc.find((issue => issue.name === issueName));
+                    const {guidelines} = issueDoc;
+                    items[issueName].wcag = guidelines;
+                  });
+                }
               });
               // Add important data to the result.
               if (statistics) {
@@ -134,7 +139,6 @@ exports.reporter = async (page, report, actIndex) => {
               resolve(actResult);
             }
             catch(error) {
-              console.log(`ERROR parsing tool report: ${error.message}`);
               data.prevented = true;
               data.error = error.message;
               resolve(result);
@@ -145,7 +149,6 @@ exports.reporter = async (page, report, actIndex) => {
     });
   }
   catch (error) {
-    console.log(`ERROR: ${error.message}`);
     data.prevented = true;
     data.error = error.message;
   };

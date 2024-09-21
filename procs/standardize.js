@@ -317,37 +317,40 @@ const doWAVE = (result, standardResult, categoryName) => {
   if (result.categories && result.categories[categoryName]) {
     const category = result.categories[categoryName];
     const ordinalSeverity = categoryName === 'alert' ? 0 : 3;
-    Object.keys(category.items).forEach(ruleID => {
-      category.items[ruleID].selectors.forEach(selector => {
-        let tagName = '';
-        let id = '';
-        if (typeof selector === 'string') {
-          const finalTerm = selector.replace(/^.+\s/, '');
-          if (finalTerm.includes('#')) {
-            const finalArray = finalTerm.split('#');
-            tagName = finalArray[0].replace(/:.*/, '');
-            id = isBadID(finalArray[1]) ? '' : finalArray[1];
+    const {items} = category;
+    if (items) {
+      Object.keys(items).forEach(ruleID => {
+        items[ruleID].selectors.forEach(selector => {
+          let tagName = '';
+          let id = '';
+          if (typeof selector === 'string') {
+            const finalTerm = selector.replace(/^.+\s/, '');
+            if (finalTerm.includes('#')) {
+              const finalArray = finalTerm.split('#');
+              tagName = finalArray[0].replace(/:.*/, '');
+              id = isBadID(finalArray[1]) ? '' : finalArray[1];
+            }
+            else {
+              tagName = finalTerm.replace(/:.*/, '');
+            }
           }
-          else {
-            tagName = finalTerm.replace(/:.*/, '');
-          }
-        }
-        const instance = {
-          ruleID,
-          what: category.items[ruleID].description,
-          ordinalSeverity,
-          tagName,
-          id,
-          location: {
-            doc: 'dom',
-            type: 'selector',
-            spec: selector
-          },
-          excerpt: ''
-        };
-        standardResult.instances.push(instance);
+          const instance = {
+            ruleID,
+            what: items[ruleID].description,
+            ordinalSeverity,
+            tagName,
+            id,
+            location: {
+              doc: 'dom',
+              type: 'selector',
+              spec: selector
+            },
+            excerpt: ''
+          };
+          standardResult.instances.push(instance);
+        });
       });
-    });
+    }
   }
 };
 // Converts a result.
@@ -642,6 +645,20 @@ const convert = (toolName, data, result, standardResult) => {
       });
     }
   }
+  // wave
+  else if (
+    toolName === 'wave'
+    && result.categories
+    && (
+      result.categories.error
+      || result.categories.contrast
+      || result.categories.alert
+    )
+  ) {
+    ['error', 'contrast', 'alert'].forEach(categoryName => {
+      doWAVE(result, standardResult, categoryName);
+    });
+  }
   // wax
   else if (toolName === 'wax' && result.violations && result.violations.length) {
     // For each violation:
@@ -681,20 +698,6 @@ const convert = (toolName, data, result, standardResult) => {
       };
       // Add the instance to the standard result.
       standardResult.instances.push(instance);
-    });
-  }
-  // wave
-  else if (
-    toolName === 'wave'
-    && result.categories
-    && (
-      result.categories.error
-      || result.categories.contrast
-      || result.categories.alert
-    )
-  ) {
-    ['error', 'contrast', 'alert'].forEach(categoryName => {
-      doWAVE(result, standardResult, categoryName);
     });
   }
   // Populate the totals of the standard result if the tool is not Testaro.

@@ -96,7 +96,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
   // If the injection and the result attachment both succeeded:
   if (! data.prevented) {
     // Get their text.
-    const actReport = reportLoc.textContent;
+    const actReport = await reportLoc.textContent();
     // Populate the act report.
     result = JSON.parse(actReport);
     // If any rules were reported violated:

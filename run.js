@@ -764,7 +764,7 @@ const doActs = async (report) => {
             // If the wait times out:
             catch(error) {
               // Quit.
-              actIndex = await abortActs(report, actIndex);
+              abortActs(report, actIndex);
               waitError(page, act, error, 'text in the URL');
             }
           }
@@ -788,7 +788,7 @@ const doActs = async (report) => {
             // If the wait times out:
             catch(error) {
               // Quit.
-              actIndex = await abortActs(report, actIndex);
+              abortActs(report, actIndex);
               waitError(page, act, error, 'text in the title');
             }
           }
@@ -811,7 +811,7 @@ const doActs = async (report) => {
             // If the wait times out:
             catch(error) {
               // Quit.
-              actIndex = await abortActs(report, actIndex);
+              abortActs(report, actIndex);
               waitError(page, act, error, 'text in the body');
             }
           }
@@ -1062,7 +1062,7 @@ const doActs = async (report) => {
                     act.result.success = false;
                     act.result.error = 'unclickable';
                     act.result.message = 'ERROR: click or load timed out';
-                    actIndex = await abortActs(report, actIndex);
+                    abortActs(report, actIndex);
                   }
                   // If the link click succeeded:
                   if (! act.result.error) {
@@ -1139,7 +1139,7 @@ const doActs = async (report) => {
               act.result.error = 'absent';
               act.result.message = 'ERROR: specified element not found';
               console.log('ERROR: Specified element not found');
-              actIndex = await abortActs(report, actIndex);
+              abortActs(report, actIndex);
             }
           }
           // Otherwise, if the act is a keypress:
@@ -1328,6 +1328,7 @@ const doActs = async (report) => {
   console.log('Acts completed');
   await browserClose();
   await fs.rm(reportPath, {force: true});
+  console.log('About to return report');
   return report;
 };
 /*
@@ -1335,7 +1336,7 @@ const doActs = async (report) => {
 */
 exports.doJob = async job => {
   // Make a report as a copy of the job.
-  const report = JSON.parse(JSON.stringify(job));
+  let report = JSON.parse(JSON.stringify(job));
   const jobData = report.jobData = {};
   // Get whether the job is valid and, if not, why.
   const jobInvalidity = isValidJob(job);
@@ -1374,7 +1375,9 @@ exports.doJob = async job => {
       }
     });
     // Perform the acts and get the revised report.
+    console.log('About to do acts');
     report = await doActs(report, 0, null);
+    console.log('Did acts');
     // Add the end time and duration to the report.
     const endTime = new Date();
     report.jobData.endTime = nowString();
@@ -1389,6 +1392,7 @@ exports.doJob = async job => {
     toolTimeData.forEach(item => {
       report.jobData.toolTimes[item[0]] = item[1];
     });
+    console.log("Finished adding to report");
   }
   // Return the report.
   return report;
