@@ -1328,7 +1328,6 @@ const doActs = async (report) => {
   console.log('Acts completed');
   await browserClose();
   await fs.rm(reportPath, {force: true});
-  console.log('About to return report');
   return report;
 };
 /*
@@ -1375,9 +1374,7 @@ exports.doJob = async job => {
       }
     });
     // Perform the acts and get the revised report.
-    console.log('About to do acts');
     report = await doActs(report, 0, null);
-    console.log('Did acts');
     // Add the end time and duration to the report.
     const endTime = new Date();
     report.jobData.endTime = nowString();
@@ -1392,7 +1389,6 @@ exports.doJob = async job => {
     toolTimeData.forEach(item => {
       report.jobData.toolTimes[item[0]] = item[1];
     });
-    console.log("Finished adding to report");
   }
   // Return the report.
   return report;

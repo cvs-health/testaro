@@ -132,46 +132,52 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
             // When the response arrives:
             .on('end', async () => {
               const content = chunks.join('');
+              // It should be JSON. If it is:
               try {
                 let contentObj = JSON.parse(content);
-                let jobInvalidity = '';
-                // If there was no job to do:
+                const {id, message, sendReportTo, sources} = contentObj;
+                // If it is empty:
                 if (! Object.keys(contentObj).length) {
                   // Report this.
-                  console.log(`No job to do at ${publicURL}`);
+                  console.log(`${logStart}no job to do`);
                   resolve(true);
                 }
-                // Otherwise, i.e. if there was a job or a message:
+                // Otherwise, if it is a message:
+                else if (message) {
+                  // Report it.
+                  console.log(`${logStart}message: ${message}`);
+                  resolve(true);
+                }
+                // Otherwise, i.e. if it is a job:
                 else {
-                  const {id, message, sendReportTo, sources} = contentObj;
-                  // If the server sent a message, not a job:
-                  if (message) {
-                    // Report it.
-                    console.log(`${logStart}${message}`);
+                  // Check it for validity.
+                  const jobInvalidity = isValidJob(contentObj);
+                  // If it is invalid:
+                  if (jobInvalidity) {
+                    // Report this to the server.
+                    serveObject({
+                      message: `invalidJob`,
+                      jobInvalidity
+                    }, response);
+                    console.log(`${logStart}invalid job (${jobInvalidity})`);
                     resolve(true);
                   }
-                  // Otherwise, if the server sent a valid job:
-                  else if (
-                    id && sendReportTo && sources && ! (jobInvalidity = isValidJob(contentObj))
-                  ) {
+                  // Otherwise, i.e. if it is valid:
+                  else {
                     // Restart the cycle.
                     cycleIndex = -1;
                     // Prevent further watching, if unwanted.
                     noJobYet = false;
                     // Add the agent to the job.
                     sources.agent = process.env.AGENT || '';
-                    // Perform the job, adding result data to it.
-                    console.log(`${logStart}job ${id} (${nowString()})`);
-                    console.log(`>> It will send report to ${sendReportTo}`);
+                    // Perform the job and create a report.
+                    console.log(`${logStart}job ${id} for ${sendReportTo} (${nowString()})`);
                     const report = await doJob(contentObj);
                     let reportJSON = JSON.stringify(report, null, 2);
                     console.log(`Job ${id} finished (${nowString()})`);
-                    // Send the report to the specified server.
-                    console.log(`Sending report ${id} to ${sendReportTo}`);
                     const reportClient = sendReportTo.startsWith('https://')
                       ? httpsClient
                       : httpClient;
-                    const reportLogStart = `Sent report ${id} to ${sendReportTo} and got `;
                     // Initialize the report destination as the sendReportTo property of the job.
                     let reportDest = sendReportTo;
                     // If it contains a placeholder:
@@ -181,6 +187,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                     }
                     // Send the report there.
                     reportClient.request(reportDest, {method: 'POST'}, repResponse => {
+                      const reportLogStart = `Did job ${id}, sent report, and got `;
                       const chunks = [];
                       repResponse
                       // If the response to the report threw an error:
@@ -192,38 +199,28 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                       .on('data', chunk => {
                         chunks.push(chunk);
                       })
-                      // When the response arrives:
+                      // When the response to the report arrives:
                       .on('end', async () => {
                         const content = chunks.join('');
+                        // It should be JSON. If it is:
                         try {
-                          // If the server sent a message, as expected:
                           const ackObj = JSON.parse(content);
-                          const {message} = ackObj;
-                          if (message) {
-                            // Report it.
-                            console.log(`${reportLogStart}message ${message}\n`);
-                            // Free the memory used by the report.
-                            reportJSON = '';
-                            contentObj = {};
-                            resolve(true);
-                          }
-                          // Otherwise, i.e. if the server sent anything else:
-                          else {
-                            // Report it.
-                            console.log(
-                              `ERROR: ${reportLogStart}status ${repResponse.statusCode} and error message ${JSON.stringify(ackObj, null, 2)}\n`
-                            );
-                            resolve(true);
-                          }
+                          // Report it.
+                          console.log(
+                            `${reportLogStart}response message: ${JSON.stringify(ackObj, null, 2)}\n`
+                          );
                         }
-                        // If processing the server message throws an error:
+                        // Otherwise, i.e. if it is not JSON:
                         catch(error) {
                           // Report it.
                           console.log(
                             `ERROR: ${reportLogStart}status ${repResponse.statusCode}, error message ${error.message}, and response ${content.slice(0, 1000)}\n`
                           );
-                          resolve(true);
                         }
+                        // Free the memory used by the job and the report.
+                        contentObj = {};
+                        reportJSON = '';
+                        resolve(true);
                       });
                     })
                     // If the report submission throws an error:
@@ -237,23 +234,14 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                     // Finish submitting the report.
                     .end(reportJSON);
                   }
-                  // Otherwise, i.e. if the server sent an invalid job:
-                  else {
-                    // Report this.
-                    const errorSuffix = jobInvalidity ? ` (${jobInvalidity})` : '';
-                    const message = `ERROR: ${logStart}invalid job${errorSuffix}`;
-                    console.log(message);
-                    serveObject({message}, response);
-                    resolve(true);
-                  }
                 }
               }
-              // If processing the server response throws an error:
+              // Otherwise, i.e. if it is not JSON:
               catch(error) {
                 // Report this.
-                console.log(`ERROR processing server response: ${error.message})`);
+                console.log(`ERROR: Job request got non-JSON response (${error.message})`);
                 resolve(true);
-              }
+              };
             });
           })
           // If the job request throws an error:

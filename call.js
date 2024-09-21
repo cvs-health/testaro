@@ -99,7 +99,6 @@ const callNetWatch = async (isForever, intervalInSeconds, isCertTolerant) => {
     Number.parseInt(intervalInSeconds, 10),
     isCertTolerant ? isCertTolerant === 'true' : undefined
   );
-  console.log('netWatch run');
 };
 
 // OPERATION
