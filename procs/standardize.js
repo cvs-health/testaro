@@ -655,6 +655,10 @@ const convert = (toolName, data, result, standardResult) => {
       || result.categories.alert
     )
   ) {
+    const {categories} = result;
+    standardResult.totals = [0, 0, 0, 0];
+    standardResult.totals[0] = categories.alert.count;
+    standardResult.totals[3] = (categories.error.count || 0) + (categories.contrast.count || 0);
     ['error', 'contrast', 'alert'].forEach(categoryName => {
       doWAVE(result, standardResult, categoryName);
     });
@@ -700,8 +704,8 @@ const convert = (toolName, data, result, standardResult) => {
       standardResult.instances.push(instance);
     });
   }
-  // Populate the totals of the standard result if the tool is not Testaro.
-  if (toolName !== 'testaro') {
+  // Populate the totals of the standard result if the tool is not Testaro or WAVE.
+  if (! ['testaro', 'wave'].includes(toolName)) {
     standardResult.instances.forEach(instance => {
       standardResult.totals[instance.ordinalSeverity] += instance.count || 1;
     });
