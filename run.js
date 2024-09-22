@@ -82,12 +82,12 @@ const errorWords = [
   'violates',
   'warning'
 ];
-// Time limits on tools.
+// Time limits on tools, accounting for page reloads by 6 Testaro tests.
 const timeLimits = {
   alfa: 20,
   ed11y: 30,
   ibm: 30,
-  testaro: 60
+  testaro: 150 + Math.round(6 * process.env.WAITS / 1000)
 };
 
 // ########## VARIABLES
@@ -501,7 +501,7 @@ const wait = ms => {
     }, ms);
   });
 };
-// Reports a job being aborted and returns an abortive act index.
+// Reports a job being aborted.
 const abortActs = (report, actIndex) => {
   // Add data on the aborted act to the report.
   report.jobData.abortTime = nowString();
@@ -543,7 +543,8 @@ const doActs = async (report) => {
   const standard = report.standard || 'only';
   const reportPath = 'temp/report.json';
   // For each act in the reeport.
-  for (const actIndex in acts) {
+  for (const doActsIndex in acts) {
+    actIndex = doActsIndex;
     // If the job has not been aborted:
     if (report.jobData && ! report.jobData.aborted) {
       let act = acts[actIndex];
@@ -584,7 +585,7 @@ const doActs = async (report) => {
           // If the performance of acts is to stop:
           if (act.jump === 0) {
             // Quit.
-            actIndex = -2;
+            break;
           }
           // Otherwise, if there is a numerical jump:
           else if (act.jump) {
