@@ -135,21 +135,15 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
               // It should be JSON. If it is:
               try {
                 let contentObj = JSON.parse(content);
-                const {id, message, sendReportTo, sources} = contentObj;
+                const {id, sendReportTo, sources} = contentObj;
                 // If it is empty:
                 if (! Object.keys(contentObj).length) {
                   // Report this.
                   console.log(`${logStart}no job to do`);
                   resolve(true);
                 }
-                // Otherwise, if it is a message:
-                else if (message) {
-                  // Report it.
-                  console.log(`${logStart}message: ${message}`);
-                  resolve(true);
-                }
                 // Otherwise, i.e. if it is a job:
-                else {
+                else if (id) {
                   // Check it for validity.
                   const jobInvalidity = isValidJob(contentObj);
                   // If it is invalid:
@@ -234,6 +228,12 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                     // Finish submitting the report.
                     .end(reportJSON);
                   }
+                }
+                // Otherwise, i.e. if it is a message:
+                else {
+                  // Report it.
+                  console.log(`${logStart}${JSON.stringify(contentObj, null, 2)}`);
+                  resolve(true);
                 }
               }
               // Otherwise, i.e. if it is not JSON:
