@@ -221,7 +221,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                     .on('error', async error => {
                       // Report this.
                       console.log(
-                        `ERROR in report submission: ${reportLogStart}error message ${error.message}\n`
+                        `ERROR ${error.code} in report submission: ${reportLogStart}error message ${error.message}\n`
                       );
                       resolve(true);
                     })
