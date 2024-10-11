@@ -179,9 +179,9 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                       // Replace the placeholder with the value of the environment variable it names.
                       reportDest = `${sendReportTo.replace(/\[([^]]+\])/, process.env[$1])}`;
                     }
+                    const reportLogStart = `Did job ${id}, sent report, and got `;
                     // Send the report there.
                     reportClient.request(reportDest, {method: 'POST'}, repResponse => {
-                      const reportLogStart = `Did job ${id}, sent report, and got `;
                       const chunks = [];
                       repResponse
                       // If the response to the report threw an error:
