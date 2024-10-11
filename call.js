@@ -73,7 +73,6 @@ const callRun = async jobIDStart => {
     const report = JSON.parse(jobJSON);
     // Ensure it does not specify server properties.
     report.observe = false;
-    report.sendReportTo = '';
     // Run it.
     report = await doJob(report);
     // Archive it.

@@ -196,7 +196,6 @@ exports.isValidJob = job => {
       timeLimit,
       creationTimeStamp,
       executionTimeStamp,
-      sendReportTo,
       target,
       sources,
       acts
@@ -232,9 +231,6 @@ exports.isValidJob = job => {
       ! (executionTimeStamp && typeof executionTimeStamp === 'string') && dateOf(executionTimeStamp)
     ) {
       return 'bad job executionTimeStamp';
-    }
-    if (typeof sendReportTo !== 'string' || sendReportTo && ! isURL(sendReportTo)) {
-      return 'bad job sendReportTo';
     }
     if (typeof target !== 'object' || target.url && ! isURL(target.url) || target.what === '') {
       return 'bad job target';

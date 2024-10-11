@@ -158,7 +158,6 @@ Here is an example of a job:
   browserID: 'webkit',
   creationTimeStamp: '241229T0537',
   executionTimeStamp: '250110T1200',
-  sendReportTo: 'https://abccorp.com/api/report',
   target: {
     what: 'Real Estate Management',
     url: 'https://abccorp.com/mgmt/realproperty.html'
@@ -204,7 +203,6 @@ Job properties:
 - `browserID`: the ID of the browser to be used, unless overridden by an act. It must be `'chromium'`, `'firefox'`, or `'webkit`'.
 - `creationTimeStamp`: a string in `yymmddThhMM` format, describing when the job was created.
 - `executionTimeStamp`: a string in `yymmddThhMM` format, specifying a date and time before which the job is not to be performed.
-- `sendReportTo`: the URL to which the job report is to be sent, or `''` if not a `netWatch` job.
 - `target`: data about the target of the job, or `{}` if the job involves multiple targets.
 - `sources`: data optionally inserted into the job by the job creator for use by the job creator.
 - `acts`: an array of the acts to be performed (documented below).
@@ -781,15 +779,15 @@ The arguments and behaviors described above for execution by a module apply here
 
 ##### Network watch
 
-Testaro can poll servers for jobs to be performed.
+An instance of Testaro, an _agent_, can poll servers for jobs to be performed.
 
-An instance of Testaro is an _agent_. A Testaro instance identifies itself when polling servers, allowing servers to decide whether to give the instance a job to do and whether to accept a report from the instance. It also identifies itself in any report that it creates.
+Network watching is governed by environment variables of the form `NETWATCH_URL_0_JOB` and `NETWATCH_URL_0_REPORT`, and by an environment variable `NETWATCH_URLS`.
 
-The URLs polled by Testaro are specified by `JOB_URLS`. The format of that environment variable is a `+`-delimited list of URLs, including schemes and agent authentications. One of the URLs might be `https://testrunner.org/a11ytest/api/job/tester3:secretsauce` or `https://testrunner.org/a11ytest/api/job?agent=tester3:secretsauce`. In these examples, the final URL segment or the query parameter is an agent authentication agreed to between the agent and a server. Such a URL can then be the requested resource in a `GET` request asking the server to assign a job to the instance.
+You can create as many pairs of `…JOB` and `…REPORT` variables as you want, one pair for each server that the agent may get jobs from. Each pair has a different number inside the variable name. The `…JOB` variable is the URL that the agent needs to send a job request to. The `…REPORT` variable is the URL that the agent needs to send a completed report to. Each URL can contain segments and/or query parameters that identify the purpose of the request
 
-Once a Testaro instance obtains a network job, Testaro performs it and adds the result data to the job, which then becomes the job report. Testaro also makes its `AGENT` value the value of the `sources.agent` property of the report. Testaro then sends the report in a `POST` request to the URL specified by the `sendReportTo` property of the job.
+The `NETWATCH_URLS` variable has a value of the form `0,3,4`. This is a comma-delimited list of the numbers of the servers to be polled.
 
-That `sendReportTo` property may contain a substring bounded by brackets, as in `https://serverx.org/[SERVERXAGENT]`. If it does, Testaro substitutes the value of its `SERVERXAGENT` environment variable for the brackets and the substring they enclose. That potentially modified `sendReportTo` property is the URL of the `POST` request. That environment variable has a value agreed to between the agent and the server.
+Once a Testaro instance obtains a network job from one of the servers, Testaro performs it and adds the result data to the job, which then becomes a report. Testaro also makes its `AGENT` value the value of the `sources.agent` property of the report. Testaro then sends the report in a `POST` request to the report URL with the same server number.
 
 Network watching can be repeated or 1-job. 1-job watching stops after 1 job has been performed.
 
@@ -823,13 +821,18 @@ Before making Testaro run a job, you can optionally also set `DEBUG` (to `'true'
 You may store environment variables in an untracked `.env` file if you wish, and Testaro will recognize them. Here is a template for a `.env` file:
 
 ```conf
-WAVE_KEY=yourwavekey
-JOB_URLs=https://yourserver.tld/job/AgentABC:abcSecretX+http://localhost:3004/testapp?agent=AgentABC:AuthABC33
-JOBDIR=../testing/jobs/ThisWorkstation
-REPORTDIR=../testing/reports
-AGENT=AgentABC
+AGENT=agentabc
 DEBUG=false
+JOB_URLs=https://yourserver.tld/job/AgentABC:abcSecretX+http://localhost:3004/testapp?agent=AgentABC:AuthABC33
+JOBDIR=../testing/jobs
+NETWATCH_URL_0_JOB=http://localhost:3000/api/assignJob/agentabc:abcpw
+NETWATCH_URL_0_OBSERVE=http://localhost:3000/api/granular/agentabc:abcpw
+NETWATCH_URL_0_REPORT=http://localhost:3000/api/takeReport/agentabc:abcpw
+PUPPETEER_DISABLE_HEADLESS_WARNING=true
+REPORTDIR=../testing/reports
 WAITS=0
+WAVE_KEY=yourwavekey
+WAX_KEY=yourwaxkey
 ```
 
 ## Validation

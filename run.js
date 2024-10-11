@@ -536,7 +536,7 @@ const addError = (alsoLog, alsoAbort, report, actIndex, message) => {
     abortActs(report, actIndex);
   }
 };
-// Performs the acts in a report.
+// Performs the acts in a report and adds the results to the report.
 const doActs = async (report) => {
   const {acts} = report;
   // Get the standardization specification.
@@ -1374,7 +1374,7 @@ exports.doJob = async job => {
         process.exit();
       }
     });
-    // Perform the acts and get the revised report.
+    // Perform the acts and get a report.
     report = await doActs(report, 0, null);
     // Add the end time and duration to the report.
     const endTime = new Date();

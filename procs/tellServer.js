@@ -37,17 +37,20 @@ const agent = process.env.AGENT;
 
 // Sends a notification to an observer.
 exports.tellServer = (report, messageParams, logMessage) => {
-  const observer = report.sendReportTo.replace(/report$/, 'granular');
-  const whoParams = `agent=${agent}&jobID=${report.id || ''}`;
-  const wholeURL = `${observer}?${whoParams}&${messageParams}`;
-  const client = wholeURL.startsWith('https://') ? httpsClient : httpClient;
-  client.request(wholeURL)
-  // If the notification threw an error:
-  .on('error', error => {
-    // Report the error.
-    const errorMessage = 'ERROR notifying the server';
-    console.log(`${errorMessage} (${error.message})`);
-  })
-  .end();
-  console.log(`${logMessage} (server notified)`);
+  const {serverID} = report.sources;
+  const observerURL = typeof serverID === 'number' ? process.env[`NETWATCH_URL_${serverID}_OBSERVE`] : '';
+  if (observerURL) {
+    const whoParams = `agent=${agent}&jobID=${report.id || ''}`;
+    const wholeURL = `${observer}?${whoParams}&${messageParams}`;
+    const client = wholeURL.startsWith('https://') ? httpsClient : httpClient;
+    client.request(wholeURL)
+    // If the notification threw an error:
+    .on('error', error => {
+      // Report the error.
+      const errorMessage = 'ERROR notifying the server';
+      console.log(`${errorMessage} (${error.message})`);
+    })
+    .end();
+    console.log(`${logMessage} (server notified)`);
+  }
 };

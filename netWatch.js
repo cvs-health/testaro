@@ -41,7 +41,9 @@ const {doJob} = require('./run');
 
 // CONSTANTS
 
-const jobURLSpec = process.env.JOB_URLS;
+const netWatchURLIDs = process.env.NETWATCH_URLS.split(/,/);
+const jobURLs = netWatchURLIDs.map(id => process.env[`NETWATCH_URL_${id}_JOB`]);
+const reportURLs = netWatchURLIDs.map(id => process.env[`NETWATCH_URL_${id}_REPORT`]);
 
 // FUNCTIONS
 
@@ -68,17 +70,17 @@ const serveObject = (object, response) => {
   2. whether to ignore unknown-certificate errors from watched servers.
 */
 exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) => {
-  const urls = jobURLSpec
-  .split('+')
-  .map(url => [Math.random(), url])
-  .sort((a, b) => a[0] - b[0])
-  .map(pair => pair[1]);
-  const urlCount = urls.length;
-  // If the job URLs exist and are valid:
+  // If the job and report URLs exist and are all valid:
   if (
-    urls
-    && urlCount
-    && urls.every(url => ['http://', 'https://'].some(prefix => url.startsWith(prefix)))
+    jobURLs
+    && reportURLs
+    && jobURLs.every((jobURL, index) => {
+      const allDefined = [jobURL, reportURLs[index]].every(url => url);
+      const allSchemed = allDefined
+      && [jobURL, reportURLs[index]]
+      .every(url => ['http://', 'https://'].some(prefix => url.startsWith(prefix)));
+      return allSchemed;
+    })
   ) {
     // Configure the watch.
     let cycleIndex = -1;
@@ -109,15 +111,15 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
       // Configure the next check.
       cycleIndex = ++cycleIndex % urlCount;
       urlIndex = ++urlIndex % urlCount;
-      const url = urls[urlIndex];
-      const publicURL = url.replace(/[?/][^?/.]+$/, '');
+      const jobURL = jobURLs[urlIndex];
+      const publicURL = jobURL.replace(/[?/][^?/.]+$/, '');
       const logStart = `Requested job from ${publicURL} and got `;
       // Perform it.
       await new Promise(resolve => {
         try {
-          const client = url.startsWith('https://') ? httpsClient : httpClient;
+          const client = jobURL.startsWith('https://') ? httpsClient : httpClient;
           // Request a job.
-          client.request(url, certOpt, response => {
+          client.request(jobURL, certOpt, response => {
             const chunks = [];
             response
             // If the response throws an error:
@@ -135,7 +137,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
               // It should be JSON. If it is:
               try {
                 let contentObj = JSON.parse(content);
-                const {id, sendReportTo, sources} = contentObj;
+                const {id, sources} = contentObj;
                 // If it is empty:
                 if (! Object.keys(contentObj).length) {
                   // Report this.
@@ -162,26 +164,20 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                     cycleIndex = -1;
                     // Prevent further watching, if unwanted.
                     noJobYet = false;
-                    // Add the agent to the job.
+                    // Add the agent and the server ID to the job.
                     sources.agent = process.env.AGENT || '';
+                    sources.serverID = urlIndex;
                     // Perform the job and create a report.
-                    console.log(`${logStart}job ${id} for ${sendReportTo} (${nowString()})`);
+                    console.log(`${logStart}job ${id} for server ${urlIndex} (${nowString()})`);
                     const report = await doJob(contentObj);
                     let reportJSON = JSON.stringify(report, null, 2);
                     console.log(`Job ${id} finished (${nowString()})`);
-                    const reportClient = sendReportTo.startsWith('https://')
+                    const reportURL = reportURLs[urlIndex];
+                    const reportClient = reportURL.startsWith('https://')
                       ? httpsClient
                       : httpClient;
-                    // Initialize the report destination as the sendReportTo property of the job.
-                    let reportDest = sendReportTo;
-                    // If it contains a placeholder:
-                    if (/\[A-Z_]+\]$/.test(sendReportTo)) {
-                      // Replace the placeholder with the value of the environment variable it names.
-                      reportDest = `${sendReportTo.replace(/\[([^]]+\])/, process.env[$1])}`;
-                    }
-                    const reportLogStart = `Did job ${id}, sent report, and got `;
-                    // Send the report there.
-                    reportClient.request(reportDest, {method: 'POST'}, repResponse => {
+                    // Send the report to the server that assigned the job.
+                    reportClient.request(reportURL, {method: 'POST'}, repResponse => {
                       const chunks = [];
                       repResponse
                       // If the response to the report threw an error:
