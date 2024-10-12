@@ -73,7 +73,9 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
   // If the job and report URLs exist and are all valid:
   if (
     jobURLs
+    && jobURLs.length
     && reportURLs
+    && reportURLs.length === jobURLs.length
     && jobURLs.every((jobURL, index) => {
       const allDefined = [jobURL, reportURLs[index]].every(url => url);
       const allSchemed = allDefined
@@ -83,6 +85,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
     })
   ) {
     // Configure the watch.
+    const urlCount = jobURLs.length;
     let cycleIndex = -1;
     let urlIndex = -1;
     let noJobYet = true;
