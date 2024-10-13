@@ -97,6 +97,9 @@ const wait = ms => {
   1: interval in seconds from a no-job check to the next check.
 */
 exports.dirWatch = async (isForever, intervalInSeconds) => {
+  intervalInSeconds ||= 5;
+  intervalInSeconds = Math.max(intervalInSeconds, 5);
+  console.log(intervalInSeconds);
   console.log(`Starting to watch directory ${jobDir}/todo for jobs`);
   let notYetRun = true;
   // As long as watching as to continue:
