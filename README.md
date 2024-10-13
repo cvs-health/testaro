@@ -781,13 +781,13 @@ The arguments and behaviors described above for execution by a module apply here
 
 An instance of Testaro, an _agent_, can poll servers for jobs to be performed.
 
-Network watching is governed by environment variables of the form `NETWATCH_URL_0_JOB` and `NETWATCH_URL_0_REPORT`, and by an environment variable `NETWATCH_URLS`.
+Network watching is governed by environment variables of the form `NETWATCH_URL_0_JOB`, `NETWATCH_URL_0_OBSERVE`, and `NETWATCH_URL_0_REPORT`, and by an environment variable `NETWATCH_URLS`.
 
-You can create as many pairs of `…JOB` and `…REPORT` variables as you want, one pair for each server that the agent may get jobs from. Each pair has a different number inside the variable name. The `…JOB` variable is the URL that the agent needs to send a job request to. The `…REPORT` variable is the URL that the agent needs to send a completed report to. Each URL can contain segments and/or query parameters that identify the purpose of the request
+You can create as many triples of `…JOB`, `OBSERVE`, and `…REPORT` variables as you want, one triple for each server that the agent may get jobs from. Each triple has a different number inside the variable name. The `…JOB` variable is the URL that the agent needs to send a job request to. The `…OBSERVE` variable is the URL that the agent needs to send granular job progress messages to. The `…REPORT` variable is the URL that the agent needs to send a completed report to. Each URL can contain segments and/or query parameters that identify the purpose of the request, the identity and authorization of the agent, etc.
 
 The `NETWATCH_URLS` variable has a value of the form `0,3,4`. This is a comma-delimited list of the numbers of the servers to be polled.
 
-Once a Testaro instance obtains a network job from one of the servers, Testaro performs it and adds the result data to the job, which then becomes a report. Testaro also makes its `AGENT` value the value of the `sources.agent` property of the report. Testaro then sends the report in a `POST` request to the report URL with the same server number.
+Once a Testaro instance obtains a network job from one of the servers, Testaro performs it and adds the result data to the job, which then becomes a report. Testaro also makes its `AGENT` value the value of the `sources.agent` property of the report. Testaro then sends the report in a `POST` request to the report URL with the same server number. If granular reporting is desired, Testaro sends progress messages to the observation URL.
 
 Network watching can be repeated or 1-job. 1-job watching stops after 1 job has been performed.
 
@@ -828,6 +828,7 @@ JOBDIR=../testing/jobs
 NETWATCH_URL_0_JOB=http://localhost:3000/api/assignJob/agentabc:abcpw
 NETWATCH_URL_0_OBSERVE=http://localhost:3000/api/granular/agentabc:abcpw
 NETWATCH_URL_0_REPORT=http://localhost:3000/api/takeReport/agentabc:abcpw
+NETWATCH_URLS=0
 PUPPETEER_DISABLE_HEADLESS_WARNING=true
 REPORTDIR=../testing/reports
 WAITS=0
