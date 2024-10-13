@@ -62,6 +62,8 @@ const serveObject = (object, response) => {
   response.setHeader('Content-Type', 'application/json; charset=utf-8');
   response.end(JSON.stringify(object));
 };
+// Removes secrets from a URL.
+const getURLBase = url => url.replace(/[?/][^?/.]+$/, '');
 /*
   Requests a network job and, when found, performs and reports it.
   Arguments:
@@ -115,7 +117,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
       cycleIndex = ++cycleIndex % urlCount;
       urlIndex = ++urlIndex % urlCount;
       const jobURL = jobURLs[urlIndex];
-      const publicURL = jobURL.replace(/[?/][^?/.]+$/, '');
+      const publicURL = getURLBase(jobURL);
       const logStart = `Requested job from ${publicURL} and got `;
       // Perform it.
       await new Promise(resolve => {
@@ -176,9 +178,11 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                     let reportJSON = JSON.stringify(report, null, 2);
                     console.log(`Job ${id} finished (${nowString()})`);
                     const reportURL = reportURLs[urlIndex];
+                    const publicReportURL = getURLBase(reportURL);
                     const reportClient = reportURL.startsWith('https://')
                       ? httpsClient
                       : httpClient;
+                    const reportLogStart = `Submitted report ${id} to ${publicReportURL} and got `;
                     // Send the report to the server that assigned the job.
                     reportClient.request(reportURL, {method: 'POST'}, repResponse => {
                       const chunks = [];

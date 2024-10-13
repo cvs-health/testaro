@@ -464,7 +464,7 @@ These changes were proposed as pull requests 1333 and 1334 (https://github.com/I
 
 The `ibm` tool is one of two tools (`testaro` is the other) with a `withItems` property. If you set `withItems` to `false`, the result includes the counts of “violations” and “recommendations”, but no information about the rules that gave rise to them.
 
-Experimentation indicates that the `ibm` tools emits untrappable errors for some targets when the content argument given to it is the page content rather than the page URL. Therefore, it is safer to use `true` as the value of `withNewContent` for the `ibm` tool.
+Experimentation indicates that the `ibm` tool emits untrappable errors for some targets when the content argument given to it is the page content rather than the page URL. Therefore, it is safer to use `true` as the value of `withNewContent` for the `ibm` tool.
 
 #### Nu Html Checker
 

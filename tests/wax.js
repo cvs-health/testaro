@@ -29,10 +29,6 @@
 
 // IMPORTS
 
-// Module to handle files.
-const fs = require('fs/promises');
-// Utility module.
-const {doBy} = require('../procs/job');
 // WAX
 const runWax = require('@wally-ax/wax-dev');
 const waxDev = {runWax};
@@ -52,39 +48,53 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
     rules,
     apiKey: process.env.WAX_KEY || ''
   };
-  const actReport = await waxDev.runWax(pageCode, waxOptions);
-  // If WAX failed with a string report:
-  if (typeof actReport === 'string') {
-    // Report this.
-    data.prevented = true;
-    data.error = actReport;
-  }
-  // Otherwise, if it failed with an object report:
-  else if (typeof actReport === 'object' && actReport.responseCode === 500) {
-    // Report this.
-    data.prevented = true;
-    data.error = actReport.message || 'response status code 500';
-  }
-  // Otherwise, i.e. if WAX succeeded:
-  else {
-    // Populate the act report.
-    result = {
-      violations: actReport
-    }
-  }
-  // Return the results.
   try {
-    JSON.stringify(data);
+    const actReport = await waxDev.runWax(pageCode, waxOptions);
+    // If WAX failed with a string report:
+    if (typeof actReport === 'string') {
+      // Report this.
+      data.prevented = true;
+      data.error = actReport;
+    }
+    // Otherwise, if it failed with an object report:
+    else if (typeof actReport === 'object' && actReport.responseCode === 500) {
+      // Report this.
+      data.prevented = true;
+      data.error = actReport.message || 'response status code 500';
+    }
+    // Otherwise, i.e. if WAX succeeded:
+    else {
+      // Populate the act report.
+      result = {
+        violations: actReport
+      }
+    }
+    // Return the results.
+    try {
+      JSON.stringify(data);
+    }
+    catch(error) {
+      const message = `ERROR: WAX result cannot be made JSON (${error.message.slice(0, 200)})`;
+      data = {
+        prevented: true,
+        error: message
+      };
+    }
+    return {
+      data,
+      result
+    };
   }
   catch(error) {
-    const message = `ERROR: WAX result cannot be made JSON (${error.message.slice(0, 200)})`;
+    const message = `ERROR running WallyAX (${error.message})`;
     data = {
       prevented: true,
       error: message
     };
+    console.log(message);
+    return {
+      data,
+      result
+    };
   }
-  return {
-    data,
-    result
-  };
 };
