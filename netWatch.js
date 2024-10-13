@@ -209,6 +209,8 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                         }
                         // Otherwise, i.e. if it is not JSON:
                         catch(error) {
+                          // Abort the watch.
+                          abort = true;
                           // Report it.
                           console.log(
                             `ERROR: ${reportLogStart}status ${repResponse.statusCode}, error message ${error.message}, and response ${content.slice(0, 1000)}\n`
@@ -222,6 +224,8 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                     })
                     // If the report submission throws an error:
                     .on('error', async error => {
+                      // Abort the watch.
+                      abort = true;
                       // Report this.
                       console.log(
                         `ERROR ${error.code} in report submission: ${reportLogStart}error message ${error.message}\n`
@@ -241,6 +245,8 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
               }
               // Otherwise, i.e. if it is not JSON:
               catch(error) {
+                // Abort the watch.
+                abort = true;
                 // Report this.
                 console.log(`ERROR: Job request got non-JSON response (${error.message})`);
                 resolve(true);
@@ -251,11 +257,15 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
           .on('error', async error => {
             // If it is a refusal to connect:
             if (error.code && error.code.includes('ECONNREFUSED')) {
+              // Abort the watch.
+              abort = true;
               // Report this.
               console.log(`${logStart}no connection`);
             }
             // Otherwise, if it was a DNS failure:
             else if (error.code && error.code.includes('ENOTFOUND')) {
+              // Abort the watch.
+              abort = true;
               // Report this.
               console.log(`${logStart}no domain name resolution`);
             }
@@ -280,9 +290,10 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
         }
         // If requesting a job throws an error:
         catch(error) {
+          // Abort the watch.
+          abort = true;
           // Report this.
           console.log(`ERROR requesting a network job (${error.message})`);
-          abort = true;
           resolve(true);
         }
       });
