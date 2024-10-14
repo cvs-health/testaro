@@ -257,15 +257,11 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
           .on('error', async error => {
             // If it is a refusal to connect:
             if (error.code && error.code.includes('ECONNREFUSED')) {
-              // Abort the watch.
-              abort = true;
               // Report this.
               console.log(`${logStart}no connection`);
             }
             // Otherwise, if it was a DNS failure:
             else if (error.code && error.code.includes('ENOTFOUND')) {
-              // Abort the watch.
-              abort = true;
               // Report this.
               console.log(`${logStart}no domain name resolution`);
             }
