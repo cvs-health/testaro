@@ -95,29 +95,9 @@ Version 16 or later of [Node.js](https://nodejs.org/en/).
 
 ## Installation
 
-Some of the dependencies of Testaro are published as Github packages. Installing Testaro therefore requires you to be authorized to read Github packages. If you do not yet have that authorization, you can give it to yourself as follows:
-- Log in at [Github](https://github.com).
-- From your avatar in the upper-right corner, choose “Settings”.
-- In the left sidebar, choose “Developer settings”.
-- In the left sidebar, choose “Personal access tokens”.
-- Activate the button “Generate new token”.
-- Give the new token a descriptive note.
-- Select an expiration date.
-- Check the checkbox `read:packages`.
-- Activate the button “Generate token”.
-- Copy the generated token (you can use the copy icon next to it).
-- In the local directory of the project into which you will install Testaro, create a file named `.npmrc`, unless it already exists.
-- Populate the `.npmrc` file with the following statements, replacing `abc` with your Github username and `xyz` with the token that you copied:
+You can install Testaro as you would install any `npm` package.
 
-    ```bash
-    @siteimprove:registry=https://npm.pkg.github.com
-    //npm.pkg.github.com/:username=abc
-    //npm.pkg.github.com/:_authToken=xyz
-    ```
-
-Once you have done that, you can install Testaro as you would install any `npm` package.
-
-However, if the Playwright dependency is ever updated to a newer version, you must also reinstall its browsers by executing the statement `npx playwright install`.
+However, whenever the Playwright dependency is updated to a newer version, you must also reinstall its browsers by executing the statement `npx playwright install`. It is safe to execute this after each `npm update`; if there are no new browsers to install, nothing will happen.
 
 To run Testaro after installation, provide the environment variables described below under “Environment variables”.
 
