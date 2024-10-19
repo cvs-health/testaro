@@ -90,7 +90,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
     const alfaActModule = await import('@siteimprove/alfa-act');
     const {Audit} = alfaActModule;
     const audit = Audit.of(alfaPage, alfaRules);
-    const outcomes = Array.from(audit.evaluate());
+    const outcomes = Array.from(await audit.evaluate());
     // For each failure or warning:
     outcomes.forEach((outcome, index) => {
       const {target} = outcome;
