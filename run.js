@@ -99,6 +99,7 @@ let actIndex = 0;
 let browser;
 let browserContext;
 let page;
+exports.page = page;
 let requestedURL = '';
 
 // FUNCTIONS
@@ -197,7 +198,7 @@ const browserClose = async () => {
     browser = null;
   }
 };
-// Launches a browser, navigates to a URL, and returns browser data.
+// Launches a browser and navigates to a URL.
 const launch = exports.launch = async (report, debug, waits, tempBrowserID, tempURL) => {
   const act = report.acts[actIndex];
   const {device} = report;
@@ -332,7 +333,6 @@ const launch = exports.launch = async (report, debug, waits, tempBrowserID, temp
       `ERROR: Browser ${browserID}, device ${deviceID}, or URL ${url} invalid`
     );
   }
-  exports.page = page;
 };
 // Returns a string representing the date and time.
 const nowString = () => (new Date()).toISOString().slice(2, 16);
@@ -618,6 +618,7 @@ const doActs = async (report) => {
       }
       // Otherwise, if the act is a test act:
       else if (type === 'test') {
+        console.log(`Starting test act processing on ${typeof page} page`);
         // Add a description of the tool to the act.
         act.what = tools[act.which];
         // Get the start time of the act.
@@ -636,12 +637,14 @@ const doActs = async (report) => {
           child.on('message', message => {
             if (! closed) {
               closed = true;
+              console.log(`Child message is ${message}`);
               resolve(message);
             }
           });
           child.on('close', code => {
             if (! closed) {
               closed = true;
+              console.log(`Code is ${code}`);
               resolve(code);
             }
           });

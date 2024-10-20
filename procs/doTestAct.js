@@ -73,8 +73,10 @@ const doTestAct = async () => {
   else {
     // Get the redefined page.
     const {page} = require('../run');
+    console.log(`doTestAct finds page type is ${typeof page}`);
     // If it exists:
     if (page) {
+      console.log(`page is truthy`);
       try {
         // If the page prevents the tool from testing:
         if (page.prevented) {
@@ -113,6 +115,7 @@ const doTestAct = async () => {
     }
     // Otherwise, i.e. if the page does not exist:
     else {
+      console.log('No page');
       process.send('ERROR: No page');
     }
   }

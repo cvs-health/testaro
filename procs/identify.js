@@ -159,10 +159,7 @@ exports.identify = async (instance, page) => {
     }
     // If either ID remains undefined and the instance specifies an element ID:
     if (id && ! (elementID.boxID && elementID.pathID)) {
-      /*
-        Get the first locator for an element with the ID, or throw an error if the identifier is
-        invalid.
-      */
+      // Get the first locator for an element with the ID.
       try {
         let locator = page.locator(`#${id.replace(/([-&;/]|^\d)/g, '\\$1')}`).first();
         // Add a box ID and a path ID to the result.
