@@ -33,8 +33,6 @@
 const getPath = {
   xPath: require('playwright-dompath').xPath
 };
-// Utility module.
-const {doBy} = require('./job');
 
 // FUNCTIONS
 
@@ -83,10 +81,13 @@ const addIDs = async (locators, recipient) => {
       const box = await boxOf(locators);
       recipient.boxID = boxToString(box);
     }
-    // Add the path ID of the element to the result if none exists yet.
+    // If the element has no path ID yet in the result:
     if (! recipient.pathID) {
-      const pathID = await doBy(1, getPath, 'xPath', [locators], 'xPath identification');
-      if (pathID !== 'timedOut') {
+      // Add it to the result.
+      const pathIDPromise = getPath.xPath(locators);
+      const timeoutPromise = setTimeout(() => true, 1000);
+      const pathID = Promise.race([pathIDPromise, timeoutPromise]);
+      if (typeof pathID === 'string') {
         recipient.pathID = pathID;
       }
     }

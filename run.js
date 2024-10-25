@@ -99,7 +99,6 @@ let actIndex = 0;
 let browser;
 let browserContext;
 let page;
-exports.page = page;
 let requestedURL = '';
 
 // FUNCTIONS
@@ -333,6 +332,7 @@ const launch = exports.launch = async (report, debug, waits, tempBrowserID, temp
       `ERROR: Browser ${browserID}, device ${deviceID}, or URL ${url} invalid`
     );
   }
+  exports.page = page;
 };
 // Returns a string representing the date and time.
 const nowString = () => (new Date()).toISOString().slice(2, 16);
@@ -618,7 +618,6 @@ const doActs = async (report) => {
       }
       // Otherwise, if the act is a test act:
       else if (type === 'test') {
-        console.log(`Starting test act processing on ${typeof page} page`);
         // Add a description of the tool to the act.
         act.what = tools[act.which];
         // Get the start time of the act.
@@ -637,14 +636,12 @@ const doActs = async (report) => {
           child.on('message', message => {
             if (! closed) {
               closed = true;
-              console.log(`Child message is ${message}`);
               resolve(message);
             }
           });
           child.on('close', code => {
             if (! closed) {
               closed = true;
-              console.log(`Code is ${code}`);
               resolve(code);
             }
           });
@@ -677,16 +674,33 @@ const doActs = async (report) => {
             };
             // Populate it.
             standardize(act);
-            // Add a box ID and a path ID to each of its standard instances if missing.
-            for (const instance of act.standardResult.instances) {
-              const elementID = await identify(instance, page);
-              if (! instance.boxID) {
-                instance.boxID = elementID ? elementID.boxID : '';
-              }
-              if (! instance.pathID) {
-                instance.pathID = elementID ? elementID.pathID : '';
-              }
-            };
+            // Launch a browser and navigate to the page.
+            await launch(
+              report,
+              debug,
+              waits,
+              act.browserID || report.browserID || '',
+              act.target && act.target.url || report.target && report.target.url || ''
+            );
+            // If this failed:
+            if (page.prevented) {
+              // Add this to the act.
+              act.prevented = true;
+              act.error = page.error || '';
+            }
+            // Otherwise, i.e. if it succeeded:
+            else {
+              // Add a box ID and a path ID to each of its standard instances if missing.
+              for (const instance of act.standardResult.instances) {
+                const elementID = await identify(instance, page);
+                if (! instance.boxID) {
+                  instance.boxID = elementID ? elementID.boxID : '';
+                }
+                if (! instance.pathID) {
+                  instance.pathID = elementID ? elementID.pathID : '';
+                }
+              };
+            }
             // If the original-format result is not to be included in the report:
             if (standard === 'only') {
               // Remove it.

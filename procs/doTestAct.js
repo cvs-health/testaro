@@ -44,6 +44,8 @@ const waits = Number.parseInt(process.env.WAITS) || 0;
 
 const actIndex = Number.parseInt(process.argv[2]);
 
+// FUNCTIONS
+
 const doTestAct = async () => {
   const reportPath = `${__dirname}/../temp/report.json`;
   // Get the saved report.
@@ -53,7 +55,7 @@ const doTestAct = async () => {
   const act = report.acts[actIndex];
   // Get the tool name.
   const {which} = act;
-  // Launch a browser, navigate to the URL, and redefine the page of the run module.
+  // Launch a browser, navigate to the URL, and redefine the page export of the run module.
   await launch(
     report,
     debug,
@@ -73,10 +75,8 @@ const doTestAct = async () => {
   else {
     // Get the redefined page.
     const {page} = require('../run');
-    console.log(`doTestAct finds page type is ${typeof page}`);
     // If it exists:
     if (page) {
-      console.log(`page is truthy`);
       try {
         // If the page prevents the tool from testing:
         if (page.prevented) {
@@ -115,7 +115,6 @@ const doTestAct = async () => {
     }
     // Otherwise, i.e. if the page does not exist:
     else {
-      console.log('No page');
       process.send('ERROR: No page');
     }
   }
