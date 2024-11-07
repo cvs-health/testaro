@@ -1363,7 +1363,7 @@ exports.doJob = async job => {
     console.log(`ERROR: ${jobInvalidity}`);
     jobData.aborted = true;
     jobData.abortedAct = null;
-    jobData.abortError = reportInvalidity;
+    jobData.abortError = jobInvalidity;
   }
   // Otherwise, i.e. if it is valid:
   else {
