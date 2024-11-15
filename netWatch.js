@@ -44,6 +44,7 @@ const {doJob} = require('./run');
 const netWatchURLIDs = process.env.NETWATCH_URLS.split(/,/);
 const jobURLs = netWatchURLIDs.map(id => process.env[`NETWATCH_URL_${id}_JOB`]);
 const reportURLs = netWatchURLIDs.map(id => process.env[`NETWATCH_URL_${id}_REPORT`]);
+const auths = netWatchURLIDs.map(id => process.env[`NETWATCH_URL_${id}_AUTH`]);
 
 // FUNCTIONS
 
@@ -62,8 +63,8 @@ const serveObject = (object, response) => {
   response.setHeader('Content-Type', 'application/json; charset=utf-8');
   response.end(JSON.stringify(object));
 };
-// Removes secrets from a URL.
-const getURLBase = url => url.replace(/[?/][^?/.]+$/, '');
+// Removes secrets from a GET URL.
+const getURLBase = getURL => getURL.replace(/[?/][^?/.]+$/, '');
 /*
   Requests a network job and, when found, performs and reports it.
   Arguments:
@@ -92,7 +93,6 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
     let urlIndex = -1;
     let noJobYet = true;
     let abort = false;
-    const certOpt = isCertTolerant ? {rejectUnauthorized: false} : {};
     const certInfo = `Certificate-${isCertTolerant ? '' : 'in'}tolerant`;
     const foreverInfo = isForever ? 'repeating' : 'one-job';
     const intervalInfo = `with ${intervalInSeconds}-second intervals`;
@@ -117,7 +117,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
       cycleIndex = ++cycleIndex % urlCount;
       urlIndex = ++urlIndex % urlCount;
       const jobURL = jobURLs[urlIndex];
-      const publicURL = getURLBase(jobURL);
+      const publicURL = auths[urlIndex] ? jobURL : getURLBase(jobURL);
       const logStart = `Requested job from ${publicURL} and got `;
       // Perform it.
       await new Promise(resolve => {
