@@ -63,8 +63,8 @@ const serveObject = (object, response) => {
   response.setHeader('Content-Type', 'application/json; charset=utf-8');
   response.end(JSON.stringify(object));
 };
-// Removes secrets from a GET URL.
-const getURLBase = getURL => getURL.replace(/[?/][^?/.]+$/, '');
+// Removes the query if any, or otherwise the final segment, from a URL.
+const getURLBase = url => url.replace(/[?/][^?/.]+$/, '');
 /*
   Requests a network job and, when found, performs and reports it.
   Arguments:
@@ -124,6 +124,10 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
         try {
           const client = jobURL.startsWith('https://') ? httpsClient : httpClient;
           // Request a job.
+          const requestOptions = isCertTolerant ? {rejectUnauthorized: false} : {};
+          if (auths[urlIndex]) {
+            requestOptions.method = 'POST';
+          }
           client.request(jobURL, certOpt, response => {
             const chunks = [];
             response
@@ -175,10 +179,14 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                     // Perform the job and create a report.
                     console.log(`${logStart}job ${id} for server ${urlIndex} (${nowString()})`);
                     const report = await doJob(contentObj);
-                    let reportJSON = JSON.stringify(report, null, 2);
+                    const responseObj = auths[urlIndex] ? {
+                      agentPW: auths[urlIndex],
+                      report
+                    } : report;
+                    let responseJSON = JSON.stringify(responseObj, null, 2);
                     console.log(`Job ${id} finished (${nowString()})`);
                     const reportURL = reportURLs[urlIndex];
-                    const publicReportURL = getURLBase(reportURL);
+                    const publicReportURL = auths[urlIndex] ? reportURL : getURLBase(reportURL);
                     const reportClient = reportURL.startsWith('https://')
                       ? httpsClient
                       : httpClient;
@@ -218,7 +226,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                         }
                         // Free the memory used by the job and the report.
                         contentObj = {};
-                        reportJSON = '';
+                        responseJSON = '';
                         resolve(true);
                       });
                     })
@@ -233,7 +241,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                       resolve(true);
                     })
                     // Finish submitting the report.
-                    .end(reportJSON);
+                    .end(responseJSON);
                   }
                 }
                 // Otherwise, i.e. if it is a message:
@@ -281,8 +289,8 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
             }
             resolve(true);
           })
-          // Finish sending the job request.
-          .end();
+          // Finish sending the job request, with a password if a POST request.
+          .end(auths[urlIndex] || '');
         }
         // If requesting a job throws an error:
         catch(error) {

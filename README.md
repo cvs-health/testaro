@@ -761,13 +761,30 @@ The arguments and behaviors described above for execution by a module apply here
 
 An instance of Testaro, an _agent_, can poll servers for jobs to be performed.
 
-Network watching is governed by environment variables of the form `NETWATCH_URL_0_JOB`, `NETWATCH_URL_0_OBSERVE`, and `NETWATCH_URL_0_REPORT`, and by an environment variable `NETWATCH_URLS`.
+Network watching is governed by environment variables of the form `NETWATCH_URL_0_JOB`, `NETWATCH_URL_0_OBSERVE`, `NETWATCH_URL_0_REPORT`, and `NETWATCH_URL_0_AUTH`, and by an environment variable `NETWATCH_URLS`.
 
-You can create as many triples of `…JOB`, `OBSERVE`, and `…REPORT` variables as you want, one triple for each server that the agent may get jobs from. Each triple has a different number inside the variable name. The `…JOB` variable is the URL that the agent needs to send a job request to. The `…OBSERVE` variable is the URL that the agent needs to send granular job progress messages to. The `…REPORT` variable is the URL that the agent needs to send a completed report to. Each URL can contain segments and/or query parameters that identify the purpose of the request, the identity and authorization of the agent, etc.
+You can create as many quadruples of `…JOB`, `OBSERVE`, `…REPORT`, and `AUTH` variables as you want, one quadruple for each server that the agent may get jobs from. Each quadruple has a different number inside the variable name. The `…JOB` variable is the URL that the agent needs to send a job request to. The `…OBSERVE` variable is the URL that the agent needs to send granular job progress messages to. The `…REPORT` variable is the URL that the agent needs to send a completed report to. The `…AUTH` variable is the password of the agent that will be recognized by the server. Each URL can contain segments and/or query parameters that identify the purpose of the request, the identity and authorization of the agent, etc.
+
+In each quadruple, the `…AUTH` variable is optional. If it is truthy (i.e. it exists and has a non-empty value), then the job request sent to the server will be a `POST` request and the payload will be the password stored as the value of the variable. Otherwise, i.e. if the variable has an empty string as its value or does not exist, the request will be a `GET` request, and any agent password will need to be provided in the URL.
 
 The `NETWATCH_URLS` variable has a value of the form `0,3,4`. This is a comma-delimited list of the numbers of the servers to be polled.
 
-Once a Testaro instance obtains a network job from one of the servers, Testaro performs it and adds the result data to the job, which then becomes a report. Testaro also makes its `AGENT` value the value of the `sources.agent` property of the report. Testaro then sends the report in a `POST` request to the report URL with the same server number. If granular reporting is desired, Testaro sends progress messages to the observation URL.
+Once a Testaro instance obtains a network job from one of the servers, Testaro performs it and adds the result data to the job, which then becomes a report. Testaro also makes its `AGENT` value the value of the `sources.agent` property of the report. Testaro then sends the report in a `POST` request to the report URL with the same server number. If there is a truthy `…AUTH` variable for the server, the request payload has this format:
+
+```json
+{
+  "agentPW": "abcdef",
+  "report": {
+    …
+  }
+}
+```
+
+If there is no truthy `…AUTH` variable for the server, the request payload is simply the report in JSON format.
+
+Thus, the `…AUTH` variables allow Testaro to comply with servers that object to agent passwords being visible in job request URLs and report-submission URLs and in any log messages that reproduce such URLs.
+
+If granular reporting is desired, Testaro sends progress messages to the observation URL.
 
 Network watching can be repeated or 1-job. 1-job watching stops after 1 job has been performed.
 
