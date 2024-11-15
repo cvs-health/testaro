@@ -290,7 +290,9 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
             resolve(true);
           })
           // Finish sending the job request, with a password if a POST request.
-          .end(auths[urlIndex] || '');
+          .end(auths[urlIndex] ? JSON.stringify({
+            agentPW: auths[urlIndex]
+          }) : '');
         }
         // If requesting a job throws an error:
         catch(error) {
