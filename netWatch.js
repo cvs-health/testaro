@@ -128,7 +128,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
           if (auths[urlIndex]) {
             requestOptions.method = 'POST';
           }
-          client.request(jobURL, certOpt, response => {
+          client.request(jobURL, requestOptions, response => {
             const chunks = [];
             response
             // If the response throws an error:
