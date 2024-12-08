@@ -542,7 +542,7 @@ const doActs = async (report) => {
   // Get the standardization specification.
   const standard = report.standard || 'only';
   const reportPath = 'temp/report.json';
-  // For each act in the reeport.
+  // For each act in the report.
   for (const doActsIndex in acts) {
     actIndex = doActsIndex;
     // If the job has not been aborted:
