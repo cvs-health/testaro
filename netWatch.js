@@ -153,7 +153,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                   console.log(`${logStart}no job to do`);
                   resolve(true);
                 }
-                // Otherwise, i.e. if it is a job:
+                // Otherwise, if it is a job:
                 else if (id) {
                   // Check it for validity.
                   const jobInvalidity = isValidJob(contentObj);
@@ -217,9 +217,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                         }
                         // Otherwise, i.e. if it is not JSON:
                         catch(error) {
-                          // Abort the watch.
-                          abort = true;
-                          // Report it.
+                          // Report this.
                           console.log(
                             `ERROR: ${reportLogStart}status ${repResponse.statusCode}, error message ${error.message}, and response ${content.slice(0, 1000)}\n`
                           );
@@ -253,10 +251,8 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
               }
               // Otherwise, i.e. if it is not JSON:
               catch(error) {
-                // Abort the watch.
-                abort = true;
                 // Report this.
-                console.log(`ERROR: Job request got non-JSON response (${error.message})`);
+                console.log(`ERROR: ${logStart}status ${response.statusCode}, error message ${error.message}, and non-JSON response ${content.slice(0, 1000)}\n`);
                 resolve(true);
               };
             });
