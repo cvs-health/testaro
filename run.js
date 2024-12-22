@@ -875,6 +875,9 @@ const doActs = async (report) => {
           act.actualURL = url;
           // If the act is a revelation:
           if (act.type === 'reveal') {
+            act.result = {
+              success: true
+            };
             // Make all elements in the page visible.
             await page.$$eval('body *', elements => {
               elements.forEach(element => {
@@ -886,15 +889,10 @@ const doActs = async (report) => {
                   element.style.visibility = 'inherit';
                 }
               });
-              act.result = {
-                success: true
-              };
             })
             .catch(error => {
               console.log(`ERROR making all elements visible (${error.message})`);
-              act.result = {
-                success: false
-              };
+              act.result.success = false;
             });
           }
           // Otherwise, if the act is a move:
