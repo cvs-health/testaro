@@ -28,6 +28,7 @@
   "homepage": "https://github.com/cvs-health/testaro#readme",
   "dependencies": {
     "@qualweb/core": "*",
+    "@qualweb/act-rules": "*",
     "@siteimprove/alfa-act": "*",
     "@siteimprove/alfa-playwright": "*",
     "@siteimprove/alfa-rules": "*",

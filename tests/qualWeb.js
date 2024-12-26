@@ -29,14 +29,20 @@
 
 // IMPORTS
 
-const {QualWeb} = require('@qualweb/core');
-const {doBy} = require('../procs/job');
+const {QualWeb, QualWebOptions} = require('@qualweb/core');
+const {ACTRules} = require('@qualweb/act-rules');
 
 // CONSTANTS
 
-const qualWeb = new QualWeb({});
+const qualWeb = new QualWeb({
+  adBlock: true,
+  stealth: true
+});
+const actRulesModule = new ACTRules({});
 const clusterOptions = {
-  timeout: 25 * 1000
+  maxConcurrency: 1,
+  timeout: 25 * 1000,
+  monitor: false
 };
 
 // FUNCTIONS
@@ -48,7 +54,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
   const data = {};
   let result = {};
   // Start the QualWeb core engine.
-  await qualWeb.start(clusterOptions);
+  await qualWeb.start(clusterOptions, {headless: true});
   // Specify the invariant test options.
   const qualWebOptions = {
     log: {
@@ -57,7 +63,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
     crawlOptions: {
       maxDepth: 0,
       maxUrls: 1,
-      timeout: 25 * 1000,
+      timeout: timeLimit * 1000,
       maxParallelCrawls: 1,
       logging: true
     },
@@ -126,7 +132,9 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
       qualWebOptions.execute.bp = true;
     }
     // Get the report.
+    console.log('XXX About to evaluate');
     let actReports = await qualWeb.evaluate(qualWebOptions);
+    console.log('XXX Got reports');
     result = actReports[withNewContent ? qualWebOptions.url : 'customHtml'];
     // If it contains a copy of the DOM:
     if (result && result.system && result.system.page && result.system.page.dom) {
