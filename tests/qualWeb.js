@@ -29,8 +29,10 @@
 
 // IMPORTS
 
-const {QualWeb, QualWebOptions} = require('@qualweb/core');
+const {QualWeb} = require('@qualweb/core');
 const {ACTRules} = require('@qualweb/act-rules');
+const {WCAGTechniques} = require('@qualweb/wcag-techniques');
+const {BestPractices} = require('@qualweb/best-practices');
 
 // CONSTANTS
 
@@ -39,11 +41,8 @@ const qualWeb = new QualWeb({
   stealth: true
 });
 const actRulesModule = new ACTRules({});
-const clusterOptions = {
-  maxConcurrency: 1,
-  timeout: 25 * 1000,
-  monitor: false
-};
+const wcagModule = new WCAGTechniques({});
+const bpModule = new BestPractices({});
 
 // FUNCTIONS
 
@@ -53,7 +52,12 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
   const {withNewContent, rules} = act;
   const data = {};
   let result = {};
-  // Start the QualWeb core engine.
+  const clusterOptions = {
+    maxConcurrency: 1,
+    timeout: timeLimit * 1000,
+    monitor: false
+  };
+    // Start the QualWeb core engine.
   await qualWeb.start(clusterOptions, {headless: true});
   // Specify the invariant test options.
   const qualWebOptions = {
@@ -69,7 +73,8 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
     },
     execute: {
       counter: true
-    }
+    },
+    modules: []
   };
   // Specify a URL or provide the content.
   try {
@@ -79,7 +84,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
     else {
       qualWebOptions.html = await page.content();
     }
-    // Specify which rules to test for.
+    // Specify which rules to test for, adding a custom execute property for report processing.
     const actSpec = rules ? rules.find(typeRules => typeRules.startsWith('act:')) : null;
     const wcagSpec = rules ? rules.find(typeRules => typeRules.startsWith('wcag:')) : null;
     const bestSpec = rules ? rules.find(typeRules => typeRules.startsWith('best:')) : null;
@@ -90,6 +95,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
       else {
         const actRules = actSpec.slice(4).split(',').map(num => `QW-ACT-R${num}`);
         qualWebOptions['act-rules'] = {rules: actRules};
+        qualWebOptions.modules.push(actRulesModule);
         qualWebOptions.execute.act = true;
       }
     }
@@ -98,6 +104,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
         levels: ['A', 'AA', 'AAA'],
         principles: ['Perceivable', 'Operable', 'Understandable', 'Robust']
       };
+      qualWebOptions.modules.push(actRulesModule);
       qualWebOptions.execute.act = true;
     }
     if (wcagSpec) {
@@ -107,6 +114,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
       else {
         const wcagTechniques = wcagSpec.slice(5).split(',').map(num => `QW-WCAG-T${num}`);
         qualWebOptions['wcag-techniques'] = {techniques: wcagTechniques};
+        qualWebOptions.modules.push(wcagModule);
         qualWebOptions.execute.wcag = true;
       }
     }
@@ -115,6 +123,7 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
         levels: ['A', 'AA', 'AAA'],
         principles: ['Perceivable', 'Operable', 'Understandable', 'Robust']
       };
+      qualWebOptions.modules.push(wcagModule);
       qualWebOptions.execute.wcag = true;
     }
     if (bestSpec) {
@@ -124,17 +133,17 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
       else {
         const bestPractices = bestSpec.slice(5).split(',').map(num => `QW-BP${num}`);
         qualWebOptions['best-practices'] = {bestPractices};
+        qualWebOptions.modules.push(bpModule);
         qualWebOptions.execute.bp = true;
       }
     }
     else {
       qualWebOptions['best-practices'] = {};
+      qualWebOptions.modules.push(bpModule);
       qualWebOptions.execute.bp = true;
     }
     // Get the report.
-    console.log('XXX About to evaluate');
     let actReports = await qualWeb.evaluate(qualWebOptions);
-    console.log('XXX Got reports');
     result = actReports[withNewContent ? qualWebOptions.url : 'customHtml'];
     // If it contains a copy of the DOM:
     if (result && result.system && result.system.page && result.system.page.dom) {
