@@ -1,5 +1,5 @@
 /*
-  © 2024 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2024–2025 CVS Health and/or one of its affiliates. All rights reserved.
 
   MIT License
 
@@ -115,6 +115,7 @@ const doTestAct = async () => {
     }
     // Otherwise, i.e. if the page does not exist:
     else {
+      // Report this.
       process.send('ERROR: No page');
     }
   }

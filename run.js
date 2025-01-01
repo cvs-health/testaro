@@ -1,5 +1,5 @@
 /*
-  © 2021–2024 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2021–2025 CVS Health and/or one of its affiliates. All rights reserved.
 
   MIT License
 
@@ -166,7 +166,16 @@ const goTo = async (report, page, url, timeout, waitUntil) => {
         };
       }
     }
-    // Otherwise, i.e. if the response status was abnormal:
+    // Otherwise, if the response status was rejection of excessive requests:
+    else if (httpStatus === 429) {
+      // Return this.
+      console.log(`Visit to ${url} prevented by request frequency restriction (status 429)`);
+      return {
+        success: false,
+        error: 'status429'
+      };
+    }
+    // Otherwise, i.e. if the response status was otherwise abnormal:
     else {
       // Return an error.
       console.log(`ERROR: Visit to ${url} got status ${httpStatus}`);
@@ -195,6 +204,32 @@ const browserClose = async () => {
     }
     await browser.close();
     browser = null;
+  }
+};
+// Adds an error result to an act.
+const addError = (alsoLog, alsoAbort, report, actIndex, message) => {
+  // If the error is to be logged:
+  if (alsoLog) {
+    // Log it.
+    console.log(message);
+  }
+  // Add error data to the result.
+  const act = report.acts[actIndex];
+  act.result ??= {};
+  act.result.success ??= false;
+  act.result.error ??= message;
+  if (act.type === 'test') {
+    act.data ??= {};
+    act.data.success = false;
+    act.data.prevented = true;
+    act.data.error = message;
+    // Add prevention data to the job data.
+    report.jobData.preventions[act.which] = message;
+  }
+  // If the job is to be aborted:
+  if (alsoAbort) {
+    // Add this to the report.
+    abortActs(report, actIndex);
   }
 };
 // Launches a browser and navigates to a URL.
@@ -307,16 +342,21 @@ const launch = exports.launch = async (report, debug, waits, tempBrowserID, temp
           report.jobData.lastScriptNonce = scriptNonce;
         }
       }
+      // Otherwise, i.e. if the navigation was prevented by a request frequency restriction:
+      else if (navResult.error === 'status429') {
+        // Report this.
+        addError(true, false, report, actIndex, 'status429');
+      }
       // Otherwise, i.e. if the launch or navigation failed:
       else {
-        // Report this and abort the job.
+        // Report this and nullify the page.
         addError(true, true, report, actIndex, `ERROR: Launch failed (${navResult.error})`);
         page = null;
       }
     }
     // If an error occurred:
     catch(error) {
-      // Report this and abort the job.
+      // Report this.
       addError(true, true, report, actIndex, `ERROR launching or navigating ${error.message}`);
       page = null;
     };
@@ -509,32 +549,6 @@ const abortActs = (report, actIndex) => {
   report.jobData.aborted = true;
   // Report that the job is aborted.
   console.log(`ERROR: Job aborted on act ${actIndex}`);
-};
-// Adds an error result to an act.
-const addError = (alsoLog, alsoAbort, report, actIndex, message) => {
-  // If the error is to be logged:
-  if (alsoLog) {
-    // Log it.
-    console.log(message);
-  }
-  // Add error data to the result.
-  const act = report.acts[actIndex];
-  act.result ??= {};
-  act.result.success ??= false;
-  act.result.error ??= message;
-  if (act.type === 'test') {
-    act.data ??= {};
-    act.data.success = false;
-    act.data.prevented = true;
-    act.data.error = message;
-    // Add prevention data to the job data.
-    report.jobData.preventions[act.which] = message;
-  }
-  // If the job is to be aborted:
-  if (alsoAbort) {
-    // Add this to the report.
-    abortActs(report, actIndex);
-  }
 };
 // Performs the acts in a report and adds the results to the report.
 const doActs = async (report) => {
