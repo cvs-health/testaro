@@ -838,7 +838,6 @@ You may store environment variables in an untracked `.env` file if you wish, and
 ```conf
 AGENT=agentabc
 DEBUG=false
-JOB_URLs=https://yourserver.tld/job/AgentABC:abcSecretX+http://localhost:3004/testapp?agent=AgentABC:AuthABC33
 JOBDIR=../testing/jobs
 NETWATCH_URL_0_JOB=http://localhost:3000/api/assignJob/agentabc:abcpw
 NETWATCH_URL_0_OBSERVE=http://localhost:3000/api/granular/agentabc:abcpw
