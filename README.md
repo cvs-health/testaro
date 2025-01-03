@@ -18,11 +18,11 @@ The need for multi-tool integration, and its costs, are discussed in [Accessibil
 
 Testaro launches and controls web browsers, performing operations, conducting tests, and recording results.
 
-Testaro is designed to be a workstation-based agent, because many of the tests performed by Testaro simulate the use of a web browser on a workstation. Testaro can be installed under a MacOS, Windows, Debian, or Ubuntu operating system.
+Testaro was designed to be a workstation-based agent, because many of the tests performed by Testaro simulate the use of a web browser on a workstation. However, Testaro can be installed under a MacOS, Windows, Debian, or Ubuntu operating system. Results of installing it on servers have not yet been reported.
 
 Testaro accepts _jobs_, performs them, and returns _reports_.
 
-Other software, located on any server or on the same workstation, can make use of Testaro, performing functions such as:
+Other software, located on the same or a different host, can make use of Testaro, performing functions such as:
 - Job preparation
 - Converting user specifications into jobs
 - Job scheduling
@@ -95,13 +95,39 @@ Version 16 or later of [Node.js](https://nodejs.org/en/).
 
 ## Installation
 
-You can install Testaro as you would install any `npm` package.
+### As an application
 
-However, whenever the Playwright dependency is updated to a newer version, you must also reinstall its browsers by executing the statement `npx playwright install`. It is safe to execute this after each `npm update`; if there are no new browsers to install, nothing will happen.
+You can clone the [Testaro repository](https://github.com/cvs-health/testaro) to install Testaro as an application:
 
-To run Testaro after installation, provide the environment variables described below under “Environment variables”.
+```bash
+cd path/to/what/will/be/the/parent/directory/of/testaro
+git clone https://github.com/cvs-health/testaro.git
+cd testaro
+npm install
+npx playwright install
+```
 
-## Payment
+After that, you can update Testaro after any version change:
+
+```bash
+cd testaro
+git checkout package-lock.json
+git pull
+npm update
+npx playwright install
+```
+
+Once it is installed as an application, you can use its features with a terminal interface by executing the “By a user” statements below.
+
+### As a dependency
+
+You can make Testaro a dependency of another application by installing it as you would install any `npm` package, such as by executing `npm install-save testaro` or including `testaro` among the dependencies in a `package.json` file.
+
+Once it is installed as a dependency, your application can use Testaro features by executing the “By a module” statements below.
+
+### Prerequisites
+
+To make the Testaro features work, you will also need to provide the environment variables described below under “Environment variables”.
 
 All of the tests that Testaro can perform are free of cost, except those performed by the WallyAX and WAVE tools. The owners of those tools issue API keys. A free initial allowance of usage may be granted to you with a new API key. Before using Testaro to perform their tests, get your API keys for [WallyAX](mailto:technology@wallyax.com) and [WAVE](https://wave.webaim.org/api/). Then use those API keys to define environment variables, as described below under “Environment variables”.
 
@@ -683,93 +709,85 @@ You are not dependent on the judgments incorporated into the standard format, be
 
 The standard format does not express opinions on issue classification. A rule ID identifies something deemed to be an issue by a tool. Useful reporting from multi-tool testing still requires the classification of tool **rules** into **issues**. If tool `A` has `alt-incomplete` as a rule ID and tool `B` has `image_alt_stub` as a rule ID, Testaro does not decide whether those are really the same issue or different issues. That decision belongs to you. The standardization of tool reports by Testaro eliminates some of the drudgery in issue classification, but not any of the judgment required for issue classification.
 
-## Execution
+## Invocation
 
-### Introduction
+Testaro features can be invoked by modules of your application when Testaro is a dependency, or directly by users who have installed Testaro as an application.
 
-Testaro can be called by modules and by users.
-
-#### Imports
-
-Before a module can execute a Testaro function, it must import that function from the module that exports it. A Testaro module can import function `f` from module `m` with the statement
+Before a module can execute a Testaro function, it must import that function from the Testaro module that exports it. A module can import function `f` from module `m` with the statement
 
 ```javascript
-const {f} = require('./m');`
+const {f} = require('testaro/m');`
 ```
 
-The argument of `require` is a path relative to the directory of the module in which this code appears. If the module is in a subdirectory, `./m` will need to be revised. In an executor within `validation/executors`, it must be revised to `../../m`.
-
-A module in another Node.js package that has Testaro as a dependency can execute the same statements, except changing `'./m'` to `'testaro/m'`.
-
-#### Immediate
+## Immediate job execution
 
 A job can be immediately executed as follows:
 
-##### By a module
+### By a module
 
 ```javascript
-const {doJob} = require('./run');
+const {doJob} = require('testaro/run');
 doJob(job)
 .then(report => …);
 ```
 
 Testaro will run the job and return a `report` object, a copy of the job with the `acts` and `jobData` properties containing the results. The final statement can further process the `report` object as desired in the `then` callback.
 
-The Testilo package contains functions that can create jobs from scripts and add scores and explanations to reports.
+The Testilo package contains functions that can create jobs from scripts, add scores and explanations to reports, and create HTML documents summarizing reports.
 
-##### By a user
+### By a user
 
 ```bash
 node call run
-node call run be76p
+node call run 250525T
 ```
 
-In the second example, `be76p` is the initial characters of the ID of a job saved as a JSON file in the `todo` subdirectory of the `JOBDIR` directory.
+In the second example, `250525T` is the initial characters of the ID of a job saved as a JSON file in the `todo` subdirectory of the `JOBDIR` directory (`JOBDIR` refers to the value of the environment variable `JOBDIR`, obtained via `process.env.JOBDIR`).
 
-The `call` module will find the first job file with a matching name if an argument is given, or the first job file if not. Then the module will execute the `doJob` function of the `run` module on the job, save the report in the `raw` subdirectory of the `REPORTDIR` directory, and archive the job file in the `done` subdirectory of the `JOBDIR` directory.
+The `call` module will find the first job file with a matching name if an argument is given, or the first job file if not. Then the module will execute the `doJob` function of the `run` module on the job, save the report in the `raw` subdirectory of the `REPORTDIR` directory, and archive the job file in the `done` subdirectory of the `JOBDIR` directory. (The report destination is named `raw` because the report has not yet been further processed by your application, perhaps using Testilo, to convert the report data into user-friendly reports.)
 
-#### Watch
+## Job watching
 
 In watch mode, Testaro periodically checks for a job to run and, when a job is obtained, performs it.
 
-##### Directory watch
+### Directory watching
 
-Testaro can watch for a job in a directory, with the `dirWatch` function, which can be executed by either a module or a user.
+Testaro can watch for a job in a directory of the filesystem where Testaro or your application is located, with the `dirWatch` function.
 
-###### By a module
+#### By a module
 
 ```javaScript
-const {dirWatch} = require('./dirWatch');
+const {dirWatch} = require('testaro/dirWatch');
 dirWatch(true, 300);
 ```
 
-In this example, a module asks Testaro to check a directory for a job every 300 seconds, to perform the jobs in the directory if any are found, and then to continue checking. If the first argument is `false`, Testaro will stop checking after performing 1 job. If it is `true`, Testaro continues checking until the process is stopped.
+In this example, a moduleof your application asks Testaro to check a directory for a job every 300 seconds, to perform the jobs in the directory if any are found, and then to continue checking. If the first argument is `false`, Testaro will stop checking after performing 1 job. If it is `true`, Testaro continues checking until the `dirWatch` process is stopped.
 
-The directory where Testaro checks for jobs is specified by `JOBDIR`. Testaro checks for jobs in its `todo` subdirectory and, when it has performed a job, moves it into the `done` subdirectory.
+Testaro checks for jobs in the `todo` subdirectory of `JOBDIR`. When it has performed a job, Testaro moves it into the `done` subdirectory.
 
-Testaro creates a report for each job and saves the report in the directory specified by `REPORTDIR`.
+Testaro creates a report for each job and saves the report in the `raw` subdirectory of `REPORTDIR`.
 
-###### By a user
+#### By a user
 
 ```javaScript
 node call dirWatch true 300
 ```
 
-The arguments and behaviors described above for execution by a module apply here, too.
+The arguments and behaviors described above for execution by a module apply here, too. If the first argument is `true`, you can terminate the process by entering `CTRL-c`.
 
-##### Network watch
+### Network watching
 
-An instance of Testaro, an _agent_, can poll servers for jobs to be performed.
+Testaro can poll servers for jobs to be performed.
 
 Network watching is governed by environment variables of the form `NETWATCH_URL_0_JOB`, `NETWATCH_URL_0_OBSERVE`, `NETWATCH_URL_0_REPORT`, and `NETWATCH_URL_0_AUTH`, and by an environment variable `NETWATCH_URLS`.
 
-You can create as many quadruples of `…JOB`, `OBSERVE`, `…REPORT`, and `AUTH` variables as you want, one quadruple for each server that the agent may get jobs from. Each quadruple has a different number inside the variable name. The `…JOB` variable is the URL that the agent needs to send a job request to. The `…OBSERVE` variable is the URL that the agent needs to send granular job progress messages to. The `…REPORT` variable is the URL that the agent needs to send a completed report to. The `…AUTH` variable is the password of the agent that will be recognized by the server. Each URL can contain segments and/or query parameters that identify the purpose of the request, the identity and authorization of the agent, etc.
+You can create as many quadruples of `…JOB`, `OBSERVE`, `…REPORT`, and `AUTH` variables as you want, one quadruple for each server that the agent may get jobs from. Each quadruple has a different number inside the variable name. The `…JOB` variable is the URL that the agent needs to send a job request to. The `…OBSERVE` variable is the URL that the agent needs to send granular job progress messages to if the job requests that. The `…REPORT` variable is the URL that the agent needs to send a completed report to. The `…AUTH` variable is the password of the agent that will be recognized by the server. Each URL can contain segments and/or query parameters that identify the purpose of the request, the identity and authorization of the agent, etc.
 
-In each quadruple, the `…AUTH` variable is optional. If it is truthy (i.e. it exists and has a non-empty value), then the job request sent to the server will be a `POST` request and the payload will be the password stored as the value of the variable. Otherwise, i.e. if the variable has an empty string as its value or does not exist, the request will be a `GET` request, and any agent password will need to be provided in the URL.
+In each quadruple, the `…AUTH` variable is optional. If it is truthy (i.e. it exists and has a non-empty value), then the job request sent to the server will be a `POST` request and the payload will be an object with an `agentPW` property, whose value is the password. Otherwise, i.e. if the variable has an empty string as its value or does not exist, the request will be a `GET` request, and an agent password, if required by the server, will need to be provided in the URL.
 
 The `NETWATCH_URLS` variable has a value of the form `0,3,4`. This is a comma-delimited list of the numbers of the servers to be polled.
 
-Once a Testaro instance obtains a network job from one of the servers, Testaro performs it and adds the result data to the job, which then becomes a report. Testaro also makes its `AGENT` value the value of the `sources.agent` property of the report. Testaro then sends the report in a `POST` request to the report URL with the same server number. If there is a truthy `…AUTH` variable for the server, the request payload has this format:
+Once Testaro obtains a network job from one of the servers, Testaro performs it and adds the result data to the job, which then becomes a report. Testaro also makes its `AGENT` value the value of the `sources.agent` property of the report. Testaro then sends the report in a `POST` request to the `…REPORT` URL with the same server number. If there is a truthy `…AUTH` variable for the server, the request payload has this format:
 
 ```json
 {
@@ -788,20 +806,20 @@ If granular reporting is desired, Testaro sends progress messages to the observa
 
 Network watching can be repeated or 1-job. 1-job watching stops after 1 job has been performed.
 
-After checking all the URLs in succession without getting a job from any of them, Testaro waits for a prescribed time before continuing to check.
+After checking all the URLs in succession without getting a job from any of them, Testaro waits for the prescribed time before continuing to check.
 
-###### By a module
+#### By a module
 
 ```javaScript
-const {netWatch} = require('./netWatch');
+const {netWatch} = require('testaro/netWatch');
 netWatch(true, 300, true);
 ```
 
-In this example, a module asks Testaro to check the servers for a job every 300 seconds, to perform any jobs obtained from the servers, and then to continue checking until the process is stopped. If the first argument is `false`, Testaro will stop checking after performing 1 job.
+In this example, a module of your application asks Testaro to check the servers for a job every 300 seconds, to perform any jobs obtained from the servers, and then to continue checking until the process is stopped. If the first argument is `false`, Testaro will stop checking after performing 1 job.
 
 The third argument specifies whether Testaro should be certificate-tolerant. A `true` value makes Testaro accept SSL certificates that fail verification against a list of certificate authorities. This allows testing of `https` targets that, for example, use self-signed certificates. If the third argument is omitted, the default for that argument is implemented. The default is `true`.
 
-###### By a user
+#### By a user
 
 ```javaScript
 node call netWatch true 300 true
@@ -809,7 +827,7 @@ node call netWatch true 300 true
 
 The arguments and behaviors described above for execution by a module apply here, too. If the first argument is `true`, you can terminate the process by entering `CTRL-c`.
 
-### Environment variables
+## Environment variables
 
 In addition to their uses described above, environment variables can be used by acts of type `test`, as documented in the `actSpecs.js` file.
 
@@ -878,13 +896,13 @@ The Playwright “Receives Events” actionability check does **not** check whet
 
 ### Test prevention
 
-Test targets employ mechanisms to prevent scraping, automated form submission, and other automated actions. These mechanisms may interfere with testing. When a test act is prevented by a target, Testaro reports this prevention.
+Test targets employ mechanisms to prevent scraping, multiple requests within a short time, automated form submission, and other automated actions. These mechanisms may interfere with testing. When a test act is prevented by a target, Testaro reports this prevention.
 
 Some targets prohibit the execution of alien scripts unless the client can demonstrate that it is the requester of the page. Failure to provide that evidence results in the script being blocked and an error message being logged, saying “Refused to execute a script because its hash, its nonce, or unsafe-inline does not appear in the script-src directive of the Content Security Policy”. This mechanism affects tools that insert scripts into a target in order to test it. Those tools include `axe`, `aslint`, `ed11y`, and `htmlcs`. To comply with this requirement, Testaro obtains a _nonce_ from the response that serves the target. Then the file that runs the tool adds that nonce to the script as the value of a `nonce` attribute when it inserts its script into the target.
 
 ### Tool duplicativity
 
-Tools sometimes do redundant testing, in that two or more tools test for the same defects, although such duplications are not necessarily perfect. This fact creates three problems:
+Tools sometimes do redundant testing, in that two or more tools test for the same defects, although such duplications are not necessarily perfect. This fact creates problems:
 - One cannot be confident in excluding some tests of some tools on the assumption that they perfectly duplicate tests of other tools.
 - The Testaro report from a job documents each tool’s results separately, so a single defect may be documented in multiple locations within the report, making the direct consumption of the report inefficient.
 - An effort to aggregate the results into a single score may distort the scores by inflating the weights of defects that happen to be discovered by multiple tools.
@@ -917,7 +935,7 @@ The files in the `temp` directory are presumed ephemeral and are not tracked by 
 
 Testilo contains procedures that reorganize report data by issue and by element, rather than tool, and that compensate for duplicative tests when computing scores.
 
-Report standardization could be performed on a server rather than a workstation, but that would require sending the original reports to the server. They are generally much larger than standardized reports. Whenever users want only standardized reports, standardizing them on the workstation eliminates the need to send the original reports anywhere. For that reason, Testaro performs report standardization.
+Report standardization could be performed by other software rather than by Testaro. That would require sending the original reports to the server. They are typically larger than standardized reports. Whenever users want only standardized reports, the fact that Testaro standardizes them eliminates the need to send the original reports anywhere.
 
 ## Code style
 
@@ -938,7 +956,7 @@ As of 12 February 2024, upon the transfer of the repository ownership to CVS Hea
 “Testaro” means “collection of tests” in Esperanto.
 
 /*
-  © 2021–2024 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2021–2025 CVS Health and/or one of its affiliates. All rights reserved.
 
   MIT License
 
