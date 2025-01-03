@@ -47,7 +47,7 @@ const actIndex = Number.parseInt(process.argv[2]);
 // FUNCTIONS
 
 const doTestAct = async () => {
-  const reportPath = `${__dirname}/../temp/report.json`;
+  const reportPath = '/tmp/report.json';
   // Get the saved report.
   const reportJSON = await fs.readFile(reportPath, 'utf8');
   const report = JSON.parse(reportJSON);

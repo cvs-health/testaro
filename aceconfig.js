@@ -32,6 +32,6 @@ module.exports = {
     'violation',
     'recommendation'
   ],
-  cacheFolder: `${__dirname}/temp`,
-  outputFolder: `${__dirname}/ibmOutput`
+  cacheFolder: '/tmp',
+  outputFolder: '/tmp'
 };

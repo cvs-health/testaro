@@ -923,7 +923,7 @@ Testaro would become more reliable if the behavior of its tools were monitored f
 
 ## Repository exclusions
 
-The files in the `temp` directory are presumed ephemeral and are not tracked by `git`. The above-mentioned `procs/doTestAct.js` module stores temporary reports in that directory.
+The files in the `temp` directory are presumed ephemeral and are not tracked by `git`.
 
 ## Related packages
 

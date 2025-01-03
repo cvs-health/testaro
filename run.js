@@ -555,7 +555,7 @@ const doActs = async (report) => {
   const {acts} = report;
   // Get the standardization specification.
   const standard = report.standard || 'only';
-  const reportPath = 'temp/report.json';
+  const reportPath = '/tmp/report.json';
   // For each act in the report.
   for (const doActsIndex in acts) {
     actIndex = doActsIndex;
