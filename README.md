@@ -839,9 +839,10 @@ You may store environment variables in an untracked `.env` file if you wish, and
 AGENT=agentabc
 DEBUG=false
 JOBDIR=../testing/jobs
-NETWATCH_URL_0_JOB=http://localhost:3000/api/assignJob/agentabc:abcpw
-NETWATCH_URL_0_OBSERVE=http://localhost:3000/api/granular/agentabc:abcpw
-NETWATCH_URL_0_REPORT=http://localhost:3000/api/takeReport/agentabc:abcpw
+NETWATCH_URL_0_JOB=http://localhost:3000/api/assignJob/agentabc
+NETWATCH_URL_0_OBSERVE=http://localhost:3000/api/granular/agentabc
+NETWATCH_URL_0_REPORT=http://localhost:3000/api/takeReport/agentabc
+NETWATCH_URL_0_AUTH=abcxyz
 NETWATCH_URLS=0
 PUPPETEER_DISABLE_HEADLESS_WARNING=true
 REPORTDIR=../testing/reports
