@@ -70,7 +70,7 @@ const callRun = async jobIDStart => {
   if (jobFileName) {
     // Get it.
     const jobJSON = await fs.readFile(`${todoDir}/${jobFileName}`, 'utf8');
-    const report = JSON.parse(jobJSON);
+    let report = JSON.parse(jobJSON);
     // Ensure it does not specify server properties.
     report.observe = false;
     // Run it.
