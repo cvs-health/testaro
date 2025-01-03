@@ -151,16 +151,6 @@ const doTest = async (content, withItems, timeLimit, rules) => {
     const runReport = await run(content, timeLimit);
     // If there were results:
     if (runReport.report) {
-      // Delete any report files.
-      try {
-        const reportNames = await fs.readdir('ibmOutput');
-        for (const reportName of reportNames) {
-          await fs.rm(`ibmOutput/${reportName}`);
-        }
-      }
-      catch(error) {
-        console.log('No result files created');
-      };
       // Return a trimmed act report.
       const {report} = runReport;
       const trimmedReport = trimActReport(data, report, withItems, rules);
