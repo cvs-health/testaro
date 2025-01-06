@@ -273,15 +273,11 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
             else if (error.message) {
               // Report this.
               console.log(`ERROR: ${logStart}got error message ${error.message.slice(0, 200)}`);
-              // Abort the watch.
-              abort = true;
             }
             // Otherwise, i.e. if it was any other error with no message:
             else {
               // Report this.
               console.log(`ERROR: ${logStart}got an error with no message`);
-              // Abort the watch.
-              abort = true;
             }
             resolve(true);
           })
