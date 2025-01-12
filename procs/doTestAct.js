@@ -52,9 +52,7 @@ const actIndex = Number.parseInt(process.argv[2]);
 const doTestAct = async () => {
   const reportPath = `${tmpDir}/report.json`;
   // Get the saved report.
-  console.log('XXX About to read report before performing act');
   const reportJSON = await fs.readFile(reportPath, 'utf8');
-  console.log('XXX Read it');
   const report = JSON.parse(reportJSON);
   // Get the act.
   const act = report.acts[actIndex];
@@ -102,9 +100,7 @@ const doTestAct = async () => {
           }
           const reportJSON = JSON.stringify(report);
           // Save the revised report.
-          console.log('XXX About to write report after performing act');
           await fs.writeFile(reportPath, reportJSON);
-          console.log('Wrote it');
           // Send a completion message.
           process.send('Act completed');
         }
@@ -113,9 +109,7 @@ const doTestAct = async () => {
       catch(error) {
         // Save the revised report.
         const reportJSON = JSON.stringify(report);
-        console.log('XXX About to write report after error performing act');
         await fs.writeFile(reportPath, reportJSON);
-        console.log('Wrote it');
         // Report the failure.
         const message = error.message.slice(0, 400);
         console.log(`ERROR: Test act ${act.which} failed (${message})`);
