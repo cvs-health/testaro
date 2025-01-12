@@ -29,7 +29,7 @@
 
 const os = require('os');
 
-const tmpDir = os.tmpDir();
+const tmpDir = os.tmpdir();
 
 module.exports = {
   reportLevels: [
