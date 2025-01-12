@@ -43,6 +43,8 @@ const {identify} = require('./procs/identify');
 const {tellServer} = require('./procs/tellServer');
 // Module to create child processes.
 const {fork} = require('child_process');
+// Module to set operating-system constants.
+const os = require('os');
 
 // CONSTANTS
 
@@ -89,6 +91,9 @@ const timeLimits = {
   ibm: 30,
   testaro: 150 + Math.round(6 * process.env.WAITS / 1000)
 };
+
+// Temporary directory
+const tmpDir = os.tmpdir();
 
 // ########## VARIABLES
 
@@ -555,7 +560,7 @@ const doActs = async (report) => {
   const {acts} = report;
   // Get the standardization specification.
   const standard = report.standard || 'only';
-  const reportPath = '/tmp/report.json';
+  const reportPath = `${tmpDir}/report.json`;
   // For each act in the report.
   for (const doActsIndex in acts) {
     actIndex = doActsIndex;
@@ -640,7 +645,7 @@ const doActs = async (report) => {
         act.startTime = startTime;
         // Save the report.
         console.log('XXX About to get tmp file count');
-        const tmpFiles = await fs.readdir('/tmp');
+        const tmpFiles = await fs.readdir(tmpDir);
         console.log(tmpFiles.length);
         console.log('XXX About to write report before creating process to perform act');
         let reportJSON = JSON.stringify(report);

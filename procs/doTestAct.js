@@ -32,6 +32,8 @@
 // Module to perform file operations.
 const fs = require('fs/promises');
 const {launch} = require(`${__dirname}/../run`);
+// Module to set operating-system constants.
+const os = require('os');
 
 // CONSTANTS
 
@@ -39,6 +41,7 @@ const {launch} = require(`${__dirname}/../run`);
 const debug = process.env.DEBUG === 'true';
 // Set WAITS environment variable to a positive number to insert delays (in ms).
 const waits = Number.parseInt(process.env.WAITS) || 0;
+const tmpDir = os.tmpDir();
 
 // VARIABLES
 
@@ -47,7 +50,7 @@ const actIndex = Number.parseInt(process.argv[2]);
 // FUNCTIONS
 
 const doTestAct = async () => {
-  const reportPath = '/tmp/report.json';
+  const reportPath = `${tmpDir}/report.json`;
   // Get the saved report.
   console.log('XXX About to read report before performing act');
   const reportJSON = await fs.readFile(reportPath, 'utf8');
