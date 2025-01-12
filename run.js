@@ -639,7 +639,10 @@ const doActs = async (report) => {
         // Add it to the act.
         act.startTime = startTime;
         // Save the report.
-        console.log('XXX About to save report before performing act');
+        console.log('XXX About to get tmp file count');
+        const tmpFiles = await fs.readdir('/tmp');
+        console.log(tmpFiles.length);
+        console.log('XXX About to write report before creating process to perform act');
         let reportJSON = JSON.stringify(report);
         await fs.writeFile(reportPath, reportJSON);
         console.log('XXX Saved it');
