@@ -1360,9 +1360,7 @@ const doActs = async (report) => {
   await fs.rm(reportPath, {force: true});
   return report;
 };
-/*
-  Runs job and returns a report.
-*/
+// Runs a job and returns a report.
 exports.doJob = async job => {
   // Make a report as a copy of the job.
   let report = JSON.parse(JSON.stringify(job));

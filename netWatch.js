@@ -178,68 +178,73 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                     sources.serverID = urlIndex;
                     // Perform the job and create a report.
                     console.log(`${logStart}job ${id} for server ${urlIndex} (${nowString()})`);
-                    const report = await doJob(contentObj);
-                    const responseObj = auths[urlIndex] ? {
-                      agentPW: auths[urlIndex],
-                      report
-                    } : report;
-                    let responseJSON = JSON.stringify(responseObj, null, 2);
-                    console.log(`Job ${id} finished (${nowString()})`);
-                    const reportURL = reportURLs[urlIndex];
-                    const publicReportURL = auths[urlIndex] ? reportURL : getURLBase(reportURL);
-                    const reportClient = reportURL.startsWith('https://')
-                      ? httpsClient
-                      : httpClient;
-                    const reportLogStart = `Submitted report ${id} to ${publicReportURL} and got `;
-                    // Send the report to the server that assigned the job.
-                    reportClient.request(reportURL, {method: 'POST'}, repResponse => {
-                      const chunks = [];
-                      repResponse
-                      // If the response to the report threw an error:
-                      .on('error', async error => {
-                        // Report this.
-                        console.log(`${reportLogStart}error message ${error.message}\n`);
-                        resolve(true);
-                      })
-                      .on('data', chunk => {
-                        chunks.push(chunk);
-                      })
-                      // When the response to the report arrives:
-                      .on('end', async () => {
-                        const content = chunks.join('');
-                        // It should be JSON. If it is:
-                        try {
-                          const ackObj = JSON.parse(content);
-                          // Report it.
-                          console.log(
-                            `${reportLogStart}response message: ${JSON.stringify(ackObj, null, 2)}\n`
-                          );
-                        }
-                        // Otherwise, i.e. if it is not JSON:
-                        catch(error) {
+                    try {
+                      const report = await doJob(contentObj);
+                      const responseObj = auths[urlIndex] ? {
+                        agentPW: auths[urlIndex],
+                        report
+                      } : report;
+                      let responseJSON = JSON.stringify(responseObj, null, 2);
+                      console.log(`Job ${id} finished (${nowString()})`);
+                      const reportURL = reportURLs[urlIndex];
+                      const publicReportURL = auths[urlIndex] ? reportURL : getURLBase(reportURL);
+                      const reportClient = reportURL.startsWith('https://')
+                        ? httpsClient
+                        : httpClient;
+                      const reportLogStart = `Submitted report ${id} to ${publicReportURL} and got `;
+                      // Send the report to the server that assigned the job.
+                      reportClient.request(reportURL, {method: 'POST'}, repResponse => {
+                        const chunks = [];
+                        repResponse
+                        // If the response to the report threw an error:
+                        .on('error', async error => {
                           // Report this.
-                          console.log(
-                            `ERROR: ${reportLogStart}status ${repResponse.statusCode}, error message ${error.message}, and response ${content.slice(0, 1000)}\n`
-                          );
-                        }
-                        // Free the memory used by the job and the report.
-                        contentObj = {};
-                        responseJSON = '';
+                          console.log(`${reportLogStart}error message ${error.message}\n`);
+                          resolve(true);
+                        })
+                        .on('data', chunk => {
+                          chunks.push(chunk);
+                        })
+                        // When the response to the report arrives:
+                        .on('end', async () => {
+                          const content = chunks.join('');
+                          // It should be JSON. If it is:
+                          try {
+                            const ackObj = JSON.parse(content);
+                            // Report it.
+                            console.log(
+                              `${reportLogStart}response message: ${JSON.stringify(ackObj, null, 2)}\n`
+                            );
+                          }
+                          // Otherwise, i.e. if it is not JSON:
+                          catch(error) {
+                            // Report this.
+                            console.log(
+                              `ERROR: ${reportLogStart}status ${repResponse.statusCode}, error message ${error.message}, and response ${content.slice(0, 1000)}\n`
+                            );
+                          }
+                          // Free the memory used by the job and the report.
+                          contentObj = {};
+                          responseJSON = '';
+                          resolve(true);
+                        });
+                      })
+                      // If the report submission throws an error:
+                      .on('error', async error => {
+                        // Abort the watch.
+                        abort = true;
+                        // Report this.
+                        console.log(
+                          `ERROR ${error.code} in report submission: ${reportLogStart}error message ${error.message}\n`
+                        );
                         resolve(true);
-                      });
-                    })
-                    // If the report submission throws an error:
-                    .on('error', async error => {
-                      // Abort the watch.
-                      abort = true;
-                      // Report this.
-                      console.log(
-                        `ERROR ${error.code} in report submission: ${reportLogStart}error message ${error.message}\n`
-                      );
-                      resolve(true);
-                    })
-                    // Finish submitting the report.
-                    .end(responseJSON);
+                      })
+                      // Finish submitting the report.
+                      .end(responseJSON);
+                    }
+                    catch(error) {
+                      console.log(`ERROR performing job ${id} (${error.message})`);
+                    }
                   }
                 }
                 // Otherwise, i.e. if it is a message:
