@@ -650,7 +650,7 @@ const doActs = async (report) => {
         const actResult = await new Promise(resolve => {
           let closed = false;
           const child = fork(
-            'procs/doTestAct', [actIndex], {timeout: 1000 * timeLimits[act.which] || 15000}
+            `${__dirname}/procs/doTestAct`, [actIndex], {timeout: 1000 * timeLimits[act.which] || 15000}
           );
           child.on('message', message => {
             if (! closed) {
