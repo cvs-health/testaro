@@ -91,8 +91,16 @@ exports.reporter = async (page, withItems) => {
           }
           // Otherwise, if it now has a non-solid outline:
           else if (styleDec.outlineStyle !== 'solid') {
-            // Return this violation.
-            return 'a non-solid focus outline';
+            // If the outline style exists:
+            if (styleDec.outlineStyle) {
+              // Return this violation.
+              return `a focus outline with the ${styleDec.outlineStyle} instead of solid style`;
+            }
+            // Otherwise, i.e. if no outline style exists:
+            else {
+              // Return this violation.
+              return 'a focus outline with no style instead of solid style';
+            }
           }
           // Otherwise, i.e. if the element now has a standard outline:
           else {
