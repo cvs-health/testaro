@@ -74,14 +74,25 @@ exports.reporter = async (page, withItems) => {
         else {
           // Focus the element.
           el.focus({preventScroll: true});
-          // If it now has no standard outline:
-          if (
-            Number.parseFloat(styleDec.outlineWidth) < 2
-            || styleDec.outlineColor === 'rgba(0, 0, 0, 0)'
-            || styleDec.outlineStyle !== 'solid'
-          ) {
-            // Return a violation.
-            return 'no standard focus outline';
+          // If it now has no outline:
+          if (styleDec.outlineWidth === '0px') {
+            // Return this violation.
+            return 'no focus outline';
+          }
+          // Otherwise, if it now has an outline thinner than 2 pixels:
+          else if (Number.parseFloat(styleDec.outlineWidth) < 2) {
+            // Return this violation.
+            return 'a focus outline thinner than 2 pixels';
+          }
+          // Otherwise, if it now has a transparent outline:
+          else if (styleDec.outlineColor === 'rgba(0, 0, 0, 0)') {
+            // Return this violation.
+            return 'a transparent focus outline';
+          }
+          // Otherwise, if it now has a non-solid outline:
+          else if (styleDec.outlineStyle !== 'solid') {
+            // Return this violation.
+            return 'a non-solid focus outline';
           }
           // Otherwise, i.e. if the element now has a standard outline:
           else {
