@@ -93,8 +93,16 @@ exports.reporter = async (page, withItems) => {
           else if (styleDec.outlineStyle !== 'solid') {
             // If the outline style exists:
             if (styleDec.outlineStyle) {
-              // Return this violation.
-              return `a focus outline with the ${styleDec.outlineStyle} instead of solid style`;
+              // If the style is delegated to the user agent:
+              if (styleDec.outlineStyle === 'auto') {
+                // Return conformance.
+                return false;
+              }
+              // Otherwise, i.e. if the style is not delegated to the user agent:
+              else {
+                // Return this violation.
+                return `a focus outline with the ${styleDec.outlineStyle} instead of solid style`;
+              }
             }
             // Otherwise, i.e. if no outline style exists:
             else {
