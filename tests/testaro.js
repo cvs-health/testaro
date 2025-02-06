@@ -105,7 +105,8 @@ const evalRules = {
   role: 'native-replacing explicit roles',
   styleDiff: 'style inconsistencies',
   tabNav: 'nonstandard keyboard navigation between elements with the tab role',
-  targetSize: 'buttons, inputs, and non-inline links smaller than 44 pixels wide and high',
+  targetSmall: 'buttons, inputs, and non-inline links smaller than 44 pixels wide and high',
+  targetTiny: 'buttons, inputs, and non-inline links smaller than 24 pixels wide and high',
   titledEl: 'title attributes on inappropriate elements',
   zIndex: 'non-default Z indexes'
 };
