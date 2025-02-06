@@ -73,10 +73,10 @@ Editoria11y: 23
 HTML CodeSniffer: 110
 Nu Html Checker: 260
 QualWeb: 115
-Testaro: 46
+Testaro: 47
 WallyAX: 27
 WAVE: 60
-total: 1006
+total: 1007
 ```
 
 Some of the tools are under active development, and their rule counts change over time.
