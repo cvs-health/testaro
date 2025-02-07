@@ -1,6 +1,6 @@
 {
   "ruleID": "titledEl",
-  "selector": "[title]:not(input, button, textarea, select, iframe)",
+  "selector": "[title]:not(button, iframe, input, link, select, textarea)",
   "complaints": {
     "instance": "Ineligible element has a title attribute",
     "summary": "Ineligible elements have title attributes"
