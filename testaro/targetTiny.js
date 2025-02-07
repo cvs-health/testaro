@@ -45,8 +45,13 @@ exports.reporter = async (page, withItems) => {
   for (const loc of all.allLocs) {
     // Get the size of its element, if small.
     const sizeData = await loc.evaluate(el => {
-      const width = el.offsetWidth;
-      const height = el.offsetHeight;
+      const rect = el.getBoundingClientRect();
+      const widthR = rect && rect.width || 0;
+      const heightR = rect && rect.height || 0;
+      const widthP = el.offsetWidth;
+      const width = Math.max(widthP, Math.round(widthR));
+      const heightP = el.offsetHeight;
+      const height = Math.max(heightP, Math.round(heightR));
       const tagName = el.tagName;
       return width < 24 || height < 24 ? {tagName, width, height} : null;
     });
