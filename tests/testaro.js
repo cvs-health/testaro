@@ -78,7 +78,6 @@ const evalRules = {
   docType: 'document without a doctype property',
   dupAtt: 'elements with duplicate attributes',
   embAc: 'active elements embedded in links or buttons',
-  filter: 'filter styles on elements',
   focAll: 'discrepancies between focusable and Tab-focused elements',
   focInd: 'missing and nonstandard focus indicators',
   focOp: 'Tab-focusable elements that are not operable',
