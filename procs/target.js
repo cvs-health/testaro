@@ -23,38 +23,46 @@
 */
 
 /*
-  targetSmall
-  Related to Tenon rule 152, but stricter.
-  This test reports buttons, inputs, and non-inline links with widths or heights smaller than 44 pixels.
+  target
+  Utilities for Testaro targetSmall and targetTiny tests.
 */
 
 // ########## IMPORTS
 
-// Module to perform common operations.
-const {init, report} = require('../procs/testaro');
 // Module to classify links.
-const {isTooSmall} = require('../procs/target');
+const {isInlineLink} = require('./isInlineLink');
 
 // ########## FUNCTIONS
 
-// Runs the test and returns the result.
-exports.reporter = async (page, withItems) => {
-  // Initialize the locators and result.
-  const all = await init(100, page, 'a, button, input');
-  // For each locator:
-  for (const loc of all.allLocs) {
-    // Get data on it if illicitly small.
-    const sizeData = await isTooSmall(loc, 44);
-    // If it is:
-    if (sizeData) {
-      // Add the locator to the array of violators.
-      all.locs.push([loc, `${sizeData.width} wide by ${sizeData.height} high`]);
+// Returns data about a target if it is illicitly small.
+exports.isTooSmall = async (loc, min) => {
+  const sizeData = await loc.evaluate(el => {
+    const rect = el.getBoundingClientRect();
+    const widthR = rect && rect.width || 0;
+    const heightR = rect && rect.height || 0;
+    const widthP = el.offsetWidth;
+    const width = Math.max(widthP, Math.round(widthR));
+    const heightP = el.offsetHeight;
+    const height = Math.max(heightP, Math.round(heightR));
+    const tagName = el.tagName;
+    const isSmall = width < min || height < min;
+    const styleDec = window.getComputedStyle(el);
+    const displayStyle = styleDec.display;
+    if (displayStyle === 'none') {
+      return null;
     }
-  };
-  // Populate and return the result.
-  const whats = [
-    'Interactive element pixel size (__param__) is less than 44 by 44',
-    'Interactive elements are smaller than 44 pixels wide and high'
-  ];
-  return await report(withItems, all, 'targetSmall', whats, 1);
+    else {
+      return isSmall ? {tagName, width, height} : null;
+    }
+  });
+  // If it is too small and displayed:
+  if (sizeData) {
+    // If it is an inline link:
+    if (sizeData.tagName === 'A' && await isInlineLink(loc)) {
+      // Exempt it.
+      sizeData = null;
+    }
+  }
+  // Return data about the target or that it is not illicitly too small.
+  return sizeData;
 };
