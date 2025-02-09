@@ -88,7 +88,7 @@ exports.isTooSmall = async (loc, min) => {
         // Get whether it is too small.
         const isSmall = elDims.some(dim => dim < min);
         // Get its data if too small or its compliant status.
-        return isSmall ? {tagName, width, height} : null;
+        return isSmall ? {tagName, width: elDims[0], height: elDims[1]} : null;
       }
     }, min);
   }
