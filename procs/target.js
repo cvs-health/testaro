@@ -34,7 +34,7 @@ const {isInlineLink} = require('./isInlineLink');
 
 // ########## FUNCTIONS
 
-// Returns data about a target if it is illicitly small.
+// Returns data about a target if it is displayed and illicitly small.
 exports.isTooSmall = async (loc, min) => {
   // If the target is an inline link:
   if (await isInlineLink(loc)) {
@@ -45,59 +45,56 @@ exports.isTooSmall = async (loc, min) => {
   else {
     // Get data on it if it is too small.
     let sizeData = await loc.evaluate((el, min) => {
-      // Gets the width and height of an element.
-      const getDims = el => {
-        const rect = el.getBoundingClientRect();
-        const widthR = rect && rect.width || 0;
-        const heightR = rect && rect.height || 0;
-        const widthP = el.offsetWidth || 0;
-        const width = Math.max(widthP, Math.round(widthR));
-        const heightP = el.offsetHeight || 0;
-        const height = Math.max(heightP, Math.round(heightR));
-        return [width, height];
-      };
-      const tagName = el.tagName;
-      // Get the width and height of the target.
-      const elDims = getDims(el);
-      // If either dimension is too small:
-      if (elDims.some(dim => dim < min)) {
-        // Get the parent of the target.
-        const elParent = el.parentElement;
-        // Get the child elements of the parent, including the target.
-        const elGeneration = Array.from(elParent.children);
-        // If the target has no siblings of its type:
-        if (elGeneration.filter(peer => peer.tagName === tagName).length === 1) {
-          // Get the width and height of the parent.
-          const parentDims = getDims(el);
-          elDims.forEach((elDim, index) => {
-            if (elDim < min && parentDims[index] > elDim) {
-              elDims[index] = parentDims[index];
-            }
-          });
-      const rect = el.getBoundingClientRect();
-      const widthR = rect && rect.width || 0;
-      const heightR = rect && rect.height || 0;
-      const widthP = el.offsetWidth;
-      const width = Math.max(widthP, Math.round(widthR));
-      const heightP = el.offsetHeight;
-      const height = Math.max(heightP, Math.round(heightR));
-      // Get whether either is too small.
-      const isSmall = width < min || height < min;
+      // Get its styles.
       const styleDec = window.getComputedStyle(el);
       const displayStyle = styleDec.display;
-      // If the element is hidden:
+      // If it is hidden:
       if (displayStyle === 'none') {
         // Exempt it.
         return null;
       }
       // Otherwise, i.e. if it is displayed:
       else {
+        // Gets the width and height of an element.
+        const getDims = el => {
+          const rect = el.getBoundingClientRect();
+          const widthR = rect && rect.width || 0;
+          const heightR = rect && rect.height || 0;
+          const widthP = el.offsetWidth || 0;
+          const width = Math.max(widthP, Math.round(widthR));
+          const heightP = el.offsetHeight || 0;
+          const height = Math.max(heightP, Math.round(heightR));
+          return [width, height];
+        };
+        const tagName = el.tagName;
+        // Get the width and height of the target.
+        const elDims = getDims(el);
+        // If either dimension is too small:
+        if (elDims.some(dim => dim < min)) {
+          // Get the parent of the target.
+          const elParent = el.parentElement;
+          // Get the child elements of the parent, including the target.
+          const elGeneration = Array.from(elParent.children);
+          // If the target has no siblings of its type:
+          if (elGeneration.filter(peer => peer.tagName === tagName).length === 1) {
+            // Get the width and height of the parent.
+            const parentDims = getDims(el);
+            // For each dimension of the target:
+            elDims.forEach((elDim, index) => {
+              // If it is too small and smaller than that of the parent:
+              if (elDim < min && parentDims[index] > elDim) {
+                // Replace it with the dimension of the parent.
+                elDims[index] = parentDims[index];
+              }
+            });
+          }
+        }
+        // Get whether it is too small.
+        const isSmall = elDims.some(dim => dim < min);
         // Get its data if too small or its compliant status.
         return isSmall ? {tagName, width, height} : null;
       }
-  }, min);
-  // If it is too small and displayed:
-  if (sizeData) {
+    }, min);
   }
   // Return data about the target or its compliant status.
   return sizeData;
