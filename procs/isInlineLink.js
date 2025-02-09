@@ -30,36 +30,44 @@
 */
 
 exports.isInlineLink = async loc => await loc.evaluate(element => {
-  let listAncestor;
-  // Initialize the link as inline.
-  let result = true;
-  // If its display style property is block:
-  const styleDec = window.getComputedStyle(element);
-  if (styleDec.display === 'block') {
-    // Reclassify the link as non-inline.
-    result = false;
+  // If the element is not a link:
+  if (element.tagName !== 'A' && element.getAttribute('role') !== 'link') {
+    // Classify it as not an inline link.
+    return false;
   }
-  // Otherwise, if it is in a list item in a list of at least 2 links:
-  else if (listAncestor = element.closest('ul, ol')) {
-    if (listAncestor.children.length > 1 && Array.from(listAncestor.children).every(child => {
-      const isValidListItem = child.tagName === 'LI';
-      const has1Link = child.querySelectorAll('a').length === 1;
-      return isValidListItem && has1Link;
-    })) {
-      // If the list text is entirely link text:
-      const listText = listAncestor.textContent.replace(/\s/g, '');
-      let linkTextRaw = '';
-      listAncestor.querySelectorAll('a').forEach(link => {
-        linkTextRaw += link.textContent;
-      });
-      const linkText = linkTextRaw.replace(/\s/g, '');
-      console.log(linkText);
-      if (listText === linkText && listText.length) {
-        // Reclassify the link as non-inline.
-        result = false;
+  // Otherwise, i.e. if it is a link:
+  else {
+    let listAncestor;
+    // Initialize the link as inline.
+    let result = true;
+    // If its display style property is block:
+    const styleDec = window.getComputedStyle(element);
+    if (styleDec.display === 'block') {
+      // Reclassify the link as non-inline.
+      result = false;
+    }
+    // Otherwise, if it is in a list item in a list of at least 2 links:
+    else if (listAncestor = element.closest('ul, ol')) {
+      if (listAncestor.children.length > 1 && Array.from(listAncestor.children).every(child => {
+        const isValidListItem = child.tagName === 'LI';
+        const has1Link = child.querySelectorAll('a').length === 1;
+        return isValidListItem && has1Link;
+      })) {
+        // If the list text is entirely link text:
+        const listText = listAncestor.textContent.replace(/\s/g, '');
+        let linkTextRaw = '';
+        listAncestor.querySelectorAll('a').forEach(link => {
+          linkTextRaw += link.textContent;
+        });
+        const linkText = linkTextRaw.replace(/\s/g, '');
+        console.log(linkText);
+        if (listText === linkText && listText.length) {
+          // Reclassify the link as non-inline.
+          result = false;
+        }
       }
     }
+    // Return the result.
+    return result;
   }
-  // Return the result.
-  return result;
 });
