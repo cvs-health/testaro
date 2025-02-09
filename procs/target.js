@@ -36,7 +36,16 @@ const {isInlineLink} = require('./isInlineLink');
 
 // Returns data about a target if it is illicitly small.
 exports.isTooSmall = async (loc, min) => {
-  const sizeData = await loc.evaluate(el => {
+  let sizeData = await loc.evaluate((el, min) => {
+    const tagName = el.tagName;
+    const elParent = el.parentElement;
+    const elGeneration = Array.from(elParent.children);
+    // If the target has no siblings of its type:
+    if (elGeneration.filter(peer => peer.tagName === tagName).length === 1) {
+      // Treate its parent as the element.
+      el = elParent;
+    }
+    // Get the width and height of the element.
     const rect = el.getBoundingClientRect();
     const widthR = rect && rect.width || 0;
     const heightR = rect && rect.height || 0;
@@ -44,25 +53,29 @@ exports.isTooSmall = async (loc, min) => {
     const width = Math.max(widthP, Math.round(widthR));
     const heightP = el.offsetHeight;
     const height = Math.max(heightP, Math.round(heightR));
-    const tagName = el.tagName;
+    // Get whether either is too small.
     const isSmall = width < min || height < min;
     const styleDec = window.getComputedStyle(el);
     const displayStyle = styleDec.display;
+    // If the element is hidden:
     if (displayStyle === 'none') {
+      // Exempt it.
       return null;
     }
+    // Otherwise, i.e. if it is displayed:
     else {
+      // Get its data if too small or its compliant status.
       return isSmall ? {tagName, width, height} : null;
     }
-  });
+  }, min);
   // If it is too small and displayed:
   if (sizeData) {
-    // If it is an inline link:
+    // If the located element is an inline link:
     if (sizeData.tagName === 'A' && await isInlineLink(loc)) {
       // Exempt it.
       sizeData = null;
     }
   }
-  // Return data about the target or that it is not illicitly too small.
+  // Return data about the target or its compliant status.
   return sizeData;
 };
