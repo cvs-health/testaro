@@ -74,7 +74,7 @@ exports.isTooSmall = async (loc, min) => {
           // If the target has no siblings of its type:
           if (elGeneration.filter(peer => peer.tagName === tagName).length === 1) {
             // Get the width and height of the parent.
-            const parentDims = getDims(el);
+            const parentDims = getDims(elParent);
             // For each dimension of the target:
             elDims.forEach((elDim, index) => {
               // If it is too small and smaller than that of the parent:
