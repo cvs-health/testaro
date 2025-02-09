@@ -36,15 +36,11 @@ const {isInlineLink} = require('./isInlineLink');
 
 // Returns data about a target if it is displayed and illicitly small.
 exports.isTooSmall = async (loc, min) => {
-  // If the target is an inline link:
-  if (await isInlineLink(loc)) {
-    // Exempt it.
-    sizeData = null;
-  }
-  // Otherwise, i.e. if it is not an inline link:
-  else {
+  let sizeData = null;
+  // If the target is not an inline link:
+  if (!(await isInlineLink(loc))) {
     // Get data on it if it is too small.
-    let sizeData = await loc.evaluate((el, min) => {
+    sizeData = await loc.evaluate((el, min) => {
       // Get its styles.
       const styleDec = window.getComputedStyle(el);
       const displayStyle = styleDec.display;
