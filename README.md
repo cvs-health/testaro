@@ -880,7 +880,7 @@ Please report any issues, including feature requests, at the [repository](https:
 
 The rationales motivating the Testaro-defined tests can be found in comments within the files of those tests, in the `tests` directory. Unavoidably, each test is opinionated. Testaro itself, however, can accommodate other tests representing different opinions. Testaro is intended to be neutral with respect to questions such as the criteria for accessibility, the severities of accessibility defects, whether accessibility is binary or graded, and the distinction between usability and accessibility.
 
-## Testing challenges
+## Challenges
 
 ### Abnormal termination
 
@@ -921,11 +921,17 @@ Tools can become faulty. For example, Alfa stopped reporting any rule violations
 
 Testaro would become more reliable if the behavior of its tools were monitored for suspect changes.
 
+### Containerized deployment
+
+The experimental deployment of Testaro as a dependency in a containerized application has been unsuccessful. Playwnight errors have been thrown that are not thrown when the same application is deployed without containerization.
+
 ## Repository exclusions
 
 The files in the `temp` directory are presumed ephemeral and are not tracked by `git`.
 
-## Related packages
+## Related work
+
+### Testilo
 
 [Testilo](https://www.npmjs.com/package/testilo) is an application that:
 - converts lists of targets and lists of issues into jobs
@@ -936,6 +942,10 @@ The files in the `temp` directory are presumed ephemeral and are not tracked by 
 Testilo contains procedures that reorganize report data by issue and by element, rather than tool, and that compensate for duplicative tests when computing scores.
 
 Report standardization could be performed by other software rather than by Testaro. That would require sending the original reports to the server. They are typically larger than standardized reports. Whenever users want only standardized reports, the fact that Testaro standardizes them eliminates the need to send the original reports anywhere.
+
+### Automated accessibility testing at Slack
+
+[Automated accessibility testing at Slack](https://slack.engineering/automated-accessibility-testing-at-slack/) is based on Playwright, with Axe as a single tool.
 
 ## Code style
 
