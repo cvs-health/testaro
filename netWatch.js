@@ -244,6 +244,7 @@ exports.netWatch = async (isForever, intervalInSeconds, isCertTolerant = true) =
                     }
                     catch(error) {
                       console.log(`ERROR performing job ${id} (${error.message})`);
+                      resolve(true);
                     }
                   }
                 }
