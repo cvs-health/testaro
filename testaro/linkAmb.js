@@ -1,5 +1,5 @@
 /*
-  © 2023 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2023–2025 CVS Health and/or one of its affiliates. All rights reserved.
 
   MIT License
 
@@ -40,21 +40,29 @@ const {getLocatorData} = require('../procs/getLocatorData');
 exports.reporter = async (page, withItems) => {
   // Initialize the locators and result.
   const all = await init(100, page, 'a[href]:visible');
-  const linkTexts = new Set();
+  const linksData = [];
   // For each locator:
   for (const loc of all.allLocs) {
     // Get its text.
     const elData = await getLocatorData(loc);
-    // If a previous link has the same text:
     const linkText = elData.excerpt.toLowerCase();
-    if (linkTexts.has(linkText)) {
-      // Add the locator to the array of violators.
-      all.locs.push(loc);
-    }
-    // Otherwise, i.e. if this is the first link with the text:
-    else {
-      // Record its text.
-      linkTexts.add(linkText);
+    // Get its destination.
+    const linkTo = await loc.getAttribute('href');
+    // If the text and destination exist:
+    if (linkText && linkTo) {
+      // If a previous link has the same text but a different destination:
+      if (linksData.some(linkData => linkData.text === linkText && linkData.to !== linkTo)) {
+        // Add the locator to the array of violators.
+        all.locs.push(loc);
+      }
+      // Otherwise, i.e. if no previous link has the same taxt but a different destination:
+      else {
+        // Record its text and destination.
+        linksData.push({
+          text: linkText,
+          to: linkTo
+        });
+      }
     }
   }
   // Populate and return the result.

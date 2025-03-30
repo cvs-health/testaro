@@ -1,5 +1,5 @@
 /*
-  © 2022–2024 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2022–2025 CVS Health and/or one of its affiliates. All rights reserved.
 
   MIT License
 
@@ -31,7 +31,7 @@
 
 // Module to process files.
 const fs = require('fs').promises;
-// Module to run Testaro jebs.
+// Module to run Testaro jobs.
 const {doJob} = require('../run');
 
 // FUNCTIONS
@@ -42,7 +42,7 @@ exports.validateTest = async testID => {
   const jobFileNames = await fs.readdir(`${__dirname}/tests/jobs`);
   for (const jobFileName of jobFileNames.filter(fileName => fileName === `${testID}.json`)) {
     const jobJSON = await fs.readFile(`${__dirname}/tests/jobs/${jobFileName}`, 'utf8');
-    const report = JSON.parse(jobJSON);
+    let report = JSON.parse(jobJSON);
     // Perform it.
     report = await doJob(report);
     // Report whether the end time was reported.
