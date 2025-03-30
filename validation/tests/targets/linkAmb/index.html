@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  © 2023 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2023–2025 CVS Health and/or one of its affiliates. All rights reserved.
 
   MIT License
 
@@ -33,9 +33,14 @@
     <main>
       <h1>Page with unambiguous and ambiguous links</h1>
       <p>This is a normal link to <a href="https://en.wikipedia.org">English information</a>.</p>
+      <p>The next two links, too, are unambiguous. Although they have the same name, they also have the same destination.</p>
+      <ul>
+        <li><a id="basqueInfoWP0" href="https://eus.wikipedia.org">Basque information</a></li>
+        <li><a id="basqueInfoWP1" href="https://eus.wikipedia.org">Basque information</a></li>
+      </ul>
       <p>However, the next two links are ambiguous, because their names are the same and yet they have different destinations:</p>
       <ul>
-        <li><a id="basqueInfoWP" href="https://eus.wikipedia.org">Basque information</a></li>
+        <li><a id="basqueInfoWP2" href="https://eus.wikipedia.org">Basque information</a></li>
         <li><a id="basqueInfoICB" href="https://www.eke.eus/en/kultura/basque-country">Basque information</a></li>
       </ul>
     </main>

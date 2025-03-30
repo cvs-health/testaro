@@ -2,16 +2,25 @@
   "id": "linkAmb",
   "what": "validation of linkAmb test",
   "strict": true,
+  "standard": "only",
+  "observe": false,
+  "device": {
+    "id": "default"
+  },
+  "browserID": "webkit",
+  "creationTimeStamp": "240101T1500",
+  "executionTimeStamp": "240101T1200",
+  "target": {
+    "what": "page with unambiguous and ambiguous links",
+    "url": "file://validation/tests/targets/linkAmb/index.html"
+  },
+  "sources": {
+  },
   "timeLimit": 20,
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/linkAmb/index.html",
-      "what": "page with unambiguous and ambiguous links"
-    },
-    {
       "type": "test",
+      "launch": {},
       "which": "testaro",
       "withItems": true,
       "stopOnFail": true,
@@ -84,6 +93,7 @@
     },
     {
       "type": "test",
+      "launch": {},
       "which": "testaro",
       "withItems": false,
       "stopOnFail": true,
@@ -124,11 +134,5 @@
         "linkAmb"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }
