@@ -1,14 +1,10 @@
 {
-  "id": "hover",
-  "what": "validation of hover test",
-  "strict": true,
+  "rule": "hover",
   "timeLimit": 40,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/hover/good.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/hover/good.html",
       "what": "page with standard hover behavior"
     },
     {
@@ -185,14 +181,5 @@
         "hover"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

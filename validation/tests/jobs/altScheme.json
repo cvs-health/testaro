@@ -1,14 +1,10 @@
 {
-  "id": "altScheme",
-  "what": "validation of altScheme test",
-  "strict": true,
+  "rule": "altScheme",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/altScheme/index.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/altScheme/index.html",
       "what": "page with elements having textual and URL text alternatives"
     },
     {
@@ -145,14 +141,5 @@
         "altScheme"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

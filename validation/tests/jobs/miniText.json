@@ -1,14 +1,10 @@
 {
-  "id": "miniText",
-  "what": "validation of miniText test",
-  "strict": true,
+  "rule": "miniText",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/miniText/index.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/miniText/index.html",
       "what": "page with text in various font sizes"
     },
     {
@@ -130,14 +126,5 @@
         "miniText"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

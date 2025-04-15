@@ -1,14 +1,10 @@
 {
-  "id": "focAll",
-  "what": "validation of focAll test",
-  "strict": true,
+  "rule": "focAll",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/focAll/good.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/focAll/good.html",
       "what": "fully Tab-focusable page"
     },
     {
@@ -127,14 +123,5 @@
         "focAll"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

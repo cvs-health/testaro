@@ -1,14 +1,10 @@
 {
-  "id": "attVal",
-  "what": "validation of attVal test",
-  "strict": true,
+  "rule": "attVal",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/attVal/good.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/attVal/good.html",
       "what": "page with permitted attribute values"
     },
     {
@@ -181,14 +177,5 @@
         "attVal": ["lang", true, ["en-US", "de-CH"]]
       }
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

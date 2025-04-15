@@ -1,14 +1,10 @@
 {
-  "id": "targetSize",
-  "what": "validation of targetSize test",
-  "strict": true,
+  "rule": "targetSize",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/targetSize/index.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/targetSize/index.html",
       "what": "page with variously sized interaction targets"
     },
     {
@@ -150,14 +146,5 @@
         "targetSize"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

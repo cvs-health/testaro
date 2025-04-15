@@ -146,7 +146,7 @@ exports.actSpecs = {
       'Perform tests of a tool',
       {
         which: [true, 'string', 'isTest', 'tool name'],
-        launch: [false, 'object', '', 'if new browser to be launched, properties different from target, browserID, and what of the job'],
+        launch: [false, 'object', '', 'new target, browserID, and/or what, if any'],
         rules: [false, 'array', 'areStrings', 'rule IDs or (for nuVal) specifications, if not all']
       }
     ],

@@ -1,0 +1,29 @@
+{
+  "id": "250101T0000-aaa-00",
+  "what": "",
+  "strict": true,
+  "standard": "only",
+  "observe": false,
+  "device": {
+    "id": "default",
+    "windowOptions": {
+      "reducedMotion": "no-preference"
+    }
+  },
+  "browserID": "webkit",
+  "timeLimit": 60,
+  "creationTimeStamp": "250101T0000",
+  "executionTimeStamp": "250101T0000",
+  "sendReportTo": "",
+  "target": {
+    "what": "page for test validation",
+    "url": "file://to_be_replaced.html"
+  },
+  "sources": {
+    "script": "test",
+    "batch": "test",
+    "mergeID": "aaa",
+    "requester": ""
+  },
+  "acts": []
+}

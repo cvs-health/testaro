@@ -1,14 +1,10 @@
 {
-  "id": "embAc",
-  "what": "validation of embAc test",
-  "strict": true,
+  "rule": "embAc",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/embAc/good.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/embAc/good.html",
       "what": "page without embedding in links or buttons"
     },
     {
@@ -142,14 +138,5 @@
         "embAc"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

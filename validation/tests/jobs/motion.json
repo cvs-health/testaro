@@ -1,14 +1,11 @@
 {
-  "id": "motion",
-  "what": "validation of motion test",
-  "strict": true,
+  "rule": "motion",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
       "which": "webkit",
-      "url": "file://validation/tests/targets/motion/good.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/motion/good.html",
       "what": "page without motion"
     },
     {
@@ -90,14 +87,5 @@
         "motion"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

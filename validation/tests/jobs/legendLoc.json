@@ -1,14 +1,10 @@
 {
-  "id": "legendLoc",
-  "what": "validation of legendLoc test",
-  "strict": true,
+  "rule": "legendLoc",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/legendLoc/index.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/legendLoc/index.html",
       "what": "page with standard and nonstandard legend locations"
     },
     {
@@ -136,14 +132,5 @@
         "legendLoc"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

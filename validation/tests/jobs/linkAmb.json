@@ -1,23 +1,6 @@
 {
-  "id": "linkAmb",
-  "what": "validation of linkAmb test",
-  "strict": true,
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "browserID": "webkit",
-  "creationTimeStamp": "240101T1500",
-  "executionTimeStamp": "240101T1200",
-  "target": {
-    "what": "page with unambiguous and ambiguous links",
-    "url": "file://validation/tests/targets/linkAmb/index.html"
-  },
-  "sources": {
-  },
+  "rule": "linkAmb",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
       "type": "test",

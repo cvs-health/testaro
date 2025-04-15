@@ -1,14 +1,10 @@
 {
-  "id": "zIndex",
-  "what": "validation of zIndex test",
-  "strict": true,
+  "rule": "zIndex",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/zIndex/good.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/zIndex/good.html",
       "what": "page with no explicit z-index attributes"
     },
     {
@@ -142,14 +138,5 @@
         "zIndex"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

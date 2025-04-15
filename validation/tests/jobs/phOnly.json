@@ -1,14 +1,10 @@
 {
-  "id": "phOnly",
-  "what": "validation of phOnly test",
-  "strict": true,
+  "rule": "phOnly",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/phOnly/index.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/phOnly/index.html",
       "what": "page with inputs with and without labels and placeholders"
     },
     {
@@ -135,14 +131,5 @@
         "phOnly"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

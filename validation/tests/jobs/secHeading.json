@@ -1,14 +1,10 @@
 {
-  "id": "secHeading",
-  "what": "validation of secHeading test",
-  "strict": true,
+  "rule": "secHeading",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/secHeading/index.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/secHeading/index.html",
       "what": "page with sections having logical and illogical heading sequences"
     },
     {
@@ -135,14 +131,5 @@
         "secHeading"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

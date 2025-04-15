@@ -1,14 +1,10 @@
 {
-  "id": "headEl",
-  "what": "validation of headEl test",
-  "strict": true,
+  "rule": "headEl",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/headEl/index.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/headEl/index.html",
       "what": "page with valid and invalid elements in the head"
     },
     {
@@ -53,14 +49,5 @@
         "headEl"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

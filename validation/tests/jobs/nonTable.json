@@ -1,14 +1,10 @@
 {
-  "id": "nonTable",
-  "what": "validation of nonTable test",
-  "strict": true,
+  "rule": "nonTable",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/nonTable/index.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/nonTable/index.html",
       "what": "page with a real table and 3 pseudotables"
     },
     {
@@ -140,14 +136,5 @@
         "nonTable"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

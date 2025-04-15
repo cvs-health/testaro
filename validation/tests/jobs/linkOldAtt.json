@@ -1,14 +1,10 @@
 {
-  "id": "linkOldAtt",
-  "what": "validation of linkOldAtt test",
-  "strict": true,
+  "rule": "linkOldAtt",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/linkOldAtt/index.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/linkOldAtt/index.html",
       "what": "page with links with and without deprecated attributes"
     },
     {
@@ -120,14 +116,5 @@
         "linkOldAtt"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

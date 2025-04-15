@@ -1,14 +1,10 @@
 {
-  "id": "optRoleSel",
-  "what": "validation of optRoleSel test",
-  "strict": true,
+  "rule": "optRoleSel",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/optRoleSel/index.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/optRoleSel/index.html",
       "what": "page with and without aria-select attributes on option-role elements"
     },
     {
@@ -120,14 +116,5 @@
         "optRoleSel"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

@@ -1,14 +1,10 @@
 {
-  "id": "hovInd",
-  "what": "validation of hovInd test",
-  "strict": true,
+  "rule": "hovInd",
   "timeLimit": 40,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/hovInd/index.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/hovInd/index.html",
       "what": "page with varied hover indicators"
     },
     {
@@ -166,14 +162,5 @@
         "hovInd": [7]
       }
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

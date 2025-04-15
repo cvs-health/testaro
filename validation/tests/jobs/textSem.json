@@ -1,14 +1,10 @@
 {
-  "id": "textSem",
-  "what": "validation of textSem test",
-  "strict": true,
+  "rule": "textSem",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/textSem/index.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/textSem/index.html",
       "what": "page with semantically and nonsemantically varied text"
     },
     {
@@ -150,14 +146,5 @@
         "textSem"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

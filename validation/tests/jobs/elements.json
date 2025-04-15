@@ -1,14 +1,10 @@
 {
-  "id": "elements",
-  "what": "validation of elements test",
-  "strict": true,
+  "rule": "elements",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/elements/index.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/elements/index.html",
       "what": "page with a shadow root"
     },
     {
@@ -294,13 +290,5 @@
       }
     }
   ],
-  "sources": {
-  },
-  "standard": "no",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  "standard": "no"
 }

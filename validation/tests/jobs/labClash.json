@@ -1,14 +1,10 @@
 {
-  "id": "labClash",
-  "what": "validation of labClash test",
-  "strict": true,
+  "rule": "labClash",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/labClash/good.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/labClash/good.html",
       "what": "page with standard labeling"
     },
     {
@@ -110,14 +106,5 @@
         "labClash"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

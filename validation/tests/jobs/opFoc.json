@@ -1,14 +1,10 @@
 {
-  "id": "opFoc",
-  "what": "validation of opFoc test",
-  "strict": true,
+  "rule": "opFoc",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/opFoc/good.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/opFoc/good.html",
       "what": "page with standard focusability and operability"
     },
     {
@@ -162,14 +158,5 @@
         "opFoc"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

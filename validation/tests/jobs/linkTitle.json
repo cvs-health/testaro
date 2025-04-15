@@ -1,14 +1,10 @@
 {
-  "id": "linkTitle",
-  "what": "validation of linkTitle test",
-  "strict": true,
+  "rule": "linkTitle",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/linkTitle/index.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/linkTitle/index.html",
       "what": "page with normal and rodundantly titled links"
     },
     {
@@ -125,14 +121,5 @@
         "linkTitle"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

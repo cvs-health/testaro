@@ -1,14 +1,10 @@
 {
-  "id": "imageLink",
-  "what": "validation of imageLink test",
-  "strict": true,
+  "rule": "imageLink",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/imageLink/index.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/imageLink/index.html",
       "what": "page with links to web pages and to image files"
     },
     {
@@ -135,14 +131,5 @@
         "imageLink"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

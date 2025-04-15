@@ -1,14 +1,10 @@
 {
-  "id": "lineHeight",
-  "what": "validation of lineHeight test",
-  "strict": true,
+  "rule": "lineHeight",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/lineheight/index.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/lineheight/index.html",
       "what": "page with various line heights"
     },
     {
@@ -120,14 +116,5 @@
         "lineHeight"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

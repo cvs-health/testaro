@@ -1,14 +1,10 @@
 {
-  "id": "title",
-  "what": "validation of title test",
-  "strict": true,
+  "rule": "title",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/title/good.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/title/good.html",
       "what": "page with a title"
     },
     {
@@ -51,13 +47,5 @@
       ]
     }
   ],
-  "sources": {
-  },
-  "standard": "no",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  "standard": "no"
 }

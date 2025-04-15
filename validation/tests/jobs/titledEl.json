@@ -1,14 +1,10 @@
 {
-  "id": "titledEl",
-  "what": "validation of titledEl test",
-  "strict": true,
+  "rule": "titledEl",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/titledEl/index.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/titledEl/index.html",
       "what": "page with valid and invalid title attributes"
     },
     {
@@ -140,14 +136,5 @@
         "titledEl"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

@@ -1,14 +1,10 @@
 {
-  "id": "radioSet",
-  "what": "validation of radioSet test",
-  "strict": true,
+  "rule": "radioSet",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/radioSet/good.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/radioSet/good.html",
       "what": "page with standard radio-button grouping"
     },
     {
@@ -188,14 +184,5 @@
         "radioSet"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

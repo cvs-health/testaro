@@ -1,14 +1,10 @@
 {
-  "id": "docType",
-  "what": "validation of docType test",
-  "strict": true,
+  "rule": "docType",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/docType/good.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/docType/good.html",
       "what": "page with doctype"
     },
     {
@@ -85,14 +81,5 @@
         "docType"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

@@ -1,14 +1,10 @@
 {
-  "id": "adbID",
-  "what": "validation of adbID test",
-  "strict": true,
+  "rule": "adbID",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/adbID/index.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/adbID/index.html",
       "what": "page with elements having good and bad description references"
     },
     {
@@ -130,14 +126,5 @@
         "adbID"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }

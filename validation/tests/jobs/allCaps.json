@@ -1,14 +1,10 @@
 {
-  "id": "allCaps",
-  "what": "validation of allCaps test",
-  "strict": true,
+  "rule": "allCaps",
   "timeLimit": 20,
-  "browserID": "webkit",
   "acts": [
     {
-      "type": "launch",
-      "which": "chromium",
-      "url": "file://validation/tests/targets/allCaps/index.html",
+      "type": "url",
+      "which": "file://validation/tests/targets/allCaps/index.html",
       "what": "page with various letter cases"
     },
     {
@@ -135,14 +131,5 @@
         "allCaps"
       ]
     }
-  ],
-  "sources": {
-  },
-  "standard": "only",
-  "observe": false,
-  "device": {
-    "id": "default"
-  },
-  "timeStamp": "240101T1500",
-  "creationTimeStamp": "240101T1200"
+  ]
 }
