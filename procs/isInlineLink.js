@@ -29,10 +29,10 @@
   with no other nonspacing text content.
 */
 
-// Returns the normalized text content of an element.
-const realTextOf = element => element.textContent.replace(/\s/g, '');
-
 exports.isInlineLink = async loc => await loc.evaluate(element => {
+  // Returns the normalized text content of an element.
+  const realTextOf = element => element ? element.textContent.replace(/\s/g, '') : '';
+  const blockElementTypes = 'p, div, li, h1, h2, h3, h4, h5, h6';
   // If the element is not a link:
   if (element.tagName !== 'A' && element.getAttribute('role') !== 'link') {
     // Classify it as not an inline link.
@@ -45,7 +45,7 @@ exports.isInlineLink = async loc => await loc.evaluate(element => {
     // If its display style property is block or is tantamount to block:
     if (
       window.getComputedStyle(element).display === 'block'
-      || (realTextOf(element.closest('p', 'div', 'ul', 'ol'))) === realTextOf(element)
+      || realTextOf(element.closest(blockElementTypes)) === realTextOf(element)
     ) {
       // Reclassify the link as non-inline.
       result = false;
