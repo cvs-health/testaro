@@ -3,6 +3,7 @@
   "what": "validation of elements test",
   "strict": true,
   "timeLimit": 20,
+  "browserID": "webkit",
   "acts": [
     {
       "type": "launch",
@@ -297,6 +298,9 @@
   },
   "standard": "no",
   "observe": false,
+  "device": {
+    "id": "default"
+  },
   "timeStamp": "240101T1500",
   "creationTimeStamp": "240101T1200"
 }

@@ -3,6 +3,7 @@
   "what": "validation of attVal test",
   "strict": true,
   "timeLimit": 20,
+  "browserID": "webkit",
   "acts": [
     {
       "type": "launch",
@@ -185,6 +186,9 @@
   },
   "standard": "only",
   "observe": false,
+  "device": {
+    "id": "default"
+  },
   "timeStamp": "240101T1500",
   "creationTimeStamp": "240101T1200"
 }

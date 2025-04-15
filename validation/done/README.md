@@ -1,3 +1,3 @@
 # exJobs
 
-Directory into which executor `watchDir` archives jobs.
+Directory into which executor `dirWatch` archives jobs.

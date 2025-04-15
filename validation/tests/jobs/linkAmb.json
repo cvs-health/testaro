@@ -17,6 +17,7 @@
   "sources": {
   },
   "timeLimit": 20,
+  "browserID": "webkit",
   "acts": [
     {
       "type": "test",

@@ -3,6 +3,7 @@
   "what": "validation of labClash test",
   "strict": true,
   "timeLimit": 20,
+  "browserID": "webkit",
   "acts": [
     {
       "type": "launch",

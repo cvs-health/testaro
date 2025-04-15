@@ -81,7 +81,7 @@ const evalRules = {
   focAll: 'discrepancies between focusable and Tab-focused elements',
   focInd: 'missing and nonstandard focus indicators',
   focOp: 'Tab-focusable elements that are not operable',
-  focVis: 'links that are invisible when focused',
+  focVis: 'links that are not entirely visible when focused',
   headEl: 'invalid elements within the head',
   headingAmb: 'same-level sibling headings with identical texts',
   hover: 'hover-caused content changes',

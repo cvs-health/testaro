@@ -38,7 +38,8 @@ const {doJob} = require('../run');
 
 // Validates a test.
 exports.validateTest = async testID => {
-  // Get the job that validates the test.
+  // Create a job to validate the test.
+  
   const jobFileNames = await fs.readdir(`${__dirname}/tests/jobs`);
   for (const jobFileName of jobFileNames.filter(fileName => fileName === `${testID}.json`)) {
     const jobJSON = await fs.readFile(`${__dirname}/tests/jobs/${jobFileName}`, 'utf8');
