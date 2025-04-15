@@ -3,9 +3,11 @@
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/distortion/index.html",
-      "what": "page with distorted text"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/distortion/index.html",
+        "what": "page with distorted text"
+      }
     },
     {
       "type": "test",

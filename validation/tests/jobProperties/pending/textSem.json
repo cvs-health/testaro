@@ -1,11 +1,13 @@
 {
-  "rule": "secHeading",
+  "rule": "textSem",
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/secHeading/index.html",
-      "what": "page with sections having logical and illogical heading sequences"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/textSem/index.html",
+        "what": "page with semantically and nonsemantically varied text"
+      }
     },
     {
       "type": "test",
@@ -14,34 +16,34 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.1",
+          "standardResult.totals.0",
           "=",
-          3
+          4
         ],
         [
-          "standardResult.instances.length",
+          "standardResult.totals.1",
           "=",
-          3
+          0
         ],
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "secHeading"
+          "textSem"
         ],
         [
           "standardResult.instances.0.what",
           "=",
-          "Element violates the logical level order in its sectioning container"
+          "Element is semantically vague"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          1
+          0
         ],
         [
           "standardResult.instances.0.tagName",
           "=",
-          "H2"
+          "I"
         ],
         [
           "standardResult.instances.0.location.doc",
@@ -54,39 +56,54 @@
           "box"
         ],
         [
-          "standardResult.instances.0.location.spec.y",
+          "standardResult.instances.0.location.spec.width",
           ">",
           0
         ],
         [
           "standardResult.instances.0.excerpt",
           "=",
-          "This heading is illogical"
+          "tag"
         ],
         [
           "standardResult.instances.1.tagName",
           "=",
-          "H1"
+          "I"
         ],
         [
           "standardResult.instances.1.excerpt",
           "=",
-          "This heading is fundamentally illogical"
+          "Never"
+        ],
+        [
+          "standardResult.instances.2.ordinalSeverity",
+          "=",
+          0
         ],
         [
           "standardResult.instances.2.tagName",
           "=",
-          "H2"
+          "B"
         ],
         [
           "standardResult.instances.2.excerpt",
           "=",
-          "This article heading is illogical"
+          "accessible"
+        ],
+        [
+          "standardResult.instances.3.tagName",
+          "=",
+          "SMALL"
+        ],
+        [
+          "standardResult.instances.3.excerpt",
+          "=",
+          "This situation is rare and probably does not apply to you."
         ]
       ],
       "rules": [
         "y",
-        "secHeading"
+        "textSem"
       ]
     },
     {
@@ -96,9 +113,9 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.1",
+          "standardResult.totals.0",
           "=",
-          3
+          4
         ],
         [
           "standardResult.totals.3",
@@ -106,29 +123,29 @@
           0
         ],
         [
-          "standardResult.instances.length",
-          "=",
-          1
-        ],
-        [
           "standardResult.instances.0.ruleID",
           "=",
-          "secHeading"
-        ],
-        [
-          "standardResult.instances.0.count",
-          "=",
-          3
+          "textSem"
         ],
         [
           "standardResult.instances.0.what",
           "=",
-          "Heading elements violate the logical level order in their sectioning containers"
+          "Semantically vague elements i, b, and/or small are used"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          4
         ]
       ],
       "rules": [
         "y",
-        "secHeading"
+        "textSem"
       ]
     }
   ]

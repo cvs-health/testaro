@@ -3,9 +3,11 @@
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/labClash/good.html",
-      "what": "page with standard labeling"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/labClash/good.html",
+        "what": "page with standard labeling"
+      }
     },
     {
       "type": "test",

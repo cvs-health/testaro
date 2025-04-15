@@ -3,10 +3,11 @@
   "timeLimit": 20,
   "acts": [
     {
-      "which": "webkit",
-      "type": "url",
-      "which": "file://validation/tests/targets/motion/good.html",
-      "what": "page without motion"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/motion/good.html",
+        "what": "page without motion"
+      }
     },
     {
       "type": "test",

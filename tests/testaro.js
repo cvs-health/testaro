@@ -38,6 +38,7 @@ const {tellServer} = require('../procs/tellServer');
 
 // ######## CONSTANTS
 
+// The validation job data for the tests listed below are in the pending directory.
 /*
 const futureEvalRulesTraining = {
   altScheme: 'img elements with alt attributes having URLs as their entire values',

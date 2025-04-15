@@ -63,8 +63,8 @@ const doTestAct = async () => {
     report,
     debug,
     waits,
-    act.launch.browserID || report.browserID,
-    act.launch.target && act.launch.target.url || report.target.url
+    act.launch && act.launch.browserID || report.browserID,
+    act.launch && act.launch.target && act.launch.target.url || report.target.url
   );
   // If the launch aborted the job:
   if (report.jobData && report.jobData.aborted) {

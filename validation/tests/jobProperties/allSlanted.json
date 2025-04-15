@@ -3,9 +3,11 @@
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/allSlanted/index.html",
-      "what": "page with various slantednesses"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/allSlanted/index.html",
+        "what": "page with various slantednesses"
+      }
     },
     {
       "type": "test",

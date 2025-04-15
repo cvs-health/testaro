@@ -3,9 +3,11 @@
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/attVal/good.html",
-      "what": "page with permitted attribute values"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/attVal/good.html",
+        "what": "page with permitted attribute values"
+      }
     },
     {
       "type": "test",

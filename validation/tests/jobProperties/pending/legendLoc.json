@@ -1,22 +1,25 @@
 {
-  "rule": "textSem",
+  "rule": "legendLoc",
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/textSem/index.html",
-      "what": "page with semantically and nonsemantically varied text"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/legendLoc/index.html",
+        "what": "page with standard and nonstandard legend locations"
+      }
     },
     {
       "type": "test",
       "which": "testaro",
+      "what": "legendLoc",
       "withItems": true,
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.0",
+          "standardResult.totals.3",
           "=",
-          4
+          2
         ],
         [
           "standardResult.totals.1",
@@ -26,22 +29,22 @@
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "textSem"
+          "legendLoc"
         ],
         [
           "standardResult.instances.0.what",
           "=",
-          "Element is semantically vague"
+          "Element is not the first child of a fieldset element"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          0
+          3
         ],
         [
           "standardResult.instances.0.tagName",
           "=",
-          "I"
+          "LEGEND"
         ],
         [
           "standardResult.instances.0.location.doc",
@@ -61,47 +64,22 @@
         [
           "standardResult.instances.0.excerpt",
           "=",
-          "tag"
+          "Choose a food"
         ],
         [
-          "standardResult.instances.1.tagName",
+          "standardResult.instances.1.ruleID",
           "=",
-          "I"
+          "legendLoc"
         ],
         [
           "standardResult.instances.1.excerpt",
           "=",
-          "Never"
-        ],
-        [
-          "standardResult.instances.2.ordinalSeverity",
-          "=",
-          0
-        ],
-        [
-          "standardResult.instances.2.tagName",
-          "=",
-          "B"
-        ],
-        [
-          "standardResult.instances.2.excerpt",
-          "=",
-          "accessible"
-        ],
-        [
-          "standardResult.instances.3.tagName",
-          "=",
-          "SMALL"
-        ],
-        [
-          "standardResult.instances.3.excerpt",
-          "=",
-          "This situation is rare and probably does not apply to you."
+          "Choose a gas"
         ]
       ],
       "rules": [
         "y",
-        "textSem"
+        "legendLoc"
       ]
     },
     {
@@ -111,39 +89,49 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.0",
-          "=",
-          4
-        ],
-        [
           "standardResult.totals.3",
           "=",
+          2
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
           0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          1
         ],
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "textSem"
+          "legendLoc"
         ],
         [
           "standardResult.instances.0.what",
           "=",
-          "Semantically vague elements i, b, and/or small are used"
+          "legend elements are not the first children of fieldset elements"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          0
+          3
         ],
         [
           "standardResult.instances.0.count",
           "=",
-          4
+          2
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "LEGEND"
         ]
       ],
       "rules": [
         "y",
-        "textSem"
+        "legendLoc"
       ]
     }
   ]

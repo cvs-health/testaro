@@ -1,11 +1,13 @@
 {
-  "rule": "adbID",
+  "rule": "datalistRef",
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/adbID/index.html",
-      "what": "page with elements having good and bad description references"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/datalistRef/index.html",
+        "what": "page with correct and erroneous datalist references"
+      }
     },
     {
       "type": "test",
@@ -14,7 +16,7 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.0",
+          "standardResult.totals.2",
           "=",
           0
         ],
@@ -26,12 +28,12 @@
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "adbID"
+          "datalistRef"
         ],
         [
           "standardResult.instances.0.what",
           "=",
-          "Referenced description of the element is ambiguous or missing"
+          "list attribute of the element references an ambiguous or missing datalist element"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
@@ -41,7 +43,7 @@
         [
           "standardResult.instances.0.tagName",
           "=",
-          "SPAN"
+          "INPUT"
         ],
         [
           "standardResult.instances.0.location.doc",
@@ -60,28 +62,18 @@
         ],
         [
           "standardResult.instances.0.excerpt",
-          "=",
-          "the World Wide Web"
-        ],
-        [
-          "standardResult.instances.1.tagName",
-          "=",
-          "LI"
+          "i",
+          "material"
         ],
         [
           "standardResult.instances.1.excerpt",
-          "=",
-          "Defect 2: United States of America"
-        ],
-        [
-          "standardResult.instances.1.location.spec.y",
-          ">",
-          0
+          "i",
+          "city"
         ]
       ],
       "rules": [
         "y",
-        "adbID"
+        "datalistRef"
       ]
     },
     {
@@ -103,12 +95,12 @@
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "adbID"
+          "datalistRef"
         ],
         [
           "standardResult.instances.0.what",
           "=",
-          "Referenced descriptions of elements are ambiguous or missing"
+          "list attributes of elements reference ambiguous or missing datalist elements"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
@@ -123,7 +115,7 @@
       ],
       "rules": [
         "y",
-        "adbID"
+        "datalistRef"
       ]
     }
   ]

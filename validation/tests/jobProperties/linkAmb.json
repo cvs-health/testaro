@@ -3,6 +3,13 @@
   "timeLimit": 20,
   "acts": [
     {
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/linkAmb/index.html",
+        "what": "page with unambiguous and ambiguous links"
+      }
+    },
+    {
       "type": "test",
       "launch": {},
       "which": "testaro",

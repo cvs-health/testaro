@@ -1,11 +1,13 @@
 {
-  "rule": "captionLoc",
+  "rule": "secHeading",
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/captionLoc/index.html",
-      "what": "page with standard and nonstandard caption locations"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/secHeading/index.html",
+        "what": "page with sections having logical and illogical heading sequences"
+      }
     },
     {
       "type": "test",
@@ -14,34 +16,34 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.3",
-          "=",
-          2
-        ],
-        [
           "standardResult.totals.1",
-          "=",
-          0
-        ],
-        [
-          "standardResult.instances.0.ruleID",
-          "=",
-          "captionLoc"
-        ],
-        [
-          "standardResult.instances.0.what",
-          "=",
-          "Element is not the first child of a table element"
-        ],
-        [
-          "standardResult.instances.0.ordinalSeverity",
           "=",
           3
         ],
         [
+          "standardResult.instances.length",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "secHeading"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "Element violates the logical level order in its sectioning container"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          1
+        ],
+        [
           "standardResult.instances.0.tagName",
           "=",
-          "CAPTION"
+          "H2"
         ],
         [
           "standardResult.instances.0.location.doc",
@@ -54,24 +56,39 @@
           "box"
         ],
         [
-          "standardResult.instances.0.location.spec.width",
+          "standardResult.instances.0.location.spec.y",
           ">",
           0
         ],
         [
           "standardResult.instances.0.excerpt",
           "=",
-          "Office personnel"
+          "This heading is illogical"
+        ],
+        [
+          "standardResult.instances.1.tagName",
+          "=",
+          "H1"
         ],
         [
           "standardResult.instances.1.excerpt",
           "=",
-          "Farm personnel"
+          "This heading is fundamentally illogical"
+        ],
+        [
+          "standardResult.instances.2.tagName",
+          "=",
+          "H2"
+        ],
+        [
+          "standardResult.instances.2.excerpt",
+          "=",
+          "This article heading is illogical"
         ]
       ],
       "rules": [
         "y",
-        "captionLoc"
+        "secHeading"
       ]
     },
     {
@@ -81,12 +98,12 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.3",
+          "standardResult.totals.1",
           "=",
-          2
+          3
         ],
         [
-          "standardResult.totals.1",
+          "standardResult.totals.3",
           "=",
           0
         ],
@@ -98,32 +115,22 @@
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "captionLoc"
-        ],
-        [
-          "standardResult.instances.0.what",
-          "=",
-          "caption elements are not the first children of table elements"
-        ],
-        [
-          "standardResult.instances.0.ordinalSeverity",
-          "=",
-          3
+          "secHeading"
         ],
         [
           "standardResult.instances.0.count",
           "=",
-          2
+          3
         ],
         [
-          "standardResult.instances.0.tagName",
+          "standardResult.instances.0.what",
           "=",
-          "CAPTION"
+          "Heading elements violate the logical level order in their sectioning containers"
         ]
       ],
       "rules": [
         "y",
-        "captionLoc"
+        "secHeading"
       ]
     }
   ]

@@ -3,9 +3,11 @@
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/linkOldAtt/index.html",
-      "what": "page with links with and without deprecated attributes"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/linkOldAtt/index.html",
+        "what": "page with links with and without deprecated attributes"
+      }
     },
     {
       "type": "test",

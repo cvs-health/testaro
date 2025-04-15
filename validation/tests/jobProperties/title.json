@@ -3,9 +3,11 @@
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/title/good.html",
-      "what": "page with a title"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/title/good.html",
+        "what": "page with a title"
+      }
     },
     {
       "type": "test",

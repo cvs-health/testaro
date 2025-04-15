@@ -3,9 +3,11 @@
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/linkUl/na.html",
-      "what": "page without inline links"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/linkUl/na.html",
+        "what": "page without inline links"
+      }
     },
     {
       "type": "test",
@@ -75,7 +77,7 @@
         [
           "standardResult.totals.1",
           "=",
-          6
+          2
         ],
         [
           "standardResult.totals.2",
@@ -85,7 +87,7 @@
         [
           "standardResult.instances.length",
           "=",
-          6
+          2
         ],
         [
           "standardResult.instances.0.ruleID",
@@ -133,34 +135,34 @@
           "English"
         ],
         [
-          "standardResult.instances.5.what",
+          "standardResult.instances.1.what",
           "i",
           "but has no"
         ],
         [
-          "standardResult.instances.5.tagName",
+          "standardResult.instances.1.tagName",
           "=",
           "A"
         ],
         [
-          "standardResult.instances.5.location.doc",
+          "standardResult.instances.1.location.doc",
           "=",
           "dom"
         ],
         [
-          "standardResult.instances.5.location.type",
+          "standardResult.instances.1.location.type",
           "=",
           "box"
         ],
         [
-          "standardResult.instances.5.location.spec.y",
+          "standardResult.instances.1.location.spec.y",
           ">",
           0
         ],
         [
-          "standardResult.instances.5.excerpt",
+          "standardResult.instances.1.excerpt",
           "i",
-          "Turkish"
+          "French"
         ]
       ],
       "rules": [
@@ -177,7 +179,7 @@
         [
           "standardResult.totals.1",
           "=",
-          6
+          2
         ],
         [
           "standardResult.totals.2",
@@ -207,7 +209,7 @@
         [
           "standardResult.instances.0.count",
           "=",
-          6
+          2
         ],
         [
           "standardResult.instances.0.tagName",

@@ -55,7 +55,7 @@ const job = {
   sendReportTo: '',
   target: {
     what: 'page for test validation',
-    url: 'file://to_be_replaced.html'
+    url: 'file://validation/tests/targets/adbID/index.html'
   },
   sources: {
     script: 'test',

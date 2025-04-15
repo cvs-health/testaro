@@ -1,11 +1,13 @@
 {
-  "rule": "phOnly",
+  "rule": "altScheme",
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/phOnly/index.html",
-      "what": "page with inputs with and without labels and placeholders"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/altScheme/index.html",
+        "what": "page with elements having textual and URL text alternatives"
+      }
     },
     {
       "type": "test",
@@ -14,24 +16,24 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.2",
-          "=",
-          2
-        ],
-        [
           "standardResult.totals.0",
           "=",
           0
         ],
         [
+          "standardResult.totals.2",
+          "=",
+          3
+        ],
+        [
           "standardResult.instances.0.ruleID",
           "=",
-          "phOnly"
+          "altScheme"
         ],
         [
           "standardResult.instances.0.what",
           "=",
-          "Element has a placeholder but no accessible name"
+          "Element has an alt attribute with a URL as its entire value"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
@@ -41,7 +43,12 @@
         [
           "standardResult.instances.0.tagName",
           "=",
-          "INPUT"
+          "IMG"
+        ],
+        [
+          "standardResult.instances.0.id",
+          "=",
+          "mapPNG"
         ],
         [
           "standardResult.instances.0.location.doc",
@@ -51,32 +58,47 @@
         [
           "standardResult.instances.0.location.type",
           "=",
-          "box"
+          "selector"
         ],
         [
-          "standardResult.instances.0.location.spec.y",
-          ">",
-          0
+          "standardResult.instances.0.location.spec",
+          "=",
+          "#mapPNG"
         ],
         [
           "standardResult.instances.0.excerpt",
           "i",
-          "river2"
+          "Blank_map_of_states"
+        ],
+        [
+          "standardResult.instances.1.what",
+          "=",
+          "Element has an alt attribute with a URL as its entire value"
         ],
         [
           "standardResult.instances.1.tagName",
           "=",
-          "INPUT"
+          "IMG"
+        ],
+        [
+          "standardResult.instances.1.location.spec.height",
+          ">",
+          0
         ],
         [
           "standardResult.instances.1.excerpt",
           "i",
-          "company2"
+          "httpforever"
+        ],
+        [
+          "standardResult.instances.2.excerpt",
+          "i",
+          "favicon"
         ]
       ],
       "rules": [
         "y",
-        "phOnly"
+        "altScheme"
       ]
     },
     {
@@ -86,29 +108,24 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.2",
-          "=",
-          2
-        ],
-        [
           "standardResult.totals.1",
           "=",
           0
         ],
         [
-          "standardResult.instances.length",
+          "standardResult.totals.2",
           "=",
-          1
+          3
         ],
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "phOnly"
+          "altScheme"
         ],
         [
           "standardResult.instances.0.what",
           "=",
-          "input elements have placeholders but no accessible names"
+          "img elements have alt attributes with URLs as their entire values"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
@@ -118,17 +135,12 @@
         [
           "standardResult.instances.0.count",
           "=",
-          2
-        ],
-        [
-          "standardResult.instances.0.tagName",
-          "=",
-          "INPUT"
+          3
         ]
       ],
       "rules": [
         "y",
-        "phOnly"
+        "altScheme"
       ]
     }
   ]

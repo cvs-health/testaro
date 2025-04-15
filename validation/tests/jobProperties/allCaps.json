@@ -3,9 +3,11 @@
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/allCaps/index.html",
-      "what": "page with various letter cases"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/allCaps/index.html",
+        "what": "page with various letter cases"
+      }
     },
     {
       "type": "test",

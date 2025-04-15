@@ -3,9 +3,11 @@
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/hr/index.html",
-      "what": "page with an hr element"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/hr/index.html",
+        "what": "page with an hr element"
+      }
     },
     {
       "type": "test",

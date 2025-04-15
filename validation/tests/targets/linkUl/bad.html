@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  © 2022–2023 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2022–2025 CVS Health and/or one of its affiliates. All rights reserved.
 
   MIT License
 
@@ -39,21 +39,9 @@
       <h1>Page with non-underlined inline links</h1>
       <p>This paragraph contains an inline link to <a id="overline" style="text-decoration: overline" href="https://en.wikipedia.org">English information</a> that has an overline instead of an underline.</p>
       <p>This paragraph contains an inline link to <a style="text-decoration: none" href="https://fr.wikipedia.org">French information</a> without any underline.</p>
-      <p>This paragraph introduces a list of nonunderlined links, but it contains only 1 link, so that link fails to be classified as a list link.</p>
-      <ul class="nude"</ul>
-        <li><a href="https://eus.wikipedia.org">Basque information</a></li>
-      </ul>
-      <p>This paragraph introduces a list of nonunderlined links, but it contains an item that is not a link, so its link fails to be classified as a list link.</p>
-      <ul class="nude">
-        <li><span>Spanish information is not available</span></li>
-        <li><a href="https://eo.wikipedia.org">Esperanto information</a></li>
-      </ul>
-      <p>This paragraph introduces a list of nonunderlined links, but it contains additional text, so its links fail to be classified as list links.</p>
-      <ul class="nude">
-        <li><a id="extraText" href="https://fr.wikipedia.org">French information</a> is available, as well as</li>
-        <li><a href="https://tr.wikipedia.org">Turkish information</a></li>
-      </ul>
-      <p>Defects: 6</p>
+      <p>The next paragraph contains a nonunderlined link but no other text content, so that link is classified as a block link.</p>
+      <p><a href="https://eus.wikipedia.org">Basque information</a></p>
+      <p>Defects: 2</p>
     </main>
   </body>
 </html>

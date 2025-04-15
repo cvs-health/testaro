@@ -246,6 +246,8 @@ const launch = exports.launch = async (report, debug, waits, tempBrowserID, temp
   const url = tempURL || report.target && report.target.url || '';
   // If the specified browser and device types and URL exist:
   if (isBrowserID(browserID) && isDeviceID(deviceID) && isURL(url)) {
+    // Replace the report target URL with this URL.
+    report.target.url = url;
     // Create a browser of the specified or default type.
     const browserType = require('playwright')[browserID];
     // Close the current browser, if any.
@@ -762,6 +764,8 @@ const doActs = async (report) => {
           const navResult = await goTo(report, page, requestedURL, 15000, 'domcontentloaded');
           // If the visit succeeded:
           if (navResult.success) {
+            // Revise the report URL to this URL.
+            report.target.url = requestedURL;
             // Add the script nonce, if any, to the act.
             const {response} = navResult;
             const scriptNonce = getNonce(response);

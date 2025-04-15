@@ -3,9 +3,11 @@
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/headEl/index.html",
-      "what": "page with valid and invalid elements in the head"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/headEl/index.html",
+        "what": "page with valid and invalid elements in the head"
+      }
     },
     {
       "type": "test",

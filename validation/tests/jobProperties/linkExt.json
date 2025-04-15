@@ -3,9 +3,11 @@
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/linkExt/index.html",
-      "what": "page with normal and forcibly external links"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/linkExt/index.html",
+        "what": "page with normal and forcibly external links"
+      }
     },
     {
       "type": "test",

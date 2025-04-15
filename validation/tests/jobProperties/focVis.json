@@ -3,9 +3,11 @@
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/focVis/index.html",
-      "what": "page with links outside the viewport"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/focVis/index.html",
+        "what": "page with links outside the viewport"
+      }
     },
     {
       "type": "test",

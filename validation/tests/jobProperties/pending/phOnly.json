@@ -1,11 +1,13 @@
 {
-  "rule": "optRoleSel",
+  "rule": "phOnly",
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/optRoleSel/index.html",
-      "what": "page with and without aria-select attributes on option-role elements"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/phOnly/index.html",
+        "what": "page with inputs with and without labels and placeholders"
+      }
     },
     {
       "type": "test",
@@ -14,9 +16,9 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.1",
+          "standardResult.totals.2",
           "=",
-          1
+          2
         ],
         [
           "standardResult.totals.0",
@@ -26,22 +28,22 @@
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "optRoleSel"
+          "phOnly"
         ],
         [
           "standardResult.instances.0.what",
           "=",
-          "Element has an explicit option role but no aria-selected attribute"
+          "Element has a placeholder but no accessible name"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          1
+          2
         ],
         [
           "standardResult.instances.0.tagName",
           "=",
-          "P"
+          "INPUT"
         ],
         [
           "standardResult.instances.0.location.doc",
@@ -54,19 +56,29 @@
           "box"
         ],
         [
-          "standardResult.instances.0.location.spec.width",
+          "standardResult.instances.0.location.spec.y",
           ">",
           0
         ],
         [
           "standardResult.instances.0.excerpt",
+          "i",
+          "river2"
+        ],
+        [
+          "standardResult.instances.1.tagName",
           "=",
-          "Vegan"
+          "INPUT"
+        ],
+        [
+          "standardResult.instances.1.excerpt",
+          "i",
+          "company2"
         ]
       ],
       "rules": [
         "y",
-        "optRoleSel"
+        "phOnly"
       ]
     },
     {
@@ -76,12 +88,12 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.1",
+          "standardResult.totals.2",
           "=",
-          1
+          2
         ],
         [
-          "standardResult.totals.2",
+          "standardResult.totals.1",
           "=",
           0
         ],
@@ -93,27 +105,32 @@
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "optRoleSel"
+          "phOnly"
         ],
         [
           "standardResult.instances.0.what",
           "=",
-          "Elements with explicit option roles have no aria-selected attributes"
+          "input elements have placeholders but no accessible names"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          1
+          2
         ],
         [
           "standardResult.instances.0.count",
           "=",
-          1
+          2
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "INPUT"
         ]
       ],
       "rules": [
         "y",
-        "optRoleSel"
+        "phOnly"
       ]
     }
   ]

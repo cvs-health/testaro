@@ -3,9 +3,11 @@
   "timeLimit": 40,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/hovInd/index.html",
-      "what": "page with varied hover indicators"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/hovInd/index.html",
+        "what": "page with varied hover indicators"
+      }
     },
     {
       "type": "test",

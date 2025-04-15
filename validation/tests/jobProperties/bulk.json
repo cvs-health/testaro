@@ -3,9 +3,11 @@
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/bulk/good.html",
-      "what": "small page"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/bulk/good.html",
+        "what": "small page"
+      }
     },
     {
       "type": "test",

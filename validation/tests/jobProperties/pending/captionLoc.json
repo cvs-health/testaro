@@ -1,16 +1,17 @@
 {
-  "rule": "legendLoc",
+  "rule": "captionLoc",
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/legendLoc/index.html",
-      "what": "page with standard and nonstandard legend locations"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/captionLoc/index.html",
+        "what": "page with standard and nonstandard caption locations"
+      }
     },
     {
       "type": "test",
       "which": "testaro",
-      "what": "legendLoc",
       "withItems": true,
       "stopOnFail": true,
       "expect": [
@@ -27,12 +28,12 @@
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "legendLoc"
+          "captionLoc"
         ],
         [
           "standardResult.instances.0.what",
           "=",
-          "Element is not the first child of a fieldset element"
+          "Element is not the first child of a table element"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
@@ -42,7 +43,7 @@
         [
           "standardResult.instances.0.tagName",
           "=",
-          "LEGEND"
+          "CAPTION"
         ],
         [
           "standardResult.instances.0.location.doc",
@@ -62,22 +63,17 @@
         [
           "standardResult.instances.0.excerpt",
           "=",
-          "Choose a food"
-        ],
-        [
-          "standardResult.instances.1.ruleID",
-          "=",
-          "legendLoc"
+          "Office personnel"
         ],
         [
           "standardResult.instances.1.excerpt",
           "=",
-          "Choose a gas"
+          "Farm personnel"
         ]
       ],
       "rules": [
         "y",
-        "legendLoc"
+        "captionLoc"
       ]
     },
     {
@@ -104,12 +100,12 @@
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "legendLoc"
+          "captionLoc"
         ],
         [
           "standardResult.instances.0.what",
           "=",
-          "legend elements are not the first children of fieldset elements"
+          "caption elements are not the first children of table elements"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
@@ -124,12 +120,12 @@
         [
           "standardResult.instances.0.tagName",
           "=",
-          "LEGEND"
+          "CAPTION"
         ]
       ],
       "rules": [
         "y",
-        "legendLoc"
+        "captionLoc"
       ]
     }
   ]

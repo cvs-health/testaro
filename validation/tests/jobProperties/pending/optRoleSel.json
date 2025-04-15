@@ -1,11 +1,13 @@
 {
-  "rule": "datalistRef",
+  "rule": "optRoleSel",
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/datalistRef/index.html",
-      "what": "page with correct and erroneous datalist references"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/optRoleSel/index.html",
+        "what": "page with and without aria-select attributes on option-role elements"
+      }
     },
     {
       "type": "test",
@@ -14,34 +16,34 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.2",
+          "standardResult.totals.1",
+          "=",
+          1
+        ],
+        [
+          "standardResult.totals.0",
           "=",
           0
         ],
         [
-          "standardResult.totals.3",
-          "=",
-          2
-        ],
-        [
           "standardResult.instances.0.ruleID",
           "=",
-          "datalistRef"
+          "optRoleSel"
         ],
         [
           "standardResult.instances.0.what",
           "=",
-          "list attribute of the element references an ambiguous or missing datalist element"
+          "Element has an explicit option role but no aria-selected attribute"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          3
+          1
         ],
         [
           "standardResult.instances.0.tagName",
           "=",
-          "INPUT"
+          "P"
         ],
         [
           "standardResult.instances.0.location.doc",
@@ -54,24 +56,19 @@
           "box"
         ],
         [
-          "standardResult.instances.0.location.spec.height",
+          "standardResult.instances.0.location.spec.width",
           ">",
           0
         ],
         [
           "standardResult.instances.0.excerpt",
-          "i",
-          "material"
-        ],
-        [
-          "standardResult.instances.1.excerpt",
-          "i",
-          "city"
+          "=",
+          "Vegan"
         ]
       ],
       "rules": [
         "y",
-        "datalistRef"
+        "optRoleSel"
       ]
     },
     {
@@ -83,37 +80,42 @@
         [
           "standardResult.totals.1",
           "=",
+          1
+        ],
+        [
+          "standardResult.totals.2",
+          "=",
           0
         ],
         [
-          "standardResult.totals.3",
+          "standardResult.instances.length",
           "=",
-          2
+          1
         ],
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "datalistRef"
+          "optRoleSel"
         ],
         [
           "standardResult.instances.0.what",
           "=",
-          "list attributes of elements reference ambiguous or missing datalist elements"
+          "Elements with explicit option roles have no aria-selected attributes"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
           "=",
-          3
+          1
         ],
         [
           "standardResult.instances.0.count",
           "=",
-          2
+          1
         ]
       ],
       "rules": [
         "y",
-        "datalistRef"
+        "optRoleSel"
       ]
     }
   ]

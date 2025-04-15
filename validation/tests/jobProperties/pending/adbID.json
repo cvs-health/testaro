@@ -1,11 +1,13 @@
 {
-  "rule": "altScheme",
+  "rule": "adbID",
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/altScheme/index.html",
-      "what": "page with elements having textual and URL text alternatives"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/adbID/index.html",
+        "what": "page with elements having good and bad aria-describedby references"
+      }
     },
     {
       "type": "test",
@@ -19,34 +21,29 @@
           0
         ],
         [
-          "standardResult.totals.2",
-          "=",
-          3
-        ],
-        [
-          "standardResult.instances.0.ruleID",
-          "=",
-          "altScheme"
-        ],
-        [
-          "standardResult.instances.0.what",
-          "=",
-          "Element has an alt attribute with a URL as its entire value"
-        ],
-        [
-          "standardResult.instances.0.ordinalSeverity",
+          "standardResult.totals.3",
           "=",
           2
         ],
         [
-          "standardResult.instances.0.tagName",
+          "standardResult.instances.0.ruleID",
           "=",
-          "IMG"
+          "adbID"
         ],
         [
-          "standardResult.instances.0.id",
+          "standardResult.instances.0.what",
           "=",
-          "mapPNG"
+          "Referenced description of the element is ambiguous or missing"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "SPAN"
         ],
         [
           "standardResult.instances.0.location.doc",
@@ -56,47 +53,37 @@
         [
           "standardResult.instances.0.location.type",
           "=",
-          "selector"
+          "box"
         ],
         [
-          "standardResult.instances.0.location.spec",
-          "=",
-          "#mapPNG"
-        ],
-        [
-          "standardResult.instances.0.excerpt",
-          "i",
-          "Blank_map_of_states"
-        ],
-        [
-          "standardResult.instances.1.what",
-          "=",
-          "Element has an alt attribute with a URL as its entire value"
-        ],
-        [
-          "standardResult.instances.1.tagName",
-          "=",
-          "IMG"
-        ],
-        [
-          "standardResult.instances.1.location.spec.height",
+          "standardResult.instances.0.location.spec.height",
           ">",
           0
         ],
         [
-          "standardResult.instances.1.excerpt",
-          "i",
-          "httpforever"
+          "standardResult.instances.0.excerpt",
+          "=",
+          "the World Wide Web"
         ],
         [
-          "standardResult.instances.2.excerpt",
-          "i",
-          "favicon"
+          "standardResult.instances.1.tagName",
+          "=",
+          "LI"
+        ],
+        [
+          "standardResult.instances.1.excerpt",
+          "=",
+          "Defect 2: United States of America"
+        ],
+        [
+          "standardResult.instances.1.location.spec.y",
+          ">",
+          0
         ]
       ],
       "rules": [
         "y",
-        "altScheme"
+        "adbID"
       ]
     },
     {
@@ -111,34 +98,34 @@
           0
         ],
         [
-          "standardResult.totals.2",
-          "=",
-          3
-        ],
-        [
-          "standardResult.instances.0.ruleID",
-          "=",
-          "altScheme"
-        ],
-        [
-          "standardResult.instances.0.what",
-          "=",
-          "img elements have alt attributes with URLs as their entire values"
-        ],
-        [
-          "standardResult.instances.0.ordinalSeverity",
+          "standardResult.totals.3",
           "=",
           2
         ],
         [
-          "standardResult.instances.0.count",
+          "standardResult.instances.0.ruleID",
+          "=",
+          "adbID"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "Referenced descriptions of elements are ambiguous or missing"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
           "=",
           3
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          2
         ]
       ],
       "rules": [
         "y",
-        "altScheme"
+        "adbID"
       ]
     }
   ]

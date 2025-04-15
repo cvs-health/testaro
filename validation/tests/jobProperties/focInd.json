@@ -3,9 +3,11 @@
   "timeLimit": 20,
   "acts": [
     {
-      "type": "url",
-      "which": "file://validation/tests/targets/focInd/good.html",
-      "what": "page with outline focus indication"
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/focInd/good.html",
+        "what": "page with outline focus indication"
+      }
     },
     {
       "type": "test",
