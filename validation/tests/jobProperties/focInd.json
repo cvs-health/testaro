@@ -51,7 +51,7 @@
         [
           "standardResult.totals.1",
           "=",
-          8
+          7
         ],
         [
           "standardResult.totals.3",
@@ -66,7 +66,7 @@
         [
           "standardResult.instances.0.tagName",
           "=",
-          "A"
+          "INPUT"
         ],
         [
           "standardResult.instances.0.location.doc",
@@ -76,40 +76,40 @@
         [
           "standardResult.instances.0.location.type",
           "=",
-          "box"
+          "selector"
         ],
         [
-          "standardResult.instances.0.location.spec.y",
-          ">",
-          0
+          "standardResult.instances.0.location.spec",
+          "=",
+          "#textInput"
         ],
         [
           "standardResult.instances.0.excerpt",
           "i",
-          "English"
+          "narrative"
         ],
         [
-          "standardResult.instances.3.ruleID",
+          "standardResult.instances.2.ruleID",
           "=",
           "focInd"
         ],
         [
-          "standardResult.instances.3.ordinalSeverity",
+          "standardResult.instances.2.ordinalSeverity",
           "=",
           1
         ],
         [
-          "standardResult.instances.3.tagName",
+          "standardResult.instances.2.tagName",
           "=",
           "INPUT"
         ],
         [
-          "standardResult.instances.3.id",
+          "standardResult.instances.2.id",
           "=",
           "thickOutlineInput"
         ],
         [
-          "standardResult.instances.3.location.spec",
+          "standardResult.instances.2.location.spec",
           "=",
           "#thickOutlineInput"
         ]
@@ -128,7 +128,7 @@
         [
           "standardResult.totals.1",
           "=",
-          8
+          7
         ],
         [
           "standardResult.totals.0",
@@ -148,7 +148,7 @@
         [
           "standardResult.instances.0.count",
           "=",
-          8
+          7
         ],
         [
           "standardResult.instances.0.what",

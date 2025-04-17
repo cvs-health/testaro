@@ -35,7 +35,6 @@ const fs = require('fs').promises;
 const {doJob} = require('../run');
 
 // CONSTANTS
-
 const job = {
   id: '250101T0000-aaa-00',
   what: '',
@@ -73,6 +72,9 @@ exports.validateTest = async testID => {
   // Get data for a job for the test.
   const jobProperties = require(`./tests/jobProperties/${testID}.json`);
   // Use the data to complete the job.
+  if (jobProperties.standard) {
+    job.standard = jobProperties.standard;
+  }
   job.what = `validate Testaro test ${jobProperties.rule}`;
   job.timeLimit = jobProperties.timeLimit;
   job.acts = jobProperties.acts;

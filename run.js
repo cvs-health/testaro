@@ -686,50 +686,53 @@ const doActs = async (report) => {
           const {toolTimes} = report.jobData;
           toolTimes[act.which] ??= 0;
           toolTimes[act.which] += time;
-          // If the act was not prevented and standardization is required:
-          if (['also', 'only'].includes(standard) && act.data && ! act.data.prevented) {
-            // Initialize the standard result.
-            act.standardResult = {
-              totals: [0, 0, 0, 0],
-              instances: []
-            };
-            // Populate it.
-            standardize(act);
-            // Launch a browser and navigate to the page.
-            await launch(
-              report,
-              debug,
-              waits,
-              act.browserID || report.browserID || '',
-              act.target && act.target.url || report.target && report.target.url || ''
-            );
-            // If this failed:
-            if (page.prevented) {
-              // Add this to the act.
-              act.prevented = true;
-              act.error = page.error || '';
-            }
-            // Otherwise, i.e. if it succeeded:
-            else {
-              // Add a box ID and a path ID to each of its standard instances if missing.
-              for (const instance of act.standardResult.instances) {
-                const elementID = await identify(instance, page);
-                if (! instance.boxID) {
-                  instance.boxID = elementID ? elementID.boxID : '';
-                }
-                if (! instance.pathID) {
-                  instance.pathID = elementID ? elementID.pathID : '';
-                }
+          // If the act was not prevented:
+          if (act.data && ! act.data.prevented) {
+            // If standardization is required:
+            if (['also', 'only'].includes(standard)) {
+              // Initialize the standard result.
+              act.standardResult = {
+                totals: [0, 0, 0, 0],
+                instances: []
               };
+              // Populate it.
+              standardize(act);
+              // Launch a browser and navigate to the page.
+              await launch(
+                report,
+                debug,
+                waits,
+                act.browserID || report.browserID || '',
+                act.target && act.target.url || report.target && report.target.url || ''
+              );
+              // If this failed:
+              if (page.prevented) {
+                // Add this to the act.
+                act.prevented = true;
+                act.error = page.error || '';
+              }
+              // Otherwise, i.e. if it succeeded:
+              else {
+                // Add a box ID and a path ID to each of its standard instances if missing.
+                for (const instance of act.standardResult.instances) {
+                  const elementID = await identify(instance, page);
+                  if (! instance.boxID) {
+                    instance.boxID = elementID ? elementID.boxID : '';
+                  }
+                  if (! instance.pathID) {
+                    instance.pathID = elementID ? elementID.pathID : '';
+                  }
+                };
+              }
+              // If the original-format result is not to be included in the report:
+              if (standard === 'only') {
+                // Remove it.
+                delete act.result;
+              }
             }
-            // If the original-format result is not to be included in the report:
-            if (standard === 'only') {
-              // Remove it.
-              delete act.result;
-            }
+            // If the act has expectations:
             const expectations = act.expect;
-            // If the act was not prevented and has expectations:
-            if (expectations && act.data && ! act.data.prevented) {
+            if (expectations) {
               // Initialize whether they were fulfilled.
               act.expectations = [];
               let failureCount = 0;
