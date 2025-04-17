@@ -25,8 +25,7 @@
 /*
   isInlineLink
   Returns whether the link of a locator is inline.
-  A link is classified as inline unless it is in an ordered or unordered list of at least 2 links
-  with no other nonspacing text content.
+  A link is classified as inline unless its declared or effective display is block.
 */
 
 exports.isInlineLink = async loc => await loc.evaluate(element => {

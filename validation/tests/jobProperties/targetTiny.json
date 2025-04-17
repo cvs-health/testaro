@@ -1,5 +1,5 @@
 {
-  "rule": "targetSize",
+  "rule": "targetTiny",
   "timeLimit": 20,
   "acts": [
     {
@@ -23,17 +23,17 @@
         [
           "standardResult.totals.1",
           "=",
-          4
+          3
         ],
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "targetSize"
+          "targetTiny"
         ],
         [
           "standardResult.instances.0.what",
           "i",
-          "is less than"
+          "is less than 24"
         ],
         [
           "standardResult.instances.0.ordinalSeverity",
@@ -48,7 +48,7 @@
         [
           "standardResult.instances.0.id",
           "=",
-          "defaultbutton"
+          ""
         ],
         [
           "standardResult.instances.0.location.doc",
@@ -58,52 +58,42 @@
         [
           "standardResult.instances.0.location.type",
           "=",
-          "selector"
+          "box"
         ],
         [
-          "standardResult.instances.0.location.spec",
-          "=",
-          "#defaultbutton"
-        ],
-        [
-          "standardResult.instances.0.excerpt",
-          "i",
-          "(too small)"
-        ],
-        [
-          "standardResult.instances.2.what",
-          "i",
-          "is less than"
-        ],
-        [
-          "standardResult.instances.2.tagName",
-          "=",
-          "INPUT"
-        ],
-        [
-          "standardResult.instances.2.excerpt",
-          "i",
-          "small box"
-        ],
-        [
-          "standardResult.instances.2.location.spec.y",
+          "standardResult.instances.0.location.spec.y",
           ">",
           0
         ],
         [
-          "standardResult.instances.3.tagName",
+          "standardResult.instances.0.excerpt",
+          "=",
+          "Tiny"
+        ],
+        [
+          "standardResult.instances.2.what",
+          "i",
+          "is less than 24"
+        ],
+        [
+          "standardResult.instances.2.tagName",
           "=",
           "A"
         ],
         [
-          "standardResult.instances.3.excerpt",
+          "standardResult.instances.2.excerpt",
           "=",
-          "Wikimedia Foundation"
+          "Wikimedia Foundation (tiny)"
+        ],
+        [
+          "standardResult.instances.2.location.spec.x",
+          ">",
+          0
         ]
       ],
       "rules": [
         "y",
-        "targetSize"
+        "targetTiny"
       ]
     },
     {
@@ -115,7 +105,7 @@
         [
           "standardResult.totals.1",
           "=",
-          4
+          3
         ],
         [
           "standardResult.totals.3",
@@ -125,7 +115,7 @@
         [
           "standardResult.instances.0.ruleID",
           "=",
-          "targetSize"
+          "targetTiny"
         ],
         [
           "standardResult.instances.0.what",
@@ -140,12 +130,12 @@
         [
           "standardResult.instances.0.count",
           "=",
-          4
+          3
         ]
       ],
       "rules": [
         "y",
-        "targetSize"
+        "targetTiny"
       ]
     }
   ]

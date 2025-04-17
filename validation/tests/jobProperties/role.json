@@ -47,14 +47,14 @@
       "stopOnFail": true,
       "expect": [
         [
-          "standardResult.totals.1",
+          "standardResult.totals.0",
           "=",
-          3
+          8
         ],
         [
           "standardResult.totals.3",
           "=",
-          6
+          0
         ],
         [
           "standardResult.instances.1.ruleID",
@@ -64,22 +64,17 @@
         [
           "standardResult.instances.1.what",
           "i",
-          "invalid or native-replaceable explicit role section"
+          "which is also an implicit"
         ],
         [
           "standardResult.instances.1.ordinalSeverity",
           "=",
-          3
-        ],
-        [
-          "standardResult.instances.1.count",
-          "=",
-          1
+          0
         ],
         [
           "standardResult.instances.1.tagName",
           "=",
-          "SECTION"
+          "H2"
         ],
         [
           "standardResult.instances.2.ruleID",
@@ -89,37 +84,27 @@
         [
           "standardResult.instances.2.what",
           "i",
-          "have redundant explicit role heading"
+          "which is also an implicit"
         ],
         [
           "standardResult.instances.2.ordinalSeverity",
           "=",
-          1
-        ],
-        [
-          "standardResult.instances.2.count",
-          "=",
-          1
+          0
         ],
         [
           "standardResult.instances.2.tagName",
           "=",
-          "H2"
+          "H3"
         ],
         [
           "standardResult.instances.4.what",
           "i",
-          "invalid or native-replaceable explicit role heading"
+          "which is also an implicit"
         ],
         [
           "standardResult.instances.4.ordinalSeverity",
           "=",
-          3
-        ],
-        [
-          "standardResult.instances.4.count",
-          "=",
-          2
+          0
         ],
         [
           "standardResult.instances.4.tagName",
@@ -127,14 +112,14 @@
           "H3"
         ],
         [
-          "standardResult.instances.7.what",
+          "standardResult.instances.7.tagName",
           "i",
-          "combobox"
+          "INPUT"
         ],
         [
           "standardResult.instances.4.ordinalSeverity",
           "=",
-          3
+          0
         ]
       ],
       "withItems": true,

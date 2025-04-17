@@ -23,7 +23,7 @@
         [
           "standardResult.totals.1",
           "=",
-          2
+          3
         ],
         [
           "standardResult.totals.2",
@@ -103,7 +103,7 @@
         [
           "standardResult.instances.3.what",
           "i",
-          "are alike"
+          "are alike on hover and focus"
         ],
         [
           "standardResult.instances.3.ordinalSeverity",

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  © 2021–2023 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2021–2025 CVS Health and/or one of its affiliates. All rights reserved.
 
   MIT License
 
@@ -25,52 +25,48 @@
 <html lang="en-US">
   <head>
     <meta charset="utf-8">
-    <title>Page with deviant role elements</title>
+    <title>Page with elements having explicit native-replacing roles</title>
     <meta name="description" content="tester">
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
     <section role="main">
-      <h1>Page with deviant role elements</h1>
+      <h1>Page with elements having explicit native-replacing roles</h1>
+      <section>
+        <h2>Conflict</h2>
+        <p>The parent section of these sections has an unnecessary explicit role <code>main</code>, instead of a <code>main</code> element with the same implicit role. Violation 0.</p>
+      </section>
       <section role="section">
         <h2>Abstraction</h2>
-        <p>This section has an abstract role, so it is bad.</p>
+        <p>This section has an abstract role, which is invalid, but it does not violate this rule.</p>
       </section>
       <section>
         <h2 role="heading">Redundancy</h2>
-        <p>The heading of this section has a redundant role, with an inferred level.</p>
+        <p>The heading of this section has a redundant role, with an inferred level. Violation 1.</p>
         <section>
           <h3 role="heading" aria-level="3">Redundancy with explicit level</h3>
-          <p>The heading of this section has a redundant role because the stated level is 3 and the implicit level is 3.</p>
+          <p>The heading of this section has a redundant role because the stated level is 3 and the implicit level is 3. Violation 2.</p>
         </section>
         <section>
           <h3 role="heading">Failed redundancy for missing level</h3>
-          <p>The heading of this section has a heading that fails redundancy because the inferred level is 2 but the explicit level is 3. So the element role is bad.</p>
+          <p>The heading of this section has a heading that fails redundancy because the inferred level is 2 but the explicit level is 3. It violates this rule regardless of the missing level. Violation 3.</p>
         </section>
         <section>
           <h3 role="heading" aria-level="4">Failed redundancy for wrong level</h3>
-          <p>The heading of this section has a heading that fails redundancy because the attributional level is 4 but the explicit level is 3. So the element role is bad.</p>
+          <p>The heading of this section has a heading that fails redundancy because the attributional level is 4 but the explicit level is 3. So the element role is bad. It violates the rule regardless of the level error. Violation 4.</p>
         </section>
-      </section>
-      <section>
-        <h2>Conflict</h2>
-        <p>The parent section of these sections has an unnecessary explicit role <code>main</code>, instead of a <code>main</code> element with the same implicit role.</p>
       </section>
       <section>
         <h2>Attributes</h2>
         <h3>Valid redundancy</h3>
-        <p>This paragraph contains an input for a number. It has an implicit <code>spinbutton</code> role and the same redundant explicit role. <input type="number" role="spinbutton"></p>
+        <p>This paragraph contains an input for a number. It has an implicit <code>spinbutton</code> role and the same redundant explicit role. Violation 5. <input type="number" role="spinbutton"></p>
         <h3>Failed redundancy</h3>
-        <p>This paragraph contains an input for a number. It has an implicit <code>spinbutton</code> role but an explicit <code>textbox</code> role, so its role is bad. <input type="number" role="textbox"></p>
+        <p>This paragraph contains an input for a number. It has an implicit <code>spinbutton</code> role but an explicit <code>textbox</code> role, so its role is bad. Violation 6. <input type="number" role="textbox"></p>
         <h3>Attribute existence</h3>
         <datalist id="options"><option value="a"></option><option value="b"></option></datalist>
-        <p>This input is identical, except that it omits the <code>list</code> attribute. That makes its implicit role <code>textbox</code>, so the explicit role of <code>combobox</code> is bad. <input role="combobox"></p>
+        <p>This input is identical, except that it omits the <code>list</code> attribute. That makes its implicit role <code>textbox</code>, so the explicit role of <code>combobox</code> is bad. Violation 7. <input role="combobox"></p>
       </section>
-      <p>Redundant: h2/heading, h3/heading, section/main, input/spinbutton</p>
-      <p>Bad: section/section, h3/heading(2), input/textbox, input/combobox</p>
-      <p>Redundant order: section/main, h2/heading, h3/heading, input/spinbutton</p>
-      <p>Bad order: section/section, h3/heading, input/textbox, input/combobox</p>
-      <p>Instance order: section(main, section), h2(heading), h3(heading[3]), input(spinbutton, textbox, combobox)</p>
+      <p>8 rule violations, ordinal severity 0</p>
     </section>
   </body>
 </html>

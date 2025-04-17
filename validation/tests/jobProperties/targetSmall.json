@@ -1,0 +1,152 @@
+{
+  "rule": "targetSmall",
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/targetSize/index.html",
+        "what": "page with variously sized interaction targets"
+      }
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": true,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.0",
+          "=",
+          6
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "targetSmall"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "is less than 44"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "BUTTON"
+        ],
+        [
+          "standardResult.instances.0.id",
+          "=",
+          "defaultbutton"
+        ],
+        [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "selector"
+        ],
+        [
+          "standardResult.instances.0.location.spec",
+          "=",
+          "#defaultbutton"
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "i",
+          "Default (small)"
+        ],
+        [
+          "standardResult.instances.2.what",
+          "i",
+          "is less than"
+        ],
+        [
+          "standardResult.instances.2.tagName",
+          "=",
+          "INPUT"
+        ],
+        [
+          "standardResult.instances.2.excerpt",
+          "i",
+          "Small box:"
+        ],
+        [
+          "standardResult.instances.2.location.spec.y",
+          ">",
+          0
+        ],
+        [
+          "standardResult.instances.4.tagName",
+          "=",
+          "A"
+        ],
+        [
+          "standardResult.instances.4.excerpt",
+          "=",
+          "Wikimedia Foundation (small)"
+        ]
+      ],
+      "rules": [
+        "y",
+        "targetSmall"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.0",
+          "=",
+          6
+        ],
+        [
+          "standardResult.totals.3",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "targetSmall"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "i",
+          "are smaller"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          6
+        ]
+      ],
+      "rules": [
+        "y",
+        "targetSmall"
+      ]
+    }
+  ]
+}

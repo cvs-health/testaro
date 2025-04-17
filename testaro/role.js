@@ -1,5 +1,5 @@
 /*
-  © 2021–2024 CVS Health and/or one of its affiliates. All rights reserved.
+  © 2021–2025 CVS Health and/or one of its affiliates. All rights reserved.
 
   MIT License
 
@@ -47,8 +47,17 @@ const {init, report} = require('../procs/testaro');
     dt: 'term',
     fieldset: 'group',
     figure: 'figure',
+    h1: 'heading',
+    h2: 'heading',
+    h3: 'heading',
+    h4: 'heading',
+    h5: 'heading',
+    h6: 'heading',
     hr: 'separator',
     html: 'document',
+    'input[type=number]': 'spinbutton',
+    'input[type=text]': 'textbox',
+    'input[type=text, list]': 'combobox',
     li: 'listitem',
     main: 'main',
     math: 'math',
@@ -79,7 +88,7 @@ exports.reporter = async (page, withItems) => {
   for (const loc of all.allLocs) {
     // Get the explicit role of the element.
     const role = await loc.getAttribute('role');
-    // If it is implicit:
+    // If it is also implicit:
     if (implicitRoles.has(role)) {
       // Add the locator to the array of violators.
       all.locs.push([loc, role]);
@@ -87,7 +96,7 @@ exports.reporter = async (page, withItems) => {
   }
   // Populate and return the result.
   const whats = [
-    'Element has an explicit __param__ role, but it is also an implicit HTML element role',
+    'Element has an explicit __param__ role, which is also an implicit HTML element role',
     'Elements have roles assigned that are also implicit roles of HTML elements'
   ];
   return await report(withItems, all, 'role', whats, 0);
