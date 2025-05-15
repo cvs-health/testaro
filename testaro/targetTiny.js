@@ -25,7 +25,8 @@
 /*
   targetTiny
   Related to Tenon rule 152.
-  This test reports buttons, inputs, and non-inline links with widths or heights smaller than 24 pixels.
+  This test reports visible buttons, inputs, and non-inline links with widths or heights smaller
+  than 24 pixels.
 */
 
 // ########## IMPORTS
@@ -40,7 +41,7 @@ const {isTooSmall} = require('../procs/target');
 // Runs the test and returns the result.
 exports.reporter = async (page, withItems) => {
   // Initialize the locators and result.
-  const all = await init(100, page, 'a, button, input');
+  const all = await init(100, page, 'a:visible, button:visible, input:visible');
   // For each locator:
   for (const loc of all.allLocs) {
     // Get data on it if illicitly small.
