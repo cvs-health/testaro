@@ -1414,11 +1414,14 @@ exports.doJob = async job => {
       }
     });
     // Perform the acts and get a report.
+    console.log('Performing the job acts');
     report = await doActs(report, 0, null);
     // Add the end time and duration to the report.
     const endTime = new Date();
     report.jobData.endTime = nowString();
-    report.jobData.elapsedSeconds =  Math.floor((endTime - startTime) / 1000);
+    const elapsedSeconds = Math.floor((endTime - startTime) / 1000);
+    report.jobData.elapsedSeconds =  elapsedSeconds;
+    console.log(`Elapsed seconds: ${elapsedSeconds}`);
     // Consolidate and sort the tool times.
     const {toolTimes} = report.jobData;
     const toolTimeData = Object

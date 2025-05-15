@@ -44,7 +44,7 @@ exports.isTooSmall = async (loc, min) => {
       // Get its styles.
       const styleDec = window.getComputedStyle(el);
       const displayStyle = styleDec.display;
-      // If it is hidden:
+      // If it is hidden (which should be impossible because of the selector):
       if (displayStyle === 'none') {
         // Exempt it.
         return null;
@@ -67,22 +67,29 @@ exports.isTooSmall = async (loc, min) => {
         const elDims = getDims(el);
         // If either dimension is too small:
         if (elDims.some(dim => dim < min)) {
-          // Get the parent of the target.
+          // Get the parent element of the target.
           const elParent = el.parentElement;
-          // Get the child elements of the parent, including the target.
-          const elGeneration = Array.from(elParent.children);
-          // If the target has no siblings of its type:
-          if (elGeneration.filter(peer => peer.tagName === tagName).length === 1) {
-            // Get the width and height of the parent.
-            const parentDims = getDims(elParent);
-            // For each dimension of the target:
-            elDims.forEach((elDim, index) => {
-              // If it is too small and smaller than that of the parent:
-              if (elDim < min && parentDims[index] > elDim) {
-                // Replace it with the dimension of the parent.
-                elDims[index] = parentDims[index];
-              }
-            });
+          // If the parent element exists:
+          if (elParent) {
+            // Get the child elements of the parent, including the target.
+            const elGeneration = Array.from(elParent.children);
+            // If the target has no siblings of its type:
+            if (elGeneration.filter(peer => peer.tagName === tagName).length === 1) {
+              // Get the width and height of the parent.
+              const parentDims = getDims(elParent);
+              // For each dimension of the target:
+              elDims.forEach((elDim, index) => {
+                // If it is too small and smaller than that of the parent:
+                if (elDim < min && parentDims[index] > elDim) {
+                  // Replace it with the dimension of the parent (a substitute for distance).
+                  elDims[index] = parentDims[index];
+                }
+              });
+            }
+          }
+          // Otherwise, i.e. if it does not exist:
+          else {
+            console.log(`WARNING: Target ${tagName} (${el.innerHTML}) has no parent element`);
           }
         }
         // Get whether it is too small.

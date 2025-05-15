@@ -36,7 +36,7 @@ const waxDev = {runWax};
 // FUNCTIONS
 
 // Conducts and reports the WAX tests.
-exports.reporter = async (page, report, actIndex, timeLimit) => {
+exports.reporter = async (page, report, actIndex) => {
   // Initialize the act report.
   let data = {};
   let result = {};
@@ -56,17 +56,43 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
       data.prevented = true;
       data.error = actReport;
     }
-    // Otherwise, if it failed with an object report:
-    else if (typeof actReport === 'object' && actReport.responseCode === 500) {
-      // Report this.
-      data.prevented = true;
-      data.error = actReport.message || 'response status code 500';
+    // Otherwise, if the report is an array:
+    else if (Array.isArray(actReport)) {
+      // If it is an error report:
+      if (actReport.length === 1 && typeof actReport[0] === 'object' && actReport[0].error) {
+        // Report this.
+        data.prevented = true;
+        const {error} = actReport[0];
+        data.error = error;
+        console.log(`ERROR running wax: ${error}`);
+      }
+      // Otherwise, i.e. if it is a successful report:
+      else {
+        // Populate the act report.
+        result = {
+          violations: actReport
+        }
+      }
     }
-    // Otherwise, i.e. if WAX succeeded:
-    else {
-      // Populate the act report.
-      result = {
-        violations: actReport
+    // Otherwise, if the report is a non-array object:
+    else if (typeof actReport === 'object') {
+      // If the response status was a system error:
+      if(actReport.responseCode === 500) {
+        // Report this.
+        data.prevented = true;
+        data.error = actReport.message || 'response status code 500';
+      }
+      // Otherwise, if there was an error:
+      else if (actReport.error) {
+        // Report this.
+        data.prevented = true;
+        data.error = actReport.error;
+      }
+      // In any other case:
+      else {
+        // Report a prevention.
+        data.prevented = true;
+        data.error = 'wax failure';
       }
     }
     // Return the results.
