@@ -147,7 +147,7 @@ exports.actSpecs = {
       {
         which: [true, 'string', 'isTest', 'tool name'],
         launch: [false, 'object', '', 'new target, browserID, and/or what, if any'],
-        rules: [false, 'array', 'areStrings', 'rule IDs or (for nuVal) specifications, if not all']
+        rules: [false, 'array', 'areStrings', 'rule IDs or (for testaro or nuVal) specifications, if not all']
       }
     ],
     text: [
