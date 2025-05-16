@@ -356,15 +356,15 @@ const launch = exports.launch = async (report, debug, waits, tempBrowserID, temp
       }
       // Otherwise, i.e. if the launch or navigation failed:
       else {
-        // Report this and nullify the page.
-        addError(true, true, report, actIndex, `ERROR: Launch failed (${navResult.error})`);
+        // Report this.
+        addError(true, false, report, actIndex, `ERROR: Launch failed (${navResult.error})`);
         page = null;
       }
     }
     // If an error occurred:
     catch(error) {
       // Report this.
-      addError(true, true, report, actIndex, `ERROR launching or navigating ${error.message}`);
+      addError(true, false, report, actIndex, `ERROR launching or navigating ${error.message}`);
       page = null;
     };
   }
@@ -783,13 +783,13 @@ const doActs = async (report) => {
             // If a prohibited redirection occurred:
             if (response.exception === 'badRedirection') {
               // Report this and abort the job.
-              addError(true, true, report, actIndex, 'ERROR: Navigation illicitly redirected');
+              addError(true, false, report, actIndex, 'ERROR: Navigation illicitly redirected');
             }
           }
           // Otherwise, i.e. if the visit failed:
           else {
-            // Report this and abort the job.
-            addError(true, true, report, actIndex, 'ERROR: Visit failed');
+            // Report this.
+            addError(true, false, report, actIndex, 'ERROR: Visit failed');
           }
         }
         // Otherwise, if the act is a wait for text:
@@ -871,7 +871,7 @@ const doActs = async (report) => {
           .catch(async error => {
             // Report this and abort the job.
             console.log(`ERROR waiting for page to be ${act.which} (${error.message})`);
-            addError(true, true, report, actIndex, `ERROR waiting for page to be ${act.which}`);
+            addError(true, false, report, actIndex, `ERROR waiting for page to be ${act.which}`);
           });
           // If the wait succeeded:
           if (actIndex > -2) {
@@ -1015,7 +1015,7 @@ const doActs = async (report) => {
                 // If the move fails:
                 catch(error) {
                   // Add the error result to the act and abort the job.
-                  addError(true, true, report, actIndex, `ERROR: ${move} failed`);
+                  addError(true, false, report, actIndex, `ERROR: ${move} failed`);
                 }
                 if (act.result.success) {
                   try {
@@ -1349,19 +1349,19 @@ const doActs = async (report) => {
           // Otherwise, i.e. if the act type is unknown:
           else {
             // Add the error result to the act and abort the job.
-            addError(true, true, report, actIndex, 'ERROR: Invalid act type');
+            addError(true, false, report, actIndex, 'ERROR: Invalid act type');
           }
         }
         // Otherwise, a page URL is required but does not exist, so:
         else {
           // Add an error result to the act and abort the job.
-          addError(true, true, report, actIndex, 'ERROR: Page has no URL');
+          addError(true, false, report, actIndex, 'ERROR: Page has no URL');
         }
       }
       // Otherwise, i.e. if no page exists:
       else {
         // Add an error result to the act and abort the job.
-        addError(true, true, report, actIndex, 'ERROR: No page identified');
+        addError(true, false, report, actIndex, 'ERROR: No page identified');
       }
       // Add the end time to the act.
       act.endTime = Date.now();
