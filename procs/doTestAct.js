@@ -54,7 +54,7 @@ const doTestAct = async () => {
   // Get the saved report.
   const reportJSON = await fs.readFile(reportPath, 'utf8');
   const report = JSON.parse(reportJSON);
-  // Get the act.
+  // Get a reference to the act in the report.
   const act = report.acts[actIndex];
   // Get the tool name.
   const {which} = act;
@@ -94,7 +94,7 @@ const doTestAct = async () => {
           act.data = actReport.data;
           act.result = actReport.result;
           // If the tool reported that the page prevented testing:
-          if (actReport.data && actReport.data.prevented) {
+          if (act.data && act.data.prevented) {
             // Add prevention data to the job data.
             report.jobData.preventions[which] = act.data.error;
           }
@@ -118,8 +118,19 @@ const doTestAct = async () => {
     }
     // Otherwise, i.e. if the page does not exist:
     else {
+      // Add data to the act.
+      act.data ??= {};
+      act.data.prevented = true;
+      act.data.error = 'No page';
+      // Add prevention data to the job data.
+      report.jobData.preventions[which] = act.data.error;
+      // Save the revised report.
+      const reportJSON = JSON.stringify(report);
+      await fs.writeFile(reportPath, reportJSON);
       // Report this.
-      process.send('ERROR: No page');
+      const message = 'ERROR: No page';
+      console.log(message);
+      process.send(message);
     }
   }
 };

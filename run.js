@@ -174,7 +174,7 @@ const goTo = async (report, page, url, timeout, waitUntil) => {
     // Otherwise, if the response status was rejection of excessive requests:
     else if (httpStatus === 429) {
       // Return this.
-      console.log(`Visit to ${url} prevented by request frequency restriction (status 429)`);
+      console.log(`ERROR: Visit to ${url} prevented by request frequency limit (status 429)`);
       return {
         success: false,
         error: 'status429'
@@ -633,8 +633,9 @@ const doActs = async (report) => {
         // If this failed:
         if (page.prevented) {
           // Add this to the act.
-          act.prevented = true;
-          act.error = page.error || '';
+          act.data ??= {};
+          act.data.prevented = true;
+          act.data.error = page.error || '';
         }
       }
       // Otherwise, if the act is a test act:
@@ -708,8 +709,9 @@ const doActs = async (report) => {
               // If this failed:
               if (page.prevented) {
                 // Add this to the act.
-                act.prevented = true;
-                act.error = page.error || '';
+                act.data ??= {};
+                act.data.prevented = true;
+                act.data.error = page.error || '';
               }
               // Otherwise, i.e. if it succeeded:
               else {
@@ -782,7 +784,7 @@ const doActs = async (report) => {
             act.result.url = page.url();
             // If a prohibited redirection occurred:
             if (response.exception === 'badRedirection') {
-              // Report this and abort the job.
+              // Report this.
               addError(true, false, report, actIndex, 'ERROR: Navigation illicitly redirected');
             }
           }

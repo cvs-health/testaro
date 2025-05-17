@@ -187,10 +187,12 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
       };
     }
     // Return the data and result, discarding the separate element data.
+    const data = {};
+    if (result.prevented) {
+      data.prevented = true;
+    }
     return {
-      data: {
-        prevented: result.prevented
-      },
+      data,
       result
     };
   }
@@ -198,12 +200,8 @@ exports.reporter = async (page, report, actIndex, timeLimit) => {
   else {
     // Return this.
     return {
-      data: {
-        prevented: false
-      },
-      result: {
-        prevented: false,
-      }
+      data: {},
+      result: {}
     }
   }
 };
