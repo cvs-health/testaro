@@ -1,0 +1,152 @@
+{
+  "rule": "textSem",
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/textSem/index.html",
+        "what": "page with semantically and nonsemantically varied text"
+      }
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": true,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.0",
+          "=",
+          4
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "textSem"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "Element is semantically vague"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "I"
+        ],
+        [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.0.location.spec.width",
+          ">",
+          0
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "=",
+          "tag"
+        ],
+        [
+          "standardResult.instances.1.tagName",
+          "=",
+          "I"
+        ],
+        [
+          "standardResult.instances.1.excerpt",
+          "=",
+          "Never"
+        ],
+        [
+          "standardResult.instances.2.ordinalSeverity",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.2.tagName",
+          "=",
+          "B"
+        ],
+        [
+          "standardResult.instances.2.excerpt",
+          "=",
+          "accessible"
+        ],
+        [
+          "standardResult.instances.3.tagName",
+          "=",
+          "SMALL"
+        ],
+        [
+          "standardResult.instances.3.excerpt",
+          "=",
+          "This situation is rare and probably does not apply to you."
+        ]
+      ],
+      "rules": [
+        "y",
+        "textSem"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.0",
+          "=",
+          4
+        ],
+        [
+          "standardResult.totals.3",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "textSem"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "Semantically vague elements i, b, and/or small are used"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          4
+        ]
+      ],
+      "rules": [
+        "y",
+        "textSem"
+      ]
+    }
+  ]
+}

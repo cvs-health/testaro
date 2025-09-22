@@ -1,0 +1,147 @@
+{
+  "rule": "altScheme",
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/altScheme/index.html",
+        "what": "page with elements having textual and URL text alternatives"
+      }
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": true,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.0",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.2",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "altScheme"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "Element has an alt attribute with a URL as its entire value"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "IMG"
+        ],
+        [
+          "standardResult.instances.0.id",
+          "=",
+          "mapPNG"
+        ],
+        [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "selector"
+        ],
+        [
+          "standardResult.instances.0.location.spec",
+          "=",
+          "#mapPNG"
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "i",
+          "Blank_map_of_states"
+        ],
+        [
+          "standardResult.instances.1.what",
+          "=",
+          "Element has an alt attribute with a URL as its entire value"
+        ],
+        [
+          "standardResult.instances.1.tagName",
+          "=",
+          "IMG"
+        ],
+        [
+          "standardResult.instances.1.location.spec.height",
+          ">",
+          0
+        ],
+        [
+          "standardResult.instances.1.excerpt",
+          "i",
+          "httpforever"
+        ],
+        [
+          "standardResult.instances.2.excerpt",
+          "i",
+          "favicon"
+        ]
+      ],
+      "rules": [
+        "y",
+        "altScheme"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.2",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "altScheme"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "img elements have alt attributes with URLs as their entire values"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          3
+        ]
+      ],
+      "rules": [
+        "y",
+        "altScheme"
+      ]
+    }
+  ]
+}

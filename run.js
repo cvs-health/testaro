@@ -152,7 +152,18 @@ const goTo = async (report, page, url, timeout, waitUntil) => {
     if ([200, 304].includes(httpStatus) || url.startsWith('file:')) {
       // If the browser was redirected in violation of a strictness requirement:
       const actualURL = page.url();
-      if (report.strict && deSlash(actualURL) !== deSlash(url)) {
+      // Normalize file:// URLs for comparison (handles Windows path formats)
+      const normalizeFile = u => {
+        if (!u) return u;
+        if (!u.toLowerCase().startsWith('file:')) return u;
+        // Ensure forward slashes and three slashes after file:
+        let path = u.replace(/^file:\/+/i, '');
+        path = path.replace(/\\/g, '/');
+        return 'file:///' + path.replace(/^\//, '');
+      };
+      const actualNorm = actualURL.startsWith('file:') ? normalizeFile(actualURL) : actualURL;
+      const urlNorm = url.startsWith('file:') ? normalizeFile(url) : url;
+      if (report.strict && deSlash(actualNorm) !== deSlash(urlNorm)) {
         // Return an error.
         console.log(`ERROR: Visit to ${url} redirected to ${actualURL}`);
         return {
