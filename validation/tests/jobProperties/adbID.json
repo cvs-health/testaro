@@ -1,0 +1,132 @@
+{
+  "rule": "adbID",
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/adbID/index.html",
+        "what": "page with elements having good and bad aria-describedby references"
+      }
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": true,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.0",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.3",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "adbID"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "Referenced description of the element is ambiguous or missing"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "SPAN"
+        ],
+        [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.0.location.spec.height",
+          ">",
+          0
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "=",
+          "the World Wide Web"
+        ],
+        [
+          "standardResult.instances.1.tagName",
+          "=",
+          "LI"
+        ],
+        [
+          "standardResult.instances.1.excerpt",
+          "=",
+          "Defect 2: United States of America"
+        ],
+        [
+          "standardResult.instances.1.location.spec.y",
+          ">",
+          0
+        ]
+      ],
+      "rules": [
+        "y",
+        "adbID"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.3",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "adbID"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "Referenced descriptions of elements are ambiguous or missing"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          2
+        ]
+      ],
+      "rules": [
+        "y",
+        "adbID"
+      ]
+    }
+  ]
+}

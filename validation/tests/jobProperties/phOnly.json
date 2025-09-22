@@ -1,0 +1,137 @@
+{
+  "rule": "phOnly",
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/phOnly/index.html",
+        "what": "page with inputs with and without labels and placeholders"
+      }
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": true,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.2",
+          "=",
+          2
+        ],
+        [
+          "standardResult.totals.0",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "phOnly"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "Element has a placeholder but no accessible name"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "INPUT"
+        ],
+        [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.0.location.spec.y",
+          ">",
+          0
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "i",
+          "river2"
+        ],
+        [
+          "standardResult.instances.1.tagName",
+          "=",
+          "INPUT"
+        ],
+        [
+          "standardResult.instances.1.excerpt",
+          "i",
+          "company2"
+        ]
+      ],
+      "rules": [
+        "y",
+        "phOnly"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.2",
+          "=",
+          2
+        ],
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "phOnly"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "input elements have placeholders but no accessible names"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "INPUT"
+        ]
+      ],
+      "rules": [
+        "y",
+        "phOnly"
+      ]
+    }
+  ]
+}

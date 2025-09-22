@@ -55,19 +55,21 @@ const futureEvalRulesCleanRoom = {
   phOnly: 'input elements with placeholders but no accessible names'
 };
 */
-const futureRules = new Set([
-  'adbID',
-  'imageLink',
-  'legendLoc',
-  'optRoleSel',
-  'phOnly'
-]);
+// The following were previously marked as future (clean-room) rules.
+// For local validation runs they are included in evalRules below. Remove from futureRules
+// when preparing clean-room submissions.
+const futureRules = new Set([]);
 const evalRules = {
   altScheme: 'img elements with alt attributes having URLs as their entire values',
   captionLoc: 'caption elements that are not first children of table elements',
   datalistRef: 'elements with ambiguous or missing referenced datalist elements',
   secHeading: 'headings that violate the logical level order in their sectioning containers',
   textSem: 'semantically vague elements i, b, and/or small',
+  adbID: 'elements with ambiguous or missing referenced descriptions',
+  imageLink: 'links with image files as their destinations',
+  legendLoc: 'legend elements that are not first children of fieldset elements',
+  optRoleSel: 'Non-option elements with option roles that have no aria-selected attributes',
+  phOnly: 'input elements with placeholders but no accessible names',
   allCaps: 'leaf elements with entirely upper-case text longer than 7 characters',
   allHidden: 'page that is entirely or mostly hidden',
   allSlanted: 'leaf elements with entirely italic or oblique text longer than 39 characters',
