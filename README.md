@@ -963,6 +963,369 @@ Maintenance of this repository by copyright holder CVS Health may come to an end
 
 As of 12 February 2024, upon the transfer of the repository ownership to CVS Health, contributors of code to Testaro are required to execute the [CVS Health OSS Project Contributor License Agreement](https://forms.office.com/pages/responsepage.aspx?id=uGG7-v46dU65NKR_eCuM1xbiih2MIwxBuRvO0D_wqVFUQ1k0OE5SVVJWWkY4MTVJMkY3Sk9GM1FHRC4u) for Testaro before any pull request will be approved and merged.
 
+## Future work
+
+Future work on this project may include TypeScript conversion, conversion of Playwright testing to use Playwright Test, and any revisions necessary in order to permit this project to be containerized.
+
+### TypeScript conversion
+
+Recommendations on 2025-09-23 from `gpt-5` via Cursor 1.6.35:
+
+**Question**
+
+What are the major decisions that will be required if this entire repository is converted from JavaScript to TypeScript?
+
+**Answer**
+
+I'll scan key files to understand the current setup (module system, scripts, dependencies) so I can tailor the TypeScript migration decisions to this repo’s specifics.
+
+I'll quickly scan for module patterns and JSON imports across the repo to tailor the TypeScript migration decisions (CJS vs ESM, JSON handling, dynamic requires).
+
+#### Major decisions for a full TypeScript migration
+
+- **Module system and runtime**
+  - CommonJS vs ESM output (`module` = commonjs vs nodenext) and `package.json` `"type"` choice.
+  - Whether to keep `require/exports` at runtime or rewrite to `import/export` in source.
+  - `esModuleInterop`/`allowSyntheticDefaultImports` settings for interop.
+
+- **Build vs runtime execution**
+  - Transpile-then-run (`tsc` to `dist/`) vs on-the-fly (`ts-node`/register) for all CLI executors in `validation/executors/` and top-level scripts.
+  - If building, how to resolve runtime paths to forked workers (e.g., `procs/doTestAct`): compute `dist` paths, or use a loader.
+
+- **Pathing for child processes**
+  - How `child_process.fork` targets compiled files (adjust `__dirname` usage, emit to predictable `outDir`, or use ts-node in children).
+  - Consistent strategy for file URL handling (current `file://` normalization logic) post-build.
+
+- **Type strictness and tsconfig**
+  - Level of strictness (`strict`, `noImplicitAny`, `strictNullChecks`, `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`).
+  - Target and libs (`target` ES2020/ES2022; `lib` includes `ES2020`, `DOM` if needed for `page.evaluate` contexts).
+  - `moduleResolution` (`node`, `nodenext`, or `bundler`) and `resolveJsonModule` (only if you convert JSON imports from fs-read to imports).
+
+- **Data model design**
+  - Formal interfaces for `Job`, `Report`, `Act` (discriminated unions for `type` = `launch|test|url|wait|state|page|...`), and nested structures like `standardResult`, `jobData`, `toolTimes`.
+  - How much to type dynamic/mutable shapes (e.g., `report.jobData.*`, adding properties lazily) vs using `any`/`Partial`.
+  - Strategy for optional properties and progressive enrichment during execution.
+
+- **3rd‑party types and augmentations**
+  - Verify/choose type packages for `playwright`, `@siteimprove/alfa-*`, `axe-playwright`, `@qualweb/*`, `accessibility-checker`, `playwright-dompath`, `pixelmatch`. Plan fallbacks if defs are missing.
+  - Decide on module augmentation vs casting for custom fields (e.g., `page.browserID` assignment requires augmenting `playwright.Page` or casting).
+
+- **Dynamic loading patterns**
+  - `tests/testaro.js` dynamically requires rule modules by filename; decide to:
+    - keep dynamic `require` (typed as `unknown`/`any`), or
+    - replace with a typed registry/factory, or
+    - use dynamic `import()` with explicit result typing.
+  - Same decision for runtime JSON rule loading vs typed imports.
+
+- **JSON rule and data typing**
+  - Define interfaces for JSON rule files in `testaro/*.json` and job property JSON under `validation/tests/jobProperties/`.
+  - Whether to keep fs-based JSON reads (runtime-validated) or switch to typed imports using `resolveJsonModule`.
+
+- **Node/DOM boundary typing**
+  - How to type `page.evaluate` payloads and element handles; utility helpers like `textOf`, `getLocatorData`, `boxOf` should have precise generics vs `any`.
+  - Decide whether to include `DOM` lib globally or rely on Playwright types and narrow evaluate functions.
+
+- **Error and result typing**
+  - Standardize error codes/messages (e.g., `'status429'`, `'badRedirection'`, numeric codes from children) into a typed union.
+  - Time-limit handling and messaging types for per-rule timeouts.
+
+- **Project layout and outputs**
+  - Where compiled files live (`dist/` mirroring current tree) and which directories are included/excluded (`node_modules`, `temp/`, `validation/jobs/**`, `validation/tests/targets/**`).
+  - Whether to keep `.js` under `testaro/` alongside `.json` or convert all rule JS to `.ts`.
+
+- **Tooling**
+  - ESLint to TS config (`@typescript-eslint/*`, parser, rules), what to enforce/relax during migration.
+  - Incremental checking plan (`allowJs`, `checkJs`, JSDoc types) vs big‑bang conversion.
+  - `skipLibCheck` policy for faster builds vs stricter dependency checks.
+
+- **Runtime compatibility and CI**
+  - Minimum Node version (current code uses `fs/promises`; align `target`/features accordingly).
+  - Update `npm` scripts to run compiled executors or ts-node variants; adjust `main`/exports fields.
+  - Update CI to compile, run validation suites, and publish artifacts if applicable.
+
+- **Performance and DX choices**
+  - Use of `tslib`/`importHelpers` to reduce output size.
+  - Source maps for debugging vs build speed.
+  - Build caching and watch mode for local dev across many small files.
+
+- **Public API typing**
+  - Surface types for externally used entry points like `run.js` (`doJob`, `launch`) if this is used as a library; decide on `.d.ts` emission and what is considered public.
+
+- **Gradual safety boundaries**
+  - Where to place `unknown`/`any` escapes (e.g., dynamic module results, process messages) and how to fence them with runtime guards to preserve correctness.
+
+- **Behavioral parity vs refactor**
+  - Whether to refactor opportunistically (e.g., replace dynamic exports, normalize act handling with discriminated unions) or preserve exact runtime semantics first and harden types later.
+
+- **Monorepo/external types scenario (if needed)**
+  - If `ibmOutput/` or other data folders need typings or should be excluded entirely from compilation.
+
+- **Licensing and headers**
+  - How to preserve license headers/comments during transpilation if that’s a requirement.
+
+- **Migration sequencing**
+  - Directory order (e.g., core `procs/` first, then `tests/`, then executors) and gate criteria to keep `validation` flows working throughout.
+
+- **Testing strategy**
+  - Decide on type-level tests and runtime regression checks for the many rules in `testaro/` to ensure no behavior drift.
+
+- **Non-standard patterns**
+  - Confirm approach for in-place mutation of Playwright elements (focus/check/click workflows) and timing helpers to remain compatible under TS’s stricter async typing.
+
+- **Distribution and consumers**
+  - If published, decide on dual CJS/ESM output and `exports` map for consumers; if internal CLI only, keep CJS for simplicity.
+
+- **Env/config handling**
+  - Typing for env vars (e.g., `DEBUG`, `WAITS`) and a strategy to centralize env parsing, optionally with a schema.
+
+- **File I/O and paths**
+  - Formalize types for file contents read/written (reports, JSON job files) and ensure atomicity/encoding assumptions are explicit.
+
+- **Automated code mods**
+  - Choose codemods for `require`→`import`, `exports.`→`export`, and add TSDoc/JSDoc scaffolding where helpful.
+
+- **Fallback for missing types**
+  - Policy for creating minimal `*.d.ts` shims vs pinning dependency versions that ship their own types.
+
+- **Security and sandboxing**
+  - Revisit `page.evaluate` usage to ensure types don’t mask unsafe patterns; possibly introduce typed helpers for CSP/nonce handling.
+
+- **Ownership and conventions**
+  - Naming, folder structure for types, and conventions (e.g., suffix `*Rule.ts` for testaro rules, `*Executor.ts` for executors).
+
+- **Performance budgets**
+  - Ensure TS doesn’t slow hot paths; decide on `transpileOnly` for dev and full type-check in CI.
+
+- **Docs**
+  - Whether to publish type-first docs for rules, job schema, and report schema.
+
+- **Binary compatibility and scripts**
+  - Shebang/CLI wrappers if any are added; adjust NPM scripts (`run`, `tests`, `dirWatch`, `netWatch`) to compiled targets.
+
+- **Source of truth for rule registry**
+  - Move from filesystem discovery/dynamic require to a typed registry or keep FS-based discovery and accept weaker typing there.
+
+- **Augmentation of global state**
+  - Approach for module-global mutable state (`browser`, `page`, `actIndex`, `actCount`) under TS (keep, or encapsulate for easier typing).
+
+- **Error codes and enums**
+  - Decide on enums/constants for error strings currently used ad hoc across modules.
+
+- **Back-compatibility**
+  - If external users rely on current JS entry points, decide on keeping JS shim files or major-version bump.
+
+- **CI artifacts**
+  - Whether to commit `dist/` for executors used by external systems (if any) or build on demand.
+
+- **Validation data**
+  - Type-checking and exclude patterns for large static trees under `validation/tests/targets/**`.
+
+- **Standardization pipeline**
+  - Strongly typing `standardize`, `identify`, `getLocatorData` interfaces to ensure the report format remains stable.
+
+- **Global configuration**
+  - Where to centralize tsconfig(s): single root vs per-folder `tsconfig.json` if executors or tests need different settings.
+
+- **Dev ergonomics**
+  - Editor/watch settings for auto-build and source maps to keep the current debugging/logging experience.
+
+- **Release management**
+  - Versioning strategy aligning the migration with a major release and a deprecation window for JS users.
+
+- **Repository hygiene**
+  - Git ignore updates for `dist/`, source maps, and generated typings; precommit checks for type errors.
+
+- **Incremental guardrails**
+  - Introduce `// TODO(ts):` backlog tags and thresholds (e.g., don’t merge if new `any`s added) to keep type quality from regressing.
+
+- **Performance of rule timeouts**
+  - Keep or parameterize the 15s per-rule timeout with typed config; ensure typings don’t accidentally widen timing types.
+
+- **Playwright context**
+  - Decide if `Page`/`BrowserContext` are passed through typed helpers rather than shared module state to improve type soundness.
+
+- **Logging**
+  - Strongly type logging interfaces and message formats (currently strings) if you want structured logs.
+
+- **Observability hooks**
+  - Type `tellServer` interface so message parameters are validated at compile time.
+
+- **Temporary directories and file lifecycle**
+  - Ensure typed guarantees for report temp file creation/deletion around `doActs`.
+
+- **Edge-case Node APIs**
+  - Keep `process.on('message')` and `fork` message contract typed (e.g., discriminated unions for IPC).
+
+- **Risk posture**
+  - Choose between maximal type safety (more refactor) vs minimal-change transpilation (faster migration, looser types).
+
+- **Team workflow**
+  - Coding standards for type annotations, error handling, and rule authoring templates (`data/template.js` → `.ts`).
+
+- **Documentation updates**
+  - Update `README.md` and contributor docs for TS build, scripts, and rule authoring in TS.
+
+- **License headers**
+  - Confirm TypeScript compiler preserves headers in output where needed.
+
+- **Binary assets**
+  - Decide on handling and typing for `ed11y/editoria11y.min.js`, `htmlcs/HTMLCS.js`, and `temp/engine/*.js` (likely exclude from TS).
+
+- **Validation executors**
+  - Whether to type and migrate `validation/**` (watchers, runners) now or later; they are part of the runtime entrypoints.
+
+- **Scripted searches**
+  - If any script relies on `.js` globbing, update to include `.ts` or compiled `.js` as appropriate.
+
+- **Monorepo split (optional)**
+  - Consider separating library (`procs/`, `testaro/`) from CLI/executors to simplify build and type boundaries.
+
+- **Release notes and migration guide**
+  - Communicate breaking changes (paths, module format, APIs) to downstream users.
+
+- **Contingency**
+  - Rollback plan if TS introduces runtime regressions; maintain a JS branch during transition.
+
+- **Ownership of generated types**
+  - Whether to emit `.d.ts` for public consumption and how to keep them in sync.
+
+- **Security posture**
+  - Type-narrow inputs to `page.evaluate` to reduce injection risks; consider runtime schema validation aligned with compile-time types.
+
+- **Consistency and naming**
+  - Normalize names (e.g., rule IDs, act types) in enums to prevent typo bugs now caught by types.
+
+- **Testing gates**
+  - Enforce typecheck in CI (noEmit + typecheck) and keep separate from build to catch type errors early.
+
+- **Performance tuning**
+  - `skipLibCheck` usage for speed in CI, and segment builds if needed.
+
+- **Dev dependency choices**
+  - Add and pin: `typescript`, `ts-node` (if used), `@types/node`, `@typescript-eslint/*`, `tslib`.
+
+- **Scaffolding**
+  - Provide a TS rule template replacing `data/template.js`.
+
+- **Migration approach**
+  - Big bang vs module-by-module with `allowJs`; define the cutover point for flipping scripts to compiled artifacts.
+
+- **Source map policy**
+  - Whether to emit for executors (useful for debugging) and how to ship them.
+
+- **Error handling consistency**
+  - Tighten thrown vs returned error patterns and type them across modules.
+
+- **API surfaces to freeze**
+  - Identify external-callable functions (e.g., `doJob`) and lock their types as public contracts.
+
+- **Coding ergonomics**
+  - Decide on utility types and helpers to avoid repeated broad `any`.
+
+- **CI matrix**
+  - If Node versions vary in your environments, decide on supported versions and align TS `target` and features.
+
+- **Sourcemap stack traces**
+  - Configure `source-map-support` if you need clean stack traces in production.
+
+- **Rule discovery**
+  - If you keep filesystem discovery of rules, define a typed manifest generator to bridge dynamic loading and static typing.
+
+- **Binary and non-TS code**
+  - Exclude third-party/minified JS from the TS pipeline; document it in `tsconfig.exclude`.
+
+- **Globbing and watch**
+  - Decide on watch-mode for dev across large tree and avoid compiling validation target fixtures.
+
+- **Optional refactors**
+  - Replace stringly-typed error/status codes with enums for compile-time checks.
+
+- **Docs for contributors**
+  - Update `CONTRIBUTING.md` to explain adding new rules/tests in TS.
+
+- **License and headers policy**
+  - Ensure headers are preserved via tsconfig `removeComments: false` (or custom tooling).
+
+- **Long-term maintenance**
+  - Plan for gradually increasing strictness and paying down `any`/casts.
+
+- **Ownership of types**
+  - Assign owners for core type packages (job/report schema) to prevent drift.
+
+- **Release cadence**
+  - Decide on a major version for TS cutover and soft-deprecate JS.
+
+- **Verification runs**
+  - Run the existing `validation` flows pre/post migration to assert parity.
+
+- **Scripting updates**
+  - Update NPM scripts to call `node dist/...` or `ts-node ...` consistently.
+
+- **Formatting**
+  - Decide on Prettier integration for TS files.
+
+- **Path aliases**
+  - Whether to introduce TS path mapping (e.g., `@procs/*`) and align runtime with `tsconfig-paths` if used.
+
+- **Type exposure for consumers**
+  - If this is used as a library, add `types` in `package.json` and consider dual-emit CJS/ESM with an `exports` map.
+
+- **Internal logging contracts**
+  - Give `tellServer` a typed param object instead of loosely concatenated query strings.
+
+- **IPC contracts**
+  - Type the message payloads between parent and forked child (act results, error codes) as discriminated unions.
+
+- **Rule authoring ergonomics**
+  - Provide typed helpers (`init`, `report`, `simplify`) signatures and ensure rule modules stay small and consistent.
+
+- **Binary deps (Playwright)**
+  - Decide if Playwright version pins need to change for type stability.
+
+- **Local dev**
+  - Editor/tsserver performance considerations; exclude large static trees to keep TS fast.
+
+- **Guarding dynamic text operations**
+  - Tight typing for text processing helpers (`debloat`, `textOf`) to reduce nullability issues.
+
+- **Backward-compatible shims**
+  - If external systems call JS entrypoints, add thin JS shims that `require` built outputs.
+
+- **Risk acceptance**
+  - Explicitly document areas that remain `any` for practicality (dynamic rule loading, external tool outputs).
+
+- **Ownership and review**
+  - Establish code owners for type changes spanning modules (`procs/`, `tests/`, `validation/`).
+
+- **Documentation of schemas**
+  - Publish the job/report JSON schema alongside TS types to keep runtime validation aligned.
+
+- **SLA for migration**
+  - Timeline and checkpoints (compile, typecheck clean, parity runs, strictness uplift).
+
+- **Final cutover**
+  - Switch scripts to compiled artifacts, remove `allowJs`, and enforce TS-only in CI.
+
+- **Post-cutover cleanups**
+  - Remove unused JS files, codemod leftovers, and deprecated helpers.
+
+- **Observability**
+  - Optional: typed structured logs to replace ad hoc `console.log` parsing in CI.
+
+- **Security review**
+  - Review `page.evaluate` and dynamic inputs under strict types; add guards where types reveal risks.
+
+- **Team training**
+  - Align on TS patterns (narrowing, discriminated unions, module augmentation).
+
+- **Performance validation**
+  - Ensure no regressions in tool time limits and process orchestration after build step insertion.
+
+- **Long-term benefits**
+  - Decide which parts gain the most from rich typing first (job/act schema, rule registry, Playwright helpers).
+
+- Converted the repo’s needs into concrete decision points covering module format, build/run, tsconfig, domain typing, dynamic loading, child-process pathing, 3rd‑party types, and CI/publishing impacts.
+
 ## Etymology
 
 “Testaro” means “collection of tests” in Esperanto.
