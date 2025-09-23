@@ -957,6 +957,8 @@ Work on the custom tests in this package began in 2017, and work on the multi-pa
 
 On 12 February 2024 ownership of the Testaro repository was transfered from the personal account of contributor Jonathan Pool to the organization account `cvs-health` of CVS Health. The MIT license of the repository did not change.
 
+Maintenance of this repository by copyright holder CVS Health may come to an end on 30 September 2025. Thereafter, forks of this repository may be the loci of further development.
+
 ## Contributing
 
 As of 12 February 2024, upon the transfer of the repository ownership to CVS Health, contributors of code to Testaro are required to execute the [CVS Health OSS Project Contributor License Agreement](https://forms.office.com/pages/responsepage.aspx?id=uGG7-v46dU65NKR_eCuM1xbiih2MIwxBuRvO0D_wqVFUQ1k0OE5SVVJWWkY4MTVJMkY3Sk9GM1FHRC4u) for Testaro before any pull request will be approved and merged.
