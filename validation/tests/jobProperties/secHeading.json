@@ -1,0 +1,137 @@
+{
+  "rule": "secHeading",
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/secHeading/index.html",
+        "what": "page with sections having logical and illogical heading sequences"
+      }
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": true,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.1",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "secHeading"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "Element violates the logical level order in its sectioning container"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "H2"
+        ],
+        [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.0.location.spec.y",
+          ">",
+          0
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "=",
+          "This heading is illogical"
+        ],
+        [
+          "standardResult.instances.1.tagName",
+          "=",
+          "H1"
+        ],
+        [
+          "standardResult.instances.1.excerpt",
+          "=",
+          "This heading is fundamentally illogical"
+        ],
+        [
+          "standardResult.instances.2.tagName",
+          "=",
+          "H2"
+        ],
+        [
+          "standardResult.instances.2.excerpt",
+          "=",
+          "This article heading is illogical"
+        ]
+      ],
+      "rules": [
+        "y",
+        "secHeading"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.1",
+          "=",
+          3
+        ],
+        [
+          "standardResult.totals.3",
+          "=",
+          0
+        ],
+        [
+          "standardResult.instances.length",
+          "=",
+          1
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "secHeading"
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "Heading elements violate the logical level order in their sectioning containers"
+        ]
+      ],
+      "rules": [
+        "y",
+        "secHeading"
+      ]
+    }
+  ]
+}

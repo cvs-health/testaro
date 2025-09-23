@@ -1,0 +1,122 @@
+{
+  "rule": "datalistRef",
+  "timeLimit": 20,
+  "acts": [
+    {
+      "type": "launch",
+      "target": {
+        "url": "file://validation/tests/targets/datalistRef/index.html",
+        "what": "page with correct and erroneous datalist references"
+      }
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": true,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.2",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.3",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "datalistRef"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "list attribute of the element references an ambiguous or missing datalist element"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.tagName",
+          "=",
+          "INPUT"
+        ],
+        [
+          "standardResult.instances.0.location.doc",
+          "=",
+          "dom"
+        ],
+        [
+          "standardResult.instances.0.location.type",
+          "=",
+          "box"
+        ],
+        [
+          "standardResult.instances.0.location.spec.height",
+          ">",
+          0
+        ],
+        [
+          "standardResult.instances.0.excerpt",
+          "i",
+          "material"
+        ],
+        [
+          "standardResult.instances.1.excerpt",
+          "i",
+          "city"
+        ]
+      ],
+      "rules": [
+        "y",
+        "datalistRef"
+      ]
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "stopOnFail": true,
+      "expect": [
+        [
+          "standardResult.totals.1",
+          "=",
+          0
+        ],
+        [
+          "standardResult.totals.3",
+          "=",
+          2
+        ],
+        [
+          "standardResult.instances.0.ruleID",
+          "=",
+          "datalistRef"
+        ],
+        [
+          "standardResult.instances.0.what",
+          "=",
+          "list attributes of elements reference ambiguous or missing datalist elements"
+        ],
+        [
+          "standardResult.instances.0.ordinalSeverity",
+          "=",
+          3
+        ],
+        [
+          "standardResult.instances.0.count",
+          "=",
+          2
+        ]
+      ],
+      "rules": [
+        "y",
+        "datalistRef"
+      ]
+    }
+  ]
+}

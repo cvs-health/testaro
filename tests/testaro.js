@@ -56,11 +56,6 @@ const futureEvalRulesCleanRoom = {
 };
 */
 const futureRules = new Set([
-  'altScheme',
-  'captionLoc',
-  'dataListRef',
-  'secHeading',
-  'textSem',
   'adbID',
   'imageLink',
   'legendLoc',
@@ -68,6 +63,11 @@ const futureRules = new Set([
   'phOnly'
 ]);
 const evalRules = {
+  altScheme: 'img elements with alt attributes having URLs as their entire values',
+  captionLoc: 'caption elements that are not first children of table elements',
+  datalistRef: 'elements with ambiguous or missing referenced datalist elements',
+  secHeading: 'headings that violate the logical level order in their sectioning containers',
+  textSem: 'semantically vague elements i, b, and/or small',
   allCaps: 'leaf elements with entirely upper-case text longer than 7 characters',
   allHidden: 'page that is entirely or mostly hidden',
   allSlanted: 'leaf elements with entirely italic or oblique text longer than 39 characters',
