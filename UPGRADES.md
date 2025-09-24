@@ -1,5 +1,5 @@
 # Major decisions for JavaScript to TypeScript conversion
-_Exported on 9/23/2025 at 15:13:23 PDT from Cursor (1.6.45)_
+_Exported on 9/24/2025 at 09:18:03 PDT from Cursor (1.6.45)_
 
 ---
 
@@ -1490,26 +1490,541 @@ export class ASLintTool implements TestingTool {
 }
 ```
 
-/*
-  © 2021–2025 CVS Health and/or one of its affiliates. All rights reserved.
+---
 
-  MIT License
+**User**
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files (the "Software"), to deal
-  in the Software without restriction, including without limitation the rights
-  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  copies of the Software, and to permit persons to whom the Software is
-  furnished to do so, subject to the following conditions:
+The recommended monorepo structure above provides for Testaro being a package. Is it wise to consider making each testing tool that is currently within Testaro a distinct package? I imagine some benefits from this:
+(1) Protection of the rest of Testaro from disruption when a particular testing tool is revised.
+(2) Parallelization of testing service, with distinct servers running single tools on the same target page, with their reports consolidated by Testaro, decreasing completion time.
+(3) Use of a configurable testing tool as the enforcer of any customer-specific custom rules.
 
-  The above copyright notice and this permission notice shall be included in all
-  copies or substantial portions of the Software.
+---
 
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-  SOFTWARE.
-*/
+**Cursor**
+
+Excellent strategic thinking! Your analysis of the benefits is spot-on, and this approach would significantly improve the architecture. Let me analyze the implications and provide a refined monorepo structure.
+
+## Benefits Analysis
+
+### **1. Isolation & Protection**
+- **Tool-specific updates**: Each tool can be updated independently
+- **Dependency isolation**: Tool-specific dependencies don't conflict
+- **Versioning**: Each tool can have its own versioning strategy
+- **Testing**: Tool-specific validation and testing
+
+### **2. Parallelization & Performance**
+- **Horizontal scaling**: Run tools on separate servers/containers
+- **Resource optimization**: Allocate resources per tool requirements
+- **Fault tolerance**: One tool failure doesn't affect others
+- **Load balancing**: Distribute tool execution across infrastructure
+
+### **3. Custom Rules Framework**
+- **Plugin architecture**: Each tool becomes a plugin
+- **Customer-specific tools**: Custom tools as separate packages
+- **Rule enforcement**: Tools can enforce custom business rules
+- **Extensibility**: Easy to add new tools without core changes
+
+## Recommended Monorepo Structure
+
+```
+testaro-monorepo/
+├── turbo.json
+├── pnpm-workspace.yaml
+├── packages/
+│   ├── core/                           # Shared utilities, types, interfaces
+│   ├── testaro/                        # Main orchestrator
+│   ├── testilo/                        # Report processing
+│   ├── ui/                             # Web interface
+│   ├── tools/                          # Tool packages
+│   │   ├── axe/                        # Axe tool package
+│   │   ├── htmlcs/                     # HTML CodeSniffer package
+│   │   ├── aslint/                     # ASLint package
+│   │   ├── alfa/                       # Alfa package
+│   │   ├── qualweb/                    # QualWeb package
+│   │   ├── ibm/                        # IBM Accessibility Checker package
+│   │   ├── ed11y/                      # Editoria11y package
+│   │   ├── nuval/                      # Nu Html Checker package
+│   │   ├── wave/                       # WAVE package
+│   │   ├── wax/                        # WallyAX package
+│   │   └── testaro-rules/              # Testaro custom rules package
+│   ├── validation/                     # Validation framework
+│   └── custom-tools/                   # Customer-specific tools
+│       ├── customer-a-rules/           # Customer A's custom rules
+│       └── customer-b-rules/           # Customer B's custom rules
+├── apps/
+│   ├── cli/                            # Command-line interface
+│   ├── demo/                           # Example usage
+│   ├── validation-runner/              # Validation test runner
+│   └── tool-server/                    # Individual tool server
+└── tools/
+    └── rule-builder/                   # Custom rule creation tool
+```
+
+## Tool Package Structure
+
+### **Individual Tool Package Example:**
+```
+packages/tools/axe/
+├── package.json
+├── src/
+│   ├── index.ts                        # Main tool interface
+│   ├── tool.ts                        # Tool implementation
+│   ├── types.ts                       # Tool-specific types
+│   └── validation.ts                  # Tool validation
+├── tests/
+│   ├── tool.spec.ts                   # Tool-specific tests
+│   └── validation.spec.ts             # Tool validation tests
+└── README.md
+```
+
+### **Tool Package Interface:**
+```typescript
+// packages/tools/axe/src/types.ts
+export interface AxeToolOptions {
+  tags?: string[];
+  rules?: string[];
+  timeout?: number;
+}
+
+export interface AxeToolResult {
+  violations: AxeViolation[];
+  passes: AxePass[];
+  incomplete: AxeIncomplete[];
+  inapplicable: AxeInapplicable[];
+}
+
+// packages/tools/axe/src/tool.ts
+export class AxeTool implements TestingTool {
+  async run(page: Page, options: AxeToolOptions): Promise<AxeToolResult> {
+    // Tool-specific implementation
+  }
+  
+  async validate(page: Page, options: ValidationOptions): Promise<ValidationResult> {
+    // Tool-specific validation
+  }
+}
+```
+
+## Core Orchestrator Package
+
+### **Testaro Main Package:**
+```typescript
+// packages/testaro/src/orchestrator.ts
+export class TestaroOrchestrator {
+  private tools: Map<string, TestingTool> = new Map();
+  
+  async registerTool(name: string, tool: TestingTool): Promise<void> {
+    this.tools.set(name, tool);
+  }
+  
+  async runTools(
+    page: Page, 
+    toolConfigs: ToolConfig[]
+  ): Promise<ToolResult[]> {
+    // Parallel execution of tools
+    const results = await Promise.all(
+      toolConfigs.map(config => this.runTool(page, config))
+    );
+    
+    return results;
+  }
+  
+  private async runTool(
+    page: Page, 
+    config: ToolConfig
+  ): Promise<ToolResult> {
+    const tool = this.tools.get(config.name);
+    if (!tool) {
+      throw new Error(`Tool ${config.name} not found`);
+    }
+    
+    return await tool.run(page, config.options);
+  }
+}
+```
+
+## Parallelization Architecture
+
+### **Tool Server Implementation:**
+```typescript
+// apps/tool-server/src/server.ts
+export class ToolServer {
+  private tools: Map<string, TestingTool> = new Map();
+  
+  async start(port: number): Promise<void> {
+    // Register available tools
+    await this.registerTools();
+    
+    // Start HTTP server
+    const server = express();
+    server.post('/run/:tool', this.handleToolRequest.bind(this));
+    server.listen(port);
+  }
+  
+  private async handleToolRequest(
+    req: Request, 
+    res: Response
+  ): Promise<void> {
+    const { tool } = req.params;
+    const { pageData, options } = req.body;
+    
+    const toolInstance = this.tools.get(tool);
+    if (!toolInstance) {
+      res.status(404).json({ error: 'Tool not found' });
+      return;
+    }
+    
+    // Run tool on provided page data
+    const result = await toolInstance.run(pageData, options);
+    res.json(result);
+  }
+}
+```
+
+### **Distributed Execution:**
+```typescript
+// packages/testaro/src/distributed-executor.ts
+export class DistributedExecutor {
+  private toolServers: Map<string, string> = new Map();
+  
+  async runTools(
+    page: Page, 
+    toolConfigs: ToolConfig[]
+  ): Promise<ToolResult[]> {
+    // Distribute tools across servers
+    const serverAssignments = this.assignToolsToServers(toolConfigs);
+    
+    // Execute tools in parallel
+    const results = await Promise.all(
+      serverAssignments.map(assignment => 
+        this.executeOnServer(assignment.server, assignment.tools, page)
+      )
+    );
+    
+    return results.flat();
+  }
+  
+  private async executeOnServer(
+    server: string, 
+    tools: ToolConfig[], 
+    page: Page
+  ): Promise<ToolResult[]> {
+    // Send page data and tool configs to server
+    const response = await fetch(`${server}/run`, {
+      method: 'POST',
+      body: JSON.stringify({ tools, pageData: await page.content() })
+    });
+    
+    return await response.json();
+  }
+}
+```
+
+## Custom Rules Framework
+
+### **Custom Tool Package:**
+```typescript
+// packages/custom-tools/customer-a-rules/src/index.ts
+export class CustomerARulesTool implements TestingTool {
+  async run(page: Page, options: ToolOptions): Promise<ToolResult> {
+    // Customer-specific rule implementations
+    const violations = await this.checkCustomRules(page, options.rules);
+    
+    return {
+      violations,
+      passes: [],
+      incomplete: [],
+      inapplicable: []
+    };
+  }
+  
+  private async checkCustomRules(
+    page: Page, 
+    rules: string[]
+  ): Promise<Violation[]> {
+    // Implement customer-specific business rules
+    const results: Violation[] = [];
+    
+    for (const rule of rules) {
+      const violations = await this.checkRule(page, rule);
+      results.push(...violations);
+    }
+    
+    return results;
+  }
+}
+```
+
+## Implementation Benefits
+
+### **1. Isolation & Protection**
+- **Independent updates**: Each tool can be updated without affecting others
+- **Dependency management**: Tool-specific dependencies are isolated
+- **Versioning**: Each tool follows its own versioning strategy
+- **Testing**: Tool-specific validation and testing
+
+### **2. Parallelization & Performance**
+- **Horizontal scaling**: Tools can run on separate servers
+- **Resource optimization**: Allocate resources per tool requirements
+- **Fault tolerance**: One tool failure doesn't affect others
+- **Load balancing**: Distribute tool execution across infrastructure
+
+### **3. Custom Rules Framework**
+- **Plugin architecture**: Each tool becomes a plugin
+- **Customer-specific tools**: Custom tools as separate packages
+- **Rule enforcement**: Tools can enforce custom business rules
+- **Extensibility**: Easy to add new tools without core changes
+
+## Migration Strategy
+
+### **Phase 1: Tool Package Extraction**
+1. Extract each tool into its own package
+2. Establish common interfaces
+3. Implement tool-specific validation
+4. Test individual tool packages
+
+### **Phase 2: Orchestrator Implementation**
+1. Implement Testaro orchestrator
+2. Add parallel execution support
+3. Implement distributed execution
+4. Test orchestrator with tool packages
+
+### **Phase 3: Custom Rules Framework**
+1. Implement custom tool interface
+2. Create example custom tools
+3. Add rule builder tool
+4. Test custom rules framework
+
+### **Phase 4: Production Deployment**
+1. Deploy tool servers
+2. Implement load balancing
+3. Add monitoring and logging
+4. Performance optimization
+
+## Conclusion
+
+Your suggestion to make each testing tool a distinct package is **architecturally sound** and provides significant benefits:
+
+1. **Isolation**: Protects the rest of Testaro from tool-specific changes
+2. **Parallelization**: Enables distributed execution and performance optimization
+3. **Customization**: Supports customer-specific rules and tools
+4. **Scalability**: Allows horizontal scaling of tool execution
+5. **Maintainability**: Easier to manage and update individual tools
+
+This approach transforms Testaro from a monolithic testing tool into a **distributed testing platform** that can scale horizontally and support custom business rules. The monorepo structure provides the benefits of a unified codebase while maintaining the flexibility of independent tool packages.
+
+```plaintext
+testaro-monorepo/
+├── turbo.json
+├── pnpm-workspace.yaml
+├── packages/
+│   ├── core/                           # Shared utilities, types, interfaces
+│   ├── testaro/                        # Main orchestrator
+│   ├── testilo/                        # Report processing
+│   ├── ui/                             # Web interface
+│   ├── tools/                          # Tool packages
+│   │   ├── axe/                        # Axe tool package
+│   │   ├── htmlcs/                     # HTML CodeSniffer package
+│   │   ├── aslint/                     # ASLint package
+│   │   ├── alfa/                       # Alfa package
+│   │   ├── qualweb/                    # QualWeb package
+│   │   ├── ibm/                        # IBM Accessibility Checker package
+│   │   ├── ed11y/                      # Editoria11y package
+│   │   ├── nuval/                      # Nu Html Checker package
+│   │   ├── wave/                       # WAVE package
+│   │   ├── wax/                        # WallyAX package
+│   │   └── testaro-rules/              # Testaro custom rules package
+│   ├── validation/                     # Validation framework
+│   └── custom-tools/                   # Customer-specific tools
+│       ├── customer-a-rules/           # Customer A's custom rules
+│       └── customer-b-rules/           # Customer B's custom rules
+├── apps/
+│   ├── cli/                            # Command-line interface
+│   ├── demo/                           # Example usage
+│   ├── validation-runner/              # Validation test runner
+│   └── tool-server/                    # Individual tool server
+└── tools/
+    └── rule-builder/                   # Custom rule creation tool
+```
+
+```plaintext
+packages/tools/axe/
+├── package.json
+├── src/
+│   ├── index.ts                        # Main tool interface
+│   ├── tool.ts                        # Tool implementation
+│   ├── types.ts                       # Tool-specific types
+│   └── validation.ts                  # Tool validation
+├── tests/
+│   ├── tool.spec.ts                   # Tool-specific tests
+│   └── validation.spec.ts             # Tool validation tests
+└── README.md
+```
+
+```typescript
+// packages/tools/axe/src/types.ts
+export interface AxeToolOptions {
+  tags?: string[];
+  rules?: string[];
+  timeout?: number;
+}
+
+export interface AxeToolResult {
+  violations: AxeViolation[];
+  passes: AxePass[];
+  incomplete: AxeIncomplete[];
+  inapplicable: AxeInapplicable[];
+}
+
+// packages/tools/axe/src/tool.ts
+export class AxeTool implements TestingTool {
+  async run(page: Page, options: AxeToolOptions): Promise<AxeToolResult> {
+    // Tool-specific implementation
+  }
+  
+  async validate(page: Page, options: ValidationOptions): Promise<ValidationResult> {
+    // Tool-specific validation
+  }
+}
+```
+
+```typescript
+// packages/testaro/src/orchestrator.ts
+export class TestaroOrchestrator {
+  private tools: Map<string, TestingTool> = new Map();
+  
+  async registerTool(name: string, tool: TestingTool): Promise<void> {
+    this.tools.set(name, tool);
+  }
+  
+  async runTools(
+    page: Page, 
+    toolConfigs: ToolConfig[]
+  ): Promise<ToolResult[]> {
+    // Parallel execution of tools
+    const results = await Promise.all(
+      toolConfigs.map(config => this.runTool(page, config))
+    );
+    
+    return results;
+  }
+  
+  private async runTool(
+    page: Page, 
+    config: ToolConfig
+  ): Promise<ToolResult> {
+    const tool = this.tools.get(config.name);
+    if (!tool) {
+      throw new Error(`Tool ${config.name} not found`);
+    }
+    
+    return await tool.run(page, config.options);
+  }
+}
+```
+
+```typescript
+// apps/tool-server/src/server.ts
+export class ToolServer {
+  private tools: Map<string, TestingTool> = new Map();
+  
+  async start(port: number): Promise<void> {
+    // Register available tools
+    await this.registerTools();
+    
+    // Start HTTP server
+    const server = express();
+    server.post('/run/:tool', this.handleToolRequest.bind(this));
+    server.listen(port);
+  }
+  
+  private async handleToolRequest(
+    req: Request, 
+    res: Response
+  ): Promise<void> {
+    const { tool } = req.params;
+    const { pageData, options } = req.body;
+    
+    const toolInstance = this.tools.get(tool);
+    if (!toolInstance) {
+      res.status(404).json({ error: 'Tool not found' });
+      return;
+    }
+    
+    // Run tool on provided page data
+    const result = await toolInstance.run(pageData, options);
+    res.json(result);
+  }
+}
+```
+
+```typescript
+// packages/testaro/src/distributed-executor.ts
+export class DistributedExecutor {
+  private toolServers: Map<string, string> = new Map();
+  
+  async runTools(
+    page: Page, 
+    toolConfigs: ToolConfig[]
+  ): Promise<ToolResult[]> {
+    // Distribute tools across servers
+    const serverAssignments = this.assignToolsToServers(toolConfigs);
+    
+    // Execute tools in parallel
+    const results = await Promise.all(
+      serverAssignments.map(assignment => 
+        this.executeOnServer(assignment.server, assignment.tools, page)
+      )
+    );
+    
+    return results.flat();
+  }
+  
+  private async executeOnServer(
+    server: string, 
+    tools: ToolConfig[], 
+    page: Page
+  ): Promise<ToolResult[]> {
+    // Send page data and tool configs to server
+    const response = await fetch(`${server}/run`, {
+      method: 'POST',
+      body: JSON.stringify({ tools, pageData: await page.content() })
+    });
+    
+    return await response.json();
+  }
+}
+```
+
+```typescript
+// packages/custom-tools/customer-a-rules/src/index.ts
+export class CustomerARulesTool implements TestingTool {
+  async run(page: Page, options: ToolOptions): Promise<ToolResult> {
+    // Customer-specific rule implementations
+    const violations = await this.checkCustomRules(page, options.rules);
+    
+    return {
+      violations,
+      passes: [],
+      incomplete: [],
+      inapplicable: []
+    };
+  }
+  
+  private async checkCustomRules(
+    page: Page, 
+    rules: string[]
+  ): Promise<Violation[]> {
+    // Implement customer-specific business rules
+    const results: Violation[] = [];
+    
+    for (const rule of rules) {
+      const violations = await this.checkRule(page, rule);
+      results.push(...violations);
+    }
+    
+    return results;
+  }
+}
+```
