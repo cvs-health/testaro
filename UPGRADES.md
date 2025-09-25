@@ -1,5 +1,5 @@
 # Major decisions for JavaScript to TypeScript conversion
-_Exported on 9/24/2025 at 09:18:03 PDT from Cursor (1.6.45)_
+_Exported on 9/24/2025 at 20:24:42 PDT from Cursor (1.6.45)_
 
 ---
 
@@ -2028,3 +2028,38 @@ export class CustomerARulesTool implements TestingTool {
   }
 }
 ```
+
+---
+
+**User**
+
+I am beginning to doubt the wisdom of using Turborepo in a rearchitected project, because in another monorepo Turborepo is severely complicating my effort to tailor test and check output summaries to optimize the experience of the person who reads them.
+
+---
+
+**Cursor**
+
+That’s a reasonable doubt. If bespoke, human-friendly summaries are a priority, Turborepo’s log grouping/caching model can get in your way. You have three solid paths:
+
+- Prefer simplicity: pnpm workspaces + custom orchestrator
+  - Write a small Node runner (one process) that:
+    - Selects packages (by tags/globs), runs tasks with controlled concurrency
+    - Captures stdout/stderr per task to files and JSON
+    - Aggregates a final summary (Markdown/HTML/JSON) exactly as you want
+  - Parallelize in CI with a matrix over packages; no Turborepo required
+  - Keep caching at the tool level (e.g., esbuild/tsup/vitest/playwright caches) to avoid cross-task cache complexity
+
+- Swap orchestration tool
+  - Lage: lightweight, good parallelism, JSON reporter hooks; easier to bend logs
+  - Moonrepo: fast, clear reporters and JSON output; flexible pipelines
+  - Nx: powerful graph and caching, with multiple reporters and JSON output; consider only if you want its broader dev‑platform features (generators, project graph, affected logic)
+
+- Keep Turbo, but decouple the summary
+  - Run tasks with Turbo for speed, but tee each package’s reporter to per-task JSON files
+  - Post-process only those JSON artifacts to build your curated summary (ignore Turbo’s console output)
+  - Use package-level reporters (Vitest/Playwright/ESLint/Biome) as the source of truth
+
+Recommendation for your case
+- Use pnpm workspaces + a tiny custom runner (and/or a CI matrix) so you fully own output format and ordering, and avoid Turbo’s abstractions entirely. Add per-tool reporters that emit JSON and let a single summarizer assemble exactly the view you want. You can introduce a heavier orchestrator later if you need build graph/caching beyond what tools already provide.
+
+If you want, I can sketch the runner’s interface (inputs/filters/concurrency) and the summary artifact format so it slots cleanly into your validation flow and UI.
