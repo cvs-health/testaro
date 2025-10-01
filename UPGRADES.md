@@ -2063,3 +2063,366 @@ Recommendation for your case
 - Use pnpm workspaces + a tiny custom runner (and/or a CI matrix) so you fully own output format and ordering, and avoid Turbo’s abstractions entirely. Add per-tool reporters that emit JSON and let a single summarizer assemble exactly the view you want. You can introduce a heavier orchestrator later if you need build graph/caching beyond what tools already provide.
 
 If you want, I can sketch the runner’s interface (inputs/filters/concurrency) and the summary artifact format so it slots cleanly into your validation flow and UI.
+
+## Converting tools from Playwright to Playwright Test
+
+### Axe example
+
+```typescript
+import AxeBuilder from '@axe-core/playwright';
+import type { AxeResults } from 'axe-core';
+import { chromium } from 'playwright';
+
+export async function runAxeScan(url: string): Promise<AxeResults | { error: string }> {
+  if (!url) {
+    return { error: 'URL is required' };
+  }
+  let browser: import('playwright').Browser | undefined;
+  try {
+    browser = await chromium.launch();
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    const axeBuilder = new AxeBuilder({ page });
+    const results = await axeBuilder
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+      .analyze();
+    return results;
+  } catch (error) {
+    if (error instanceof Error) {
+      return { error: `An error occurred: ${error.message}` };
+    }
+    return { error: 'An unknown error occurred' };
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
+  }
+}
+```
+
+```tsx
+'use server';
+
+import { runAxeScan } from '@/app/(custom-routes)/test/util';
+import Header from '@/components/Header/Header';
+
+export default async function AxeScanResults({
+  searchParams,
+}: {
+  searchParams: Promise<{ targetURL: string }>;
+}) {
+  const params = await searchParams;
+  const { targetURL } = params;
+  const results = await runAxeScan(targetURL);
+  if ('error' in results) {
+    return (
+      <div className="flex flex-col min-h-screen p-4 items-center">
+        <h1 className="text-2xl font-bold mb-4">Accessibility Scan Error</h1>
+        <p className="text-red-500">
+          Could not scan {targetURL}: {results.error}
+        </p>
+      </div>
+    );
+  }
+  return (
+    <div className="flex flex-col min-h-screen p-4">
+      <Header />
+      <main className="max-w-3xl ml-9">
+        <h1 className="text-2xl font-bold mb-4">Accessibility scan results</h1>
+        <p className="mb-4">
+          Results for:{' '}
+          <a href={targetURL} className="text-blue-500 hover:underline">
+            {targetURL}
+          </a>
+        </p>
+        <div className="w-full max-w-4xl mt-4">
+          <h2 className="text-xl font-bold">Violations: ({results.violations.length})</h2>
+          {results.violations.length === 0 ? (
+            <p>No violations found. Great job!</p>
+          ) : (
+            <ul className="list-disc pl-5">
+              {results.violations.map((violation) => (
+                <li key={violation.id} className="mt-2">
+                  <strong>{violation.id}</strong> ({violation.impact}): {violation.help}
+                  <p className="text-sm mt-1">{violation.description}</p>
+                  <ul className="list-disc pl-5 mt-1">
+                    {violation.nodes.map((node, index) => (
+                      <li key={`${node.html}-${index}`}>
+                        <p className="font-mono text-sm bg-gray-100 p-1 rounded">{node.html}</p>
+                        <p className="text-xs">{node.failureSummary}</p>
+                      </li>
+                    ))}
+                  </ul>
+                  <a
+                    href={violation.helpUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline text-sm"
+                  >
+                    Learn more
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="w-full max-w-4xl mt-6">
+          <h2 className="text-xl font-bold">Incomplete: ({results.incomplete.length})</h2>
+        </div>
+
+        <div className="w-full max-w-4xl mt-6">
+          <h2 className="text-xl font-bold">Passes: ({results.passes.length})</h2>
+        </div>
+      </main>
+    </div>
+  );
+}
+```
+
+# Databases
+
+## Introduction
+
+This is a guide to the use of databases in Team Spaces.
+
+Team Spaces deployed on CAP can be equipped with PostgreSQL databases. In principle, a Team Space can leverage other database management systems, too, but CAP makes PostgreSQL easier than any other solution, so this guide covers only PostgreSQL.
+
+## Do you need it?
+
+If you want your application to create, modify, and delete data that persist across deployments, then the application needs persistent storage, and a PostgreSQL database can provide that.
+
+## Limitations
+
+CAP protects the databases of deployed applications from access by anything other than those deployments. Thus, your local development server and any preview deployments have no access to the database of your deployed application. Each environment requires its own database.
+
+## Database creation
+
+### Set environment variables
+
+Here are examples of how the database-related environment variables can be defined.
+
+Add to `apps/web/.env.local`:
+
+```bash
+PGHOST=localhost
+PGPORT=5432
+PGDATABASE=spacedb
+PGUSER=localuser
+PGPASSWORD=Unguessable29054
+```
+
+Add to `apps/web/.env.production`:
+
+```bash
+PGHOST=localhost
+PGPORT=5432
+PGDATABASE=space-example-db
+PGDATABASE_PREVIEW=previews-space-example-db
+PGUSER=cap-space-example-123456789@cap-dev-gcp-appidentity.iam
+PGUSER_PREVIEW=cap-previews-123456789@cap-dev-gcp-appidentity.iam
+```
+
+Add to (or create as) `apps/web/instrumentation.ts`:
+
+```typescript
+export async function register() {
+  if (process.env.CAP_APPLICATION === 'previews') {
+    process.env.PGUSER = 'cap-previews-123456789@cap-dev-gcp-appidentity.iam';
+    process.env.PGDATABASE = 'previews-space-example';
+  }
+}
+```
+
+A password is required only for the local database. CAP requires no password, because it allows only services of the associated application to connect to any database.
+
+### Option 1: Independent environments
+
+It is possible to make the databases of different environments completely independent. A straightforward strategy is to equip your application with the ability to create and modify a PostgreSQL database, by making `postgres` a package dependency:
+
+```
+"dependencies": {
+  "postgres": "3.4.7"
+}
+```
+
+That gives your application the ability to use `sql` commands to manipulate a PostgreSQL database:
+
+```typescript
+import postgres from 'postgres';
+const sql = postgres();
+```
+
+Example of using `sql`:
+
+```typescript
+const testCases = await sql`select * from testcases where testplan = 'md'`;
+```
+
+### Option 2: Migration among environments
+
+Alternatively, you can do database development in one environment and migrate the database from that environment to the other two environments so they begin with the same schema and the same data.
+
+If you start by developing the database locally, you can set up your local host to use the `psql` command-line client interface.  Here is an example setup for a MacOS host:
+
+#### Create a user and a database
+
+```bash
+brew install postgresql@18
+psql-18
+postgres=> create user localuser with createdb password 'unguessable';
+postgres=> create database spacedb owner localuser;
+\q
+```
+
+#### Set environment variables
+
+Add to `~/.bash_profile`:
+
+```
+# PostgreSQL
+export PGHOST=localhost
+export PGPORT=5432
+export PGDATABASE=spacedb
+export PGUSER=localuser
+export PGPASSWORD=Unguessable29054
+export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
+```
+
+#### Populate the database
+
+```sql
+psql-18
+spacedb=> create table meds (id serial primary key, generic_name text not null);
+spacedb=> insert into examples (id, generic_name) values (default, 'aspirin');
+\q
+```
+
+#### Dump the database
+
+Create files describing the database schema and data:
+
+```bash
+mkdir apps/web/db-dumps
+pg_dump-18 --if-exists -csOd spacedb -f apps/web/db-dumps/schema.sql
+pg_dump-18 --inserts -aOd spacedb -f apps/web/db-dumps/data.sql
+```
+
+You can find the explanations of the above options in the [PostgreSQL documentation](https://www.postgresql.org/docs/18/app-pgdump.html).
+
+#### Migrate the database
+
+Now the database dump files are in the `apps/web/db-dumps` directory. The application in a preview or deployment environment can repopulate its own database from those files, once that database exists.
+
+The [CAP user interface](https://cap-ui.prod.platform.cvshealth.com/) allows adding a database to any CAP application. You can add one for your application. Every preview of your application is a service of the CAP `previews` application, so the database for your previews must belong to `previews`, which belongs to the `web-core` team. Getting a database for your Team Space added to the `previews` application requires an [XP service request](https://ycc.enterprise.slack.com/archives/C08ECQH6BT7).
+
+Once your two non-local databases exist, your application can populate its database. Here is an example:
+
+```tsx
+import * as fs from 'node:fs/promises';
+import path from 'node:path';
+import postgres from 'postgres';
+const sql = postgres();
+const schema = await fs.readFile(
+  path.join(__dirname, '../../../db-dumps/schema.sql'),
+  'utf8',
+);
+const data = await fs.readFile(
+  path.join(__dirname, '../../../db-dumps/data.sql'),
+  'utf8',
+);
+await sql.unsafe(schema);
+await sql.unsafe(data);
+```
+
+## Database testing
+
+### Mocking
+
+Normally, unit tests that depend on a database mock the database.
+
+To mock the database, create a utility function that makes any `SELECT` statement executed by `sql` return a particular array of rows. The subsequent tests can then check for the behaviors that should occur after an `sql` `SELECT` statement is executed.
+
+Here is a database-mocking function:
+
+```tsx
+import postgres, { type Row, type RowList, type Statement } from 'postgres';
+import { type Mock, vi } from 'vitest';
+
+type MockRowList = Row[] & Omit<RowList<Row[]>, keyof Row[]>;
+type MockedPostgres = typeof postgres & {
+  __setMockSql: (fn: Mock<() => Promise<RowList<Row[]>>>) => void;
+};
+
+/**
+ * Mocks the resolved value of the Promise returned by the sql function.
+ * The argument is an array of row-like objects, i.e. objects with column names of a table as keys.
+ */
+export function mockSqlResolvedValue(value: Record<string, unknown>[]) {
+  const mockStatement = {} as Statement;
+  const result: MockRowList = Object.assign(value, {
+    count: value.length,
+    command: 'SELECT',
+    columns: [],
+    statement: mockStatement,
+    state: 'done',
+  }) as unknown as RowList<Row[]>;
+  (postgres as MockedPostgres).__setMockSql(vi.fn().mockResolvedValue(result));
+}
+```
+
+To make this function intercept any `SELECT` statements in unit tests, add to `apps/web/setupTests.ts`:
+
+```typescript
+import { afterEach, beforeEach, type Mock, vi } from 'vitest';
+import path from 'node:path';
+
+let mockSql = vi.fn();
+vi.mock('postgres', () => {
+  const mockPostgres = () => mockSql;
+  return {
+    default: Object.assign(mockPostgres, {
+      __setMockSql: (fn: Mock) => {
+        mockSql = fn;
+      },
+    }),
+  };
+});
+
+beforeEach(() => {
+  mockSql = vi.fn();
+});
+
+afterEach(() => {
+  mockSql.mockReset();
+});
+```
+
+### Testing
+
+With mocking set up, your unit tests can expect particular results that you define, as in this example:
+
+```tsx
+import { mockSqlResolvedValue } from '@/app/test/util';
+
+describe('Database queries', () => {
+  it('should return the right data', async () => {
+    mockSqlResolvedValue([
+      {
+        id: 'User 1',
+        name: 'User 1',
+        email: 'user1@example.com',
+      },
+      {
+        id: 'User 2',
+        name: 'User 2',
+        email: 'user2@example.com',
+      },
+    ]);
+    render(await ShowUsers());
+    const email1 = screen.getByText('user1@example.com');
+    expect(email1).toBeVisible();
+  });
+});
+```
