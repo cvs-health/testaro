@@ -1,0 +1,28 @@
+{
+  "rule": "linkButtonConfusion",
+  "browserID": "webkit",
+  "device": { "id": "default" },
+  "target": {
+    "url": "file://validation/tests/targets/linkButtonConfusion/index.html"
+  },
+  "acts": [
+    {
+      "type": "launch"
+    },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "stopOnFail": true,
+      "expect": [
+        ["standardResult.totals.2", "=", 3],
+        ["standardResult.instances.0.ruleID", "=", "linkButtonConfusion"],
+        ["standardResult.instances.0.count", "=", 3]
+      ],
+      "rules": ["y", "linkButtonConfusion"],
+      "launch": {}
+    }
+  ],
+  "standard": "only",
+  "timeLimit": 30
+}

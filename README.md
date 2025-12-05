@@ -62,6 +62,24 @@ Some of the tests of Testaro are designed to act as approximate alternatives to 
 
 ## Rules
 
+
+### Custom Rule: skipLinkVisibility
+
+**skipLinkVisibility** detecta deficiencias en la visibilidad de los skip-links (enlaces de salto) en la página. Reporta cuando:
+- Un skip-link nunca es visible, ni siquiera al recibir foco.
+- Un skip-link solo es visible al recibir foco pero no cumple con el tamaño o contraste mínimo recomendado.
+
+Esta regla ayuda a cumplir con los requisitos de accesibilidad de la WCAG relacionados con la navegación por teclado y la visibilidad de los enlaces de salto.
+
+En el archivo de configuración `validation/tests/jobProperties/skipLinkVisibility.json` se encuentra el validador y el test de ejemplo.
+
+Ejemplo de resultado:
+```
+Skip-link 'skip to main content (never visible)' is never visible, even when focused.
+Skip-link 'skip to main content (visible on focus)' is only visible when focused, but does not meet minimum contrast or size.
+```
+
+---
 Each tool accessed with Testaro defines _rules_ and tests _targets_ for compliance with its rules. In total, the eleven tools define more than a thousand rules. The latest tabulation of tool rules, excluding those that have been deprecated by Testilo, is:
 
 ```

@@ -54,7 +54,7 @@ const job = {
   sendReportTo: '',
   target: {
     what: 'page for test validation',
-    url: 'file://validation/tests/targets/adbID/index.html'
+    url: '' // Will be set from jobProperties
   },
   sources: {
     script: 'test',
@@ -78,6 +78,9 @@ exports.validateTest = async testID => {
   job.what = `validate Testaro test ${jobProperties.rule}`;
   job.timeLimit = jobProperties.timeLimit;
   job.acts = jobProperties.acts;
+  if (jobProperties.target && jobProperties.target.url) {
+    job.target.url = jobProperties.target.url;
+  }
   // Perform it.
   report = await doJob(job);
   // Report whether the end time was reported.

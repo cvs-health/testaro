@@ -1,0 +1,26 @@
+{
+  "rule": "skipLinkVisibility",
+  "browserID": "webkit",
+  "device": { "id": "default" },
+  "target": {
+    "url": "file://validation/tests/targets/skipLinkVisibility/index.html"
+  },
+  "acts": [
+    { "type": "launch" },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "stopOnFail": true,
+      "expect": [
+        ["standardResult.totals.2", ">=", 1],
+        ["standardResult.instances.0.ruleID", "=", "skipLinkVisibility"],
+        ["standardResult.instances.0.count", ">=", 1]
+      ],
+      "rules": ["y", "skipLinkVisibility"],
+      "launch": {}
+    }
+  ],
+  "standard": "only",
+  "timeLimit": 30
+}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Skip Link Visibility Test</title>
+  <style>
+    .skip-link-hidden {
+      position: absolute;
+      left: -9999px;
+      top: auto;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+    .skip-link-focusable:focus {
+      position: static;
+      left: auto;
+      width: auto;
+      height: auto;
+      overflow: visible;
+      background: #000;
+      color: #fff;
+      font-size: 16px;
+      padding: 8px 16px;
+      border-radius: 4px;
+      z-index: 1000;
+    }
+    .skip-link-visible {
+      background: #000;
+      color: #fff;
+      font-size: 16px;
+      padding: 8px 16px;
+      border-radius: 4px;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link-hidden">Skip to main content (never visible)</a>
+  <a href="#main" class="skip-link-hidden skip-link-focusable">Skip to main content (visible on focus)</a>
+  <a href="#main" class="skip-link-visible">Skip to main content (always visible)</a>
+  <main id="main">
+    <h1>Main Content</h1>
+    <p>This is the main content area.</p>
+  </main>
+</body>
+</html>
