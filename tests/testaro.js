@@ -98,6 +98,8 @@ const evalRules = {
   linkTitle: 'links with title attributes repeating text content',
   linkTo: 'links without destinations',
   linkUl: 'missing underlines on inline links',
+  linkButtonConfusion: 'links that visually resemble buttons',
+  firstFocusedElement: 'initial focus is not on the first focusable element',
   miniText: 'text smaller than 11 pixels',
   motion: 'motion without user request',
   nonTable: 'table elements used for layout',

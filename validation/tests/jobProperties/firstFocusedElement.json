@@ -1,0 +1,26 @@
+{
+  "rule": "firstFocusedElement",
+  "browserID": "webkit",
+  "device": { "id": "default" },
+  "target": {
+    "url": "file://validation/tests/targets/firstFocusedElement/index.html"
+  },
+  "acts": [
+    { "type": "launch" },
+    {
+      "type": "test",
+      "which": "testaro",
+      "withItems": false,
+      "stopOnFail": true,
+      "expect": [
+        ["standardResult.totals.2", "=", 1],
+        ["standardResult.instances.0.ruleID", "=", "firstFocusedElement"],
+        ["standardResult.instances.0.count", "=", 1]
+      ],
+      "rules": ["y", "firstFocusedElement"],
+      "launch": {}
+    }
+  ],
+  "standard": "only",
+  "timeLimit": 30
+}
