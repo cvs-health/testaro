@@ -101,7 +101,7 @@ exports.dirWatch = async (isForever, intervalInSeconds) => {
   intervalInSeconds = Math.max(intervalInSeconds, 5);
   console.log(`Starting to watch directory ${jobDir}/todo for jobs`);
   let notYetRun = true;
-  // As long as watching as to continue:
+  // As long as watching is to continue:
   while (isForever || notYetRun) {
     try {
       // If there are any jobs in the watched directory:

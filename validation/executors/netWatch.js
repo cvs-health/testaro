@@ -23,7 +23,7 @@
 */
 
 /*
-  watchNet.js
+  netWatch.js
   Validator for network watching.
 */
 

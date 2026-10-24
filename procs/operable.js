@@ -24,7 +24,7 @@
 
 /*
   operable
-  Returns whether the element of a locator is operable., i.e. it has a non-inherited pointer cursor
+  Returns whether the element of a locator is operable, i.e. it has a non-inherited pointer cursor
   and is not a 'LABEL' element, has an operable tag name, has an interactive explicit role, or has
   an 'onclick' attribute. The isOperable function modifies the page.
 */
